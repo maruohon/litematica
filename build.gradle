@@ -1,0 +1,124 @@
+
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
+        }
+    }
+
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'org.spongepowered.mixin'
+
+ext.configFile = file "build.properties"
+
+configFile.withReader {
+    def prop = new Properties()
+    prop.load(it)
+    project.ext.config = new ConfigSlurper().parse prop
+}
+
+minecraft {
+    version = config.minecraft_version
+    mappings = config.mappings_version
+    runDir = 'minecraft'
+    makeObfSourceJar = false
+
+    ext.mod_version = config.mod_version
+
+    if (mod_version.endsWith('-dev')) {
+        mod_version = mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
+    }
+
+    replaceIn "Reference.java"
+    replace "@MOD_VERSION@", mod_version
+}
+
+sourceSets {
+    main {
+        ext.refMap = 'mixins.' + config.mod_id + '.refmap.json'
+    }
+}
+
+group = config.group + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = config.mod_id + '-' + config.minecraft_version_out
+version = project.minecraft.mod_version
+
+/**
+ * This section allows you to customise the generated litemod.json file
+ */
+litemod {
+    json {
+        name = config.mod_id
+        displayName = config.mod_name
+        mcversion = config.minecraft_version
+        version = config.mod_version
+        author = config.author
+
+        // Uncomment any of the following lines and fill in your own details as required
+        //dependsOn = [ 'modid', 'othermod' ]
+        //requiredAPIs = [ 'someapi' ]
+        //tweakClass = 'name.of.tweaker.here'
+        mixinConfigs = [ 'mixins.' + config.mod_id + '.json' ]
+    }
+}
+
+/**
+ * This section allows you to customise your generated jar (litemod) file. By
+ * default it includes the generated litemod.json file, however if you prefer to
+ * include your own file from resources, simply remove the line below.
+ */
+jar {
+    // Remove the "-mc1.12" suffix from the file name
+    classifier = ""
+    // Don't append a 'mod-' filename prefix >_>
+    baseName = archivesBaseName
+
+    from litemod.outputs
+
+    /*
+    manifest.mainAttributes (
+        'Built-By': System.properties['user.name'],
+        'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+        'Implementation-Title': config.mod_id,
+        'Implementation-Version': project.version
+    )
+    */
+}
+
+mixin {
+    defaultObfuscationEnv notch
+}
+
+//tasks.withType(Jar)*.baseName = archivesBaseName
+
+processResources
+{
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "mod_version", project.minecraft.mod_version
+    inputs.property "minecraft_version", project.config.minecraft_version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'mod_version': project.minecraft.mod_version, 'minecraft_version': project.config.minecraft_version
+    }
+      
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}

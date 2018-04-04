@@ -1,0 +1,16 @@
+[
+    {
+        "modid": "litematica",
+        "name": "Litematica",
+        "description": "A re-creation of/substitute for Schematica for Liteloader",
+        "version": "${mod_version}",
+        "mcversion": "${minecraft_version}",
+        "url": "http://minecraft.curseforge.com/projects/litematica",
+        "updateUrl": "",
+        "authorList": ["masa"],
+        "credits": "",
+        "logoFile": "",
+        "screenshots": [],
+        "dependencies": []
+    }
+]

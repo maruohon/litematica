@@ -1,0 +1,28 @@
+# text stuff
+* text=auto
+*.bat text eol=crlf
+*.groovy text eol=lf
+*.java text eol=crlf
+*.md text
+*.properties text eol=lf
+*.scala text eol=lf
+*.sh text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+build.gradle text eol=lf
+gradlew text eol=lf
+gradle/wrapper/gradle-wrapper.properties text eol=crlf
+COPYING.txt text eol=lf
+COPYING.LESSER.txt text eol=lf
+README.md text eol=lf
+
+#binary
+*.dat binary
+*.bin binary
+*.png binary
+*.exe binary
+*.dll binary
+*.zip binary
+*.jar binary
+*.7z binary
+*.db binary
