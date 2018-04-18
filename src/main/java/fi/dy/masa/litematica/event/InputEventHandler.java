@@ -1,8 +1,10 @@
 package fi.dy.masa.litematica.event;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import org.lwjgl.input.Keyboard;
+import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.util.Selection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -104,6 +106,24 @@ public class InputEventHandler
                                 new TextComponentString(String.format("Set pos2 to x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ())));
                     }
                 }
+                else if (eventKey == Keyboard.KEY_3)
+                {
+                    File file = new File(new File(this.mc.mcDataDir, "schematics"), "test.schematic");
+                    SchematicaSchematic schematic = SchematicaSchematic.createFromFile(file);
+                    RenderEventHandler.getInstance().setSchematic(schematic);
+
+                    if (schematic != null)
+                    {
+                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        selection.setPos1(pos);
+                        selection.setPos2(pos.add(schematic.getSize()).add(-1, -1, -1));
+                        BlockPos s = schematic.getSize();
+                        this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO,
+                                new TextComponentString(String.format("Schematic loaded, size: %d x %d x %d", s.getX(), s.getY(), s.getZ())));
+                    }
+                }
+
+                return true;
             }
 
             // Somewhat hacky fix to prevent eating the modifier keys... >_>

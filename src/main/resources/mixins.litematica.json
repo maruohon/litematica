@@ -4,6 +4,7 @@
     "refmap": "mixins.litematica.refmap.json",
     "minVersion": "0.6",
     "client": [
+        "MixinBufferBuilder",
         "MixinEntityRenderer",
         "MixinMinecraft"
     ],
