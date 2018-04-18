@@ -4,7 +4,8 @@
     "refmap": "mixins.litematica.refmap.json",
     "minVersion": "0.6",
     "client": [
-        
+        "MixinEntityRenderer",
+        "MixinMinecraft"
     ],
     "injectors": {
         "defaultRequire": 1

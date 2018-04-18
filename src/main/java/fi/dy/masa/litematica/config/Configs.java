@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.event.InputEventHandler;
 import fi.dy.masa.litematica.util.JsonUtils;
 
 public class Configs
@@ -66,7 +67,7 @@ public class Configs
             }
         }
 
-        //InputEventHandler.getInstance().updateUsedKeys();
+        InputEventHandler.getInstance().updateUsedKeys();
     }
 
     public static void save()
