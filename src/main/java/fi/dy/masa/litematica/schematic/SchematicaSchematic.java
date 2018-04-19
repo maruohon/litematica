@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.schematic;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,7 +33,7 @@ public class SchematicaSchematic
     private IBlockState[] palette;
     private Map<BlockPos, NBTTagCompound> tiles = new HashMap<>();
     private List<NBTTagCompound> entities = new ArrayList<>();
-    private String fileName;
+    private File file;
 
     private SchematicaSchematic()
     {
@@ -43,6 +42,11 @@ public class SchematicaSchematic
     public BlockPos getSize()
     {
         return this.size;
+    }
+
+    public File getFile()
+    {
+        return this.file;
     }
 
     public IBlockState[] getBlocks()
@@ -209,6 +213,7 @@ public class SchematicaSchematic
         return null;
     }
 
+    @SuppressWarnings("deprecation")
     public boolean readFromNBT(NBTTagCompound nbt)
     {
         // This method was implemented based on
@@ -221,27 +226,27 @@ public class SchematicaSchematic
             int height = nbt.getShort("Height");
             int length = nbt.getShort("Length");
             byte[] blockIdsByte = nbt.getByteArray("Blocks");
-            byte[] meta = nbt.getByteArray("Data");
+            byte[] metaArr = nbt.getByteArray("Data");
             final int numBlocks = blockIdsByte.length;
 
             this.size = new BlockPos(width, height, length);
 
             if (numBlocks != (width * height * length))
             {
-                LiteModLitematica.logger.error("Schematic: Mismatched block array size compared to the width/height/length, blocks: {}, W x H x L: {} x {} x {}",
+                LiteModLitematica.logger.error("SchematicaSchematic: Mismatched block array size compared to the width/height/length, blocks: {}, W x H x L: {} x {} x {}",
                         numBlocks, width, height, length);
                 return false;
             }
 
-            if (numBlocks != meta.length)
+            if (numBlocks != metaArr.length)
             {
-                LiteModLitematica.logger.error("Schematic: Mismatched block ID and metadata array sizes, blocks: {}, meta: {}", numBlocks, meta.length);
+                LiteModLitematica.logger.error("SchematicaSchematic: Mismatched block ID and metadata array sizes, blocks: {}, meta: {}", numBlocks, metaArr.length);
                 return false;
             }
 
             if (this.readPalette(nbt) == false)
             {
-                LiteModLitematica.logger.error("Schematic: Failed to read the block palette");
+                LiteModLitematica.logger.error("SchematicaSchematic: Failed to read the block palette");
                 return false;
             }
 
@@ -253,7 +258,7 @@ public class SchematicaSchematic
 
                 if (add.length != (blockIdsByte.length / 2))
                 {
-                    LiteModLitematica.logger.error("Schematic: Add array size mismatch, blocks: {}, add: {}, expected add: {}",
+                    LiteModLitematica.logger.error("SchematicaSchematic: Add array size mismatch, blocks: {}, add: {}, expected add: {}",
                             numBlocks, add.length, numBlocks / 2);
                     return false;
                 }
@@ -274,28 +279,39 @@ public class SchematicaSchematic
                 for (int bi = 0, ai = 0; bi < loopMax; bi += 2, ai++)
                 {
                     byte addValue = add[ai];
-                    this.blocks[bi    ] = this.palette[((addValue & 0xF0) << 4) | (((int) blockIdsByte[bi]) & 0xFF)];
-                    this.blocks[bi + 1] = this.palette[((addValue & 0x0F) << 8) | (((int) blockIdsByte[bi]) & 0xFF)];
+                    IBlockState state;
+                    state = this.palette[((addValue & 0xF0) << 4) | (((int) blockIdsByte[bi]) & 0xFF)];
+                    state = state.getBlock().getStateFromMeta(metaArr[bi]);
+                    this.blocks[bi    ] = state;
+
+                    state = this.palette[((addValue & 0x0F) << 8) | (((int) blockIdsByte[bi]) & 0xFF)];
+                    state = state.getBlock().getStateFromMeta(metaArr[bi + 1]);
+                    this.blocks[bi + 1] = state;
                 }
 
                 // Odd number of blocks, handle the last position
                 if ((numBlocks % 2) != 0)
                 {
-                    this.blocks[numBlocks - 1] = this.palette[((add[numBlocks / 2] & 0xF0) << 4) | (((int) blockIdsByte[numBlocks - 1]) & 0xFF)];
+                    IBlockState state;
+                    state = this.palette[((add[numBlocks / 2] & 0xF0) << 4) | (((int) blockIdsByte[numBlocks - 1]) & 0xFF)];
+                    state = state.getBlock().getStateFromMeta(metaArr[numBlocks - 1]);
+                    this.blocks[numBlocks - 1] = state;
                 }
             }
             // Old Schematica format
             else if (nbt.hasKey("Add", Constants.NBT.TAG_BYTE_ARRAY))
             {
                 // FIXME is this array 4 or 8 bits per block?
-                LiteModLitematica.logger.error("Schematic: Old Schematica format detected, not currently implemented...");
+                LiteModLitematica.logger.error("SchematicaSchematic: Old Schematica format detected, not currently implemented...");
                 return false;
             }
             else
             {
                 for (int i = 0; i < numBlocks; i++)
                 {
-                    this.blocks[i] = this.palette[((int) blockIdsByte[i]) & 0xFF];
+                    IBlockState state = this.palette[((int) blockIdsByte[i]) & 0xFF];
+                    state = state.getBlock().getStateFromMeta(metaArr[i]);
+                    this.blocks[i] = state;
                 }
             }
 
@@ -306,7 +322,7 @@ public class SchematicaSchematic
         }
         else
         {
-            LiteModLitematica.logger.error("Schematic: Missing block data in the schematic '{}'", this.fileName);
+            LiteModLitematica.logger.error("SchematicaSchematic: Missing block data in the schematic '{}'", this.file.getAbsolutePath());
         }
 
         return false;
@@ -330,7 +346,7 @@ public class SchematicaSchematic
 
                 if (id >= this.palette.length)
                 {
-                    LiteModLitematica.logger.error("Schematic: Invalid ID '{}' in SchematicaMapping for block '{}', max = 4095", id, key);
+                    LiteModLitematica.logger.error("SchematicaSchematic: Invalid ID '{}' in SchematicaMapping for block '{}', max = 4095", id, key);
                     return false;
                 }
 
@@ -342,7 +358,7 @@ public class SchematicaSchematic
                 }
                 else
                 {
-                    LiteModLitematica.logger.error("Schematic: Missing/non-existing block '{}' in SchematicaMapping", key);
+                    LiteModLitematica.logger.error("SchematicaSchematic: Missing/non-existing block '{}' in SchematicaMapping", key);
                 }
             }
         }
@@ -363,13 +379,13 @@ public class SchematicaSchematic
                 }
                 catch (NumberFormatException e)
                 {
-                    LiteModLitematica.logger.error("Schematic: Invalid ID '{}' (not a number) in MCEdit2 palette for block '{}'", idStr, key);
+                    LiteModLitematica.logger.error("SchematicaSchematic: Invalid ID '{}' (not a number) in MCEdit2 palette for block '{}'", idStr, key);
                     continue;
                 }
 
                 if (id >= this.palette.length)
                 {
-                    LiteModLitematica.logger.error("Schematic: Invalid ID '{}' in MCEdit2 palette for block '{}', max = 4095", id, key);
+                    LiteModLitematica.logger.error("SchematicaSchematic: Invalid ID '{}' in MCEdit2 palette for block '{}', max = 4095", id, key);
                     return false;
                 }
 
@@ -381,7 +397,7 @@ public class SchematicaSchematic
                 }
                 else
                 {
-                    LiteModLitematica.logger.error("Schematic: Missing/non-existing block '{}' in MCEdit2 palette", key);
+                    LiteModLitematica.logger.error("SchematicaSchematic: Missing/non-existing block '{}' in MCEdit2 palette", key);
                 }
             }
         }
@@ -402,7 +418,7 @@ public class SchematicaSchematic
                     }
                     else
                     {
-                        LiteModLitematica.logger.error("Schematic: Invalid ID {} for block '{}' from the registry", id, key);
+                        LiteModLitematica.logger.error("SchematicaSchematic: Invalid ID {} for block '{}' from the registry", id, key);
                     }
                 }
             }
@@ -453,7 +469,7 @@ public class SchematicaSchematic
     {
         if (file.exists() && file.isFile() && file.canRead())
         {
-            this.fileName = file.getName();
+            this.file = file;
 
             try
             {
@@ -463,9 +479,9 @@ public class SchematicaSchematic
 
                 return this.readFromNBT(nbt);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
-                LiteModLitematica.logger.error("Schematic: Failed to read Schematic data from file '{}'", file.getAbsolutePath());
+                LiteModLitematica.logger.error("SchematicaSchematic: Failed to read Schematic data from file '{}'", file.getAbsolutePath());
             }
         }
 
