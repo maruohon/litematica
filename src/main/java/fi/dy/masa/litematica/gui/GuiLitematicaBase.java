@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.config.gui.button.ButtonBase;
 import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.text.TextFormatting;
@@ -27,6 +28,7 @@ public abstract class GuiLitematicaBase extends GuiScreen
     protected static final int TOP          = 10;
     private final GuiSimpleScrollBar scrollBar = new GuiSimpleScrollBar();
     private final List<ButtonEntry<?>> buttons = new ArrayList<>();
+    private final List<GuiLabel> labels = new ArrayList<>();
     private int totalHeight = -1;
 
     public GuiLitematicaBase()
@@ -141,7 +143,21 @@ public abstract class GuiLitematicaBase extends GuiScreen
     protected <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
     {
         this.buttons.add(new ButtonEntry<>(button, listener));
-        //this.addButton(button);
+    }
+
+    protected void addLabel(int id, int x, int y, int width, int height, int colour, String... lines)
+    {
+        if (lines != null && lines.length >= 1)
+        {
+            GuiLabel label = new GuiLabel(this.mc.fontRenderer, id, x, y, width, height, colour);
+
+            for (String line : lines)
+            {
+                label.addLine(line);
+            }
+
+            this.labels.add(label);
+        }
     }
 
     protected void clearButtons()
@@ -191,6 +207,14 @@ public abstract class GuiLitematicaBase extends GuiScreen
         }
     }
 
+    protected void drawLabels(int mouseX, int mouseY, float partialTicks)
+    {
+        for (GuiLabel label : this.labels)
+        {
+            label.drawLabel(this.mc, mouseX, mouseY);
+        }
+    }
+
     /**
      * Draw the panel and chrome
      * 
@@ -220,6 +244,7 @@ public abstract class GuiLitematicaBase extends GuiScreen
         // Draw panel contents
         //this.mainPanel.drawPanel(this.host, mouseX - MARGIN - (this.mouseOverPanel(mouseX, mouseY) ? 0 : 99999), mouseY - this.innerTop, partialTicks);
         //this.drawButtons(mouseX - MARGIN - (this.mouseOverPanel(mouseX, mouseY) ? 0 : 99999), mouseY - this.innerTop, partialTicks);
+        this.drawLabels(mouseX, mouseY, partialTicks);
         this.drawButtons(mouseX, mouseY, partialTicks);
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 

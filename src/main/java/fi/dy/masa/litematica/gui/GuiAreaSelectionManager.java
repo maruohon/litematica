@@ -6,23 +6,25 @@ import java.util.List;
 import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
+import fi.dy.masa.litematica.schematic.AreaSelection;
 import fi.dy.masa.litematica.util.DataManager;
+import fi.dy.masa.litematica.util.AreaSelectionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 
-public class GuiSelectionManager extends GuiLitematicaBase
+public class GuiAreaSelectionManager extends GuiLitematicaBase
 {
     private final List<String> selectionNames = new ArrayList<>();
-    private DataManager dataManager;
+    private AreaSelectionManager selectionManager;
 
-    public GuiSelectionManager()
+    public GuiAreaSelectionManager()
     {
         Minecraft mc = Minecraft.getMinecraft();
 
         if (mc.world != null)
         {
-            this.dataManager = DataManager.getInstance(mc.world);
+            this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
         }
     }
 
@@ -50,9 +52,9 @@ public class GuiSelectionManager extends GuiLitematicaBase
     {
         this.selectionNames.clear();
 
-        if (this.dataManager != null)
+        if (this.selectionManager != null)
         {
-            this.selectionNames.addAll(this.dataManager.getAllSelectionNames());
+            this.selectionNames.addAll(this.selectionManager.getAllAreaSelectionNames());
             Collections.sort(this.selectionNames);
         }
     }
@@ -62,7 +64,7 @@ public class GuiSelectionManager extends GuiLitematicaBase
         this.clearButtons();
         this.updateNames();
 
-        if (this.dataManager == null)
+        if (this.selectionManager == null)
         {
             return;
         }
@@ -72,7 +74,7 @@ public class GuiSelectionManager extends GuiLitematicaBase
         int y = TOP + 20;
         int nameWidth = 300;
         int id = 0;
-        String currentName = this.dataManager.getCurrentSelectionName();
+        String currentName = this.selectionManager.getCurrentAreaSelectionName();
         ButtonGeneric button;
         ButtonListener listener;
         String labelRename = I18n.format("litematica.gui.button.rename");
@@ -96,6 +98,11 @@ public class GuiSelectionManager extends GuiLitematicaBase
             listener = this.createActionListener(ButtonListener.Type.REMOVE, name);
             this.addButton(button, listener);
 
+            AreaSelection selection = this.selectionManager.getAreaSelection(name);
+            int count = selection != null ? selection.getAllSelectionsBoxes().size() : 0;
+            label = I18n.format("litematica.gui.label.area_selection_box_count", count);
+            int w = this.fontRenderer.getStringWidth(label);
+            this.addLabel(id++, x + 28, y, w, 20, WHITE, label);
             y += button.getButtonHeight() + 2;
         }
 
@@ -106,21 +113,21 @@ public class GuiSelectionManager extends GuiLitematicaBase
 
     private ButtonListener createActionListener(ButtonListener.Type type, String name)
     {
-        return new ButtonListener(type, name, this.dataManager, this);
+        return new ButtonListener(type, name, this.selectionManager, this);
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
-        private final GuiSelectionManager gui;
-        private final DataManager dataManager;
+        private final GuiAreaSelectionManager gui;
+        private final AreaSelectionManager selectionManager;
         private final Type type;
         private final String name;
 
-        public ButtonListener(Type type, String name, DataManager dataManager, GuiSelectionManager gui)
+        public ButtonListener(Type type, String name, AreaSelectionManager selectionManager, GuiAreaSelectionManager gui)
         {
             this.type = type;
             this.name = name;
-            this.dataManager = dataManager;
+            this.selectionManager = selectionManager;
             this.gui = gui;
         }
 
@@ -129,31 +136,31 @@ public class GuiSelectionManager extends GuiLitematicaBase
         {
             if (this.type == Type.SELECT)
             {
-                this.dataManager.setCurrentSelection(this.name);
+                this.selectionManager.setCurrentAreaSelection(this.name);
                 this.gui.updateEntries();
             }
             else if (this.type == Type.ADD)
             {
-                this.dataManager.createNewSelection();
+                this.selectionManager.createNewAreaSelection();
                 this.gui.updateEntries();
             }
             else if (this.type == Type.REMOVE)
             {
-                this.dataManager.removeSelection(this.name);
+                this.selectionManager.removeAreaSelection(this.name);
                 this.gui.updateEntries();
 
                 int size = this.gui.selectionNames.size();
 
-                if (size > 0 && this.name.equals(this.dataManager.getCurrentSelectionName()))
+                if (size > 0 && this.name.equals(this.selectionManager.getCurrentAreaSelectionName()))
                 {
-                    this.dataManager.setCurrentSelection(this.gui.selectionNames.get(size - 1));
+                    this.selectionManager.setCurrentAreaSelection(this.gui.selectionNames.get(size - 1));
                     this.gui.updateEntries();
                 }
             }
             else if (this.type == Type.RENAME)
             {
                 String title = I18n.format("litematica.gui.title.rename_area_selection");
-                SelectionRenamer renamer = new SelectionRenamer(this.dataManager, this.name);
+                SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.name);
                 this.gui.mc.displayGuiScreen(new GuiTextInput(160, title, this.name, this.gui, renamer));
             }
         }
@@ -175,19 +182,19 @@ public class GuiSelectionManager extends GuiLitematicaBase
 
     private static class SelectionRenamer implements IStringConsumer
     {
-        private final DataManager dataManager;
+        private final AreaSelectionManager selectionManager;
         private final String oldName;
 
-        public SelectionRenamer(DataManager dataManager, String oldName)
+        public SelectionRenamer(AreaSelectionManager selectionManager, String oldName)
         {
-            this.dataManager = dataManager;
+            this.selectionManager = selectionManager;
             this.oldName = oldName;
         }
 
         @Override
         public void setString(String string)
         {
-            this.dataManager.renameSelection(this.oldName, string);
+            this.selectionManager.renameAreaSelection(this.oldName, string);
         }
     }
 }

@@ -2,15 +2,20 @@ package fi.dy.masa.litematica.util;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.mumfrey.liteloader.core.LiteLoader;
+import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.schematic.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.SchematicSelection;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
@@ -19,12 +24,11 @@ public class DataManager
 {
     private static final Int2ObjectOpenHashMap<DataManager> INSTANCES = new Int2ObjectOpenHashMap<>();
 
+    private final AreaSelectionManager selectionManager = new AreaSelectionManager();
     private final List<SchematicPlacement> loadedSchematics = new ArrayList<>();
-    private final Map<String, SchematicSelection> selections = new HashMap<>();
     private final Minecraft mc;
     private File lastSchematicDirectory; // TODO use a custom class with split directories?
     private String currentWorld = "default";
-    private String currentSelection = "Unnamed 1";
 
     private DataManager()
     {
@@ -35,6 +39,11 @@ public class DataManager
     public static DataManager getInstance(World world)
     {
         final int dimension = world.provider.getDimensionType().getId();
+        return getInstance(dimension);
+    }
+
+    public static DataManager getInstance(int dimension)
+    {
         DataManager instance = INSTANCES.get(dimension);
 
         if (instance == null)
@@ -44,6 +53,11 @@ public class DataManager
         }
 
         return instance;
+    }
+
+    public AreaSelectionManager getSelectionManager()
+    {
+        return this.selectionManager;
     }
 
     public File getSchematicDirectory()
@@ -88,87 +102,112 @@ public class DataManager
         }
     }
 
-    /**
-     * Creates a new schematic selection and returns the name of it
-     * @return
-     */
-    public String createNewSelection()
+    public static void load()
     {
-        String name = "Unnamed ";
-        int i = 1;
+        File file = getCurrentStorageFile();
+        JsonElement element = JsonUtils.parseJsonFile(file);
 
-        while (this.selections.containsKey(name + i))
+        if (element != null && element.isJsonObject())
         {
-            i++;
-        }
+            JsonObject root = element.getAsJsonObject();
 
-        this.selections.put(name + i, new SchematicSelection());
-        this.currentSelection = name + i;
-
-        return this.currentSelection;
-    }
-
-    @Nullable
-    public SchematicSelection getSelection(String name)
-    {
-        return this.selections.get(name);
-    }
-
-    public boolean removeSelection(String name)
-    {
-        return this.selections.remove(name) != null;
-    }
-
-    public boolean renameSelection(String oldName, String newName)
-    {
-        SchematicSelection selection = this.selections.remove(oldName);
-
-        if (selection != null)
-        {
-            selection.setName(newName);
-            this.selections.put(newName, selection);
-
-            if (this.currentSelection.equals(oldName))
+            if (JsonUtils.hasArray(root, "data"))
             {
-                this.currentSelection = newName;
+                JsonArray arr = root.get("data").getAsJsonArray();
+                final int size = arr.size();
+
+                for (int i = 0; i < size; i++)
+                {
+                    JsonElement el = arr.get(i);
+
+                    if (el.isJsonObject())
+                    {
+                        JsonObject obj = el.getAsJsonObject();
+
+                        if (JsonUtils.hasInteger(obj, "dim") && JsonUtils.hasObject(obj, "data"))
+                        {
+                            DataManager manager = getInstance(obj.get("dim").getAsInt());
+                            manager.fromJson(obj.get("data").getAsJsonObject());
+                        }
+                    }
+                }
             }
-
-            return true;
         }
-
-        return false;
     }
 
-    public Collection<String> getAllSelectionNames()
+    // TODO Call this from something like world exit/save
+    public static void save()
     {
-        return this.selections.keySet();
-    }
+        JsonObject root = new JsonObject();
+        JsonArray arr = new JsonArray();
 
-    public Collection<SchematicSelection> getAllSelections()
-    {
-        return this.selections.values();
-    }
-
-    public String getCurrentSelectionName()
-    {
-        return this.currentSelection;
-    }
-
-    public void setCurrentSelection(String name)
-    {
-        if (this.selections.containsKey(name))
+        for (Map.Entry<Integer, DataManager> entry : INSTANCES.entrySet())
         {
-            this.currentSelection = name;
+            JsonObject o = new JsonObject();
+            o.add("dim", new JsonPrimitive(entry.getKey()));
+            o.add("data", entry.getValue().toJson());
+            arr.add(o);
+        }
+
+        if (arr.size() > 0)
+        {
+            root.add("data", arr);
+        }
+
+        File file = getCurrentStorageFile();
+        JsonUtils.writeJsonToFile(root, file);
+    }
+
+    private void fromJson(JsonObject obj)
+    {
+        if (JsonUtils.hasObject(obj, "selections"))
+        {
+            this.selectionManager.loadFromJson(obj.get("selections").getAsJsonObject());
         }
     }
 
-    public void load()
+    private JsonObject toJson()
     {
-        
+        JsonObject obj = new JsonObject();
+
+        obj.add("selections", this.selectionManager.toJson());
+
+        return obj;
     }
 
-    public void save()
+    private static File getCurrentStorageFile()
     {
-        
+        File dir = new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+
+        if (dir.exists() == false && dir.mkdirs() == false)
+        {
+            LiteModLitematica.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
+        }
+
+        return new File(dir, getStorageFileName());
+    }
+
+    private static String getStorageFileName()
+    {
+        if (Minecraft.getMinecraft().isSingleplayer())
+        {
+            IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
+
+            if (server != null)
+            {
+                return Reference.MOD_ID + "_" + server.getFolderName() + ".json";
+            }
+        }
+        else
+        {
+            ServerData server = Minecraft.getMinecraft().getCurrentServerData();
+
+            if (server != null)
+            {
+                return Reference.MOD_ID + "_" + server.serverIP.replace(':', '_') + ".json";
+            }
+        }
+
+        return Reference.MOD_ID + "_default.json";
     }
 }

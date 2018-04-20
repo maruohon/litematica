@@ -1,6 +1,10 @@
 package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -78,5 +82,78 @@ public class SelectionBox
         {
             this.size = new BlockPos(1, 1, 1);
         }
+    }
+
+    @Nullable
+    public static SelectionBox fromJson(JsonObject obj)
+    {
+        SelectionBox box = new SelectionBox();
+
+        if (JsonUtils.hasArray(obj, "pos1"))
+        {
+            JsonArray arr = obj.get("pos1").getAsJsonArray();
+            box.setPos1(blockPosFromJson(arr));
+        }
+
+        if (JsonUtils.hasArray(obj, "pos2"))
+        {
+            JsonArray arr = obj.get("pos2").getAsJsonArray();
+            box.setPos2(blockPosFromJson(arr));
+        }
+
+        if (JsonUtils.hasString(obj, "name"))
+        {
+            box.setName(obj.get("name").getAsString());
+        }
+
+        return (box.getPos1() != null || box.getPos2() != null) ? box : null;
+    }
+
+    @Nullable
+    public JsonObject toJson()
+    {
+        JsonObject obj = new JsonObject();
+
+        if (this.pos1 != null)
+        {
+            obj.add("pos1", blockPosToJson(this.pos1));
+        }
+
+        if (this.pos2 != null)
+        {
+            obj.add("pos2", blockPosToJson(this.pos2));
+        }
+
+        obj.add("name", new JsonPrimitive(this.name));
+
+        return this.pos1 != null || this.pos2 != null ? obj : null;
+    }
+
+    public static JsonArray blockPosToJson(BlockPos pos)
+    {
+        JsonArray arr = new JsonArray();
+
+        arr.add(pos.getX());
+        arr.add(pos.getY());
+        arr.add(pos.getZ());
+
+        return arr;
+    }
+
+    @Nullable
+    public static BlockPos blockPosFromJson(JsonArray arr)
+    {
+        if (arr.size() == 3)
+        {
+            try
+            {
+                return new BlockPos(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        return null;
     }
 }

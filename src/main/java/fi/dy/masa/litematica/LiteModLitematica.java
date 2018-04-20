@@ -14,6 +14,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.KeyCallbacks;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
 import fi.dy.masa.litematica.event.InputEventHandler;
+import fi.dy.masa.litematica.util.DataManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.INetHandler;
@@ -56,6 +57,7 @@ public class LiteModLitematica implements LiteMod, Configurable, JoinGameListene
     @Override
     public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
+        DataManager.load();
     }
 
     @Override
@@ -68,5 +70,6 @@ public class LiteModLitematica implements LiteMod, Configurable, JoinGameListene
     public void onShutDown()
     {
         Configs.save();
+        DataManager.save();
     }
 }

@@ -9,7 +9,8 @@ import net.minecraft.entity.Entity;
 public class RenderEventHandler
 {
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
-    private boolean enabled;
+    private boolean allRenderingEnabled;
+    private boolean selectionRenderingEnabled;
     private SchematicaSchematic schematic;
 
     public static RenderEventHandler getInstance()
@@ -19,17 +20,24 @@ public class RenderEventHandler
 
     public void setEnabled(boolean enabled)
     {
-        this.enabled = enabled;
+        this.allRenderingEnabled = enabled;
     }
 
-    public void toggleEnabled()
+    public boolean toggleAllRenderingEnabled()
     {
-        this.enabled = ! this.enabled;
+        this.allRenderingEnabled = ! this.allRenderingEnabled;
+        return this.allRenderingEnabled;
+    }
+
+    public boolean toggleSelectionBoxesRenderingEnabled()
+    {
+        this.selectionRenderingEnabled = ! this.selectionRenderingEnabled;
+        return this.selectionRenderingEnabled;
     }
 
     public boolean isEnabled()
     {
-        return this.enabled;
+        return this.allRenderingEnabled;
     }
 
     public void setSchematic(SchematicaSchematic schematic)
@@ -41,10 +49,9 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.enabled && mc.player != null)
+        if (this.allRenderingEnabled && mc.player != null)
         {
-            // FIXME testing
-            OverlayRenderer.getInstance().renderSelectionBox(InputEventHandler.selection.getPos1(), InputEventHandler.selection.getPos2());
+            OverlayRenderer.getInstance().renderSelectionAreas();
 
             // FIXME testing
             if (this.schematic != null && InputEventHandler.selection.getPos1() != null)
@@ -59,7 +66,7 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.enabled &&
+        if (this.allRenderingEnabled &&
             mc.gameSettings.showDebugInfo == false &&
             mc.player != null
             // &&

@@ -1,12 +1,9 @@
 package fi.dy.masa.litematica.config;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mumfrey.liteloader.core.LiteLoader;
-import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.event.InputEventHandler;
 import fi.dy.masa.litematica.util.JsonUtils;
@@ -77,7 +74,6 @@ public class Configs
         if (dir.exists() && dir.isDirectory())
         {
             File configFile = new File(dir, CONFIG_FILE_NAME);
-            FileWriter writer = null;
             JsonObject root = new JsonObject();
             /*
             JsonObject objGenericHotkeys    = JsonUtils.getNestedObject(root, "GenericHotkeys", true);
@@ -100,30 +96,7 @@ public class Configs
             }
             */
 
-            try
-            {
-                writer = new FileWriter(configFile);
-                writer.write(JsonUtils.GSON.toJson(root));
-                writer.close();
-            }
-            catch (IOException e)
-            {
-                LiteModLitematica.logger.warn("Failed to write configs to file '{}'", configFile.getAbsolutePath(), e);
-            }
-            finally
-            {
-                try
-                {
-                    if (writer != null)
-                    {
-                        writer.close();
-                    }
-                }
-                catch (Exception e)
-                {
-                    LiteModLitematica.logger.warn("Failed to close config file", e);
-                }
-            }
+            JsonUtils.writeJsonToFile(root, configFile);
         }
     }
 }

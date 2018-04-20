@@ -71,7 +71,7 @@ public class InputEventHandler
             {
                 if (eventKey == Keyboard.KEY_0)
                 {
-                    RenderEventHandler.getInstance().toggleEnabled();
+                    RenderEventHandler.getInstance().toggleAllRenderingEnabled();
                     String str = RenderEventHandler.getInstance().isEnabled() ? TextFormatting.GREEN + "enabled" : TextFormatting.RED + "disabled";
                     this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentString("Rendering " + str));
                 }
