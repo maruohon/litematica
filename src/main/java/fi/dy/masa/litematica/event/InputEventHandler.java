@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
-import fi.dy.masa.litematica.util.Selection;
+import fi.dy.masa.litematica.schematic.SelectionBox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +21,7 @@ public class InputEventHandler
     private final Set<Integer> genericHotkeysUsedKeys = new HashSet<>();
     private final Set<Integer> modifierKeys = new HashSet<>();
     private final Minecraft mc;
-    public static Selection selection = new Selection(); // FIXME testing stuff
+    public static SelectionBox selection = new SelectionBox(); // FIXME testing stuff
 
     private InputEventHandler()
     {
@@ -41,12 +43,10 @@ public class InputEventHandler
     {
         this.genericHotkeysUsedKeys.clear();
 
-        /*
         for (Hotkeys hotkey : Hotkeys.values())
         {
             this.genericHotkeysUsedKeys.addAll(hotkey.getKeybind().getKeys());
         }
-        */
     }
 
     public boolean onKeyInput()
@@ -57,7 +57,6 @@ public class InputEventHandler
             final int eventKey = Keyboard.getEventKey();
             boolean cancel = false;
 
-            /*
             if (this.genericHotkeysUsedKeys.contains(eventKey))
             {
                 for (Hotkeys hotkey : Hotkeys.values())
@@ -66,7 +65,7 @@ public class InputEventHandler
                     cancel |= hotkey.getKeybind().isPressed();
                 }
             }
-            */
+
             // FIXME temporary testing stuff
             if (Keyboard.getEventKeyState() && GuiScreen.isAltKeyDown())
             {
@@ -140,9 +139,26 @@ public class InputEventHandler
         // Not in a GUI
         if (this.mc.currentScreen == null)
         {
-            
+            int dWheel = Mouse.getEventDWheel() / 120;
+
+            /*
+            if (dWheel != 0 && FeatureToggle.TWEAK_AFTER_CLICKER.getKeybind().isKeybindHeld(false))
+            {
+                int change = dWheel;
+
+                return true;
+            }
+            */
         }
 
         return false;
+    }
+
+    public static void onTick()
+    {
+        for (Hotkeys hotkey : Hotkeys.values())
+        {
+            hotkey.getKeybind().tick();
+        }
     }
 }

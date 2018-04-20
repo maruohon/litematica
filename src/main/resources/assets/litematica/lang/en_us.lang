@@ -1,3 +1,13 @@
 language.name=English
 language.region=US
 language.code=en_US
+
+litematica.error.duplicate_schematic_load=§cError:§r Tried to load a duplicate schematic + placement
+
+litematica.gui.button.cancel=Cancel
+litematica.gui.button.ok=OK
+litematica.gui.button.rename=Rename
+litematica.gui.button.reset=Reset
+
+litematica.gui.title.rename_area_selection=Rename Area Selection
+litematica.gui.title.area_selection_manager=Area Selection Manager

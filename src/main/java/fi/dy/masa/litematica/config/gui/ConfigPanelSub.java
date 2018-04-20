@@ -7,7 +7,6 @@ import java.util.Map;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.modconfig.AbstractConfigPanel;
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
-import fi.dy.masa.litematica.config.ConfigOptionListenerGeneric;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.gui.button.ConfigButtonBase;
 import fi.dy.masa.litematica.config.gui.button.ConfigButtonBoolean;

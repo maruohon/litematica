@@ -166,7 +166,7 @@ public class LitematicaConfigPanel extends AbstractConfigPanel
     private void createSubPanels()
     {
         //this.addSubPanel(new ConfigPanelGeneric(this));
-        //this.addSubPanel(new ConfigPanelGenericHotkeys(this));
+        this.addSubPanel(new ConfigPanelGenericHotkeys(this));
     }
 
     private void addSubPanel(ConfigPanelSub panel)
