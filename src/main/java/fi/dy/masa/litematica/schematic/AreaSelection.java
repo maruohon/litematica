@@ -15,6 +15,7 @@ public class AreaSelection
 {
     private final Map<String, SelectionBox> selectionBoxes = new HashMap<>();
     private String name = "Unnamed";
+    @Nullable
     private String currentBox = "Box 1";
 
     public String getName()
@@ -29,12 +30,12 @@ public class AreaSelection
 
     public String getCurrentSelectionBoxName()
     {
-        return this.currentBox;
+        return this.currentBox != null ? this.currentBox : "";
     }
 
-    public boolean setSelectedBox(String name)
+    public boolean setSelectedBox(@Nullable String name)
     {
-        if (this.selectionBoxes.containsKey(name))
+        if (name == null || this.selectionBoxes.containsKey(name))
         {
             this.currentBox = name;
             return true;
@@ -52,7 +53,7 @@ public class AreaSelection
     @Nullable
     public SelectionBox getSelectedSelectionBox()
     {
-        return this.selectionBoxes.get(this.currentBox);
+        return this.currentBox != null ? this.selectionBoxes.get(this.currentBox) : null;
     }
 
     public Collection<SelectionBox> getAllSelectionsBoxes()
@@ -109,7 +110,7 @@ public class AreaSelection
 
     public boolean removeSelectedSelectionBox()
     {
-        return this.selectionBoxes.remove(this.currentBox) != null;
+        return this.currentBox != null ? this.selectionBoxes.remove(this.currentBox) != null : false;
     }
 
     public static AreaSelection fromJson(JsonObject obj)
@@ -169,7 +170,11 @@ public class AreaSelection
 
         if (arr.size() > 0)
         {
-            obj.add("current", new JsonPrimitive(this.currentBox));
+            if (this.currentBox != null)
+            {
+                obj.add("current", new JsonPrimitive(this.currentBox));
+            }
+
             obj.add("boxes", arr);
         }
 

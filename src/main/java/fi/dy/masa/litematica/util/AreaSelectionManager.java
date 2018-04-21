@@ -23,7 +23,8 @@ import net.minecraft.world.World;
 public class AreaSelectionManager
 {
     private final Map<String, AreaSelection> selections = new HashMap<>();
-    private String currentSelection = "Unnamed 1";
+    @Nullable
+    private String currentSelection;
     private GrabbedElement grabbedElement;
 
     public Collection<String> getAllAreaSelectionNames()
@@ -38,12 +39,12 @@ public class AreaSelectionManager
 
     public String getCurrentAreaSelectionName()
     {
-        return this.currentSelection;
+        return this.currentSelection != null ? this.currentSelection : "";
     }
 
-    public void setCurrentAreaSelection(String name)
+    public void setCurrentAreaSelection(@Nullable String name)
     {
-        if (this.selections.containsKey(name))
+        if (name == null || this.selections.containsKey(name))
         {
             this.currentSelection = name;
         }
@@ -78,7 +79,7 @@ public class AreaSelectionManager
     @Nullable
     public AreaSelection getSelectedAreaSelection()
     {
-        return this.getAreaSelection(this.currentSelection);
+        return this.currentSelection != null ? this.getAreaSelection(this.currentSelection) : null;
     }
 
     public boolean removeAreaSelection(String name)
@@ -88,7 +89,7 @@ public class AreaSelectionManager
 
     public boolean removeSelectedAreaSelection()
     {
-        return this.selections.remove(this.currentSelection) != null;
+        return this.currentSelection != null ? this.selections.remove(this.currentSelection) != null : false;
     }
 
     public boolean renameAreaSelection(String oldName, String newName)
@@ -100,7 +101,7 @@ public class AreaSelectionManager
             selection.setName(newName);
             this.selections.put(newName, selection);
 
-            if (this.currentSelection.equals(oldName))
+            if (this.currentSelection != null && this.currentSelection.equals(oldName))
             {
                 this.currentSelection = newName;
             }
@@ -122,6 +123,18 @@ public class AreaSelectionManager
             if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX)
             {
                 this.changeSelection(area, trace);
+                return true;
+            }
+            else if (trace.getHitType() == HitType.MISS)
+            {
+                SelectionBox box = area.getSelectedSelectionBox();
+
+                if (box != null)
+                {
+                    box.setSelectedCorner(Corner.NONE);
+                }
+
+                area.setSelectedBox(null);
                 return true;
             }
         }
@@ -263,7 +276,11 @@ public class AreaSelectionManager
 
         if (arr.size() > 0)
         {
-            obj.add("current", new JsonPrimitive(this.currentSelection));
+            if (this.currentSelection != null)
+            {
+                obj.add("current", new JsonPrimitive(this.currentSelection));
+            }
+
             obj.add("areas", arr);
         }
 
