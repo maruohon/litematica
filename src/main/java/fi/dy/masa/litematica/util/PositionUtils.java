@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.util;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -49,6 +50,45 @@ public class PositionUtils
         z = z >= 0 ? z - 1 : z + 1;
 
         return new BlockPos(x, y, z);
+    }
+
+    /**
+     * Creates an enclosing AABB around the given positions. They will both be inside the box.
+     */
+    public static AxisAlignedBB createEnclosingAABB(BlockPos pos1, BlockPos pos2)
+    {
+        int minX = Math.min(pos1.getX(), pos2.getX());
+        int minY = Math.min(pos1.getY(), pos2.getY());
+        int minZ = Math.min(pos1.getZ(), pos2.getZ());
+        int maxX = Math.max(pos1.getX(), pos2.getX()) + 1;
+        int maxY = Math.max(pos1.getY(), pos2.getY()) + 1;
+        int maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1;
+
+        return createAABB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    /**
+     * Creates an AABB for the given position
+     */
+    public static AxisAlignedBB createAABBForPosition(BlockPos pos)
+    {
+        return createAABBForPosition(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    /**
+     * Creates an AABB for the given position
+     */
+    public static AxisAlignedBB createAABBForPosition(int x, int y, int z)
+    {
+        return createAABB(x, y, z, x + 1, y + 1, z + 1);
+    }
+
+    /**
+     * Creates an AABB with the given bounds
+     */
+    public static AxisAlignedBB createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
+    {
+        return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**
@@ -200,5 +240,12 @@ public class PositionUtils
         }
 
         return z2 > z1 ? EnumFacing.SOUTH : EnumFacing.WEST;
+    }
+
+    public enum Corner
+    {
+        NONE,
+        CORNER_1,
+        CORNER_2;
     }
 }

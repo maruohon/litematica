@@ -32,6 +32,17 @@ public class AreaSelection
         return this.currentBox;
     }
 
+    public boolean setSelectedBox(String name)
+    {
+        if (this.selectionBoxes.containsKey(name))
+        {
+            this.currentBox = name;
+            return true;
+        }
+
+        return false;
+    }
+
     @Nullable
     public SelectionBox getSelectionBox(String name)
     {

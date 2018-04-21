@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +17,7 @@ public class SelectionBox
     private BlockPos pos2;
     private BlockPos size = BlockPos.ORIGIN;
     private String name = "Unnamed";
+    private Corner selectedCorner = Corner.NONE;
 
     @Nullable
     public BlockPos getPos1()
@@ -39,6 +41,11 @@ public class SelectionBox
         return this.name;
     }
 
+    public Corner getSelectedCorner()
+    {
+        return this.selectedCorner;
+    }
+
     public void setPos1(@Nullable BlockPos pos)
     {
         this.pos1 = pos;
@@ -54,6 +61,11 @@ public class SelectionBox
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public void setSelectedCorner(Corner corner)
+    {
+        this.selectedCorner = corner;
     }
 
     public void rotate(Rotation rotation)

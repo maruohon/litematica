@@ -8,6 +8,7 @@ import org.lwjgl.input.Mouse;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.schematic.SelectionBox;
+import fi.dy.masa.litematica.util.DataManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.BlockPos;
@@ -137,7 +138,7 @@ public class InputEventHandler
     public boolean onMouseInput()
     {
         // Not in a GUI
-        if (this.mc.currentScreen == null)
+        if (this.mc.currentScreen == null && this.mc.world != null)
         {
             int dWheel = Mouse.getEventDWheel() / 120;
 
@@ -149,6 +150,18 @@ public class InputEventHandler
                 return true;
             }
             */
+            if (Mouse.getEventButtonState())
+            {
+                final int button = Mouse.getEventButton();
+
+                if (mouseEventIsPickBlock(this.mc, button))
+                {
+                    // TODO: if (isInSelectionMode())
+                    {
+                        DataManager.getInstance(this.mc.world).getSelectionManager().changeSelection(this.mc.world, this.mc.player);
+                    }
+                }
+            }
         }
 
         return false;
@@ -160,5 +173,10 @@ public class InputEventHandler
         {
             hotkey.getKeybind().tick();
         }
+    }
+
+    public static boolean mouseEventIsPickBlock(Minecraft mc, int button)
+    {
+        return button == mc.gameSettings.keyBindPickBlock.getKeyCode() + 100;
     }
 }

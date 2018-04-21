@@ -9,6 +9,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.schematic.AreaSelection;
+import fi.dy.masa.litematica.schematic.SelectionBox;
+import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import net.minecraft.entity.Entity;
+import net.minecraft.world.World;
 
 public class AreaSelectionManager
 {
@@ -95,6 +101,35 @@ public class AreaSelectionManager
             }
 
             return true;
+        }
+
+        return false;
+    }
+
+    public boolean changeSelection(World world, Entity entity)
+    {
+        AreaSelection area = this.getSelectedAreaSelection();
+
+        if (area != null && area.getAllSelectionsBoxes().size() > 0)
+        {
+            RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, 200);
+
+            if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX)
+            {
+                SelectionBox box = area.getSelectedSelectionBox();
+
+                // Clear the selected corner from any current boxes
+                if (box != null)
+                {
+                    box.setSelectedCorner(Corner.NONE);
+                }
+
+                box = trace.getHitSelectionBox();
+                area.setSelectedBox(box.getName());
+                box.setSelectedCorner(trace.getHitCorner());
+
+                return true;
+            }
         }
 
         return false;

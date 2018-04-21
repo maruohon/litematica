@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.render;
 
-import javax.annotation.Nullable;
 import fi.dy.masa.litematica.schematic.AreaSelection;
 import fi.dy.masa.litematica.schematic.SelectionBox;
 import fi.dy.masa.litematica.util.AreaSelectionManager;
 import fi.dy.masa.litematica.util.DataManager;
+import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.Vec3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -20,6 +20,7 @@ public class OverlayRenderer
     private Vec3f colorX = new Vec3f(   1f, 0.25f, 0.25f);
     private Vec3f colorY = new Vec3f(0.25f,    1f, 0.25f);
     private Vec3f colorZ = new Vec3f(0.25f, 0.25f,    1f);
+    private Vec3f colorArea = new Vec3f(1f, 1f, 1f);
 
     private OverlayRenderer()
     {
@@ -41,8 +42,8 @@ public class OverlayRenderer
             Entity renderViewEntity = this.mc.getRenderViewEntity();
             float partialTicks = this.mc.getRenderPartialTicks();
             float expand = 0.001f;
-            float lineWidthArea = 1.5f;
             float lineWidthBlockBox = 2f;
+            float lineWidthArea = 1.5f;
             SelectionBox currentBox = sel.getSelectedSelectionBox();
 
             GlStateManager.depthMask(true);
@@ -53,16 +54,7 @@ public class OverlayRenderer
 
             for (SelectionBox box : sel.getAllSelectionsBoxes())
             {
-                float wb = lineWidthBlockBox;
-                float wa = lineWidthArea;
-
-                if (box == currentBox)
-                {
-                    wb *= 2;
-                    wa *= 2;
-                }
-
-                this.renderSelectionBox(box.getPos1(), box.getPos2(), expand, wb, wa, renderViewEntity, partialTicks);
+                this.renderSelectionBox(box, box == currentBox, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks);
             }
 
             GlStateManager.popMatrix();
@@ -72,28 +64,47 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSelectionBox(@Nullable BlockPos pos1, @Nullable BlockPos pos2,
-            float expand, float lineWidthBlockBox, float lineWidthArea, Entity renderViewEntity, float partialTicks)
+    public void renderSelectionBox(SelectionBox box, boolean selected, float expand,
+            float lineWidthBlockBox, float lineWidthArea, Entity renderViewEntity, float partialTicks)
     {
+        BlockPos pos1 = box.getPos1();
+        BlockPos pos2 = box.getPos2();
+
         if (pos1 == null && pos2 == null)
         {
             return;
         }
 
+        float wb1 = box.getSelectedCorner() == Corner.CORNER_1 ? lineWidthBlockBox * 2 : lineWidthBlockBox;
+        float wb2 = box.getSelectedCorner() == Corner.CORNER_2 ? lineWidthBlockBox * 2 : lineWidthBlockBox;
+
+        /*
+        if (selected)
+        {
+            lineWidthArea *= 2;
+        }
+        */
+
         if (pos1 != null && pos2 != null && pos1.equals(pos2) == false)
         {
-            RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, this.colorPos1, renderViewEntity, partialTicks);
-            RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, this.colorPos2, renderViewEntity, partialTicks);
+            if (selected)
+            {
+                RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, this.colorX, this.colorY, this.colorZ, renderViewEntity, partialTicks);
+            }
+            else
+            {
+                RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, this.colorArea, this.colorArea, this.colorArea, renderViewEntity, partialTicks);
+            }
+        }
 
-            RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, this.colorX, this.colorY, this.colorZ, renderViewEntity, partialTicks);
-        }
-        else if (pos1 != null)
+        if (pos1 != null)
         {
-            RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, this.colorPos1, renderViewEntity, partialTicks);
+            RenderUtils.renderBlockOutline(pos1, expand, wb1, this.colorPos1, renderViewEntity, partialTicks);
         }
-        else if (pos2 != null)
+
+        if (pos2 != null)
         {
-            RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, this.colorPos2, renderViewEntity, partialTicks);
+            RenderUtils.renderBlockOutline(pos2, expand, wb2, this.colorPos2, renderViewEntity, partialTicks);
         }
     }
 }
