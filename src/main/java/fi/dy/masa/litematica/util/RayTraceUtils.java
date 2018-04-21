@@ -28,7 +28,7 @@ public class RayTraceUtils
     @Nonnull
     public static RayTraceWrapper getWrappedRayTraceFromEntity(World world, Entity entity, double range)
     {
-        Vec3d eyesVec = new Vec3d(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
+        Vec3d eyesVec = entity.getPositionEyes(1f);
         Vec3d rangedLookRot = entity.getLook(1f).scale(range);
         Vec3d lookVec = eyesVec.add(rangedLookRot);
 
@@ -60,14 +60,14 @@ public class RayTraceUtils
 
         double closestDistance = closestVanilla;
 
-        if (closestBoxDistance >= 0 && closestBoxDistance <= closestDistance)
+        if (closestBoxDistance >= 0 && (closestDistance < 0 || closestBoxDistance <= closestDistance))
         {
             closestDistance = closestBoxDistance;
             wrapper = closestBox;
         }
 
         // Corners are preferred over box body hits, thus the '<=' and this being after the box check
-        if (closestCornerDistance >= 0 && closestCornerDistance <= closestDistance)
+        if (closestCornerDistance >= 0 && (closestDistance < 0 || closestCornerDistance <= closestDistance))
         {
             closestDistance = closestCornerDistance;
             wrapper = closestCorner;
@@ -99,7 +99,7 @@ public class RayTraceUtils
                 if (closestCornerDistance < 0 || dist < closestCornerDistance)
                 {
                     closestCornerDistance = dist;
-                    closestCorner = new RayTraceWrapper(box, corner);
+                    closestCorner = new RayTraceWrapper(box, corner, hit.hitVec);
                 }
             }
         }
@@ -121,7 +121,7 @@ public class RayTraceUtils
                 if (closestBoxDistance < 0 || dist < closestBoxDistance)
                 {
                     closestBoxDistance = dist;
-                    closestBox = new RayTraceWrapper(box, Corner.NONE);
+                    closestBox = new RayTraceWrapper(box, Corner.NONE, hit.hitVec);
                 }
 
                 return true;
@@ -134,7 +134,7 @@ public class RayTraceUtils
     @Nonnull
     public static RayTraceResult getRayTraceFromEntity(World world, Entity entity, boolean useLiquids, double range)
     {
-        Vec3d eyesVec = new Vec3d(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
+        Vec3d eyesVec = entity.getPositionEyes(1f);
         Vec3d rangedLookRot = entity.getLook(1f).scale(range);
         Vec3d lookVec = eyesVec.add(rangedLookRot);
 
@@ -366,6 +366,7 @@ public class RayTraceUtils
         private final RayTraceResult trace;
         private final SelectionBox box;
         private final Corner corner;
+        private final Vec3d hitVec;
 
         public RayTraceWrapper()
         {
@@ -373,6 +374,7 @@ public class RayTraceUtils
             this.trace = null;
             this.box = null;
             this.corner = Corner.NONE;
+            this.hitVec = Vec3d.ZERO;
         }
 
         public RayTraceWrapper(RayTraceResult trace)
@@ -381,14 +383,16 @@ public class RayTraceUtils
             this.trace = trace;
             this.box = null;
             this.corner = Corner.NONE;
+            this.hitVec = trace.hitVec;
         }
 
-        public RayTraceWrapper(SelectionBox box, Corner corner)
+        public RayTraceWrapper(SelectionBox box, Corner corner, Vec3d hitVec)
         {
             this.type = corner == Corner.NONE ? HitType.BOX : HitType.CORNER;
             this.trace = null;
             this.box = box;
             this.corner = corner;
+            this.hitVec = hitVec;
         }
 
         public HitType getHitType()
@@ -406,6 +410,11 @@ public class RayTraceUtils
         public SelectionBox getHitSelectionBox()
         {
             return this.box;
+        }
+
+        public Vec3d getHitVec()
+        {
+            return this.hitVec;
         }
 
         public Corner getHitCorner()

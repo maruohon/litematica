@@ -21,6 +21,7 @@ public class OverlayRenderer
     private Vec3f colorY = new Vec3f(0.25f,    1f, 0.25f);
     private Vec3f colorZ = new Vec3f(0.25f, 0.25f,    1f);
     private Vec3f colorArea = new Vec3f(1f, 1f, 1f);
+    private Vec3f colorSelectedCorner = new Vec3f(0f, 1f, 1f);
 
     private OverlayRenderer()
     {
@@ -75,15 +76,10 @@ public class OverlayRenderer
             return;
         }
 
-        float wb1 = box.getSelectedCorner() == Corner.CORNER_1 ? lineWidthBlockBox * 2 : lineWidthBlockBox;
-        float wb2 = box.getSelectedCorner() == Corner.CORNER_2 ? lineWidthBlockBox * 2 : lineWidthBlockBox;
-
-        /*
-        if (selected)
-        {
-            lineWidthArea *= 2;
-        }
-        */
+        //float wb1 = box.getSelectedCorner() == Corner.CORNER_1 ? lineWidthBlockBox * 2 : lineWidthBlockBox;
+        //float wb2 = box.getSelectedCorner() == Corner.CORNER_2 ? lineWidthBlockBox * 2 : lineWidthBlockBox;
+        Vec3f color1 = box.getSelectedCorner() == Corner.CORNER_1 ? this.colorSelectedCorner : this.colorPos1;
+        Vec3f color2 = box.getSelectedCorner() == Corner.CORNER_2 ? this.colorSelectedCorner : this.colorPos2;
 
         if (pos1 != null && pos2 != null && pos1.equals(pos2) == false)
         {
@@ -99,12 +95,12 @@ public class OverlayRenderer
 
         if (pos1 != null)
         {
-            RenderUtils.renderBlockOutline(pos1, expand, wb1, this.colorPos1, renderViewEntity, partialTicks);
+            RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
         }
 
         if (pos2 != null)
         {
-            RenderUtils.renderBlockOutline(pos2, expand, wb2, this.colorPos2, renderViewEntity, partialTicks);
+            RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
         }
     }
 }

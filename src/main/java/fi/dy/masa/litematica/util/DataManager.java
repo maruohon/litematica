@@ -15,6 +15,8 @@ import fi.dy.masa.litematica.schematic.SchematicPlacement;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -23,6 +25,8 @@ import net.minecraft.world.World;
 public class DataManager
 {
     private static final Int2ObjectOpenHashMap<DataManager> INSTANCES = new Int2ObjectOpenHashMap<>();
+
+    public static ItemStack toolItem = new ItemStack(Items.STICK);
 
     private final AreaSelectionManager selectionManager = new AreaSelectionManager();
     private final List<SchematicPlacement> loadedSchematics = new ArrayList<>();

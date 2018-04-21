@@ -6,15 +6,23 @@ import java.util.Set;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.config.KeyCallbacks;
+import fi.dy.masa.litematica.schematic.AreaSelection;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.schematic.SelectionBox;
+import fi.dy.masa.litematica.util.AreaSelectionManager;
 import fi.dy.masa.litematica.util.DataManager;
+import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.RayTraceUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 
 public class InputEventHandler
 {
@@ -70,43 +78,7 @@ public class InputEventHandler
             // FIXME temporary testing stuff
             if (Keyboard.getEventKeyState() && GuiScreen.isAltKeyDown())
             {
-                if (eventKey == Keyboard.KEY_0)
-                {
-                    RenderEventHandler.getInstance().toggleAllRenderingEnabled();
-                    String str = RenderEventHandler.getInstance().isEnabled() ? TextFormatting.GREEN + "enabled" : TextFormatting.RED + "disabled";
-                    this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentString("Rendering " + str));
-                }
-                else if (eventKey == Keyboard.KEY_1)
-                {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-
-                    if (selection.getPos1() != null && selection.getPos1().equals(pos))
-                    {
-                        selection.setPos1(null);
-                    }
-                    else
-                    {
-                        selection.setPos1(pos);
-                        this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO,
-                                new TextComponentString(String.format("Set pos1 to x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ())));
-                    }
-                }
-                else if (eventKey == Keyboard.KEY_2)
-                {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-
-                    if (selection.getPos2() != null && selection.getPos2().equals(pos))
-                    {
-                        selection.setPos2(null);
-                    }
-                    else
-                    {
-                        selection.setPos2(pos);
-                        this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO,
-                                new TextComponentString(String.format("Set pos2 to x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ())));
-                    }
-                }
-                else if (eventKey == Keyboard.KEY_3)
+                if (eventKey == Keyboard.KEY_3)
                 {
                     File file = new File(new File(this.mc.mcDataDir, "schematics"), "test.schematic");
                     SchematicaSchematic schematic = SchematicaSchematic.createFromFile(file);
@@ -120,10 +92,9 @@ public class InputEventHandler
                         BlockPos s = schematic.getSize();
                         this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO,
                                 new TextComponentString(String.format("Schematic loaded, size: %d x %d x %d", s.getX(), s.getY(), s.getZ())));
+                        return true;
                     }
                 }
-
-                return true;
             }
 
             // Somewhat hacky fix to prevent eating the modifier keys... >_>
@@ -138,19 +109,32 @@ public class InputEventHandler
     public boolean onMouseInput()
     {
         // Not in a GUI
-        if (this.mc.currentScreen == null && this.mc.world != null)
+        if (this.mc.currentScreen == null && this.mc.world != null && this.mc.player != null)
         {
-            int dWheel = Mouse.getEventDWheel() / 120;
+            World world = this.mc.world;
+            EntityPlayer player = this.mc.player;
+            final int dWheel = Mouse.getEventDWheel() / 120;
+            final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.toolItem.getItem());
 
-            /*
-            if (dWheel != 0 && FeatureToggle.TWEAK_AFTER_CLICKER.getKeybind().isKeybindHeld(false))
+            if (dWheel != 0)
             {
-                int change = dWheel;
+                if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
+                {
+                    AreaSelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 
-                return true;
+                    if (sm.hasGrabbedElement())
+                    {
+                        sm.changeGrabDistance(player, dWheel);
+                        return true;
+                    }
+                    else if (sm.hasSelectedElement())
+                    {
+                        sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), dWheel);
+                        return true;
+                    }
+                }
             }
-            */
-            if (Mouse.getEventButtonState())
+            else if (Mouse.getEventButtonState())
             {
                 final int button = Mouse.getEventButton();
 
@@ -158,7 +142,39 @@ public class InputEventHandler
                 {
                     // TODO: if (isInSelectionMode())
                     {
-                        DataManager.getInstance(this.mc.world).getSelectionManager().changeSelection(this.mc.world, this.mc.player);
+                        AreaSelectionManager sm = DataManager.getInstance(world).getSelectionManager();
+
+                        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
+                        {
+                            if (sm.hasGrabbedElement())
+                            {
+                                sm.releaseGrabbedElement();
+                            }
+                            else
+                            {
+                                sm.grabElement(this.mc, 200);
+                            }
+                        }
+                        else
+                        {
+                            sm.changeSelection(world, player, 200);
+                        }
+
+                        return true;
+                    }
+                }
+                else if (mouseEventIsAttack(this.mc, button))
+                {
+                    if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
+                    {
+                        this.setCornerPosition(this.mc, Corner.CORNER_1);
+                    }
+                }
+                else if (mouseEventIsUse(this.mc, button))
+                {
+                    if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
+                    {
+                        this.setCornerPosition(this.mc, Corner.CORNER_2);
                     }
                 }
             }
@@ -173,6 +189,66 @@ public class InputEventHandler
         {
             hotkey.getKeybind().tick();
         }
+
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc.world != null && mc.player != null)
+        {
+            AreaSelectionManager sm = DataManager.getInstance(mc.world).getSelectionManager();
+
+            if (sm.hasGrabbedElement())
+            {
+                sm.moveGrabbedElement(mc.player);
+            }
+        }
+    }
+
+    private void setCornerPosition(Minecraft mc, Corner corner)
+    {
+        AreaSelectionManager sm = DataManager.getInstance(mc.world).getSelectionManager();
+        AreaSelection sel = sm.getSelectedAreaSelection();
+
+        if (corner != Corner.NONE && sel != null && sel.getSelectedSelectionBox() != null)
+        {
+            RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, 200);
+
+            if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+            {
+                return;
+            }
+
+            int cornerIndex = 1;
+            BlockPos pos = trace.getBlockPos();
+
+            // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
+            if (mc.player.isSneaking() == false)
+            {
+                pos = pos.offset(trace.sideHit);
+            }
+
+            if (corner == Corner.CORNER_1)
+            {
+                sel.getSelectedSelectionBox().setPos1(pos);
+            }
+            else if (corner == Corner.CORNER_2)
+            {
+                sel.getSelectedSelectionBox().setPos2(pos);
+                cornerIndex = 2;
+            }
+
+            String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+            KeyCallbacks.printMessage(this.mc, "litematica.message.set_selection_box_point", cornerIndex, posStr);
+        }
+    }
+
+    public static boolean mouseEventIsAttack(Minecraft mc, int button)
+    {
+        return button == mc.gameSettings.keyBindAttack.getKeyCode() + 100;
+    }
+
+    public static boolean mouseEventIsUse(Minecraft mc, int button)
+    {
+        return button == mc.gameSettings.keyBindUseItem.getKeyCode() + 100;
     }
 
     public static boolean mouseEventIsPickBlock(Minecraft mc, int button)

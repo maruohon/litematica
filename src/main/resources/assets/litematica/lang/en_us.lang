@@ -15,6 +15,7 @@ litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.area_selection_manager=Area Selection Manager
 
 litematica.message.added_selection_box=Added a new selection box at %s
+litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.set_selection_box_point=Set/moved point %d to %s
 litematica.message.toggled=Toggled %s %s
