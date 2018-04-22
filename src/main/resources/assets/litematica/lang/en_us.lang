@@ -22,6 +22,7 @@ litematica.gui.title.save_schematic_filename=Schematic File Name
 
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
+litematica.message.moved_selection=Moved the current selection from %s to %s
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.schematic_saved=Schematic saved
 litematica.message.set_area_origin=Set the area origin point to %s

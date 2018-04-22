@@ -81,6 +81,7 @@ public class InputEventHandler
             {
                 if (eventKey == Keyboard.KEY_0)
                 {
+                    DataManager.save();
                     this.mc.displayGuiScreen(new GuiSchematicSave());
                 }
                 if (eventKey == Keyboard.KEY_3)

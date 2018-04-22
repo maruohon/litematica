@@ -6,11 +6,12 @@ import fi.dy.masa.litematica.config.hotkeys.KeybindMulti;
 
 public enum Hotkeys implements IHotkey
 {
-    ADD_SELECTION_BOX                   ("addSelectionBox",                 "M,A",  "Add a new selection box"),
-    DELETE_SELECTION_BOX                ("deleteSelectionBox",              "M,D",  "Delete the currently selected selection box"),
+    ADD_SELECTION_BOX                   ("addSelectionBox",                 "M,A",  "Add a new selection box (position 1) here"),
+    DELETE_SELECTION_BOX                ("deleteSelectionBox",              "M,D",  "Delete the currently selected box"),
+    MOVE_ENTIRE_SELECTION               ("moveEntireSelection",             "M,V",  "Move the entire current selection here"),
     OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the area selection manager GUI"),
     SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
-    SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,O",  "Set the origin point of the currently selected area"),
+    SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,O",  "Set/move the origin point of the current selection here"),
     SET_SELECTION_BOX_POSITION_1        ("setSelectionBoxPosition1",        "M,1",  "Set the first position of the currently selected box to the player's position"),
     SET_SELECTION_BOX_POSITION_2        ("setSelectionBoxPosition2",        "M,2",  "Set the second position of the currently selected box to the player's position"),
     TOGGLE_ALL_RENDERING                ("toggleAllRendering",              "M,R",  "Toggle all rendering on/off"),

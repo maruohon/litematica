@@ -129,6 +129,26 @@ public class Selection
         return this.currentBox != null ? this.selectionBoxes.remove(this.currentBox) != null : false;
     }
 
+    public void moveEntireSelectionTo(BlockPos newOrigin)
+    {
+        BlockPos diff = newOrigin.subtract(this.origin);
+
+        for (Box box : this.selectionBoxes.values())
+        {
+            if (box.getPos1() != null)
+            {
+                box.setPos1(box.getPos1().add(diff));
+            }
+
+            if (box.getPos2() != null)
+            {
+                box.setPos2(box.getPos2().add(diff));
+            }
+        }
+
+        this.origin = newOrigin;
+    }
+
     public static Selection fromJson(JsonObject obj)
     {
         Selection area = new Selection();

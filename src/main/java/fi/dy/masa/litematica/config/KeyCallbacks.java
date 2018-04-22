@@ -28,6 +28,7 @@ public class KeyCallbacks
 
         Hotkeys.ADD_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
         Hotkeys.DELETE_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
+        Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_AREA_ORIGIN.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
@@ -98,6 +99,21 @@ public class KeyCallbacks
                         {
                             KeyCallbacks.printMessage(this.mc, "litematica.message.removed_selection_box", name);
                         }
+                    }
+                }
+                else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())
+                {
+                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    Selection selection = sm.getCurrentSelection();
+
+                    if (selection != null)
+                    {
+                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        BlockPos old = selection.getOrigin();
+                        selection.moveEntireSelectionTo(pos);
+                        String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+                        String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                        KeyCallbacks.printMessage(this.mc, "litematica.message.moved_selection", oldStr, posStr);
                     }
                 }
                 else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
