@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 public class AreaSelection
 {
     private final Map<String, SelectionBox> selectionBoxes = new HashMap<>();
+    private BlockPos origin = BlockPos.ORIGIN;
     private String name = "Unnamed";
     @Nullable
     private String currentBox = "Box 1";
@@ -44,6 +45,16 @@ public class AreaSelection
         return false;
     }
 
+    public BlockPos getOrigin()
+    {
+        return this.origin;
+    }
+
+    public void setOrigin(BlockPos origin)
+    {
+        this.origin = origin;
+    }
+
     @Nullable
     public SelectionBox getSelectionBox(String name)
     {
@@ -63,6 +74,11 @@ public class AreaSelection
 
     public String createNewSelectionBox(BlockPos pos1)
     {
+        if (this.origin.equals(BlockPos.ORIGIN) && this.selectionBoxes.isEmpty())
+        {
+            this.origin = pos1;
+        }
+
         String name = "Box ";
         int i = 1;
 

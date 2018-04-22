@@ -1,5 +1,9 @@
 package fi.dy.masa.litematica.util;
 
+import java.util.Collection;
+import javax.annotation.Nullable;
+import fi.dy.masa.litematica.schematic.AreaSelection;
+import fi.dy.masa.litematica.schematic.SelectionBox;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -50,6 +54,41 @@ public class PositionUtils
         z = z >= 0 ? z - 1 : z + 1;
 
         return new BlockPos(x, y, z);
+    }
+
+    public static BlockPos getTotalAreaSize(AreaSelection area)
+    {
+        Collection<SelectionBox> boxes = area.getAllSelectionsBoxes();
+
+        if (boxes.isEmpty())
+        {
+            return BlockPos.ORIGIN;
+        }
+
+        BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos( 60000000,  60000000,  60000000);
+        BlockPos.MutableBlockPos posMax = new BlockPos.MutableBlockPos(-60000000, -60000000, -60000000);
+
+        for (SelectionBox box : boxes)
+        {
+            getMinMaxCoords(posMin, posMax, box.getPos1());
+            getMinMaxCoords(posMin, posMax, box.getPos2());
+        }
+
+        return posMax.subtract(posMin).add(1, 1, 1);
+    }
+
+    private static void getMinMaxCoords(BlockPos.MutableBlockPos posMin, BlockPos.MutableBlockPos posMax, @Nullable BlockPos posToCheck)
+    {
+        if (posToCheck != null)
+        {
+            posMin.setPos(  Math.min(posMin.getX(), posToCheck.getX()),
+                            Math.min(posMin.getY(), posToCheck.getY()),
+                            Math.min(posMin.getZ(), posToCheck.getZ()));
+
+            posMax.setPos(  Math.max(posMax.getX(), posToCheck.getX()),
+                            Math.max(posMax.getY(), posToCheck.getY()),
+                            Math.max(posMax.getZ(), posToCheck.getZ()));
+        }
     }
 
     /**
