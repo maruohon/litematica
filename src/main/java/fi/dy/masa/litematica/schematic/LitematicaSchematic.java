@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
@@ -77,9 +79,9 @@ public class LitematicaSchematic
     }
 
     @Nullable
-    public static LitematicaSchematic makeSchematic(World world, AreaSelection area, boolean takeEntities, String author, IStringConsumer feedback)
+    public static LitematicaSchematic makeSchematic(World world, Selection area, boolean takeEntities, String author, IStringConsumer feedback)
     {
-        List<SelectionBox> boxes = getValidBoxes(area);
+        List<Box> boxes = getValidBoxes(area);
 
         if (boxes.isEmpty())
         {
@@ -107,9 +109,9 @@ public class LitematicaSchematic
         return schematic;
     }
 
-    private void takeEntitiesFromWorld(World world, List<SelectionBox> boxes, BlockPos origin)
+    private void takeEntitiesFromWorld(World world, List<Box> boxes, BlockPos origin)
     {
-        for (SelectionBox box : boxes)
+        for (Box box : boxes)
         {
             AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
             List<Entity> entities = world.getEntitiesInAABBexcluding(null, bb, null);
@@ -138,11 +140,11 @@ public class LitematicaSchematic
         }
     }
 
-    private void takeBlocksFromWorld(World world, List<SelectionBox> boxes, BlockPos origin)
+    private void takeBlocksFromWorld(World world, List<Box> boxes, BlockPos origin)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
 
-        for (SelectionBox box : boxes)
+        for (Box box : boxes)
         {
             BlockPos size = box.getSize();
             final int sizeX = Math.abs(size.getX());
@@ -189,28 +191,28 @@ public class LitematicaSchematic
         }
     }
 
-    private void setSubRegionPositions(List<SelectionBox> boxes, BlockPos areaOrigin)
+    private void setSubRegionPositions(List<Box> boxes, BlockPos areaOrigin)
     {
-        for (SelectionBox box : boxes)
+        for (Box box : boxes)
         {
             this.subRegionPositions.add(box.getPos1().subtract(areaOrigin));
         }
     }
 
-    private void setSubRegionSizes(List<SelectionBox> boxes)
+    private void setSubRegionSizes(List<Box> boxes)
     {
-        for (SelectionBox box : boxes)
+        for (Box box : boxes)
         {
             this.subRegionSizes.add(box.getSize());
         }
     }
 
-    private static List<SelectionBox> getValidBoxes(AreaSelection area)
+    private static List<Box> getValidBoxes(Selection area)
     {
-        List<SelectionBox> boxes = new ArrayList<>();
-        Collection<SelectionBox> originalBoxes = area.getAllSelectionsBoxes();
+        List<Box> boxes = new ArrayList<>();
+        Collection<Box> originalBoxes = area.getAllSelectionsBoxes();
 
-        for (SelectionBox box : originalBoxes)
+        for (Box box : originalBoxes)
         {
             if (isBoxValid(box))
             {
@@ -221,7 +223,7 @@ public class LitematicaSchematic
         return boxes;
     }
 
-    private static boolean isBoxValid(SelectionBox box)
+    private static boolean isBoxValid(Box box)
     {
         return box.getPos1() != null && box.getPos2() != null;
     }

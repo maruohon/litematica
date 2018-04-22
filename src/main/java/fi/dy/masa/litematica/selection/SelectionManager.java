@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.util;
+package fi.dy.masa.litematica.selection;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,9 +9,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.config.KeyCallbacks;
-import fi.dy.masa.litematica.schematic.AreaSelection;
-import fi.dy.masa.litematica.schematic.SelectionBox;
+import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import net.minecraft.client.Minecraft;
@@ -20,81 +20,53 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class AreaSelectionManager
+public class SelectionManager
 {
-    private final Map<String, AreaSelection> selections = new HashMap<>();
+    private final Map<String, Selection> selections = new HashMap<>();
     @Nullable
     private String currentSelection;
     private GrabbedElement grabbedElement;
 
-    public Collection<String> getAllAreaSelectionNames()
+    public Collection<String> getAllSelectionNames()
     {
         return this.selections.keySet();
     }
 
-    public Collection<AreaSelection> getAllAreaSelections()
+    public Collection<Selection> getAllSelections()
     {
         return this.selections.values();
     }
 
-    public String getCurrentAreaSelectionName()
+    public String getCurrentSelectionName()
     {
         return this.currentSelection != null ? this.currentSelection : "";
     }
 
-    public void setCurrentAreaSelection(@Nullable String name)
+    @Nullable
+    public Selection getCurrentSelection()
     {
-        if (name == null || this.selections.containsKey(name))
-        {
-            this.currentSelection = name;
-        }
-    }
-
-    /**
-     * Creates a new schematic selection and returns the name of it
-     * @return
-     */
-    public String createNewAreaSelection()
-    {
-        String name = "Unnamed ";
-        int i = 1;
-
-        while (this.selections.containsKey(name + i))
-        {
-            i++;
-        }
-
-        this.selections.put(name + i, new AreaSelection());
-        this.currentSelection = name + i;
-
-        return this.currentSelection;
+        return this.currentSelection != null ? this.getSelection(this.currentSelection) : null;
     }
 
     @Nullable
-    public AreaSelection getAreaSelection(String name)
+    public Selection getSelection(String name)
     {
         return this.selections.get(name);
     }
 
-    @Nullable
-    public AreaSelection getSelectedAreaSelection()
-    {
-        return this.currentSelection != null ? this.getAreaSelection(this.currentSelection) : null;
-    }
-
-    public boolean removeAreaSelection(String name)
+    public boolean removeSelection(String name)
     {
         return this.selections.remove(name) != null;
     }
 
-    public boolean removeSelectedAreaSelection()
+    public boolean removeCurrentSelection()
     {
         return this.currentSelection != null ? this.selections.remove(this.currentSelection) != null : false;
     }
 
-    public boolean renameAreaSelection(String oldName, String newName)
+    public boolean renameSelection(String oldName, String newName)
     {
-        AreaSelection selection = this.selections.remove(oldName);
+        Selection selection = this.selections.remove(oldName);
 
         if (selection != null)
         {
@@ -112,9 +84,37 @@ public class AreaSelectionManager
         return false;
     }
 
+    public void setCurrentSelection(@Nullable String name)
+    {
+        if (name == null || this.selections.containsKey(name))
+        {
+            this.currentSelection = name;
+        }
+    }
+
+    /**
+     * Creates a new schematic selection and returns the name of it
+     * @return
+     */
+    public String createNewSelection()
+    {
+        String name = "Unnamed ";
+        int i = 1;
+
+        while (this.selections.containsKey(name + i))
+        {
+            i++;
+        }
+
+        this.selections.put(name + i, new Selection());
+        this.currentSelection = name + i;
+
+        return this.currentSelection;
+    }
+
     public boolean changeSelection(World world, Entity entity, int maxDistance)
     {
-        AreaSelection area = this.getSelectedAreaSelection();
+        Selection area = this.getCurrentSelection();
 
         if (area != null && area.getAllSelectionsBoxes().size() > 0)
         {
@@ -125,13 +125,9 @@ public class AreaSelectionManager
                 this.changeSelection(area, trace);
                 return true;
             }
-            else if (trace.getHitType() == HitType.ORIGIN)
-            {
-                return true;
-            }
             else if (trace.getHitType() == HitType.MISS)
             {
-                SelectionBox box = area.getSelectedSelectionBox();
+                Box box = area.getSelectedSelectionBox();
 
                 if (box != null)
                 {
@@ -146,9 +142,9 @@ public class AreaSelectionManager
         return false;
     }
 
-    private void changeSelection(AreaSelection area, RayTraceWrapper trace)
+    private void changeSelection(Selection area, RayTraceWrapper trace)
     {
-        SelectionBox box = area.getSelectedSelectionBox();
+        Box box = area.getSelectedSelectionBox();
 
         // Clear the selected corner from any current boxes
         if (box != null)
@@ -162,25 +158,21 @@ public class AreaSelectionManager
             area.setSelectedBox(box.getName());
             box.setSelectedCorner(trace.getHitCorner());
         }
-        else if (trace.getHitType() == HitType.ORIGIN)
-        {
-            
-        }
     }
 
     public boolean hasSelectedElement()
     {
-        AreaSelection area = this.getSelectedAreaSelection();
+        Selection area = this.getCurrentSelection();
         return area != null && area.getSelectedSelectionBox() != null;
     }
 
     public void moveSelectedElement(EnumFacing direction, int amount)
     {
-        AreaSelection area = this.getSelectedAreaSelection();
+        Selection area = this.getCurrentSelection();
 
         if (area != null && area.getSelectedSelectionBox() != null)
         {
-            SelectionBox box = area.getSelectedSelectionBox();
+            Box box = area.getSelectedSelectionBox();
             Corner selectedCorner = box.getSelectedCorner();
 
             if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_1) && box.getPos1() != null)
@@ -204,7 +196,7 @@ public class AreaSelectionManager
     {
         World world = mc.world;
         Entity entity = mc.player;
-        AreaSelection area = this.getSelectedAreaSelection();
+        Selection area = this.getCurrentSelection();
 
         if (area != null && area.getAllSelectionsBoxes().size() > 0)
         {
@@ -263,7 +255,7 @@ public class AreaSelectionManager
 
                 if (el.isJsonObject())
                 {
-                    AreaSelection area = AreaSelection.fromJson(el.getAsJsonObject());
+                    Selection area = Selection.fromJson(el.getAsJsonObject());
                     this.selections.put(area.getName(), area);
                 }
             }
@@ -271,7 +263,7 @@ public class AreaSelectionManager
 
         if (JsonUtils.hasString(obj, "current"))
         {
-            this.setCurrentAreaSelection(obj.get("current").getAsString());
+            this.setCurrentSelection(obj.get("current").getAsString());
         }
     }
 
@@ -280,7 +272,7 @@ public class AreaSelectionManager
         JsonObject obj = new JsonObject();
         JsonArray arr = new JsonArray();
 
-        for (AreaSelection area : this.selections.values())
+        for (Selection area : this.selections.values())
         {
             arr.add(area.toJson());
         }
@@ -300,19 +292,19 @@ public class AreaSelectionManager
 
     private static class GrabbedElement
     {
-        public final SelectionBox grabbedBox;
-        public final SelectionBox originalBox;
+        public final Box grabbedBox;
+        public final Box originalBox;
         public final Vec3d grabPosition;
         public final Corner grabbedCorner;
         public double grabDistance;
 
-        private GrabbedElement(SelectionBox box, Corner corner, Vec3d grabPosition, double grabDistance)
+        private GrabbedElement(Box box, Corner corner, Vec3d grabPosition, double grabDistance)
         {
             this.grabbedBox = box;
             this.grabbedCorner = corner;
             this.grabPosition = grabPosition;
             this.grabDistance = grabDistance;
-            this.originalBox = new SelectionBox();
+            this.originalBox = new Box();
             this.originalBox.setPos1(box.getPos1());
             this.originalBox.setPos2(box.getPos2());
         }

@@ -3,8 +3,9 @@ package fi.dy.masa.litematica.util;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.schematic.AreaSelection;
-import fi.dy.masa.litematica.schematic.SelectionBox;
+import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -35,7 +36,7 @@ public class RayTraceUtils
         RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
         double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
 
-        AreaSelection area = DataManager.getInstance(world).getSelectionManager().getSelectedAreaSelection();
+        Selection area = DataManager.getInstance(world).getSelectionManager().getCurrentSelection();
         RayTraceWrapper wrapper = null;
 
         closestBox = null;
@@ -45,7 +46,7 @@ public class RayTraceUtils
 
         if (area != null)
         {
-            for (SelectionBox box : area.getAllSelectionsBoxes())
+            for (Box box : area.getAllSelectionsBoxes())
             {
                 boolean hitCorner = false;
                 hitCorner |= traceToBoxCorner(box, Corner.CORNER_1, eyesPos, lookEndPosc);
@@ -84,7 +85,7 @@ public class RayTraceUtils
         return wrapper;
     }
 
-    private static boolean traceToBoxCorner(SelectionBox box, Corner corner, Vec3d start, Vec3d end)
+    private static boolean traceToBoxCorner(Box box, Corner corner, Vec3d start, Vec3d end)
     {
         BlockPos pos = (corner == Corner.CORNER_1) ? box.getPos1() : (corner == Corner.CORNER_2) ? box.getPos2() : null;
         boolean hitCorner = false;
@@ -110,7 +111,7 @@ public class RayTraceUtils
         return hitCorner;
     }
 
-    private static boolean traceToBoxBody(SelectionBox box, Vec3d start, Vec3d end)
+    private static boolean traceToBoxBody(Box box, Vec3d start, Vec3d end)
     {
         if (box.getPos1() != null && box.getPos2() != null)
         {
@@ -134,7 +135,7 @@ public class RayTraceUtils
         return false;
     }
 
-    private static boolean traceToAreaOrigin(AreaSelection area, Vec3d start, Vec3d end)
+    private static boolean traceToAreaOrigin(Selection area, Vec3d start, Vec3d end)
     {
         BlockPos pos = area.getOrigin();
 
@@ -391,7 +392,7 @@ public class RayTraceUtils
     {
         private final HitType type;
         private final RayTraceResult trace;
-        private final SelectionBox box;
+        private final Box box;
         private final Corner corner;
         private final Vec3d hitVec;
 
@@ -422,7 +423,7 @@ public class RayTraceUtils
             this.hitVec = Vec3d.ZERO;
         }
 
-        public RayTraceWrapper(SelectionBox box, Corner corner, Vec3d hitVec)
+        public RayTraceWrapper(Box box, Corner corner, Vec3d hitVec)
         {
             this.type = corner == Corner.NONE ? HitType.BOX : HitType.CORNER;
             this.trace = null;
@@ -443,7 +444,7 @@ public class RayTraceUtils
         }
 
         @Nullable
-        public SelectionBox getHitSelectionBox()
+        public Box getHitSelectionBox()
         {
             return this.box;
         }

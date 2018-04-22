@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.schematic;
+package fi.dy.masa.litematica.selection;
 
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
@@ -10,7 +10,7 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
-public class SelectionBox
+public class Box
 {
     private BlockPos pos1;
     private BlockPos pos2;
@@ -96,9 +96,9 @@ public class SelectionBox
     }
 
     @Nullable
-    public static SelectionBox fromJson(JsonObject obj)
+    public static Box fromJson(JsonObject obj)
     {
-        SelectionBox box = new SelectionBox();
+        Box box = new Box();
 
         BlockPos pos = JsonUtils.blockPosFromJson(obj, "pos1");
 

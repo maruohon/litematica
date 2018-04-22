@@ -1,9 +1,9 @@
 package fi.dy.masa.litematica.render;
 
-import fi.dy.masa.litematica.schematic.AreaSelection;
-import fi.dy.masa.litematica.schematic.SelectionBox;
-import fi.dy.masa.litematica.util.AreaSelectionManager;
-import fi.dy.masa.litematica.util.DataManager;
+import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.Vec3f;
 import net.minecraft.client.Minecraft;
@@ -36,8 +36,8 @@ public class OverlayRenderer
 
     public void renderSelectionAreas()
     {
-        AreaSelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-        AreaSelection area = sm.getSelectedAreaSelection();
+        SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+        Selection area = sm.getCurrentSelection();
 
         if (area != null)
         {
@@ -46,7 +46,7 @@ public class OverlayRenderer
             float expand = 0.001f;
             float lineWidthBlockBox = 2f;
             float lineWidthArea = 1.5f;
-            SelectionBox currentBox = area.getSelectedSelectionBox();
+            Box currentBox = area.getSelectedSelectionBox();
 
             GlStateManager.depthMask(true);
             GlStateManager.disableLighting();
@@ -54,7 +54,7 @@ public class OverlayRenderer
             GlStateManager.disableTexture2D();
             GlStateManager.pushMatrix();
 
-            for (SelectionBox box : area.getAllSelectionsBoxes())
+            for (Box box : area.getAllSelectionsBoxes())
             {
                 this.renderSelectionBox(box, box == currentBox, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks);
             }
@@ -71,7 +71,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSelectionBox(SelectionBox box, boolean selected, float expand,
+    public void renderSelectionBox(Box box, boolean selected, float expand,
             float lineWidthBlockBox, float lineWidthArea, Entity renderViewEntity, float partialTicks)
     {
         BlockPos pos1 = box.getPos1();

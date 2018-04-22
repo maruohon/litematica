@@ -7,12 +7,12 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.config.KeyCallbacks;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
-import fi.dy.masa.litematica.schematic.AreaSelection;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
-import fi.dy.masa.litematica.schematic.SelectionBox;
-import fi.dy.masa.litematica.util.AreaSelectionManager;
-import fi.dy.masa.litematica.util.DataManager;
+import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
@@ -31,7 +31,7 @@ public class InputEventHandler
     private final Set<Integer> genericHotkeysUsedKeys = new HashSet<>();
     private final Set<Integer> modifierKeys = new HashSet<>();
     private final Minecraft mc;
-    public static SelectionBox selection = new SelectionBox(); // FIXME testing stuff
+    public static Box selection = new Box(); // FIXME testing stuff
 
     private InputEventHandler()
     {
@@ -125,7 +125,7 @@ public class InputEventHandler
             {
                 if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
                 {
-                    AreaSelectionManager sm = DataManager.getInstance(world).getSelectionManager();
+                    SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 
                     if (sm.hasGrabbedElement())
                     {
@@ -147,7 +147,7 @@ public class InputEventHandler
                 {
                     // TODO: if (isInSelectionMode())
                     {
-                        AreaSelectionManager sm = DataManager.getInstance(world).getSelectionManager();
+                        SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 
                         if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
                         {
@@ -199,7 +199,7 @@ public class InputEventHandler
 
         if (mc.world != null && mc.player != null)
         {
-            AreaSelectionManager sm = DataManager.getInstance(mc.world).getSelectionManager();
+            SelectionManager sm = DataManager.getInstance(mc.world).getSelectionManager();
 
             if (sm.hasGrabbedElement())
             {
@@ -210,8 +210,8 @@ public class InputEventHandler
 
     private void setCornerPosition(Minecraft mc, Corner corner)
     {
-        AreaSelectionManager sm = DataManager.getInstance(mc.world).getSelectionManager();
-        AreaSelection sel = sm.getSelectedAreaSelection();
+        SelectionManager sm = DataManager.getInstance(mc.world).getSelectionManager();
+        Selection sel = sm.getCurrentSelection();
 
         if (corner != Corner.NONE && sel != null && sel.getSelectedSelectionBox() != null)
         {

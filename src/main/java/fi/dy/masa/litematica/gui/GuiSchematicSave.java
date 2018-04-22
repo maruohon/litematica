@@ -3,18 +3,18 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
-import fi.dy.masa.litematica.schematic.AreaSelection;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.util.AreaSelectionManager;
-import fi.dy.masa.litematica.util.DataManager;
+import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.InfoUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
 public class GuiSchematicSave extends GuiLitematicaBase
 {
-    private AreaSelectionManager selectionManager;
+    private SelectionManager selectionManager;
 
     public GuiSchematicSave()
     {
@@ -57,10 +57,10 @@ public class GuiSchematicSave extends GuiLitematicaBase
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiSchematicSave gui;
-        private final AreaSelectionManager selectionManager;
+        private final SelectionManager selectionManager;
         private final Type type;
 
-        public ButtonListener(Type type, AreaSelectionManager selectionManager, GuiSchematicSave gui)
+        public ButtonListener(Type type, SelectionManager selectionManager, GuiSchematicSave gui)
         {
             this.type = type;
             this.selectionManager = selectionManager;
@@ -93,9 +93,9 @@ public class GuiSchematicSave extends GuiLitematicaBase
     private static class SchematicSaver implements IStringConsumer
     {
         private final Minecraft mc;
-        private final AreaSelectionManager selectionManager;
+        private final SelectionManager selectionManager;
 
-        public SchematicSaver(Minecraft mc, AreaSelectionManager selectionManager)
+        public SchematicSaver(Minecraft mc, SelectionManager selectionManager)
         {
             this.mc = mc;
             this.selectionManager = selectionManager;
@@ -104,7 +104,7 @@ public class GuiSchematicSave extends GuiLitematicaBase
         @Override
         public void setString(String string)
         {
-            AreaSelection area = this.selectionManager.getSelectedAreaSelection();
+            Selection area = this.selectionManager.getCurrentSelection();
 
             if (area != null)
             {

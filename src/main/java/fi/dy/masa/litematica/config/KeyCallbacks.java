@@ -3,11 +3,11 @@ package fi.dy.masa.litematica.config;
 import fi.dy.masa.litematica.config.hotkeys.IHotkeyCallback;
 import fi.dy.masa.litematica.config.hotkeys.IKeybind;
 import fi.dy.masa.litematica.config.hotkeys.KeyAction;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.RenderEventHandler;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
-import fi.dy.masa.litematica.schematic.AreaSelection;
-import fi.dy.masa.litematica.util.AreaSelectionManager;
-import fi.dy.masa.litematica.util.DataManager;
+import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.SelectionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -73,13 +73,13 @@ public class KeyCallbacks
             {
                 if (key == Hotkeys.ADD_SELECTION_BOX.getKeybind())
                 {
-                    AreaSelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    AreaSelection sel = sm.getSelectedAreaSelection();
+                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    Selection selection = sm.getCurrentSelection();
 
-                    if (sel != null)
+                    if (selection != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        sel.createNewSelectionBox(pos);
+                        selection.createNewSelectionBox(pos);
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         KeyCallbacks.printMessage(this.mc, "litematica.message.added_selection_box", posStr);
@@ -87,14 +87,14 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())
                 {
-                    AreaSelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    AreaSelection sel = sm.getSelectedAreaSelection();
+                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    Selection selection = sm.getCurrentSelection();
 
-                    if (sel != null)
+                    if (selection != null)
                     {
-                        String name = sel.getCurrentSelectionBoxName();
+                        String name = selection.getCurrentSelectionBoxName();
 
-                        if (sel.removeSelectedSelectionBox())
+                        if (selection.removeSelectedSelectionBox())
                         {
                             KeyCallbacks.printMessage(this.mc, "litematica.message.removed_selection_box", name);
                         }
@@ -102,34 +102,34 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
                 {
-                    AreaSelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    AreaSelection area = sm.getSelectedAreaSelection();
+                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    Selection selection = sm.getCurrentSelection();
 
-                    if (area != null)
+                    if (selection != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        area.setOrigin(pos);
+                        selection.setOrigin(pos);
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         KeyCallbacks.printMessage(this.mc, "litematica.message.set_area_origin", posStr);
                     }
                 }
                 else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() || key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())
                 {
-                    AreaSelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    AreaSelection sel = sm.getSelectedAreaSelection();
+                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    Selection selection = sm.getCurrentSelection();
 
-                    if (sel != null && sel.getSelectedSelectionBox() != null)
+                    if (selection != null && selection.getSelectedSelectionBox() != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                         int p = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? 1 : 2;
 
                         if (p == 1)
                         {
-                            sel.getSelectedSelectionBox().setPos1(pos);
+                            selection.getSelectedSelectionBox().setPos1(pos);
                         }
                         else
                         {
-                            sel.getSelectedSelectionBox().setPos2(pos);
+                            selection.getSelectedSelectionBox().setPos2(pos);
                         }
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());

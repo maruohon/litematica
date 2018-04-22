@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.schematic;
+package fi.dy.masa.litematica.selection;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,9 +11,9 @@ import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.JsonUtils;
 import net.minecraft.util.math.BlockPos;
 
-public class AreaSelection
+public class Selection
 {
-    private final Map<String, SelectionBox> selectionBoxes = new HashMap<>();
+    private final Map<String, Box> selectionBoxes = new HashMap<>();
     private BlockPos origin = BlockPos.ORIGIN;
     private String name = "Unnamed";
     @Nullable
@@ -56,18 +56,18 @@ public class AreaSelection
     }
 
     @Nullable
-    public SelectionBox getSelectionBox(String name)
+    public Box getSelectionBox(String name)
     {
         return this.selectionBoxes.get(name);
     }
 
     @Nullable
-    public SelectionBox getSelectedSelectionBox()
+    public Box getSelectedSelectionBox()
     {
         return this.currentBox != null ? this.selectionBoxes.get(this.currentBox) : null;
     }
 
-    public Collection<SelectionBox> getAllSelectionsBoxes()
+    public Collection<Box> getAllSelectionsBoxes()
     {
         return this.selectionBoxes.values();
     }
@@ -87,7 +87,7 @@ public class AreaSelection
             i++;
         }
 
-        SelectionBox box = new SelectionBox();
+        Box box = new Box();
         box.setName(name + i);
         box.setPos1(pos1);
 
@@ -103,7 +103,7 @@ public class AreaSelection
      * @param replace
      * @return true if the box was successfully added, false if replace was false and there was already a box with the same name
      */
-    public boolean addSelectionBox(SelectionBox box, boolean replace)
+    public boolean addSelectionBox(Box box, boolean replace)
     {
         if (replace || this.selectionBoxes.containsKey(box.getName()) == false)
         {
@@ -129,9 +129,9 @@ public class AreaSelection
         return this.currentBox != null ? this.selectionBoxes.remove(this.currentBox) != null : false;
     }
 
-    public static AreaSelection fromJson(JsonObject obj)
+    public static Selection fromJson(JsonObject obj)
     {
-        AreaSelection area = new AreaSelection();
+        Selection area = new Selection();
 
         if (JsonUtils.hasArray(obj, "boxes"))
         {
@@ -144,7 +144,7 @@ public class AreaSelection
 
                 if (el.isJsonObject())
                 {
-                    SelectionBox box = SelectionBox.fromJson(el.getAsJsonObject());
+                    Box box = Box.fromJson(el.getAsJsonObject());
 
                     if (box != null)
                     {
@@ -179,7 +179,7 @@ public class AreaSelection
         JsonObject obj = new JsonObject();
         JsonArray arr = new JsonArray();
 
-        for (SelectionBox box : this.selectionBoxes.values())
+        for (Box box : this.selectionBoxes.values())
         {
             JsonObject o = box.toJson();
 

@@ -1,8 +1,8 @@
-package fi.dy.masa.litematica.schematic;
+package fi.dy.masa.litematica.selection;
 
 import net.minecraft.util.EnumFacing;
 
-public class SelectionBoxSliced extends SelectionBox
+public class BoxSliced extends Box
 {
     private EnumFacing sliceDirection = EnumFacing.EAST;
     private int sliceStart = 0;

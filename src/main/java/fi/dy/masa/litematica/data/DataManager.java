@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.util;
+package fi.dy.masa.litematica.data;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,6 +12,8 @@ import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.schematic.SchematicPlacement;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.JsonUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
@@ -28,7 +30,7 @@ public class DataManager
 
     public static ItemStack toolItem = new ItemStack(Items.STICK);
 
-    private final AreaSelectionManager selectionManager = new AreaSelectionManager();
+    private final SelectionManager selectionManager = new SelectionManager();
     private final List<SchematicPlacement> loadedSchematics = new ArrayList<>();
     private final Minecraft mc;
     private File lastSchematicDirectory; // TODO use a custom class with split directories?
@@ -59,7 +61,7 @@ public class DataManager
         return instance;
     }
 
-    public AreaSelectionManager getSelectionManager()
+    public SelectionManager getSelectionManager()
     {
         return this.selectionManager;
     }

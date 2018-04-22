@@ -2,8 +2,8 @@ package fi.dy.masa.litematica.util;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.schematic.AreaSelection;
-import fi.dy.masa.litematica.schematic.SelectionBox;
+import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.Box;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -56,9 +56,9 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
-    public static BlockPos getTotalAreaSize(AreaSelection area)
+    public static BlockPos getTotalAreaSize(Selection area)
     {
-        Collection<SelectionBox> boxes = area.getAllSelectionsBoxes();
+        Collection<Box> boxes = area.getAllSelectionsBoxes();
 
         if (boxes.isEmpty())
         {
@@ -68,7 +68,7 @@ public class PositionUtils
         BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos( 60000000,  60000000,  60000000);
         BlockPos.MutableBlockPos posMax = new BlockPos.MutableBlockPos(-60000000, -60000000, -60000000);
 
-        for (SelectionBox box : boxes)
+        for (Box box : boxes)
         {
             getMinMaxCoords(posMin, posMax, box.getPos1());
             getMinMaxCoords(posMin, posMax, box.getPos2());
