@@ -14,6 +14,7 @@ litematica.gui.button.reset=Reset
 litematica.gui.button.save_area_to_schematic=Save Area
 
 litematica.gui.label.area_selection_box_count=Boxes: %d
+litematica.gui.label.area_selection_origin=Origin: %s
 
 litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.area_selection_manager=Area Selection Manager

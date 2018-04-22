@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
 public class GuiAreaSelectionManager extends GuiLitematicaBase
@@ -95,6 +96,9 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             Selection selection = this.selectionManager.getSelection(name);
             int count = selection != null ? selection.getAllSelectionsBoxes().size() : 0;
             label = I18n.format("litematica.gui.label.area_selection_box_count", count);
+            BlockPos o = selection.getOrigin();
+            String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
+            label += ", " + I18n.format("litematica.gui.label.area_selection_origin", strOrigin);
             int w = this.fontRenderer.getStringWidth(label);
             this.addLabel(id++, x + 28, y, w, 20, WHITE, label);
             y += button.getButtonHeight() + 2;

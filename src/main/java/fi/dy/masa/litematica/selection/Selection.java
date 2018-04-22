@@ -17,7 +17,7 @@ public class Selection
     private BlockPos origin = BlockPos.ORIGIN;
     private String name = "Unnamed";
     @Nullable
-    private String currentBox = "Box 1";
+    private String currentBox;
 
     public String getName()
     {
@@ -126,7 +126,9 @@ public class Selection
 
     public boolean removeSelectedSelectionBox()
     {
-        return this.currentBox != null ? this.selectionBoxes.remove(this.currentBox) != null : false;
+        boolean success = this.currentBox != null ? this.selectionBoxes.remove(this.currentBox) != null : false;
+        this.currentBox = null;
+        return success;
     }
 
     public void moveEntireSelectionTo(BlockPos newOrigin)
