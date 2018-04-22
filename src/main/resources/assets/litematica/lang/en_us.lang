@@ -3,20 +3,28 @@ language.region=US
 language.code=en_US
 
 litematica.error.duplicate_schematic_load=§cError:§r Tried to load a duplicate schematic + placement
+litematica.error.schematic_write_to_file_failed.directory_creation_failed=Failed to create schematic directory
+litematica.error.schematic_write_to_file_failed.exception=Failed to write the schematic to file '%s'
+litematica.error.schematic_write_to_file_failed.exists=Failed to write the schematic to a file, file already exists
 
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.ok=OK
 litematica.gui.button.rename=Rename
 litematica.gui.button.reset=Reset
+litematica.gui.button.save_area_to_schematic=Save Area
 
 litematica.gui.label.area_selection_box_count=Boxes: %d
 
 litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.area_selection_manager=Area Selection Manager
+litematica.gui.title.save_schematic=Save the currently selected area as a Schematic
+litematica.gui.title.save_schematic_filename=Schematic File Name
 
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.removed_selection_box=Removed selection box %s
+litematica.message.schematic_saved=Schematic saved
+litematica.message.set_area_origin=Set the area origin point to %s
 litematica.message.set_selection_box_point=Set/moved point %d to %s
 litematica.message.toggled=Toggled %s %s
 litematica.message.value.on=ON

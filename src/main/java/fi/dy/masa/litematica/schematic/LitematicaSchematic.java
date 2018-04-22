@@ -1,5 +1,7 @@
 package fi.dy.masa.litematica.schematic;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -8,12 +10,15 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.util.PositionUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityPainting;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +27,7 @@ import net.minecraft.world.World;
 
 public class LitematicaSchematic
 {
-    private final List<BlockStateContainerVariable> blocks = new ArrayList<>();
+    private final List<LitematicaBlockStateContainer> blockContainers = new ArrayList<>();
     private Map<BlockPos, NBTTagCompound> tileEntities = new HashMap<>();
     private List<EntityInfo> entities = new ArrayList<>();
     private final List<BlockPos> subRegionPositions = new ArrayList<>();
@@ -31,7 +36,7 @@ public class LitematicaSchematic
     private String author = "Unknown";
     private long timeCreated;
     private long timeModified;
-    private IBlockState[] palette;
+    private String iconData = "";
 
     public BlockPos getTotalSize()
     {
@@ -41,6 +46,14 @@ public class LitematicaSchematic
     public String getAuthor()
     {
         return this.author;
+    }
+
+    /**
+     * @return the BASE64 encoded PNG image data, if set, or otherwise an empty string
+     */
+    public String getIconData()
+    {
+        return this.iconData;
     }
 
     public long getCreationTime()
@@ -56,6 +69,11 @@ public class LitematicaSchematic
     public boolean hasBeenModified()
     {
         return this.timeModified != this.timeCreated;
+    }
+
+    public void setIconData(String iconData)
+    {
+        this.iconData = iconData;
     }
 
     @Nullable
@@ -130,8 +148,7 @@ public class LitematicaSchematic
             final int sizeX = Math.abs(size.getX());
             final int sizeY = Math.abs(size.getY());
             final int sizeZ = Math.abs(size.getZ());
-            final int length = sizeX * sizeY * sizeZ;
-            BlockStateContainerVariable container = new BlockStateContainerVariable(length);
+            LitematicaBlockStateContainer container = new LitematicaBlockStateContainer(sizeX, sizeY, sizeZ);
 
             // We want to loop nice & easy from 0 to n here, but the per-sub-region pos1 can be at
             // any corner of the area. Thus we need to offset from the total area origin
@@ -157,6 +174,7 @@ public class LitematicaSchematic
 
                             if (te != null)
                             {
+                                // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x + startX - origin.getX(), y + startY - origin.getY(), z + startZ - origin.getZ());
                                 NBTTagCompound nbt = new NBTTagCompound();
                                 nbt = te.writeToNBT(nbt);
@@ -167,7 +185,7 @@ public class LitematicaSchematic
                 }
             }
 
-            this.blocks.add(container);
+            this.blockContainers.add(container);
         }
     }
 
@@ -206,6 +224,194 @@ public class LitematicaSchematic
     private static boolean isBoxValid(SelectionBox box)
     {
         return box.getPos1() != null && box.getPos2() != null;
+    }
+
+    private NBTTagCompound writeToNBT()
+    {
+        NBTTagCompound nbt = new NBTTagCompound();
+
+        nbt.setInteger("SizeX", this.totalSize.getX());
+        nbt.setInteger("SizeY", this.totalSize.getY());
+        nbt.setInteger("SizeZ", this.totalSize.getZ());
+        nbt.setString("Author", this.author);
+        nbt.setLong("TimeCreated", this.timeCreated);
+        nbt.setLong("TimeModified", this.timeModified);
+        nbt.setString("IconData", this.iconData);
+
+        this.writeBlockPosListToNBT(this.subRegionSizes, nbt, "RegionSizes");
+        this.writeBlockPosListToNBT(this.subRegionPositions, nbt, "RegionPositions");
+
+        this.writeEntitiesToNBT(nbt, "Entities");
+        this.writeTileEntitiesToNBT(nbt, "TileEntities");
+        this.writeBlocksToNBT(nbt, "Blocks");
+
+        return nbt;
+    }
+
+    private void writeBlockPosListToNBT(List<BlockPos> list, NBTTagCompound nbt, String tagName)
+    {
+        if (list.size() > 0)
+        {
+            NBTTagList tagList = new NBTTagList();
+
+            for (BlockPos pos : list)
+            {
+                NBTTagCompound tag = new NBTTagCompound();
+                this.writeBlockPosToTag(pos, tag);
+                tagList.appendTag(tag);
+            }
+
+            nbt.setTag(tagName, tagList);
+        }
+    }
+
+    private void writeEntitiesToNBT(NBTTagCompound nbt, String tagName)
+    {
+        if (this.entities.size() > 0)
+        {
+            NBTTagList tagList = new NBTTagList();
+
+            for (EntityInfo info : this.entities)
+            {
+                NBTTagCompound tag = new NBTTagCompound();
+
+                this.writeBlockPosToTag(info.pos, tag);
+                this.writeVec3dToTag(info.posVec, tag);
+                tag.setTag("EntityData", info.nbt);
+
+                tagList.appendTag(tag);
+            }
+
+            nbt.setTag(tagName, tagList);
+        }
+    }
+
+    private void writeTileEntitiesToNBT(NBTTagCompound nbt, String tagName)
+    {
+        if (this.tileEntities.size() > 0)
+        {
+            NBTTagList tagList = new NBTTagList();
+
+            for (Map.Entry<BlockPos, NBTTagCompound> entry : this.tileEntities.entrySet())
+            {
+                NBTTagCompound tag = new NBTTagCompound();
+                NBTTagCompound tileNbt = entry.getValue();
+                tileNbt.removeTag("x");
+                tileNbt.removeTag("y");
+                tileNbt.removeTag("z");
+                tag.setTag("TileNBT", entry.getValue());
+
+                // Note: This within-schematic relative position is not inside the tile tag!
+                this.writeBlockPosToTag(entry.getKey(), tag);
+
+                tagList.appendTag(tag);
+            }
+
+            nbt.setTag(tagName, tagList);
+        }
+    }
+
+    private void writeBlocksToNBT(NBTTagCompound nbt, String tagName)
+    {
+        if (this.blockContainers.size() > 0)
+        {
+            NBTTagCompound wrapper = new NBTTagCompound();
+            int area = 0;
+
+            for (LitematicaBlockStateContainer container : this.blockContainers)
+            {
+                NBTTagCompound tag = new NBTTagCompound();
+                tag.setTag("Palette", container.getPalette().writeToNBT());
+                tag.setIntArray("BlockStatesIntArray", this.longArrayToIntArray(container.getBackingLongArray()));
+                wrapper.setTag("Area_" + area, tag);
+                area++;
+            }
+
+            nbt.setTag(tagName, wrapper);
+        }
+    }
+
+    private int[] longArrayToIntArray(long[] arrLong)
+    {
+        int[] arrInt = new int[arrLong.length * 2];
+
+        for (int i = 0; i < arrLong.length; ++i)
+        {
+            arrInt[i * 2    ] = (int) ( arrLong[i]         & 0xFFFFFFFF);
+            arrInt[i * 2 + 1] = (int) ((arrLong[i] >>> 32) & 0xFFFFFFFF);
+        }
+
+        return arrInt;
+    }
+
+    private long[] intArrayToLongArray(int[] arrInt)
+    {
+        long[] arrLong = new long[(int) Math.ceil(arrInt.length / 2)];
+        final int maxLower = (int) Math.floor(arrInt.length / 2);
+
+        for (int i = 0; i < maxLower; ++i)
+        {
+            int intIndex = i << 1;
+            arrLong[i] = (((long) arrInt[intIndex + 1]) << 32) | arrInt[intIndex];
+        }
+
+        // Odd number of input elements, handle the last element
+        if (maxLower != arrLong.length)
+        {
+            arrLong[arrLong.length - 1] = arrInt[arrInt.length - 1];
+        }
+
+        return arrLong;
+    }
+
+    private void writeBlockPosToTag(BlockPos pos, NBTTagCompound tag)
+    {
+        tag.setInteger("x", pos.getX());
+        tag.setInteger("y", pos.getY());
+        tag.setInteger("z", pos.getZ());
+    }
+
+    private void writeVec3dToTag(Vec3d vec, NBTTagCompound tag)
+    {
+        tag.setDouble("dx", vec.x);
+        tag.setDouble("dy", vec.y);
+        tag.setDouble("dz", vec.z);
+    }
+
+    public boolean writeToFile(File dir, String filename, boolean override, IStringConsumer feedback)
+    {
+        if (filename.endsWith(".litematic") == false)
+        {
+            filename = filename + ".litematic";
+        }
+
+        File file = new File(dir, filename);
+
+        try
+        {
+            if (dir.exists() == false && dir.mkdirs() == false)
+            {
+                feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.directory_creation_failed", dir.getAbsolutePath()));
+                return false;
+            }
+
+            if (file.exists() && override == false)
+            {
+                feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.exists", file.getAbsolutePath()));
+                return false;
+            }
+
+            FileOutputStream os = new FileOutputStream(file);
+            CompressedStreamTools.writeCompressed(this.writeToNBT(), os);
+            os.close();
+            return true;
+        }
+        catch (Exception e)
+        {
+            feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.exception", file.getAbsolutePath()));
+        }
+
+        return false;
     }
 
     public static class EntityInfo

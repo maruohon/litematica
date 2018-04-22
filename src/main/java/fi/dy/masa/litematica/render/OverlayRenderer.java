@@ -22,6 +22,7 @@ public class OverlayRenderer
     private Vec3f colorZ = new Vec3f(0.25f, 0.25f,    1f);
     private Vec3f colorArea = new Vec3f(1f, 1f, 1f);
     private Vec3f colorSelectedCorner = new Vec3f(0f, 1f, 1f);
+    private Vec3f colorAreaOrigin = new Vec3f(1f, 0x90 / 255f, 0x10 / 255f);
 
     private OverlayRenderer()
     {
@@ -36,16 +37,16 @@ public class OverlayRenderer
     public void renderSelectionAreas()
     {
         AreaSelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-        AreaSelection sel = sm.getSelectedAreaSelection();
+        AreaSelection area = sm.getSelectedAreaSelection();
 
-        if (sel != null)
+        if (area != null)
         {
             Entity renderViewEntity = this.mc.getRenderViewEntity();
             float partialTicks = this.mc.getRenderPartialTicks();
             float expand = 0.001f;
             float lineWidthBlockBox = 2f;
             float lineWidthArea = 1.5f;
-            SelectionBox currentBox = sel.getSelectedSelectionBox();
+            SelectionBox currentBox = area.getSelectedSelectionBox();
 
             GlStateManager.depthMask(true);
             GlStateManager.disableLighting();
@@ -53,9 +54,14 @@ public class OverlayRenderer
             GlStateManager.disableTexture2D();
             GlStateManager.pushMatrix();
 
-            for (SelectionBox box : sel.getAllSelectionsBoxes())
+            for (SelectionBox box : area.getAllSelectionsBoxes())
             {
                 this.renderSelectionBox(box, box == currentBox, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks);
+            }
+
+            if (area.getOrigin() != null)
+            {
+                RenderUtils.renderBlockOutline(area.getOrigin(), expand, lineWidthBlockBox, this.colorAreaOrigin, renderViewEntity, partialTicks);
             }
 
             GlStateManager.popMatrix();

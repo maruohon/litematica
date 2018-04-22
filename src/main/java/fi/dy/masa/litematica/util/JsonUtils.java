@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import fi.dy.masa.litematica.LiteModLitematica;
+import net.minecraft.util.math.BlockPos;
 
 public class JsonUtils
 {
@@ -170,6 +171,44 @@ public class JsonUtils
     public static String getString(JsonObject obj, String name)
     {
         return getStringOrDefault(obj, name, null);
+    }
+
+    public static boolean hasBlockPos(JsonObject obj, String name)
+    {
+        return blockPosFromJson(obj, name) != null;
+    }
+
+    public static JsonArray blockPosToJson(BlockPos pos)
+    {
+        JsonArray arr = new JsonArray();
+
+        arr.add(pos.getX());
+        arr.add(pos.getY());
+        arr.add(pos.getZ());
+
+        return arr;
+    }
+
+    @Nullable
+    public static BlockPos blockPosFromJson(JsonObject obj, String name)
+    {
+        if (hasArray(obj, name))
+        {
+            JsonArray arr = obj.getAsJsonArray(name);
+
+            if (arr.size() == 3)
+            {
+                try
+                {
+                    return new BlockPos(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        }
+
+        return null;
     }
 
     // https://stackoverflow.com/questions/29786197/gson-jsonobject-copy-value-affected-others-jsonobject-instance

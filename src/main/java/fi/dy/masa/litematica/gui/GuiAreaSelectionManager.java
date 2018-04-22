@@ -7,8 +7,8 @@ import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.AreaSelection;
-import fi.dy.masa.litematica.util.DataManager;
 import fi.dy.masa.litematica.util.AreaSelectionManager;
+import fi.dy.masa.litematica.util.DataManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
@@ -32,12 +32,6 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
     protected String getTitle()
     {
         return I18n.format("litematica.gui.title.area_selection_manager");
-    }
-
-    @Override
-    public boolean doesGuiPauseGame()
-    {
-        return false;
     }
 
     @Override

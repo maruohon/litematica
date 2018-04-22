@@ -7,6 +7,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.config.KeyCallbacks;
+import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.schematic.AreaSelection;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.schematic.SelectionBox;
@@ -78,6 +79,10 @@ public class InputEventHandler
             // FIXME temporary testing stuff
             if (Keyboard.getEventKeyState() && GuiScreen.isAltKeyDown())
             {
+                if (eventKey == Keyboard.KEY_0)
+                {
+                    this.mc.displayGuiScreen(new GuiSchematicSave());
+                }
                 if (eventKey == Keyboard.KEY_3)
                 {
                     File file = new File(new File(this.mc.mcDataDir, "schematics"), "test.schematic");

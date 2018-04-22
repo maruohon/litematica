@@ -28,6 +28,7 @@ public class KeyCallbacks
 
         Hotkeys.ADD_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
         Hotkeys.DELETE_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
+        Hotkeys.SET_AREA_ORIGIN.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
@@ -97,6 +98,19 @@ public class KeyCallbacks
                         {
                             KeyCallbacks.printMessage(this.mc, "litematica.message.removed_selection_box", name);
                         }
+                    }
+                }
+                else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
+                {
+                    AreaSelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    AreaSelection area = sm.getSelectedAreaSelection();
+
+                    if (area != null)
+                    {
+                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        area.setOrigin(pos);
+                        String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                        KeyCallbacks.printMessage(this.mc, "litematica.message.set_area_origin", posStr);
                     }
                 }
                 else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() || key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())

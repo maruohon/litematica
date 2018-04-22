@@ -164,6 +164,13 @@ public class AreaSelection
             area.currentBox = obj.get("current").getAsString();
         }
 
+        BlockPos pos = JsonUtils.blockPosFromJson(obj, "origin");
+
+        if (pos != null)
+        {
+            area.origin = pos;
+        }
+
         return area;
     }
 
@@ -192,6 +199,11 @@ public class AreaSelection
             }
 
             obj.add("boxes", arr);
+        }
+
+        if (this.origin != null)
+        {
+            obj.add("origin", JsonUtils.blockPosToJson(this.origin));
         }
 
         return obj;

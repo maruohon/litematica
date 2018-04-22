@@ -10,6 +10,7 @@ public enum Hotkeys implements IHotkey
     DELETE_SELECTION_BOX                ("deleteSelectionBox",              "M,D",  "Delete the currently selected selection box"),
     OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the area selection manager GUI"),
     SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
+    SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,O",  "Set the origin point of the currently selected area"),
     SET_SELECTION_BOX_POSITION_1        ("setSelectionBoxPosition1",        "M,1",  "Set the first position of the currently selected box to the player's position"),
     SET_SELECTION_BOX_POSITION_2        ("setSelectionBoxPosition2",        "M,2",  "Set the second position of the currently selected box to the player's position"),
     TOGGLE_ALL_RENDERING                ("toggleAllRendering",              "M,R",  "Toggle all rendering on/off"),

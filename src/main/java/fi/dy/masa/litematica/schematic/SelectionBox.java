@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.JsonUtils;
@@ -84,7 +83,7 @@ public class SelectionBox
     {
         if (this.pos1 != null && this.pos2 != null)
         {
-            this.size = this.pos2.subtract(this.pos1).add(1, 1, 1);
+            this.size = PositionUtils.getAreaSizeFromRelativeEndPosition(this.pos2.subtract(this.pos1));
         }
         else if (this.pos1 == null && this.pos2 == null)
         {
@@ -101,16 +100,18 @@ public class SelectionBox
     {
         SelectionBox box = new SelectionBox();
 
-        if (JsonUtils.hasArray(obj, "pos1"))
+        BlockPos pos = JsonUtils.blockPosFromJson(obj, "pos1");
+
+        if (pos != null)
         {
-            JsonArray arr = obj.get("pos1").getAsJsonArray();
-            box.setPos1(blockPosFromJson(arr));
+            box.setPos1(pos);
         }
 
-        if (JsonUtils.hasArray(obj, "pos2"))
+        pos = JsonUtils.blockPosFromJson(obj, "pos2");
+
+        if (pos != null)
         {
-            JsonArray arr = obj.get("pos2").getAsJsonArray();
-            box.setPos2(blockPosFromJson(arr));
+            box.setPos2(pos);
         }
 
         if (JsonUtils.hasString(obj, "name"))
@@ -128,44 +129,16 @@ public class SelectionBox
 
         if (this.pos1 != null)
         {
-            obj.add("pos1", blockPosToJson(this.pos1));
+            obj.add("pos1", JsonUtils.blockPosToJson(this.pos1));
         }
 
         if (this.pos2 != null)
         {
-            obj.add("pos2", blockPosToJson(this.pos2));
+            obj.add("pos2", JsonUtils.blockPosToJson(this.pos2));
         }
 
         obj.add("name", new JsonPrimitive(this.name));
 
         return this.pos1 != null || this.pos2 != null ? obj : null;
-    }
-
-    public static JsonArray blockPosToJson(BlockPos pos)
-    {
-        JsonArray arr = new JsonArray();
-
-        arr.add(pos.getX());
-        arr.add(pos.getY());
-        arr.add(pos.getZ());
-
-        return arr;
-    }
-
-    @Nullable
-    public static BlockPos blockPosFromJson(JsonArray arr)
-    {
-        if (arr.size() == 3)
-        {
-            try
-            {
-                return new BlockPos(arr.get(0).getAsInt(), arr.get(1).getAsInt(), arr.get(2).getAsInt());
-            }
-            catch (Exception e)
-            {
-            }
-        }
-
-        return null;
     }
 }

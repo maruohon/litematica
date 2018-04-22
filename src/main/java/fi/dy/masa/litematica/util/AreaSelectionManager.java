@@ -125,6 +125,10 @@ public class AreaSelectionManager
                 this.changeSelection(area, trace);
                 return true;
             }
+            else if (trace.getHitType() == HitType.ORIGIN)
+            {
+                return true;
+            }
             else if (trace.getHitType() == HitType.MISS)
             {
                 SelectionBox box = area.getSelectedSelectionBox();
@@ -152,9 +156,16 @@ public class AreaSelectionManager
             box.setSelectedCorner(Corner.NONE);
         }
 
-        box = trace.getHitSelectionBox();
-        area.setSelectedBox(box.getName());
-        box.setSelectedCorner(trace.getHitCorner());
+        if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX)
+        {
+            box = trace.getHitSelectionBox();
+            area.setSelectedBox(box.getName());
+            box.setSelectedCorner(trace.getHitCorner());
+        }
+        else if (trace.getHitType() == HitType.ORIGIN)
+        {
+            
+        }
     }
 
     public boolean hasSelectedElement()

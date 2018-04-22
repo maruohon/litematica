@@ -28,12 +28,12 @@ public class RayTraceUtils
     @Nonnull
     public static RayTraceWrapper getWrappedRayTraceFromEntity(World world, Entity entity, double range)
     {
-        Vec3d eyesVec = entity.getPositionEyes(1f);
+        Vec3d eyesPos = entity.getPositionEyes(1f);
         Vec3d rangedLookRot = entity.getLook(1f).scale(range);
-        Vec3d lookVec = eyesVec.add(rangedLookRot);
+        Vec3d lookEndPosc = eyesPos.add(rangedLookRot);
 
         RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
-        double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesVec) : -1D;
+        double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
 
         AreaSelection area = DataManager.getInstance(world).getSelectionManager().getSelectedAreaSelection();
         RayTraceWrapper wrapper = null;
@@ -48,14 +48,16 @@ public class RayTraceUtils
             for (SelectionBox box : area.getAllSelectionsBoxes())
             {
                 boolean hitCorner = false;
-                hitCorner |= traceToBoxCorner(box, Corner.CORNER_1, eyesVec, lookVec);
-                hitCorner |= traceToBoxCorner(box, Corner.CORNER_2, eyesVec, lookVec);
+                hitCorner |= traceToBoxCorner(box, Corner.CORNER_1, eyesPos, lookEndPosc);
+                hitCorner |= traceToBoxCorner(box, Corner.CORNER_2, eyesPos, lookEndPosc);
 
                 if (hitCorner == false)
                 {
-                    traceToBoxBody(box, eyesVec, lookVec);
+                    traceToBoxBody(box, eyesPos, lookEndPosc);
                 }
             }
+
+            traceToAreaOrigin(area, eyesPos, lookEndPosc);
         }
 
         double closestDistance = closestVanilla;
@@ -70,7 +72,8 @@ public class RayTraceUtils
         if (closestCornerDistance >= 0 && (closestDistance < 0 || closestCornerDistance <= closestDistance))
         {
             closestDistance = closestCornerDistance;
-            wrapper = closestCorner;
+            // The origin type uses the corner distance variable, but not the trace wrapper
+            wrapper = closestCorner != null ? closestCorner : new RayTraceWrapper(RayTraceWrapper.HitType.ORIGIN);
         }
 
         if (wrapper == null || closestDistance < 0)
@@ -131,14 +134,38 @@ public class RayTraceUtils
         return false;
     }
 
+    private static boolean traceToAreaOrigin(AreaSelection area, Vec3d start, Vec3d end)
+    {
+        BlockPos pos = area.getOrigin();
+
+        if (pos != null)
+        {
+            AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
+            RayTraceResult hit = bb.calculateIntercept(start, end);
+
+            if (hit != null)
+            {
+                double dist = hit.hitVec.distanceTo(start);
+
+                if (closestCornerDistance < 0 || dist < closestCornerDistance)
+                {
+                    closestCornerDistance = dist;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     @Nonnull
     public static RayTraceResult getRayTraceFromEntity(World world, Entity entity, boolean useLiquids, double range)
     {
-        Vec3d eyesVec = entity.getPositionEyes(1f);
+        Vec3d eyesPos = entity.getPositionEyes(1f);
         Vec3d rangedLookRot = entity.getLook(1f).scale(range);
-        Vec3d lookVec = eyesVec.add(rangedLookRot);
+        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
-        RayTraceResult result = rayTraceBlocks(world, eyesVec, lookVec, useLiquids, false, false, 1000);
+        RayTraceResult result = rayTraceBlocks(world, eyesPos, lookEndPos, useLiquids, false, false, 1000);
 
         if (result == null)
         {
@@ -148,7 +175,7 @@ public class RayTraceUtils
         AxisAlignedBB bb = entity.getEntityBoundingBox().expand(rangedLookRot.x, rangedLookRot.y, rangedLookRot.z).expand(1d, 1d, 1d);
         List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(entity, bb);
 
-        double closest = result.typeOfHit == RayTraceResult.Type.BLOCK ? eyesVec.distanceTo(result.hitVec) : Double.MAX_VALUE;
+        double closest = result.typeOfHit == RayTraceResult.Type.BLOCK ? eyesPos.distanceTo(result.hitVec) : Double.MAX_VALUE;
         RayTraceResult entityTrace = null;
         Entity targetEntity = null;
 
@@ -156,11 +183,11 @@ public class RayTraceUtils
         {
             Entity entityTmp = list.get(i);
             bb = entityTmp.getEntityBoundingBox();
-            RayTraceResult traceTmp = bb.calculateIntercept(lookVec, eyesVec);
+            RayTraceResult traceTmp = bb.calculateIntercept(lookEndPos, eyesPos);
 
             if (traceTmp != null)
             {
-                double distance = eyesVec.distanceTo(traceTmp.hitVec);
+                double distance = eyesPos.distanceTo(traceTmp.hitVec);
 
                 if (distance <= closest)
                 {
@@ -176,7 +203,7 @@ public class RayTraceUtils
             result = new RayTraceResult(targetEntity, entityTrace.hitVec);
         }
 
-        if (eyesVec.distanceTo(result.hitVec) > range)
+        if (eyesPos.distanceTo(result.hitVec) > range)
         {
             result = new RayTraceResult(RayTraceResult.Type.MISS, Vec3d.ZERO, EnumFacing.UP, BlockPos.ORIGIN);
         }
@@ -386,6 +413,15 @@ public class RayTraceUtils
             this.hitVec = trace.hitVec;
         }
 
+        public RayTraceWrapper(HitType type)
+        {
+            this.type = type;
+            this.trace = null;
+            this.box = null;
+            this.corner = Corner.NONE;
+            this.hitVec = Vec3d.ZERO;
+        }
+
         public RayTraceWrapper(SelectionBox box, Corner corner, Vec3d hitVec)
         {
             this.type = corner == Corner.NONE ? HitType.BOX : HitType.CORNER;
@@ -427,7 +463,8 @@ public class RayTraceUtils
             MISS,
             VANILLA,
             BOX,
-            CORNER;
+            CORNER,
+            ORIGIN;
         }
     }
 }
