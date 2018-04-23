@@ -3,6 +3,8 @@ language.region=US
 language.code=en_US
 
 litematica.error.duplicate_schematic_load=§cError:§r Tried to load a duplicate schematic + placement
+litematica.error.schematic_read_from_file_failed.cant_read=Failed to read schematic from file '%s'
+litematica.error.schematic_read_from_file_failed.exception=Exception while trying to read schematic from file '%s'
 litematica.error.schematic_write_to_file_failed.directory_creation_failed=Failed to create schematic directory
 litematica.error.schematic_write_to_file_failed.exception=Failed to write the schematic to file '%s'
 litematica.error.schematic_write_to_file_failed.exists=Failed to write the schematic to a file, file already exists
@@ -25,6 +27,7 @@ litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.moved_selection=Moved the current selection from %s to %s
 litematica.message.removed_selection_box=Removed selection box %s
+litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
 litematica.message.schematic_saved=Schematic saved
 litematica.message.set_area_origin=Set the area origin point to %s
 litematica.message.set_selection_box_point=Set/moved point %d to %s

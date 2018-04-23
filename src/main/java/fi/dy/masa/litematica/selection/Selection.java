@@ -131,6 +131,26 @@ public class Selection
         return success;
     }
 
+    public boolean renameSelectionBox(String oldName, String newName)
+    {
+        Box box = this.selectionBoxes.remove(oldName);
+
+        if (box != null)
+        {
+            box.setName(newName);
+            this.selectionBoxes.put(newName, box);
+
+            if (this.currentBox != null && this.currentBox.equals(oldName))
+            {
+                this.currentBox = newName;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     public void moveEntireSelectionTo(BlockPos newOrigin)
     {
         BlockPos diff = newOrigin.subtract(this.origin);
