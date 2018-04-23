@@ -1,9 +1,11 @@
 package fi.dy.masa.litematica.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.Selection;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -56,10 +58,34 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
-    public static BlockPos getTotalAreaSize(Selection area)
+    public static List<Box> getValidBoxes(Selection area)
     {
-        Collection<Box> boxes = area.getAllSelectionsBoxes();
+        List<Box> boxes = new ArrayList<>();
+        Collection<Box> originalBoxes = area.getAllSelectionsBoxes();
 
+        for (Box box : originalBoxes)
+        {
+            if (isBoxValid(box))
+            {
+                boxes.add(box);
+            }
+        }
+
+        return boxes;
+    }
+
+    public static boolean isBoxValid(Box box)
+    {
+        return box.getPos1() != null && box.getPos2() != null;
+    }
+
+    public static BlockPos getEnclosingAreaSize(Selection area)
+    {
+        return getEnclosingAreaSize(area.getAllSelectionsBoxes());
+    }
+
+    public static BlockPos getEnclosingAreaSize(Collection<Box> boxes)
+    {
         if (boxes.isEmpty())
         {
             return BlockPos.ORIGIN;
@@ -75,6 +101,28 @@ public class PositionUtils
         }
 
         return posMax.subtract(posMin).add(1, 1, 1);
+    }
+
+    public static int getTotalVolume(Collection<Box> boxes)
+    {
+        if (boxes.isEmpty())
+        {
+            return 0;
+        }
+
+        int volume = 0;
+
+        for (Box box : boxes)
+        {
+            if (isBoxValid(box))
+            {
+                BlockPos min = getMinCorner(box.getPos1(), box.getPos2());
+                BlockPos max = getMaxCorner(box.getPos1(), box.getPos2());
+                volume += (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
+            }
+        }
+
+        return volume;
     }
 
     private static void getMinMaxCoords(BlockPos.MutableBlockPos posMin, BlockPos.MutableBlockPos posMax, @Nullable BlockPos posToCheck)

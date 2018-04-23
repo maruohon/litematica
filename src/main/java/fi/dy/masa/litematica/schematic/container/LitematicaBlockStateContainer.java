@@ -18,7 +18,7 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
 
     public LitematicaBlockStateContainer(int sizeX, int sizeY, int sizeZ)
     {
-        this(sizeX, sizeY, sizeZ, 4, null);
+        this(sizeX, sizeY, sizeZ, 2, null);
     }
 
     private LitematicaBlockStateContainer(int sizeX, int sizeY, int sizeZ, int bits, long[] backingLongArray)

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.util.Constants;
 import fi.dy.masa.litematica.util.NBTUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -40,6 +40,7 @@ public class LitematicaSchematic
     private final Map<String, BlockPos> subRegionSizes = new HashMap<>();
     private final SchematicMetadata metadata = new SchematicMetadata();
     private BlockPos totalSize = BlockPos.ORIGIN;
+    private int totalBlocks;
 
     public BlockPos getTotalSize()
     {
@@ -54,7 +55,7 @@ public class LitematicaSchematic
     @Nullable
     public static LitematicaSchematic makeSchematic(World world, Selection area, boolean takeEntities, String author, IStringConsumer feedback)
     {
-        List<Box> boxes = getValidBoxes(area);
+        List<Box> boxes = PositionUtils.getValidBoxes(area);
 
         if (boxes.isEmpty())
         {
@@ -65,15 +66,19 @@ public class LitematicaSchematic
         LitematicaSchematic schematic = new LitematicaSchematic();
 
         long time = (new Date()).getTime();
-        schematic.totalSize = PositionUtils.getTotalAreaSize(area);
+        schematic.totalSize = PositionUtils.getEnclosingAreaSize(area);
         schematic.metadata.setAuthor(author);
         schematic.metadata.setTimeCreated(time);
         schematic.metadata.setTimeModified(time);
+        schematic.metadata.setRegionCount(boxes.size());
+        schematic.metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
+        schematic.metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
 
         schematic.setSubRegionPositions(boxes, area.getOrigin());
         schematic.setSubRegionSizes(boxes);
 
         schematic.takeBlocksFromWorld(world, boxes, area.getOrigin());
+        schematic.metadata.setTotalBlocks(schematic.totalBlocks);
 
         if (takeEntities)
         {
@@ -148,6 +153,12 @@ public class LitematicaSchematic
                         IBlockState state = world.getBlockState(posMutable).getActualState(world, posMutable);
                         container.set(x, y, z, state);
 
+                        // TODO Should just call world.isAirBlock() to be (better) Forge-mod compatible?
+                        if (state.getMaterial() != Material.AIR)
+                        {
+                            this.totalBlocks++;
+                        }
+
                         if (state.getBlock().hasTileEntity())
                         {
                             TileEntity te = world.getTileEntity(posMutable);
@@ -184,27 +195,6 @@ public class LitematicaSchematic
         {
             this.subRegionSizes.put(box.getName(), box.getSize());
         }
-    }
-
-    private static List<Box> getValidBoxes(Selection area)
-    {
-        List<Box> boxes = new ArrayList<>();
-        Collection<Box> originalBoxes = area.getAllSelectionsBoxes();
-
-        for (Box box : originalBoxes)
-        {
-            if (isBoxValid(box))
-            {
-                boxes.add(box);
-            }
-        }
-
-        return boxes;
-    }
-
-    private static boolean isBoxValid(Box box)
-    {
-        return box.getPos1() != null && box.getPos2() != null;
     }
 
     private NBTTagCompound writeToNBT()
