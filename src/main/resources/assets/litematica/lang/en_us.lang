@@ -17,11 +17,20 @@ litematica.gui.button.save_area_to_schematic=Save Area
 
 litematica.gui.label.area_selection_box_count=Boxes: %d
 litematica.gui.label.area_selection_origin=Origin: %s
+litematica.gui.label.description=Description
+litematica.gui.label.schematic_info.author=Author: §f%s§r
+litematica.gui.label.schematic_info.enclosing_size=Enclosing size:
+litematica.gui.label.schematic_info.region_count=Regions: §f%d§r
+litematica.gui.label.schematic_info.time_created=Created: §f%s§r
+litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
+litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
+litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
 litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.save_schematic=Save the currently selected area as a Schematic
 litematica.gui.title.save_schematic_filename=Schematic File Name
+litematica.gui.title.schematic_browser=Schematic Browser
 
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.grabbed_element_for_moving=Grabbed an element to move

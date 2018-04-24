@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import java.io.IOException;
 import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.data.DataManager;
@@ -15,6 +16,7 @@ import net.minecraft.client.resources.I18n;
 public class GuiSchematicSave extends GuiLitematicaBase
 {
     private SelectionManager selectionManager;
+    private WidgetSchematicBrowser schematicBrowser;
 
     public GuiSchematicSave()
     {
@@ -37,6 +39,14 @@ public class GuiSchematicSave extends GuiLitematicaBase
     {
         super.initGui();
 
+        if (this.schematicBrowser == null)
+        {
+            this.schematicBrowser = new WidgetSchematicBrowser(10, 60, this.width - 20, this.height - 100);
+        }
+
+        this.schematicBrowser.setSize(this.width - 20, this.height - 100);
+        this.schematicBrowser.initGui();
+
         int xStart = LEFT;
         int x = xStart;
         int y = TOP + 20;
@@ -47,6 +57,46 @@ public class GuiSchematicSave extends GuiLitematicaBase
         ButtonGeneric button = new ButtonGeneric(id++, x, y, nameWidth, 20, label);
         ButtonListener listener = this.createActionListener(ButtonListener.Type.SAVE);
         this.addButton(button, listener);
+    }
+
+    @Override
+    public void setWorldAndResolution(Minecraft mc, int width, int height)
+    {
+        super.setWorldAndResolution(mc, width, height);
+
+        this.schematicBrowser.setWorldAndResolution(mc, width, height);
+    }
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
+        super.drawScreen(mouseX, mouseY, partialTicks);
+
+        this.schematicBrowser.drawScreen(mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        this.schematicBrowser.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    @Override
+    protected void mouseWheelScrolled(int mouseWheelDelta)
+    {
+        super.mouseWheelScrolled(mouseWheelDelta);
+
+        this.schematicBrowser.mouseWheelScrolled(mouseWheelDelta);
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+        super.keyTyped(typedChar, keyCode);
+
+        this.schematicBrowser.keyTyped(typedChar, keyCode);
     }
 
     private ButtonListener createActionListener(ButtonListener.Type type)

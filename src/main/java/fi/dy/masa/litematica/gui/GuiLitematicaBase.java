@@ -13,7 +13,10 @@ import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.text.TextFormatting;
 
 public abstract class GuiLitematicaBase extends GuiScreen
@@ -85,11 +88,26 @@ public abstract class GuiLitematicaBase extends GuiScreen
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int button) throws IOException
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
-        this.mousePressed(mouseX, mouseY, button);
+        if (mouseButton == 0)
+        {
+            if (this.scrollBar.wasMouseOver())
+            {
+                this.scrollBar.setDragging(true);
+            }
+        }
 
-        super.mouseClicked(mouseX, mouseY, button);
+        for (ButtonEntry<?> entry : this.buttons)
+        {
+            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
+            {
+                // Don't call super if the button press got handled
+                return;
+            }
+        }
+
+        super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -115,26 +133,6 @@ public abstract class GuiLitematicaBase extends GuiScreen
     protected void mouseWheelScrolled(int mouseWheelDelta)
     {
         this.scrollBar.offsetValue(-mouseWheelDelta / 8);
-    }
-
-    protected void mousePressed(int mouseX, int mouseY, int mouseButton)
-    {
-        if (mouseButton == 0)
-        {
-            if (this.scrollBar.wasMouseOver())
-            {
-                this.scrollBar.setDragging(true);
-            }
-        }
-
-        for (ButtonEntry<?> entry : this.buttons)
-        {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return;
-            }
-        }
     }
 
     @Override
@@ -269,5 +267,40 @@ public abstract class GuiLitematicaBase extends GuiScreen
         this.scrollBar.drawScrollBar(mouseX, mouseY, partialTicks, this.innerWidth + MARGIN - 5, TOP, 5, this.innerHeight,
                 Math.max(this.innerHeight, this.totalHeight));
         */
+    }
+
+    public static void drawOutlinedBox(int x, int y, int width, int height, int colorBg, int colorBorder)
+    {
+        // Draw the background
+        drawRect(x, y, x + width, y + height, colorBg);
+
+        // Draw the border
+        drawOutline(x, y, width, height, colorBorder);
+    }
+
+    public static void drawOutline(int x, int y, int width, int height, int colorBorder)
+    {
+        int right = x + width;
+        int bottom = y + height;
+
+        drawRect(x - 1,  y - 1,         x, bottom + 1, colorBorder); // left edge
+        drawRect(right,  y - 1, right + 1, bottom + 1, colorBorder); // right edge
+        drawRect(    x,  y - 1,     right,          y, colorBorder); // top edge
+        drawRect(    x, bottom,     right, bottom + 1, colorBorder); // bottom edge
+    }
+
+    public static void drawTexturedRect(int x, int y, int u, int v, int width, int height, float zLevel)
+    {
+        float pixelWidth = 0.00390625F;
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+
+        buffer.pos(x        , y + height, zLevel).tex( u          * pixelWidth, (v + height) * pixelWidth).endVertex();
+        buffer.pos(x + width, y + height, zLevel).tex((u + width) * pixelWidth, (v + height) * pixelWidth).endVertex();
+        buffer.pos(x + width, y         , zLevel).tex((u + width) * pixelWidth,  v           * pixelWidth).endVertex();
+        buffer.pos(x        , y         , zLevel).tex( u          * pixelWidth,  v           * pixelWidth).endVertex();
+
+        tessellator.draw();
     }
 }

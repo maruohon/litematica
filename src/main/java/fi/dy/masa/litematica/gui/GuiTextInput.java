@@ -81,21 +81,10 @@ public class GuiTextInput extends GuiLitematicaBase
     {
         this.parent.drawScreen(mouseX, mouseY, partialTicks);
 
-        int left = this.dialogLeft;
-        int right = left + this.dialogWidth;
-        int top = this.dialogTop;
-        int bottom = top + this.dialogHeight;
-
-        // Draw the dark background
-        drawRect(left, top, left + this.dialogWidth, top + this.dialogHeight, 0xC0000000);
-
-        drawRect(left - 1, top - 1, left, bottom + 1, COLOR_HORIZONTAL_BAR); // Left edge
-        drawRect(right, top - 1, right + 1, bottom + 1, COLOR_HORIZONTAL_BAR); // Right edge
-        drawRect(left, top - 1, right, top, COLOR_HORIZONTAL_BAR); // top edge
-        drawRect(left, bottom, right, bottom + 1, COLOR_HORIZONTAL_BAR); // bottom edge
+        drawOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
 
         // Draw the title
-        this.drawString(this.fontRenderer, this.getTitle(), left + 10, top + 4, WHITE);
+        this.drawString(this.fontRenderer, this.getTitle(), this.dialogLeft + 10, this.dialogTop + 4, WHITE);
 
         //super.drawScreen(mouseX, mouseY, partialTicks);
         this.textField.drawTextBox();

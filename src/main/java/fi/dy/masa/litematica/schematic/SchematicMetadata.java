@@ -72,6 +72,11 @@ public class SchematicMetadata
         return timeModified;
     }
 
+    public boolean hasBeenModified()
+    {
+        return this.timeCreated != this.timeModified;
+    }
+
     public void setAuthor(String author)
     {
         this.author = author;

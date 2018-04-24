@@ -26,20 +26,20 @@ import net.minecraft.world.World;
 
 public class DataManager
 {
+    public static final File ROOT_SCHEMATIC_DIRECTORY = new File(Minecraft.getMinecraft().mcDataDir, "schematics");
+
     private static final Int2ObjectOpenHashMap<DataManager> INSTANCES = new Int2ObjectOpenHashMap<>();
 
+    private static File lastSchematicDirectory = ROOT_SCHEMATIC_DIRECTORY;
     public static ItemStack toolItem = new ItemStack(Items.STICK);
 
     private final SelectionManager selectionManager = new SelectionManager();
     private final List<SchematicPlacement> loadedSchematics = new ArrayList<>();
     private final Minecraft mc;
-    private File lastSchematicDirectory; // TODO use a custom class with split directories?
-    private String currentWorld = "default";
 
     private DataManager()
     {
         this.mc = Minecraft.getMinecraft();
-        this.lastSchematicDirectory = new File(this.mc.mcDataDir, "schematics");
     }
 
     public static DataManager getInstance(World world)
@@ -66,14 +66,14 @@ public class DataManager
         return this.selectionManager;
     }
 
-    public File getSchematicDirectory()
+    public static File getCurrentSchematicDirectory()
     {
-        return this.lastSchematicDirectory;
+        return lastSchematicDirectory;
     }
 
-    public void setSchematicDirectory(File dir)
+    public static void setCurrentSchematicDirectory(File dir)
     {
-        this.lastSchematicDirectory = dir;
+        lastSchematicDirectory = dir;
     }
 
     public List<SchematicPlacement> getLoadedSchematicsForDimension(World world)
