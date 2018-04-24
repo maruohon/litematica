@@ -18,6 +18,7 @@ import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.gui.GuiSimpleScrollBar;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
@@ -265,10 +266,30 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
 
     protected void drawParentOrRootDirectoryBar(int x, int y, int width, int height, int mouseX, int mouseY)
     {
+        int relativeY = mouseY - this.browserEntriesStartY;
+
+        // The up/to root directory bar exists and one of the buttons is being hovered
+        if (this.browserEntiresOffsetY > 0 && relativeY >= 0 && relativeY < this.browserEntryHeight)
+        {
+            if (mouseX >= this.browserEntriesStartX &&
+                mouseX < this.browserEntriesStartX + Widgets.FILE_ICON_DIR_ROOT.getWidth())
+            {
+                drawOutlinedBox(x, y + 1, 12, 12, 0x20C0C0C0, 0xE0FFFFFF);
+            }
+            else if (mouseX >= this.browserEntriesStartX + Widgets.FILE_ICON_DIR_ROOT.getWidth() + 2 &&
+                     mouseX < this.browserEntriesStartX + Widgets.FILE_ICON_DIR_UP.getWidth() * 2 + 2)
+            {
+                drawOutlinedBox(x + 14, y + 1, 12, 12, 0x20C0C0C0, 0xE0FFFFFF);
+            }
+        }
+
+        GlStateManager.color(1f, 1f, 1f);
+
         this.mc.getTextureManager().bindTexture(Widgets.TEXTURE);
         Widgets.FILE_ICON_DIR_ROOT.renderAt(x, y + 1, this.zLevel);
         Widgets.FILE_ICON_DIR_UP.renderAt(x + 14, y + 1, this.zLevel);
 
+        // Draw the directory path text background
         drawRect(x + 28, y, x + width, y + height, 0x20FFFFFF);
 
         int textColor = 0xC0C0C0C0;
@@ -319,6 +340,8 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
 
     protected void drawDirectoryEntry(int index, int x, int y, int width, int height, int mouseX, int mouseY)
     {
+        GlStateManager.color(1f, 1f, 1f);
+
         DirectoryEntry entry = this.directoryContents.get(index);
         this.mc.getTextureManager().bindTexture(Widgets.TEXTURE);
         Widgets widget = Widgets.FILE_ICON_DIR;
