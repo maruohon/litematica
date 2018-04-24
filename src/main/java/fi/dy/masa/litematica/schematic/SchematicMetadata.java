@@ -1,6 +1,11 @@
 package fi.dy.masa.litematica.schematic;
 
+import java.io.File;
+import java.io.FileInputStream;
+import javax.annotation.Nullable;
+import fi.dy.masa.litematica.util.Constants;
 import fi.dy.masa.litematica.util.NBTUtils;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 
@@ -153,5 +158,31 @@ public class SchematicMetadata
         {
             this.enclosingSize = size;
         }
+    }
+
+    @Nullable
+    public static SchematicMetadata fromFile(File file)
+    {
+        if (file.exists() && file.canRead())
+        {
+            try
+            {
+                FileInputStream is = new FileInputStream(file);
+                NBTTagCompound nbt = CompressedStreamTools.readCompressed(is);
+                is.close();
+
+                if (nbt != null && nbt.hasKey("Author", Constants.NBT.TAG_STRING))
+                {
+                    SchematicMetadata metadata = new SchematicMetadata();
+                    metadata.readFromNBT(nbt);
+                    return metadata;
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        return null;
     }
 }

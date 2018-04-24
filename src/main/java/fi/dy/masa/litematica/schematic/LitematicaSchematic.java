@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
+import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.Selection;
@@ -22,8 +23,10 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagLongArray;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -224,7 +227,7 @@ public class LitematicaSchematic
                 NBTTagCompound tag = new NBTTagCompound();
 
                 tag.setTag("BlockStatePalette", blockContainer.getPalette().writeToNBT());
-                tag.setIntArray("BlockStates", this.longArrayToIntArray(blockContainer.getBackingLongArray()));
+                tag.setTag("BlockStates", new NBTTagLongArray(blockContainer.getBackingLongArray()));
                 tag.setTag("TileEntities", this.writeTileEntitiesToNBT(tileMap));
 
                 // The entity list will not exist, if takeEntities is false when creating the schematic
@@ -336,10 +339,16 @@ public class LitematicaSchematic
                     this.tileEntities.put(regionName, this.readTileEntitiesFromNBT(regionTag.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND)));
                     this.entities.put(regionName, this.readEntitiesFromNBT(regionTag.getTagList("Entities", Constants.NBT.TAG_COMPOUND)));
 
-                    NBTTagList palette = regionTag.getTagList("BlockStatePalette", Constants.NBT.TAG_COMPOUND);
-                    long[] blockStateArr = this.intArrayToLongArray(regionTag.getIntArray("BlockStates"));
-                    LitematicaBlockStateContainer container = LitematicaBlockStateContainer.createFrom(palette, blockStateArr, regionSize);
-                    this.blockContainers.put(regionName, container);
+                    NBTBase nbtBase = regionTag.getTag("BlockStates");
+
+                    // There are no convenience methods in NBTTagCompound yet in 1.12, so we'll have to do it the ugly way...
+                    if (nbtBase != null && nbtBase.getId() == Constants.NBT.TAG_LONG_ARRAY)
+                    {
+                        NBTTagList palette = regionTag.getTagList("BlockStatePalette", Constants.NBT.TAG_COMPOUND);
+                        long[] blockStateArr = ((IMixinNBTTagLongArray) nbtBase).getArray();
+                        LitematicaBlockStateContainer container = LitematicaBlockStateContainer.createFrom(palette, blockStateArr, regionSize);
+                        this.blockContainers.put(regionName, container);
+                    }
                 }
             }
         }
@@ -386,39 +395,6 @@ public class LitematicaSchematic
         }
 
         return tileMap;
-    }
-
-    private int[] longArrayToIntArray(long[] arrLong)
-    {
-        int[] arrInt = new int[arrLong.length * 2];
-
-        for (int i = 0; i < arrLong.length; ++i)
-        {
-            arrInt[i * 2    ] = (int) ( arrLong[i]         & 0xFFFFFFFF);
-            arrInt[i * 2 + 1] = (int) ((arrLong[i] >>> 32) & 0xFFFFFFFF);
-        }
-
-        return arrInt;
-    }
-
-    private long[] intArrayToLongArray(int[] arrInt)
-    {
-        long[] arrLong = new long[(int) Math.ceil(arrInt.length / 2)];
-        final int maxLower = (int) Math.floor(arrInt.length / 2);
-
-        for (int i = 0; i < maxLower; ++i)
-        {
-            int intIndex = i << 1;
-            arrLong[i] = (((long) arrInt[intIndex + 1]) << 32) | arrInt[intIndex];
-        }
-
-        // Odd number of input elements, handle the last element
-        if (maxLower != arrLong.length)
-        {
-            arrLong[arrLong.length - 1] = arrInt[arrInt.length - 1];
-        }
-
-        return arrLong;
     }
 
     public boolean writeToFile(File dir, String fileNameIn, boolean override, IStringConsumer feedback)

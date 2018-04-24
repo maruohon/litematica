@@ -62,7 +62,7 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
 
             if (this.bits <= 4)
             {
-                this.bits = 4;
+                this.bits = Math.max(2, this.bits);
                 this.palette = new LitematicaBlockStatePaletteLinear(this.bits, this);
             }
             else
