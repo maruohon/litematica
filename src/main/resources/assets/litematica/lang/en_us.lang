@@ -33,6 +33,8 @@ litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 
 litematica.message.added_selection_box=Added a new selection box at %s
+litematica.error.message.invalid_directory=Invalid directory '%s'
+litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.moved_selection=Moved the current selection from %s to %s
 litematica.message.removed_selection_box=Removed selection box %s

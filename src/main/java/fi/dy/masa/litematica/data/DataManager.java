@@ -13,6 +13,7 @@ import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.schematic.SchematicPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
@@ -26,7 +27,7 @@ import net.minecraft.world.World;
 
 public class DataManager
 {
-    public static final File ROOT_SCHEMATIC_DIRECTORY = new File(Minecraft.getMinecraft().mcDataDir, "schematics");
+    public static final File ROOT_SCHEMATIC_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getMinecraft().mcDataDir, "schematics"));
 
     private static final Int2ObjectOpenHashMap<DataManager> INSTANCES = new Int2ObjectOpenHashMap<>();
 
@@ -73,7 +74,7 @@ public class DataManager
 
     public static void setCurrentSchematicDirectory(File dir)
     {
-        lastSchematicDirectory = dir;
+        lastSchematicDirectory = FileUtils.getCanonicalFileIfPossible(dir);
     }
 
     public List<SchematicPlacement> getLoadedSchematicsForDimension(World world)

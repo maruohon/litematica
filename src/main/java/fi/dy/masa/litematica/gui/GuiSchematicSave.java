@@ -2,30 +2,38 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import java.io.IOException;
+import org.lwjgl.input.Keyboard;
+import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.InfoUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 
-public class GuiSchematicSave extends GuiLitematicaBase
+public class GuiSchematicSave extends GuiSchematicBrowserBase
 {
-    private SelectionManager selectionManager;
-    private WidgetSchematicBrowser schematicBrowser;
+    private final SelectionManager selectionManager;
+    private final GuiTextField textField;
 
     public GuiSchematicSave()
     {
         Minecraft mc = Minecraft.getMinecraft();
+        this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
 
-        if (mc.world != null)
-        {
-            this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
-        }
+        this.textField = new GuiTextField(0, mc.fontRenderer, 10, 32, 100, 20);
+        this.textField.setMaxStringLength(160);
+        this.textField.setText("");
+        this.textField.setFocused(true);
+        this.textField.setCursorPositionEnd();
     }
 
     @Override
@@ -39,40 +47,35 @@ public class GuiSchematicSave extends GuiLitematicaBase
     {
         super.initGui();
 
-        if (this.schematicBrowser == null)
+        ((IGuiTextField) this.textField).setInternalWidth(this.width - 253);
+        DirectoryEntry entry = this.schematicBrowser.getSelectedEntry();
+
+        if (entry != null)
         {
-            this.schematicBrowser = new WidgetSchematicBrowser(10, 60, this.width - 20, this.height - 100);
+            this.textField.setText(FileUtils.getNameWithoutExtension(entry.getName()));
         }
 
-        this.schematicBrowser.setSize(this.width - 20, this.height - 100);
-        this.schematicBrowser.initGui();
-
-        int xStart = LEFT;
-        int x = xStart;
-        int y = TOP + 20;
-        int nameWidth = 300;
-        int id = 0;
-
+        int x = this.textField.x + this.textField.getWidth() + 12;
+        int y = 32;
         String label = I18n.format("litematica.gui.button.save_area_to_schematic");
-        ButtonGeneric button = new ButtonGeneric(id++, x, y, nameWidth, 20, label);
+        ButtonGeneric button = new ButtonGeneric(1, x, y, 60, 20, label);
         ButtonListener listener = this.createActionListener(ButtonListener.Type.SAVE);
         this.addButton(button, listener);
     }
 
     @Override
-    public void setWorldAndResolution(Minecraft mc, int width, int height)
+    public void drawContents(int mouseX, int mouseY, float partialTicks)
     {
-        super.setWorldAndResolution(mc, width, height);
+        super.drawContents(mouseX, mouseY, partialTicks);
 
-        this.schematicBrowser.setWorldAndResolution(mc, width, height);
+        this.textField.drawTextBox();
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    public void setString(String string)
     {
-        super.drawScreen(mouseX, mouseY, partialTicks);
-
-        this.schematicBrowser.drawScreen(mouseX, mouseY, partialTicks);
+        this.textField.setText(FileUtils.getNameWithoutExtension(string));
+        this.textField.setCursorPositionEnd();
     }
 
     @Override
@@ -80,15 +83,19 @@ public class GuiSchematicSave extends GuiLitematicaBase
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
-        this.schematicBrowser.mouseClicked(mouseX, mouseY, mouseButton);
-    }
+        this.textField.mouseClicked(mouseX, mouseY, mouseButton);
 
-    @Override
-    protected void mouseWheelScrolled(int mouseWheelDelta)
-    {
-        super.mouseWheelScrolled(mouseWheelDelta);
+        int x = this.textField.x;
+        int y = this.textField.y;
+        int w = ((IGuiTextField) this.textField).getInternalWidth();
+        int h = ((IGuiTextField) this.textField).getHeight();
 
-        this.schematicBrowser.mouseWheelScrolled(mouseWheelDelta);
+        // Clear the field on right click
+        if (mouseButton == 1 && mouseX >= x && mouseX < x + w && mouseY >= y && mouseY < y + h)
+        {
+            this.textField.setText("");
+            this.textField.setCursorPosition(0);
+        }
     }
 
     @Override
@@ -96,12 +103,19 @@ public class GuiSchematicSave extends GuiLitematicaBase
     {
         super.keyTyped(typedChar, keyCode);
 
-        this.schematicBrowser.keyTyped(typedChar, keyCode);
+        if (this.textField.textboxKeyTyped(typedChar, keyCode))
+        {
+            this.schematicBrowser.setSelectedEntry(null, -1);
+        }
+        else if (keyCode == Keyboard.KEY_TAB)
+        {
+            this.textField.setFocused(! this.textField.isFocused());
+        }
     }
 
     private ButtonListener createActionListener(ButtonListener.Type type)
     {
-        return new ButtonListener(type,  this.selectionManager, this);
+        return new ButtonListener(type, this.selectionManager, this);
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
@@ -122,9 +136,40 @@ public class GuiSchematicSave extends GuiLitematicaBase
         {
             if (this.type == Type.SAVE)
             {
-                String title = I18n.format("litematica.gui.title.save_schematic_filename");
-                SchematicSaver saver = new SchematicSaver(this.gui.mc, this.selectionManager);
-                this.gui.mc.displayGuiScreen(new GuiTextInput(160, title, "", this.gui, saver));
+                IStringConsumer feedback = InfoUtils.INFO_MESSAGE_CONSUMER;
+                File dir = this.gui.schematicBrowser.getCurrentDirectory();
+                String name = this.gui.textField.getText();
+
+                if (dir.isDirectory() == false)
+                {
+                    feedback.setString(I18n.format("litematica.error.message.invalid_directory", dir.getAbsolutePath()));
+                    return;
+                }
+
+                if (name.isEmpty())
+                {
+                    feedback.setString(I18n.format("litematica.error.message.invalid_schematic_name", name));
+                    return;
+                }
+
+                File file = new File(dir, name);
+                boolean takeEntities = true; // TODO
+                SchematicSaver saver = new SchematicSaver(dir, name, takeEntities, this.gui.mc, this.selectionManager, this.gui);
+
+                if (file.exists())
+                {
+                    
+                }
+                else
+                {
+                    saver.saveSchematic();
+                }
+            }
+            else if (this.type == Type.THUMBNAIL)
+            {
+                GuiScreen currentScreen = this.gui.mc.currentScreen;
+                this.gui.mc.displayGuiScreen(null);
+                this.gui.mc.displayGuiScreen(currentScreen);
             }
         }
 
@@ -136,42 +181,46 @@ public class GuiSchematicSave extends GuiLitematicaBase
 
         public enum Type
         {
-            SAVE;
+            SAVE,
+            THUMBNAIL;
         }
     }
 
-    private static class SchematicSaver implements IStringConsumer
+    private static class SchematicSaver
     {
+        private final GuiSchematicSave gui;
+        private final File dir;
+        private final String name;
         private final Minecraft mc;
         private final SelectionManager selectionManager;
+        private final boolean takeEntities;
 
-        public SchematicSaver(Minecraft mc, SelectionManager selectionManager)
+        public SchematicSaver(File dir, String name, boolean takeEntities, Minecraft mc, SelectionManager selectionManager, GuiSchematicSave gui)
         {
+            this.dir = dir;
+            this.name = name;
+            this.takeEntities = takeEntities;
             this.mc = mc;
             this.selectionManager = selectionManager;
+            this.gui = gui;
         }
 
-        @Override
-        public void setString(String string)
+        public void saveSchematic()
         {
             Selection area = this.selectionManager.getCurrentSelection();
 
             if (area != null)
             {
                 IStringConsumer feedback = InfoUtils.INFO_MESSAGE_CONSUMER;
-                boolean takeEntities = true;
                 String author = this.mc.player.getName();
-                LitematicaSchematic schematic = LitematicaSchematic.makeSchematic(this.mc.world, area, takeEntities, author, feedback);
+                LitematicaSchematic schematic = LitematicaSchematic.makeSchematic(this.mc.world, area, this.takeEntities, author, feedback);
 
                 if (schematic != null)
                 {
-                    // TODO directory browser and override option
-                    File dir = new File(Minecraft.getMinecraft().mcDataDir, "schematics");
-                    boolean override = false;
-
-                    if (schematic.writeToFile(dir, string, override, feedback))
+                    if (schematic.writeToFile(this.dir, this.name, true, feedback))
                     {
                         feedback.setString("litematica.message.schematic_saved");
+                        this.gui.schematicBrowser.refreshEntries();
                     }
                 }
             }

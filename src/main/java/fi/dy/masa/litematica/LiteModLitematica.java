@@ -7,8 +7,10 @@ import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
+import com.mumfrey.liteloader.ScreenshotListener;
 import com.mumfrey.liteloader.ShutdownListener;
 import com.mumfrey.liteloader.Tickable;
+import com.mumfrey.liteloader.core.LiteLoaderEventBroker.ReturnValue;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.KeyCallbacks;
@@ -17,10 +19,12 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
+import net.minecraft.util.text.ITextComponent;
 
-public class LiteModLitematica implements LiteMod, Configurable, JoinGameListener, ShutdownListener, Tickable
+public class LiteModLitematica implements LiteMod, Configurable, JoinGameListener, ScreenshotListener, ShutdownListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -71,5 +75,11 @@ public class LiteModLitematica implements LiteMod, Configurable, JoinGameListene
     {
         Configs.save();
         DataManager.save();
+    }
+
+    @Override
+    public boolean onSaveScreenshot(String screenshotName, int width, int height, Framebuffer fbo, ReturnValue<ITextComponent> message)
+    {
+        return true;
     }
 }

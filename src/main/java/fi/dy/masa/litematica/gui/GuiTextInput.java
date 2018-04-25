@@ -77,9 +77,9 @@ public class GuiTextInput extends GuiLitematicaBase
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    public void drawContents(int mouseX, int mouseY, float partialTicks)
     {
-        this.parent.drawScreen(mouseX, mouseY, partialTicks);
+        this.parent.drawContents(mouseX, mouseY, partialTicks);
 
         drawOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
 

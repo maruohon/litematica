@@ -6,7 +6,6 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import com.mumfrey.liteloader.client.gui.GuiSimpleScrollBar;
 import fi.dy.masa.litematica.config.gui.button.ButtonBase;
 import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
@@ -17,6 +16,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
 public abstract class GuiLitematicaBase extends GuiScreen
@@ -29,10 +29,9 @@ public abstract class GuiLitematicaBase extends GuiScreen
     protected static final int COLOR_HORIZONTAL_BAR = 0xFF999999;
     protected static final int LEFT         = 20;
     protected static final int TOP          = 10;
-    private final GuiSimpleScrollBar scrollBar = new GuiSimpleScrollBar();
     private final List<ButtonEntry<?>> buttons = new ArrayList<>();
     private final List<GuiLabel> labels = new ArrayList<>();
-    private int totalHeight = -1;
+    private final List<InfoWidget> infoWidgets = new ArrayList<>();
 
     public GuiLitematicaBase()
     {
@@ -53,8 +52,11 @@ public abstract class GuiLitematicaBase extends GuiScreen
     }
 
     @Override
-    public void updateScreen()
+    public void initGui()
     {
+        super.initGui();
+
+        this.clearButtons();
     }
 
     @Override
@@ -62,7 +64,21 @@ public abstract class GuiLitematicaBase extends GuiScreen
     {
         this.drawPanel(mouseX, mouseY, partialTicks);
 
+        this.drawContents(mouseX, mouseY, partialTicks);
+
         super.drawScreen(mouseX, mouseY, partialTicks);
+
+        if (this.infoWidgets.isEmpty() == false)
+        {
+            for (InfoWidget widget : this.infoWidgets)
+            {
+                widget.render(mouseX, mouseY);
+            }
+        }
+    }
+
+    protected void drawContents(int mouseX, int mouseY, float partialTicks)
+    {
     }
 
     @Override
@@ -77,11 +93,13 @@ public abstract class GuiLitematicaBase extends GuiScreen
     @Override
     public void handleMouseInput() throws IOException
     {
+        int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
+        int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
         int mouseWheelDelta = Mouse.getEventDWheel();
 
         if (mouseWheelDelta != 0)
         {
-            this.mouseWheelScrolled(mouseWheelDelta);
+            this.mouseWheelScrolled(mouseX, mouseY, mouseWheelDelta);
         }
 
         super.handleMouseInput();
@@ -90,14 +108,6 @@ public abstract class GuiLitematicaBase extends GuiScreen
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
-        if (mouseButton == 0)
-        {
-            if (this.scrollBar.wasMouseOver())
-            {
-                this.scrollBar.setDragging(true);
-            }
-        }
-
         for (ButtonEntry<?> entry : this.buttons)
         {
             if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
@@ -110,29 +120,13 @@ public abstract class GuiLitematicaBase extends GuiScreen
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
-    @Override
-    protected void mouseReleased(int mouseX, int mouseY, int button)
+    protected void mouseWheelScrolled(int mouseX, int mouseY, int mouseWheelDelta)
     {
-        if (button == -1)
-        {
-            //this.mainPanel.mouseMoved(this.host, mouseX - LEFT_EDGE - MARGIN, mouseY - this.innerTop);
-        }
-        else
-        {
-            if (button == 0)
-            {
-                this.scrollBar.setDragging(false);
-            }
-
-            //this.mainPanel.mouseReleased(this.host, mouseX - LEFT_EDGE - MARGIN, mouseY - this.innerTop, button);
-        }
-
-        super.mouseReleased(mouseX, mouseY, button);
     }
 
-    protected void mouseWheelScrolled(int mouseWheelDelta)
+    protected void addInfoWidget(InfoWidget widget)
     {
-        this.scrollBar.offsetValue(-mouseWheelDelta / 8);
+        this.infoWidgets.add(widget);
     }
 
     @Override
@@ -142,6 +136,11 @@ public abstract class GuiLitematicaBase extends GuiScreen
         {
             this.mc.displayGuiScreen(null);
         }
+    }
+
+    public void bindTexture(ResourceLocation texture)
+    {
+        this.mc.getTextureManager().bindTexture(texture);
     }
 
     protected <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
