@@ -20,6 +20,7 @@ public abstract class GuiSchematicBrowserBase extends GuiLitematicaBase implemen
         super.initGui();
 
         this.schematicBrowser.setSize(this.width - 20, this.height - 80);
+        this.schematicBrowser.initGui();
     }
 
     @Override

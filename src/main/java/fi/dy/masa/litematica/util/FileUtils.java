@@ -23,7 +23,7 @@ public class FileUtils
         return file;
     }
 
-    public static String getJoinedTrailingPathElements(File file, File rootPath, int maxStringLength)
+    public static String getJoinedTrailingPathElements(File file, File rootPath, int maxStringLength, String separator)
     {
         String path = "";
 
@@ -33,7 +33,7 @@ public class FileUtils
 
             if (path.isEmpty() == false)
             {
-                path = name + " => " + path;
+                path = name + separator + path;
             }
             else
             {

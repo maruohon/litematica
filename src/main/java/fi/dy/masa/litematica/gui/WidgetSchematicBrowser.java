@@ -20,16 +20,17 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.util.FileUtils;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class WidgetSchematicBrowser extends GuiLitematicaBase
+public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirectoryNavigator
 {
     protected static final FileFilter DIRECTORY_FILTER = new FileFilterDirectories();
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     protected final List<DirectoryEntry> directoryContents = new ArrayList<>();
+    protected final List<WidgetDirectoryEntry> directoryEntryWidgets = new ArrayList<>();
     protected Map<File, SchematicMetadata> cachedMetadata = new HashMap<>();
     protected Set<File> checkedMetadataFiles = new HashSet<>();
     protected File currentDirectory;
@@ -45,25 +46,30 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
     protected int entryHeight;
     protected int browserEntriesStartX;
     protected int browserEntriesStartY;
-    protected int browserEntiresOffsetY;
+    protected int browserEntriesOffsetY;
     protected int browserEntryWidth;
     protected int browserEntryHeight;
+    protected int browserPaddingX;
+    protected int browserPaddingY;
     protected int maxVisibleBrowserEntries;
     protected int selectedEntryIndex = -1;
+    protected int lastScrollbarPosition = -1;
     @Nullable
     protected DirectoryEntry selectedEntry;
     @Nullable
     protected final IStringConsumer selectionListener;
+    @Nullable
+    protected WidgetDirectoryNavigation directoryNavigationWidget;
 
     public WidgetSchematicBrowser(int x, int y, int width, int height, @Nullable IStringConsumer selectionListener)
     {
+        this.mc = Minecraft.getMinecraft();
         this.posX = x;
         this.posY = y;
         this.selectionListener = selectionListener;
+        this.currentDirectory = DataManager.getCurrentSchematicDirectory();
 
         this.setSize(width, height);
-
-        this.setDirectory(DataManager.getCurrentSchematicDirectory());
     }
 
     @Override
@@ -77,69 +83,166 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
     {
         super.initGui();
 
-        this.updateBrowserMaxVisibleEntries(4);
+        this.updateBrowserMaxVisibleEntries();
+        this.refreshEntries();
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+        super.keyTyped(typedChar, keyCode);
+
+        if (keyCode == Keyboard.KEY_UP)         this.offsetSelectionOrScrollbar(-1, true);
+        else if (keyCode == Keyboard.KEY_DOWN)  this.offsetSelectionOrScrollbar( 1, true);
+        else if (keyCode == Keyboard.KEY_PRIOR) this.offsetSelectionOrScrollbar(-this.maxVisibleBrowserEntries / 2, false);
+        else if (keyCode == Keyboard.KEY_NEXT)  this.offsetSelectionOrScrollbar( this.maxVisibleBrowserEntries / 2, false);
+        else if (keyCode == Keyboard.KEY_HOME)  this.offsetSelectionOrScrollbar(-this.scrollBar.getMaxValue(), false);
+        else if (keyCode == Keyboard.KEY_END)   this.offsetSelectionOrScrollbar( this.scrollBar.getMaxValue(), false);
+        else if ((keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_LEFT) && this.currentDirectoryIsRoot() == false)
+        {
+            this.switchToParentDirectory();
+        }
+        else if ((keyCode == Keyboard.KEY_RIGHT || keyCode == Keyboard.KEY_RETURN) &&
+                  this.selectedEntry != null && this.selectedEntry.getType() == DirectoryEntryType.DIRECTORY)
+        {
+            this.switchToDirectory(new File(this.selectedEntry.getDirectory(), this.selectedEntry.getName()));
+        }
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+        if (mouseButton == 0)
+        {
+            if (this.scrollBar.wasMouseOver())
+            {
+                this.scrollBar.setDragging(true);
+            }
+        }
+
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        if (this.directoryNavigationWidget != null && this.directoryNavigationWidget.mouseClicked(mouseX, mouseY, mouseButton))
+        {
+            return;
+        }
+
+        int relativeY = mouseY - this.browserEntriesStartY - this.browserEntriesOffsetY;
+        int index = relativeY / this.browserEntryHeight + this.scrollBar.getValue();
+
+        if (relativeY >= 0 &&
+            relativeY < this.maxVisibleBrowserEntries * this.browserEntryHeight &&
+            mouseX >= this.browserEntriesStartX &&
+            mouseX < this.browserEntriesStartX + this.browserEntryWidth)
+        {
+            if (index < Math.min(this.directoryContents.size(), this.maxVisibleBrowserEntries + this.scrollBar.getValue()))
+            {
+                DirectoryEntry entry = this.directoryContents.get(index);
+                this.setSelectedEntry(entry, index);
+
+                if (entry != null && entry.getType() == DirectoryEntryType.DIRECTORY)
+                {
+                    this.switchToDirectory(new File(entry.getDirectory(), entry.getName()));
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int button)
+    {
+        if (button == 0)
+        {
+            this.scrollBar.setDragging(false);
+        }
+
+        super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    protected void mouseWheelScrolled(int mouseX, int mouseY, int mouseWheelDelta)
+    {
+        if (mouseX >= this.posX && mouseX <= this.posX + this.browserWidth &&
+            mouseY >= this.posY && mouseY <= this.posY + this.browserHeight)
+        {
+            this.offsetSelectionOrScrollbar(mouseWheelDelta < 0 ? 3 : -3, false);
+        }
     }
 
     @Override
     public void drawContents(int mouseX, int mouseY, float partialTicks)
     {
-        this.drawDirectoryEntries(mouseX, mouseY);
+        // Draw an outline around the entire file browser
+        GuiLitematicaBase.drawOutlinedBox(this.posX, this.posY, this.browserWidth, this.browserHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
+
+        // Draw the root/up widget, is the current directory has that (ie. is not the root directory)
+        if (this.directoryNavigationWidget != null)
+        {
+            this.directoryNavigationWidget.render(mouseX, mouseY, false);
+        }
+
+        // Draw the currently visible directory entries
+        for (int i = 0; i < this.directoryEntryWidgets.size(); i++)
+        {
+            WidgetDirectoryEntry widget = this.directoryEntryWidgets.get(i);
+            widget.render(mouseX, mouseY, widget.getDirectoryEntry() == this.selectedEntry);
+        }
 
         int scrollbarHeight = this.browserHeight - 8;
         int totalHeight = Math.max(this.directoryContents.size() * this.browserEntryHeight, scrollbarHeight);
         this.scrollBar.drawScrollBar(mouseX, mouseY, partialTicks,
                 this.posX + this.browserWidth - 9, this.browserEntriesStartY, 8, scrollbarHeight, totalHeight);
 
+        // The value gets updated in the drawScrollBar() method above, if dragging
+        if (this.scrollBar.getValue() != this.lastScrollbarPosition)
+        {
+            this.lastScrollbarPosition = this.scrollBar.getValue();
+            this.recreateDirectoryEntryWidgets();
+        }
+
         this.drawSelectedSchematicInfo(this.selectedEntry);
     }
 
     public void setSize(int width, int height)
     {
-        int browserPaddingX = 3;
-        int browserPaddingY = 4;
         this.totalWidth = width;
         this.totalHeight = height;
         this.infoWidth = 160;
         this.infoHeight = 280;
         this.browserWidth = width - this.infoWidth - 10;
         this.browserHeight = height;
-        this.browserEntriesStartX = this.posX + browserPaddingX;
-        this.browserEntriesStartY = this.posY + browserPaddingY;
-        this.browserEntryWidth = this.browserWidth - 16;
+        this.browserPaddingX = 3;
+        this.browserPaddingY = 4;
+        this.browserEntriesStartX = this.posX + this.browserPaddingX;
+        this.browserEntriesStartY = this.posY + this.browserPaddingY;
+        this.browserEntryWidth = this.browserWidth - 14;
         this.browserEntryHeight = 14;
 
-        this.updateBrowserMaxVisibleEntries(browserPaddingY);
+        this.updateBrowserMaxVisibleEntries();
+        this.refreshEntries();
     }
 
-    protected void updateBrowserMaxVisibleEntries(int browserPaddingY)
+    protected void updateBrowserMaxVisibleEntries()
     {
-        this.maxVisibleBrowserEntries = (this.browserHeight - browserPaddingY - this.browserEntiresOffsetY) / this.browserEntryHeight;
+        this.maxVisibleBrowserEntries = (this.browserHeight - this.browserPaddingY - this.browserEntriesOffsetY) / this.browserEntryHeight;
         this.scrollBar.setMaxValue(this.directoryContents.size() - this.maxVisibleBrowserEntries);
+    }
+
+    protected void updateBrowserOffsets()
+    {
+        if (this.currentDirectoryIsRoot())
+        {
+            this.browserEntriesOffsetY = 0;
+        }
+        else
+        {
+            this.browserEntriesOffsetY = this.browserEntryHeight + 2;
+        }
     }
 
     public void refreshEntries()
     {
         this.readDirectory(this.currentDirectory);
-    }
-
-    protected void setDirectory(File dir)
-    {
-        this.setSelectedEntry(null, -1);
-
-        this.currentDirectory = FileUtils.getCanonicalFileIfPossible(dir);
-        DataManager.setCurrentSchematicDirectory(dir);
-        this.readDirectory(dir);
-
-        if (this.currentDirectoryIsRoot())
-        {
-            this.browserEntiresOffsetY = 0;
-        }
-        else
-        {
-            this.browserEntiresOffsetY = this.browserEntryHeight + 2;
-        }
-
-        this.updateBrowserMaxVisibleEntries(4);
     }
 
     protected void readDirectory(File dir)
@@ -171,32 +274,49 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
         }
 
         this.scrollBar.setMaxValue(this.directoryContents.size() - this.maxVisibleBrowserEntries);
+
+        this.updateBrowserMaxVisibleEntries();
+        this.recreateDirectoryEntryWidgets();
     }
 
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    protected void recreateDirectoryEntryWidgets()
     {
-        super.keyTyped(typedChar, keyCode);
+        this.directoryEntryWidgets.clear();
 
-        if (keyCode == Keyboard.KEY_UP) this.offsetSelectionOrScrollbar(-1);
-        else if (keyCode == Keyboard.KEY_DOWN) this.offsetSelectionOrScrollbar(1);
-        else if (keyCode == Keyboard.KEY_PRIOR) this.offsetSelectionOrScrollbar(-this.maxVisibleBrowserEntries / 2);
-        else if (keyCode == Keyboard.KEY_NEXT) this.offsetSelectionOrScrollbar(this.maxVisibleBrowserEntries / 2);
-        else if (keyCode == Keyboard.KEY_HOME) this.offsetSelectionOrScrollbar(-this.scrollBar.getMaxValue());
-        else if (keyCode == Keyboard.KEY_END) this.offsetSelectionOrScrollbar(this.scrollBar.getMaxValue());
-        else if ((keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_LEFT) && this.currentDirectoryIsRoot() == false)
+        final int numEntries = this.directoryContents.size();
+        final int maxShown = Math.min(this.maxVisibleBrowserEntries, numEntries);
+        int x = this.posX + 2;
+        int y = this.posY + 4;
+        int width = this.browserEntryWidth;
+        int height = this.browserEntryHeight;
+
+        if (this.browserEntriesOffsetY > 0)
         {
-            this.switchToParentDirectory();
+            this.directoryNavigationWidget = new WidgetDirectoryNavigation(x, y, width, height, height,
+                    this.currentDirectory, DataManager.ROOT_SCHEMATIC_DIRECTORY, this.mc, this);
+            y += this.browserEntriesOffsetY;
         }
-        else if (keyCode == Keyboard.KEY_RIGHT && this.selectedEntry != null && this.selectedEntry.getType() == DirectoryEntryType.DIRECTORY)
+        else
         {
-            this.setDirectory(new File(this.selectedEntry.getDirectory(), this.selectedEntry.getName()));
+            this.directoryNavigationWidget = null;
+        }
+
+        for (int i = 0, index = this.scrollBar.getValue(); i < maxShown && index < numEntries; i++, index++)
+        {
+            DirectoryEntry entry = this.directoryContents.get(index);
+            boolean isOdd = (index & 0x1) != 0;
+            this.directoryEntryWidgets.add(new WidgetDirectoryEntry(x, y, width, height, this.zLevel, isOdd, entry, this.mc));
+            y += height;
         }
     }
 
-    protected void offsetSelectionOrScrollbar(int amount)
+    protected void offsetSelectionOrScrollbar(int amount, boolean changeSelection)
     {
-        if (this.selectedEntryIndex >= 0)
+        if (changeSelection == false)
+        {
+            this.scrollBar.offsetValue(amount);
+        }
+        else if (this.selectedEntryIndex >= 0)
         {
             int max = Math.max(this.directoryContents.size() - 1, 0);
             int index = Math.min(Math.max(this.selectedEntryIndex + amount, 0), max);
@@ -223,85 +343,8 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
                 this.setSelectedEntry(this.directoryContents.get(index), index);
             }
         }
-    }
 
-    @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
-        if (mouseButton == 0)
-        {
-            if (this.scrollBar.wasMouseOver())
-            {
-                this.scrollBar.setDragging(true);
-            }
-        }
-
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-
-        int relativeY = mouseY - this.browserEntriesStartY;
-
-        // FIXME needs clean-up
-        // The up/to root directory bar exists and was clicked
-        if (this.browserEntiresOffsetY > 0 && relativeY >= 0 && relativeY < this.browserEntryHeight)
-        {
-            this.setSelectedEntry(null, -1);
-
-            if (mouseX >= this.browserEntriesStartX &&
-                mouseX < this.browserEntriesStartX + Widgets.FILE_ICON_DIR_ROOT.getWidth())
-            {
-                this.setDirectory(DataManager.ROOT_SCHEMATIC_DIRECTORY);
-            }
-            else if (mouseX >= this.browserEntriesStartX + Widgets.FILE_ICON_DIR_ROOT.getWidth() + 2 &&
-                     mouseX < this.browserEntriesStartX + Widgets.FILE_ICON_DIR_UP.getWidth() * 2 + 2)
-            {
-                this.switchToParentDirectory();
-            }
-
-            return;
-        }
-        else
-        {
-            relativeY -= this.browserEntiresOffsetY;
-        }
-
-        int index = relativeY / this.browserEntryHeight + this.scrollBar.getValue();
-
-        if (relativeY >= 0 && relativeY < this.maxVisibleBrowserEntries * this.browserEntryHeight &&
-            mouseX >= this.browserEntriesStartX &&
-            mouseX < this.browserEntriesStartX + this.browserEntryWidth)
-        {
-            if (index < Math.min(this.directoryContents.size(), this.maxVisibleBrowserEntries + this.scrollBar.getValue()))
-            {
-                DirectoryEntry entry = this.directoryContents.get(index);
-                this.setSelectedEntry(entry, index);
-
-                if (entry != null && entry.getType() == DirectoryEntryType.DIRECTORY)
-                {
-                    this.setDirectory(new File(entry.getDirectory(), entry.getName()));
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void mouseReleased(int mouseX, int mouseY, int button)
-    {
-        if (button == 0)
-        {
-            this.scrollBar.setDragging(false);
-        }
-
-        super.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    protected void mouseWheelScrolled(int mouseX, int mouseY, int mouseWheelDelta)
-    {
-        if (mouseX >= this.posX && mouseX <= this.posX + this.browserWidth &&
-            mouseY >= this.posY && mouseY <= this.posY + this.browserHeight)
-        {
-            this.scrollBar.offsetValue(-mouseWheelDelta / 120 * 3);
-        }
+        this.recreateDirectoryEntryWidgets();
     }
 
     protected boolean currentDirectoryIsRoot()
@@ -309,17 +352,42 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
         return this.currentDirectory.equals(DataManager.ROOT_SCHEMATIC_DIRECTORY);
     }
 
-    protected void switchToParentDirectory()
+    @Override
+    public File getCurrentDirectory()
+    {
+        return this.currentDirectory;
+    }
+
+    @Override
+    public void switchToDirectory(File dir)
+    {
+        this.setSelectedEntry(null, -1);
+
+        this.currentDirectory = FileUtils.getCanonicalFileIfPossible(dir);
+        DataManager.setCurrentSchematicDirectory(dir);
+
+        this.updateBrowserOffsets();
+        this.readDirectory(dir);
+    }
+
+    @Override
+    public void switchToRootDirectory()
+    {
+        this.switchToDirectory(DataManager.ROOT_SCHEMATIC_DIRECTORY);
+    }
+
+    @Override
+    public void switchToParentDirectory()
     {
         File parent = this.currentDirectory.getParentFile();
 
         if (parent != null)
         {
-            this.setDirectory(parent);
+            this.switchToDirectory(parent);
         }
         else
         {
-            this.setDirectory(DataManager.ROOT_SCHEMATIC_DIRECTORY);
+            this.switchToRootDirectory();
         }
     }
 
@@ -327,11 +395,6 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
     public DirectoryEntry getSelectedEntry()
     {
         return this.selectedEntry;
-    }
-
-    public File getCurrentDirectory()
-    {
-        return this.currentDirectory;
     }
 
     public void setSelectedEntry(@Nullable DirectoryEntry entry, int index)
@@ -343,108 +406,6 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase
         {
             this.selectionListener.setString(entry.getName());
         }
-    }
-
-    protected void drawDirectoryEntries(int mouseX, int mouseY)
-    {
-        int x = this.posX + 2;
-        int y = this.posY + 4;
-
-        GuiLitematicaBase.drawOutlinedBox(this.posX, this.posY, this.browserWidth, this.browserHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
-
-        if (this.browserEntiresOffsetY > 0)
-        {
-            this.drawParentOrRootDirectoryBar(x, y, this.browserWidth - 16, this.browserEntryHeight, mouseX, mouseY);
-            y += this.browserEntiresOffsetY;
-        }
-
-        final int entries = this.directoryContents.size();
-        final int max = Math.min(this.maxVisibleBrowserEntries, entries);
-
-        for (int i = 0, index = this.scrollBar.getValue(); i < max && index < entries; i++, index++)
-        {
-            this.drawDirectoryEntry(index, x, y, this.browserWidth - 16, this.browserEntryHeight, mouseX, mouseY);
-            y += this.browserEntryHeight;
-        }
-    }
-
-    protected void drawParentOrRootDirectoryBar(int x, int y, int width, int height, int mouseX, int mouseY)
-    {
-        int relativeY = mouseY - this.browserEntriesStartY;
-
-        // FIXME needs clean-up
-        // The up/to root directory bar exists and one of the buttons is being hovered
-        if (this.browserEntiresOffsetY > 0 && relativeY >= 0 && relativeY < this.browserEntryHeight)
-        {
-            if (mouseX >= this.browserEntriesStartX &&
-                mouseX < this.browserEntriesStartX + Widgets.FILE_ICON_DIR_ROOT.getWidth())
-            {
-                drawOutlinedBox(x, y + 1, 12, 12, 0x20C0C0C0, 0xE0FFFFFF);
-            }
-            else if (mouseX >= this.browserEntriesStartX + Widgets.FILE_ICON_DIR_ROOT.getWidth() + 2 &&
-                     mouseX < this.browserEntriesStartX + Widgets.FILE_ICON_DIR_UP.getWidth() * 2 + 2)
-            {
-                drawOutlinedBox(x + 14, y + 1, 12, 12, 0x20C0C0C0, 0xE0FFFFFF);
-            }
-        }
-
-        GlStateManager.color(1f, 1f, 1f);
-
-        this.mc.getTextureManager().bindTexture(Widgets.TEXTURE);
-        Widgets.FILE_ICON_DIR_ROOT.renderAt(x, y + 1, this.zLevel);
-        Widgets.FILE_ICON_DIR_UP.renderAt(x + 14, y + 1, this.zLevel);
-
-        // Draw the directory path text background
-        drawRect(x + 28, y, x + width, y + height, 0x20FFFFFF);
-
-        int textColor = 0xC0C0C0C0;
-        int maxLen = (this.browserWidth - 40) / this.fontRenderer.getStringWidth("a") - 4;
-        String path = FileUtils.getJoinedTrailingPathElements(this.currentDirectory, DataManager.ROOT_SCHEMATIC_DIRECTORY, maxLen);
-        this.fontRenderer.drawString(path, x + 31, y + 3, textColor);
-    }
-
-    protected void drawDirectoryEntry(int index, int x, int y, int width, int height, int mouseX, int mouseY)
-    {
-        GlStateManager.color(1f, 1f, 1f);
-
-        DirectoryEntry entry = this.directoryContents.get(index);
-        this.mc.getTextureManager().bindTexture(Widgets.TEXTURE);
-        Widgets widget = Widgets.FILE_ICON_DIR;
-
-        switch (entry.getType())
-        {
-            case DIRECTORY:             widget = Widgets.FILE_ICON_DIR; break;
-            case LITEMATICA_SCHEMATIC:  widget = Widgets.FILE_ICON_LITEMATIC; break;
-            case SCHEMATICA_SCHEMATIC:  widget = Widgets.FILE_ICON_SCHEMATIC; break;
-            case VANILLA_STRUCTURE:     widget = Widgets.FILE_ICON_VANILLA; break;
-            default:
-        }
-
-        widget.renderAt(x, y + 1, this.zLevel);
-        int iw = widget.getWidth();
-
-        // Draw a lighter background for the hovered and the selected entry
-        if (index == this.selectedEntryIndex || (mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height))
-        {
-            drawRect(x + iw + 2, y, x + width, y + height, 0x70FFFFFF);
-        }
-        else if ((index % 2) != 0)
-        {
-            drawRect(x + iw + 2, y, x + width, y + height, 0x20FFFFFF);
-        }
-        // Draw a slightly lighter background for even entries
-        else
-        {
-            drawRect(x + iw + 2, y, x + width, y + height, 0x38FFFFFF);
-        }
-
-        if (index == this.selectedEntryIndex)
-        {
-            GuiLitematicaBase.drawOutline(x + iw + 2, y, width - iw - 2, height, 0xEEEEEEEE);
-        }
-
-        String name = FileUtils.getNameWithoutExtension(entry.getName());
-        this.fontRenderer.drawString(name, x + iw + 4, y + 3, 0xFFFFFFFF);
     }
 
     protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry)

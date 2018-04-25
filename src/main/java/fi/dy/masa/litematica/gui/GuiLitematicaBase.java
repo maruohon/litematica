@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import fi.dy.masa.litematica.config.gui.button.ButtonBase;
 import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
@@ -38,6 +39,11 @@ public abstract class GuiLitematicaBase extends GuiScreen
     }
 
     protected abstract String getTitle();
+
+    public Minecraft getMinecraft()
+    {
+        return this.mc;
+    }
 
     @Override
     public void onGuiClosed()
