@@ -8,10 +8,10 @@ public abstract class GuiSchematicBrowserBase extends GuiLitematicaBase implemen
 {
     protected final WidgetSchematicBrowser schematicBrowser;
 
-    public GuiSchematicBrowserBase()
+    public GuiSchematicBrowserBase(int browserX, int browserY)
     {
         // The width and height will be set to the actual values in initGui()
-        this.schematicBrowser = new WidgetSchematicBrowser(10, 60, 100, 100, this);
+        this.schematicBrowser = new WidgetSchematicBrowser(browserX, browserY, 100, 100, this);
     }
 
     @Override
@@ -19,8 +19,18 @@ public abstract class GuiSchematicBrowserBase extends GuiLitematicaBase implemen
     {
         super.initGui();
 
-        this.schematicBrowser.setSize(this.width - 20, this.height - 80);
+        this.schematicBrowser.setSize(this.getBrowserWidth(), this.getBrowserHeight());
         this.schematicBrowser.initGui();
+    }
+
+    protected int getBrowserWidth()
+    {
+        return this.width - 20;
+    }
+
+    protected int getBrowserHeight()
+    {
+        return this.height - 80;
     }
 
     @Override

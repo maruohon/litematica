@@ -20,6 +20,7 @@ public class SchematicPlacement
     private BlockPos pos;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
+    private boolean loadToWorld;
 
     public SchematicPlacement(SchematicaSchematic schematic, int dimension, BlockPos pos)
     {
@@ -27,6 +28,11 @@ public class SchematicPlacement
         this.dimension = dimension;
         this.pos = pos;
         this.schematicFile = this.schematic.getFile();
+    }
+
+    public boolean getLoadToWorld()
+    {
+        return this.loadToWorld;
     }
 
     public SchematicaSchematic getSchematic()
@@ -61,6 +67,11 @@ public class SchematicPlacement
         return mirror;
     }
 
+    public void setLoadToWorld(boolean load)
+    {
+        this.loadToWorld = load;
+    }
+
     public SchematicPlacement setPos(BlockPos pos)
     {
         this.pos = pos;
@@ -79,22 +90,31 @@ public class SchematicPlacement
         return this;
     }
 
+    @Nullable
     public JsonObject toJson()
     {
-        JsonObject obj = new JsonObject();
-        JsonArray arr = new JsonArray();
+        if (this.schematicFile != null)
+        {
+            JsonObject obj = new JsonObject();
+            JsonArray arr = new JsonArray();
 
-        arr.add(this.pos.getX());
-        arr.add(this.pos.getY());
-        arr.add(this.pos.getZ());
+            arr.add(this.pos.getX());
+            arr.add(this.pos.getY());
+            arr.add(this.pos.getZ());
 
-        obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
-        obj.add("dim", new JsonPrimitive(this.dimension));
-        obj.add("pos", arr);
-        obj.add("rotation", new JsonPrimitive(this.rotation.name()));
-        obj.add("mirror", new JsonPrimitive(this.mirror.name()));
+            obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
+            obj.add("dim", new JsonPrimitive(this.dimension));
+            obj.add("pos", arr);
+            obj.add("rotation", new JsonPrimitive(this.rotation.name()));
+            obj.add("mirror", new JsonPrimitive(this.mirror.name()));
+            obj.add("load", new JsonPrimitive(this.loadToWorld));
 
-        return obj;
+            return obj;
+        }
+
+        // If this placement is for an an in-memory-only Schematic, then there is no point in saving
+        // this placement, as the schematic can't be automatically loaded anyway.
+        return null;
     }
 
     @Nullable
@@ -104,7 +124,8 @@ public class SchematicPlacement
             JsonUtils.hasInteger(obj, "dim") &&
             JsonUtils.hasArray(obj, "pos") &&
             JsonUtils.hasString(obj, "rotation") &&
-            JsonUtils.hasString(obj, "mirror"))
+            JsonUtils.hasString(obj, "mirror") &&
+            JsonUtils.hasBoolean(obj, "load"))
         {
             File file = new File(obj.get("schematic").getAsString());
             SchematicaSchematic schematic = SchematicaSchematic.createFromFile(file);
@@ -130,6 +151,7 @@ public class SchematicPlacement
             SchematicPlacement placement = new SchematicPlacement(schematic, dimension, pos);
             placement.setRotation(rotation);
             placement.setMirror(mirror);
+            placement.setLoadToWorld(obj.get("load").getAsBoolean());
 
             return placement;
         }

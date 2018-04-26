@@ -9,7 +9,9 @@ import org.lwjgl.opengl.GL11;
 import fi.dy.masa.litematica.config.gui.button.ButtonBase;
 import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
+import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
@@ -20,7 +22,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
-public abstract class GuiLitematicaBase extends GuiScreen
+public abstract class GuiLitematicaBase extends GuiScreen implements IStringConsumer
 {
     protected static final String BUTTON_LABEL_ADD = TextFormatting.DARK_GREEN + "+" + TextFormatting.RESET;
     protected static final String BUTTON_LABEL_REMOVE = TextFormatting.DARK_RED + "-" + TextFormatting.RESET;
@@ -33,6 +35,8 @@ public abstract class GuiLitematicaBase extends GuiScreen
     private final List<ButtonEntry<?>> buttons = new ArrayList<>();
     private final List<GuiLabel> labels = new ArrayList<>();
     private final List<InfoWidget> infoWidgets = new ArrayList<>();
+    private final List<Message> messages = new ArrayList<>();
+    private InfoType nextMessageType = InfoType.INFO;
 
     public GuiLitematicaBase()
     {
@@ -73,6 +77,8 @@ public abstract class GuiLitematicaBase extends GuiScreen
         this.drawContents(mouseX, mouseY, partialTicks);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
+
+        this.drawGuiMessages();
 
         if (this.infoWidgets.isEmpty() == false)
         {
@@ -126,6 +132,15 @@ public abstract class GuiLitematicaBase extends GuiScreen
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+        if (keyCode == Keyboard.KEY_ESCAPE)
+        {
+            this.mc.displayGuiScreen(null);
+        }
+    }
+
     protected void mouseWheelScrolled(int mouseX, int mouseY, int mouseWheelDelta)
     {
     }
@@ -136,12 +151,63 @@ public abstract class GuiLitematicaBase extends GuiScreen
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    public void setString(String string)
     {
-        if (keyCode == Keyboard.KEY_ESCAPE)
+        this.addGuiMessage(this.nextMessageType, string, 3000);
+    }
+
+    public void addGuiMessage(InfoType type, String message)
+    {
+        this.addGuiMessage(type, message, 3000);
+    }
+
+    public void addGuiMessage(InfoType type, String message, int displayTimeMs)
+    {
+        this.messages.add(new Message(type, message, displayTimeMs, 200));
+    }
+
+    public void setNextMessageType(InfoType type)
+    {
+        this.nextMessageType = type;
+    }
+
+    protected void drawGuiMessages()
+    {
+        if (this.messages.isEmpty() == false)
         {
-            this.mc.displayGuiScreen(null);
+            int boxWidth = 300;
+            int boxHeight = this.getMessagesHeight() + 20;
+            int x = this.width / 2 - boxWidth / 2;
+            int y = this.height / 2 - boxHeight / 2;
+
+            drawOutlinedBox(x, y, boxWidth, boxHeight, 0xDD000000, COLOR_HORIZONTAL_BAR);
+            x += 10;
+            y += 10;
+
+            for (int i = 0; i < this.messages.size(); ++i)
+            {
+                Message message = this.messages.get(i);
+                y = message.renderAt(x, y, 0xFFFFFFFF);
+
+                if (message.hasExpired())
+                {
+                    this.messages.remove(i);
+                    --i;
+                }
+            }
         }
+    }
+
+    private int getMessagesHeight()
+    {
+        int height = 0;
+
+        for (int i = 0; i < this.messages.size(); ++i)
+        {
+            height += this.messages.get(i).getMessageHeight();
+        }
+
+        return height;
     }
 
     public void bindTexture(ResourceLocation texture)
@@ -307,5 +373,111 @@ public abstract class GuiLitematicaBase extends GuiScreen
         buffer.pos(x        , y         , zLevel).tex( u          * pixelWidth,  v           * pixelWidth).endVertex();
 
         tessellator.draw();
+    }
+
+    public static class Message
+    {
+        public static final String RESET = TextFormatting.RESET.toString();
+        public static final String GREEN = TextFormatting.GREEN.toString();
+        public static final String GRAY = TextFormatting.GRAY.toString();
+        public static final String WHITE = TextFormatting.WHITE.toString();
+        public static final String GOLD = TextFormatting.GOLD.toString();
+        public static final String RED = TextFormatting.RED.toString();
+        private final InfoType type;
+        private final long created;
+        private final int displayTime;
+        private final int maxLineWidth;
+        private final List<String> message = new ArrayList<>();
+        private final FontRenderer fontRenderer;
+
+        public Message(InfoType type, String message, int displayTimeMs, int maxLineWidth)
+        {
+            this.type = type;
+            this.created = System.currentTimeMillis();
+            this.displayTime = displayTimeMs;
+            this.maxLineWidth = maxLineWidth;
+            this.fontRenderer = Minecraft.getMinecraft().fontRenderer;
+
+            this.setMessage(message);
+        }
+
+        public boolean hasExpired()
+        {
+            return System.currentTimeMillis() > (this.created + this.displayTime);
+        }
+
+        public int getMessageHeight()
+        {
+            return this.message.size() * (this.fontRenderer.FONT_HEIGHT + 1) - 1 + 5;
+        }
+
+        public void setMessage(String message)
+        {
+            this.message.clear();
+
+            String[] arr = message.split(" ");
+            StringBuilder sb = new StringBuilder(this.maxLineWidth + 32);
+            final int spaceWidth = this.fontRenderer.getStringWidth(" ");
+            int lineWidth = 0;
+
+            for (String str : arr)
+            {
+                int width = this.fontRenderer.getStringWidth(str);
+
+                if (lineWidth > 0 && (lineWidth + width + spaceWidth) > this.maxLineWidth)
+                {
+                    this.message.add(sb.toString());
+                    sb = new StringBuilder(this.maxLineWidth + 32);
+                    lineWidth = 0;
+                }
+
+                if (lineWidth > 0)
+                {
+                    sb.append(" ");
+                }
+
+                sb.append(str);
+                lineWidth += width;
+            }
+
+            this.message.add(sb.toString());
+        }
+
+        /**
+         * Renders the lines for this message
+         * @return the y coordinate of the next message
+         */
+        public int renderAt(int x, int y, int textColor)
+        {
+            String format = this.getFormatCode();
+
+            for (String text : this.message)
+            {
+                this.fontRenderer.drawString(format + text + RESET, x, y, textColor);
+                y += this.fontRenderer.FONT_HEIGHT + 1;
+            }
+
+            return y + 5;
+        }
+
+        public String getFormatCode()
+        {
+            switch (this.type)
+            {
+                case INFO:      return GRAY;
+                case SUCCESS:   return GREEN;
+                case WARNING:   return GOLD;
+                case ERROR:     return RED;
+                default:        return GRAY;
+            }
+        }
+    }
+
+    public enum InfoType
+    {
+        INFO,
+        SUCCESS,
+        WARNING,
+        ERROR;
     }
 }

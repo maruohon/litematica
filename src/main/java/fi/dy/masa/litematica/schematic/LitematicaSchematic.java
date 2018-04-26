@@ -477,7 +477,6 @@ public class LitematicaSchematic
 
                 if (schematic.readFromNBT(nbt))
                 {
-                    feedback.setString(I18n.format("litematica.message.schematic_read_from_file_success", fileSchematic.getAbsolutePath()));
                     return schematic;
                 }
             }

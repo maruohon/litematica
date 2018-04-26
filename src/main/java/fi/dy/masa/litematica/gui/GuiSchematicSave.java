@@ -26,6 +26,8 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase
 
     public GuiSchematicSave()
     {
+        super(10, 60);
+
         Minecraft mc = Minecraft.getMinecraft();
         this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
 

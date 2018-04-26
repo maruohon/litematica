@@ -275,6 +275,7 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
 
         this.scrollBar.setMaxValue(this.directoryContents.size() - this.maxVisibleBrowserEntries);
 
+        this.updateBrowserOffsets();
         this.updateBrowserMaxVisibleEntries();
         this.recreateDirectoryEntryWidgets();
     }
@@ -366,7 +367,6 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
         this.currentDirectory = FileUtils.getCanonicalFileIfPossible(dir);
         DataManager.setCurrentSchematicDirectory(dir);
 
-        this.updateBrowserOffsets();
         this.readDirectory(dir);
     }
 
@@ -523,6 +523,11 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
         public String getName()
         {
             return this.name;
+        }
+
+        public File getFullPath()
+        {
+            return new File(this.dir, this.name);
         }
 
         @Override

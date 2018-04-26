@@ -9,6 +9,7 @@ public enum Hotkeys implements IHotkey
     ADD_SELECTION_BOX                   ("addSelectionBox",                 "M,A",  "Add a new selection box (position 1) here"),
     DELETE_SELECTION_BOX                ("deleteSelectionBox",              "M,D",  "Delete the currently selected box"),
     MOVE_ENTIRE_SELECTION               ("moveEntireSelection",             "M,V",  "Move the entire current selection here"),
+    OPEN_GUI_SCHEMATIC_ACTIONS          ("openGuiSchematicActions",         "M,C",  "Open the Schematic actions GUI"),
     OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the area selection manager GUI"),
     SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
     SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,O",  "Set/move the origin point of the current selection here"),
