@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
+import fi.dy.masa.litematica.render.OverlayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
@@ -39,12 +40,21 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
 
-        String labelEn = I18n.format("litematica.button.schematic_placements.enable");
-        String labelDis = I18n.format("litematica.button.schematic_placements.disable");
-        String label = this.placement.isEnabled() ? labelDis : labelEn;
+        String labelEn = I18n.format("litematica.button.schematic_placements.render_enable");
+        String labelDis = I18n.format("litematica.button.schematic_placements.render_disable");
+        String label = this.placement.getRenderSchematic() ? labelDis : labelEn;
         int len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
         posX -= (len + 4);
-        this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), new ButtonListener(ButtonListener.ButtonType.TOGGLE_ENABLED, this));
+        ButtonListener listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_RENDER, this);
+        this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
+
+        labelEn = I18n.format("litematica.button.schematic_placements.enable");
+        labelDis = I18n.format("litematica.button.schematic_placements.disable");
+        label = this.placement.isEnabled() ? labelDis : labelEn;
+        len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
+        posX -= (len + 4);
+        listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_ENABLED, this);
+        this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
 
         posX = this.createButton(posX, posY, ButtonListener.ButtonType.SELECT);
     }
@@ -120,15 +130,23 @@ public class WidgetSchematicPlacement extends WidgetBase
             if (this.type == ButtonType.SELECT)
             {
                 DataManager.getInstance(dimension).getSchematicPlacementManager().setSelectedSchematicPlacement(this.widget.placement);
+                OverlayRenderer.getInstance().updatePlacementCache();
             }
             else if (this.type == ButtonType.REMOVE)
             {
                 DataManager.getInstance(dimension).getSchematicPlacementManager().removeSchematicPlacement(this.widget.placement);
                 this.widget.parent.refreshEntries();
+                OverlayRenderer.getInstance().updatePlacementCache();
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {
                 this.widget.placement.setEnabled(! this.widget.placement.isEnabled());
+                this.widget.parent.refreshEntries();
+                OverlayRenderer.getInstance().updatePlacementCache();
+            }
+            else if (this.type == ButtonType.TOGGLE_RENDER)
+            {
+                this.widget.placement.setRenderSchematic(! this.widget.placement.getRenderSchematic());
                 this.widget.parent.refreshEntries();
             }
         }
@@ -143,7 +161,8 @@ public class WidgetSchematicPlacement extends WidgetBase
         {
             SELECT          ("litematica.button.schematic_placements.select"),
             REMOVE          ("litematica.button.schematic_placements.remove"),
-            TOGGLE_ENABLED  ("litematica.button.schematic_placements.toggle_enabled");
+            TOGGLE_ENABLED  (""),
+            TOGGLE_RENDER   ("");
 
             private final String labelKey;
 

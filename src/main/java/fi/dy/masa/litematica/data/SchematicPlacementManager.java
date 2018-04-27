@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
 import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.JsonUtils;
 import net.minecraft.client.resources.I18n;
@@ -61,6 +62,8 @@ public class SchematicPlacementManager
                 --i;
             }
         }
+
+        OverlayRenderer.getInstance().updatePlacementCache();
     }
 
     @Nullable

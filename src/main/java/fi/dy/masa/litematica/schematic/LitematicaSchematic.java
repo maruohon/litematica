@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
@@ -53,6 +54,20 @@ public class LitematicaSchematic
     public SchematicMetadata getMetadata()
     {
         return this.metadata;
+    }
+
+    public Map<String, Box> getAreas()
+    {
+        ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
+
+        for (String name : this.subRegionPositions.keySet())
+        {
+            BlockPos pos = this.subRegionPositions.get(name);
+            Box box = new Box(pos, pos.add(this.subRegionSizes.get(name)));
+            builder.put(name, box);
+        }
+
+        return builder.build();
     }
 
     @Nullable

@@ -28,6 +28,8 @@ litematica.button.schematic_placements.remove=Remove
 litematica.button.schematic_placements.select=Select
 litematica.button.schematic_placements.disable=Disable
 litematica.button.schematic_placements.enable=Enable
+litematica.button.schematic_placements.render_enable=Enable rendering
+litematica.button.schematic_placements.render_disable=Disable rendering
 
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.create_placement=Create placement

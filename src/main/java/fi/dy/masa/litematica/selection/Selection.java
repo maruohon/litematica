@@ -19,6 +19,32 @@ public class Selection
     @Nullable
     private String currentBox;
 
+    public static Selection fromBoxes(BlockPos origin, Map<String, Box> boxes, String name, boolean boxesAreRelative)
+    {
+        Selection selection = new Selection();
+        selection.origin = origin;
+        selection.name = name;
+
+        if (boxesAreRelative)
+        {
+            for (Map.Entry<String, Box> entry : boxes.entrySet())
+            {
+                Box box = entry.getValue();
+                BlockPos pos1 = box.getPos1().add(origin);
+                BlockPos pos2 = box.getPos2().add(origin);
+                box = new Box(pos1, pos2);
+                box.setName(entry.getKey());
+                selection.selectionBoxes.put(box.getName(), box);
+            }
+        }
+        else
+        {
+            selection.selectionBoxes.putAll(boxes);
+        }
+
+        return selection;
+    }
+
     public String getName()
     {
         return this.name;

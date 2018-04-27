@@ -18,6 +18,17 @@ public class Box
     private String name = "Unnamed";
     private Corner selectedCorner = Corner.NONE;
 
+    public Box()
+    {
+    }
+
+    public Box(BlockPos pos1, BlockPos pos2)
+    {
+        this.pos1 = pos1;
+        this.pos2 = pos2;
+        this.updateSize();
+    }
+
     @Nullable
     public BlockPos getPos1()
     {

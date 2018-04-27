@@ -9,7 +9,6 @@ import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
-import fi.dy.masa.litematica.util.PositionUtils;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -23,6 +22,7 @@ public class SchematicPlacement
     private Mirror mirror = Mirror.NONE;
     private File schematicFile;
     private boolean enabled;
+    private boolean renderSchematic;
 
     public SchematicPlacement(LitematicaSchematic schematic, BlockPos pos, String name)
     {
@@ -36,6 +36,11 @@ public class SchematicPlacement
         return this.enabled;
     }
 
+    public boolean getRenderSchematic()
+    {
+        return this.renderSchematic;
+    }
+
     public String getName()
     {
         return this.name;
@@ -46,16 +51,9 @@ public class SchematicPlacement
         return schematic;
     }
 
-    public BlockPos getPos1()
+    public BlockPos getPos()
     {
         return pos;
-    }
-
-    public BlockPos getPos2()
-    {
-        BlockPos size = this.schematic.getTotalSize();
-        size = PositionUtils.getTransformedBlockPos(size, this.mirror, this.rotation);
-        return pos.add(size);
     }
 
     public Rotation getRotation()
@@ -71,6 +69,11 @@ public class SchematicPlacement
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public void setRenderSchematic(boolean render)
+    {
+        this.renderSchematic = render;
     }
 
     public SchematicPlacement setPos(BlockPos pos)
@@ -109,6 +112,7 @@ public class SchematicPlacement
             obj.add("rotation", new JsonPrimitive(this.rotation.name()));
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
             obj.add("enabled", new JsonPrimitive(this.enabled));
+            obj.add("render_schematic", new JsonPrimitive(this.renderSchematic));
 
             return obj;
         }
@@ -125,8 +129,7 @@ public class SchematicPlacement
             JsonUtils.hasString(obj, "name") &&
             JsonUtils.hasArray(obj, "pos") &&
             JsonUtils.hasString(obj, "rotation") &&
-            JsonUtils.hasString(obj, "mirror") &&
-            JsonUtils.hasBoolean(obj, "enabled"))
+            JsonUtils.hasString(obj, "mirror"))
         {
             File file = new File(obj.get("schematic").getAsString());
             LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName(), InfoUtils.INFO_MESSAGE_CONSUMER);
@@ -152,7 +155,8 @@ public class SchematicPlacement
             SchematicPlacement placement = new SchematicPlacement(schematic, pos, name);
             placement.setRotation(rotation);
             placement.setMirror(mirror);
-            placement.setEnabled(obj.get("enabled").getAsBoolean());
+            placement.enabled = JsonUtils.getBoolean(obj, "enabled");
+            placement.renderSchematic = JsonUtils.getBoolean(obj, "render_schematic");
 
             return placement;
         }

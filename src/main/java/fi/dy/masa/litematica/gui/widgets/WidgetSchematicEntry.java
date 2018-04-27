@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
+import fi.dy.masa.litematica.render.OverlayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -109,8 +110,13 @@ public class WidgetSchematicEntry extends WidgetBase
                 BlockPos pos = new BlockPos(mc.player.getPositionVector());
                 SchematicEntry entry = this.widget.schematicEntry;
                 SchematicPlacement placement = new SchematicPlacement(entry.schematic, pos, entry.name);
-                placement.setEnabled(GuiScreen.isShiftKeyDown());
+                placement.setEnabled(GuiScreen.isShiftKeyDown() == false);
                 DataManager.getInstance(dimension).getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
+
+                if (placement.isEnabled())
+                {
+                    OverlayRenderer.getInstance().updatePlacementCache();
+                }
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {
