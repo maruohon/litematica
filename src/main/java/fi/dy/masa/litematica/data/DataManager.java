@@ -1,8 +1,6 @@
 package fi.dy.masa.litematica.data;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -11,7 +9,6 @@ import com.google.gson.JsonPrimitive;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.schematic.SchematicPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
@@ -21,8 +18,6 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.text.ChatType;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class DataManager
@@ -35,12 +30,10 @@ public class DataManager
     public static ItemStack toolItem = new ItemStack(Items.STICK);
 
     private final SelectionManager selectionManager = new SelectionManager();
-    private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
-    private final Minecraft mc;
+    private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
 
     private DataManager()
     {
-        this.mc = Minecraft.getMinecraft();
     }
 
     public static DataManager getInstance(World world)
@@ -67,6 +60,11 @@ public class DataManager
         return this.selectionManager;
     }
 
+    public SchematicPlacementManager getSchematicPlacementManager()
+    {
+        return this.schematicPlacementManager;
+    }
+
     public static File getCurrentSchematicDirectory()
     {
         return lastSchematicDirectory;
@@ -75,28 +73,6 @@ public class DataManager
     public static void setCurrentSchematicDirectory(File dir)
     {
         lastSchematicDirectory = FileUtils.getCanonicalFileIfPossible(dir);
-    }
-
-    public List<SchematicPlacement> getSchematicsPlacements()
-    {
-        return this.schematicPlacements;
-    }
-
-    public void addSchematicPlacement(SchematicPlacement placement)
-    {
-        if (this.schematicPlacements.contains(placement) == false)
-        {
-            this.schematicPlacements.add(placement);
-        }
-        else
-        {
-            this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("litematica.error.duplicate_schematic_load"));
-        }
-    }
-
-    public boolean removeSchematicPlacement(SchematicPlacement placement)
-    {
-        return this.schematicPlacements.remove(placement);
     }
 
     public static void load()
@@ -161,6 +137,11 @@ public class DataManager
         {
             this.selectionManager.loadFromJson(obj.get("selections").getAsJsonObject());
         }
+
+        if (JsonUtils.hasObject(obj, "placements"))
+        {
+            this.schematicPlacementManager.loadFromJson(obj.get("placements").getAsJsonObject());
+        }
     }
 
     private JsonObject toJson()
@@ -168,6 +149,7 @@ public class DataManager
         JsonObject obj = new JsonObject();
 
         obj.add("selections", this.selectionManager.toJson());
+        obj.add("placements", this.schematicPlacementManager.toJson());
 
         return obj;
     }

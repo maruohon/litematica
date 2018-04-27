@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import fi.dy.masa.litematica.config.gui.button.ButtonBase;
 import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
+import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.gui.widgets.WidgetInfo;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import net.minecraft.client.Minecraft;
@@ -23,7 +24,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
-public abstract class GuiLitematicaBase extends GuiScreen implements IStringConsumer
+public abstract class GuiLitematicaBase extends GuiScreen implements IMessageConsumer, IStringConsumer
 {
     protected static final String BUTTON_LABEL_ADD = TextFormatting.DARK_GREEN + "+" + TextFormatting.RESET;
     protected static final String BUTTON_LABEL_REMOVE = TextFormatting.DARK_RED + "-" + TextFormatting.RESET;
@@ -155,6 +156,12 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IStringCons
     public void setString(String string)
     {
         this.addGuiMessage(this.nextMessageType, string, 3000);
+    }
+
+    @Override
+    public void addMessage(InfoType type, String message)
+    {
+        this.addGuiMessage(type, message);
     }
 
     public void addGuiMessage(InfoType type, String message)

@@ -6,7 +6,7 @@ import fi.dy.masa.litematica.config.hotkeys.KeyAction;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.RenderEventHandler;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
-import fi.dy.masa.litematica.gui.GuiSchematicActions;
+import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import net.minecraft.client.Minecraft;
@@ -54,7 +54,7 @@ public class KeyCallbacks
             {
                 if (key == Hotkeys.OPEN_GUI_SCHEMATIC_ACTIONS.getKeybind())
                 {
-                    this.mc.displayGuiScreen(new GuiSchematicActions());
+                    this.mc.displayGuiScreen(new GuiMainMenu());
                 }
                 else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind())
                 {

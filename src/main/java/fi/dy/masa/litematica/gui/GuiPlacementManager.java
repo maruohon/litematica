@@ -1,18 +1,18 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
-import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
+import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiListBase;
-import fi.dy.masa.litematica.gui.widgets.WidgetLoadedSchematics;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicEntry;
+import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
+import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacements;
 import net.minecraft.client.resources.I18n;
 
-public class GuiLoadedSchematicsManager extends GuiListBase<SchematicEntry, WidgetSchematicEntry, WidgetLoadedSchematics>
+public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetSchematicPlacements>
 {
     private int id;
 
-    public GuiLoadedSchematicsManager()
+    public GuiPlacementManager()
     {
         super(10, 40);
     }
@@ -20,7 +20,7 @@ public class GuiLoadedSchematicsManager extends GuiListBase<SchematicEntry, Widg
     @Override
     protected String getTitle()
     {
-        return I18n.format("litematica.gui.title.manage_loaded_schematics");
+        return I18n.format("litematica.gui.title.manage_schematic_placements");
     }
 
     @Override
@@ -47,14 +47,7 @@ public class GuiLoadedSchematicsManager extends GuiListBase<SchematicEntry, Widg
         String label;
         ButtonGeneric button;
 
-        ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS;
-        label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type));
-        x += buttonWidth + 4;
-
-        type = ButtonListenerChangeMenu.ButtonType.SHOW_PLACEMENTS;
+        ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.SHOW_LOADED;
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
@@ -69,8 +62,8 @@ public class GuiLoadedSchematicsManager extends GuiListBase<SchematicEntry, Widg
     }
 
     @Override
-    protected WidgetLoadedSchematics createListWidget(int listX, int listY)
+    protected WidgetSchematicPlacements createListWidget(int listX, int listY)
     {
-        return new WidgetLoadedSchematics(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this, null);
+        return new WidgetSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this, null);
     }
 }

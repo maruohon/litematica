@@ -1,18 +1,19 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
+import net.minecraft.client.Minecraft;
 
-public class WidgetLoadedSchematics extends WidgetListBase<SchematicEntry, WidgetSchematicEntry>
+public class WidgetSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
 {
     private final IMessageConsumer messageConsumer;
 
-    public WidgetLoadedSchematics(int x, int y, int width, int height,
-            IMessageConsumer messageConsumer, @Nullable ISelectionListener<SchematicEntry> selectionListener)
+    public WidgetSchematicPlacements(int x, int y, int width, int height,
+            IMessageConsumer messageConsumer, @Nullable ISelectionListener<SchematicPlacement> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
@@ -36,8 +37,9 @@ public class WidgetLoadedSchematics extends WidgetListBase<SchematicEntry, Widge
     {
         this.listContents.clear();
 
-        SchematicHolder holder = SchematicHolder.getInstance();
-        this.listContents.addAll(holder.getAllSchematics());
+        Minecraft mc = Minecraft.getMinecraft();
+        int dimension = mc.world.provider.getDimensionType().getId();
+        this.listContents.addAll(DataManager.getInstance(dimension).getSchematicPlacementManager().getAllSchematicsPlacements());
 
         this.scrollBar.setMaxValue(this.listContents.size() - this.maxVisibleBrowserEntries);
 
@@ -46,8 +48,8 @@ public class WidgetLoadedSchematics extends WidgetListBase<SchematicEntry, Widge
     }
 
     @Override
-    protected WidgetSchematicEntry createListWidget(int x, int y, boolean isOdd, SchematicEntry entry)
+    protected WidgetSchematicPlacement createListWidget(int x, int y, boolean isOdd, SchematicPlacement entry)
     {
-        return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, entry, this, this.mc);
+        return new WidgetSchematicPlacement(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, entry, this, this.mc);
     }
 }

@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.schematic;
+package fi.dy.masa.litematica.data;
 
 import java.io.File;
 import javax.annotation.Nullable;
@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -16,21 +17,28 @@ import net.minecraft.util.math.BlockPos;
 public class SchematicPlacement
 {
     private final LitematicaSchematic schematic;
+    private final String name;
     private BlockPos pos;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
     private File schematicFile;
-    private boolean loadToWorld;
+    private boolean enabled;
 
-    public SchematicPlacement(LitematicaSchematic schematic, BlockPos pos)
+    public SchematicPlacement(LitematicaSchematic schematic, BlockPos pos, String name)
     {
         this.schematic = schematic;
         this.pos = pos;
+        this.name = name;
     }
 
-    public boolean getLoadToWorld()
+    public boolean isEnabled()
     {
-        return this.loadToWorld;
+        return this.enabled;
+    }
+
+    public String getName()
+    {
+        return this.name;
     }
 
     public LitematicaSchematic getSchematic()
@@ -60,9 +68,9 @@ public class SchematicPlacement
         return mirror;
     }
 
-    public void setLoadToWorld(boolean load)
+    public void setEnabled(boolean enabled)
     {
-        this.loadToWorld = load;
+        this.enabled = enabled;
     }
 
     public SchematicPlacement setPos(BlockPos pos)
@@ -96,10 +104,11 @@ public class SchematicPlacement
             arr.add(this.pos.getZ());
 
             obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
+            obj.add("name", new JsonPrimitive(this.name));
             obj.add("pos", arr);
             obj.add("rotation", new JsonPrimitive(this.rotation.name()));
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
-            obj.add("load", new JsonPrimitive(this.loadToWorld));
+            obj.add("enabled", new JsonPrimitive(this.enabled));
 
             return obj;
         }
@@ -113,10 +122,11 @@ public class SchematicPlacement
     public static SchematicPlacement fromJson(JsonObject obj)
     {
         if (JsonUtils.hasString(obj, "schematic") &&
+            JsonUtils.hasString(obj, "name") &&
             JsonUtils.hasArray(obj, "pos") &&
             JsonUtils.hasString(obj, "rotation") &&
             JsonUtils.hasString(obj, "mirror") &&
-            JsonUtils.hasBoolean(obj, "load"))
+            JsonUtils.hasBoolean(obj, "enabled"))
         {
             File file = new File(obj.get("schematic").getAsString());
             LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName(), InfoUtils.INFO_MESSAGE_CONSUMER);
@@ -127,6 +137,7 @@ public class SchematicPlacement
                 return null;
             }
 
+            String name = obj.get("name").getAsString();
             Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
             Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
             JsonArray posArr = obj.get("pos").getAsJsonArray();
@@ -138,10 +149,10 @@ public class SchematicPlacement
             }
 
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
-            SchematicPlacement placement = new SchematicPlacement(schematic, pos);
+            SchematicPlacement placement = new SchematicPlacement(schematic, pos, name);
             placement.setRotation(rotation);
             placement.setMirror(mirror);
-            placement.setLoadToWorld(obj.get("load").getAsBoolean());
+            placement.setEnabled(obj.get("enabled").getAsBoolean());
 
             return placement;
         }
@@ -158,6 +169,7 @@ public class SchematicPlacement
         result = prime * result + ((pos == null) ? 0 : pos.hashCode());
         result = prime * result + ((rotation == null) ? 0 : rotation.hashCode());
         result = prime * result + ((schematicFile == null) ? 0 : schematicFile.hashCode());
+        result = prime * result + ((schematic == null) ? 0 : schematic.hashCode());
         return result;
     }
 
@@ -188,6 +200,13 @@ public class SchematicPlacement
                 return false;
         }
         else if (!schematicFile.equals(other.schematicFile))
+            return false;
+        if (schematic == null)
+        {
+            if (other.schematic != null)
+                return false;
+        }
+        else if (!schematic.equals(other.schematic))
             return false;
         return true;
     }
