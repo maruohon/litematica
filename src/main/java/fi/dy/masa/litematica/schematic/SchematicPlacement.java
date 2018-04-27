@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import net.minecraft.util.Mirror;
@@ -14,20 +15,17 @@ import net.minecraft.util.math.BlockPos;
 
 public class SchematicPlacement
 {
-    private final SchematicaSchematic schematic;
-    private final File schematicFile;
-    private final int dimension;
+    private final LitematicaSchematic schematic;
     private BlockPos pos;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
+    private File schematicFile;
     private boolean loadToWorld;
 
-    public SchematicPlacement(SchematicaSchematic schematic, int dimension, BlockPos pos)
+    public SchematicPlacement(LitematicaSchematic schematic, BlockPos pos)
     {
         this.schematic = schematic;
-        this.dimension = dimension;
         this.pos = pos;
-        this.schematicFile = this.schematic.getFile();
     }
 
     public boolean getLoadToWorld()
@@ -35,14 +33,9 @@ public class SchematicPlacement
         return this.loadToWorld;
     }
 
-    public SchematicaSchematic getSchematic()
+    public LitematicaSchematic getSchematic()
     {
         return schematic;
-    }
-
-    public int getDimension()
-    {
-        return dimension;
     }
 
     public BlockPos getPos1()
@@ -52,7 +45,7 @@ public class SchematicPlacement
 
     public BlockPos getPos2()
     {
-        BlockPos size = this.schematic.getSize();
+        BlockPos size = this.schematic.getTotalSize();
         size = PositionUtils.getTransformedBlockPos(size, this.mirror, this.rotation);
         return pos.add(size);
     }
@@ -103,7 +96,6 @@ public class SchematicPlacement
             arr.add(this.pos.getZ());
 
             obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
-            obj.add("dim", new JsonPrimitive(this.dimension));
             obj.add("pos", arr);
             obj.add("rotation", new JsonPrimitive(this.rotation.name()));
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
@@ -121,14 +113,13 @@ public class SchematicPlacement
     public static SchematicPlacement fromJson(JsonObject obj)
     {
         if (JsonUtils.hasString(obj, "schematic") &&
-            JsonUtils.hasInteger(obj, "dim") &&
             JsonUtils.hasArray(obj, "pos") &&
             JsonUtils.hasString(obj, "rotation") &&
             JsonUtils.hasString(obj, "mirror") &&
             JsonUtils.hasBoolean(obj, "load"))
         {
             File file = new File(obj.get("schematic").getAsString());
-            SchematicaSchematic schematic = SchematicaSchematic.createFromFile(file);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName(), InfoUtils.INFO_MESSAGE_CONSUMER);
 
             if (schematic == null)
             {
@@ -136,7 +127,6 @@ public class SchematicPlacement
                 return null;
             }
 
-            int dimension = obj.get("dim").getAsInt();
             Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
             Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
             JsonArray posArr = obj.get("pos").getAsJsonArray();
@@ -148,7 +138,7 @@ public class SchematicPlacement
             }
 
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
-            SchematicPlacement placement = new SchematicPlacement(schematic, dimension, pos);
+            SchematicPlacement placement = new SchematicPlacement(schematic, pos);
             placement.setRotation(rotation);
             placement.setMirror(mirror);
             placement.setLoadToWorld(obj.get("load").getAsBoolean());
@@ -164,7 +154,6 @@ public class SchematicPlacement
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + dimension;
         result = prime * result + ((mirror == null) ? 0 : mirror.hashCode());
         result = prime * result + ((pos == null) ? 0 : pos.hashCode());
         result = prime * result + ((rotation == null) ? 0 : rotation.hashCode());
@@ -182,8 +171,6 @@ public class SchematicPlacement
         if (getClass() != obj.getClass())
             return false;
         SchematicPlacement other = (SchematicPlacement) obj;
-        if (dimension != other.dimension)
-            return false;
         if (mirror != other.mirror)
             return false;
         if (pos == null)

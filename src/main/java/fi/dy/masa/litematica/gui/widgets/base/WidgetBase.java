@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.gui;
+package fi.dy.masa.litematica.gui.widgets.base;
 
 public abstract class WidgetBase
 {
@@ -7,6 +7,7 @@ public abstract class WidgetBase
     protected final int width;
     protected final int height;
     protected final float zLevel;
+    protected boolean selected;
 
     public WidgetBase(int x, int y, int width, int height, float zLevel)
     {
@@ -35,8 +36,14 @@ public abstract class WidgetBase
 
     protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
+        this.selected = true;
         return true;
     }
 
-    public abstract void render(int mouseX, int mouseY, boolean isSelected);
+    public void setSelected(boolean selected)
+    {
+        this.selected = selected;
+    }
+
+    public abstract void render(int mouseX, int mouseY);
 }

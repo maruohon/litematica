@@ -1,7 +1,11 @@
-package fi.dy.masa.litematica.gui;
+package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.interfaces.IDirectoryNavigator;
+import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.util.FileUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -43,15 +47,15 @@ public class WidgetDirectoryNavigation extends WidgetBase
 
     protected boolean isHoveringIcon(int mouseX, int mouseY, int iconIndex)
     {
-        final int iw = Widgets.FILE_ICON_DIR_ROOT.getWidth();
+        final int iw = Icons.FILE_ICON_DIR_ROOT.getWidth();
         return mouseY >= this.y + 1 && mouseY < this.y + this.height &&
             mouseX >= this.x + iconIndex * (iw + 2) && mouseX < this.x + iconIndex * (iw + 2) + iw;
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean isSelected)
+    public void render(int mouseX, int mouseY)
     {
-        final int iw = Widgets.FILE_ICON_DIR_ROOT.getWidth();
+        final int iw = Icons.FILE_ICON_DIR_ROOT.getWidth();
 
         // Hovering the "to root directory" widget/icon
         if (this.isHoveringIcon(mouseX, mouseY, 0))
@@ -65,9 +69,9 @@ public class WidgetDirectoryNavigation extends WidgetBase
 
         GlStateManager.color(1f, 1f, 1f);
 
-        this.mc.getTextureManager().bindTexture(Widgets.TEXTURE);
-        Widgets.FILE_ICON_DIR_ROOT  .renderAt(this.x         , this.y + 1, this.zLevel);
-        Widgets.FILE_ICON_DIR_UP    .renderAt(this.x + iw + 2, this.y + 1, this.zLevel);
+        this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
+        Icons.FILE_ICON_DIR_ROOT  .renderAt(this.x         , this.y + 1, this.zLevel);
+        Icons.FILE_ICON_DIR_UP    .renderAt(this.x + iw + 2, this.y + 1, this.zLevel);
 
         // Draw the directory path text background
         GuiLitematicaBase.drawRect(this.x + (iw + 2) * 2 + 2, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);

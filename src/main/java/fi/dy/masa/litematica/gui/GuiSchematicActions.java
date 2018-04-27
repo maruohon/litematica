@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -21,14 +22,16 @@ public class GuiSchematicActions extends GuiLitematicaBase
         int x = 20;
         int y = 30;
 
+        this.createButton(x, y, Type.SHOW_LOADED);
+        y += 44;
+
         this.createButton(x, y, Type.LOAD_SCHEMATICS);
         y += 22;
     }
 
     private void createButton(int x, int y, Type type)
     {
-        int id = 0;
-        ButtonGeneric button = new ButtonGeneric(id++, x, y, 160, 20, I18n.format(type.getLabelKey()));
+        ButtonGeneric button = new ButtonGeneric(0, x, y, 160, 20, I18n.format(type.getLabelKey()));
         this.addButton(button, new ButtonListener(type, this));
     }
 
@@ -46,7 +49,11 @@ public class GuiSchematicActions extends GuiLitematicaBase
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            if (this.type == Type.LOAD_SCHEMATICS)
+            if (this.type == Type.SHOW_LOADED)
+            {
+                Minecraft.getMinecraft().displayGuiScreen(new GuiLoadedSchematicsManager());
+            }
+            else if (this.type == Type.LOAD_SCHEMATICS)
             {
                 Minecraft.getMinecraft().displayGuiScreen(new GuiSchematicLoad());
             }

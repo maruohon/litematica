@@ -35,7 +35,7 @@ public class DataManager
     public static ItemStack toolItem = new ItemStack(Items.STICK);
 
     private final SelectionManager selectionManager = new SelectionManager();
-    private final List<SchematicPlacement> loadedSchematics = new ArrayList<>();
+    private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
     private final Minecraft mc;
 
     private DataManager()
@@ -77,36 +77,26 @@ public class DataManager
         lastSchematicDirectory = FileUtils.getCanonicalFileIfPossible(dir);
     }
 
-    public List<SchematicPlacement> getLoadedSchematicsForDimension(World world)
+    public List<SchematicPlacement> getSchematicsPlacements()
     {
-        List<SchematicPlacement> list = new ArrayList<>();
-
-        if (world != null)
-        {
-            final int dimension = world.provider.getDimensionType().getId();
-
-            for (SchematicPlacement placement : this.loadedSchematics)
-            {
-                if (placement.getDimension() == dimension)
-                {
-                    list.add(placement);
-                }
-            }
-        }
-
-        return list;
+        return this.schematicPlacements;
     }
 
-    public void loadSchematic(World world, SchematicPlacement placement)
+    public void addSchematicPlacement(SchematicPlacement placement)
     {
-        if (this.loadedSchematics.contains(placement) == false)
+        if (this.schematicPlacements.contains(placement) == false)
         {
-            this.loadedSchematics.add(placement);
+            this.schematicPlacements.add(placement);
         }
         else
         {
             this.mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation("litematica.error.duplicate_schematic_load"));
         }
+    }
+
+    public boolean removeSchematicPlacement(SchematicPlacement placement)
+    {
+        return this.schematicPlacements.remove(placement);
     }
 
     public static void load()

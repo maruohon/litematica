@@ -1,5 +1,6 @@
-package fi.dy.masa.litematica.gui;
+package fi.dy.masa.litematica.gui.widgets;
 
+import fi.dy.masa.litematica.gui.Icons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -13,11 +14,11 @@ public class WidgetCheckBox
     protected final int textWidth;
     protected final float zLevel;
     protected final String displayText;
-    protected final Widgets widgetUnchecked;
-    protected final Widgets widgetChecked;
+    protected final Icons widgetUnchecked;
+    protected final Icons widgetChecked;
     protected boolean checked;
 
-    public WidgetCheckBox(int x, int y, float zLevel, Widgets widgetUnchecked, Widgets widgetChecked, String text, Minecraft mc)
+    public WidgetCheckBox(int x, int y, float zLevel, Icons widgetUnchecked, Icons widgetChecked, String text, Minecraft mc)
     {
         this.x = x;
         this.y = y;
@@ -61,9 +62,9 @@ public class WidgetCheckBox
     public void render()
     {
         GlStateManager.color(1f, 1f, 1f);
-        this.mc.getTextureManager().bindTexture(Widgets.TEXTURE);
+        this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
 
-        Widgets widget = this.checked ? this.widgetChecked : this.widgetUnchecked;
+        Icons widget = this.checked ? this.widgetChecked : this.widgetUnchecked;
         widget.renderAt(this.x, this.y, this.zLevel);
 
         int iw = widget.getWidth();

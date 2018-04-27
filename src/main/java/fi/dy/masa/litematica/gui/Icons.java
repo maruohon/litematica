@@ -1,9 +1,10 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import net.minecraft.util.ResourceLocation;
 
-public enum Widgets
+public enum Icons
 {
     FILE_ICON_LITEMATIC     (102,   0, 12, 12),
     FILE_ICON_SCHEMATIC     (102,  12, 12, 12),
@@ -19,7 +20,7 @@ public enum Widgets
     private final int w;
     private final int h;
 
-    private Widgets(int u, int v, int w, int h)
+    private Icons(int u, int v, int w, int h)
     {
         this.u = u;
         this.v = v;

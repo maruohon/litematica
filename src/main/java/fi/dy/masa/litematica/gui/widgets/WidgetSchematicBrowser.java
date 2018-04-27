@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.gui;
+package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -15,58 +15,38 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
-import com.mumfrey.liteloader.client.gui.GuiSimpleScrollBar;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.interfaces.IStringConsumer;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.interfaces.IDirectoryNavigator;
+import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
+import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
+import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.util.FileUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirectoryNavigator
+public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, WidgetDirectoryEntry> implements IDirectoryNavigator
 {
     protected static final FileFilter DIRECTORY_FILTER = new FileFilterDirectories();
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    protected final List<DirectoryEntry> directoryContents = new ArrayList<>();
-    protected final List<WidgetDirectoryEntry> directoryEntryWidgets = new ArrayList<>();
     protected Map<File, SchematicMetadata> cachedMetadata = new HashMap<>();
     protected Set<File> checkedMetadataFiles = new HashSet<>();
     protected File currentDirectory;
-    protected final GuiSimpleScrollBar scrollBar = new GuiSimpleScrollBar();
-    protected final int posX;
-    protected final int posY;
-    protected int totalWidth;
-    protected int totalHeight;
-    protected int infoWidth;
-    protected int infoHeight;
-    protected int browserWidth;
-    protected int browserHeight;
-    protected int entryHeight;
-    protected int browserEntriesStartX;
-    protected int browserEntriesStartY;
-    protected int browserEntriesOffsetY;
-    protected int browserEntryWidth;
-    protected int browserEntryHeight;
-    protected int browserPaddingX;
-    protected int browserPaddingY;
-    protected int maxVisibleBrowserEntries;
-    protected int selectedEntryIndex = -1;
-    protected int lastScrollbarPosition = -1;
+    protected final int infoWidth;
+    protected final int infoHeight;
     @Nullable
     protected DirectoryEntry selectedEntry;
     @Nullable
-    protected final IStringConsumer selectionListener;
-    @Nullable
     protected WidgetDirectoryNavigation directoryNavigationWidget;
 
-    public WidgetSchematicBrowser(int x, int y, int width, int height, @Nullable IStringConsumer selectionListener)
+    public WidgetSchematicBrowser(int x, int y, int width, int height, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
-        this.mc = Minecraft.getMinecraft();
-        this.posX = x;
-        this.posY = y;
-        this.selectionListener = selectionListener;
+        super(x, y, width, height, selectionListener);
+
+        this.infoWidth = 160;
+        this.infoHeight = 280;
         this.currentDirectory = DataManager.getCurrentSchematicDirectory();
 
         this.setSize(width, height);
@@ -76,15 +56,6 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
     protected String getTitle()
     {
         return I18n.format("litematica.gui.title.schematic_browser");
-    }
-
-    @Override
-    public void initGui()
-    {
-        super.initGui();
-
-        this.updateBrowserMaxVisibleEntries();
-        this.refreshEntries();
     }
 
     @Override
@@ -110,63 +81,14 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
-        if (mouseButton == 0)
-        {
-            if (this.scrollBar.wasMouseOver())
-            {
-                this.scrollBar.setDragging(true);
-            }
-        }
-
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-
         if (this.directoryNavigationWidget != null && this.directoryNavigationWidget.mouseClicked(mouseX, mouseY, mouseButton))
         {
             return;
         }
 
-        int relativeY = mouseY - this.browserEntriesStartY - this.browserEntriesOffsetY;
-        int index = relativeY / this.browserEntryHeight + this.scrollBar.getValue();
-
-        if (relativeY >= 0 &&
-            relativeY < this.maxVisibleBrowserEntries * this.browserEntryHeight &&
-            mouseX >= this.browserEntriesStartX &&
-            mouseX < this.browserEntriesStartX + this.browserEntryWidth)
-        {
-            if (index < Math.min(this.directoryContents.size(), this.maxVisibleBrowserEntries + this.scrollBar.getValue()))
-            {
-                DirectoryEntry entry = this.directoryContents.get(index);
-                this.setSelectedEntry(entry, index);
-
-                if (entry != null && entry.getType() == DirectoryEntryType.DIRECTORY)
-                {
-                    this.switchToDirectory(new File(entry.getDirectory(), entry.getName()));
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void mouseReleased(int mouseX, int mouseY, int button)
-    {
-        if (button == 0)
-        {
-            this.scrollBar.setDragging(false);
-        }
-
-        super.mouseReleased(mouseX, mouseY, button);
-    }
-
-    @Override
-    protected void mouseWheelScrolled(int mouseX, int mouseY, int mouseWheelDelta)
-    {
-        if (mouseX >= this.posX && mouseX <= this.posX + this.browserWidth &&
-            mouseY >= this.posY && mouseY <= this.posY + this.browserHeight)
-        {
-            this.offsetSelectionOrScrollbar(mouseWheelDelta < 0 ? 3 : -3, false);
-        }
+        super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -178,54 +100,21 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
         // Draw the root/up widget, is the current directory has that (ie. is not the root directory)
         if (this.directoryNavigationWidget != null)
         {
-            this.directoryNavigationWidget.render(mouseX, mouseY, false);
-        }
-
-        // Draw the currently visible directory entries
-        for (int i = 0; i < this.directoryEntryWidgets.size(); i++)
-        {
-            WidgetDirectoryEntry widget = this.directoryEntryWidgets.get(i);
-            widget.render(mouseX, mouseY, widget.getDirectoryEntry() == this.selectedEntry);
-        }
-
-        int scrollbarHeight = this.browserHeight - 8;
-        int totalHeight = Math.max(this.directoryContents.size() * this.browserEntryHeight, scrollbarHeight);
-        this.scrollBar.drawScrollBar(mouseX, mouseY, partialTicks,
-                this.posX + this.browserWidth - 9, this.browserEntriesStartY, 8, scrollbarHeight, totalHeight);
-
-        // The value gets updated in the drawScrollBar() method above, if dragging
-        if (this.scrollBar.getValue() != this.lastScrollbarPosition)
-        {
-            this.lastScrollbarPosition = this.scrollBar.getValue();
-            this.recreateDirectoryEntryWidgets();
+            this.directoryNavigationWidget.render(mouseX, mouseY);
         }
 
         this.drawSelectedSchematicInfo(this.selectedEntry);
+
+        super.drawContents(mouseX, mouseY, partialTicks);
     }
 
+    @Override
     public void setSize(int width, int height)
     {
-        this.totalWidth = width;
-        this.totalHeight = height;
-        this.infoWidth = 160;
-        this.infoHeight = 280;
+        super.setSize(width, height);
+
         this.browserWidth = width - this.infoWidth - 10;
-        this.browserHeight = height;
-        this.browserPaddingX = 3;
-        this.browserPaddingY = 4;
-        this.browserEntriesStartX = this.posX + this.browserPaddingX;
-        this.browserEntriesStartY = this.posY + this.browserPaddingY;
         this.browserEntryWidth = this.browserWidth - 14;
-        this.browserEntryHeight = 14;
-
-        this.updateBrowserMaxVisibleEntries();
-        this.refreshEntries();
-    }
-
-    protected void updateBrowserMaxVisibleEntries()
-    {
-        this.maxVisibleBrowserEntries = (this.browserHeight - this.browserPaddingY - this.browserEntriesOffsetY) / this.browserEntryHeight;
-        this.scrollBar.setMaxValue(this.directoryContents.size() - this.maxVisibleBrowserEntries);
     }
 
     protected void updateBrowserOffsets()
@@ -240,14 +129,12 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
         }
     }
 
+    @Override
     public void refreshEntries()
     {
-        this.readDirectory(this.currentDirectory);
-    }
+        this.listContents.clear();
 
-    protected void readDirectory(File dir)
-    {
-        this.directoryContents.clear();
+        File dir = this.currentDirectory;
 
         if (dir.isDirectory() && dir.canRead())
         {
@@ -260,7 +147,7 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
             }
 
             Collections.sort(list);
-            this.directoryContents.addAll(list);
+            this.listContents.addAll(list);
 
             list.clear();
 
@@ -270,22 +157,21 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
             }
 
             Collections.sort(list);
-            this.directoryContents.addAll(list);
+            this.listContents.addAll(list);
         }
 
-        this.scrollBar.setMaxValue(this.directoryContents.size() - this.maxVisibleBrowserEntries);
+        this.scrollBar.setMaxValue(this.listContents.size() - this.maxVisibleBrowserEntries);
 
         this.updateBrowserOffsets();
         this.updateBrowserMaxVisibleEntries();
-        this.recreateDirectoryEntryWidgets();
+        this.recreateListWidgets();
     }
 
-    protected void recreateDirectoryEntryWidgets()
+    @Override
+    protected void recreateListWidgets()
     {
-        this.directoryEntryWidgets.clear();
+        super.recreateListWidgets();
 
-        final int numEntries = this.directoryContents.size();
-        final int maxShown = Math.min(this.maxVisibleBrowserEntries, numEntries);
         int x = this.posX + 2;
         int y = this.posY + 4;
         int width = this.browserEntryWidth;
@@ -301,51 +187,12 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
         {
             this.directoryNavigationWidget = null;
         }
-
-        for (int i = 0, index = this.scrollBar.getValue(); i < maxShown && index < numEntries; i++, index++)
-        {
-            DirectoryEntry entry = this.directoryContents.get(index);
-            boolean isOdd = (index & 0x1) != 0;
-            this.directoryEntryWidgets.add(new WidgetDirectoryEntry(x, y, width, height, this.zLevel, isOdd, entry, this.mc));
-            y += height;
-        }
     }
 
-    protected void offsetSelectionOrScrollbar(int amount, boolean changeSelection)
+    @Override
+    protected WidgetDirectoryEntry createListWidget(int x, int y, boolean isOdd, DirectoryEntry entry)
     {
-        if (changeSelection == false)
-        {
-            this.scrollBar.offsetValue(amount);
-        }
-        else if (this.selectedEntryIndex >= 0)
-        {
-            int max = Math.max(this.directoryContents.size() - 1, 0);
-            int index = Math.min(Math.max(this.selectedEntryIndex + amount, 0), max);
-
-            if (index != this.selectedEntryIndex)
-            {
-                if (index < this.scrollBar.getValue() || index >= this.scrollBar.getValue() + this.maxVisibleBrowserEntries)
-                {
-                    this.scrollBar.offsetValue(index - this.selectedEntryIndex);
-                }
-
-                DirectoryEntry entry = this.directoryContents.get(index);
-                this.setSelectedEntry(entry, index);
-            }
-        }
-        else
-        {
-            //this.scrollBar.offsetValue(amount);
-
-            int index = this.scrollBar.getValue();
-
-            if (index >= 0 && index < this.directoryContents.size())
-            {
-                this.setSelectedEntry(this.directoryContents.get(index), index);
-            }
-        }
-
-        this.recreateDirectoryEntryWidgets();
+        return new WidgetDirectoryEntry(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, isOdd, entry, this.mc, this);
     }
 
     protected boolean currentDirectoryIsRoot()
@@ -367,7 +214,7 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
         this.currentDirectory = FileUtils.getCanonicalFileIfPossible(dir);
         DataManager.setCurrentSchematicDirectory(dir);
 
-        this.readDirectory(dir);
+        this.refreshEntries();
     }
 
     @Override
@@ -388,23 +235,6 @@ public class WidgetSchematicBrowser extends GuiLitematicaBase implements IDirect
         else
         {
             this.switchToRootDirectory();
-        }
-    }
-
-    @Nullable
-    public DirectoryEntry getSelectedEntry()
-    {
-        return this.selectedEntry;
-    }
-
-    public void setSelectedEntry(@Nullable DirectoryEntry entry, int index)
-    {
-        this.selectedEntry = entry;
-        this.selectedEntryIndex = index;
-
-        if (entry != null && this.selectionListener != null)
-        {
-            this.selectionListener.setString(entry.getName());
         }
     }
 

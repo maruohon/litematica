@@ -7,7 +7,9 @@ import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.WidgetSchematicBrowser.DirectoryEntry;
+import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
+import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
+import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.Selection;
@@ -19,7 +21,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 
-public class GuiSchematicSave extends GuiSchematicBrowserBase
+public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
     private final SelectionManager selectionManager;
     private final GuiTextField textField;
@@ -50,7 +52,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase
         super.initGui();
 
         ((IGuiTextField) this.textField).setInternalWidth(this.width - 253);
-        DirectoryEntry entry = this.schematicBrowser.getSelectedEntry();
+        DirectoryEntry entry = this.widget.getSelectedEntry();
 
         if (entry != null)
         {
@@ -81,6 +83,21 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase
     }
 
     @Override
+    public void onSelectionChange(DirectoryEntry entry)
+    {
+        if (entry != null)
+        {
+            this.setString(entry.getName());
+        }
+    }
+
+    @Override
+    protected ISelectionListener<DirectoryEntry> getSelectionListener()
+    {
+        return this;
+    }
+
+    @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -107,7 +124,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase
 
         if (this.textField.textboxKeyTyped(typedChar, keyCode))
         {
-            this.schematicBrowser.setSelectedEntry(null, -1);
+            this.widget.setSelectedEntry(null, -1);
         }
         else if (keyCode == Keyboard.KEY_TAB)
         {
@@ -139,7 +156,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase
             if (this.type == Type.SAVE)
             {
                 IStringConsumer feedback = InfoUtils.INFO_MESSAGE_CONSUMER;
-                File dir = this.gui.schematicBrowser.getCurrentDirectory();
+                File dir = this.gui.widget.getCurrentDirectory();
                 String name = this.gui.textField.getText();
 
                 if (dir.isDirectory() == false)
@@ -222,7 +239,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase
                     if (schematic.writeToFile(this.dir, this.name, true, feedback))
                     {
                         feedback.setString("litematica.message.schematic_saved");
-                        this.gui.schematicBrowser.refreshEntries();
+                        this.gui.widget.refreshEntries();
                     }
                 }
             }

@@ -5,6 +5,7 @@ import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;

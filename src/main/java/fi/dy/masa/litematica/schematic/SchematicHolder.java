@@ -39,8 +39,8 @@ public class SchematicHolder
         return this.schematics.remove(id) != null;
     }
 
-    public Collection<LitematicaSchematic> getAllSchematics()
+    public Collection<Integer> getAllSchematicsIds()
     {
-        return this.schematics.values();
+        return this.schematics.keySet();
     }
 }

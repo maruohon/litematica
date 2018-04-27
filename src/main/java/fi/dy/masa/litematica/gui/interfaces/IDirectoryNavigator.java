@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.gui;
+package fi.dy.masa.litematica.gui.interfaces;
 
 import java.io.File;
 

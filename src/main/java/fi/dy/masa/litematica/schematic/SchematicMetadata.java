@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class SchematicMetadata
 {
+    private String name = "?";
     private String author = "Unknown";
     private String thumbnailLocation = "";
     private String thumbnailData = "";
@@ -21,6 +22,11 @@ public class SchematicMetadata
     private int regionCount;
     private int totalVolume;
     private int totalBlocks;
+
+    public String getName()
+    {
+        return this.name;
+    }
 
     public String getAuthor()
     {
@@ -77,6 +83,11 @@ public class SchematicMetadata
         return this.timeCreated != this.timeModified;
     }
 
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
     public void setAuthor(String author)
     {
         this.author = author;
@@ -131,6 +142,7 @@ public class SchematicMetadata
     {
         NBTTagCompound nbt = new NBTTagCompound();
 
+        nbt.setString("Name", this.name);
         nbt.setString("Author", this.author);
         nbt.setString("Description", this.description);
         nbt.setString("ThumbnailLocation", this.thumbnailLocation);
@@ -147,6 +159,7 @@ public class SchematicMetadata
 
     public void readFromNBT(NBTTagCompound nbt)
     {
+        this.name = nbt.getString("Name");
         this.author = nbt.getString("Author");
         this.description = nbt.getString("Description");
         this.thumbnailLocation = nbt.getString("ThumbnailLocation");

@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.gui;
+package fi.dy.masa.litematica.gui.base;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import fi.dy.masa.litematica.config.gui.button.ButtonBase;
 import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
 import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
+import fi.dy.masa.litematica.gui.widgets.WidgetInfo;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -34,7 +35,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IStringCons
     protected static final int TOP          = 10;
     private final List<ButtonEntry<?>> buttons = new ArrayList<>();
     private final List<GuiLabel> labels = new ArrayList<>();
-    private final List<InfoWidget> infoWidgets = new ArrayList<>();
+    private final List<WidgetInfo> infoWidgets = new ArrayList<>();
     private final List<Message> messages = new ArrayList<>();
     private InfoType nextMessageType = InfoType.INFO;
 
@@ -82,14 +83,14 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IStringCons
 
         if (this.infoWidgets.isEmpty() == false)
         {
-            for (InfoWidget widget : this.infoWidgets)
+            for (WidgetInfo widget : this.infoWidgets)
             {
                 widget.render(mouseX, mouseY);
             }
         }
     }
 
-    protected void drawContents(int mouseX, int mouseY, float partialTicks)
+    public void drawContents(int mouseX, int mouseY, float partialTicks)
     {
     }
 
@@ -145,7 +146,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IStringCons
     {
     }
 
-    protected void addInfoWidget(InfoWidget widget)
+    protected void addInfoWidget(WidgetInfo widget)
     {
         this.infoWidgets.add(widget);
     }
@@ -163,7 +164,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IStringCons
 
     public void addGuiMessage(InfoType type, String message, int displayTimeMs)
     {
-        this.messages.add(new Message(type, message, displayTimeMs, 200));
+        this.messages.add(new Message(type, message, displayTimeMs, 380));
     }
 
     public void setNextMessageType(InfoType type)
@@ -175,7 +176,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IStringCons
     {
         if (this.messages.isEmpty() == false)
         {
-            int boxWidth = 300;
+            int boxWidth = 400;
             int boxHeight = this.getMessagesHeight() + 20;
             int x = this.width / 2 - boxWidth / 2;
             int y = this.height / 2 - boxHeight / 2;
@@ -457,7 +458,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IStringCons
                 y += this.fontRenderer.FONT_HEIGHT + 1;
             }
 
-            return y + 5;
+            return y + 3;
         }
 
         public String getFormatCode()
