@@ -147,7 +147,7 @@ public class InputEventHandler
 
                 if (mouseEventIsPickBlock(this.mc, button))
                 {
-                    // TODO: if (isInSelectionMode())
+                    if (RenderEventHandler.getInstance().isEnabled()/* && isInSelectionMode()*/) // TODO
                     {
                         SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 
@@ -156,18 +156,19 @@ public class InputEventHandler
                             if (sm.hasGrabbedElement())
                             {
                                 sm.releaseGrabbedElement();
+                                return true;
                             }
                             else
                             {
                                 sm.grabElement(this.mc, 200);
+                                return true;
                             }
                         }
                         else
                         {
                             sm.changeSelection(world, player, 200);
+                            return true;
                         }
-
-                        return true;
                     }
                 }
                 else if (mouseEventIsAttack(this.mc, button))
@@ -175,6 +176,7 @@ public class InputEventHandler
                     if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
                     {
                         this.setCornerPosition(this.mc, Corner.CORNER_1);
+                        return true;
                     }
                 }
                 else if (mouseEventIsUse(this.mc, button))
@@ -182,6 +184,7 @@ public class InputEventHandler
                     if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
                     {
                         this.setCornerPosition(this.mc, Corner.CORNER_2);
+                        return true;
                     }
                 }
             }
