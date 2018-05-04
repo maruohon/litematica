@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import net.minecraft.util.math.BlockPos;
 
 public class Selection
@@ -100,6 +101,8 @@ public class Selection
 
     public String createNewSelectionBox(BlockPos pos1)
     {
+        this.clearCurrentSelectedCorner();
+
         if (this.origin.equals(BlockPos.ORIGIN) && this.selectionBoxes.isEmpty())
         {
             this.origin = pos1;
@@ -116,11 +119,22 @@ public class Selection
         Box box = new Box();
         box.setName(name + i);
         box.setPos1(pos1);
+        box.setSelectedCorner(Corner.CORNER_1);
 
         this.selectionBoxes.put(name + i, box);
         this.currentBox = name + i;
 
         return this.currentBox;
+    }
+
+    public void clearCurrentSelectedCorner()
+    {
+        Box box = this.getSelectedSelectionBox();
+
+        if (box != null)
+        {
+            box.setSelectedCorner(Corner.NONE);
+        }
     }
 
     /**

@@ -127,13 +127,7 @@ public class SelectionManager
             }
             else if (trace.getHitType() == HitType.MISS)
             {
-                Box box = area.getSelectedSelectionBox();
-
-                if (box != null)
-                {
-                    box.setSelectedCorner(Corner.NONE);
-                }
-
+                area.clearCurrentSelectedCorner();
                 area.setSelectedBox(null);
                 return true;
             }
@@ -144,16 +138,11 @@ public class SelectionManager
 
     private void changeSelection(Selection area, RayTraceWrapper trace)
     {
-        Box box = area.getSelectedSelectionBox();
-
-        // Clear the selected corner from any current boxes
-        if (box != null)
-        {
-            box.setSelectedCorner(Corner.NONE);
-        }
+        area.clearCurrentSelectedCorner();
 
         if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX)
         {
+            Box box = area.getSelectedSelectionBox();
             box = trace.getHitSelectionBox();
             area.setSelectedBox(box.getName());
             box.setSelectedCorner(trace.getHitCorner());
