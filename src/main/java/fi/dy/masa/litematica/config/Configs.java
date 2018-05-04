@@ -1,16 +1,28 @@
 package fi.dy.masa.litematica.config;
 
 import java.io.File;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.config.options.ConfigBase;
+import fi.dy.masa.litematica.config.options.ConfigBoolean;
 import fi.dy.masa.litematica.event.InputEventHandler;
 import fi.dy.masa.litematica.util.JsonUtils;
 
 public class Configs
 {
     private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
+
+    public static class Generic
+    {
+        public static final ConfigBoolean VERBOSE_LOGGING       = new ConfigBoolean("verboseLogging", false, "If enabled, a bunch of debug messages will be printed to the console");
+
+        public static final ImmutableList<ConfigBase> OPTIONS = ImmutableList.of(
+                VERBOSE_LOGGING
+        );
+    }
 
     public static void load()
     {
@@ -23,44 +35,8 @@ public class Configs
             if (element != null && element.isJsonObject())
             {
                 JsonObject root = element.getAsJsonObject();
-                /*
-                JsonObject objTweakToggles      = JsonUtils.getNestedObject(root, "TweakToggles", false);
-                JsonObject objTweakHotkeys      = JsonUtils.getNestedObject(root, "TweakHotkeys", false);
-                JsonObject objGenericHotkeys    = JsonUtils.getNestedObject(root, "GenericHotkeys", false);
-                JsonObject objGeneric           = JsonUtils.getNestedObject(root, "Generic", false);
 
-                if (objGeneric != null)
-                {
-                    for (ConfigsGeneric gen : ConfigsGeneric.values())
-                    {
-                        if (objGeneric.has(gen.getName()) && objGeneric.get(gen.getName()).isJsonPrimitive())
-                        {
-                            gen.setValueFromJsonPrimitive(objGeneric.get(gen.getName()).getAsJsonPrimitive());
-                        }
-                    }
-                }
-
-                for (FeatureToggle toggle : FeatureToggle.values())
-                {
-                    if (objTweakToggles != null && JsonUtils.hasBoolean(objTweakToggles, toggle.getName()))
-                    {
-                        toggle.setBooleanValue(JsonUtils.getBoolean(objTweakToggles, toggle.getName()));
-                    }
-
-                    if (objTweakHotkeys != null && JsonUtils.hasString(objTweakHotkeys, toggle.getName()))
-                    {
-                        toggle.getKeybind().setKeysFromStorageString(JsonUtils.getString(objTweakHotkeys, toggle.getName()));
-                    }
-                }
-
-                for (Hotkeys hotkey : Hotkeys.values())
-                {
-                    if (objGenericHotkeys != null && JsonUtils.hasString(objGenericHotkeys, hotkey.getName()))
-                    {
-                        hotkey.getKeybind().setKeysFromStorageString(JsonUtils.getString(objGenericHotkeys, hotkey.getName()));
-                    }
-                }
-                */
+                readOptions(root, "Generic", Generic.OPTIONS);
             }
         }
 
@@ -75,28 +51,36 @@ public class Configs
         {
             File configFile = new File(dir, CONFIG_FILE_NAME);
             JsonObject root = new JsonObject();
-            /*
-            JsonObject objGenericHotkeys    = JsonUtils.getNestedObject(root, "GenericHotkeys", true);
-            JsonObject objGeneric           = JsonUtils.getNestedObject(root, "Generic", true);
 
-            for (ConfigsGeneric gen : ConfigsGeneric.values())
-            {
-                objGeneric.add(gen.getName(), gen.getAsJsonPrimitive());
-            }
-
-            for (FeatureToggle toggle : FeatureToggle.values())
-            {
-                objTweakToggles.add(toggle.getName(), new JsonPrimitive(toggle.getBooleanValue()));
-                objTweakHotkeys.add(toggle.getName(), new JsonPrimitive(toggle.getKeybind().getStorageString()));
-            }
-
-            for (Hotkeys hotkey : Hotkeys.values())
-            {
-                objGenericHotkeys.add(hotkey.getName(), new JsonPrimitive(hotkey.getKeybind().getStorageString()));
-            }
-            */
+            writeOptions(root, "Generic", Generic.OPTIONS);
 
             JsonUtils.writeJsonToFile(root, configFile);
+        }
+    }
+
+    public static void readOptions(JsonObject root, String category, ImmutableList<ConfigBase> options)
+    {
+        JsonObject obj = JsonUtils.getNestedObject(root, category, false);
+
+        if (obj != null)
+        {
+            for (ConfigBase option : options)
+            {
+                if (obj.has(option.getName()))
+                {
+                    option.setValueFromJsonElement(obj.get(option.getName()));
+                }
+            }
+        }
+    }
+
+    public static void writeOptions(JsonObject root, String category, ImmutableList<ConfigBase> options)
+    {
+        JsonObject obj = JsonUtils.getNestedObject(root, category, true);
+
+        for (ConfigBase option : options)
+        {
+            obj.add(option.getName(), option.getAsJsonElement());
         }
     }
 }

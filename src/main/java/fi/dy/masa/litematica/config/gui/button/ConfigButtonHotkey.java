@@ -5,9 +5,10 @@ import org.lwjgl.input.Keyboard;
 import fi.dy.masa.litematica.config.gui.ConfigPanelHotkeysBase;
 import fi.dy.masa.litematica.config.hotkeys.IHotkey;
 import fi.dy.masa.litematica.config.hotkeys.IKeybind;
+import fi.dy.masa.litematica.gui.button.ButtonBase;
 import net.minecraft.util.text.TextFormatting;
 
-public class ConfigButtonHotkey extends ConfigButtonBase
+public class ConfigButtonHotkey extends ButtonBase
 {
     private final ConfigPanelHotkeysBase host;
     private final IHotkey hotkey;

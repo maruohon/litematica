@@ -78,6 +78,7 @@ public class DataManager
     public static void load()
     {
         File file = getCurrentStorageFile();
+        LiteModLitematica.logInfo("Loading settings from file '{}'", file.getAbsolutePath());
         JsonElement element = JsonUtils.parseJsonFile(file);
 
         if (element != null && element.isJsonObject())
@@ -105,10 +106,19 @@ public class DataManager
                     }
                 }
             }
+
+            if (JsonUtils.hasString(root, "last_directory"))
+            {
+                File dir = new File(root.get("last_directory").getAsString());
+
+                if (dir.exists() && dir.isDirectory())
+                {
+                    lastSchematicDirectory = dir;
+                }
+            }
         }
     }
 
-    // TODO Call this from something like world exit/save
     public static void save()
     {
         JsonObject root = new JsonObject();
@@ -127,7 +137,11 @@ public class DataManager
             root.add("data", arr);
         }
 
+        root.add("last_directory", new JsonPrimitive(lastSchematicDirectory.getAbsolutePath()));
+
         File file = getCurrentStorageFile();
+        LiteModLitematica.logInfo("Writing settings to file '{}'", file.getAbsolutePath());
+
         JsonUtils.writeJsonToFile(root, file);
     }
 

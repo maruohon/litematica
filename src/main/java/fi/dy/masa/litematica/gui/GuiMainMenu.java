@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
-import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.button.ButtonGeneric;
+import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -31,16 +31,15 @@ public class GuiMainMenu extends GuiLitematicaBase
         this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SHOW_LOADED);
         y += 22;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SHOW_AREA_SELECTIONS);
+        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS);
         y += 44;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS);
-        y += 22;
+        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SHOW_AREA_SELECTIONS);
     }
 
     private void createChangeMenuButton(int x, int y, ButtonListenerChangeMenu.ButtonType type)
     {
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, 160, 20, I18n.format(type.getLabelKey()));
+        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, 200, 20, I18n.format(type.getLabelKey()), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type));
     }
 
@@ -87,30 +86,37 @@ public class GuiMainMenu extends GuiLitematicaBase
         public enum ButtonType
         {
             // List loaded Schematics in SchematicHolder
-            SHOW_LOADED             ("litematica.gui.button.change_menu.show_loaded_schematics"),
+            SHOW_LOADED             ("litematica.gui.button.change_menu.show_loaded_schematics", ButtonIcon.LOADED_SCHEMATICS),
             // List Schematics placements
-            SHOW_PLACEMENTS         ("litematica.gui.button.change_menu.show_schematic_placements"),
+            SHOW_PLACEMENTS         ("litematica.gui.button.change_menu.show_schematic_placements", ButtonIcon.SCHEMATIC_PLACEMENTS),
             // Load Schematics from file to memory
-            SHOW_AREA_SELECTIONS    ("litematica.gui.button.change_menu.show_area_selections"),
+            SHOW_AREA_SELECTIONS    ("litematica.gui.button.change_menu.show_area_selections", ButtonIcon.AREA_SELECTION),
             // Load Schematics from file to memory
-            LOAD_SCHEMATICS         ("litematica.gui.button.change_menu.load_schematic_to_memory"),
+            LOAD_SCHEMATICS         ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcon.SCHEMATIC_BROWSER),
             // Create a new Schematic from an area selection
-            CREATE_SCHEMATIC        ("litematica.gui.button.change_menu.create_schematic_from_area"),
+            CREATE_SCHEMATIC        ("litematica.gui.button.change_menu.create_schematic_from_area", null),
             // Edit Schematics (description or icon), or convert between formats
-            MANAGE_SCHEMATICS       ("litematica.gui.button.change_menu.manage_schematics"),
+            MANAGE_SCHEMATICS       ("litematica.gui.button.change_menu.manage_schematics", null),
             // Switch to the Litematica main menu
-            MAIN_MENU               ("litematica.gui.button.change_menu.to_main_menu");
+            MAIN_MENU               ("litematica.gui.button.change_menu.to_main_menu", null);
 
             private final String labelKey;
+            private final ButtonIcon icon;
 
-            private ButtonType(String labelKey)
+            private ButtonType(String labelKey, ButtonIcon icon)
             {
                 this.labelKey = labelKey;
+                this.icon = icon;
             }
 
             public String getLabelKey()
             {
                 return this.labelKey;
+            }
+
+            public ButtonIcon getIcon()
+            {
+                return this.icon;
             }
         }
     }

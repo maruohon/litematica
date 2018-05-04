@@ -2,13 +2,14 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.litematica.config.gui.button.ButtonBase;
-import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
-import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
-import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.base.ButtonEntry;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.button.ButtonBase;
+import fi.dy.masa.litematica.gui.button.ButtonGeneric;
+import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import net.minecraft.client.Minecraft;
@@ -33,7 +34,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.mc = mc;
 
         this.id = 0;
-        int posX = x + width - 10;
+        int posX = x + width;
         int posY = y + 1;
 
         // Note: These are placed from right to left
@@ -57,6 +58,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
 
         posX = this.createButton(posX, posY, ButtonListener.ButtonType.SELECT);
+        posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
     }
 
     private int createButton(int x, int y, ButtonListener.ButtonType type)
@@ -127,7 +129,11 @@ public class WidgetSchematicPlacement extends WidgetBase
             Minecraft mc = Minecraft.getMinecraft();
             int dimension = mc.world.provider.getDimensionType().getId();
 
-            if (this.type == ButtonType.SELECT)
+            if (this.type == ButtonType.CONFIGURE)
+            {
+                mc.displayGuiScreen(new GuiPlacementConfiguration(this.widget.placement));
+            }
+            else if (this.type == ButtonType.SELECT)
             {
                 DataManager.getInstance(dimension).getSchematicPlacementManager().setSelectedSchematicPlacement(this.widget.placement);
                 OverlayRenderer.getInstance().updatePlacementCache();
@@ -159,6 +165,7 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         public enum ButtonType
         {
+            CONFIGURE       ("litematica.button.schematic_placements.configure"),
             SELECT          ("litematica.button.schematic_placements.select"),
             REMOVE          ("litematica.button.schematic_placements.remove"),
             TOGGLE_ENABLED  (""),

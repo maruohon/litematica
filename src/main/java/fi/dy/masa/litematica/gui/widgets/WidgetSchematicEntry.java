@@ -2,14 +2,14 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.litematica.config.gui.button.ButtonBase;
-import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
-import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
-import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
 import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.gui.base.ButtonEntry;
+import fi.dy.masa.litematica.gui.button.ButtonBase;
+import fi.dy.masa.litematica.gui.button.ButtonGeneric;
+import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import net.minecraft.client.Minecraft;

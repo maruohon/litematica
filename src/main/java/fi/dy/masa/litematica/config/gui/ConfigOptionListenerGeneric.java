@@ -1,9 +1,9 @@
 package fi.dy.masa.litematica.config.gui;
 
 import com.mumfrey.liteloader.modconfig.AbstractConfigPanel.ConfigOptionListener;
-import fi.dy.masa.litematica.config.gui.button.ConfigButtonBase;
+import fi.dy.masa.litematica.gui.button.ButtonBase;
 
-public class ConfigOptionListenerGeneric<T extends ConfigButtonBase> implements ConfigOptionListener<T>
+public class ConfigOptionListenerGeneric<T extends ButtonBase> implements ConfigOptionListener<T>
 {
     private boolean dirty;
 

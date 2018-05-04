@@ -74,12 +74,19 @@ public class LiteModLitematica implements LiteMod, Configurable, JoinGameListene
     public void onShutDown()
     {
         Configs.save();
-        DataManager.save();
     }
 
     @Override
     public boolean onSaveScreenshot(String screenshotName, int width, int height, Framebuffer fbo, ReturnValue<ITextComponent> message)
     {
         return true;
+    }
+
+    public static void logInfo(String message, Object... args)
+    {
+        if (Configs.Generic.VERBOSE_LOGGING.getValue())
+        {
+            logger.info(message, args);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.config.gui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,23 +9,22 @@ import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.modconfig.AbstractConfigPanel;
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.gui.button.ConfigButtonBase;
 import fi.dy.masa.litematica.config.gui.button.ConfigButtonBoolean;
 import fi.dy.masa.litematica.config.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.litematica.config.interfaces.ConfigType;
-import fi.dy.masa.litematica.config.interfaces.IConfig;
-import fi.dy.masa.litematica.config.interfaces.IConfigBoolean;
 import fi.dy.masa.litematica.config.interfaces.IConfigGeneric;
 import fi.dy.masa.litematica.config.interfaces.IConfigOptionList;
-import fi.dy.masa.litematica.config.interfaces.INamed;
+import fi.dy.masa.litematica.config.options.ConfigBase;
+import fi.dy.masa.litematica.config.options.ConfigBoolean;
+import fi.dy.masa.litematica.gui.button.ButtonBase;
 import net.minecraft.client.resources.I18n;
 
 public abstract class ConfigPanelSub extends AbstractConfigPanel
 {
     private final LitematicaConfigPanel parent;
-    private final Map<IConfig, ConfigTextField> textFields = new HashMap<>();
-    private final ConfigOptionListenerGeneric<ConfigButtonBase> listener = new ConfigOptionListenerGeneric<>();
-    private final List<ConfigButtonBase> buttons = new ArrayList<>();
+    private final Map<ConfigBase, ConfigTextField> textFields = new HashMap<>();
+    private final ConfigOptionListenerGeneric<ButtonBase> listener = new ConfigOptionListenerGeneric<>();
+    private final List<ButtonBase> buttons = new ArrayList<>();
     private final List<HoverInfo> configComments = new ArrayList<>();
     private final String title;
 
@@ -63,7 +63,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
     @Override
     public void mousePressed(ConfigPanelHost host, int mouseX, int mouseY, int mouseButton)
     {
-        for (ConfigButtonBase button : this.buttons)
+        for (ButtonBase button : this.buttons)
         {
             if (button.mousePressed(this.mc, mouseX, mouseY))
             {
@@ -77,7 +77,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         super.mousePressed(host, mouseX, mouseY, mouseButton);
     }
 
-    protected <T extends ConfigButtonBase> void addButton(T button, ConfigOptionListener<T> listener)
+    protected <T extends ButtonBase> void addButton(T button, ConfigOptionListener<T> listener)
     {
         this.buttons.add(button);
         this.addControl(button, listener);
@@ -87,7 +87,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
     {
         boolean dirty = false;
 
-        for (IConfig config : this.getConfigs())
+        for (ConfigBase config : this.getConfigs())
         {
             ConfigType type = config.getType();
 
@@ -114,9 +114,9 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         return dirty;
     }
 
-    protected abstract IConfig[] getConfigs();
+    protected abstract Collection<ConfigBase> getConfigs();
 
-    protected ConfigOptionListenerGeneric<ConfigButtonBase> getConfigListener()
+    protected ConfigOptionListenerGeneric<ButtonBase> getConfigListener()
     {
         return this.listener;
     }
@@ -131,7 +131,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         int configHeight = 20;
         int labelWidth = this.getMaxLabelWidth(this.getConfigs()) + 10;
 
-        for (IConfig config : this.getConfigs())
+        for (ConfigBase config : this.getConfigs())
         {
             this.addLabel(0, x, y + 7, labelWidth, 8, 0xFFFFFFFF, config.getName());
 
@@ -145,7 +145,7 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
 
             if (type == ConfigType.BOOLEAN)
             {
-                this.addButton(new ConfigButtonBoolean(0, x + labelWidth, y, 204, configHeight, (IConfigBoolean) config), this.listener);
+                this.addButton(new ConfigButtonBoolean(0, x + labelWidth, y, 204, configHeight, (ConfigBoolean) config), this.listener);
             }
             else if (type == ConfigType.OPTION_LIST)
             {
@@ -188,12 +188,12 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         }
     }
 
-    protected void addTextField(IConfig config, ConfigTextField field)
+    protected void addTextField(ConfigBase config, ConfigTextField field)
     {
         this.textFields.put(config, field);
     }
 
-    protected ConfigTextField getTextFieldFor(IConfig config)
+    protected ConfigTextField getTextFieldFor(ConfigBase config)
     {
         return this.textFields.get(config);
     }
@@ -205,11 +205,11 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
         this.configComments.add(info);
     }
 
-    protected int getMaxLabelWidth(INamed[] entries)
+    protected int getMaxLabelWidth(Collection<ConfigBase> entries)
     {
         int maxWidth = 0;
 
-        for (INamed entry : entries)
+        for (ConfigBase entry : entries)
         {
             maxWidth = Math.max(maxWidth, this.mc.fontRenderer.getStringWidth(entry.getName()));
         }

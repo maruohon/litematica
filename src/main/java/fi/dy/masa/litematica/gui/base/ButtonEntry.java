@@ -1,6 +1,8 @@
-package fi.dy.masa.litematica.config.gui.button;
+package fi.dy.masa.litematica.gui.base;
 
 import com.mumfrey.liteloader.modconfig.AbstractConfigPanel.ConfigOptionListener;
+import fi.dy.masa.litematica.gui.button.ButtonBase;
+import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 
 public class ButtonEntry<T extends ButtonBase>

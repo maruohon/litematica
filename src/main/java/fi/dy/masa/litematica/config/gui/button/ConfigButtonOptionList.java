@@ -1,9 +1,10 @@
 package fi.dy.masa.litematica.config.gui.button;
 
 import fi.dy.masa.litematica.config.interfaces.IConfigOptionList;
+import fi.dy.masa.litematica.gui.button.ButtonBase;
 import net.minecraft.client.Minecraft;
 
-public class ConfigButtonOptionList extends ConfigButtonBase
+public class ConfigButtonOptionList extends ButtonBase
 {
     private final IConfigOptionList config;
 

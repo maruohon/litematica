@@ -3,13 +3,14 @@ package fi.dy.masa.litematica.gui.base;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.litematica.config.gui.button.ButtonBase;
-import fi.dy.masa.litematica.config.gui.button.ButtonEntry;
-import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
+import fi.dy.masa.litematica.gui.button.ButtonBase;
+import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.litematica.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetInfo;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import net.minecraft.client.Minecraft;
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -35,6 +37,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     protected static final int LEFT         = 20;
     protected static final int TOP          = 10;
     private final List<ButtonEntry<?>> buttons = new ArrayList<>();
+    private final List<TextFieldEntry<?>> textFields = new ArrayList<>();
     private final List<GuiLabel> labels = new ArrayList<>();
     private final List<WidgetInfo> infoWidgets = new ArrayList<>();
     private final List<Message> messages = new ArrayList<>();
@@ -68,7 +71,9 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     {
         super.initGui();
 
+        this.labels.clear();
         this.clearButtons();
+        this.clearTextFields();
     }
 
     @Override
@@ -131,6 +136,15 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
             }
         }
 
+        for (TextFieldEntry<?> entry : this.textFields)
+        {
+            if (entry.mouseClicked(mouseX, mouseY, mouseButton))
+            {
+                // Don't call super if the button press got handled
+                return;
+            }
+        }
+
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
@@ -140,6 +154,15 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         if (keyCode == Keyboard.KEY_ESCAPE)
         {
             this.mc.displayGuiScreen(null);
+            return;
+        }
+
+        for (TextFieldEntry<?> entry : this.textFields)
+        {
+            if (entry.keyTyped(typedChar, keyCode))
+            {
+                return;
+            }
         }
     }
 
@@ -228,6 +251,11 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         this.buttons.add(new ButtonEntry<>(button, listener));
     }
 
+    protected <T extends GuiTextField> void addtextField(T textField, @Nullable ITextFieldListener<T> listener)
+    {
+        this.textFields.add(new TextFieldEntry<>(textField, listener));
+    }
+
     protected void addLabel(int id, int x, int y, int width, int height, int colour, String... lines)
     {
         if (lines != null && lines.length >= 1)
@@ -246,6 +274,11 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     protected void clearButtons()
     {
         this.buttons.clear();
+    }
+
+    protected void clearTextFields()
+    {
+        this.textFields.clear();
     }
 
     private boolean stealFocus()
@@ -290,6 +323,14 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         }
     }
 
+    protected void drawTextFields()
+    {
+        for (TextFieldEntry<?> entry : this.textFields)
+        {
+            entry.draw();
+        }
+    }
+
     protected void drawLabels(int mouseX, int mouseY, float partialTicks)
     {
         for (GuiLabel label : this.labels)
@@ -328,6 +369,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         //this.mainPanel.drawPanel(this.host, mouseX - MARGIN - (this.mouseOverPanel(mouseX, mouseY) ? 0 : 99999), mouseY - this.innerTop, partialTicks);
         //this.drawButtons(mouseX - MARGIN - (this.mouseOverPanel(mouseX, mouseY) ? 0 : 99999), mouseY - this.innerTop, partialTicks);
         this.drawLabels(mouseX, mouseY, partialTicks);
+        this.drawTextFields();
         this.drawButtons(mouseX, mouseY, partialTicks);
         GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 
@@ -487,5 +529,11 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         SUCCESS,
         WARNING,
         ERROR;
+    }
+
+    public enum LeftRight
+    {
+        LEFT,
+        RIGHT
     }
 }

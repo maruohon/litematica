@@ -3,10 +3,10 @@ package fi.dy.masa.litematica.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
-import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.button.ButtonGeneric;
+import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -57,7 +57,6 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
 
     private void updateEntries()
     {
-        this.clearButtons();
         this.updateNames();
 
         if (this.selectionManager == null)
@@ -74,7 +73,7 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
         ButtonGeneric button;
         ButtonListener listener;
         String labelRename = I18n.format("litematica.gui.button.rename");
-        int widthRename = this.mc.fontRenderer.getStringWidth(labelRename) + 12;
+        int widthRename = this.mc.fontRenderer.getStringWidth(labelRename) + 10;
 
         for (String name : this.selectionNames)
         {
@@ -83,12 +82,12 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             button = new ButtonGeneric(id++, x, y, nameWidth, 20, label);
             listener = this.createActionListener(ButtonListener.Type.SELECT, name);
             this.addButton(button, listener);
-             x += nameWidth + 8;
+            x += nameWidth + 4;
 
             button = new ButtonGeneric(id++, x, y, widthRename, 20, labelRename);
             listener = this.createActionListener(ButtonListener.Type.RENAME, name);
             this.addButton(button, listener);
-            x += widthRename + 8;
+            x += widthRename + 4;
 
             button = new ButtonGeneric(id++, x, y, 20, 20, BUTTON_LABEL_REMOVE);
             listener = this.createActionListener(ButtonListener.Type.REMOVE, name);
@@ -105,7 +104,7 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             y += button.getButtonHeight() + 2;
         }
 
-        button = new ButtonGeneric(id++, xStart + nameWidth + widthRename + 16, y, 20, 20, BUTTON_LABEL_ADD);
+        button = new ButtonGeneric(id++, xStart + nameWidth + widthRename + 8, y, 20, 20, BUTTON_LABEL_ADD);
         listener = this.createActionListener(ButtonListener.Type.ADD, "");
         this.addButton(button, listener);
     }
@@ -136,24 +135,24 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             if (this.type == Type.SELECT)
             {
                 this.selectionManager.setCurrentSelection(this.name);
-                this.gui.updateEntries();
+                this.gui.initGui();
             }
             else if (this.type == Type.ADD)
             {
                 this.selectionManager.createNewSelection();
-                this.gui.updateEntries();
+                this.gui.initGui();
             }
             else if (this.type == Type.REMOVE)
             {
                 this.selectionManager.removeSelection(this.name);
-                this.gui.updateEntries();
+                this.gui.initGui();
 
                 int size = this.gui.selectionNames.size();
 
                 if (size > 0 && this.name.equals(this.selectionManager.getCurrentSelectionName()))
                 {
                     this.selectionManager.setCurrentSelection(this.gui.selectionNames.get(size - 1));
-                    this.gui.updateEntries();
+                    this.gui.initGui();
                 }
             }
             else if (this.type == Type.RENAME)

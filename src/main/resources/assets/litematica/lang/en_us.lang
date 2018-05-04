@@ -16,14 +16,15 @@ litematica.error.schematic_write_to_file_failed.exists=Failed to write the schem
 
 litematica.info.schematic_load.schematic_loaded=Schematic '%s' successfully loaded to memory
 
-litematica.gui.button.change_menu.create_schematic_from_area=Create Schematic from selection
-litematica.gui.button.change_menu.load_schematic_to_memory=Load Schematic to memory
-litematica.gui.button.change_menu.manage_schematics=Manage Schematics
-litematica.gui.button.change_menu.show_area_selections=Show Area Selections
-litematica.gui.button.change_menu.show_loaded_schematics=Show loaded Schematics
-litematica.gui.button.change_menu.show_schematic_placements=Show Schematic placements
+litematica.gui.button.change_menu.create_schematic_from_area=Create schematic from selection
+litematica.gui.button.change_menu.load_schematics_to_memory=Load schematics to memory
+litematica.gui.button.change_menu.manage_schematics=Manage schematics
+litematica.gui.button.change_menu.show_area_selections=Show area selections
+litematica.gui.button.change_menu.show_loaded_schematics=Show loaded schematics
+litematica.gui.button.change_menu.show_schematic_placements=Show schematic placements
 litematica.gui.button.change_menu.to_main_menu=Litematica menu
 
+litematica.button.schematic_placements.configure=Configure
 litematica.button.schematic_placements.remove=Remove
 litematica.button.schematic_placements.select=Select
 litematica.button.schematic_placements.disable=Disable
@@ -33,10 +34,16 @@ litematica.button.schematic_placements.render_disable=Disable rendering
 
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.create_placement=Create placement
+litematica.gui.button.disable=Disable
+litematica.gui.button.enable=Enable
 litematica.gui.button.load_schematic_to_memory=Load Schematic to memory
 litematica.gui.button.ok=OK
+litematica.gui.button.mirror_value=Mirror: %s
+litematica.gui.button.move_here=Move here
+litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
 litematica.gui.button.reset=Reset
+litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_area_to_schematic=Save Area
 litematica.gui.button.save_to_file=Save to file
 litematica.gui.button.unload=Unload
@@ -52,12 +59,13 @@ litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
 litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
-litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.area_selection_manager=Area Selection Manager
+litematica.gui.title.configure_placement=Configure Schematic placement
 litematica.gui.title.litematica_main_menu=Litematica Main Menu
 litematica.gui.title.load_schematic=Load Schematic
 litematica.gui.title.manage_loaded_schematics=Manage loaded Schematics
 litematica.gui.title.manage_schematic_placements=Manage Schematic Placements
+litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.save_schematic=Save the currently selected area as a Schematic
 litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
@@ -75,3 +83,5 @@ litematica.message.set_selection_box_point=Set/moved point %d to %s
 litematica.message.toggled=Toggled %s %s
 litematica.message.value.on=ON
 litematica.message.value.off=OFF
+
+litematica.message.warning.invalid_number=Invalid input for a number '%s'

@@ -4,16 +4,12 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import net.minecraft.util.ResourceLocation;
 
-public enum Icons
+public enum ButtonIcon
 {
-    BUTTON_PLUS_MINUS_8     (  0,   0,  8,  8),
-    BUTTON_PLUS_MINUS_12    ( 24,   0, 12, 12),
-    FILE_ICON_LITEMATIC     (144,   0, 12, 12),
-    FILE_ICON_SCHEMATIC     (144,  12, 12, 12),
-    FILE_ICON_VANILLA       (144,  24, 12, 12),
-    FILE_ICON_DIR           (156,   0, 12, 12),
-    FILE_ICON_DIR_UP        (156,  12, 12, 12),
-    FILE_ICON_DIR_ROOT      (156,  24, 12, 12);
+    AREA_SELECTION          (102,   0, 14, 14),
+    LOADED_SCHEMATICS       (102,  14, 14, 14),
+    SCHEMATIC_BROWSER       (102,  28, 14, 14),
+    SCHEMATIC_PLACEMENTS    (102,  42, 14, 14);
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 
@@ -22,7 +18,7 @@ public enum Icons
     private final int w;
     private final int h;
 
-    private Icons(int u, int v, int w, int h)
+    private ButtonIcon(int u, int v, int w, int h)
     {
         this.u = u;
         this.v = v;
@@ -50,8 +46,20 @@ public enum Icons
         return this.v;
     }
 
-    public void renderAt(int x, int y, float zLevel)
+    public void renderAt(int x, int y, float zLevel, boolean enabled, boolean selected)
     {
-        GuiLitematicaBase.drawTexturedRect(x, y, this.u, this.v, this.w, this.h, zLevel);
+        int u = this.u;
+
+        if (enabled)
+        {
+            u += this.w;
+        }
+
+        if (selected)
+        {
+            u += this.w;
+        }
+
+        GuiLitematicaBase.drawTexturedRect(x, y, u, this.v, this.w, this.h, zLevel);
     }
 }

@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.config.gui.button;
+package fi.dy.masa.litematica.gui.button;
 
 import com.mumfrey.liteloader.modconfig.AbstractConfigPanel.ConfigOptionListener;
 

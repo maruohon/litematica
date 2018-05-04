@@ -71,6 +71,11 @@ public class SchematicPlacement
         this.enabled = enabled;
     }
 
+    public void toggleEnabled()
+    {
+        this.enabled = ! this.enabled;
+    }
+
     public void setRenderSchematic(boolean render)
     {
         this.renderSchematic = render;

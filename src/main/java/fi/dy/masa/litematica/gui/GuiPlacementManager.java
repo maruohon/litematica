@@ -1,9 +1,9 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiListBase;
+import fi.dy.masa.litematica.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacements;
 import net.minecraft.client.resources.I18n;

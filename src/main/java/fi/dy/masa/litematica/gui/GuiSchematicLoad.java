@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import fi.dy.masa.litematica.config.gui.button.ButtonGeneric;
-import fi.dy.masa.litematica.config.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
+import fi.dy.masa.litematica.gui.button.ButtonGeneric;
+import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
