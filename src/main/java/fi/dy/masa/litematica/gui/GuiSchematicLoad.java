@@ -18,12 +18,8 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
     public GuiSchematicLoad()
     {
         super(10, 40);
-    }
 
-    @Override
-    protected String getTitle()
-    {
-        return I18n.format("litematica.gui.title.load_schematic");
+        this.title = I18n.format("litematica.gui.title.load_schematic");
     }
 
     @Override
@@ -48,14 +44,14 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type));
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type));
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>

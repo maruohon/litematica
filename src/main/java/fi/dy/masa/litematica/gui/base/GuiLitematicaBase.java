@@ -42,12 +42,24 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     private final List<WidgetInfo> infoWidgets = new ArrayList<>();
     private final List<Message> messages = new ArrayList<>();
     private InfoType nextMessageType = InfoType.INFO;
+    protected String title = "";
+    @Nullable
+    protected GuiLitematicaBase parent;
 
     public GuiLitematicaBase()
     {
     }
 
-    protected abstract String getTitle();
+    public GuiLitematicaBase setParent(GuiLitematicaBase parent)
+    {
+        this.parent = parent;
+        return this;
+    }
+
+    protected String getTitle()
+    {
+        return this.parent != null ? this.parent.getTitle() + " => " + this.title : this.title;
+    }
 
     public Minecraft getMinecraft()
     {
@@ -116,23 +128,47 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
         int mouseWheelDelta = Mouse.getEventDWheel();
 
-        if (mouseWheelDelta != 0)
+        if (mouseWheelDelta == 0 || this.onMouseScrolled(mouseX, mouseY, mouseWheelDelta) == false)
         {
-            this.mouseWheelScrolled(mouseX, mouseY, mouseWheelDelta);
+            super.handleMouseInput();
         }
-
-        super.handleMouseInput();
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+        if (this.onMouseClicked(mouseX, mouseY, mouseButton) == false)
+        {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+        }
+    }
+
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int mouseButton)
+    {
+        if (this.onMouseReleased(mouseX, mouseY, mouseButton) == false)
+        {
+            super.mouseReleased(mouseX, mouseY, mouseButton);
+        }
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+        if (this.onKeyTyped(typedChar, keyCode) == false)
+        {
+            super.keyTyped(typedChar, keyCode);
+        }
+    }
+
+    public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
         for (ButtonEntry<?> entry : this.buttons)
         {
             if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
             {
                 // Don't call super if the button press got handled
-                return;
+                return true;
             }
         }
 
@@ -141,33 +177,40 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
             if (entry.mouseClicked(mouseX, mouseY, mouseButton))
             {
                 // Don't call super if the button press got handled
-                return;
+                return true;
             }
         }
 
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        return false;
     }
 
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton)
+    {
+        return false;
+    }
+
+    public boolean onMouseScrolled(int mouseX, int mouseY, int mouseWheelDelta)
+    {
+        return false;
+    }
+
+    public boolean onKeyTyped(char typedChar, int keyCode)
     {
         if (keyCode == Keyboard.KEY_ESCAPE)
         {
-            this.mc.displayGuiScreen(null);
-            return;
+            this.mc.displayGuiScreen(this.parent);
+            return true;
         }
 
         for (TextFieldEntry<?> entry : this.textFields)
         {
             if (entry.keyTyped(typedChar, keyCode))
             {
-                return;
+                return true;
             }
         }
-    }
 
-    protected void mouseWheelScrolled(int mouseX, int mouseY, int mouseWheelDelta)
-    {
+        return false;
     }
 
     protected void addInfoWidget(WidgetInfo widget)

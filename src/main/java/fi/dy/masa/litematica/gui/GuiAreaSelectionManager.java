@@ -23,17 +23,12 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
     public GuiAreaSelectionManager()
     {
         Minecraft mc = Minecraft.getMinecraft();
+        this.title = I18n.format("litematica.gui.title.area_selection_manager");
 
         if (mc.world != null)
         {
             this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
         }
-    }
-
-    @Override
-    protected String getTitle()
-    {
-        return I18n.format("litematica.gui.title.area_selection_manager");
     }
 
     @Override

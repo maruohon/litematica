@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.gui.widgets.base;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -56,17 +55,18 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
     }
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
+        boolean ret = false;
+
         if (mouseButton == 0)
         {
             if (this.scrollBar.wasMouseOver())
             {
                 this.scrollBar.setDragging(true);
+                ret = true;
             }
         }
-
-        super.mouseClicked(mouseX, mouseY, mouseButton);
 
         final int relativeY = mouseY - this.browserEntriesStartY - this.browserEntriesOffsetY;
         final int widgetIndex = relativeY / this.browserEntryHeight;
@@ -84,30 +84,41 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
                 if (widgetIndex < this.listWidgets.size())
                 {
                     this.listWidgets.get(widgetIndex).onMouseClicked(mouseX, mouseY, mouseButton);
+                    ret = true;
                 }
             }
         }
+
+        if (ret)
+        {
+            return true;
+        }
+
+        return super.onMouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
-    public void mouseReleased(int mouseX, int mouseY, int button)
+    public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton)
     {
-        if (button == 0)
+        if (mouseButton == 0)
         {
             this.scrollBar.setDragging(false);
         }
 
-        super.mouseReleased(mouseX, mouseY, button);
+        return super.onMouseReleased(mouseX, mouseY, mouseButton);
     }
 
     @Override
-    public void mouseWheelScrolled(int mouseX, int mouseY, int mouseWheelDelta)
+    public boolean onMouseScrolled(int mouseX, int mouseY, int mouseWheelDelta)
     {
         if (mouseX >= this.posX && mouseX <= this.posX + this.browserWidth &&
             mouseY >= this.posY && mouseY <= this.posY + this.browserHeight)
         {
             this.offsetSelectionOrScrollbar(mouseWheelDelta < 0 ? 3 : -3, false);
+            return true;
         }
+
+        return false;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.gui;
 
-import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
@@ -13,7 +12,6 @@ import net.minecraft.client.resources.I18n;
 
 public class GuiTextInput extends GuiLitematicaBase
 {
-    private final GuiLitematicaBase parent;
     private final String title;
     private final GuiTextField textField;
     private final String originalText;
@@ -94,32 +92,25 @@ public class GuiTextInput extends GuiLitematicaBase
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    public boolean onKeyTyped(char typedChar, int keyCode)
     {
-        if (keyCode == Keyboard.KEY_ESCAPE)
-        {
-            this.mc.displayGuiScreen(this.parent);
-            return;
-        }
-        else if (keyCode == Keyboard.KEY_RETURN)
+        if (keyCode == Keyboard.KEY_RETURN)
         {
             this.consumer.setString(this.textField.getText());
             this.mc.displayGuiScreen(this.parent);
-            return;
+            return true;
         }
 
         if (this.textField.isFocused())
         {
-            this.textField.textboxKeyTyped(typedChar, keyCode);
+            return this.textField.textboxKeyTyped(typedChar, keyCode);
         }
-        else
-        {
-            super.keyTyped(typedChar, keyCode);
-        }
+
+        return super.onKeyTyped(typedChar, keyCode);
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int button) throws IOException
+    public boolean onMouseClicked(int mouseX, int mouseY, int button)
     {
         if (mouseX >= this.textField.x && mouseX < this.textField.x + ((IGuiTextField) this.textField).getInternalWidth() &&
             mouseY >= this.textField.y && mouseY < this.textField.y + ((IGuiTextField) this.textField).getHeight())
@@ -133,11 +124,11 @@ public class GuiTextInput extends GuiLitematicaBase
             {
                 this.textField.mouseClicked(mouseX, mouseY, button);
             }
+
+            return true;
         }
-        else
-        {
-            super.mouseClicked(mouseX, mouseY, button);
-        }
+
+        return super.onMouseClicked(mouseX, mouseY, button);
     }
 
     private ButtonListener createActionListener(ButtonListener.Type type)

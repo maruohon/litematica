@@ -15,12 +15,8 @@ public class GuiLoadedSchematicsManager extends GuiListBase<SchematicEntry, Widg
     public GuiLoadedSchematicsManager()
     {
         super(10, 40);
-    }
 
-    @Override
-    protected String getTitle()
-    {
-        return I18n.format("litematica.gui.title.manage_loaded_schematics");
+        this.title = I18n.format("litematica.gui.title.manage_loaded_schematics");
     }
 
     @Override
@@ -51,21 +47,21 @@ public class GuiLoadedSchematicsManager extends GuiListBase<SchematicEntry, Widg
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type));
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
         x += buttonWidth + 4;
 
         type = ButtonListenerChangeMenu.ButtonType.SHOW_PLACEMENTS;
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type));
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type));
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
     }
 
     @Override

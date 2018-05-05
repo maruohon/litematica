@@ -26,12 +26,6 @@ public class WidgetLoadedSchematics extends WidgetListBase<SchematicEntry, Widge
     }
 
     @Override
-    protected String getTitle()
-    {
-        return "";
-    }
-
-    @Override
     public void refreshEntries()
     {
         this.listContents.clear();

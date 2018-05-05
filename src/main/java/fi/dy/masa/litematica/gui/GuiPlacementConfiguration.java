@@ -23,12 +23,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
     public GuiPlacementConfiguration(SchematicPlacement placement)
     {
         this.placement = placement;
-    }
-
-    @Override
-    protected String getTitle()
-    {
-        return I18n.format("litematica.gui.title.configure_placement");
+        this.title = I18n.format("litematica.gui.title.configure_placement");
     }
 
     @Override
@@ -69,7 +64,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         x = this.width - buttonWidth - 10;
         y = this.height - 36;
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type));
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
     }
 
     private void createCoordinateInput(int x, int y, int width, CoordinateType type)

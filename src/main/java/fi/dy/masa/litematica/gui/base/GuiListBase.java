@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.gui.base;
 
-import java.io.IOException;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
@@ -29,6 +28,17 @@ public abstract class GuiListBase<TYPE, WIDGET extends WidgetBase, WIDGETLIST ex
     }
 
     @Override
+    public GuiLitematicaBase setParent(GuiLitematicaBase parent)
+    {
+        if (this.widget != null)
+        {
+            this.widget.setParent(parent);
+        }
+
+        return super.setParent(parent);
+    }
+
+    @Override
     public void initGui()
     {
         super.initGui();
@@ -38,35 +48,47 @@ public abstract class GuiListBase<TYPE, WIDGET extends WidgetBase, WIDGETLIST ex
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        if (this.widget.onMouseClicked(mouseX, mouseY, mouseButton))
+        {
+            return true;
+        }
 
-        this.widget.mouseClicked(mouseX, mouseY, mouseButton);
+        return super.onMouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
-    protected void mouseReleased(int mouseX, int mouseY, int button)
+    public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton)
     {
-        this.widget.mouseReleased(mouseX, mouseY, button);
+        if (this.widget.onMouseReleased(mouseX, mouseY, mouseButton))
+        {
+            return true;
+        }
 
-        super.mouseReleased(mouseX, mouseY, button);
+        return super.onMouseReleased(mouseX, mouseY, mouseButton);
     }
 
     @Override
-    protected void mouseWheelScrolled(int mouseX, int mouseY, int mouseWheelDelta)
+    public boolean onMouseScrolled(int mouseX, int mouseY, int mouseWheelDelta)
     {
-        super.mouseWheelScrolled(mouseX, mouseY, mouseWheelDelta);
+        if (this.widget.onMouseScrolled(mouseX, mouseY, mouseWheelDelta))
+        {
+            return true;
+        }
 
-        this.widget.mouseWheelScrolled(mouseX, mouseY, mouseWheelDelta);
+        return super.onMouseScrolled(mouseX, mouseY, mouseWheelDelta);
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    public boolean  onKeyTyped(char typedChar, int keyCode)
     {
-        super.keyTyped(typedChar, keyCode);
+        if (this.widget.onKeyTyped(typedChar, keyCode))
+        {
+            return true;
+        }
 
-        this.widget.keyTyped(typedChar, keyCode);
+        return super.onKeyTyped(typedChar, keyCode);
     }
 
     @Override

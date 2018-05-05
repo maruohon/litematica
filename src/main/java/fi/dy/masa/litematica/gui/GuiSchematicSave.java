@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.data.DataManager;
@@ -30,6 +29,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
     {
         super(10, 60);
 
+        this.title = I18n.format("litematica.gui.title.save_schematic");
         Minecraft mc = Minecraft.getMinecraft();
         this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
 
@@ -38,12 +38,6 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
         this.textField.setText("");
         this.textField.setFocused(true);
         this.textField.setCursorPositionEnd();
-    }
-
-    @Override
-    protected String getTitle()
-    {
-        return I18n.format("litematica.gui.title.save_schematic");
     }
 
     @Override
@@ -98,11 +92,9 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
-
-        this.textField.mouseClicked(mouseX, mouseY, mouseButton);
+        boolean ret = this.textField.mouseClicked(mouseX, mouseY, mouseButton);
 
         int x = this.textField.x;
         int y = this.textField.y;
@@ -114,22 +106,32 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
         {
             this.textField.setText("");
             this.textField.setCursorPosition(0);
+            ret = true;
         }
+
+        if (ret)
+        {
+            return true;
+        }
+
+        return super.onMouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    public boolean onKeyTyped(char typedChar, int keyCode)
     {
-        super.keyTyped(typedChar, keyCode);
-
         if (this.textField.textboxKeyTyped(typedChar, keyCode))
         {
             this.widget.setSelectedEntry(null, -1);
+            return true;
         }
         else if (keyCode == Keyboard.KEY_TAB)
         {
             this.textField.setFocused(! this.textField.isFocused());
+            return true;
         }
+
+        return super.onKeyTyped(typedChar, keyCode);
     }
 
     private ButtonListener createActionListener(ButtonListener.Type type)

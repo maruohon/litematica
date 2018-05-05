@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +44,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     {
         super(x, y, width, height, selectionListener);
 
+        this.title = I18n.format("litematica.gui.title.schematic_browser");
         this.infoWidth = 160;
         this.infoHeight = 280;
         this.currentDirectory = DataManager.getCurrentSchematicDirectory();
@@ -53,16 +53,8 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     }
 
     @Override
-    protected String getTitle()
+    public boolean onKeyTyped(char typedChar, int keyCode)
     {
-        return I18n.format("litematica.gui.title.schematic_browser");
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
-        super.keyTyped(typedChar, keyCode);
-
         if (keyCode == Keyboard.KEY_UP)         this.offsetSelectionOrScrollbar(-1, true);
         else if (keyCode == Keyboard.KEY_DOWN)  this.offsetSelectionOrScrollbar( 1, true);
         else if (keyCode == Keyboard.KEY_PRIOR) this.offsetSelectionOrScrollbar(-this.maxVisibleBrowserEntries / 2, false);
@@ -78,17 +70,23 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
         {
             this.switchToDirectory(new File(this.selectedEntry.getDirectory(), this.selectedEntry.getName()));
         }
+        else
+        {
+            return super.onKeyTyped(typedChar, keyCode);
+        }
+
+        return true;
     }
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        if (this.directoryNavigationWidget != null && this.directoryNavigationWidget.mouseClicked(mouseX, mouseY, mouseButton))
+        if (this.directoryNavigationWidget != null && this.directoryNavigationWidget.onMouseClicked(mouseX, mouseY, mouseButton))
         {
-            return;
+            return true;
         }
 
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        return super.onMouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override

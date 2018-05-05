@@ -10,10 +10,9 @@ public class GuiMainMenu extends GuiLitematicaBase
 {
     private int id;
 
-    @Override
-    protected String getTitle()
+    public GuiMainMenu()
     {
-        return I18n.format("litematica.gui.title.litematica_main_menu");
+        this.title = I18n.format("litematica.gui.title.litematica_main_menu");
     }
 
     @Override
@@ -40,41 +39,52 @@ public class GuiMainMenu extends GuiLitematicaBase
     private void createChangeMenuButton(int x, int y, ButtonListenerChangeMenu.ButtonType type)
     {
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, 200, 20, I18n.format(type.getLabelKey()), type.getIcon());
-        this.addButton(button, new ButtonListenerChangeMenu(type));
+        this.addButton(button, new ButtonListenerChangeMenu(type, this));
     }
 
     public static class ButtonListenerChangeMenu implements IButtonActionListener<ButtonGeneric>
     {
+        private final GuiLitematicaBase parent;
         private final ButtonType type;
 
-        public ButtonListenerChangeMenu(ButtonType type)
+        public ButtonListenerChangeMenu(ButtonType type, GuiLitematicaBase parent)
         {
             this.type = type;
+            this.parent = parent;
         }
 
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
+            GuiLitematicaBase gui = null;
+
             if (this.type == ButtonType.SHOW_LOADED)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiLoadedSchematicsManager());
+                gui = new GuiLoadedSchematicsManager();
             }
             else if (this.type == ButtonType.SHOW_PLACEMENTS)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiPlacementManager());
+                gui = new GuiPlacementManager();
             }
             else if (this.type == ButtonType.SHOW_AREA_SELECTIONS)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiAreaSelectionManager());
+                gui = new GuiAreaSelectionManager();
             }
             else if (this.type == ButtonType.LOAD_SCHEMATICS)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiSchematicLoad());
+                gui = new GuiSchematicLoad();
             }
             else if (this.type == ButtonType.MAIN_MENU)
             {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiMainMenu());
+                gui = new GuiMainMenu();
             }
+
+            if (gui != null)
+            {
+                gui.setParent(this.parent);
+            }
+
+            Minecraft.getMinecraft().displayGuiScreen(gui);
         }
 
         @Override

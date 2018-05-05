@@ -27,12 +27,6 @@ public class WidgetSchematicPlacements extends WidgetListBase<SchematicPlacement
     }
 
     @Override
-    protected String getTitle()
-    {
-        return "";
-    }
-
-    @Override
     public void refreshEntries()
     {
         this.listContents.clear();
