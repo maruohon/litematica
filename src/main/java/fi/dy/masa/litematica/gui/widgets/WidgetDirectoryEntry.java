@@ -50,7 +50,7 @@ public class WidgetDirectoryEntry extends WidgetBase
     }
 
     @Override
-    public void render(int mouseX, int mouseY)
+    public void render(int mouseX, int mouseY, boolean selected)
     {
         Icons widget;
 
@@ -70,7 +70,7 @@ public class WidgetDirectoryEntry extends WidgetBase
         int iw = widget.getWidth();
 
         // Draw a lighter background for the hovered and the selected entry
-        if (this.selected || this.isMouseOver(mouseX, mouseY))
+        if (selected || this.isMouseOver(mouseX, mouseY))
         {
             GuiLitematicaBase.drawRect(this.x + iw + 2, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
         }
@@ -85,7 +85,7 @@ public class WidgetDirectoryEntry extends WidgetBase
         }
 
         // Draw an outline if this is the currently selected entry
-        if (this.selected)
+        if (selected)
         {
             GuiLitematicaBase.drawOutline(this.x + iw + 2, this.y, this.width - iw - 2, this.height, 0xEEEEEEEE);
         }

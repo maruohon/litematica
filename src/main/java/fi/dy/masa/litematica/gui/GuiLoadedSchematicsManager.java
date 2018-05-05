@@ -45,15 +45,15 @@ public class GuiLoadedSchematicsManager extends GuiListBase<SchematicEntry, Widg
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
+        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
         x += buttonWidth + 4;
 
         type = ButtonListenerChangeMenu.ButtonType.SHOW_PLACEMENTS;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
+        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;

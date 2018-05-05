@@ -103,7 +103,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         {
             for (WidgetInfo widget : this.infoWidgets)
             {
-                widget.render(mouseX, mouseY);
+                widget.render(mouseX, mouseY, false);
             }
         }
     }

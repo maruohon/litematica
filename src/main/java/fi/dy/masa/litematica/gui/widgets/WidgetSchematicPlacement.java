@@ -92,7 +92,7 @@ public class WidgetSchematicPlacement extends WidgetBase
     }
 
     @Override
-    public void render(int mouseX, int mouseY)
+    public void render(int mouseX, int mouseY, boolean selected)
     {
         Minecraft mc = Minecraft.getMinecraft();
         int dimension = mc.world.provider.getDimensionType().getId();

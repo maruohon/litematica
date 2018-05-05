@@ -39,7 +39,7 @@ public class WidgetInfo extends WidgetBase
     }
 
     @Override
-    public void render(int mouseX, int mouseY)
+    public void render(int mouseX, int mouseY, boolean selected)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.parent.bindTexture(this.texture);

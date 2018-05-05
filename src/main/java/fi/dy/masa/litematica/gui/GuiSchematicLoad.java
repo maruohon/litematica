@@ -42,8 +42,8 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.SHOW_LOADED;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
+        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;

@@ -122,7 +122,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
     {
         if (this.textField.textboxKeyTyped(typedChar, keyCode))
         {
-            this.widget.setSelectedEntry(null, -1);
+            this.widget.clearSelection();
             return true;
         }
         else if (keyCode == Keyboard.KEY_TAB)

@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui.widgets.base;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.gui.GuiSimpleScrollBar;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
@@ -50,6 +51,7 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
     {
         super.initGui();
 
+        Keyboard.enableRepeatEvents(true);
         this.updateBrowserMaxVisibleEntries();
         this.refreshEntries();
     }
@@ -122,13 +124,28 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
     }
 
     @Override
+    public boolean onKeyTyped(char typedChar, int keyCode)
+    {
+        if (keyCode == Keyboard.KEY_UP)         this.offsetSelectionOrScrollbar(-1, true);
+        else if (keyCode == Keyboard.KEY_DOWN)  this.offsetSelectionOrScrollbar( 1, true);
+        else if (keyCode == Keyboard.KEY_PRIOR) this.offsetSelectionOrScrollbar(-this.maxVisibleBrowserEntries / 2, true);
+        else if (keyCode == Keyboard.KEY_NEXT)  this.offsetSelectionOrScrollbar( this.maxVisibleBrowserEntries / 2, true);
+        else if (keyCode == Keyboard.KEY_HOME)  this.offsetSelectionOrScrollbar(-this.listContents.size(), true);
+        else if (keyCode == Keyboard.KEY_END)   this.offsetSelectionOrScrollbar( this.listContents.size(), true);
+
+        return super.onKeyTyped(typedChar, keyCode);
+    }
+
+    @Override
     public void drawContents(int mouseX, int mouseY, float partialTicks)
     {
+        final int selected = this.selectedEntryIndex != -1 ? this.selectedEntryIndex - this.scrollBar.getValue() : -1;
+
         // Draw the currently visible directory entries
         for (int i = 0; i < this.listWidgets.size(); i++)
         {
             WIDGET widget = this.listWidgets.get(i);
-            widget.render(mouseX, mouseY);
+            widget.render(mouseX, mouseY, i == selected);
         }
 
         int scrollbarHeight = this.browserHeight - 8;
@@ -203,6 +220,12 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
             this.selectionListener.onSelectionChange(entry);
         }
     }
+
+    public void clearSelection()
+    {
+        this.setSelectedEntry(null, -1);
+    }
+
     protected void offsetSelectionOrScrollbar(int amount, boolean changeSelection)
     {
         if (changeSelection == false)

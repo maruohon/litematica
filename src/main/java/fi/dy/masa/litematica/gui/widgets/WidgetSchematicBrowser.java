@@ -36,8 +36,6 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     protected final int infoWidth;
     protected final int infoHeight;
     @Nullable
-    protected DirectoryEntry selectedEntry;
-    @Nullable
     protected WidgetDirectoryNavigation directoryNavigationWidget;
 
     public WidgetSchematicBrowser(int x, int y, int width, int height, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
@@ -55,27 +53,21 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     @Override
     public boolean onKeyTyped(char typedChar, int keyCode)
     {
-        if (keyCode == Keyboard.KEY_UP)         this.offsetSelectionOrScrollbar(-1, true);
-        else if (keyCode == Keyboard.KEY_DOWN)  this.offsetSelectionOrScrollbar( 1, true);
-        else if (keyCode == Keyboard.KEY_PRIOR) this.offsetSelectionOrScrollbar(-this.maxVisibleBrowserEntries / 2, false);
-        else if (keyCode == Keyboard.KEY_NEXT)  this.offsetSelectionOrScrollbar( this.maxVisibleBrowserEntries / 2, false);
-        else if (keyCode == Keyboard.KEY_HOME)  this.offsetSelectionOrScrollbar(-this.scrollBar.getMaxValue(), false);
-        else if (keyCode == Keyboard.KEY_END)   this.offsetSelectionOrScrollbar( this.scrollBar.getMaxValue(), false);
-        else if ((keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_LEFT) && this.currentDirectoryIsRoot() == false)
+        if ((keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_LEFT) && this.currentDirectoryIsRoot() == false)
         {
             this.switchToParentDirectory();
+            return true;
         }
         else if ((keyCode == Keyboard.KEY_RIGHT || keyCode == Keyboard.KEY_RETURN) &&
                   this.selectedEntry != null && this.selectedEntry.getType() == DirectoryEntryType.DIRECTORY)
         {
             this.switchToDirectory(new File(this.selectedEntry.getDirectory(), this.selectedEntry.getName()));
+            return true;
         }
         else
         {
             return super.onKeyTyped(typedChar, keyCode);
         }
-
-        return true;
     }
 
     @Override
@@ -98,7 +90,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
         // Draw the root/up widget, is the current directory has that (ie. is not the root directory)
         if (this.directoryNavigationWidget != null)
         {
-            this.directoryNavigationWidget.render(mouseX, mouseY);
+            this.directoryNavigationWidget.render(mouseX, mouseY, false);
         }
 
         this.drawSelectedSchematicInfo(this.selectedEntry);
@@ -207,7 +199,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     @Override
     public void switchToDirectory(File dir)
     {
-        this.setSelectedEntry(null, -1);
+        this.clearSelection();
 
         this.currentDirectory = FileUtils.getCanonicalFileIfPossible(dir);
         DataManager.setCurrentSchematicDirectory(dir);

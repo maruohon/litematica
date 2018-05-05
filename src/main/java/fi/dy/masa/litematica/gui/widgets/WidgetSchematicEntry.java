@@ -78,7 +78,7 @@ public class WidgetSchematicEntry extends WidgetBase
     }
 
     @Override
-    public void render(int mouseX, int mouseY)
+    public void render(int mouseX, int mouseY, boolean selected)
     {
         String name = this.schematicEntry.name;
         this.mc.fontRenderer.drawString(name, this.x + 4, this.y + 3, 0xFFFFFFFF);

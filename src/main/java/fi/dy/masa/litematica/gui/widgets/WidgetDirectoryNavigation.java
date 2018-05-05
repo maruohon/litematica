@@ -53,7 +53,7 @@ public class WidgetDirectoryNavigation extends WidgetBase
     }
 
     @Override
-    public void render(int mouseX, int mouseY)
+    public void render(int mouseX, int mouseY, boolean selected)
     {
         final int iw = Icons.FILE_ICON_DIR_ROOT.getWidth();
 
