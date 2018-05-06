@@ -115,7 +115,7 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
 
     public static LitematicaBlockStateContainer createFrom(NBTTagList palette, long[] blockStates, BlockPos size)
     {
-        int bits = Math.max(4, Integer.SIZE - Integer.numberOfLeadingZeros(palette.tagCount()));
+        int bits = Math.max(2, Integer.SIZE - Integer.numberOfLeadingZeros(palette.tagCount()));
         LitematicaBlockStateContainer container = new LitematicaBlockStateContainer(size.getX(), size.getY(), size.getZ(), bits, blockStates);
         container.palette.readFromNBT(palette);
         return container;

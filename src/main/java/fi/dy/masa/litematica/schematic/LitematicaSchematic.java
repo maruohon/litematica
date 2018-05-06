@@ -63,7 +63,8 @@ public class LitematicaSchematic
         for (String name : this.subRegionPositions.keySet())
         {
             BlockPos pos = this.subRegionPositions.get(name);
-            Box box = new Box(pos, pos.add(this.subRegionSizes.get(name)));
+            BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(this.subRegionSizes.get(name));
+            Box box = new Box(pos, pos.add(posEndRel));
             builder.put(name, box);
         }
 
@@ -361,7 +362,13 @@ public class LitematicaSchematic
                     {
                         NBTTagList palette = regionTag.getTagList("BlockStatePalette", Constants.NBT.TAG_COMPOUND);
                         long[] blockStateArr = ((IMixinNBTTagLongArray) nbtBase).getArray();
-                        LitematicaBlockStateContainer container = LitematicaBlockStateContainer.createFrom(palette, blockStateArr, regionSize);
+
+                        BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
+                        BlockPos posMin = PositionUtils.getMinCorner(regionPos, posEndRel);
+                        BlockPos posMax = PositionUtils.getMaxCorner(regionPos, posEndRel);
+                        BlockPos size = posMax.subtract(posMin).add(1, 1, 1);
+
+                        LitematicaBlockStateContainer container = LitematicaBlockStateContainer.createFrom(palette, blockStateArr, size);
                         this.blockContainers.put(regionName, container);
                     }
                 }
