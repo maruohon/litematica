@@ -8,7 +8,6 @@ import fi.dy.masa.litematica.gui.base.GuiTextFieldNumeric;
 import fi.dy.masa.litematica.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.interfaces.ITextFieldListener;
-import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.util.PositionUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
@@ -185,7 +184,6 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
-            OverlayRenderer.getInstance().updatePlacementCache();
         }
 
         public enum Type
@@ -231,8 +229,6 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                     case Y: this.placement.setPos(new BlockPos(posOld.getX(), value, posOld.getZ())); break;
                     case Z: this.placement.setPos(new BlockPos(posOld.getX(), posOld.getY(), value)); break;
                 }
-
-                OverlayRenderer.getInstance().updatePlacementCache();
             }
             catch (NumberFormatException e)
             {

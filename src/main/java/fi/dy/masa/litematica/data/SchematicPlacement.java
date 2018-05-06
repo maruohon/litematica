@@ -6,20 +6,26 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.gen.structure.template.PlacementSettings;
 
 public class SchematicPlacement
 {
-    private final LitematicaSchematic schematic;
-    private final String name;
+    private String name;
+    @Nullable
+    private LitematicaSchematic schematic;
     private BlockPos pos;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
+    private boolean ignoreEntities;
     private File schematicFile;
     private boolean enabled;
     private boolean renderSchematic;
@@ -38,7 +44,7 @@ public class SchematicPlacement
 
     public boolean getRenderSchematic()
     {
-        return this.renderSchematic;
+        return this.isEnabled() && this.renderSchematic;
     }
 
     public String getName()
@@ -66,37 +72,67 @@ public class SchematicPlacement
         return mirror;
     }
 
+    public PlacementSettings getPlacement()
+    {
+        PlacementSettings placement = new PlacementSettings();
+
+        placement.setMirror(this.mirror);
+        placement.setRotation(this.rotation);
+        placement.setIgnoreEntities(this.ignoreEntities);
+        placement.setReplacedBlock(Blocks.STRUCTURE_VOID);
+
+        return placement;
+    }
+
     public void setEnabled(boolean enabled)
     {
-        this.enabled = enabled;
+        if (enabled != this.enabled)
+        {
+            this.enabled = enabled;
+            this.updateRenderers(false);
+        }
     }
 
     public void toggleEnabled()
     {
-        this.enabled = ! this.enabled;
+        this.setEnabled(! this.enabled);
     }
 
     public void setRenderSchematic(boolean render)
     {
         this.renderSchematic = render;
+        this.updateRenderers(false);
     }
 
     public SchematicPlacement setPos(BlockPos pos)
     {
         this.pos = pos;
+        this.updateRenderers(false);
         return this;
     }
 
     public SchematicPlacement setRotation(Rotation rotation)
     {
         this.rotation = rotation;
+        this.updateRenderers(false);
         return this;
     }
 
     public SchematicPlacement setMirror(Mirror mirror)
     {
         this.mirror = mirror;
+        this.updateRenderers(false);
         return this;
+    }
+
+    private void updateRenderers(boolean forceUpdate)
+    {
+        OverlayRenderer.getInstance().updatePlacementCache();
+
+        if (forceUpdate || this.schematic != null)
+        {
+            SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
+        }
     }
 
     @Nullable
@@ -116,6 +152,7 @@ public class SchematicPlacement
             obj.add("pos", arr);
             obj.add("rotation", new JsonPrimitive(this.rotation.name()));
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
+            obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities));
             obj.add("enabled", new JsonPrimitive(this.enabled));
             obj.add("render_schematic", new JsonPrimitive(this.renderSchematic));
 
@@ -158,8 +195,9 @@ public class SchematicPlacement
 
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
             SchematicPlacement placement = new SchematicPlacement(schematic, pos, name);
-            placement.setRotation(rotation);
-            placement.setMirror(mirror);
+            placement.rotation = rotation;
+            placement.mirror = mirror;
+            placement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
             placement.enabled = JsonUtils.getBoolean(obj, "enabled");
             placement.renderSchematic = JsonUtils.getBoolean(obj, "render_schematic");
 

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
+import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
@@ -22,7 +23,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityPainting;
+import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,6 +37,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.structure.template.PlacementSettings;
+import net.minecraft.world.gen.structure.template.Template;
 
 public class LitematicaSchematic
 {
@@ -105,6 +111,170 @@ public class LitematicaSchematic
         }
 
         return schematic;
+    }
+
+    public boolean placeToWorld(World world, final BlockPos origin, PlacementSettings placement, boolean notifyNeighbors)
+    {
+        /*
+        Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(this.getAreas().values());
+        BlockPos posMin = pair.getLeft();
+        BlockPos posMax = pair.getRight();
+
+        // FIXME testing, move elsewhere
+        if (world.getChunkProvider() instanceof ChunkProviderClient)
+        {
+            BlockPos pos1 = Template.transformedBlockPos(placement, posMin).add(origin);
+            BlockPos pos2 = Template.transformedBlockPos(placement, posMax).add(origin);
+            int x1 = pos1.getX() >> 4;
+            int z1 = pos1.getZ() >> 4;
+            int x2 = pos2.getX() >> 4;
+            int z2 = pos2.getZ() >> 4;
+            int border = 3;
+
+            for (int cz = z1 - border; cz <= z2 + border; ++cz)
+            {
+                for (int cx = x1 - border; cx <= x2 + border; ++cx)
+                {
+                    if (((ChunkProviderClient) world.getChunkProvider()).getLoadedChunk(cx, cz) == null)
+                    {
+                        ((ChunkProviderClient) world.getChunkProvider()).loadChunk(cx, cz);
+                    }
+                }
+            }
+        }
+        */
+
+        for (String regionName : this.blockContainers.keySet())
+        {
+            BlockPos regionPos = this.subRegionPositions.get(regionName);
+            BlockPos regionSize = this.subRegionSizes.get(regionName);
+            LitematicaBlockStateContainer container = this.blockContainers.get(regionName);
+            Map<BlockPos, NBTTagCompound> tileMap = this.tileEntities.get(regionName);
+            List<EntityInfo> entityList = this.entities.get(regionName);
+
+            if (regionPos != null && regionSize != null && container != null && tileMap != null && entityList != null)
+            {
+                this.placeBlocksToWorld(world, origin, placement, regionPos, regionSize, container, tileMap, notifyNeighbors);
+                this.placeEntitiesToWorld(world, origin, placement, entityList);
+            }
+            else
+            {
+                LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
+            }
+        }
+
+        return true;
+    }
+
+    private void placeBlocksToWorld(World world, BlockPos origin, PlacementSettings placement, BlockPos regionPos, BlockPos regionSize,
+            LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
+    {
+        BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
+        BlockPos posMin = PositionUtils.getMinCorner(regionPos, posEndRel);
+        BlockPos posMax = PositionUtils.getMaxCorner(regionPos, posEndRel);
+
+        if (PositionUtils.arePositionsWithinWorld(world, posMin, posMax, origin, placement))
+        {
+            final int sizeX = posMax.getX() - posMin.getX() + 1;
+            final int sizeY = posMax.getY() - posMin.getY() + 1;
+            final int sizeZ = posMax.getZ() - posMin.getZ() + 1;
+            BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+
+            for (int y = 0; y < sizeY; ++y)
+            {
+                for (int z = 0; z < sizeZ; ++z)
+                {
+                    for (int x = 0; x < sizeX; ++x)
+                    {
+                        IBlockState state = container.get(x, y, z);
+
+                        if (state.getMaterial() == Material.AIR)
+                        {
+                            continue;
+                        }
+
+                        posMutable.setPos(x, y, z);
+                        NBTTagCompound teNBT = tileMap.get(posMutable);
+
+                        posMutable.setPos(posMin.getX() + x, posMin.getY() + y, posMin.getZ() + z);
+                        BlockPos pos = Template.transformedBlockPos(placement, posMutable).add(origin);
+
+                        state = state.withMirror(placement.getMirror());
+                        state = state.withRotation(placement.getRotation());
+
+                        if (teNBT != null)
+                        {
+                            TileEntity te = world.getTileEntity(pos);
+
+                            if (te != null)
+                            {
+                                if (te instanceof IInventory)
+                                {
+                                    ((IInventory) te).clear();
+                                }
+
+                                world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 4);
+                            }
+                        }
+
+                        System.out.printf("placing: %d, %d, %d to %s\n", pos.getX(), pos.getY(), pos.getZ(), state);
+                        if (world.setBlockState(pos, state, 2) && teNBT != null)
+                        {
+                            TileEntity te = world.getTileEntity(pos);
+
+                            if (te != null)
+                            {
+                                teNBT.setInteger("x", pos.getX());
+                                teNBT.setInteger("y", pos.getY());
+                                teNBT.setInteger("z", pos.getZ());
+                                te.readFromNBT(teNBT);
+                                te.mirror(placement.getMirror());
+                                te.rotate(placement.getRotation());
+                            }
+                        }
+                        System.out.printf("read back: %d, %d, %d to %s\n", pos.getX(), pos.getY(), pos.getZ(), world.getBlockState(pos));
+                        System.out.printf("chunk %s\n", world.getChunkFromBlockCoords(pos));
+                    }
+                }
+            }
+
+            if (notifyNeighbors)
+            {
+                for (int y = 0; y < sizeY; ++y)
+                {
+                    for (int z = 0; z < sizeZ; ++z)
+                    {
+                        for (int x = 0; x < sizeX; ++x)
+                        {
+                            posMutable.setPos(posMin.getX() + x, posMin.getY() + y, posMin.getZ() + z);
+                            BlockPos pos = Template.transformedBlockPos(placement, posMutable).add(origin);
+                            world.notifyNeighborsRespectDebug(pos, world.getBlockState(pos).getBlock(), false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void placeEntitiesToWorld(World world, BlockPos origin, PlacementSettings placement, List<EntityInfo> entityList)
+    {
+        for (EntityInfo info : entityList)
+        {
+            Entity entity = EntityList.createEntityFromNBT(info.nbt, world);
+
+            if (entity != null)
+            {
+                Vec3d pos = info.posVec;
+                pos = PositionUtils.transformedVec3d(pos, placement.getMirror(), placement.getRotation());
+
+                entity.setLocationAndAngles(pos.x + origin.getX(), pos.y + origin.getY(), pos.z + origin.getZ(), entity.rotationYaw, entity.rotationPitch);
+                world.spawnEntity(entity);
+
+                entity.prevRotationYaw = entity.rotationYaw;
+                entity.prevRotationPitch = entity.rotationPitch;
+                entity.ticksExisted = 2;
+            }
+        }
     }
 
     private void takeEntitiesFromWorld(World world, List<Box> boxes, BlockPos origin)

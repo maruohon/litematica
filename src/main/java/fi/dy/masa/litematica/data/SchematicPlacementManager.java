@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.client.resources.I18n;
 
 public class SchematicPlacementManager
@@ -35,6 +36,12 @@ public class SchematicPlacementManager
             {
                 messageConsumer.addMessage(InfoType.SUCCESS, I18n.format("litematica.message.schematic_placement_added"));
             }
+
+            if (placement.isEnabled())
+            {
+                OverlayRenderer.getInstance().updatePlacementCache();
+                SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
+            }
         }
         else if (messageConsumer != null)
         {
@@ -49,7 +56,15 @@ public class SchematicPlacementManager
             this.selectedPlacement = null;
         }
 
-        return this.schematicPlacements.remove(placement);
+        boolean ret = this.schematicPlacements.remove(placement);
+
+        if (ret)
+        {
+            OverlayRenderer.getInstance().updatePlacementCache();
+            SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
+        }
+
+        return ret;
     }
 
     public void removeAllPlacementsOfSchematic(LitematicaSchematic schematic)
@@ -64,6 +79,7 @@ public class SchematicPlacementManager
         }
 
         OverlayRenderer.getInstance().updatePlacementCache();
+        SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
     }
 
     @Nullable
@@ -77,6 +93,7 @@ public class SchematicPlacementManager
         if (placement == null || this.schematicPlacements.contains(placement))
         {
             this.selectedPlacement = placement;
+            OverlayRenderer.getInstance().updatePlacementCache();
         }
     }
 

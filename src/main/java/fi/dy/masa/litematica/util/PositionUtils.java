@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.Selection;
 import net.minecraft.util.EnumFacing;
@@ -12,6 +13,10 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.gen.structure.template.PlacementSettings;
+import net.minecraft.world.gen.structure.template.Template;
 
 public class PositionUtils
 {
@@ -30,6 +35,25 @@ public class PositionUtils
         return pos.getX() >= posMin.getX() && pos.getX() <= posMax.getX() &&
                pos.getY() >= posMin.getY() && pos.getY() <= posMax.getY() &&
                pos.getZ() >= posMin.getZ() && pos.getZ() <= posMax.getZ();
+    }
+
+    public static boolean arePositionsWithinWorld(World world, BlockPos posRel1, BlockPos posRel2, BlockPos offset, PlacementSettings placement)
+    {
+        BlockPos pos1 = Template.transformedBlockPos(placement, posRel1).add(offset);
+        BlockPos pos2 = Template.transformedBlockPos(placement, posRel2).add(offset);
+        return arePositionsWithinWorld(world, pos1, pos2);
+    }
+
+    public static boolean arePositionsWithinWorld(World world, BlockPos pos1, BlockPos pos2)
+    {
+        if (pos1.getY() >= 0 && pos1.getY() < 256 &&
+            pos2.getY() >= 0 && pos2.getY() < 256)
+        {
+            WorldBorder border = world.getWorldBorder();
+            return border.contains(pos1) && border.contains(pos2);
+        }
+
+        return false;
     }
 
     public static BlockPos getAreaSizeFromRelativeEndPosition(BlockPos posEndRelative)
@@ -86,9 +110,22 @@ public class PositionUtils
 
     public static BlockPos getEnclosingAreaSize(Collection<Box> boxes)
     {
+        Pair<BlockPos, BlockPos> pair = getEnclosingAreaCorners(boxes);
+        return pair.getRight().subtract(pair.getLeft()).add(1, 1, 1);
+    }
+
+    /**
+     * Returns the min and max corners of the enclosing box around the given collection of boxes.
+     * The minimum corner is the left entry and the maximum corner is the right entry of the pair.
+     * @param boxes
+     * @return
+     */
+    @Nullable
+    public static Pair<BlockPos, BlockPos> getEnclosingAreaCorners(Collection<Box> boxes)
+    {
         if (boxes.isEmpty())
         {
-            return BlockPos.ORIGIN;
+            return null;
         }
 
         BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos( 60000000,  60000000,  60000000);
@@ -100,7 +137,21 @@ public class PositionUtils
             getMinMaxCoords(posMin, posMax, box.getPos2());
         }
 
-        return posMax.subtract(posMin).add(1, 1, 1);
+        return Pair.of(posMin.toImmutable(), posMax.toImmutable());
+    }
+
+    private static void getMinMaxCoords(BlockPos.MutableBlockPos posMin, BlockPos.MutableBlockPos posMax, @Nullable BlockPos posToCheck)
+    {
+        if (posToCheck != null)
+        {
+            posMin.setPos(  Math.min(posMin.getX(), posToCheck.getX()),
+                            Math.min(posMin.getY(), posToCheck.getY()),
+                            Math.min(posMin.getZ(), posToCheck.getZ()));
+
+            posMax.setPos(  Math.max(posMax.getX(), posToCheck.getX()),
+                            Math.max(posMax.getY(), posToCheck.getY()),
+                            Math.max(posMax.getZ(), posToCheck.getZ()));
+        }
     }
 
     public static int getTotalVolume(Collection<Box> boxes)
@@ -123,20 +174,6 @@ public class PositionUtils
         }
 
         return volume;
-    }
-
-    private static void getMinMaxCoords(BlockPos.MutableBlockPos posMin, BlockPos.MutableBlockPos posMax, @Nullable BlockPos posToCheck)
-    {
-        if (posToCheck != null)
-        {
-            posMin.setPos(  Math.min(posMin.getX(), posToCheck.getX()),
-                            Math.min(posMin.getY(), posToCheck.getY()),
-                            Math.min(posMin.getZ(), posToCheck.getZ()));
-
-            posMax.setPos(  Math.max(posMax.getX(), posToCheck.getX()),
-                            Math.max(posMax.getY(), posToCheck.getY()),
-                            Math.max(posMax.getZ(), posToCheck.getZ()));
-        }
     }
 
     /**

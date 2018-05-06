@@ -11,7 +11,6 @@ import fi.dy.masa.litematica.gui.button.ButtonBase;
 import fi.dy.masa.litematica.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
-import fi.dy.masa.litematica.render.OverlayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -112,11 +111,6 @@ public class WidgetSchematicEntry extends WidgetBase
                 SchematicPlacement placement = new SchematicPlacement(entry.schematic, pos, entry.name);
                 placement.setEnabled(GuiScreen.isShiftKeyDown() == false);
                 DataManager.getInstance(dimension).getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
-
-                if (placement.isEnabled())
-                {
-                    OverlayRenderer.getInstance().updatePlacementCache();
-                }
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {

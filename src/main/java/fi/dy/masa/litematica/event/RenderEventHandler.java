@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.event;
 
+import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
@@ -9,8 +10,9 @@ import net.minecraft.entity.Entity;
 public class RenderEventHandler
 {
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
-    private boolean allRenderingEnabled;
-    private boolean selectionRenderingEnabled;
+    private boolean enableRendering;
+    private boolean renderSelections;
+    private boolean renderSchematics;
     private SchematicaSchematic schematic;
 
     public static RenderEventHandler getInstance()
@@ -20,24 +22,30 @@ public class RenderEventHandler
 
     public void setEnabled(boolean enabled)
     {
-        this.allRenderingEnabled = enabled;
+        this.enableRendering = enabled;
     }
 
     public boolean toggleAllRenderingEnabled()
     {
-        this.allRenderingEnabled = ! this.allRenderingEnabled;
-        return this.allRenderingEnabled;
+        this.enableRendering = ! this.enableRendering;
+        return this.enableRendering;
     }
 
-    public boolean toggleSelectionBoxesRenderingEnabled()
+    public boolean toggleRenderSelectionBoxes()
     {
-        this.selectionRenderingEnabled = ! this.selectionRenderingEnabled;
-        return this.selectionRenderingEnabled;
+        this.renderSelections = ! this.renderSelections;
+        return this.renderSelections;
+    }
+
+    public boolean toggleRenderSchematics()
+    {
+        this.renderSchematics = ! this.renderSchematics;
+        return this.renderSchematics;
     }
 
     public boolean isEnabled()
     {
-        return this.allRenderingEnabled;
+        return this.enableRendering;
     }
 
     public void setSchematic(SchematicaSchematic schematic)
@@ -49,8 +57,13 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.allRenderingEnabled && mc.player != null)
+        if (this.enableRendering && mc.player != null)
         {
+            if (this.renderSchematics)
+            {
+                LitematicaRenderer.getInstance().renderSchematicWorld();
+            }
+
             OverlayRenderer.getInstance().renderSelectionAreas();
 
             // FIXME testing
@@ -66,7 +79,7 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.allRenderingEnabled &&
+        if (this.enableRendering &&
             mc.gameSettings.showDebugInfo == false &&
             mc.player != null
             // &&

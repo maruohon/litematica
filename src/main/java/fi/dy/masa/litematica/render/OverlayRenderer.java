@@ -106,12 +106,12 @@ public class OverlayRenderer
                 for (Box box : areaTmp.getAllSelectionsBoxes())
                 {
                     BoxType type = placement == this.currentPlacement ? BoxType.SCHEMATIC_SELECTED : BoxType.SCHEMATIC_UNSELECTED;
-                    this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks);
+                    this.renderSelectionBox(box, type, expand, 1f, 0.5f, renderViewEntity, partialTicks);
                 }
 
                 if (area.getOrigin() != null)
                 {
-                    RenderUtils.renderBlockOutline(area.getOrigin(), expand, lineWidthBlockBox, this.colorAreaOrigin, renderViewEntity, partialTicks);
+                    RenderUtils.renderBlockOutline(area.getOrigin(), expand, 2f, this.colorAreaOrigin, renderViewEntity, partialTicks);
                 }
             }
         }

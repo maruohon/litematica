@@ -35,6 +35,7 @@ public class KeyCallbacks
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
+        Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind().setCallback(callbackMessage);
     }
 
@@ -166,8 +167,14 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind())
                 {
-                    boolean enabled = RenderEventHandler.getInstance().toggleSelectionBoxesRenderingEnabled();
+                    boolean enabled = RenderEventHandler.getInstance().toggleRenderSelectionBoxes();
                     String name = splitCamelCase(Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getName());
+                    this.printToggleMessage(name, enabled);
+                }
+                else if (key == Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind())
+                {
+                    boolean enabled = RenderEventHandler.getInstance().toggleRenderSchematics();
+                    String name = splitCamelCase(Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                 }
             }

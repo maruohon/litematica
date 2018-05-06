@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputEventHandler;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 
@@ -33,13 +34,15 @@ public class MixinMinecraft
         }
     }
 
-    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;)V", at = @At("HEAD"))
-    private void onLoadWorld(@Nullable WorldClient worldClientIn, CallbackInfo ci)
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("HEAD"))
+    private void onLoadWorld(@Nullable WorldClient worldClientIn, String loadingMessage, CallbackInfo ci)
     {
         // Save the settings before the integrated server gets shut down
         if (worldClientIn == null)
         {
             DataManager.save();
         }
+
+        SchematicWorldHandler.getInstance().onClientWorldChange(worldClientIn);
     }
 }

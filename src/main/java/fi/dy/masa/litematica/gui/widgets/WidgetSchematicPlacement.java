@@ -11,7 +11,6 @@ import fi.dy.masa.litematica.gui.button.ButtonBase;
 import fi.dy.masa.litematica.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
-import fi.dy.masa.litematica.render.OverlayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
@@ -136,19 +135,16 @@ public class WidgetSchematicPlacement extends WidgetBase
             else if (this.type == ButtonType.SELECT)
             {
                 DataManager.getInstance(dimension).getSchematicPlacementManager().setSelectedSchematicPlacement(this.widget.placement);
-                OverlayRenderer.getInstance().updatePlacementCache();
             }
             else if (this.type == ButtonType.REMOVE)
             {
                 DataManager.getInstance(dimension).getSchematicPlacementManager().removeSchematicPlacement(this.widget.placement);
                 this.widget.parent.refreshEntries();
-                OverlayRenderer.getInstance().updatePlacementCache();
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {
                 this.widget.placement.setEnabled(! this.widget.placement.isEnabled());
                 this.widget.parent.refreshEntries();
-                OverlayRenderer.getInstance().updatePlacementCache();
             }
             else if (this.type == ButtonType.TOGGLE_RENDER)
             {
