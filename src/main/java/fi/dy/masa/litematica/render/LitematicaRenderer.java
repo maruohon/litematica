@@ -2,13 +2,14 @@ package fi.dy.masa.litematica.render;
 
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+import fi.dy.masa.litematica.render.shader.ShaderProgram;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.culling.ClippingHelperImpl;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -19,6 +20,7 @@ public class LitematicaRenderer
 {
     private static final LitematicaRenderer INSTANCE = new LitematicaRenderer();
 
+    private static final ShaderProgram SHADER_ALPHA = new ShaderProgram("litematica", null, "shaders/alpha.frag");
     private Minecraft mc;
     private RenderGlobal renderGlobal;
     private int frameCount;
@@ -41,11 +43,13 @@ public class LitematicaRenderer
 
     public void loadRenderers()
     {
+        System.out.printf("loadRenderers()\n");
         this.getRenderGlobal().loadRenderers();
     }
 
     public void onSchematicWorldChanged(@Nullable WorldClient worldClient)
     {
+        System.out.printf("onSchematicWorldChanged(): %s\n", worldClient);
         this.getRenderGlobal().setWorldAndLoadRenderers(worldClient);
     }
 
@@ -61,7 +65,26 @@ public class LitematicaRenderer
             fpsMin = Math.max(fpsMin, 60);
             long finishTimeNano = Math.max((long)(1000000000 / fpsMin / 4), 0L);
 
+            boolean translucentSchematic = true && OpenGlHelper.shadersSupported;
+            float alpha = 0.5f;
+
+            GlStateManager.pushMatrix();
+
+            if (translucentSchematic)
+            {
+                //System.out.printf("alpha: %s\n", SHADER_ALPHA.getProgram());
+                GL20.glUseProgram(SHADER_ALPHA.getProgram());
+                GL20.glUniform1f(GL20.glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), alpha);
+            }
+
             this.renderWorld(this.mc.getRenderPartialTicks(), finishTimeNano);
+
+            if (translucentSchematic)
+            {
+                GL20.glUseProgram(0);
+            }
+
+            GlStateManager.popMatrix();
 
             this.mc.mcProfiler.endSection();
         }
@@ -118,10 +141,10 @@ public class LitematicaRenderer
 
         //this.mc.mcProfiler.endStartSection("camera");
         //this.setupCameraTransform(partialTicks, pass);
-        ActiveRenderInfo.updateRenderInfo(this.mc.player, this.mc.gameSettings.thirdPersonView == 2);
+        //ActiveRenderInfo.updateRenderInfo(this.mc.player, this.mc.gameSettings.thirdPersonView == 2);
 
-        this.mc.mcProfiler.endStartSection("frustum");
-        ClippingHelperImpl.getInstance();
+        //this.mc.mcProfiler.endStartSection("frustum");
+        //ClippingHelperImpl.getInstance();
 
         this.mc.mcProfiler.endStartSection("culling");
         ICamera icamera = new Frustum();
@@ -176,29 +199,33 @@ public class LitematicaRenderer
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.pushMatrix();
         GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         renderGlobal.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, pass, entity);
 
-        GlStateManager.enableAlpha();
         renderGlobal.renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, partialTicks, pass, entity);
 
         this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
         renderGlobal.renderBlockLayer(BlockRenderLayer.CUTOUT, partialTicks, pass, entity);
         this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 
+        GlStateManager.disableBlend();
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
 
-        //if (!this.debugView)
-        {
-            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-            GlStateManager.popMatrix();
-            GlStateManager.pushMatrix();
-            RenderHelper.enableStandardItemLighting();
-            this.mc.mcProfiler.endStartSection("entities");
-            renderGlobal.renderEntities(entity, icamera, partialTicks);
-            RenderHelper.disableStandardItemLighting();
-            //this.disableLightmap();
-        }
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.popMatrix();
+
+        GlStateManager.pushMatrix();
+        this.mc.mcProfiler.endStartSection("entities");
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        renderGlobal.renderEntities(entity, icamera, partialTicks);
+        GlStateManager.disableBlend();
+        RenderHelper.disableStandardItemLighting();
+        //this.disableLightmap();
 
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.popMatrix();
@@ -250,28 +277,40 @@ public class LitematicaRenderer
 
         //this.mc.mcProfiler.endStartSection("weather");
         //this.renderRainSnow(partialTicks);
-        GlStateManager.depthMask(true);
+        //GlStateManager.depthMask(true);
         //renderGlobal.renderWorldBorder(entity, partialTicks);
 
-        GlStateManager.disableBlend();
+        //GlStateManager.disableBlend();
+        //GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+
         GlStateManager.enableCull();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-
-        //this.setupFog(0, partialTicks);
-
-        GlStateManager.enableBlend();
-        GlStateManager.depthMask(false);
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
+        //this.setupFog(0, partialTicks);
+
         this.mc.mcProfiler.endStartSection("translucent");
+        GlStateManager.depthMask(false);
+        GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+
         renderGlobal.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, pass, entity);
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
+        GlStateManager.depthMask(true);
+
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.enableCull();
+
+        /*
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.depthMask(true);
         GlStateManager.enableCull();
         GlStateManager.disableBlend();
         GlStateManager.disableFog();
+        */
 
         /*
         if (entity.posY + (double)entity.getEyeHeight() >= 128.0D)

@@ -54,22 +54,26 @@ public class SchematicWorldHandler
     private void recreateSchematicWorld(boolean remove)
     {
         System.out.printf("recreateSchematicWorld(): remove = %s\n", remove);
-        if (remove || this.mc.player == null)
+        if (remove)
         {
             this.world = null;
         }
         else
         {
             this.world = new WorldClient(null, this.settings, 0, EnumDifficulty.PEACEFUL, this.mc.mcProfiler);
-            int r = this.mc.gameSettings.renderDistanceChunks + 1;
-            int centerX = ((int) this.mc.player.posX) >> 4;
-            int centerZ = ((int) this.mc.player.posZ) >> 4;
 
-            for (int cz = centerZ - r; cz <= centerZ + r; ++cz)
+            if (this.mc.player != null)
             {
-                for (int cx = centerX - r; cx <= centerX + r; ++cx)
+                int r = this.mc.gameSettings.renderDistanceChunks + 1;
+                int centerX = ((int) this.mc.player.posX) >> 4;
+                int centerZ = ((int) this.mc.player.posZ) >> 4;
+
+                for (int cz = centerZ - r; cz <= centerZ + r; ++cz)
                 {
-                    this.world.getChunkProvider().loadChunk(cx, cz);
+                    for (int cx = centerX - r; cx <= centerX + r; ++cx)
+                    {
+                        this.world.getChunkProvider().loadChunk(cx, cz);
+                    }
                 }
             }
         }

@@ -38,7 +38,7 @@ public class MixinMinecraft
     private void onLoadWorld(@Nullable WorldClient worldClientIn, String loadingMessage, CallbackInfo ci)
     {
         // Save the settings before the integrated server gets shut down
-        if (worldClientIn == null)
+        if (Minecraft.getMinecraft().world != null && worldClientIn == null)
         {
             DataManager.save();
         }
