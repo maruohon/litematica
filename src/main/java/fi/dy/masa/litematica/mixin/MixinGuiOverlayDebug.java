@@ -18,7 +18,7 @@ import net.minecraft.util.text.TextFormatting;
 public class MixinGuiOverlayDebug
 {
     @Inject(method = "renderDebugInfoLeft()V",
-            at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/String;)Z", shift = Shift.AFTER, ordinal = 2),
+            at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/String;)Z", shift = Shift.AFTER, ordinal = 2, remap = false),
             locals = LocalCapture.CAPTURE_FAILSOFT, require = 0)
     private void onRenderDebugInfoLeft(CallbackInfo ci, List<String> list)
     {
