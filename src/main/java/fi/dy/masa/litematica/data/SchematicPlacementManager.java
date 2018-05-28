@@ -34,7 +34,7 @@ public class SchematicPlacementManager
 
             if (messageConsumer != null)
             {
-                messageConsumer.addMessage(InfoType.SUCCESS, I18n.format("litematica.message.schematic_placement_added"));
+                messageConsumer.addMessage(InfoType.SUCCESS, I18n.format("litematica.message.schematic_placement_created", placement.getName()));
             }
 
             if (placement.isEnabled())
@@ -60,6 +60,7 @@ public class SchematicPlacementManager
 
         if (ret)
         {
+            placement.onRemoved();
             OverlayRenderer.getInstance().updatePlacementCache();
             SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
         }
@@ -73,7 +74,7 @@ public class SchematicPlacementManager
         {
             if (this.schematicPlacements.get(i).getSchematic() == schematic)
             {
-                this.schematicPlacements.remove(i);
+                this.schematicPlacements.remove(i).onRemoved();
                 --i;
             }
         }

@@ -110,6 +110,7 @@ public class WidgetSchematicEntry extends WidgetBase
                 SchematicEntry entry = this.widget.schematicEntry;
                 SchematicPlacement placement = new SchematicPlacement(entry.schematic, pos, entry.name);
                 placement.setEnabled(GuiScreen.isShiftKeyDown() == false);
+                placement.setBoxesBBColorNext();
                 DataManager.getInstance(dimension).getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
             }
             else if (this.type == Type.SAVE_TO_FILE)

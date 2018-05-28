@@ -65,7 +65,7 @@ public class LitematicaRenderer
             fpsMin = Math.max(fpsMin, 60);
             long finishTimeNano = Math.max((long)(1000000000 / fpsMin / 4), 0L);
 
-            boolean translucentSchematic = true && OpenGlHelper.shadersSupported;
+            boolean translucentSchematic = false;//true && OpenGlHelper.shadersSupported;
             float alpha = 0.5f;
 
             GlStateManager.pushMatrix();

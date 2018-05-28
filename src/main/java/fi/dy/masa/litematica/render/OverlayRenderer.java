@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.render;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
@@ -19,6 +20,32 @@ import net.minecraft.util.math.BlockPos;
 public class OverlayRenderer
 {
     private static final OverlayRenderer INSTANCE = new OverlayRenderer();
+
+    // https://stackoverflow.com/questions/470690/how-to-automatically-generate-n-distinct-colors
+    public static final int[] KELLY_COLORS = {
+            0xFFB300,    // Vivid Yellow
+            0x803E75,    // Strong Purple
+            0xFF6800,    // Vivid Orange
+            0xA6BDD7,    // Very Light Blue
+            0xC10020,    // Vivid Red
+            0xCEA262,    // Grayish Yellow
+            0x817066,    // Medium Gray
+            // The following don't work well for people with defective color vision
+            0x007D34,    // Vivid Green
+            0xF6768E,    // Strong Purplish Pink
+            0x00538A,    // Strong Blue
+            0xFF7A5C,    // Strong Yellowish Pink
+            0x53377A,    // Strong Violet
+            0xFF8E00,    // Vivid Orange Yellow
+            0xB32851,    // Strong Purplish Red
+            0xF4C800,    // Vivid Greenish Yellow
+            0x7F180D,    // Strong Reddish Brown
+            0x93AA00,    // Vivid Yellowish Green
+            0x593315,    // Deep Yellowish Brown
+            0xF13A13,    // Vivid Reddish Orange
+            0x232C16     // Dark Olive Green
+        };
+
     private final Minecraft mc;
     private final Map<SchematicPlacement, Selection> placementSelections = new HashMap<>();
     private SchematicPlacement currentPlacement;
@@ -28,8 +55,7 @@ public class OverlayRenderer
     private Vec3f colorY = new Vec3f(0.25f,    1f, 0.25f);
     private Vec3f colorZ = new Vec3f(0.25f, 0.25f,    1f);
     private Vec3f colorArea = new Vec3f(1f, 1f, 1f);
-    private Vec3f colorBoxSchematicSelected = new Vec3f(0x16 / 255f, 1f, 1f);
-    private Vec3f colorBoxSchematicUnselected = new Vec3f(0xCB / 255f, 0x2B / 255f, 1f);
+    private Vec3f colorBoxPlacementSelected = new Vec3f(0x16 / 255f, 1f, 1f);
     private Vec3f colorSelectedCorner = new Vec3f(0f, 1f, 1f);
     private Vec3f colorAreaOrigin = new Vec3f(1f, 0x90 / 255f, 0x10 / 255f);
 
@@ -87,7 +113,7 @@ public class OverlayRenderer
             for (Box box : area.getAllSelectionsBoxes())
             {
                 BoxType type = box == currentBox ? BoxType.AREA_SELECTED : BoxType.AREA_UNSELECTED;
-                this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks);
+                this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
             }
 
             if (area.getOrigin() != null)
@@ -105,8 +131,8 @@ public class OverlayRenderer
 
                 for (Box box : areaTmp.getAllSelectionsBoxes())
                 {
-                    BoxType type = placement == this.currentPlacement ? BoxType.SCHEMATIC_SELECTED : BoxType.SCHEMATIC_UNSELECTED;
-                    this.renderSelectionBox(box, type, expand, 1f, 0.5f, renderViewEntity, partialTicks);
+                    BoxType type = placement == this.currentPlacement ? BoxType.PLACEMENT_SELECTED : BoxType.PLACEMENT_UNSELECTED;
+                    this.renderSelectionBox(box, type, expand, 1f, 1f, renderViewEntity, partialTicks, placement);
                 }
 
                 if (area.getOrigin() != null)
@@ -127,7 +153,7 @@ public class OverlayRenderer
     }
 
     public void renderSelectionBox(Box box, BoxType boxType, float expand,
-            float lineWidthBlockBox, float lineWidthArea, Entity renderViewEntity, float partialTicks)
+            float lineWidthBlockBox, float lineWidthArea, Entity renderViewEntity, float partialTicks, @Nullable SchematicPlacement placement)
     {
         BlockPos pos1 = box.getPos1();
         BlockPos pos2 = box.getPos2();
@@ -151,13 +177,20 @@ public class OverlayRenderer
                 color2 = box.getSelectedCorner() == Corner.CORNER_2 ? this.colorSelectedCorner : this.colorPos2;
                 break;
             case AREA_UNSELECTED:
-                colorX = this.colorArea; colorY = this.colorArea; colorZ = this.colorArea;
+                colorX = this.colorArea;
+                colorY = this.colorArea;
+                colorZ = this.colorArea;
                 break;
-            case SCHEMATIC_SELECTED:
-                colorX = this.colorBoxSchematicSelected; colorY = this.colorBoxSchematicSelected; colorZ = this.colorBoxSchematicSelected;
+            case PLACEMENT_SELECTED:
+                colorX = this.colorBoxPlacementSelected;
+                colorY = this.colorBoxPlacementSelected;
+                colorZ = this.colorBoxPlacementSelected;
                 break;
-            case SCHEMATIC_UNSELECTED:
-                colorX = this.colorBoxSchematicUnselected; colorY = this.colorBoxSchematicUnselected; colorZ = this.colorBoxSchematicUnselected;
+            case PLACEMENT_UNSELECTED:
+                Vec3f color = placement.getBoxesBBColor();
+                colorX = color;
+                colorY = color;
+                colorZ = color;
                 break;
             default: return;
         }
@@ -167,14 +200,14 @@ public class OverlayRenderer
             RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
         }
 
-        if (boxType == BoxType.SCHEMATIC_SELECTED)
+        if (boxType == BoxType.PLACEMENT_SELECTED)
         {
-            color1 = this.colorBoxSchematicSelected;
+            color1 = this.colorBoxPlacementSelected;
             color2 = color1;
         }
-        else if (boxType == BoxType.SCHEMATIC_UNSELECTED)
+        else if (boxType == BoxType.PLACEMENT_UNSELECTED)
         {
-            color1 = this.colorBoxSchematicUnselected;
+            color1 = placement.getBoxesBBColor();
             color2 = color1;
         }
         else
@@ -198,7 +231,7 @@ public class OverlayRenderer
     {
         AREA_SELECTED,
         AREA_UNSELECTED,
-        SCHEMATIC_SELECTED,
-        SCHEMATIC_UNSELECTED;
+        PLACEMENT_SELECTED,
+        PLACEMENT_UNSELECTED;
     }
 }

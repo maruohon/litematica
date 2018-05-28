@@ -147,7 +147,7 @@ public class InputEventHandler
 
                 if (mouseEventIsPickBlock(this.mc, button))
                 {
-                    if (RenderEventHandler.getInstance().isEnabled()/* && isInSelectionMode()*/) // TODO
+                    if (hasTool && RenderEventHandler.getInstance().isEnabled()/* && isInSelectionMode()*/) // TODO
                     {
                         SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 

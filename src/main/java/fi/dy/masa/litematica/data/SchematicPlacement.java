@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.data;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -10,6 +12,7 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.util.Vec3f;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
@@ -19,6 +22,9 @@ import net.minecraft.world.gen.structure.template.PlacementSettings;
 
 public class SchematicPlacement
 {
+    private static int nextColorIndex;
+    private static final Set<Integer> USED_COLORS = new HashSet<>();
+
     private String name;
     @Nullable
     private LitematicaSchematic schematic;
@@ -29,6 +35,8 @@ public class SchematicPlacement
     private File schematicFile;
     private boolean enabled;
     private boolean renderSchematic;
+    private int boxesBBColor;
+    private Vec3f boxesBBColorVec = new Vec3f(0xFF, 0xFF, 0xFF);
 
     public SchematicPlacement(LitematicaSchematic schematic, BlockPos pos, String name)
     {
@@ -70,6 +78,11 @@ public class SchematicPlacement
     public Mirror getMirror()
     {
         return mirror;
+    }
+
+    public Vec3f getBoxesBBColor()
+    {
+        return this.boxesBBColorVec;
     }
 
     public PlacementSettings getPlacement()
@@ -125,6 +138,19 @@ public class SchematicPlacement
         return this;
     }
 
+    public SchematicPlacement setBoxesBBColor(int color)
+    {
+        this.boxesBBColor = color;
+        this.boxesBBColorVec = new Vec3f(((color >> 16) & 0xFF) / 255f, ((color >> 8) & 0xFF) / 255f, (color & 0xFF) / 255f);
+        USED_COLORS.add(color);
+        return this;
+    }
+
+    public SchematicPlacement setBoxesBBColorNext()
+    {
+        return this.setBoxesBBColor(getNextBoxColor());
+    }
+
     private void updateRenderers(boolean forceUpdate)
     {
         OverlayRenderer.getInstance().updatePlacementCache();
@@ -132,6 +158,16 @@ public class SchematicPlacement
         if (forceUpdate || this.schematic != null)
         {
             SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
+        }
+    }
+
+    public void onRemoved()
+    {
+        USED_COLORS.remove(this.boxesBBColor);
+
+        if (USED_COLORS.isEmpty())
+        {
+            nextColorIndex = 0;
         }
     }
 
@@ -154,6 +190,7 @@ public class SchematicPlacement
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
             obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities));
             obj.add("enabled", new JsonPrimitive(this.enabled));
+            obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
             obj.add("render_schematic", new JsonPrimitive(this.renderSchematic));
 
             return obj;
@@ -182,9 +219,6 @@ public class SchematicPlacement
                 return null;
             }
 
-            String name = obj.get("name").getAsString();
-            Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
-            Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
             JsonArray posArr = obj.get("pos").getAsJsonArray();
 
             if (posArr.size() != 3)
@@ -193,13 +227,25 @@ public class SchematicPlacement
                 return null;
             }
 
+            String name = obj.get("name").getAsString();
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
+            Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
+            Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
             SchematicPlacement placement = new SchematicPlacement(schematic, pos, name);
             placement.rotation = rotation;
             placement.mirror = mirror;
             placement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
             placement.enabled = JsonUtils.getBoolean(obj, "enabled");
             placement.renderSchematic = JsonUtils.getBoolean(obj, "render_schematic");
+
+            if (JsonUtils.hasInteger(obj, "bb_color"))
+            {
+                placement.setBoxesBBColor(JsonUtils.getInteger(obj, "bb_color"));
+            }
+            else
+            {
+                placement.setBoxesBBColorNext();
+            }
 
             return placement;
         }
@@ -256,5 +302,25 @@ public class SchematicPlacement
         else if (!schematic.equals(other.schematic))
             return false;
         return true;
+    }
+
+    private static int getNextBoxColor()
+    {
+        int length = OverlayRenderer.KELLY_COLORS.length;
+        int color = OverlayRenderer.KELLY_COLORS[nextColorIndex];
+        nextColorIndex = (nextColorIndex + 1) % length;
+
+        for (int i = 0; i < length; ++i)
+        {
+            if (USED_COLORS.contains(color) == false)
+            {
+                return color;
+            }
+
+            color = OverlayRenderer.KELLY_COLORS[nextColorIndex];
+            nextColorIndex = (nextColorIndex + 1) % length;
+        }
+
+        return color;
     }
 }
