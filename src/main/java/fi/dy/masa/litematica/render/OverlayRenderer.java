@@ -80,8 +80,7 @@ public class OverlayRenderer
         {
             if (placement.isEnabled())
             {
-                Selection selection = Selection.fromBoxes(placement.getPos(), placement.getSchematic().getAreas(), placement.getName(), true);
-                this.placementSelections.put(placement, selection);
+                this.placementSelections.put(placement, Selection.fromPlacement(placement));
             }
         }
     }

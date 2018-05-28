@@ -130,7 +130,9 @@ public class WidgetSchematicPlacement extends WidgetBase
 
             if (this.type == ButtonType.CONFIGURE)
             {
-                mc.displayGuiScreen(new GuiPlacementConfiguration(this.widget.placement));
+                GuiPlacementConfiguration gui = new GuiPlacementConfiguration(this.widget.placement);
+                gui.setParent(this.widget.parent);
+                mc.displayGuiScreen(gui);
             }
             else if (this.type == ButtonType.SELECT)
             {

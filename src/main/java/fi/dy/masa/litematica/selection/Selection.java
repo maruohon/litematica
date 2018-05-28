@@ -8,7 +8,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import net.minecraft.util.math.BlockPos;
 
@@ -20,27 +22,23 @@ public class Selection
     @Nullable
     private String currentBox;
 
-    public static Selection fromBoxes(BlockPos origin, Map<String, Box> boxes, String name, boolean boxesAreRelative)
+    public static Selection fromPlacement(SchematicPlacement placement)
     {
+        BlockPos origin = placement.getPos();
+        Map<String, Box> boxes = placement.getSchematic().getAreas();
+        String name = placement.getName();
         Selection selection = new Selection();
         selection.origin = origin;
         selection.name = name;
 
-        if (boxesAreRelative)
+        for (Map.Entry<String, Box> entry : boxes.entrySet())
         {
-            for (Map.Entry<String, Box> entry : boxes.entrySet())
-            {
-                Box box = entry.getValue();
-                BlockPos pos1 = box.getPos1().add(origin);
-                BlockPos pos2 = box.getPos2().add(origin);
-                box = new Box(pos1, pos2);
-                box.setName(entry.getKey());
-                selection.selectionBoxes.put(box.getName(), box);
-            }
-        }
-        else
-        {
-            selection.selectionBoxes.putAll(boxes);
+            Box box = entry.getValue();
+            BlockPos pos1 = PositionUtils.getTransformedBlockPos(box.getPos1(), placement.getMirror(), placement.getRotation()).add(origin);
+            BlockPos pos2 = PositionUtils.getTransformedBlockPos(box.getPos2(), placement.getMirror(), placement.getRotation()).add(origin);
+            box = new Box(pos1, pos2);
+            box.setName(entry.getKey());
+            selection.selectionBoxes.put(box.getName(), box);
         }
 
         return selection;
