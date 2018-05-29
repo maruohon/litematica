@@ -3,9 +3,9 @@ package fi.dy.masa.litematica.util;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -63,14 +63,14 @@ public class RayTraceUtils
 
         double closestDistance = closestVanilla;
 
-        if (closestBoxDistance >= 0 && (closestDistance < 0 || closestBoxDistance <= closestDistance))
+        if (closestBoxDistance >= 0 && (closestVanilla < 0 || closestBoxDistance <= closestVanilla))
         {
             closestDistance = closestBoxDistance;
             wrapper = closestBox;
         }
 
-        // Corners are preferred over box body hits, thus the '<=' and this being after the box check
-        if (closestCornerDistance >= 0 && (closestDistance < 0 || closestCornerDistance <= closestDistance))
+        // Corners are preferred over box body hits, thus this being after the box check
+        if (closestCornerDistance >= 0 && (closestVanilla < 0 || closestCornerDistance <= closestVanilla))
         {
             closestDistance = closestCornerDistance;
             // The origin type uses the corner distance variable, but not the trace wrapper
@@ -88,7 +88,6 @@ public class RayTraceUtils
     private static boolean traceToBoxCorner(Box box, Corner corner, Vec3d start, Vec3d end)
     {
         BlockPos pos = (corner == Corner.CORNER_1) ? box.getPos1() : (corner == Corner.CORNER_2) ? box.getPos2() : null;
-        boolean hitCorner = false;
 
         if (pos != null)
         {
@@ -97,7 +96,6 @@ public class RayTraceUtils
 
             if (hit != null)
             {
-                hitCorner = true;
                 double dist = hit.hitVec.distanceTo(start);
 
                 if (closestCornerDistance < 0 || dist < closestCornerDistance)
@@ -105,10 +103,12 @@ public class RayTraceUtils
                     closestCornerDistance = dist;
                     closestCorner = new RayTraceWrapper(box, corner, hit.hitVec);
                 }
+
+                return true;
             }
         }
 
-        return hitCorner;
+        return false;
     }
 
     private static boolean traceToBoxBody(Box box, Vec3d start, Vec3d end)
