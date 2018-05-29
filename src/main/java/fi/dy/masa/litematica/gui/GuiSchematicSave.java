@@ -234,10 +234,12 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
             {
                 IStringConsumer feedback = InfoUtils.INFO_MESSAGE_CONSUMER;
                 String author = this.mc.player.getName();
-                LitematicaSchematic schematic = LitematicaSchematic.makeSchematic(this.mc.world, area, this.takeEntities, author, feedback);
+                LitematicaSchematic schematic = LitematicaSchematic.createSchematic(this.mc.world, area, this.takeEntities, author, feedback);
 
                 if (schematic != null)
                 {
+                    schematic.getMetadata().setName(this.name);
+
                     if (schematic.writeToFile(this.dir, this.name, true, feedback))
                     {
                         feedback.setString("litematica.message.schematic_saved");

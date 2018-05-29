@@ -7,7 +7,6 @@ import fi.dy.masa.litematica.render.shader.ShaderProgram;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -43,13 +42,13 @@ public class LitematicaRenderer
 
     public void loadRenderers()
     {
-        System.out.printf("loadRenderers()\n");
+        System.out.printf("LitematicaRenderer#loadRenderers()\n");
         this.getRenderGlobal().loadRenderers();
     }
 
     public void onSchematicWorldChanged(@Nullable WorldClient worldClient)
     {
-        System.out.printf("onSchematicWorldChanged(): %s\n", worldClient);
+        System.out.printf("LitematicaRenderer#onSchematicWorldChanged(): %s\n", worldClient);
         this.getRenderGlobal().setWorldAndLoadRenderers(worldClient);
     }
 

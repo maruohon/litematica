@@ -29,7 +29,7 @@ public class SchematicWorldHandler
 
     public void onClientWorldChange(WorldClient worldClient)
     {
-        System.out.printf("onClientWorldChange(): %s\n", worldClient);
+        System.out.printf("SchematicWorldHandler#onClientWorldChange(): %s\n", worldClient);
         this.recreateSchematicWorld(worldClient == null);
     }
 
@@ -53,7 +53,7 @@ public class SchematicWorldHandler
 
     private void recreateSchematicWorld(boolean remove)
     {
-        System.out.printf("recreateSchematicWorld(): remove = %s\n", remove);
+        System.out.printf("SchematicWorldHandler#recreateSchematicWorld(): remove = %s\n", remove);
         if (remove)
         {
             this.world = null;
@@ -83,6 +83,7 @@ public class SchematicWorldHandler
 
     public void rebuildSchematicWorld(boolean placeActiveSchematics)
     {
+        System.out.printf("SchematicWorldHandler#rebuildSchematicWorld(): %s\n", placeActiveSchematics);
         this.recreateSchematicWorld(this.mc.world == null);
 
         if (placeActiveSchematics && this.world != null)

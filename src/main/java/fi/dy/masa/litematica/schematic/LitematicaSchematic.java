@@ -42,6 +42,7 @@ import net.minecraft.world.gen.structure.template.Template;
 
 public class LitematicaSchematic
 {
+    public static final String FILE_EXTENSION = ".litematic";
     public static final int SCHEMATIC_VERSION = 1;
     private final Map<String, LitematicaBlockStateContainer> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, NBTTagCompound>> tileEntities = new HashMap<>();
@@ -51,6 +52,19 @@ public class LitematicaSchematic
     private final SchematicMetadata metadata = new SchematicMetadata();
     private BlockPos totalSize = BlockPos.ORIGIN;
     private int totalBlocks;
+    @Nullable
+    private final File schematicFile;
+
+    private LitematicaSchematic(@Nullable File file)
+    {
+        this.schematicFile = file;
+    }
+
+    @Nullable
+    public File getFile()
+    {
+        return this.schematicFile;
+    }
 
     public BlockPos getTotalSize()
     {
@@ -78,7 +92,7 @@ public class LitematicaSchematic
     }
 
     @Nullable
-    public static LitematicaSchematic makeSchematic(World world, Selection area, boolean takeEntities, String author, IStringConsumer feedback)
+    public static LitematicaSchematic createSchematic(World world, Selection area, boolean takeEntities, String author, IStringConsumer feedback)
     {
         List<Box> boxes = PositionUtils.getValidBoxes(area);
 
@@ -88,7 +102,7 @@ public class LitematicaSchematic
             return null;
         }
 
-        LitematicaSchematic schematic = new LitematicaSchematic();
+        LitematicaSchematic schematic = new LitematicaSchematic(null);
 
         long time = (new Date()).getTime();
         schematic.totalSize = PositionUtils.getEnclosingAreaSize(area);
@@ -217,7 +231,6 @@ public class LitematicaSchematic
                             }
                         }
 
-                        System.out.printf("placing: %d, %d, %d to %s\n", pos.getX(), pos.getY(), pos.getZ(), state);
                         if (world.setBlockState(pos, state, 2) && teNBT != null)
                         {
                             TileEntity te = world.getTileEntity(pos);
@@ -232,8 +245,6 @@ public class LitematicaSchematic
                                 te.rotate(placement.getRotation());
                             }
                         }
-                        System.out.printf("read back: %d, %d, %d to %s\n", pos.getX(), pos.getY(), pos.getZ(), world.getBlockState(pos));
-                        System.out.printf("chunk %s\n", world.getChunkFromBlockCoords(pos));
                     }
                 }
             }
@@ -593,9 +604,9 @@ public class LitematicaSchematic
     {
         String fileName = fileNameIn;
 
-        if (fileName.endsWith(".litematic") == false)
+        if (fileName.endsWith(FILE_EXTENSION) == false)
         {
-            fileName = fileName + ".litematic";
+            fileName = fileName + FILE_EXTENSION;
         }
 
         File fileSchematic = new File(dir, fileName);
@@ -644,9 +655,9 @@ public class LitematicaSchematic
     {
         String fileName = fileNameIn;
 
-        if (fileName.endsWith(".litematic") == false)
+        if (fileName.endsWith(FILE_EXTENSION) == false)
         {
-            fileName = fileName + ".litematic";
+            fileName = fileName + FILE_EXTENSION;
         }
 
         File fileSchematic = new File(dir, fileName);
@@ -665,7 +676,7 @@ public class LitematicaSchematic
 
             if (nbt != null)
             {
-                LitematicaSchematic schematic = new LitematicaSchematic();
+                LitematicaSchematic schematic = new LitematicaSchematic(fileSchematic);
 
                 if (schematic.readFromNBT(nbt))
                 {

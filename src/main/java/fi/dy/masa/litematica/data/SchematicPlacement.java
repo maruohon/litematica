@@ -32,7 +32,6 @@ public class SchematicPlacement
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
     private boolean ignoreEntities;
-    private File schematicFile;
     private boolean enabled;
     private boolean renderSchematic;
     private int boxesBBColor;
@@ -117,6 +116,11 @@ public class SchematicPlacement
         this.updateRenderers(false);
     }
 
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
     public SchematicPlacement setPos(BlockPos pos)
     {
         this.pos = pos;
@@ -174,7 +178,7 @@ public class SchematicPlacement
     @Nullable
     public JsonObject toJson()
     {
-        if (this.schematicFile != null)
+        if (this.schematic.getFile() != null)
         {
             JsonObject obj = new JsonObject();
             JsonArray arr = new JsonArray();
@@ -183,7 +187,7 @@ public class SchematicPlacement
             arr.add(this.pos.getY());
             arr.add(this.pos.getZ());
 
-            obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
+            obj.add("schematic", new JsonPrimitive(this.schematic.getFile().getAbsolutePath()));
             obj.add("name", new JsonPrimitive(this.name));
             obj.add("pos", arr);
             obj.add("rotation", new JsonPrimitive(this.rotation.name()));
@@ -261,7 +265,6 @@ public class SchematicPlacement
         result = prime * result + ((mirror == null) ? 0 : mirror.hashCode());
         result = prime * result + ((pos == null) ? 0 : pos.hashCode());
         result = prime * result + ((rotation == null) ? 0 : rotation.hashCode());
-        result = prime * result + ((schematicFile == null) ? 0 : schematicFile.hashCode());
         result = prime * result + ((schematic == null) ? 0 : schematic.hashCode());
         return result;
     }
@@ -286,13 +289,6 @@ public class SchematicPlacement
         else if (!pos.equals(other.pos))
             return false;
         if (rotation != other.rotation)
-            return false;
-        if (schematicFile == null)
-        {
-            if (other.schematicFile != null)
-                return false;
-        }
-        else if (!schematicFile.equals(other.schematicFile))
             return false;
         if (schematic == null)
         {

@@ -105,7 +105,8 @@ public class SchematicPlacementManager
         if (this.schematicPlacements.size() > 0)
         {
             JsonArray arr = new JsonArray();
-            int index = -1;
+            int selectedIndex = 0;
+            boolean indexValid = false;
 
             for (int i = 0; i < this.schematicPlacements.size(); ++i)
             {
@@ -118,16 +119,20 @@ public class SchematicPlacementManager
 
                     if (this.selectedPlacement == placement)
                     {
-                        index = i;
+                        indexValid = true;
+                    }
+                    else if (indexValid == false)
+                    {
+                        selectedIndex++;
                     }
                 }
             }
 
             obj.add("placements", arr);
 
-            if (index >= 0)
+            if (indexValid)
             {
-                obj.add("selected", new JsonPrimitive(index));
+                obj.add("selected", new JsonPrimitive(selectedIndex));
             }
         }
 
@@ -156,6 +161,7 @@ public class SchematicPlacementManager
                     if (placement != null)
                     {
                         this.schematicPlacements.add(placement);
+                        SchematicHolder.getInstance().addSchematic(placement.getSchematic(), placement.getSchematic().getMetadata().getName());
                     }
                 }
                 else
@@ -170,5 +176,7 @@ public class SchematicPlacementManager
                 this.selectedPlacement = this.schematicPlacements.get(index);
             }
         }
+
+        OverlayRenderer.getInstance().updatePlacementCache();
     }
 }

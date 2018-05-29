@@ -18,6 +18,12 @@ public class SchematicHolder
         return INSTANCE;
     }
 
+    public void clearLoadedSchematics()
+    {
+        this.schematics.clear();
+        this.nextId = 0;
+    }
+
     /**
      * Adds the given schematic
      * @param schematic

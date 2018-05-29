@@ -61,6 +61,7 @@ public class LiteModLitematica implements LiteMod, Configurable, JoinGameListene
     @Override
     public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
     {
+        System.out.printf("onJoinGame -> DataManager.load()\n");
         DataManager.load();
     }
 
