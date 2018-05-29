@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.util.OperationMode;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
@@ -27,7 +28,8 @@ public class DataManager
     private static final Int2ObjectOpenHashMap<DataManager> INSTANCES = new Int2ObjectOpenHashMap<>();
 
     private static File lastSchematicDirectory = ROOT_SCHEMATIC_DIRECTORY;
-    public static ItemStack toolItem = new ItemStack(Items.STICK);
+    public static ItemStack toolItem = new ItemStack(Items.STICK); // FIXME
+    private static OperationMode operationMode = OperationMode.PLACEMENT;
 
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
@@ -63,6 +65,16 @@ public class DataManager
     public SchematicPlacementManager getSchematicPlacementManager()
     {
         return this.schematicPlacementManager;
+    }
+
+    public static OperationMode getOperationMode()
+    {
+        return operationMode;
+    }
+
+    public static void setOperationMode(OperationMode mode)
+    {
+        operationMode = mode;
     }
 
     public static File getCurrentSchematicDirectory()
@@ -116,6 +128,20 @@ public class DataManager
                     lastSchematicDirectory = dir;
                 }
             }
+
+            if (JsonUtils.hasString(root, "operation_mode"))
+            {
+                try
+                {
+                    operationMode = OperationMode.valueOf(root.get("operation_mode").getAsString());
+                }
+                catch (Exception e) {}
+
+                if (operationMode == null)
+                {
+                    operationMode = OperationMode.PLACEMENT;
+                }
+            }
         }
     }
 
@@ -138,6 +164,7 @@ public class DataManager
         }
 
         root.add("last_directory", new JsonPrimitive(lastSchematicDirectory.getAbsolutePath()));
+        root.add("operation_mode", new JsonPrimitive(operationMode.name()));
 
         File file = getCurrentStorageFile();
         LiteModLitematica.logInfo("Writing settings to file '{}'", file.getAbsolutePath());

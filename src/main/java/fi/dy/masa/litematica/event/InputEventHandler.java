@@ -6,21 +6,18 @@ import java.util.Set;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.config.KeyCallbacks;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
-import fi.dy.masa.litematica.selection.Selection;
-import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.litematica.util.RayTraceUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -123,9 +120,14 @@ public class InputEventHandler
             final int dWheel = Mouse.getEventDWheel() / 120;
             final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.toolItem.getItem());
 
+            if (hasTool == false)
+            {
+                return false;
+            }
+
             if (dWheel != 0)
             {
-                if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
+                if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
                 {
                     SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 
@@ -134,20 +136,38 @@ public class InputEventHandler
                         sm.changeGrabDistance(player, dWheel);
                         return true;
                     }
-                    else if (sm.hasSelectedElement())
+                    else if (sm.hasSelectedElement() || (sm.getCurrentSelection() != null && sm.getCurrentSelection().isOriginSelected()))
                     {
                         sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), dWheel);
                         return true;
                     }
                 }
+                else if (Hotkeys.OPERATION_MODE_CHANGE_KEY.getKeybind().isKeybindHeld(false))
+                {
+                    DataManager.setOperationMode(DataManager.getOperationMode().cycle(dWheel < 0));
+                    return true;
+                }
             }
-            else if (Mouse.getEventButtonState())
+            else if (Mouse.getEventButtonState() && RenderEventHandler.getInstance().isEnabled())
             {
                 final int button = Mouse.getEventButton();
+                OperationMode mode = DataManager.getOperationMode();
 
-                if (mouseEventIsPickBlock(this.mc, button))
+                boolean isLeftClick = mouseEventIsAttack(this.mc, button);
+                boolean isRightClick = mouseEventIsUse(this.mc, button);
+
+                if (isLeftClick || isRightClick)
                 {
-                    if (hasTool && RenderEventHandler.getInstance().isEnabled()/* && isInSelectionMode()*/) // TODO
+                    if (mode == OperationMode.AREA_SELECTION)
+                    {
+                        SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
+                        sm.setPositionOfCurrentSelectionToRayTrace(this.mc, isLeftClick ? Corner.CORNER_1 : Corner.CORNER_2, 200);
+                        return true;
+                    }
+                }
+                else if (mouseEventIsPickBlock(this.mc, button))
+                {
+                    if (mode == OperationMode.AREA_SELECTION)
                     {
                         SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 
@@ -170,21 +190,8 @@ public class InputEventHandler
                             return true;
                         }
                     }
-                }
-                else if (mouseEventIsAttack(this.mc, button))
-                {
-                    if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
+                    else if (mode == OperationMode.PLACEMENT)
                     {
-                        this.setCornerPosition(this.mc, Corner.CORNER_1);
-                        return true;
-                    }
-                }
-                else if (mouseEventIsUse(this.mc, button))
-                {
-                    if (hasTool && Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
-                    {
-                        this.setCornerPosition(this.mc, Corner.CORNER_2);
-                        return true;
                     }
                 }
             }
@@ -210,44 +217,6 @@ public class InputEventHandler
             {
                 sm.moveGrabbedElement(mc.player);
             }
-        }
-    }
-
-    private void setCornerPosition(Minecraft mc, Corner corner)
-    {
-        SelectionManager sm = DataManager.getInstance(mc.world).getSelectionManager();
-        Selection sel = sm.getCurrentSelection();
-
-        if (corner != Corner.NONE && sel != null && sel.getSelectedSelectionBox() != null)
-        {
-            RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, 200);
-
-            if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
-            {
-                return;
-            }
-
-            int cornerIndex = 1;
-            BlockPos pos = trace.getBlockPos();
-
-            // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
-            if (mc.player.isSneaking() == false)
-            {
-                pos = pos.offset(trace.sideHit);
-            }
-
-            if (corner == Corner.CORNER_1)
-            {
-                sel.getSelectedSelectionBox().setPos1(pos);
-            }
-            else if (corner == Corner.CORNER_2)
-            {
-                sel.getSelectedSelectionBox().setPos2(pos);
-                cornerIndex = 2;
-            }
-
-            String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-            KeyCallbacks.printMessage(this.mc, "litematica.message.set_selection_box_point", cornerIndex, posStr);
         }
     }
 

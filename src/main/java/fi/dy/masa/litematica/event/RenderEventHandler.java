@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.event;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.RenderUtils;
+import fi.dy.masa.litematica.render.ToolHud;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -79,15 +80,9 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.enableRendering &&
-            mc.gameSettings.showDebugInfo == false &&
-            mc.player != null
-            // &&
-            //(ConfigsGeneric.REQUIRE_SNEAK.getBooleanValue() == false || mc.player.isSneaking()) &&
-            //(ConfigsGeneric.REQUIRE_HOLDING_KEY.getBooleanValue() == false || InputEventHandler.isRequiredKeyActive())
-            )
+        if (this.enableRendering && mc.gameSettings.showDebugInfo == false && mc.player != null)
         {
-            //this.renderText(mc, ConfigsGeneric.TEXT_POS_X.getIntegerValue(), ConfigsGeneric.TEXT_POS_Y.getIntegerValue(), this.lines);
+            ToolHud.getInstance().renderHud();
         }
     }
 }

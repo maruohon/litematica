@@ -115,10 +115,8 @@ public class OverlayRenderer
                 this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
             }
 
-            if (area.getOrigin() != null)
-            {
-                RenderUtils.renderBlockOutline(area.getOrigin(), expand, lineWidthBlockBox, this.colorAreaOrigin, renderViewEntity, partialTicks);
-            }
+            Vec3f color = area.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
+            RenderUtils.renderBlockOutline(area.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
         }
 
         if (this.placementSelections.isEmpty() == false)
@@ -134,10 +132,8 @@ public class OverlayRenderer
                     this.renderSelectionBox(box, type, expand, 1f, 1f, renderViewEntity, partialTicks, placement);
                 }
 
-                if (area.getOrigin() != null)
-                {
-                    RenderUtils.renderBlockOutline(area.getOrigin(), expand, 2f, this.colorAreaOrigin, renderViewEntity, partialTicks);
-                }
+                Vec3f color = area.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
+                RenderUtils.renderBlockOutline(area.getOrigin(), expand, 2f, color, renderViewEntity, partialTicks);
             }
         }
 

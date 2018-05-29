@@ -17,6 +17,8 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -120,7 +122,7 @@ public class SelectionManager
         {
             RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
 
-            if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX)
+            if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX || trace.getHitType() == HitType.ORIGIN)
             {
                 this.changeSelection(area, trace);
                 return true;
@@ -129,6 +131,7 @@ public class SelectionManager
             {
                 area.clearCurrentSelectedCorner();
                 area.setSelectedBox(null);
+                area.setOriginSelected(false);
                 return true;
             }
         }
@@ -142,10 +145,15 @@ public class SelectionManager
 
         if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX)
         {
-            Box box = area.getSelectedSelectionBox();
-            box = trace.getHitSelectionBox();
+            Box box = trace.getHitSelectionBox();
             area.setSelectedBox(box.getName());
+            area.setOriginSelected(false);
             box.setSelectedCorner(trace.getHitCorner());
+        }
+        else if (trace.getHitType() == HitType.ORIGIN)
+        {
+            area.setSelectedBox(null);
+            area.setOriginSelected(true);
         }
     }
 
@@ -159,19 +167,26 @@ public class SelectionManager
     {
         Selection area = this.getCurrentSelection();
 
-        if (area != null && area.getSelectedSelectionBox() != null)
+        if (area != null)
         {
-            Box box = area.getSelectedSelectionBox();
-            Corner selectedCorner = box.getSelectedCorner();
-
-            if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_1) && box.getPos1() != null)
+            if (area.getSelectedSelectionBox() != null)
             {
-                box.setPos1(box.getPos1().offset(direction, amount));
+                Box box = area.getSelectedSelectionBox();
+                Corner selectedCorner = box.getSelectedCorner();
+
+                if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_1) && box.getPos1() != null)
+                {
+                    box.setPos1(box.getPos1().offset(direction, amount));
+                }
+
+                if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_2) && box.getPos2() != null)
+                {
+                    box.setPos2(box.getPos2().offset(direction, amount));
+                }
             }
-
-            if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_2) && box.getPos2() != null)
+            else if (area.isOriginSelected())
             {
-                box.setPos2(box.getPos2().offset(direction, amount));
+                area.setOrigin(area.getOrigin().offset(direction, amount));
             }
         }
     }
@@ -205,6 +220,62 @@ public class SelectionManager
         }
 
         return false;
+    }
+
+    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, Corner corner, double maxDistance)
+    {
+        Selection sel = this.getCurrentSelection();
+
+        if (sel != null)
+        {
+            boolean movingCorner = sel.getSelectedSelectionBox() != null && corner != Corner.NONE;
+            boolean movingOrigin = sel.isOriginSelected();
+
+            if (movingCorner || movingOrigin)
+            {
+                RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
+
+                if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+                {
+                    return;
+                }
+
+                BlockPos pos = trace.getBlockPos();
+
+                // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
+                if (mc.player.isSneaking() == false)
+                {
+                    pos = pos.offset(trace.sideHit);
+                }
+
+                if (movingCorner)
+                {
+                    int cornerIndex = 1;
+
+                    if (corner == Corner.CORNER_1)
+                    {
+                        sel.getSelectedSelectionBox().setPos1(pos);
+                    }
+                    else if (corner == Corner.CORNER_2)
+                    {
+                        sel.getSelectedSelectionBox().setPos2(pos);
+                        cornerIndex = 2;
+                    }
+
+                    String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                    KeyCallbacks.printMessage(mc, "litematica.message.set_selection_box_point", cornerIndex, posStr);
+                }
+                // Moving the origin point
+                else
+                {
+                    BlockPos old = sel.getOrigin();
+                    sel.setOrigin(pos);
+                    String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+                    String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                    KeyCallbacks.printMessage(mc, "litematica.message.moved_area_origin", posStrOld, posStrNew);
+                }
+            }
+        }
     }
 
     public void releaseGrabbedElement()

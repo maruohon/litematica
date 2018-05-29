@@ -21,6 +21,7 @@ public class Selection
     private String name = "Unnamed";
     @Nullable
     private String currentBox;
+    private boolean originSelected;
 
     public static Selection fromPlacement(SchematicPlacement placement)
     {
@@ -68,6 +69,16 @@ public class Selection
         }
 
         return false;
+    }
+
+    public boolean isOriginSelected()
+    {
+        return this.originSelected;
+    }
+
+    public void setOriginSelected(boolean selected)
+    {
+        this.originSelected = selected;
     }
 
     public BlockPos getOrigin()
@@ -281,10 +292,7 @@ public class Selection
             obj.add("boxes", arr);
         }
 
-        if (this.origin != null)
-        {
-            obj.add("origin", JsonUtils.blockPosToJson(this.origin));
-        }
+        obj.add("origin", JsonUtils.blockPosToJson(this.origin));
 
         return obj;
     }

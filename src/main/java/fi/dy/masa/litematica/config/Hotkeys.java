@@ -11,6 +11,7 @@ public enum Hotkeys implements IHotkey
     MOVE_ENTIRE_SELECTION               ("moveEntireSelection",             "M,V",  "Move the entire current selection here"),
     OPEN_GUI_SCHEMATIC_ACTIONS          ("openGuiSchematicActions",         "M,C",  "Open the Schematic actions GUI"),
     OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the area selection manager GUI"),
+    OPERATION_MODE_CHANGE_KEY           ("operationModeChangeKey",          "LCONTROL", "The key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode."),
     SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
     SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,O",  "Set/move the origin point of the current selection here"),
     SET_SELECTION_BOX_POSITION_1        ("setSelectionBoxPosition1",        "M,1",  "Set the first position of the currently selected box to the player's position"),

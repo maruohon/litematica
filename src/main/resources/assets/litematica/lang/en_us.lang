@@ -70,9 +70,14 @@ litematica.gui.title.save_schematic=Save the currently selected area as a Schema
 litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 
+litematica.hud.area_selection.box_count=Boxes
+litematica.hud.area_selection.selected_area=Area
+litematica.hud.selected_mode=Mode
+
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
+litematica.message.moved_area_origin=Moved the area origin point from %s to %s
 litematica.message.moved_selection=Moved the current selection from %s to %s
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.schematic_placement_created=Placement created for '%s'
@@ -85,3 +90,14 @@ litematica.message.value.on=ON
 litematica.message.value.off=OFF
 
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
+
+litematica.operation_mode.name.area_selection=Area Selection
+litematica.operation_mode.name.placement=Schematic Placement
+litematica.operation_mode.name.fill=Fill
+litematica.operation_mode.name.replace=Replace
+litematica.operation_mode.name.clone_source=Clone (from)
+litematica.operation_mode.name.clone_destination=Clone (to)
+litematica.operation_mode.name.move_source=Move (from)
+litematica.operation_mode.name.move_destination=Move (to)
+litematica.operation_mode.name.stack=Stack
+litematica.operation_mode.name.delete=Delete
