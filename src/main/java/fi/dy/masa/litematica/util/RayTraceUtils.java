@@ -1,12 +1,16 @@
 package fi.dy.masa.litematica.util;
 
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -23,8 +27,11 @@ public class RayTraceUtils
 {
     private static RayTraceWrapper closestBox;
     private static RayTraceWrapper closestCorner;
+    private static RayTraceWrapper closestOrigin;
     private static double closestBoxDistance;
     private static double closestCornerDistance;
+    private static double closestOriginDistance;
+    private static HitType originType;
 
     @Nonnull
     public static RayTraceWrapper getWrappedRayTraceFromEntity(World world, Entity entity, double range)
@@ -36,29 +43,36 @@ public class RayTraceUtils
         RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
         double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
 
-        Selection area = DataManager.getInstance(world).getSelectionManager().getCurrentSelection();
+        DataManager dataManager = DataManager.getInstance(world);
+        AreaSelection area = dataManager.getSelectionManager().getCurrentSelection();
         RayTraceWrapper wrapper = null;
 
-        closestBox = null;
-        closestCorner = null;
-        closestBoxDistance = -1D;
-        closestCornerDistance = -1D;
+        clearTraceVars();
 
-        if (area != null)
+        if (DataManager.getOperationMode() == OperationMode.AREA_SELECTION && area != null)
         {
-            for (Box box : area.getAllSelectionsBoxes())
+            for (Box box : area.getAllSubRegionBoxes())
             {
                 boolean hitCorner = false;
-                hitCorner |= traceToBoxCorner(box, Corner.CORNER_1, eyesPos, lookEndPosc);
-                hitCorner |= traceToBoxCorner(box, Corner.CORNER_2, eyesPos, lookEndPosc);
+                hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_1, eyesPos, lookEndPosc);
+                hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_2, eyesPos, lookEndPosc);
 
                 if (hitCorner == false)
                 {
-                    traceToBoxBody(box, eyesPos, lookEndPosc);
+                    traceToSelectionBoxBody(box, eyesPos, lookEndPosc);
                 }
             }
 
-            traceToAreaOrigin(area, eyesPos, lookEndPosc);
+            traceToOrigin(area.getOrigin(), eyesPos, lookEndPosc, HitType.SELECTION_ORIGIN, null);
+        }
+
+        if (DataManager.getOperationMode() == OperationMode.PLACEMENT)
+        {
+            for (SchematicPlacement placement : dataManager.getSchematicPlacementManager().getAllSchematicsPlacements())
+            {
+                traceToPlacementBox(placement, eyesPos, lookEndPosc);
+                traceToOrigin(placement.getOrigin(), eyesPos, lookEndPosc, HitType.PLACEMENT_ORIGIN, placement);
+            }
         }
 
         double closestDistance = closestVanilla;
@@ -73,9 +87,25 @@ public class RayTraceUtils
         if (closestCornerDistance >= 0 && (closestVanilla < 0 || closestCornerDistance <= closestVanilla))
         {
             closestDistance = closestCornerDistance;
-            // The origin type uses the corner distance variable, but not the trace wrapper
-            wrapper = closestCorner != null ? closestCorner : new RayTraceWrapper(RayTraceWrapper.HitType.ORIGIN);
+            wrapper = closestCorner;
         }
+
+        // Origins are preferred over everything else
+        if (closestOriginDistance >= 0 && (closestVanilla < 0 || closestOriginDistance <= closestVanilla))
+        {
+            closestDistance = closestOriginDistance;
+
+            if (originType == HitType.PLACEMENT_ORIGIN)
+            {
+                wrapper = closestOrigin;
+            }
+            else
+            {
+                wrapper = new RayTraceWrapper(RayTraceWrapper.HitType.SELECTION_ORIGIN);
+            }
+        }
+
+        clearTraceVars();
 
         if (wrapper == null || closestDistance < 0)
         {
@@ -85,7 +115,17 @@ public class RayTraceUtils
         return wrapper;
     }
 
-    private static boolean traceToBoxCorner(Box box, Corner corner, Vec3d start, Vec3d end)
+    private static void clearTraceVars()
+    {
+        closestBox = null;
+        closestCorner = null;
+        closestOrigin = null;
+        closestBoxDistance = -1D;
+        closestCornerDistance = -1D;
+        closestOriginDistance = -1D;
+    }
+
+    private static boolean traceToSelectionBoxCorner(Box box, Corner corner, Vec3d start, Vec3d end)
     {
         BlockPos pos = (corner == Corner.CORNER_1) ? box.getPos1() : (corner == Corner.CORNER_2) ? box.getPos2() : null;
 
@@ -111,7 +151,7 @@ public class RayTraceUtils
         return false;
     }
 
-    private static boolean traceToBoxBody(Box box, Vec3d start, Vec3d end)
+    private static boolean traceToSelectionBoxBody(Box box, Vec3d start, Vec3d end)
     {
         if (box.getPos1() != null && box.getPos2() != null)
         {
@@ -135,22 +175,59 @@ public class RayTraceUtils
         return false;
     }
 
-    private static boolean traceToAreaOrigin(Selection area, Vec3d start, Vec3d end)
+    private static boolean traceToPlacementBox(SchematicPlacement placement, Vec3d start, Vec3d end)
     {
-        BlockPos pos = area.getOrigin();
+        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes();
+        boolean hitSomething = false;
 
+        for (Map.Entry<String, Box> entry : boxes.entrySet())
+        {
+            String boxName = entry.getKey();
+            Box box = entry.getValue();
+
+            if (box.getPos1() != null && box.getPos2() != null)
+            {
+                AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+                RayTraceResult trace = bb.calculateIntercept(start, end);
+
+                if (trace != null)
+                {
+                    double dist = trace.hitVec.distanceTo(start);
+
+                    if (closestBoxDistance < 0 || dist < closestBoxDistance)
+                    {
+                        closestBoxDistance = dist;
+                        closestBox = new RayTraceWrapper(placement, trace.hitVec, boxName);
+                        hitSomething = true;
+                    }
+                }
+            }
+        }
+
+        return hitSomething;
+    }
+
+    private static boolean traceToOrigin(BlockPos pos, Vec3d start, Vec3d end, HitType type, @Nullable SchematicPlacement placement)
+    {
         if (pos != null)
         {
             AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
-            RayTraceResult hit = bb.calculateIntercept(start, end);
+            RayTraceResult trace = bb.calculateIntercept(start, end);
 
-            if (hit != null)
+            if (trace != null)
             {
-                double dist = hit.hitVec.distanceTo(start);
+                double dist = trace.hitVec.distanceTo(start);
 
-                if (closestCornerDistance < 0 || dist < closestCornerDistance)
+                if (closestOriginDistance < 0 || dist < closestOriginDistance)
                 {
-                    closestCornerDistance = dist;
+                    closestOriginDistance = dist;
+                    originType = type;
+
+                    if (type == HitType.PLACEMENT_ORIGIN)
+                    {
+                        closestOrigin = new RayTraceWrapper(placement, trace.hitVec, null);
+                    }
+
                     return true;
                 }
             }
@@ -391,45 +468,70 @@ public class RayTraceUtils
     public static class RayTraceWrapper
     {
         private final HitType type;
-        private final RayTraceResult trace;
-        private final Box box;
         private final Corner corner;
         private final Vec3d hitVec;
+        @Nullable
+        private final RayTraceResult trace;
+        @Nullable
+        private final Box box;
+        @Nullable
+        private final SchematicPlacement schematicPlacement;
+        @Nullable
+        private final String placementRegionName;
 
         public RayTraceWrapper()
         {
             this.type = HitType.MISS;
-            this.trace = null;
-            this.box = null;
             this.corner = Corner.NONE;
             this.hitVec = Vec3d.ZERO;
+            this.trace = null;
+            this.box = null;
+            this.schematicPlacement = null;
+            this.placementRegionName = null;
         }
 
         public RayTraceWrapper(RayTraceResult trace)
         {
             this.type = HitType.VANILLA;
-            this.trace = trace;
-            this.box = null;
             this.corner = Corner.NONE;
             this.hitVec = trace.hitVec;
+            this.trace = trace;
+            this.box = null;
+            this.schematicPlacement = null;
+            this.placementRegionName = null;
         }
 
         public RayTraceWrapper(HitType type)
         {
             this.type = type;
-            this.trace = null;
-            this.box = null;
             this.corner = Corner.NONE;
             this.hitVec = Vec3d.ZERO;
+            this.trace = null;
+            this.box = null;
+            this.schematicPlacement = null;
+            this.placementRegionName = null;
         }
 
         public RayTraceWrapper(Box box, Corner corner, Vec3d hitVec)
         {
-            this.type = corner == Corner.NONE ? HitType.BOX : HitType.CORNER;
-            this.trace = null;
-            this.box = box;
+            this.type = corner == Corner.NONE ? HitType.SELECTION_BOX_BODY : HitType.SELECTION_BOX_CORNER;
             this.corner = corner;
             this.hitVec = hitVec;
+            this.trace = null;
+            this.box = box;
+            this.schematicPlacement = null;
+            this.placementRegionName = null;
+        }
+
+        public RayTraceWrapper(SchematicPlacement placement, Vec3d hitVec, @Nullable String regionName)
+        {
+            this.type = regionName != null ? HitType.PLACEMENT_SUBREGION : HitType.PLACEMENT_ORIGIN;
+            this.corner = Corner.NONE;
+            this.hitVec = hitVec;
+            this.trace = null;
+            this.box = null;
+            this.schematicPlacement = placement;
+            this.placementRegionName = regionName;
         }
 
         public HitType getHitType()
@@ -449,6 +551,18 @@ public class RayTraceUtils
             return this.box;
         }
 
+        @Nullable
+        public SchematicPlacement getHitSchematicPlacement()
+        {
+            return this.schematicPlacement;
+        }
+
+        @Nullable
+        public String getHitSchematicPlacementRegionName()
+        {
+            return this.placementRegionName;
+        }
+
         public Vec3d getHitVec()
         {
             return this.hitVec;
@@ -463,9 +577,11 @@ public class RayTraceUtils
         {
             MISS,
             VANILLA,
-            BOX,
-            CORNER,
-            ORIGIN;
+            SELECTION_BOX_BODY,
+            SELECTION_BOX_CORNER,
+            SELECTION_ORIGIN,
+            PLACEMENT_SUBREGION,
+            PLACEMENT_ORIGIN;
         }
     }
 }

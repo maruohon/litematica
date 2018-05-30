@@ -11,7 +11,7 @@ import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.InfoUtils;
@@ -228,7 +228,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
 
         public void saveSchematic()
         {
-            Selection area = this.selectionManager.getCurrentSelection();
+            AreaSelection area = this.selectionManager.getCurrentSelection();
 
             if (area != null)
             {

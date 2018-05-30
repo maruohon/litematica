@@ -1,17 +1,23 @@
 package fi.dy.masa.litematica.data;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.Vec3f;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.init.Blocks;
@@ -22,26 +28,38 @@ import net.minecraft.world.gen.structure.template.PlacementSettings;
 
 public class SchematicPlacement
 {
-    private static int nextColorIndex;
     private static final Set<Integer> USED_COLORS = new HashSet<>();
+    private static int nextColorIndex;
 
-    private String name;
-    @Nullable
+    private final Map<String, Placement> relativeSubRegionPlacements = new HashMap<>();
     private LitematicaSchematic schematic;
-    private BlockPos pos;
+    private BlockPos origin;
+    private String name;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
     private boolean ignoreEntities;
     private boolean enabled;
     private boolean renderSchematic;
+    private boolean regionPlacementsModified;
     private int boxesBBColor;
     private Vec3f boxesBBColorVec = new Vec3f(0xFF, 0xFF, 0xFF);
+    @Nullable
+    private String selectedSubRegionName;
 
-    public SchematicPlacement(LitematicaSchematic schematic, BlockPos pos, String name)
+    private SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name)
     {
         this.schematic = schematic;
-        this.pos = pos;
+        this.origin = origin;
         this.name = name;
+    }
+
+    public static SchematicPlacement createFor(LitematicaSchematic schematic, BlockPos origin, String name)
+    {
+        SchematicPlacement placement = new SchematicPlacement(schematic, origin, name);
+        placement.setBoxesBBColorNext();
+        placement.resetSubRegionsToSchematicValues();
+
+        return placement;
     }
 
     public boolean isEnabled()
@@ -54,6 +72,11 @@ public class SchematicPlacement
         return this.isEnabled() && this.renderSchematic;
     }
 
+    public boolean isRegionPlacementModified()
+    {
+        return this.regionPlacementsModified;
+    }
+
     public String getName()
     {
         return this.name;
@@ -64,9 +87,9 @@ public class SchematicPlacement
         return schematic;
     }
 
-    public BlockPos getPos()
+    public BlockPos getOrigin()
     {
-        return pos;
+        return origin;
     }
 
     public Rotation getRotation()
@@ -84,7 +107,7 @@ public class SchematicPlacement
         return this.boxesBBColorVec;
     }
 
-    public PlacementSettings getPlacement()
+    public PlacementSettings getPlacementSettings()
     {
         PlacementSettings placement = new PlacementSettings();
 
@@ -96,12 +119,107 @@ public class SchematicPlacement
         return placement;
     }
 
+    @Nullable
+    public String getSelectedSubRegionName()
+    {
+        return this.selectedSubRegionName;
+    }
+
+    public void setSelectedSubRegionName(@Nullable String name)
+    {
+        this.selectedSubRegionName = name;
+    }
+
+    @Nullable
+    public Placement getRelativeSubRegionPlacement(String areaName)
+    {
+        return this.relativeSubRegionPlacements.get(areaName);
+    }
+
+    public ImmutableMap<String, Placement> getRelativeSubRegionPlacements()
+    {
+        ImmutableMap.Builder<String, Placement> builder = ImmutableMap.builder();
+
+        for (Map.Entry<String, Placement> entry : this.relativeSubRegionPlacements.entrySet())
+        {
+            builder.put(entry.getKey(), entry.getValue());
+        }
+
+        return builder.build();
+    }
+
+    public ImmutableMap<String, Box> getSubRegionBoxes()
+    {
+        ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
+        Map<String, BlockPos> areaSizes = this.schematic.getAreaSizes();
+
+        for (Map.Entry<String, Placement> entry : this.relativeSubRegionPlacements.entrySet())
+        {
+            String name = entry.getKey();
+            Placement placement = entry.getValue();
+
+            BlockPos boxOriginRelative = placement.getPos();
+            BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
+            BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSizes.get(name));
+            pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
+            pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
+
+            builder.put(name, new Box(boxOriginAbsolute, pos2, name));
+        }
+
+        return builder.build();
+    }
+
+    public void moveSubRegionTo(String regionName, BlockPos newPos)
+    {
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            this.relativeSubRegionPlacements.get(regionName).setPos(newPos.subtract(this.origin));
+            this.regionPlacementsModified = true;
+            this.updateRenderers();
+        }
+    }
+
+    public void setSubRegionRotation(String regionName, Rotation rotation)
+    {
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            this.relativeSubRegionPlacements.get(regionName).setRotation(rotation);
+            this.regionPlacementsModified = true;
+            this.updateRenderers();
+        }
+    }
+
+    public void setSubRegionMirror(String regionName, Mirror mirror)
+    {
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
+            this.regionPlacementsModified = true;
+            this.updateRenderers();
+        }
+    }
+
+    public void resetSubRegionsToSchematicValues()
+    {
+        Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
+        this.relativeSubRegionPlacements.clear();
+        this.regionPlacementsModified = false;
+
+        for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
+        {
+            this.relativeSubRegionPlacements.put(entry.getKey(), new Placement(entry.getValue()));
+        }
+
+        this.updateRenderers();
+    }
+
     public void setEnabled(boolean enabled)
     {
         if (enabled != this.enabled)
         {
             this.enabled = enabled;
-            this.updateRenderers(false);
+            this.updateRenderers();
         }
     }
 
@@ -112,8 +230,11 @@ public class SchematicPlacement
 
     public void setRenderSchematic(boolean render)
     {
-        this.renderSchematic = render;
-        this.updateRenderers(false);
+        if (render != this.renderSchematic)
+        {
+            this.renderSchematic = render;
+            this.updateRenderers();
+        }
     }
 
     public void setName(String name)
@@ -121,24 +242,24 @@ public class SchematicPlacement
         this.name = name;
     }
 
-    public SchematicPlacement setPos(BlockPos pos)
+    public SchematicPlacement setOrigin(BlockPos origin)
     {
-        this.pos = pos;
-        this.updateRenderers(false);
+        this.origin = origin;
+        this.updateRenderers();
         return this;
     }
 
     public SchematicPlacement setRotation(Rotation rotation)
     {
         this.rotation = rotation;
-        this.updateRenderers(false);
+        this.updateRenderers();
         return this;
     }
 
     public SchematicPlacement setMirror(Mirror mirror)
     {
         this.mirror = mirror;
-        this.updateRenderers(false);
+        this.updateRenderers();
         return this;
     }
 
@@ -150,19 +271,15 @@ public class SchematicPlacement
         return this;
     }
 
-    public SchematicPlacement setBoxesBBColorNext()
+    private SchematicPlacement setBoxesBBColorNext()
     {
         return this.setBoxesBBColor(getNextBoxColor());
     }
 
-    private void updateRenderers(boolean forceUpdate)
+    public void updateRenderers()
     {
         OverlayRenderer.getInstance().updatePlacementCache();
-
-        if (forceUpdate || this.schematic != null)
-        {
-            SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
-        }
+        SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
     }
 
     public void onRemoved()
@@ -183,19 +300,34 @@ public class SchematicPlacement
             JsonObject obj = new JsonObject();
             JsonArray arr = new JsonArray();
 
-            arr.add(this.pos.getX());
-            arr.add(this.pos.getY());
-            arr.add(this.pos.getZ());
+            arr.add(this.origin.getX());
+            arr.add(this.origin.getY());
+            arr.add(this.origin.getZ());
 
             obj.add("schematic", new JsonPrimitive(this.schematic.getFile().getAbsolutePath()));
             obj.add("name", new JsonPrimitive(this.name));
-            obj.add("pos", arr);
+            obj.add("origin", arr);
             obj.add("rotation", new JsonPrimitive(this.rotation.name()));
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
             obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities));
             obj.add("enabled", new JsonPrimitive(this.enabled));
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
             obj.add("render_schematic", new JsonPrimitive(this.renderSchematic));
+
+            if (this.relativeSubRegionPlacements.isEmpty() == false)
+            {
+                arr = new JsonArray();
+
+                for (Map.Entry<String, Placement> entry : this.relativeSubRegionPlacements.entrySet())
+                {
+                    JsonObject placementObj = new JsonObject();
+                    placementObj.add("name", new JsonPrimitive(entry.getKey()));
+                    placementObj.add("placement", entry.getValue().toJson());
+                    arr.add(placementObj);
+                }
+
+                obj.add("placements", arr);
+            }
 
             return obj;
         }
@@ -210,9 +342,10 @@ public class SchematicPlacement
     {
         if (JsonUtils.hasString(obj, "schematic") &&
             JsonUtils.hasString(obj, "name") &&
-            JsonUtils.hasArray(obj, "pos") &&
+            JsonUtils.hasArray(obj, "origin") &&
             JsonUtils.hasString(obj, "rotation") &&
-            JsonUtils.hasString(obj, "mirror"))
+            JsonUtils.hasString(obj, "mirror") &&
+            JsonUtils.hasArray(obj, "placements"))
         {
             File file = new File(obj.get("schematic").getAsString());
             LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName(), InfoUtils.INFO_MESSAGE_CONSUMER);
@@ -223,11 +356,11 @@ public class SchematicPlacement
                 return null;
             }
 
-            JsonArray posArr = obj.get("pos").getAsJsonArray();
+            JsonArray posArr = obj.get("origin").getAsJsonArray();
 
             if (posArr.size() != 3)
             {
-                LiteModLitematica.logger.warn("Failed to load schematic placement for '{}', invalid position", file.getAbsolutePath());
+                LiteModLitematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", file.getAbsolutePath());
                 return null;
             }
 
@@ -235,23 +368,47 @@ public class SchematicPlacement
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
             Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
             Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
-            SchematicPlacement placement = new SchematicPlacement(schematic, pos, name);
-            placement.rotation = rotation;
-            placement.mirror = mirror;
-            placement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
-            placement.enabled = JsonUtils.getBoolean(obj, "enabled");
-            placement.renderSchematic = JsonUtils.getBoolean(obj, "render_schematic");
+            SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, pos, name);
+            schematicPlacement.rotation = rotation;
+            schematicPlacement.mirror = mirror;
+            schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
+            schematicPlacement.enabled = JsonUtils.getBoolean(obj, "enabled");
+            schematicPlacement.renderSchematic = JsonUtils.getBoolean(obj, "render_schematic");
 
             if (JsonUtils.hasInteger(obj, "bb_color"))
             {
-                placement.setBoxesBBColor(JsonUtils.getInteger(obj, "bb_color"));
+                schematicPlacement.setBoxesBBColor(JsonUtils.getInteger(obj, "bb_color"));
             }
             else
             {
-                placement.setBoxesBBColorNext();
+                schematicPlacement.setBoxesBBColorNext();
             }
 
-            return placement;
+            JsonArray placementArr = obj.get("placements").getAsJsonArray();
+
+            for (int i = 0; i < placementArr.size(); ++i)
+            {
+                JsonElement el = placementArr.get(i);
+
+                if (el.isJsonObject())
+                {
+                    JsonObject placementObj = el.getAsJsonObject();
+
+                    if (JsonUtils.hasString(placementObj, "name") &&
+                        JsonUtils.hasObject(placementObj, "placement"))
+                    {
+                        Placement placement = Placement.fromJson(placementObj.get("placement").getAsJsonObject());
+
+                        if (placement != null)
+                        {
+                            String placementName = placementObj.get("name").getAsString();
+                            schematicPlacement.relativeSubRegionPlacements.put(placementName, placement);
+                        }
+                    }
+                }
+            }
+
+            return schematicPlacement;
         }
 
         return null;
@@ -263,7 +420,7 @@ public class SchematicPlacement
         final int prime = 31;
         int result = 1;
         result = prime * result + ((mirror == null) ? 0 : mirror.hashCode());
-        result = prime * result + ((pos == null) ? 0 : pos.hashCode());
+        result = prime * result + ((origin == null) ? 0 : origin.hashCode());
         result = prime * result + ((rotation == null) ? 0 : rotation.hashCode());
         result = prime * result + ((schematic == null) ? 0 : schematic.hashCode());
         return result;
@@ -281,12 +438,12 @@ public class SchematicPlacement
         SchematicPlacement other = (SchematicPlacement) obj;
         if (mirror != other.mirror)
             return false;
-        if (pos == null)
+        if (origin == null)
         {
-            if (other.pos != null)
+            if (other.origin != null)
                 return false;
         }
-        else if (!pos.equals(other.pos))
+        else if (!origin.equals(other.origin))
             return false;
         if (rotation != other.rotation)
             return false;

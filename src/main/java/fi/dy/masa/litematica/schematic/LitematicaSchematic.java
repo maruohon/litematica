@@ -11,11 +11,13 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.data.Placement;
+import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.util.Constants;
 import fi.dy.masa.litematica.util.NBTUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -37,8 +39,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.template.PlacementSettings;
-import net.minecraft.world.gen.structure.template.Template;
 
 public class LitematicaSchematic
 {
@@ -76,6 +76,32 @@ public class LitematicaSchematic
         return this.metadata;
     }
 
+    public Map<String, BlockPos> getAreaPositions()
+    {
+        ImmutableMap.Builder<String, BlockPos> builder = ImmutableMap.builder();
+
+        for (String name : this.subRegionPositions.keySet())
+        {
+            BlockPos pos = this.subRegionPositions.get(name);
+            builder.put(name, pos);
+        }
+
+        return builder.build();
+    }
+
+    public Map<String, BlockPos> getAreaSizes()
+    {
+        ImmutableMap.Builder<String, BlockPos> builder = ImmutableMap.builder();
+
+        for (String name : this.subRegionSizes.keySet())
+        {
+            BlockPos pos = this.subRegionSizes.get(name);
+            builder.put(name, pos);
+        }
+
+        return builder.build();
+    }
+
     public Map<String, Box> getAreas()
     {
         ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
@@ -84,7 +110,7 @@ public class LitematicaSchematic
         {
             BlockPos pos = this.subRegionPositions.get(name);
             BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(this.subRegionSizes.get(name));
-            Box box = new Box(pos, pos.add(posEndRel));
+            Box box = new Box(pos, pos.add(posEndRel), name);
             builder.put(name, box);
         }
 
@@ -92,7 +118,7 @@ public class LitematicaSchematic
     }
 
     @Nullable
-    public static LitematicaSchematic createSchematic(World world, Selection area, boolean takeEntities, String author, IStringConsumer feedback)
+    public static LitematicaSchematic createSchematic(World world, AreaSelection area, boolean takeEntities, String author, IStringConsumer feedback)
     {
         List<Box> boxes = PositionUtils.getValidBoxes(area);
 
@@ -127,7 +153,7 @@ public class LitematicaSchematic
         return schematic;
     }
 
-    public boolean placeToWorld(World world, final BlockPos origin, PlacementSettings placement, boolean notifyNeighbors)
+    public boolean placeToWorld(World world, SchematicPlacement schematicPlacement, boolean notifyNeighbors)
     {
         /*
         Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(this.getAreas().values());
@@ -158,36 +184,46 @@ public class LitematicaSchematic
         }
         */
 
-        for (String regionName : this.blockContainers.keySet())
-        {
-            BlockPos regionPos = this.subRegionPositions.get(regionName);
-            BlockPos regionSize = this.subRegionSizes.get(regionName);
-            LitematicaBlockStateContainer container = this.blockContainers.get(regionName);
-            Map<BlockPos, NBTTagCompound> tileMap = this.tileEntities.get(regionName);
-            List<EntityInfo> entityList = this.entities.get(regionName);
+        ImmutableMap<String, Placement> relativePlacements = schematicPlacement.getRelativeSubRegionPlacements();
+        BlockPos origin = schematicPlacement.getOrigin();
 
-            if (regionPos != null && regionSize != null && container != null && tileMap != null && entityList != null)
+        for (String regionName : relativePlacements.keySet())
+        {
+            Placement placement = relativePlacements.get(regionName);
+
+            if (placement.isEnabled())
             {
-                this.placeBlocksToWorld(world, origin, placement, regionPos, regionSize, container, tileMap, notifyNeighbors);
-                this.placeEntitiesToWorld(world, origin, placement, entityList);
-            }
-            else
-            {
-                LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
+                BlockPos regionPos = placement.getPos();
+                BlockPos regionSize = this.subRegionSizes.get(regionName);
+                LitematicaBlockStateContainer container = this.blockContainers.get(regionName);
+                Map<BlockPos, NBTTagCompound> tileMap = this.tileEntities.get(regionName);
+                List<EntityInfo> entityList = this.entities.get(regionName);
+
+                if (regionPos != null && regionSize != null && container != null && tileMap != null && entityList != null)
+                {
+                    this.placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, container, tileMap, notifyNeighbors);
+                    this.placeEntitiesToWorld(world, origin, schematicPlacement, placement, entityList);
+                }
+                else
+                {
+                    LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
+                }
             }
         }
 
         return true;
     }
 
-    private void placeBlocksToWorld(World world, BlockPos origin, PlacementSettings placement, BlockPos regionPos, BlockPos regionSize,
+    private void placeBlocksToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
+            SchematicPlacement schematicPlacement, Placement placement,
             LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
     {
+        // These are the un-transformed relative positions
         BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
         BlockPos posMin = PositionUtils.getMinCorner(regionPos, posEndRel);
         BlockPos posMax = PositionUtils.getMaxCorner(regionPos, posEndRel);
 
-        if (PositionUtils.arePositionsWithinWorld(world, posMin, posMax, origin, placement))
+        if (PositionUtils.arePositionsWithinWorld(world, posMin, posMax, origin, schematicPlacement, placement))
         {
             final int sizeX = posMax.getX() - posMin.getX() + 1;
             final int sizeY = posMax.getY() - posMin.getY() + 1;
@@ -211,7 +247,7 @@ public class LitematicaSchematic
                         NBTTagCompound teNBT = tileMap.get(posMutable);
 
                         posMutable.setPos(posMin.getX() + x, posMin.getY() + y, posMin.getZ() + z);
-                        BlockPos pos = Template.transformedBlockPos(placement, posMutable).add(origin);
+                        BlockPos pos = PositionUtils.getTransformedRelativePlacementPosition(posMutable, schematicPlacement, placement).add(origin);
 
                         state = state.withMirror(placement.getMirror());
                         state = state.withRotation(placement.getRotation());
@@ -231,7 +267,7 @@ public class LitematicaSchematic
                             }
                         }
 
-                        if (world.setBlockState(pos, state, 2) && teNBT != null)
+                        if (world.setBlockState(pos, state, 0x12) && teNBT != null)
                         {
                             TileEntity te = world.getTileEntity(pos);
 
@@ -258,7 +294,7 @@ public class LitematicaSchematic
                         for (int x = 0; x < sizeX; ++x)
                         {
                             posMutable.setPos(posMin.getX() + x, posMin.getY() + y, posMin.getZ() + z);
-                            BlockPos pos = Template.transformedBlockPos(placement, posMutable).add(origin);
+                            BlockPos pos = PositionUtils.getTransformedRelativePlacementPosition(posMutable, schematicPlacement, placement).add(origin);
                             world.notifyNeighborsRespectDebug(pos, world.getBlockState(pos).getBlock(), false);
                         }
                     }
@@ -267,7 +303,7 @@ public class LitematicaSchematic
         }
     }
 
-    private void placeEntitiesToWorld(World world, BlockPos origin, PlacementSettings placement, List<EntityInfo> entityList)
+    private void placeEntitiesToWorld(World world, BlockPos origin, SchematicPlacement schematicPlacement, Placement placement, List<EntityInfo> entityList)
     {
         for (EntityInfo info : entityList)
         {
@@ -276,6 +312,7 @@ public class LitematicaSchematic
             if (entity != null)
             {
                 Vec3d pos = info.posVec;
+                pos = PositionUtils.transformedVec3d(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 pos = PositionUtils.transformedVec3d(pos, placement.getMirror(), placement.getRotation());
 
                 entity.setLocationAndAngles(pos.x + origin.getX(), pos.y + origin.getY(), pos.z + origin.getZ(), entity.rotationYaw, entity.rotationPitch);

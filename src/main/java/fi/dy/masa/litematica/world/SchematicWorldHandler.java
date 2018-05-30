@@ -5,7 +5,6 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.EnumDifficulty;
@@ -94,12 +93,7 @@ public class SchematicWorldHandler
             {
                 if (placement.getRenderSchematic())
                 {
-                    LitematicaSchematic schematic = placement.getSchematic();
-
-                    if (schematic != null)
-                    {
-                        schematic.placeToWorld(this.world, placement.getPos(), placement.getPlacement(), false);
-                    }
+                    placement.getSchematic().placeToWorld(this.world, placement, false);
                 }
             }
         }

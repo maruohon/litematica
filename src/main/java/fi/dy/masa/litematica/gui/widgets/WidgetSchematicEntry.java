@@ -108,9 +108,9 @@ public class WidgetSchematicEntry extends WidgetBase
                 int dimension = mc.world.provider.getDimensionType().getId();
                 BlockPos pos = new BlockPos(mc.player.getPositionVector());
                 SchematicEntry entry = this.widget.schematicEntry;
-                SchematicPlacement placement = new SchematicPlacement(entry.schematic, pos, entry.name);
-                placement.setEnabled(GuiScreen.isShiftKeyDown() == false);
-                placement.setBoxesBBColorNext();
+                SchematicPlacement placement = SchematicPlacement.createFor(entry.schematic, pos, entry.name);
+                placement.setEnabled(true);
+                placement.setRenderSchematic(GuiScreen.isShiftKeyDown() == false);
                 DataManager.getInstance(dimension).getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
             }
             else if (this.type == Type.SAVE_TO_FILE)

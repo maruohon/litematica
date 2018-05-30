@@ -80,7 +80,7 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (this.enableRendering && mc.gameSettings.showDebugInfo == false && mc.player != null)
+        if (this.enableRendering && mc.currentScreen == null && mc.gameSettings.showDebugInfo == false && mc.player != null)
         {
             ToolHud.getInstance().renderHud();
         }

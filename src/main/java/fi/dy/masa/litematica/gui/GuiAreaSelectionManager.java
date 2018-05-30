@@ -8,7 +8,7 @@ import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
-import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -88,8 +88,8 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             listener = this.createActionListener(ButtonListener.Type.REMOVE, name);
             this.addButton(button, listener);
 
-            Selection selection = this.selectionManager.getSelection(name);
-            int count = selection != null ? selection.getAllSelectionsBoxes().size() : 0;
+            AreaSelection selection = this.selectionManager.getSelection(name);
+            int count = selection != null ? selection.getAllSubRegionBoxes().size() : 0;
             label = I18n.format("litematica.gui.label.area_selection_box_count", count);
             BlockPos o = selection.getOrigin();
             String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());

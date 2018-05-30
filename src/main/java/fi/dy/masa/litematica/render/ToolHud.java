@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import fi.dy.masa.litematica.config.HudAlignment;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
@@ -16,6 +16,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
 public class ToolHud
@@ -60,7 +61,7 @@ public class ToolHud
         {
             SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
             str = I18n.format("litematica.hud.area_selection.selected_area");
-            Selection selection = sm.getCurrentSelection();
+            AreaSelection selection = sm.getCurrentSelection();
 
             if (selection != null)
             {
@@ -68,8 +69,12 @@ public class ToolHud
                 lines.add(String.format("%s: %s%s%s", str, WHITE_ITA, strTmp, RESET));
 
                 str = I18n.format("litematica.hud.area_selection.box_count");
-                int count = selection.getAllSelectionsBoxes().size();
+                int count = selection.getAllSubRegionBoxes().size();
                 lines.add(String.format("%s: %s%d%s", str, GREEN, count, RESET));
+
+                BlockPos or = selection.getOrigin();
+                str = I18n.format("litematica.hud.area_selection.origin");
+                lines.add(String.format("%s: x: %s%d%s y: %s%d%s z: %s%d%s", str, GREEN, or.getX(), WHITE, GREEN, or.getY(), WHITE, GREEN, or.getZ(), RESET));
             }
         }
         else if (mode == OperationMode.PLACEMENT)

@@ -72,7 +72,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
         int offset = this.mc.fontRenderer.getStringWidth(label) + 4;
 
-        BlockPos pos = this.placement.getPos();
+        BlockPos pos = this.placement.getOrigin();
         String text = "";
 
         switch (type)
@@ -170,7 +170,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
                 case MOVE_HERE:
                     BlockPos pos = new BlockPos(mc.player.getPositionVector());
-                    this.placement.setPos(pos);
+                    this.placement.setOrigin(pos);
                     break;
 
                 case SHOW_HIDE:
@@ -221,13 +221,13 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
             try
             {
                 int value = Integer.parseInt(textField.getText());
-                BlockPos posOld = this.placement.getPos();
+                BlockPos posOld = this.placement.getOrigin();
 
                 switch (this.type)
                 {
-                    case X: this.placement.setPos(new BlockPos(value, posOld.getY(), posOld.getZ())); break;
-                    case Y: this.placement.setPos(new BlockPos(posOld.getX(), value, posOld.getZ())); break;
-                    case Z: this.placement.setPos(new BlockPos(posOld.getX(), posOld.getY(), value)); break;
+                    case X: this.placement.setOrigin(new BlockPos(value, posOld.getY(), posOld.getZ())); break;
+                    case Y: this.placement.setOrigin(new BlockPos(posOld.getX(), value, posOld.getZ())); break;
+                    case Z: this.placement.setOrigin(new BlockPos(posOld.getX(), posOld.getY(), value)); break;
                 }
             }
             catch (NumberFormatException e)

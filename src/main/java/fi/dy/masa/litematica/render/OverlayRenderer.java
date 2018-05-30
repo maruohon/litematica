@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.selection.Selection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.Vec3f;
@@ -47,8 +48,7 @@ public class OverlayRenderer
         };
 
     private final Minecraft mc;
-    private final Map<SchematicPlacement, Selection> placementSelections = new HashMap<>();
-    private SchematicPlacement currentPlacement;
+    private final Map<SchematicPlacement, ImmutableMap<String, Box>> placements = new HashMap<>();
     private Vec3f colorPos1 = new Vec3f(1f, 0.0625f, 0.0625f);
     private Vec3f colorPos2 = new Vec3f(0.0625f, 0.0625f, 1f);
     private Vec3f colorX = new Vec3f(   1f, 0.25f, 0.25f);
@@ -71,16 +71,14 @@ public class OverlayRenderer
 
     public void updatePlacementCache()
     {
-        this.placementSelections.clear();
-        SchematicPlacementManager manager = DataManager.getInstance(this.mc.world).getSchematicPlacementManager();
-        List<SchematicPlacement> list = manager.getAllSchematicsPlacements();
-        this.currentPlacement = manager.getSelectedSchematicPlacement();
+        this.placements.clear();
+        List<SchematicPlacement> list = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getAllSchematicsPlacements();
 
         for (SchematicPlacement placement : list)
         {
             if (placement.isEnabled())
             {
-                this.placementSelections.put(placement, Selection.fromPlacement(placement));
+                this.placements.put(placement, placement.getSubRegionBoxes());
             }
         }
     }
@@ -93,9 +91,10 @@ public class OverlayRenderer
         float lineWidthBlockBox = 2f;
         float lineWidthArea = 1.5f;
 
-        SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-        Selection area = sm.getCurrentSelection();
-        final boolean hasWork = area != null || this.placementSelections.isEmpty() == false;
+        DataManager dataManager = DataManager.getInstance(this.mc.world);
+        SelectionManager sm = dataManager.getSelectionManager();
+        AreaSelection currentSelection = sm.getCurrentSelection();
+        final boolean hasWork = currentSelection != null || this.placements.isEmpty() == false;
 
         if (hasWork)
         {
@@ -105,35 +104,41 @@ public class OverlayRenderer
             GlStateManager.pushMatrix();
         }
 
-        if (area != null)
+        if (currentSelection != null)
         {
-            Box currentBox = area.getSelectedSelectionBox();
+            Box currentBox = currentSelection.getSelectedSubRegionBox();
 
-            for (Box box : area.getAllSelectionsBoxes())
+            for (Box box : currentSelection.getAllSubRegionBoxes())
             {
                 BoxType type = box == currentBox ? BoxType.AREA_SELECTED : BoxType.AREA_UNSELECTED;
                 this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
             }
 
-            Vec3f color = area.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
-            RenderUtils.renderBlockOutline(area.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+            Vec3f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
+            RenderUtils.renderBlockOutline(currentSelection.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
         }
 
-        if (this.placementSelections.isEmpty() == false)
+        if (this.placements.isEmpty() == false)
         {
-            for (Map.Entry<SchematicPlacement, Selection> entry : this.placementSelections.entrySet())
+            SchematicPlacementManager spm = dataManager.getSchematicPlacementManager();
+            SchematicPlacement currentPlacement = spm.getSelectedSchematicPlacement();
+
+            for (Map.Entry<SchematicPlacement, ImmutableMap<String, Box>> entry : this.placements.entrySet())
             {
                 SchematicPlacement placement = entry.getKey();
-                Selection areaTmp = entry.getValue();
+                ImmutableMap<String, Box> boxMap = entry.getValue();
+                boolean origin = spm.isOriginSelected();
 
-                for (Box box : areaTmp.getAllSelectionsBoxes())
+                for (Map.Entry<String, Box> entryBox : boxMap.entrySet())
                 {
-                    BoxType type = placement == this.currentPlacement ? BoxType.PLACEMENT_SELECTED : BoxType.PLACEMENT_UNSELECTED;
-                    this.renderSelectionBox(box, type, expand, 1f, 1f, renderViewEntity, partialTicks, placement);
+                    String boxName = entryBox.getKey();
+                    boolean boxSelected = placement == currentPlacement && (origin || boxName.equals(placement.getSelectedSubRegionName()));
+                    BoxType type = boxSelected ? BoxType.PLACEMENT_SELECTED : BoxType.PLACEMENT_UNSELECTED;
+                    this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, placement);
                 }
 
-                Vec3f color = area.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
-                RenderUtils.renderBlockOutline(area.getOrigin(), expand, 2f, color, renderViewEntity, partialTicks);
+                Vec3f color = placement == currentPlacement && origin ? this.colorSelectedCorner : placement.getBoxesBBColor();
+                RenderUtils.renderBlockOutline(placement.getOrigin(), expand, 2f, color, renderViewEntity, partialTicks);
             }
         }
 

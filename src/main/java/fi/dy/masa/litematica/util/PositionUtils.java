@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+import fi.dy.masa.litematica.data.Placement;
+import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.selection.Selection;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -15,8 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.gen.structure.template.PlacementSettings;
-import net.minecraft.world.gen.structure.template.Template;
 
 public class PositionUtils
 {
@@ -37,10 +37,22 @@ public class PositionUtils
                pos.getZ() >= posMin.getZ() && pos.getZ() <= posMax.getZ();
     }
 
-    public static boolean arePositionsWithinWorld(World world, BlockPos posRel1, BlockPos posRel2, BlockPos offset, PlacementSettings placement)
+    public static BlockPos getTransformedRelativePlacementPosition(BlockPos posRel, SchematicPlacement schematicPlacement, Placement placement)
     {
-        BlockPos pos1 = Template.transformedBlockPos(placement, posRel1).add(offset);
-        BlockPos pos2 = Template.transformedBlockPos(placement, posRel2).add(offset);
+        BlockPos pos;
+
+        pos = getTransformedBlockPos(posRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+        pos = getTransformedBlockPos(posRel, placement.getMirror(), placement.getRotation());
+
+        return pos;
+    }
+
+    public static boolean arePositionsWithinWorld(World world, BlockPos posRel1, BlockPos posRel2, BlockPos offset,
+            SchematicPlacement schematicPlacement, Placement placement)
+    {
+        BlockPos pos1 = getTransformedRelativePlacementPosition(posRel1, schematicPlacement, placement).add(offset);
+        BlockPos pos2 = getTransformedRelativePlacementPosition(posRel2, schematicPlacement, placement).add(offset);
+
         return arePositionsWithinWorld(world, pos1, pos2);
     }
 
@@ -82,10 +94,10 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
-    public static List<Box> getValidBoxes(Selection area)
+    public static List<Box> getValidBoxes(AreaSelection area)
     {
         List<Box> boxes = new ArrayList<>();
-        Collection<Box> originalBoxes = area.getAllSelectionsBoxes();
+        Collection<Box> originalBoxes = area.getAllSubRegionBoxes();
 
         for (Box box : originalBoxes)
         {
@@ -103,9 +115,9 @@ public class PositionUtils
         return box.getPos1() != null && box.getPos2() != null;
     }
 
-    public static BlockPos getEnclosingAreaSize(Selection area)
+    public static BlockPos getEnclosingAreaSize(AreaSelection area)
     {
-        return getEnclosingAreaSize(area.getAllSelectionsBoxes());
+        return getEnclosingAreaSize(area.getAllSubRegionBoxes());
     }
 
     public static BlockPos getEnclosingAreaSize(Collection<Box> boxes)

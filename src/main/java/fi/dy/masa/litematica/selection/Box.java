@@ -22,10 +22,12 @@ public class Box
     {
     }
 
-    public Box(BlockPos pos1, BlockPos pos2)
+    public Box(BlockPos pos1, BlockPos pos2, String name)
     {
         this.pos1 = pos1;
         this.pos2 = pos2;
+        this.name = name;
+
         this.updateSize();
     }
 
@@ -109,28 +111,31 @@ public class Box
     @Nullable
     public static Box fromJson(JsonObject obj)
     {
-        Box box = new Box();
-
-        BlockPos pos = JsonUtils.blockPosFromJson(obj, "pos1");
-
-        if (pos != null)
-        {
-            box.setPos1(pos);
-        }
-
-        pos = JsonUtils.blockPosFromJson(obj, "pos2");
-
-        if (pos != null)
-        {
-            box.setPos2(pos);
-        }
-
         if (JsonUtils.hasString(obj, "name"))
         {
-            box.setName(obj.get("name").getAsString());
+            BlockPos pos1 = JsonUtils.blockPosFromJson(obj, "pos1");
+            BlockPos pos2 = JsonUtils.blockPosFromJson(obj, "pos2");
+
+            if (pos1 != null || pos2 != null)
+            {
+                Box box = new Box();
+                box.setName(obj.get("name").getAsString());
+
+                if (pos1 != null)
+                {
+                    box.setPos1(pos1);
+                }
+
+                if (pos2 != null)
+                {
+                    box.setPos2(pos2);
+                }
+
+                return box;
+            }
         }
 
-        return (box.getPos1() != null || box.getPos2() != null) ? box : null;
+        return null;
     }
 
     @Nullable

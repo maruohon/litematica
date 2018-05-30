@@ -7,7 +7,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.RenderEventHandler;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
-import fi.dy.masa.litematica.selection.Selection;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -82,12 +82,12 @@ public class KeyCallbacks
                 if (key == Hotkeys.ADD_SELECTION_BOX.getKeybind())
                 {
                     SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    Selection selection = sm.getCurrentSelection();
+                    AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        selection.createNewSelectionBox(pos);
+                        selection.createNewSubRegionBox(pos);
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         KeyCallbacks.printMessage(this.mc, "litematica.message.added_selection_box", posStr);
@@ -96,13 +96,13 @@ public class KeyCallbacks
                 else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())
                 {
                     SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    Selection selection = sm.getCurrentSelection();
+                    AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
                     {
-                        String name = selection.getCurrentSelectionBoxName();
+                        String name = selection.getCurrentSubRegionBoxName();
 
-                        if (selection.removeSelectedSelectionBox())
+                        if (selection.removeSelectedSubRegionBox())
                         {
                             KeyCallbacks.printMessage(this.mc, "litematica.message.removed_selection_box", name);
                         }
@@ -111,7 +111,7 @@ public class KeyCallbacks
                 else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())
                 {
                     SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    Selection selection = sm.getCurrentSelection();
+                    AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
                     {
@@ -126,7 +126,7 @@ public class KeyCallbacks
                 else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
                 {
                     SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    Selection selection = sm.getCurrentSelection();
+                    AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
                     {
@@ -139,20 +139,20 @@ public class KeyCallbacks
                 else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() || key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())
                 {
                     SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    Selection selection = sm.getCurrentSelection();
+                    AreaSelection selection = sm.getCurrentSelection();
 
-                    if (selection != null && selection.getSelectedSelectionBox() != null)
+                    if (selection != null && selection.getSelectedSubRegionBox() != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                         int p = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? 1 : 2;
 
                         if (p == 1)
                         {
-                            selection.getSelectedSelectionBox().setPos1(pos);
+                            selection.getSelectedSubRegionBox().setPos1(pos);
                         }
                         else
                         {
-                            selection.getSelectedSelectionBox().setPos2(pos);
+                            selection.getSelectedSubRegionBox().setPos2(pos);
                         }
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());

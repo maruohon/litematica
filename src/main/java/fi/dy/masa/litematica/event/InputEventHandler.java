@@ -155,13 +155,19 @@ public class InputEventHandler
 
                 boolean isLeftClick = mouseEventIsAttack(this.mc, button);
                 boolean isRightClick = mouseEventIsUse(this.mc, button);
+                int maxDistance = 200;
 
                 if (isLeftClick || isRightClick)
                 {
                     if (mode == OperationMode.AREA_SELECTION)
                     {
                         SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
-                        sm.setPositionOfCurrentSelectionToRayTrace(this.mc, isLeftClick ? Corner.CORNER_1 : Corner.CORNER_2, 200);
+                        sm.setPositionOfCurrentSelectionToRayTrace(this.mc, isLeftClick ? Corner.CORNER_1 : Corner.CORNER_2, maxDistance);
+                        return true;
+                    }
+                    else if (mode == OperationMode.PLACEMENT)
+                    {
+                        DataManager.getInstance(world).getSchematicPlacementManager().setPositionOfCurrentSelectionToRayTrace(this.mc, maxDistance);
                         return true;
                     }
                 }
@@ -180,18 +186,20 @@ public class InputEventHandler
                             }
                             else
                             {
-                                sm.grabElement(this.mc, 200);
+                                sm.grabElement(this.mc, maxDistance);
                                 return true;
                             }
                         }
                         else
                         {
-                            sm.changeSelection(world, player, 200);
+                            sm.changeSelection(world, player, maxDistance);
                             return true;
                         }
                     }
                     else if (mode == OperationMode.PLACEMENT)
                     {
+                        DataManager.getInstance(world).getSchematicPlacementManager().changeSelection(world, player, maxDistance);
+                        return true;
                     }
                 }
             }

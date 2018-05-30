@@ -24,7 +24,7 @@ import net.minecraft.world.World;
 
 public class SelectionManager
 {
-    private final Map<String, Selection> selections = new HashMap<>();
+    private final Map<String, AreaSelection> selections = new HashMap<>();
     @Nullable
     private String currentSelection;
     private GrabbedElement grabbedElement;
@@ -34,7 +34,7 @@ public class SelectionManager
         return this.selections.keySet();
     }
 
-    public Collection<Selection> getAllSelections()
+    public Collection<AreaSelection> getAllSelections()
     {
         return this.selections.values();
     }
@@ -45,13 +45,13 @@ public class SelectionManager
     }
 
     @Nullable
-    public Selection getCurrentSelection()
+    public AreaSelection getCurrentSelection()
     {
         return this.currentSelection != null ? this.getSelection(this.currentSelection) : null;
     }
 
     @Nullable
-    public Selection getSelection(String name)
+    public AreaSelection getSelection(String name)
     {
         return this.selections.get(name);
     }
@@ -68,7 +68,7 @@ public class SelectionManager
 
     public boolean renameSelection(String oldName, String newName)
     {
-        Selection selection = this.selections.remove(oldName);
+        AreaSelection selection = this.selections.remove(oldName);
 
         if (selection != null)
         {
@@ -108,7 +108,7 @@ public class SelectionManager
             i++;
         }
 
-        this.selections.put(name + i, new Selection());
+        this.selections.put(name + i, new AreaSelection());
         this.currentSelection = name + i;
 
         return this.currentSelection;
@@ -116,13 +116,13 @@ public class SelectionManager
 
     public boolean changeSelection(World world, Entity entity, int maxDistance)
     {
-        Selection area = this.getCurrentSelection();
+        AreaSelection area = this.getCurrentSelection();
 
-        if (area != null && area.getAllSelectionsBoxes().size() > 0)
+        if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
             RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
 
-            if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX || trace.getHitType() == HitType.ORIGIN)
+            if (trace.getHitType() == HitType.SELECTION_BOX_CORNER || trace.getHitType() == HitType.SELECTION_BOX_BODY || trace.getHitType() == HitType.SELECTION_ORIGIN)
             {
                 this.changeSelection(area, trace);
                 return true;
@@ -130,7 +130,7 @@ public class SelectionManager
             else if (trace.getHitType() == HitType.MISS)
             {
                 area.clearCurrentSelectedCorner();
-                area.setSelectedBox(null);
+                area.setSelectedSubRegionBox(null);
                 area.setOriginSelected(false);
                 return true;
             }
@@ -139,39 +139,39 @@ public class SelectionManager
         return false;
     }
 
-    private void changeSelection(Selection area, RayTraceWrapper trace)
+    private void changeSelection(AreaSelection area, RayTraceWrapper trace)
     {
         area.clearCurrentSelectedCorner();
 
-        if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX)
+        if (trace.getHitType() == HitType.SELECTION_BOX_CORNER || trace.getHitType() == HitType.SELECTION_BOX_BODY)
         {
             Box box = trace.getHitSelectionBox();
-            area.setSelectedBox(box.getName());
+            area.setSelectedSubRegionBox(box.getName());
             area.setOriginSelected(false);
             box.setSelectedCorner(trace.getHitCorner());
         }
-        else if (trace.getHitType() == HitType.ORIGIN)
+        else if (trace.getHitType() == HitType.SELECTION_ORIGIN)
         {
-            area.setSelectedBox(null);
+            area.setSelectedSubRegionBox(null);
             area.setOriginSelected(true);
         }
     }
 
     public boolean hasSelectedElement()
     {
-        Selection area = this.getCurrentSelection();
-        return area != null && area.getSelectedSelectionBox() != null;
+        AreaSelection area = this.getCurrentSelection();
+        return area != null && area.getSelectedSubRegionBox() != null;
     }
 
     public void moveSelectedElement(EnumFacing direction, int amount)
     {
-        Selection area = this.getCurrentSelection();
+        AreaSelection area = this.getCurrentSelection();
 
         if (area != null)
         {
-            if (area.getSelectedSelectionBox() != null)
+            if (area.getSelectedSubRegionBox() != null)
             {
-                Box box = area.getSelectedSelectionBox();
+                Box box = area.getSelectedSubRegionBox();
                 Corner selectedCorner = box.getSelectedCorner();
 
                 if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_1) && box.getPos1() != null)
@@ -200,13 +200,13 @@ public class SelectionManager
     {
         World world = mc.world;
         Entity entity = mc.player;
-        Selection area = this.getCurrentSelection();
+        AreaSelection area = this.getCurrentSelection();
 
-        if (area != null && area.getAllSelectionsBoxes().size() > 0)
+        if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
             RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
 
-            if (trace.getHitType() == HitType.CORNER || trace.getHitType() == HitType.BOX)
+            if (trace.getHitType() == HitType.SELECTION_BOX_CORNER || trace.getHitType() == HitType.SELECTION_BOX_BODY)
             {
                 this.changeSelection(area, trace);
                 this.grabbedElement = new GrabbedElement(
@@ -224,11 +224,11 @@ public class SelectionManager
 
     public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, Corner corner, double maxDistance)
     {
-        Selection sel = this.getCurrentSelection();
+        AreaSelection sel = this.getCurrentSelection();
 
         if (sel != null)
         {
-            boolean movingCorner = sel.getSelectedSelectionBox() != null && corner != Corner.NONE;
+            boolean movingCorner = sel.getSelectedSubRegionBox() != null && corner != Corner.NONE;
             boolean movingOrigin = sel.isOriginSelected();
 
             if (movingCorner || movingOrigin)
@@ -254,11 +254,11 @@ public class SelectionManager
 
                     if (corner == Corner.CORNER_1)
                     {
-                        sel.getSelectedSelectionBox().setPos1(pos);
+                        sel.getSelectedSubRegionBox().setPos1(pos);
                     }
                     else if (corner == Corner.CORNER_2)
                     {
-                        sel.getSelectedSelectionBox().setPos2(pos);
+                        sel.getSelectedSubRegionBox().setPos2(pos);
                         cornerIndex = 2;
                     }
 
@@ -315,7 +315,7 @@ public class SelectionManager
 
                 if (el.isJsonObject())
                 {
-                    Selection area = Selection.fromJson(el.getAsJsonObject());
+                    AreaSelection area = AreaSelection.fromJson(el.getAsJsonObject());
                     this.selections.put(area.getName(), area);
                 }
             }
@@ -332,7 +332,7 @@ public class SelectionManager
         JsonObject obj = new JsonObject();
         JsonArray arr = new JsonArray();
 
-        for (Selection area : this.selections.values())
+        for (AreaSelection area : this.selections.values())
         {
             arr.add(area.toJson());
         }

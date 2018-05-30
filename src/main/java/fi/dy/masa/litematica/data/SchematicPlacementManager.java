@@ -7,19 +7,29 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.litematica.config.KeyCallbacks;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
 import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.util.RayTraceUtils;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.World;
 
 public class SchematicPlacementManager
 {
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
     @Nullable
     private SchematicPlacement selectedPlacement;
+    private boolean originSelected;
 
     public List<SchematicPlacement> getAllSchematicsPlacements()
     {
@@ -72,9 +82,18 @@ public class SchematicPlacementManager
     {
         for (int i = 0; i < this.schematicPlacements.size(); ++i)
         {
-            if (this.schematicPlacements.get(i).getSchematic() == schematic)
+            SchematicPlacement placement = this.schematicPlacements.get(i);
+
+            if (placement.getSchematic() == schematic)
             {
-                this.schematicPlacements.remove(i).onRemoved();
+                if (this.selectedPlacement == placement)
+                {
+                    this.selectedPlacement = null;
+                    this.originSelected = false;
+                }
+
+                this.schematicPlacements.remove(i);
+                placement.onRemoved();
                 --i;
             }
         }
@@ -89,12 +108,103 @@ public class SchematicPlacementManager
         return this.selectedPlacement;
     }
 
+    public boolean isOriginSelected()
+    {
+        return this.originSelected;
+    }
+
     public void setSelectedSchematicPlacement(@Nullable SchematicPlacement placement)
     {
         if (placement == null || this.schematicPlacements.contains(placement))
         {
             this.selectedPlacement = placement;
             OverlayRenderer.getInstance().updatePlacementCache();
+        }
+    }
+
+    public boolean changeSelection(World world, Entity entity, int maxDistance)
+    {
+        if (this.schematicPlacements.size() > 0)
+        {
+            RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
+
+            SchematicPlacement placement = this.getSelectedSchematicPlacement();
+
+            if (placement != null)
+            {
+                placement.setSelectedSubRegionName(null);
+            }
+
+            if (trace.getHitType() == HitType.PLACEMENT_SUBREGION)
+            {
+                this.setSelectedSchematicPlacement(trace.getHitSchematicPlacement());
+                this.getSelectedSchematicPlacement().setSelectedSubRegionName(trace.getHitSchematicPlacementRegionName());
+                this.originSelected = false;
+                return true;
+            }
+            else if (trace.getHitType() == HitType.PLACEMENT_ORIGIN)
+            {
+                this.setSelectedSchematicPlacement(trace.getHitSchematicPlacement());
+                this.getSelectedSchematicPlacement().setSelectedSubRegionName(null);
+                this.originSelected = true;
+                return true;
+            }
+            else if (trace.getHitType() == HitType.MISS)
+            {
+                this.setSelectedSchematicPlacement(null);
+                this.originSelected = false;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, double maxDistance)
+    {
+        SchematicPlacement placement = this.getSelectedSchematicPlacement();
+
+        if (placement != null)
+        {
+            boolean movingBox = placement.getSelectedSubRegionName() != null;
+            boolean movingOrigin = this.originSelected;
+
+            if (movingBox || movingOrigin)
+            {
+                RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
+
+                if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+                {
+                    return;
+                }
+
+                BlockPos pos = trace.getBlockPos();
+
+                // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
+                if (mc.player.isSneaking() == false)
+                {
+                    pos = pos.offset(trace.sideHit);
+                }
+
+                if (movingBox)
+                {
+                    placement.moveSubRegionTo(placement.getSelectedSubRegionName(), pos);
+
+                    String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                    KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_subregion_to", posStr);
+                }
+                // Moving the origin point
+                else
+                {
+                    BlockPos old = placement.getOrigin();
+                    placement.setOrigin(pos);
+                    String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+                    String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                    KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
+                }
+
+                placement.updateRenderers();
+            }
         }
     }
 
