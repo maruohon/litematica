@@ -348,6 +348,11 @@ public class SchematicPlacement
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
             obj.add("render_schematic", new JsonPrimitive(this.renderSchematic));
 
+            if (this.selectedSubRegionName != null)
+            {
+                obj.add("selected_region", new JsonPrimitive(this.selectedSubRegionName));
+            }
+
             if (this.relativeSubRegionPlacements.isEmpty() == false)
             {
                 arr = new JsonArray();
@@ -416,6 +421,11 @@ public class SchematicPlacement
             else
             {
                 schematicPlacement.setBoxesBBColorNext();
+            }
+
+            if (JsonUtils.hasString(obj, "selected_region"))
+            {
+                schematicPlacement.selectedSubRegionName = JsonUtils.getString(obj, "selected_region");
             }
 
             JsonArray placementArr = obj.get("placements").getAsJsonArray();
