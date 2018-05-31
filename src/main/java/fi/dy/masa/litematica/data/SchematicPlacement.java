@@ -42,6 +42,7 @@ public class SchematicPlacement
     private boolean renderSchematic;
     private boolean regionPlacementsModified;
     private int boxesBBColor;
+    private final int subRegionCount;
     private Vec3f boxesBBColorVec = new Vec3f(0xFF, 0xFF, 0xFF);
     @Nullable
     private String selectedSubRegionName;
@@ -51,6 +52,7 @@ public class SchematicPlacement
         this.schematic = schematic;
         this.origin = origin;
         this.name = name;
+        this.subRegionCount = schematic.getSubRegionCount();
     }
 
     public static SchematicPlacement createFor(LitematicaSchematic schematic, BlockPos origin, String name)
@@ -105,6 +107,11 @@ public class SchematicPlacement
     public Vec3f getBoxesBBColor()
     {
         return this.boxesBBColorVec;
+    }
+
+    public int getSubRegionCount()
+    {
+        return this.subRegionCount;
     }
 
     public PlacementSettings getPlacementSettings()

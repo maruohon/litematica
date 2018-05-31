@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import fi.dy.masa.litematica.config.HudAlignment;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -56,6 +58,8 @@ public class ToolHud
         List<String> lines = this.lineList;
         lines.clear();
         String str;
+        String strYes = GuiLitematicaBase.TXT_GREEN + I18n.format("litematica.label.yes") + GuiLitematicaBase.TXT_RST;
+        String strNo = GuiLitematicaBase.TXT_RED + I18n.format("litematica.label.no") + GuiLitematicaBase.TXT_RST;
 
         if (mode == OperationMode.AREA_SELECTION)
         {
@@ -79,7 +83,27 @@ public class ToolHud
         }
         else if (mode == OperationMode.PLACEMENT)
         {
-            
+            SchematicPlacement placement = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+            if (placement != null)
+            {
+                str = I18n.format("litematica.hud.schematic_placement.selected_placement");
+                lines.add(String.format("%s: %s%s%s", str, WHITE, placement.getName(), RESET));
+
+                str = I18n.format("litematica.hud.schematic_placement.sub_region_count");
+                int count = placement.getSubRegionCount();
+                lines.add(String.format("%s: %s%d%s", str, GREEN, count, RESET));
+
+                str = I18n.format("litematica.hud.schematic_placement.sub_regions_modified");
+                String strTmp = placement.isRegionPlacementModified() ? strYes : strNo;
+                lines.add(String.format("%s: %s", str, strTmp));
+            }
+            else
+            {
+                String strTmp = "<" + I18n.format("litematica.label.none_lower") + ">";
+                str = I18n.format("litematica.hud.schematic_placement.selected_placement");
+                lines.add(String.format("%s: %s%s%s", str, WHITE, strTmp, RESET));
+            }
         }
 
         str = I18n.format("litematica.hud.selected_mode");

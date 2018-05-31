@@ -76,7 +76,16 @@ litematica.gui.title.schematic_browser=Schematic Browser
 litematica.hud.area_selection.box_count=Boxes
 litematica.hud.area_selection.origin=Origin
 litematica.hud.area_selection.selected_area=Area
+
+litematica.hud.schematic_placement.selected_placement=Placement
+litematica.hud.schematic_placement.sub_region_count=Regions
+litematica.hud.schematic_placement.sub_regions_modified=Regions modified
+
 litematica.hud.selected_mode=Mode
+
+litematica.label.none_lower=none
+litematica.label.no=no
+litematica.label.yes=yes
 
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
