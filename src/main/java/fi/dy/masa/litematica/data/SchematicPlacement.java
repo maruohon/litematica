@@ -175,7 +175,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             this.relativeSubRegionPlacements.get(regionName).setPos(newPos.subtract(this.origin));
-            this.regionPlacementsModified = true;
+            this.checkAreSubRegionsModified();
             this.updateRenderers();
         }
     }
@@ -185,7 +185,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             this.relativeSubRegionPlacements.get(regionName).setRotation(rotation);
-            this.regionPlacementsModified = true;
+            this.checkAreSubRegionsModified();
             this.updateRenderers();
         }
     }
@@ -195,7 +195,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
-            this.regionPlacementsModified = true;
+            this.checkAreSubRegionsModified();
             this.updateRenderers();
         }
     }
@@ -212,6 +212,33 @@ public class SchematicPlacement
         }
 
         this.updateRenderers();
+    }
+
+    public void checkAreSubRegionsModified()
+    {
+        Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
+
+        if (areaPositions.size() != this.relativeSubRegionPlacements.size())
+        {
+            this.regionPlacementsModified = true;
+            return;
+        }
+
+        for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
+        {
+            Placement placement = this.relativeSubRegionPlacements.get(entry.getKey());
+
+            if (placement == null ||
+                placement.getMirror() != Mirror.NONE ||
+                placement.getRotation() != Rotation.NONE ||
+                placement.getPos().equals(entry.getValue()) == false)
+            {
+                this.regionPlacementsModified = true;
+                return;
+            }
+        }
+
+        this.regionPlacementsModified = false;
     }
 
     public void setEnabled(boolean enabled)
@@ -407,6 +434,8 @@ public class SchematicPlacement
                     }
                 }
             }
+
+            schematicPlacement.checkAreSubRegionsModified();
 
             return schematicPlacement;
         }
