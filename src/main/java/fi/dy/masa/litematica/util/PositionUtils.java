@@ -37,12 +37,10 @@ public class PositionUtils
                pos.getZ() >= posMin.getZ() && pos.getZ() <= posMax.getZ();
     }
 
-    public static BlockPos getTransformedRelativePlacementPosition(BlockPos posRel, SchematicPlacement schematicPlacement, Placement placement)
+    public static BlockPos getTransformedRelativePlacementPosition(BlockPos pos, SchematicPlacement schematicPlacement, Placement placement)
     {
-        BlockPos pos;
-
-        pos = getTransformedBlockPos(posRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        pos = getTransformedBlockPos(posRel, placement.getMirror(), placement.getRotation());
+        pos = getTransformedBlockPos(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+        pos = getTransformedBlockPos(pos, placement.getMirror(), placement.getRotation());
 
         return pos;
     }

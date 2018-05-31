@@ -249,8 +249,8 @@ public class LitematicaSchematic
                         posMutable.setPos(posMin.getX() + x, posMin.getY() + y, posMin.getZ() + z);
                         BlockPos pos = PositionUtils.getTransformedRelativePlacementPosition(posMutable, schematicPlacement, placement).add(origin);
 
-                        state = state.withMirror(placement.getMirror());
-                        state = state.withRotation(placement.getRotation());
+                        state = state.withMirror(schematicPlacement.getMirror()).withMirror(placement.getMirror());
+                        state = state.withRotation(schematicPlacement.getRotation().add(placement.getRotation()));
 
                         if (teNBT != null)
                         {
