@@ -138,6 +138,12 @@ public class SchematicPlacement
     }
 
     @Nullable
+    public Placement getSelectedSubRegionPlacement()
+    {
+        return this.selectedSubRegionName != null ? this.relativeSubRegionPlacements.get(this.selectedSubRegionName) : null;
+    }
+
+    @Nullable
     public Placement getRelativeSubRegionPlacement(String areaName)
     {
         return this.relativeSubRegionPlacements.get(areaName);
@@ -177,6 +183,11 @@ public class SchematicPlacement
         return builder.build();
     }
 
+    /**
+     * Moves the sub-region to the given <b>absolute</b> position.
+     * @param regionName
+     * @param newPos
+     */
     public void moveSubRegionTo(String regionName, BlockPos newPos)
     {
         if (this.relativeSubRegionPlacements.containsKey(regionName))
@@ -202,6 +213,16 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
+            this.checkAreSubRegionsModified();
+            this.updateRenderers();
+        }
+    }
+
+    public void toggleSubRegionEnabled(String regionName)
+    {
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            this.relativeSubRegionPlacements.get(regionName).toggleEnabled();
             this.checkAreSubRegionsModified();
             this.updateRenderers();
         }
@@ -236,6 +257,7 @@ public class SchematicPlacement
             Placement placement = this.relativeSubRegionPlacements.get(entry.getKey());
 
             if (placement == null ||
+                placement.isEnabled() == false ||
                 placement.getMirror() != Mirror.NONE ||
                 placement.getRotation() != Rotation.NONE ||
                 placement.getPos().equals(entry.getValue()) == false)

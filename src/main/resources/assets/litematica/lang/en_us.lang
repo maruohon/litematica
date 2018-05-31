@@ -60,10 +60,14 @@ litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
 litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
+litematica.gui.placement_sub_region.label.region_position=Region position
+litematica.gui.placement_sub_region.button.slice_type=Slice: %s
+
 litematica.gui.label.placement_settings.placement_origin=Placement origin
 
 litematica.gui.title.area_selection_manager=Area Selection Manager
-litematica.gui.title.configure_placement=Configure Schematic placement
+litematica.gui.title.configure_schematic_placement=Configure Schematic placement
+litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
 litematica.gui.title.litematica_main_menu=Litematica Main Menu
 litematica.gui.title.load_schematic=Load Schematic
 litematica.gui.title.manage_loaded_schematics=Manage loaded Schematics

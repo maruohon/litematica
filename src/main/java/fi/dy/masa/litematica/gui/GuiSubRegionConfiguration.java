@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
@@ -14,15 +14,17 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class GuiPlacementConfiguration extends GuiLitematicaBase
+public class GuiSubRegionConfiguration extends GuiLitematicaBase
 {
-    private final SchematicPlacement placement;
+    private final SchematicPlacement schematicPlacement;
+    private final Placement placement;
     private int id;
 
-    public GuiPlacementConfiguration(SchematicPlacement placement)
+    public GuiSubRegionConfiguration(SchematicPlacement schematicPlacement, Placement placement)
     {
+        this.schematicPlacement = schematicPlacement;
         this.placement = placement;
-        this.title = I18n.format("litematica.gui.title.configure_schematic_placement");
+        this.title = I18n.format("litematica.gui.title.configure_schematic_sub_region");
     }
 
     @Override
@@ -35,13 +37,10 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         int x = this.width - width - 10;
         int y = 20;
 
-        this.createButton(x, y, width, ButtonListener.Type.REMOVE_PLACEMENT);
-        y += 22;
-
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
         y += 32;
 
-        String label = I18n.format("litematica.gui.label.placement_settings.placement_origin");
+        String label = I18n.format("litematica.gui.placement_sub_region.label.region_position");
         this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
         y += 20;
 
@@ -63,7 +62,8 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         this.createButton(x, y, width, ButtonListener.Type.MIRROR);
         y += 22;
 
-        this.createButton(x, y, width, ButtonListener.Type.RESET_SUB_REGIONS);
+        this.createButton(x, y, width, ButtonListener.Type.SLICE_TYPE);
+        y += 22;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
@@ -80,7 +80,8 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
         int offset = this.mc.fontRenderer.getStringWidth(label) + 4;
 
-        BlockPos pos = this.placement.getOrigin();
+        // The sub-region placements are relative
+        BlockPos pos = this.placement.getPos().add(this.schematicPlacement.getOrigin());
         String text = "";
 
         switch (type)
@@ -92,13 +93,13 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
         GuiTextFieldNumeric textField = new GuiTextFieldNumeric(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
-        TextFieldListener listener = new TextFieldListener(type, this.placement);
+        TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement);
         this.addtextField(textField, listener);
     }
 
     private void createButton(int x, int y, int width, ButtonListener.Type type)
     {
-        ButtonListener listener = new ButtonListener(type, this.placement, this);
+        ButtonListener listener = new ButtonListener(type, this.schematicPlacement, this.placement, this);
         String label = "";
 
         switch (type)
@@ -128,24 +129,12 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                     label = I18n.format("litematica.gui.button.enable");
                 break;
 
-            case RESET_SUB_REGIONS:
-                if (this.placement.isRegionPlacementModified())
-                {
-                    label = TXT_ORANGE + I18n.format("litematica.gui.button.reset_sub_region_placements") + TXT_RST;
-                }
-                else
-                {
-                    label = I18n.format("litematica.gui.button.reset_sub_region_placements");
-                    ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
-                    button.enabled = false;
-                    this.addButton(button, listener);
-                    return;
-                }
+            case SLICE_TYPE:
+            {
+                String value = "todo";
+                label = I18n.format("litematica.gui.placement_sub_region.button.slice_type", value);
                 break;
-
-            case REMOVE_PLACEMENT:
-                label = TXT_RED + I18n.format("litematica.gui.button.remove_placement") + TXT_RST;
-                break;
+            }
         }
 
         this.addButton(new ButtonGeneric(this.id++, x, y, width, 20, label), listener);
@@ -154,14 +143,18 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiLitematicaBase parent;
-        private final SchematicPlacement placement;
+        private final SchematicPlacement schematicPlacement;
+        private final Placement placement;
         private final Type type;
+        private final String subRegionName;
 
-        public ButtonListener(Type type, SchematicPlacement placement, GuiLitematicaBase parent)
+        public ButtonListener(Type type, SchematicPlacement schematicPlacement, Placement placement, GuiLitematicaBase parent)
         {
-            this.parent = parent;
-            this.placement = placement;
             this.type = type;
+            this.schematicPlacement = schematicPlacement;
+            this.placement = placement;
+            this.parent = parent;
+            this.subRegionName = schematicPlacement.getSelectedSubRegionName();
         }
 
         @Override
@@ -179,33 +172,26 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
-                    this.placement.setRotation(PositionUtils.cycleRotation(this.placement.getRotation(), reverse));
+                    this.schematicPlacement.setSubRegionRotation(this.subRegionName, PositionUtils.cycleRotation(this.placement.getRotation(), reverse));
                     break;
                 }
 
                 case MIRROR:
                 {
                     boolean reverse = mouseButton == 1;
-                    this.placement.setMirror(PositionUtils.cycleMirror(this.placement.getMirror(), reverse));
+                    this.schematicPlacement.setSubRegionMirror(this.subRegionName, PositionUtils.cycleMirror(this.placement.getMirror(), reverse));
                     break;
                 }
 
                 case MOVE_HERE:
-                    BlockPos pos = new BlockPos(mc.player.getPositionVector());
-                    this.placement.setOrigin(pos);
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(mc.player.getPositionVector()));
                     break;
 
                 case TOGGLE_ENABLED:
-                    this.placement.toggleEnabled();
+                    this.schematicPlacement.toggleSubRegionEnabled(this.subRegionName);
                     break;
 
-                case RESET_SUB_REGIONS:
-                    this.placement.resetSubRegionsToSchematicValues();
-                    break;
-
-                case REMOVE_PLACEMENT:
-                    DataManager.getInstance(mc.world).getSchematicPlacementManager().removeSchematicPlacement(this.placement);
-                    mc.displayGuiScreen(null);
+                case SLICE_TYPE:
                     break;
             }
 
@@ -214,24 +200,27 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
         public enum Type
         {
+            TOGGLE_ENABLED,
+            MOVE_HERE,
             ROTATE,
             MIRROR,
-            MOVE_HERE,
-            TOGGLE_ENABLED,
-            RESET_SUB_REGIONS,
-            REMOVE_PLACEMENT;
+            SLICE_TYPE;
         }
     }
 
     private static class TextFieldListener implements ITextFieldListener<GuiTextField>
     {
-        private final SchematicPlacement placement;
+        private final SchematicPlacement schematicPlacement;
+        private final Placement placement;
         private final CoordinateType type;
+        private final String subRegionName;
 
-        public TextFieldListener(CoordinateType type, SchematicPlacement placement)
+        public TextFieldListener(CoordinateType type, SchematicPlacement schematicPlacement, Placement placement)
         {
+            this.schematicPlacement = schematicPlacement;
             this.placement = placement;
             this.type = type;
+            this.subRegionName = schematicPlacement.getSelectedSubRegionName();
         }
 
         @Override
@@ -246,14 +235,19 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
             try
             {
                 int value = Integer.parseInt(textField.getText());
-                BlockPos posOld = this.placement.getOrigin();
+                // The sub-region placements are relative (but the setter below uses the
+                // absolute position and subtracts the placement origin internally)
+                BlockPos posOld = this.placement.getPos().add(this.schematicPlacement.getOrigin());
+                BlockPos pos = posOld;
 
                 switch (this.type)
                 {
-                    case X: this.placement.setOrigin(new BlockPos(value, posOld.getY(), posOld.getZ())); break;
-                    case Y: this.placement.setOrigin(new BlockPos(posOld.getX(), value, posOld.getZ())); break;
-                    case Z: this.placement.setOrigin(new BlockPos(posOld.getX(), posOld.getY(), value)); break;
+                    case X: pos = new BlockPos(value, posOld.getY(), posOld.getZ()); break;
+                    case Y: pos = new BlockPos(posOld.getX(), value, posOld.getZ()); break;
+                    case Z: pos = new BlockPos(posOld.getX(), posOld.getY(), value); break;
                 }
+
+                this.schematicPlacement.moveSubRegionTo(this.subRegionName, pos);
             }
             catch (NumberFormatException e)
             {

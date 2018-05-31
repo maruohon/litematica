@@ -4,11 +4,13 @@ import fi.dy.masa.litematica.config.hotkeys.IHotkeyCallback;
 import fi.dy.masa.litematica.config.hotkeys.IKeybind;
 import fi.dy.masa.litematica.config.hotkeys.KeyAction;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.event.RenderEventHandler;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import net.minecraft.client.Minecraft;
@@ -58,11 +60,20 @@ public class KeyCallbacks
             {
                 if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
                 {
-                    SchematicPlacement placement = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
+                    SchematicPlacement schematicPlacement = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-                    if (placement != null)
+                    if (schematicPlacement != null)
                     {
-                        this.mc.displayGuiScreen(new GuiPlacementConfiguration(placement));
+                        Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
+
+                        if (placement != null)
+                        {
+                            this.mc.displayGuiScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
+                        }
+                        else
+                        {
+                            this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
+                        }
                     }
                 }
                 else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_ACTIONS.getKeybind())

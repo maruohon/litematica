@@ -37,21 +37,12 @@ public class PositionUtils
                pos.getZ() >= posMin.getZ() && pos.getZ() <= posMax.getZ();
     }
 
-    public static BlockPos getTransformedRelativePlacementPosition(BlockPos pos, SchematicPlacement schematicPlacement, Placement placement)
+    public static BlockPos getTransformedPlacementPosition(BlockPos posWithinSub, SchematicPlacement schematicPlacement, Placement placement)
     {
+        BlockPos pos = posWithinSub;
         pos = getTransformedBlockPos(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         pos = getTransformedBlockPos(pos, placement.getMirror(), placement.getRotation());
-
         return pos;
-    }
-
-    public static boolean arePositionsWithinWorld(World world, BlockPos posRel1, BlockPos posRel2, BlockPos offset,
-            SchematicPlacement schematicPlacement, Placement placement)
-    {
-        BlockPos pos1 = getTransformedRelativePlacementPosition(posRel1, schematicPlacement, placement).add(offset);
-        BlockPos pos2 = getTransformedRelativePlacementPosition(posRel2, schematicPlacement, placement).add(offset);
-
-        return arePositionsWithinWorld(world, pos1, pos2);
     }
 
     public static boolean arePositionsWithinWorld(World world, BlockPos pos1, BlockPos pos2)

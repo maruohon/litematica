@@ -47,6 +47,11 @@ public class Placement
         this.enabled = enabled;
     }
 
+    public void toggleEnabled()
+    {
+        this.setEnabled(! this.isEnabled());
+    }
+
     public void setPos(BlockPos pos)
     {
         this.pos = pos;

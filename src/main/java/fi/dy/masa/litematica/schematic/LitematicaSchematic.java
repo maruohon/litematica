@@ -35,6 +35,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLongArray;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -223,16 +225,19 @@ public class LitematicaSchematic
             SchematicPlacement schematicPlacement, Placement placement,
             LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
     {
-        // These are the un-transformed relative positions
+        // These are the untransformed relative positions
         BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
-        BlockPos posMin = PositionUtils.getMinCorner(regionPos, posEndRel);
-        BlockPos posMax = PositionUtils.getMaxCorner(regionPos, posEndRel);
+        BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
+        BlockPos posMaxRel = PositionUtils.getMaxCorner(regionPos, posEndRel);
+        BlockPos posMinAbs = PositionUtils.getTransformedPlacementPosition(regionPos.subtract(posMinRel), schematicPlacement, placement).add(origin);
+        BlockPos posMaxAbs = PositionUtils.getTransformedPlacementPosition(regionPos.subtract(posMaxRel), schematicPlacement, placement).add(origin);
+        BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
 
-        if (PositionUtils.arePositionsWithinWorld(world, posMin, posMax, origin, schematicPlacement, placement))
+        if (PositionUtils.arePositionsWithinWorld(world, posMinAbs, posMaxAbs))
         {
-            final int sizeX = posMax.getX() - posMin.getX() + 1;
-            final int sizeY = posMax.getY() - posMin.getY() + 1;
-            final int sizeZ = posMax.getZ() - posMin.getZ() + 1;
+            final int sizeX = posMaxRel.getX() - posMinRel.getX() + 1;
+            final int sizeY = posMaxRel.getY() - posMinRel.getY() + 1;
+            final int sizeZ = posMaxRel.getZ() - posMinRel.getZ() + 1;
             BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
             for (int y = 0; y < sizeY; ++y)
@@ -243,7 +248,7 @@ public class LitematicaSchematic
                     {
                         IBlockState state = container.get(x, y, z);
 
-                        if (state.getMaterial() == Material.AIR)
+                        if (state.getBlock() == Blocks.AIR)
                         {
                             continue;
                         }
@@ -251,11 +256,21 @@ public class LitematicaSchematic
                         posMutable.setPos(x, y, z);
                         NBTTagCompound teNBT = tileMap.get(posMutable);
 
-                        posMutable.setPos(posMin.getX() + x, posMin.getY() + y, posMin.getZ() + z);
-                        BlockPos pos = PositionUtils.getTransformedRelativePlacementPosition(posMutable, schematicPlacement, placement).add(origin);
 
-                        state = state.withMirror(schematicPlacement.getMirror()).withMirror(placement.getMirror());
-                        state = state.withRotation(schematicPlacement.getRotation().add(placement.getRotation()));
+                        posMutable.setPos(  posMinRel.getX() + x - regionPos.getX(),
+                                            posMinRel.getY() + y - regionPos.getY(),
+                                            posMinRel.getZ() + z - regionPos.getZ());
+
+                        BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
+                        pos = pos.add(regionPosTransformed).add(origin);
+
+                        Mirror mirror = schematicPlacement.getMirror();
+                        if (mirror != Mirror.NONE) { state = state.withMirror(mirror); }
+                        mirror = placement.getMirror();
+                        if (mirror != Mirror.NONE) { state = state.withMirror(mirror); }
+
+                        Rotation rotation = schematicPlacement.getRotation().add(placement.getRotation());
+                        if (rotation != Rotation.NONE) { state = state.withRotation(rotation); }
 
                         if (teNBT != null)
                         {
@@ -298,8 +313,10 @@ public class LitematicaSchematic
                     {
                         for (int x = 0; x < sizeX; ++x)
                         {
-                            posMutable.setPos(posMin.getX() + x, posMin.getY() + y, posMin.getZ() + z);
-                            BlockPos pos = PositionUtils.getTransformedRelativePlacementPosition(posMutable, schematicPlacement, placement).add(origin);
+                            posMutable.setPos(  posMinRel.getX() + x - regionPos.getX(),
+                                                posMinRel.getY() + y - regionPos.getY(),
+                                                posMinRel.getZ() + z - regionPos.getZ());
+                            BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement).add(origin);
                             world.notifyNeighborsRespectDebug(pos, world.getBlockState(pos).getBlock(), false);
                         }
                     }
