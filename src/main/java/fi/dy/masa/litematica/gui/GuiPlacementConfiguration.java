@@ -33,32 +33,40 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         this.id = 0;
         int width = 120;
         int x = this.width - width - 10;
-        int y = 50;
+        int y = 20;
 
-        this.createButton(x, 20, width, ButtonListener.Type.REMOVE_PLACEMENT);
+        this.createButton(x, y, width, ButtonListener.Type.REMOVE_PLACEMENT);
+        y += 22;
+
+        this.createButton(x, y, width, ButtonListener.Type.SHOW_HIDE);
+        y += 32;
+
+        String label = I18n.format("litematica.gui.label.placement_settings.placement_origin");
+        this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
+        y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
-        y += 22;
+        y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Y);
-        y += 22;
+        y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Z);
-        y += 32;
+        y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.MOVE_HERE);
         y += 44;
-
-        this.createButton(x, y, width, ButtonListener.Type.SHOW_HIDE);
-        y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.ROTATE);
         y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.MIRROR);
+        y += 22;
+
+        this.createButton(x, y, width, ButtonListener.Type.RESET_SUB_REGIONS);
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        String label = I18n.format(type.getLabelKey());
+        label = I18n.format(type.getLabelKey());
         int buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         y = this.height - 36;
@@ -90,6 +98,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
     private void createButton(int x, int y, int width, ButtonListener.Type type)
     {
+        ButtonListener listener = new ButtonListener(type, this.placement, this);
         String label = "";
 
         switch (type)
@@ -119,14 +128,27 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                     label = I18n.format("litematica.gui.button.enable");
                 break;
 
+            case RESET_SUB_REGIONS:
+                if (this.placement.isRegionPlacementModified())
+                {
+                    label = TXT_ORANGE + I18n.format("litematica.gui.button.reset_sub_region_placements") + TXT_RST;
+                }
+                else
+                {
+                    label = I18n.format("litematica.gui.button.reset_sub_region_placements");
+                    ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+                    button.enabled = false;
+                    this.addButton(button, listener);
+                    return;
+                }
+                break;
+
             case REMOVE_PLACEMENT:
-                label = I18n.format("litematica.gui.button.remove_placement");
+                label = TXT_RED + I18n.format("litematica.gui.button.remove_placement") + TXT_RST;
                 break;
         }
 
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
-        ButtonListener listener = new ButtonListener(type, this.placement, this);
-        this.addButton(button, listener);
+        this.addButton(new ButtonGeneric(this.id++, x, y, width, 20, label), listener);
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
@@ -177,6 +199,10 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                     this.placement.toggleEnabled();
                     break;
 
+                case RESET_SUB_REGIONS:
+                    this.placement.resetSubRegionsToSchematicValues();
+                    break;
+
                 case REMOVE_PLACEMENT:
                     DataManager.getInstance(mc.world).getSchematicPlacementManager().removeSchematicPlacement(this.placement);
                     mc.displayGuiScreen(null);
@@ -192,6 +218,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
             MIRROR,
             MOVE_HERE,
             SHOW_HIDE,
+            RESET_SUB_REGIONS,
             REMOVE_PLACEMENT;
         }
     }

@@ -28,11 +28,21 @@ import net.minecraft.util.text.TextFormatting;
 
 public abstract class GuiLitematicaBase extends GuiScreen implements IMessageConsumer, IStringConsumer
 {
+    public static final String TXT_BLUE = TextFormatting.BLUE.toString();
+    public static final String TXT_GREEN = TextFormatting.GREEN.toString();
+    public static final String TXT_ORANGE = TextFormatting.GOLD.toString();
+    public static final String TXT_RED = TextFormatting.RED.toString();
+    public static final String TXT_WHITE = TextFormatting.WHITE.toString();
+    public static final String TXT_RST = TextFormatting.RESET.toString();
+
+    public static final String TXT_DARK_GREEN = TextFormatting.DARK_GREEN.toString();
+    public static final String TXT_DARK_RED = TextFormatting.DARK_RED.toString();
+
     protected static final String BUTTON_LABEL_ADD = TextFormatting.DARK_GREEN + "+" + TextFormatting.RESET;
     protected static final String BUTTON_LABEL_REMOVE = TextFormatting.DARK_RED + "-" + TextFormatting.RESET;
 
-    protected static final int WHITE                = 0xFFFFFFFF;
-    protected static final int TOOLTIP_BACKGROUND   = 0xB0000000;
+    protected static final int COLOR_WHITE          = 0xFFFFFFFF;
+    protected static final int TOOLTIP_BACKGROUND   = 0x80000000;
     protected static final int COLOR_HORIZONTAL_BAR = 0xFF999999;
     protected static final int LEFT         = 20;
     protected static final int TOP          = 10;
@@ -289,9 +299,12 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         this.mc.getTextureManager().bindTexture(texture);
     }
 
-    protected <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
+    protected <T extends ButtonBase> ButtonEntry<T> addButton(T button, IButtonActionListener<T> listener)
     {
-        this.buttons.add(new ButtonEntry<>(button, listener));
+        ButtonEntry<T> entry = new ButtonEntry<>(button, listener);
+        this.buttons.add(entry);
+
+        return entry;
     }
 
     protected <T extends GuiTextField> void addtextField(T textField, @Nullable ITextFieldListener<T> listener)
@@ -395,7 +408,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         //this.innerTop = TOP - this.scrollBar.getValue();
 
         // Draw panel title
-        this.mc.fontRenderer.drawString(this.getTitle(), LEFT, TOP, WHITE);
+        this.mc.fontRenderer.drawString(this.getTitle(), LEFT, TOP, COLOR_WHITE);
 
         // Draw top and bottom horizontal bars
         //drawRect(MARGIN, TOP - 4, this.innerWidth + MARGIN, TOP - 3, COLOR_HORIZONTAL_BAR);

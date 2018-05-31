@@ -4,9 +4,11 @@ import fi.dy.masa.litematica.config.hotkeys.IHotkeyCallback;
 import fi.dy.masa.litematica.config.hotkeys.IKeybind;
 import fi.dy.masa.litematica.config.hotkeys.KeyAction;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.event.RenderEventHandler;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
+import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import net.minecraft.client.Minecraft;
@@ -25,6 +27,7 @@ public class KeyCallbacks
         IHotkeyCallback callbackGeneric = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
 
+        Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind().setCallback(callbackGeneric);
         Hotkeys.OPEN_GUI_SCHEMATIC_ACTIONS.getKeybind().setCallback(callbackGeneric);
         Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind().setCallback(callbackGeneric);
 
@@ -53,7 +56,16 @@ public class KeyCallbacks
         {
             if (action == KeyAction.PRESS)
             {
-                if (key == Hotkeys.OPEN_GUI_SCHEMATIC_ACTIONS.getKeybind())
+                if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
+                {
+                    SchematicPlacement placement = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                    if (placement != null)
+                    {
+                        this.mc.displayGuiScreen(new GuiPlacementConfiguration(placement));
+                    }
+                }
+                else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_ACTIONS.getKeybind())
                 {
                     this.mc.displayGuiScreen(new GuiMainMenu());
                 }

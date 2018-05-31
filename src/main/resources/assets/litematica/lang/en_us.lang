@@ -43,6 +43,7 @@ litematica.gui.button.move_here=Move here
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
 litematica.gui.button.reset=Reset
+litematica.gui.button.reset_sub_region_placements=Reset sub-regions
 litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_area_to_schematic=Save Area
 litematica.gui.button.save_to_file=Save to file
@@ -58,6 +59,8 @@ litematica.gui.label.schematic_info.time_created=Created: §f%s§r
 litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
 litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
+
+litematica.gui.label.placement_settings.placement_origin=Placement origin
 
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_placement=Configure Schematic placement

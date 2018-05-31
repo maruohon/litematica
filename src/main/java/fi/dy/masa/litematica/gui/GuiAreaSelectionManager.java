@@ -95,7 +95,7 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
             label += ", " + I18n.format("litematica.gui.label.area_selection_origin", strOrigin);
             int w = this.fontRenderer.getStringWidth(label);
-            this.addLabel(id++, x + 28, y, w, 20, WHITE, label);
+            this.addLabel(id++, x + 28, y, w, 20, COLOR_WHITE, label);
             y += button.getButtonHeight() + 2;
         }
 
