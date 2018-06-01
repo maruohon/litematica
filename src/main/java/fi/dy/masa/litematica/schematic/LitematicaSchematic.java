@@ -21,7 +21,6 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.Constants;
 import fi.dy.masa.litematica.util.NBTUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -209,7 +208,7 @@ public class LitematicaSchematic
                 if (regionPos != null && regionSize != null && container != null && tileMap != null && entityList != null)
                 {
                     this.placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, container, tileMap, notifyNeighbors);
-                    this.placeEntitiesToWorld(world, origin, schematicPlacement, placement, entityList);
+                    this.placeEntitiesToWorld(world, origin, regionPos, schematicPlacement, placement, entityList);
                 }
                 else
                 {
@@ -325,8 +324,13 @@ public class LitematicaSchematic
         }
     }
 
-    private void placeEntitiesToWorld(World world, BlockPos origin, SchematicPlacement schematicPlacement, Placement placement, List<EntityInfo> entityList)
+    private void placeEntitiesToWorld(World world, BlockPos origin, BlockPos regionPos, SchematicPlacement schematicPlacement, Placement placement, List<EntityInfo> entityList)
     {
+        BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+        final int offX = regionPosRelTransformed.getX() + origin.getX();
+        final int offY = regionPosRelTransformed.getY() + origin.getY();
+        final int offZ = regionPosRelTransformed.getZ() + origin.getZ();
+
         for (EntityInfo info : entityList)
         {
             Entity entity = EntityList.createEntityFromNBT(info.nbt, world);
@@ -337,7 +341,7 @@ public class LitematicaSchematic
                 pos = PositionUtils.transformedVec3d(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 pos = PositionUtils.transformedVec3d(pos, placement.getMirror(), placement.getRotation());
 
-                entity.setLocationAndAngles(pos.x + origin.getX(), pos.y + origin.getY(), pos.z + origin.getZ(), entity.rotationYaw, entity.rotationPitch);
+                entity.setLocationAndAngles(pos.x + offX, pos.y + offY, pos.z + offZ, entity.rotationYaw, entity.rotationPitch);
                 world.spawnEntity(entity);
 
                 entity.prevRotationYaw = entity.rotationYaw;
@@ -351,8 +355,9 @@ public class LitematicaSchematic
     {
         for (Box box : boxes)
         {
-            List<EntityInfo> list = new ArrayList<>();
             AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+            BlockPos regionPosAbs = box.getPos1();
+            List<EntityInfo> list = new ArrayList<>();
             List<Entity> entities = world.getEntitiesInAABBexcluding(null, bb, null);
 
             for (Entity entity : entities)
@@ -361,12 +366,12 @@ public class LitematicaSchematic
 
                 if (entity.writeToNBTOptional(tag))
                 {
-                    Vec3d posVec = new Vec3d(entity.posX - origin.getX(), entity.posY - origin.getY(), entity.posZ - origin.getZ());
+                    Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
                     BlockPos pos;
 
                     if (entity instanceof EntityPainting)
                     {
-                        pos = ((EntityPainting) entity).getHangingPosition().subtract(origin);
+                        pos = ((EntityPainting) entity).getHangingPosition().subtract(regionPosAbs);
                     }
                     else
                     {
@@ -412,8 +417,7 @@ public class LitematicaSchematic
                         IBlockState state = world.getBlockState(posMutable).getActualState(world, posMutable);
                         container.set(x, y, z, state);
 
-                        // TODO Should just call world.isAirBlock() to be (better) Forge-mod compatible?
-                        if (state.getMaterial() != Material.AIR)
+                        if (state.getBlock() != Blocks.AIR)
                         {
                             this.totalBlocks++;
                         }
