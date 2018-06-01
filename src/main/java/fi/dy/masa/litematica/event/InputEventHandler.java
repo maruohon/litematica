@@ -17,6 +17,7 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
@@ -119,6 +120,7 @@ public class InputEventHandler
             EntityPlayer player = this.mc.player;
             final int dWheel = Mouse.getEventDWheel() / 120;
             final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.toolItem.getItem());
+            OperationMode mode = DataManager.getOperationMode();
 
             if (hasTool == false)
             {
@@ -129,16 +131,25 @@ public class InputEventHandler
             {
                 if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
                 {
-                    SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
+                    if (mode == OperationMode.AREA_SELECTION)
+                    {
+                        SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 
-                    if (sm.hasGrabbedElement())
-                    {
-                        sm.changeGrabDistance(player, dWheel);
-                        return true;
+                        if (sm.hasGrabbedElement())
+                        {
+                            sm.changeGrabDistance(player, dWheel);
+                            return true;
+                        }
+                        else if (sm.hasSelectedElement() || (sm.getCurrentSelection() != null && sm.getCurrentSelection().isOriginSelected()))
+                        {
+                            sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), dWheel);
+                            return true;
+                        }
                     }
-                    else if (sm.hasSelectedElement() || (sm.getCurrentSelection() != null && sm.getCurrentSelection().isOriginSelected()))
+                    else if (mode == OperationMode.PLACEMENT)
                     {
-                        sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), dWheel);
+                        EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
+                        DataManager.getInstance(world).getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, dWheel);
                         return true;
                     }
                 }
@@ -151,7 +162,6 @@ public class InputEventHandler
             else if (Mouse.getEventButtonState() && RenderEventHandler.getInstance().isEnabled())
             {
                 final int button = Mouse.getEventButton();
-                OperationMode mode = DataManager.getOperationMode();
 
                 boolean isLeftClick = mouseEventIsAttack(this.mc, button);
                 boolean isRightClick = mouseEventIsUse(this.mc, button);

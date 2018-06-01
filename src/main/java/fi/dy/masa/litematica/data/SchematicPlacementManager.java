@@ -20,6 +20,7 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -204,6 +205,34 @@ public class SchematicPlacementManager
                 }
 
                 placement.updateRenderers();
+            }
+        }
+    }
+
+    public void nudgePositionOfCurrentSelection(EnumFacing direction, int amount)
+    {
+        SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
+
+        if (schematicPlacement != null)
+        {
+            boolean movingBox = schematicPlacement.getSelectedSubRegionName() != null;
+
+            if (movingBox)
+            {
+                Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
+
+                if (placement != null)
+                {
+                    // getPos returns a relative position, but moveSubRegionTo takes an absolute position...
+                    BlockPos old = placement.getPos().add(schematicPlacement.getOrigin());
+                    schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), old.offset(direction, amount));
+                }
+            }
+            // Moving the origin point
+            else if (this.originSelected)
+            {
+                BlockPos old = schematicPlacement.getOrigin();
+                schematicPlacement.setOrigin(old.offset(direction, amount));
             }
         }
     }
