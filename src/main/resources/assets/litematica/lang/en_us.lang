@@ -43,7 +43,6 @@ litematica.gui.button.move_here=Move here
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
 litematica.gui.button.reset=Reset
-litematica.gui.button.reset_sub_region_placements=Reset sub-regions
 litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_area_to_schematic=Save Area
 litematica.gui.button.save_to_file=Save to file
@@ -61,7 +60,10 @@ litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
 litematica.gui.placement_sub_region.label.region_position=Region position
+litematica.gui.placement_sub_region.button.reset_sub_region_placement=Reset placement
 litematica.gui.placement_sub_region.button.slice_type=Slice: %s
+
+litematica.gui.schematic_placement.button.reset_sub_region_placements=Reset sub-regions
 
 litematica.gui.label.placement_settings.placement_origin=Placement origin
 
@@ -80,9 +82,12 @@ litematica.gui.title.schematic_browser=Schematic Browser
 litematica.hud.area_selection.box_count=Boxes
 litematica.hud.area_selection.origin=Origin
 litematica.hud.area_selection.selected_area=Area
+litematica.hud.area_selection.selected_sub_region=Sub-region
 
 litematica.hud.schematic_placement.selected_placement=Placement
+litematica.hud.schematic_placement.selected_sub_region=Sub-region
 litematica.hud.schematic_placement.sub_region_count=Regions
+litematica.hud.schematic_placement.sub_region_modified=Region modified
 litematica.hud.schematic_placement.sub_regions_modified=Regions modified
 
 litematica.hud.selected_mode=Mode

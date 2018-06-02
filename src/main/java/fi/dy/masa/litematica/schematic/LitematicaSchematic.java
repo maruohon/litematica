@@ -82,6 +82,12 @@ public class LitematicaSchematic
         return this.blockContainers.size();
     }
 
+    @Nullable
+    public BlockPos getSubRegionPosition(String areaName)
+    {
+        return this.subRegionPositions.get(areaName);
+    }
+
     public Map<String, BlockPos> getAreaPositions()
     {
         ImmutableMap.Builder<String, BlockPos> builder = ImmutableMap.builder();

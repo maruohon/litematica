@@ -125,20 +125,20 @@ public class OverlayRenderer
 
             for (Map.Entry<SchematicPlacement, ImmutableMap<String, Box>> entry : this.placements.entrySet())
             {
-                SchematicPlacement placement = entry.getKey();
+                SchematicPlacement schematicPlacement = entry.getKey();
                 ImmutableMap<String, Box> boxMap = entry.getValue();
                 boolean origin = spm.isOriginSelected();
 
                 for (Map.Entry<String, Box> entryBox : boxMap.entrySet())
                 {
                     String boxName = entryBox.getKey();
-                    boolean boxSelected = placement == currentPlacement && (origin || boxName.equals(placement.getSelectedSubRegionName()));
+                    boolean boxSelected = schematicPlacement == currentPlacement && (origin || boxName.equals(schematicPlacement.getSelectedSubRegionName()));
                     BoxType type = boxSelected ? BoxType.PLACEMENT_SELECTED : BoxType.PLACEMENT_UNSELECTED;
-                    this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, placement);
+                    this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, schematicPlacement);
                 }
 
-                Vec3f color = placement == currentPlacement && origin ? this.colorSelectedCorner : placement.getBoxesBBColor();
-                RenderUtils.renderBlockOutline(placement.getOrigin(), expand, 2f, color, renderViewEntity, partialTicks);
+                Vec3f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
+                RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, 2f, color, renderViewEntity, partialTicks);
             }
         }
 

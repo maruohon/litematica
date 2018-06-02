@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 public class GuiPlacementConfiguration extends GuiLitematicaBase
 {
     private final SchematicPlacement placement;
+    private ButtonGeneric buttonResetPlacement;
     private int id;
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
@@ -72,6 +73,8 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         y = this.height - 36;
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
+
+        this.updateElements();
     }
 
     private void createCoordinateInput(int x, int y, int width, CoordinateType type)
@@ -92,7 +95,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
         GuiTextFieldNumeric textField = new GuiTextFieldNumeric(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
-        TextFieldListener listener = new TextFieldListener(type, this.placement);
+        TextFieldListener listener = new TextFieldListener(type, this.placement, this);
         this.addtextField(textField, listener);
     }
 
@@ -129,18 +132,6 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                 break;
 
             case RESET_SUB_REGIONS:
-                if (this.placement.isRegionPlacementModified())
-                {
-                    label = TXT_ORANGE + I18n.format("litematica.gui.button.reset_sub_region_placements") + TXT_RST;
-                }
-                else
-                {
-                    label = I18n.format("litematica.gui.button.reset_sub_region_placements");
-                    ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
-                    button.enabled = false;
-                    this.addButton(button, listener);
-                    return;
-                }
                 break;
 
             case REMOVE_PLACEMENT:
@@ -148,7 +139,31 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                 break;
         }
 
-        this.addButton(new ButtonGeneric(this.id++, x, y, width, 20, label), listener);
+        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+        this.addButton(button, listener);
+
+        if (type == ButtonListener.Type.RESET_SUB_REGIONS)
+        {
+            this.buttonResetPlacement = button;
+        }
+    }
+
+    private void updateElements()
+    {
+        String label = I18n.format("litematica.gui.schematic_placement.button.reset_sub_region_placements");;
+        boolean enabled = true;
+
+        if (this.placement.isRegionPlacementModified())
+        {
+            label = TXT_ORANGE + label + TXT_RST;
+        }
+        else
+        {
+            enabled = false;
+        }
+
+        this.buttonResetPlacement.displayString = label;
+        this.buttonResetPlacement.enabled = enabled;
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
@@ -200,7 +215,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                     break;
 
                 case RESET_SUB_REGIONS:
-                    this.placement.resetSubRegionsToSchematicValues();
+                    this.placement.resetAllSubRegionsToSchematicValues();
                     break;
 
                 case REMOVE_PLACEMENT:
@@ -225,13 +240,15 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
     private static class TextFieldListener implements ITextFieldListener<GuiTextField>
     {
+        private final GuiPlacementConfiguration parent;
         private final SchematicPlacement placement;
         private final CoordinateType type;
 
-        public TextFieldListener(CoordinateType type, SchematicPlacement placement)
+        public TextFieldListener(CoordinateType type, SchematicPlacement placement, GuiPlacementConfiguration parent)
         {
             this.placement = placement;
             this.type = type;
+            this.parent = parent;
         }
 
         @Override
@@ -254,6 +271,8 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                     case Y: this.placement.setOrigin(new BlockPos(posOld.getX(), value, posOld.getZ())); break;
                     case Z: this.placement.setOrigin(new BlockPos(posOld.getX(), posOld.getY(), value)); break;
                 }
+
+                this.parent.updateElements();
             }
             catch (NumberFormatException e)
             {

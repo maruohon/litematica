@@ -18,6 +18,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
 {
     private final SchematicPlacement schematicPlacement;
     private final Placement placement;
+    private ButtonGeneric buttonResetPlacement;
     private int id;
 
     public GuiSubRegionConfiguration(SchematicPlacement schematicPlacement, Placement placement)
@@ -62,6 +63,9 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
         this.createButton(x, y, width, ButtonListener.Type.MIRROR);
         y += 22;
 
+        this.createButton(x, y, width, ButtonListener.Type.RESET_PLACEMENT);
+        y += 22;
+
         this.createButton(x, y, width, ButtonListener.Type.SLICE_TYPE);
         y += 22;
 
@@ -72,6 +76,8 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
         y = this.height - 36;
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
+
+        this.updateElements();
     }
 
     private void createCoordinateInput(int x, int y, int width, CoordinateType type)
@@ -93,7 +99,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
 
         GuiTextFieldNumeric textField = new GuiTextFieldNumeric(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
-        TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement);
+        TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
         this.addtextField(textField, listener);
     }
 
@@ -129,6 +135,9 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
                     label = I18n.format("litematica.gui.button.enable");
                 break;
 
+            case RESET_PLACEMENT:
+                break;
+
             case SLICE_TYPE:
             {
                 String value = "todo";
@@ -137,7 +146,33 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
             }
         }
 
-        this.addButton(new ButtonGeneric(this.id++, x, y, width, 20, label), listener);
+        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+        this.addButton(button, listener);
+
+        if (type == ButtonListener.Type.RESET_PLACEMENT)
+        {
+            this.buttonResetPlacement = button;
+        }
+    }
+
+    private void updateElements()
+    {
+        String areaName = this.placement.getName();
+        BlockPos posOriginal = this.schematicPlacement.getSchematic().getSubRegionPosition(areaName);
+        String label = I18n.format("litematica.gui.placement_sub_region.button.reset_sub_region_placement");
+        boolean enabled = true;
+
+        if (this.placement.isRegionPlacementModified(posOriginal))
+        {
+            label = TXT_ORANGE + label + TXT_RST;
+        }
+        else
+        {
+            enabled = false;
+        }
+
+        this.buttonResetPlacement.displayString = label;
+        this.buttonResetPlacement.enabled = enabled;
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
@@ -154,7 +189,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
             this.schematicPlacement = schematicPlacement;
             this.placement = placement;
             this.parent = parent;
-            this.subRegionName = schematicPlacement.getSelectedSubRegionName();
+            this.subRegionName = placement.getName();
         }
 
         @Override
@@ -191,6 +226,10 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
                     this.schematicPlacement.toggleSubRegionEnabled(this.subRegionName);
                     break;
 
+                case RESET_PLACEMENT:
+                    this.schematicPlacement.resetSubRegionToSchematicValues(this.subRegionName);
+                    break;
+
                 case SLICE_TYPE:
                     break;
             }
@@ -204,23 +243,24 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
             MOVE_HERE,
             ROTATE,
             MIRROR,
+            RESET_PLACEMENT,
             SLICE_TYPE;
         }
     }
 
     private static class TextFieldListener implements ITextFieldListener<GuiTextField>
     {
+        private final GuiSubRegionConfiguration parent;
         private final SchematicPlacement schematicPlacement;
         private final Placement placement;
         private final CoordinateType type;
-        private final String subRegionName;
 
-        public TextFieldListener(CoordinateType type, SchematicPlacement schematicPlacement, Placement placement)
+        public TextFieldListener(CoordinateType type, SchematicPlacement schematicPlacement, Placement placement, GuiSubRegionConfiguration parent)
         {
             this.schematicPlacement = schematicPlacement;
             this.placement = placement;
             this.type = type;
-            this.subRegionName = schematicPlacement.getSelectedSubRegionName();
+            this.parent = parent;
         }
 
         @Override
@@ -247,7 +287,8 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
                     case Z: pos = new BlockPos(posOld.getX(), posOld.getY(), value); break;
                 }
 
-                this.schematicPlacement.moveSubRegionTo(this.subRegionName, pos);
+                this.schematicPlacement.moveSubRegionTo(this.placement.getName(), pos);
+                this.parent.updateElements();
             }
             catch (NumberFormatException e)
             {

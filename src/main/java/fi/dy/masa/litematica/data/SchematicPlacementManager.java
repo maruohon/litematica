@@ -163,11 +163,11 @@ public class SchematicPlacementManager
 
     public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, double maxDistance)
     {
-        SchematicPlacement placement = this.getSelectedSchematicPlacement();
+        SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
-        if (placement != null)
+        if (schematicPlacement != null)
         {
-            boolean movingBox = placement.getSelectedSubRegionName() != null;
+            boolean movingBox = schematicPlacement.getSelectedSubRegionPlacement() != null;
             boolean movingOrigin = this.originSelected;
 
             if (movingBox || movingOrigin)
@@ -189,7 +189,7 @@ public class SchematicPlacementManager
 
                 if (movingBox)
                 {
-                    placement.moveSubRegionTo(placement.getSelectedSubRegionName(), pos);
+                    schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), pos);
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                     KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_subregion_to", posStr);
@@ -197,14 +197,14 @@ public class SchematicPlacementManager
                 // Moving the origin point
                 else
                 {
-                    BlockPos old = placement.getOrigin();
-                    placement.setOrigin(pos);
+                    BlockPos old = schematicPlacement.getOrigin();
+                    schematicPlacement.setOrigin(pos);
                     String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
                     String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                     KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
                 }
 
-                placement.updateRenderers();
+                schematicPlacement.updateRenderers();
             }
         }
     }
@@ -215,18 +215,13 @@ public class SchematicPlacementManager
 
         if (schematicPlacement != null)
         {
-            boolean movingBox = schematicPlacement.getSelectedSubRegionName() != null;
+            Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
-            if (movingBox)
+            if (placement != null)
             {
-                Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
-
-                if (placement != null)
-                {
-                    // getPos returns a relative position, but moveSubRegionTo takes an absolute position...
-                    BlockPos old = placement.getPos().add(schematicPlacement.getOrigin());
-                    schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), old.offset(direction, amount));
-                }
+                // getPos returns a relative position, but moveSubRegionTo takes an absolute position...
+                BlockPos old = placement.getPos().add(schematicPlacement.getOrigin());
+                schematicPlacement.moveSubRegionTo(placement.getName(), old.offset(direction, amount));
             }
             // Moving the origin point
             else if (this.originSelected)

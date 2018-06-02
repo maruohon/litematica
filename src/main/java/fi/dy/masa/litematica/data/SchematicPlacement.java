@@ -59,7 +59,7 @@ public class SchematicPlacement
     {
         SchematicPlacement placement = new SchematicPlacement(schematic, origin, name);
         placement.setBoxesBBColorNext();
-        placement.resetSubRegionsToSchematicValues();
+        placement.resetAllSubRegionsToSchematicValues();
 
         return placement;
     }
@@ -228,7 +228,7 @@ public class SchematicPlacement
         }
     }
 
-    public void resetSubRegionsToSchematicValues()
+    public void resetAllSubRegionsToSchematicValues()
     {
         Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
         this.relativeSubRegionPlacements.clear();
@@ -236,10 +236,23 @@ public class SchematicPlacement
 
         for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
         {
-            this.relativeSubRegionPlacements.put(entry.getKey(), new Placement(entry.getValue()));
+            String name = entry.getKey();
+            this.relativeSubRegionPlacements.put(name, new Placement(entry.getValue(), name));
         }
 
         this.updateRenderers();
+    }
+
+    public void resetSubRegionToSchematicValues(String regionName)
+    {
+        BlockPos pos = this.schematic.getSubRegionPosition(regionName);
+
+        if (pos != null && this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            this.relativeSubRegionPlacements.put(regionName, new Placement(pos, regionName));
+            this.checkAreSubRegionsModified();
+            this.updateRenderers();
+        }
     }
 
     public void checkAreSubRegionsModified()
@@ -256,11 +269,7 @@ public class SchematicPlacement
         {
             Placement placement = this.relativeSubRegionPlacements.get(entry.getKey());
 
-            if (placement == null ||
-                placement.isEnabled() == false ||
-                placement.getMirror() != Mirror.NONE ||
-                placement.getRotation() != Rotation.NONE ||
-                placement.getPos().equals(entry.getValue()) == false)
+            if (placement == null || placement.isRegionPlacementModified(entry.getValue()))
             {
                 this.regionPlacementsModified = true;
                 return;

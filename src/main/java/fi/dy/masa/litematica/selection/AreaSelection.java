@@ -67,9 +67,10 @@ public class AreaSelection
         this.name = name;
     }
 
+    @Nullable
     public String getCurrentSubRegionBoxName()
     {
-        return this.currentBox != null ? this.currentBox : "";
+        return this.currentBox;
     }
 
     public boolean setSelectedSubRegionBox(@Nullable String name)

@@ -12,19 +12,26 @@ import net.minecraft.util.math.BlockPos;
 
 public class Placement
 {
+    private final String name;
     private BlockPos pos;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
     private boolean enabled = true;
 
-    public Placement(BlockPos pos)
+    public Placement(BlockPos pos, String name)
     {
         this.pos = pos;
+        this.name = name;
     }
 
     public boolean isEnabled()
     {
         return this.enabled;
+    }
+
+    public String getName()
+    {
+        return this.name;
     }
 
     public BlockPos getPos()
@@ -67,6 +74,14 @@ public class Placement
         this.mirror = mirror;
     }
 
+    public boolean isRegionPlacementModified(BlockPos originalPosition)
+    {
+        return this.isEnabled() == false ||
+               this.getMirror() != Mirror.NONE ||
+               this.getRotation() != Rotation.NONE ||
+               this.getPos().equals(originalPosition) == false;
+    }
+
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
@@ -88,6 +103,7 @@ public class Placement
     public static Placement fromJson(JsonObject obj)
     {
         if (JsonUtils.hasArray(obj, "pos") &&
+            JsonUtils.hasString(obj, "name") &&
             JsonUtils.hasString(obj, "rotation") &&
             JsonUtils.hasString(obj, "mirror"))
         {
@@ -100,7 +116,7 @@ public class Placement
             }
 
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
-            Placement placement = new Placement(pos);
+            Placement placement = new Placement(pos, obj.get("name").getAsString());
             placement.setEnabled(JsonUtils.getBoolean(obj, "enabled"));
 
             try

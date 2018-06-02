@@ -125,7 +125,7 @@ public class KeyCallbacks
                     {
                         String name = selection.getCurrentSubRegionBoxName();
 
-                        if (selection.removeSelectedSubRegionBox())
+                        if (name != null && selection.removeSelectedSubRegionBox())
                         {
                             KeyCallbacks.printMessage(this.mc, "litematica.message.removed_selection_box", name);
                         }

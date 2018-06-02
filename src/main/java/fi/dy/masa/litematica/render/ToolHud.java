@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import fi.dy.masa.litematica.config.HudAlignment;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -64,39 +65,64 @@ public class ToolHud
         if (mode == OperationMode.AREA_SELECTION)
         {
             SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-            str = I18n.format("litematica.hud.area_selection.selected_area");
             AreaSelection selection = sm.getCurrentSelection();
 
             if (selection != null)
             {
+                str = I18n.format("litematica.hud.area_selection.selected_area");
                 String strTmp = sm.getCurrentSelectionName();
-                lines.add(String.format("%s: %s%s%s", str, WHITE_ITA, strTmp, RESET));
+                lines.add(String.format("%s: %s%s%s", str, GREEN, strTmp, RESET));
 
                 str = I18n.format("litematica.hud.area_selection.box_count");
                 int count = selection.getAllSubRegionBoxes().size();
-                lines.add(String.format("%s: %s%d%s", str, GREEN, count, RESET));
-
+                String strBoxes = String.format("%s: %s%d%s", str, GREEN, count, RESET);
                 BlockPos or = selection.getOrigin();
                 str = I18n.format("litematica.hud.area_selection.origin");
-                lines.add(String.format("%s: x: %s%d%s y: %s%d%s z: %s%d%s", str, GREEN, or.getX(), WHITE, GREEN, or.getY(), WHITE, GREEN, or.getZ(), RESET));
+                String strOrigin = String.format("%s: %s%d%s, %s%d%s, %s%d%s", str, GREEN, or.getX(), WHITE, GREEN, or.getY(), WHITE, GREEN, or.getZ(), RESET);
+                lines.add(strOrigin + " - " + strBoxes);
+
+                String subRegionName = selection.getCurrentSubRegionBoxName();
+
+                if (subRegionName != null)
+                {
+                    str = I18n.format("litematica.hud.area_selection.selected_sub_region");
+                    lines.add(String.format("%s: %s%s%s", str, GREEN, subRegionName, RESET));
+                }
             }
         }
         else if (mode == OperationMode.PLACEMENT)
         {
-            SchematicPlacement placement = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
+            SchematicPlacement schematicPlacement = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-            if (placement != null)
+            if (schematicPlacement != null)
             {
                 str = I18n.format("litematica.hud.schematic_placement.selected_placement");
-                lines.add(String.format("%s: %s%s%s", str, WHITE, placement.getName(), RESET));
+                lines.add(String.format("%s: %s%s%s", str, WHITE, schematicPlacement.getName(), RESET));
 
                 str = I18n.format("litematica.hud.schematic_placement.sub_region_count");
-                int count = placement.getSubRegionCount();
-                lines.add(String.format("%s: %s%d%s", str, GREEN, count, RESET));
+                int count = schematicPlacement.getSubRegionCount();
+                String strCount = String.format("%s: %s%d%s", str, GREEN, count, RESET);
 
                 str = I18n.format("litematica.hud.schematic_placement.sub_regions_modified");
-                String strTmp = placement.isRegionPlacementModified() ? strYes : strNo;
-                lines.add(String.format("%s: %s", str, strTmp));
+                String strTmp = schematicPlacement.isRegionPlacementModified() ? strYes : strNo;
+                lines.add(strCount + String.format(" - %s: %s", str, strTmp));
+
+                str = I18n.format("litematica.hud.area_selection.origin");
+                BlockPos or = schematicPlacement.getOrigin();
+                lines.add(String.format("%s: %s%d%s, %s%d%s, %s%d%s", str, GREEN, or.getX(), WHITE, GREEN, or.getY(), WHITE, GREEN, or.getZ(), RESET));
+
+                Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
+
+                if (placement != null)
+                {
+                    String areaName = placement.getName();
+                    str = I18n.format("litematica.hud.schematic_placement.selected_sub_region");
+                    lines.add(String.format("%s: %s%s%s", str, WHITE, areaName, RESET));
+
+                    str = I18n.format("litematica.hud.schematic_placement.sub_region_modified");
+                    strTmp = placement.isRegionPlacementModified(schematicPlacement.getSchematic().getSubRegionPosition(areaName)) ? strYes : strNo;
+                    lines.add(String.format("%s: %s", str, strTmp));
+                }
             }
             else
             {
