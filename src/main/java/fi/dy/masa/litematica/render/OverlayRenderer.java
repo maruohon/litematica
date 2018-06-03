@@ -127,7 +127,7 @@ public class OverlayRenderer
             {
                 SchematicPlacement schematicPlacement = entry.getKey();
                 ImmutableMap<String, Box> boxMap = entry.getValue();
-                boolean origin = spm.isOriginSelected();
+                boolean origin = schematicPlacement.getSelectedSubRegionPlacement() == null;
 
                 for (Map.Entry<String, Box> entryBox : boxMap.entrySet())
                 {

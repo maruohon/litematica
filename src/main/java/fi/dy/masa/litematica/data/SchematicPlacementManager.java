@@ -30,7 +30,6 @@ public class SchematicPlacementManager
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
     @Nullable
     private SchematicPlacement selectedPlacement;
-    private boolean originSelected;
 
     public List<SchematicPlacement> getAllSchematicsPlacements()
     {
@@ -90,7 +89,6 @@ public class SchematicPlacementManager
                 if (this.selectedPlacement == placement)
                 {
                     this.selectedPlacement = null;
-                    this.originSelected = false;
                 }
 
                 this.schematicPlacements.remove(i);
@@ -107,11 +105,6 @@ public class SchematicPlacementManager
     public SchematicPlacement getSelectedSchematicPlacement()
     {
         return this.selectedPlacement;
-    }
-
-    public boolean isOriginSelected()
-    {
-        return this.originSelected;
     }
 
     public void setSelectedSchematicPlacement(@Nullable SchematicPlacement placement)
@@ -140,20 +133,17 @@ public class SchematicPlacementManager
             {
                 this.setSelectedSchematicPlacement(trace.getHitSchematicPlacement());
                 this.getSelectedSchematicPlacement().setSelectedSubRegionName(trace.getHitSchematicPlacementRegionName());
-                this.originSelected = false;
                 return true;
             }
             else if (trace.getHitType() == HitType.PLACEMENT_ORIGIN)
             {
                 this.setSelectedSchematicPlacement(trace.getHitSchematicPlacement());
                 this.getSelectedSchematicPlacement().setSelectedSubRegionName(null);
-                this.originSelected = true;
                 return true;
             }
             else if (trace.getHitType() == HitType.MISS)
             {
                 this.setSelectedSchematicPlacement(null);
-                this.originSelected = false;
                 return true;
             }
         }
@@ -168,44 +158,40 @@ public class SchematicPlacementManager
         if (schematicPlacement != null)
         {
             boolean movingBox = schematicPlacement.getSelectedSubRegionPlacement() != null;
-            boolean movingOrigin = this.originSelected;
 
-            if (movingBox || movingOrigin)
+            RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
+
+            if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
             {
-                RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
-
-                if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
-                {
-                    return;
-                }
-
-                BlockPos pos = trace.getBlockPos();
-
-                // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
-                if (mc.player.isSneaking() == false)
-                {
-                    pos = pos.offset(trace.sideHit);
-                }
-
-                if (movingBox)
-                {
-                    schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), pos);
-
-                    String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_subregion_to", posStr);
-                }
-                // Moving the origin point
-                else
-                {
-                    BlockPos old = schematicPlacement.getOrigin();
-                    schematicPlacement.setOrigin(pos);
-                    String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
-                    String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
-                }
-
-                schematicPlacement.updateRenderers();
+                return;
             }
+
+            BlockPos pos = trace.getBlockPos();
+
+            // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
+            if (mc.player.isSneaking() == false)
+            {
+                pos = pos.offset(trace.sideHit);
+            }
+
+            if (movingBox)
+            {
+                schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), pos);
+
+                String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_subregion_to", posStr);
+            }
+            // Moving the origin point
+            else
+            {
+                BlockPos old = schematicPlacement.getOrigin();
+                schematicPlacement.setOrigin(pos);
+                String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+                String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
+            }
+
+            schematicPlacement.updateRenderers();
         }
     }
 
@@ -217,6 +203,7 @@ public class SchematicPlacementManager
         {
             Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
+            // Moving a sub-region
             if (placement != null)
             {
                 // getPos returns a relative position, but moveSubRegionTo takes an absolute position...
@@ -224,7 +211,7 @@ public class SchematicPlacementManager
                 schematicPlacement.moveSubRegionTo(placement.getName(), old.offset(direction, amount));
             }
             // Moving the origin point
-            else if (this.originSelected)
+            else
             {
                 BlockPos old = schematicPlacement.getOrigin();
                 schematicPlacement.setOrigin(old.offset(direction, amount));
@@ -267,6 +254,7 @@ public class SchematicPlacementManager
             if (indexValid)
             {
                 obj.add("selected", new JsonPrimitive(selectedIndex));
+                obj.add("origin_selected", new JsonPrimitive(true));
             }
         }
 
