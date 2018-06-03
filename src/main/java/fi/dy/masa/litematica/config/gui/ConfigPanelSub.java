@@ -12,7 +12,6 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.gui.button.ConfigButtonBoolean;
 import fi.dy.masa.litematica.config.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.litematica.config.interfaces.ConfigType;
-import fi.dy.masa.litematica.config.interfaces.IConfigGeneric;
 import fi.dy.masa.litematica.config.interfaces.IConfigOptionList;
 import fi.dy.masa.litematica.config.options.ConfigBase;
 import fi.dy.masa.litematica.config.options.ConfigBoolean;
@@ -98,13 +97,13 @@ public abstract class ConfigPanelSub extends AbstractConfigPanel
             {
                 ConfigTextField field = this.getTextFieldFor(config);
 
-                if (field != null && config instanceof IConfigGeneric)
+                if (field != null)
                 {
                     String newValue = field.getText();
 
                     if (newValue.equals(config.getStringValue()) == false)
                     {
-                        ((IConfigGeneric) config).setValueFromString(newValue);
+                        config.setValueFromString(newValue);
                         dirty = true;
                     }
                 }

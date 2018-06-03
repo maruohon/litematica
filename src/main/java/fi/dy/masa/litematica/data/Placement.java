@@ -92,6 +92,7 @@ public class Placement
         arr.add(this.pos.getZ());
 
         obj.add("pos", arr);
+        obj.add("name", new JsonPrimitive(this.getName()));
         obj.add("rotation", new JsonPrimitive(this.rotation.name()));
         obj.add("mirror", new JsonPrimitive(this.mirror.name()));
         obj.add("enabled", new JsonPrimitive(this.enabled));
