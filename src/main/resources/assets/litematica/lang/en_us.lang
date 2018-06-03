@@ -75,6 +75,7 @@ litematica.gui.title.load_schematic=Load Schematic
 litematica.gui.title.manage_loaded_schematics=Manage loaded Schematics
 litematica.gui.title.manage_schematic_placements=Manage Schematic Placements
 litematica.gui.title.rename_area_selection=Rename Area Selection
+litematica.gui.title.rename_area_sub_region=Rename Sub Region
 litematica.gui.title.save_schematic=Save the currently selected area as a Schematic
 litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser

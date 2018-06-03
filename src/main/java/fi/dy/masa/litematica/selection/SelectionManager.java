@@ -86,6 +86,41 @@ public class SelectionManager
         return false;
     }
 
+    public boolean renameSelectedSubRegionBox(String newName)
+    {
+        String selectedArea = this.getCurrentSelectionName();
+
+        if (selectedArea != null)
+        {
+            return this.renameSelectedSubRegionBox(selectedArea, newName);
+        }
+
+        return false;
+    }
+
+    public boolean renameSelectedSubRegionBox(String selectionName, String newName)
+    {
+        AreaSelection selection = this.selections.get(selectionName);
+
+        if (selection != null)
+        {
+            String oldName = selection.getCurrentSubRegionBoxName();
+
+            if (oldName != null)
+            {
+                return selection.renameSubRegionBox(oldName, newName);
+            }
+        }
+
+        return false;
+    }
+
+    public boolean renameSubRegionBox(String selectionName, String oldName, String newName)
+    {
+        AreaSelection selection = this.selections.get(selectionName);
+        return selection != null && selection.renameSubRegionBox(oldName, newName);
+    }
+
     public void setCurrentSelection(@Nullable String name)
     {
         if (name == null || this.selections.containsKey(name))

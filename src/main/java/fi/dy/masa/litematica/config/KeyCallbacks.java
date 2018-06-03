@@ -8,11 +8,14 @@ import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.event.RenderEventHandler;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
+import fi.dy.masa.litematica.gui.GuiAreaSelectionManager.SelectedBoxRenamer;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
+import fi.dy.masa.litematica.gui.GuiTextInput;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.OperationMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -59,9 +62,12 @@ public class KeyCallbacks
         {
             if (action == KeyAction.PRESS)
             {
-                if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
+                OperationMode mode = DataManager.getOperationMode();
+                DataManager dataManager = DataManager.getInstance(this.mc.world);
+
+                if (mode == OperationMode.PLACEMENT && key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
                 {
-                    SchematicPlacement schematicPlacement = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
+                    SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
                     if (schematicPlacement != null)
                     {
@@ -74,6 +80,22 @@ public class KeyCallbacks
                         else
                         {
                             this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
+                        }
+                    }
+                }
+                else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
+                {
+                    SelectionManager sm = dataManager.getSelectionManager();
+                    AreaSelection sel = sm.getCurrentSelection();
+
+                    if (sel != null)
+                    {
+                        String name = sel.getCurrentSubRegionBoxName();
+
+                        if (name != null)
+                        {
+                            String title = I18n.format("litematica.gui.title.rename_area_sub_region");
+                            this.mc.displayGuiScreen(new GuiTextInput(128, title, name, null, new SelectedBoxRenamer(sm)));
                         }
                     }
                 }

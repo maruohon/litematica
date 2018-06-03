@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
 
 public class GuiTextInput extends GuiLitematicaBase
@@ -31,8 +32,18 @@ public class GuiTextInput extends GuiLitematicaBase
 
         this.dialogWidth = 260;
         this.dialogHeight = 100;
-        this.dialogLeft = this.parent.width / 2 - this.dialogWidth / 2;
-        this.dialogTop = this.parent.height / 2 - this.dialogHeight / 2;
+
+        if (this.parent != null)
+        {
+            this.dialogLeft = this.parent.width / 2 - this.dialogWidth / 2;
+            this.dialogTop = this.parent.height / 2 - this.dialogHeight / 2;
+        }
+        else
+        {
+            ScaledResolution res = new ScaledResolution(this.mc);
+            this.dialogLeft = res.getScaledWidth() / 2 - this.dialogWidth / 2;
+            this.dialogTop = res.getScaledHeight() / 2 - this.dialogHeight / 2;
+        }
 
         int width = Math.min(maxTextLength * 10, 240);
         this.textField = new GuiTextField(0, this.mc.fontRenderer, this.dialogLeft + 12, this.dialogTop + 40, width, 20);
@@ -72,13 +83,16 @@ public class GuiTextInput extends GuiLitematicaBase
     @Override
     public boolean doesGuiPauseGame()
     {
-        return this.parent.doesGuiPauseGame();
+        return this.parent != null && this.parent.doesGuiPauseGame();
     }
 
     @Override
     public void drawContents(int mouseX, int mouseY, float partialTicks)
     {
-        this.parent.drawContents(mouseX, mouseY, partialTicks);
+        if (this.parent != null)
+        {
+            this.parent.drawContents(mouseX, mouseY, partialTicks);
+        }
 
         drawOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
 

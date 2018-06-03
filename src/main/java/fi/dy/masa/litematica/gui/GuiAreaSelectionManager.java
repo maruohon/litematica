@@ -190,4 +190,20 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             this.selectionManager.renameSelection(this.oldName, string);
         }
     }
+
+    public static class SelectedBoxRenamer implements IStringConsumer
+    {
+        private final SelectionManager selectionManager;
+
+        public SelectedBoxRenamer(SelectionManager selectionManager)
+        {
+            this.selectionManager = selectionManager;
+        }
+
+        @Override
+        public void setString(String string)
+        {
+            this.selectionManager.renameSelectedSubRegionBox(string);
+        }
+    }
 }
