@@ -3,10 +3,12 @@ package fi.dy.masa.litematica.render;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.shader.ShaderProgram;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -64,8 +66,8 @@ public class LitematicaRenderer
             fpsMin = Math.max(fpsMin, 60);
             long finishTimeNano = Math.max((long)(1000000000 / fpsMin / 4), 0L);
 
-            boolean translucentSchematic = false;//true && OpenGlHelper.shadersSupported;
-            float alpha = 0.5f;
+            boolean translucentSchematic = Configs.Generic.RENDER_AS_TRANSLUCENT.getValue() && OpenGlHelper.shadersSupported;
+            float alpha = (float) Configs.Generic.GHOST_BLOCK_ALPHA.getValue();
 
             GlStateManager.pushMatrix();
 

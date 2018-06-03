@@ -119,7 +119,7 @@ public class InputEventHandler
             World world = this.mc.world;
             EntityPlayer player = this.mc.player;
             final int dWheel = Mouse.getEventDWheel() / 120;
-            final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.toolItem.getItem());
+            final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.getToolItem());
             OperationMode mode = DataManager.getOperationMode();
 
             if (hasTool == false)

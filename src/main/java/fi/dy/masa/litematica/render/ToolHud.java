@@ -46,7 +46,7 @@ public class ToolHud
 
     public void renderHud()
     {
-        if (this.mc.player != null && EntityUtils.isHoldingItem(this.mc.player, DataManager.toolItem.getItem()))
+        if (this.mc.player != null && EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem()))
         {
             final OperationMode mode = DataManager.getOperationMode();
             List<String> lines = this.getHudText(mode);

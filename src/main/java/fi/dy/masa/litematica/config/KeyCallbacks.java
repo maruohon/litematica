@@ -42,6 +42,7 @@ public class KeyCallbacks
         Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind().setCallback(callbackMessage);
+        Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(callbackMessage);
     }
 
     private static class KeyCallbackHotkeys implements IHotkeyCallback
@@ -200,11 +201,19 @@ public class KeyCallbacks
                     String name = splitCamelCase(Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                 }
+                else if (key == Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind())
+                {
+                    boolean enabled = ! Configs.Generic.RENDER_AS_TRANSLUCENT.getValue();
+                    Configs.Generic.RENDER_AS_TRANSLUCENT.setValue(enabled);
+                    String name = splitCamelCase(Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getName());
+                    this.printToggleMessage(name, enabled);
+                }
             }
         }
 
         protected void printToggleMessage(String name, boolean enabled)
         {
+            // FIXME
             String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
             String status = I18n.format("litematica.message.value." + (enabled ? "on" : "off"));
             String message = I18n.format("litematica.message.toggled", name, pre + status + TextFormatting.RESET);

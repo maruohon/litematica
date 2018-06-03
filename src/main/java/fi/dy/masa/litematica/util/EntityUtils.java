@@ -2,34 +2,38 @@ package fi.dy.masa.litematica.util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
 public class EntityUtils
 {
-    public static boolean isHoldingItem(EntityLivingBase entity, Item item)
+    public static boolean isHoldingItem(EntityLivingBase entity, ItemStack stackReference)
     {
-        return getHeldItemOfType(entity, item).isEmpty() == false;
+        return getHeldItemOfType(entity, stackReference).isEmpty() == false;
     }
 
-    public static ItemStack getHeldItemOfType(EntityLivingBase entity, Item item)
+    public static ItemStack getHeldItemOfType(EntityLivingBase entity, ItemStack stackReference)
     {
         ItemStack stack = entity.getHeldItemMainhand();
 
-        if (stack.isEmpty() == false && stack.getItem() == item)
+        if (stack.isEmpty() == false && areStacksEqualIgnoreDurability(stack, stackReference))
         {
             return stack;
         }
 
         stack = entity.getHeldItemOffhand();
 
-        if (stack.isEmpty() == false && stack.getItem() == item)
+        if (stack.isEmpty() == false && areStacksEqualIgnoreDurability(stack, stackReference))
         {
             return stack;
         }
 
         return ItemStack.EMPTY;
+    }
+
+    public static boolean areStacksEqualIgnoreDurability(ItemStack stack1, ItemStack stack2)
+    {
+        return ItemStack.areItemsEqualIgnoreDurability(stack1, stack2) && ItemStack.areItemStackTagsEqual(stack1, stack2);
     }
 
     public static EnumFacing getHorizontalLookingDirection(Entity entity)

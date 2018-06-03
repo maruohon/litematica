@@ -8,6 +8,9 @@ import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.options.ConfigBase;
 import fi.dy.masa.litematica.config.options.ConfigBoolean;
+import fi.dy.masa.litematica.config.options.ConfigDouble;
+import fi.dy.masa.litematica.config.options.ConfigString;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputEventHandler;
 import fi.dy.masa.litematica.util.JsonUtils;
 
@@ -17,9 +20,15 @@ public class Configs
 
     public static class Generic
     {
+        public static final ConfigDouble  GHOST_BLOCK_ALPHA     = new ConfigDouble("ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
+        public static final ConfigBoolean RENDER_AS_TRANSLUCENT = new ConfigBoolean("renderAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
+        public static final ConfigString  TOOL_ITEM             = new ConfigString("toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
         public static final ConfigBoolean VERBOSE_LOGGING       = new ConfigBoolean("verboseLogging", false, "If enabled, a bunch of debug messages will be printed to the console");
 
         public static final ImmutableList<ConfigBase> OPTIONS = ImmutableList.of(
+                GHOST_BLOCK_ALPHA,
+                RENDER_AS_TRANSLUCENT,
+                TOOL_ITEM,
                 VERBOSE_LOGGING
         );
     }
@@ -41,6 +50,7 @@ public class Configs
         }
 
         InputEventHandler.getInstance().updateUsedKeys();
+        DataManager.setToolItem(Generic.TOOL_ITEM.getValue());
     }
 
     public static void save()

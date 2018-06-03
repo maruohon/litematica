@@ -20,6 +20,7 @@ public enum Hotkeys implements IHotkey
     TOGGLE_ALL_RENDERING                ("toggleAllRendering",              "M,R",  "Toggle all rendering on/off"),
     TOGGLE_GHOST_BLOCK_RENDERING        ("toggleGhostBlockRendering",       "M,G",  "Toggle ghost block rendering on/off"),
     TOGGLE_SELECTION_BOXES_RENDERING    ("toggleSelectionBoxesRendering",   "M,B",  "Toggle selection boxes rendering on/off"),
+    TOGGLE_TRANSLUCENT_RENDERING        ("toggleTranslucentRendering",      "M,U",  "Toggle translucent vs. opaque ghost block rendering"),
     TOGGLE_WIRE_FRAME_RENDERING         ("toggleWireFrameRendering",        "M,W",  "Toggle block wire frame rendering on/off");
 
     private final String name;

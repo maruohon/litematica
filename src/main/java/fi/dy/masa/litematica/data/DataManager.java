@@ -2,6 +2,8 @@ package fi.dy.masa.litematica.data;
 
 import java.io.File;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,8 +19,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public class DataManager
@@ -27,8 +31,11 @@ public class DataManager
 
     private static final Int2ObjectOpenHashMap<DataManager> INSTANCES = new Int2ObjectOpenHashMap<>();
 
+    private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)(@(?<meta>[0-9]+))$");
+    private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
     private static File lastSchematicDirectory = ROOT_SCHEMATIC_DIRECTORY;
-    public static ItemStack toolItem = new ItemStack(Items.STICK); // FIXME
+
+    private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static OperationMode operationMode = OperationMode.PLACEMENT;
 
     private final SelectionManager selectionManager = new SelectionManager();
@@ -55,6 +62,11 @@ public class DataManager
         }
 
         return instance;
+    }
+
+    public static ItemStack getToolItem()
+    {
+        return toolItem;
     }
 
     public SelectionManager getSelectionManager()
@@ -229,5 +241,42 @@ public class DataManager
         }
 
         return Reference.MOD_ID + "_default.json";
+    }
+
+    public static void setToolItem(String itemName)
+    {
+        try
+        {
+            Matcher matcher = PATTERN_ITEM_META.matcher(itemName);
+
+            if (matcher.matches())
+            {
+                Item item = Item.REGISTRY.getObject(new ResourceLocation(matcher.group("name")));
+
+                if (item != null && item != Items.AIR)
+                {
+                    toolItem = new ItemStack(item, 1, Integer.parseInt(matcher.group("meta")));
+                    return;
+                }
+            }
+
+            matcher = PATTERN_ITEM_BASE.matcher(itemName);
+
+            if (matcher.matches())
+            {
+                Item item = Item.REGISTRY.getObject(new ResourceLocation(matcher.group("name")));
+
+                if (item != null && item != Items.AIR)
+                {
+                    toolItem = new ItemStack(item);
+                    return;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+        }
+
+        toolItem = new ItemStack(Items.STICK);
     }
 }
