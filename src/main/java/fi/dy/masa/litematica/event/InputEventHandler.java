@@ -118,7 +118,7 @@ public class InputEventHandler
         {
             World world = this.mc.world;
             EntityPlayer player = this.mc.player;
-            final int dWheel = Mouse.getEventDWheel() / 120;
+            final int origDWheel = Mouse.getEventDWheel();
             final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.getToolItem());
             OperationMode mode = DataManager.getOperationMode();
 
@@ -127,8 +127,10 @@ public class InputEventHandler
                 return false;
             }
 
-            if (dWheel != 0)
+            if (origDWheel != 0)
             {
+                final int amount = origDWheel > 0 ? 1 : -1;
+
                 if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
                 {
                     if (mode == OperationMode.AREA_SELECTION)
@@ -137,25 +139,25 @@ public class InputEventHandler
 
                         if (sm.hasGrabbedElement())
                         {
-                            sm.changeGrabDistance(player, dWheel);
+                            sm.changeGrabDistance(player, amount);
                             return true;
                         }
                         else if (sm.hasSelectedElement() || (sm.getCurrentSelection() != null && sm.getCurrentSelection().isOriginSelected()))
                         {
-                            sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), dWheel);
+                            sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), amount);
                             return true;
                         }
                     }
                     else if (mode == OperationMode.PLACEMENT)
                     {
                         EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
-                        DataManager.getInstance(world).getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, dWheel);
+                        DataManager.getInstance(world).getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
                         return true;
                     }
                 }
                 else if (Hotkeys.OPERATION_MODE_CHANGE_KEY.getKeybind().isKeybindHeld(false))
                 {
-                    DataManager.setOperationMode(DataManager.getOperationMode().cycle(dWheel < 0));
+                    DataManager.setOperationMode(DataManager.getOperationMode().cycle(amount < 0));
                     return true;
                 }
             }
