@@ -102,7 +102,6 @@ public class DataManager
     public static void load()
     {
         File file = getCurrentStorageFile();
-        LiteModLitematica.logInfo("Loading settings from file '{}'", file.getAbsolutePath());
         JsonElement element = JsonUtils.parseJsonFile(file);
 
         if (element != null && element.isJsonObject())
@@ -179,7 +178,6 @@ public class DataManager
         root.add("operation_mode", new JsonPrimitive(operationMode.name()));
 
         File file = getCurrentStorageFile();
-        LiteModLitematica.logInfo("Writing settings to file '{}'", file.getAbsolutePath());
 
         JsonUtils.writeJsonToFile(root, file);
     }
