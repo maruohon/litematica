@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
@@ -14,6 +13,8 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.malilib.hotkeys.IKeyEventHandler;
+import fi.dy.masa.malilib.hotkeys.IMouseEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,7 +24,7 @@ import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
-public class InputEventHandler
+public class InputEventHandler implements IKeyEventHandler, IMouseEventHandler
 {
     private static final InputEventHandler INSTANCE = new InputEventHandler();
     private final Set<Integer> genericHotkeysUsedKeys = new HashSet<>();
@@ -57,12 +58,12 @@ public class InputEventHandler
         }
     }
 
-    public boolean onKeyInput()
+    @Override
+    public boolean onKeyInput(int eventKey, boolean eventKeyState)
     {
         // Not in a GUI
         if (this.mc.currentScreen == null)
         {
-            final int eventKey = Keyboard.getEventKey();
             boolean cancel = false;
 
             if (this.genericHotkeysUsedKeys.contains(eventKey))
@@ -111,14 +112,14 @@ public class InputEventHandler
         return false;
     }
 
-    public boolean onMouseInput()
+    @Override
+    public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
     {
         // Not in a GUI
         if (this.mc.currentScreen == null && this.mc.world != null && this.mc.player != null)
         {
             World world = this.mc.world;
             EntityPlayer player = this.mc.player;
-            final int origDWheel = Mouse.getEventDWheel();
             final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.getToolItem());
             OperationMode mode = DataManager.getOperationMode();
 
@@ -127,11 +128,11 @@ public class InputEventHandler
                 return false;
             }
 
-            if (origDWheel != 0)
+            if (dWheel != 0)
             {
-                final int amount = origDWheel > 0 ? 1 : -1;
+                final int amount = dWheel > 0 ? 1 : -1;
 
-                if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
+                if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
                 {
                     if (mode == OperationMode.AREA_SELECTION)
                     {
@@ -155,18 +156,16 @@ public class InputEventHandler
                         return true;
                     }
                 }
-                else if (Hotkeys.OPERATION_MODE_CHANGE_KEY.getKeybind().isKeybindHeld(false))
+                else if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
                 {
                     DataManager.setOperationMode(DataManager.getOperationMode().cycle(amount < 0));
                     return true;
                 }
             }
-            else if (Mouse.getEventButtonState() && RenderEventHandler.getInstance().isEnabled())
+            else if (eventButtonState && RenderEventHandler.getInstance().isEnabled())
             {
-                final int button = Mouse.getEventButton();
-
-                boolean isLeftClick = mouseEventIsAttack(this.mc, button);
-                boolean isRightClick = mouseEventIsUse(this.mc, button);
+                boolean isLeftClick = mouseEventIsAttack(this.mc, eventButton);
+                boolean isRightClick = mouseEventIsUse(this.mc, eventButton);
                 int maxDistance = 200;
 
                 if (isLeftClick || isRightClick)
@@ -183,13 +182,13 @@ public class InputEventHandler
                         return true;
                     }
                 }
-                else if (mouseEventIsPickBlock(this.mc, button))
+                else if (mouseEventIsPickBlock(this.mc, eventButton))
                 {
                     if (mode == OperationMode.AREA_SELECTION)
                     {
                         SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
 
-                        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld(false))
+                        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
                         {
                             if (sm.hasGrabbedElement())
                             {

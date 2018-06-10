@@ -1,12 +1,10 @@
-package fi.dy.masa.litematica.config;
+package fi.dy.masa.litematica.event;
 
-import fi.dy.masa.litematica.config.hotkeys.IHotkeyCallback;
-import fi.dy.masa.litematica.config.hotkeys.IKeybind;
-import fi.dy.masa.litematica.config.hotkeys.KeyAction;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
-import fi.dy.masa.litematica.event.RenderEventHandler;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager.SelectedBoxRenamer;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
@@ -16,6 +14,10 @@ import fi.dy.masa.litematica.gui.GuiTextInput;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.OperationMode;
+import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
+import fi.dy.masa.malilib.hotkeys.IKeybind;
+import fi.dy.masa.malilib.hotkeys.KeyAction;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -208,26 +210,26 @@ public class KeyCallbacks
                 else if (key == Hotkeys.TOGGLE_ALL_RENDERING.getKeybind())
                 {
                     boolean enabled = RenderEventHandler.getInstance().toggleAllRenderingEnabled();
-                    String name = splitCamelCase(Hotkeys.TOGGLE_ALL_RENDERING.getName());
+                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_ALL_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                 }
                 else if (key == Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind())
                 {
                     boolean enabled = RenderEventHandler.getInstance().toggleRenderSelectionBoxes();
-                    String name = splitCamelCase(Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getName());
+                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                 }
                 else if (key == Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind())
                 {
                     boolean enabled = RenderEventHandler.getInstance().toggleRenderSchematics();
-                    String name = splitCamelCase(Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getName());
+                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                 }
                 else if (key == Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind())
                 {
-                    boolean enabled = ! Configs.Generic.RENDER_AS_TRANSLUCENT.getValue();
-                    Configs.Generic.RENDER_AS_TRANSLUCENT.setValue(enabled);
-                    String name = splitCamelCase(Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getName());
+                    boolean enabled = ! Configs.Generic.RENDER_AS_TRANSLUCENT.getBooleanValue();
+                    Configs.Generic.RENDER_AS_TRANSLUCENT.setBooleanValue(enabled);
+                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                 }
             }
@@ -247,17 +249,4 @@ public class KeyCallbacks
     {
         mc.ingameGUI.addChatMessage(ChatType.GAME_INFO, new TextComponentTranslation(key, args));
     }
-
-    // https://stackoverflow.com/questions/2559759/how-do-i-convert-camelcase-into-human-readable-names-in-java
-    public static String splitCamelCase(String str)
-    {
-        return str.replaceAll(
-           String.format("%s|%s|%s",
-              "(?<=[A-Z])(?=[A-Z][a-z])",
-              "(?<=[^A-Z])(?=[A-Z])",
-              "(?<=[A-Za-z])(?=[^A-Za-z])"
-           ),
-           " "
-        );
-     }
 }

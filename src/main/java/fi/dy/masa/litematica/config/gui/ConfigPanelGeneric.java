@@ -1,19 +1,19 @@
 package fi.dy.masa.litematica.config.gui;
 
-import java.util.Collection;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.options.ConfigBase;
+import fi.dy.masa.malilib.config.IConfigValue;
+import fi.dy.masa.malilib.config.gui.ConfigPanelBase;
 
-public class ConfigPanelGeneric extends ConfigPanelSub
+public class ConfigPanelGeneric extends ConfigPanelSubLitematica
 {
-    public ConfigPanelGeneric(LitematicaConfigPanel parent)
+    public ConfigPanelGeneric(ConfigPanelBase parent)
     {
         super("Generic", parent);
     }
 
     @Override
-    protected Collection<ConfigBase> getConfigs()
+    protected IConfigValue[] getConfigs()
     {
-        return Configs.Generic.OPTIONS;
+        return Configs.Generic.OPTIONS.toArray(new IConfigValue[Configs.Generic.OPTIONS.size()]);
     }
 }

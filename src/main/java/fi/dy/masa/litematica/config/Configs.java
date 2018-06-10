@@ -6,13 +6,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.config.options.ConfigBase;
-import fi.dy.masa.litematica.config.options.ConfigBoolean;
-import fi.dy.masa.litematica.config.options.ConfigDouble;
-import fi.dy.masa.litematica.config.options.ConfigString;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputEventHandler;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.malilib.config.options.ConfigBase;
+import fi.dy.masa.malilib.config.options.ConfigBoolean;
+import fi.dy.masa.malilib.config.options.ConfigDouble;
+import fi.dy.masa.malilib.config.options.ConfigString;
 
 public class Configs
 {

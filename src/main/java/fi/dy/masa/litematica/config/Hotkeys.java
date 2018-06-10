@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.config;
 
-import fi.dy.masa.litematica.config.hotkeys.IHotkey;
-import fi.dy.masa.litematica.config.hotkeys.IKeybind;
-import fi.dy.masa.litematica.config.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.hotkeys.IHotkey;
+import fi.dy.masa.malilib.hotkeys.IKeybind;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 
 public enum Hotkeys implements IHotkey
 {
@@ -13,7 +13,7 @@ public enum Hotkeys implements IHotkey
     OPEN_GUI_PLACEMENT_SETTINGS         ("openGuiPlacementSettings",        "M,P",  "Open the Placement Settings GUI for the currently selected placement"),
     OPEN_GUI_SCHEMATIC_ACTIONS          ("openGuiSchematicActions",         "M,C",  "Open the Schematic actions GUI"),
     OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the area selection manager GUI"),
-    OPERATION_MODE_CHANGE_KEY           ("operationModeChangeKey",          "LCONTROL", "The key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode."),
+    OPERATION_MODE_CHANGE_MODIFIER      ("operationModeChangeModifier",     "LCONTROL", "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode."),
     SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
     SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,O",  "Set/move the origin point of the current selection here"),
     SET_SELECTION_BOX_POSITION_1        ("setSelectionBoxPosition1",        "M,1",  "Set the first position of the currently selected box to the player's position"),
@@ -26,7 +26,7 @@ public enum Hotkeys implements IHotkey
 
     private final String name;
     private final String comment;
-    private IKeybind keybind;
+    private final IKeybind keybind;
 
     private Hotkeys(String name, String defaultHotkey, String comment)
     {
@@ -51,11 +51,5 @@ public enum Hotkeys implements IHotkey
     public IKeybind getKeybind()
     {
         return this.keybind;
-    }
-
-    @Override
-    public void setKeybind(IKeybind keybind)
-    {
-        this.keybind = keybind;
     }
 }

@@ -1,12 +1,11 @@
 package fi.dy.masa.litematica.config.gui;
 
-import java.util.Collection;
-import java.util.Collections;
 import com.mumfrey.liteloader.modconfig.ConfigPanelHost;
 import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.config.gui.button.ConfigButtonHotkey;
-import fi.dy.masa.litematica.config.interfaces.INamed;
-import fi.dy.masa.litematica.config.options.ConfigBase;
+import fi.dy.masa.litematica.event.InputEventHandler;
+import fi.dy.masa.malilib.config.IConfigValue;
+import fi.dy.masa.malilib.config.gui.ConfigPanelHotkeysBase;
+import fi.dy.masa.malilib.config.gui.button.ConfigButtonHotkey;
 
 public class ConfigPanelGenericHotkeys extends ConfigPanelHotkeysBase
 {
@@ -16,9 +15,15 @@ public class ConfigPanelGenericHotkeys extends ConfigPanelHotkeysBase
     }
 
     @Override
-    protected Collection<ConfigBase> getConfigs()
+    protected IConfigValue[] getConfigs()
     {
-        return Collections.emptyList();
+        return new IConfigValue[0];
+    }
+
+    @Override
+    protected void onSettingsChanged()
+    {
+        InputEventHandler.getInstance().updateUsedKeys();
     }
 
     @Override
@@ -41,17 +46,5 @@ public class ConfigPanelGenericHotkeys extends ConfigPanelHotkeysBase
             i += 2;
             y += 21;
         }
-    }
-
-    private int getMaxLabelWidth(INamed[] entries)
-    {
-        int maxWidth = 0;
-
-        for (INamed entry : entries)
-        {
-            maxWidth = Math.max(maxWidth, this.mc.fontRenderer.getStringWidth(entry.getName()));
-        }
-
-        return maxWidth;
     }
 }

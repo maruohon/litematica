@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.config.KeyCallbacks;
+import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
 import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.render.OverlayRenderer;

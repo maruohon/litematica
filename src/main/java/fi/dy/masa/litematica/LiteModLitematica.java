@@ -13,10 +13,11 @@ import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoaderEventBroker.ReturnValue;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.KeyCallbacks;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputEventHandler;
+import fi.dy.masa.litematica.event.KeyCallbacks;
+import fi.dy.masa.malilib.hotkeys.KeybindEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.shader.Framebuffer;
@@ -51,6 +52,11 @@ public class LiteModLitematica implements LiteMod, Configurable, JoinGameListene
     {
         KeyCallbacks.init();
         Configs.load();
+
+        InputEventHandler handler = InputEventHandler.getInstance();
+        KeybindEventHandler bindHandler = KeybindEventHandler.getInstance();
+        bindHandler.registerKeyEventHandler(handler);
+        bindHandler.registerMouseEventHandler(handler);
     }
 
     @Override
@@ -85,7 +91,7 @@ public class LiteModLitematica implements LiteMod, Configurable, JoinGameListene
 
     public static void logInfo(String message, Object... args)
     {
-        if (Configs.Generic.VERBOSE_LOGGING.getValue())
+        if (Configs.Generic.VERBOSE_LOGGING.getBooleanValue())
         {
             logger.info(message, args);
         }
