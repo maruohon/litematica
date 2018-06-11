@@ -113,6 +113,7 @@ public class RenderUtils
         buffer.pos(maxX, maxY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
     }
 
+    // FIXME testing, remove
     public static void renderGhostBlocks(IBlockState[] blocks, BlockPos size, BlockPos posStart, Entity entity, float partialTicks)
     {
         double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;

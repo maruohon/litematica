@@ -5,11 +5,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
+import com.mumfrey.liteloader.InitCompleteListener;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.ScreenshotListener;
 import com.mumfrey.liteloader.ShutdownListener;
 import com.mumfrey.liteloader.Tickable;
+import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.core.LiteLoaderEventBroker.ReturnValue;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.Configs;
@@ -25,7 +27,7 @@ import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
 import net.minecraft.util.text.ITextComponent;
 
-public class LiteModLitematica implements LiteMod, Configurable, JoinGameListener, ScreenshotListener, ShutdownListener, Tickable
+public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, ScreenshotListener, ShutdownListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -50,13 +52,14 @@ public class LiteModLitematica implements LiteMod, Configurable, JoinGameListene
     @Override
     public void init(File configPath)
     {
-        KeyCallbacks.init();
         Configs.load();
+        KeybindEventHandler.getInstance().registerKeyEventHandler(InputEventHandler.getInstance());
+    }
 
-        InputEventHandler handler = InputEventHandler.getInstance();
-        KeybindEventHandler bindHandler = KeybindEventHandler.getInstance();
-        bindHandler.registerKeyEventHandler(handler);
-        bindHandler.registerMouseEventHandler(handler);
+    @Override
+    public void onInitCompleted(Minecraft minecraft, LiteLoader loader)
+    {
+        KeyCallbacks.init();
     }
 
     @Override

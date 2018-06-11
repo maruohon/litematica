@@ -2,11 +2,8 @@ package fi.dy.masa.litematica.event;
 
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
-import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.render.ToolHud;
-import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
 
 public class RenderEventHandler
 {
@@ -14,7 +11,6 @@ public class RenderEventHandler
     private boolean enableRendering;
     private boolean renderSelections;
     private boolean renderSchematics;
-    private SchematicaSchematic schematic;
 
     public static RenderEventHandler getInstance()
     {
@@ -49,11 +45,6 @@ public class RenderEventHandler
         return this.enableRendering;
     }
 
-    public void setSchematic(SchematicaSchematic schematic)
-    {
-        this.schematic = schematic;
-    }
-
     public void onRenderWorldLast(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();
@@ -66,13 +57,6 @@ public class RenderEventHandler
             }
 
             OverlayRenderer.getInstance().renderSelectionAreas();
-
-            // FIXME testing
-            if (this.schematic != null && InputEventHandler.selection.getPos1() != null)
-            {
-                Entity renderViewEntity = mc.getRenderViewEntity();
-                RenderUtils.renderGhostBlocks(this.schematic.getBlocks(), this.schematic.getSize(), InputEventHandler.selection.getPos1(), renderViewEntity, partialTicks);
-            }
         }
     }
 

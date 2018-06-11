@@ -7,7 +7,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
 import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
@@ -17,6 +16,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -179,7 +179,7 @@ public class SchematicPlacementManager
                 schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), pos);
 
                 String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_subregion_to", posStr);
+                StringUtils.printActionbarMessage("litematica.message.placement.moved_subregion_to", posStr);
             }
             // Moving the origin point
             else
@@ -188,7 +188,7 @@ public class SchematicPlacementManager
                 schematicPlacement.setOrigin(pos);
                 String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
                 String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                KeyCallbacks.printMessage(mc, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
+                StringUtils.printActionbarMessage("litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
             }
 
             schematicPlacement.updateRenderers();

@@ -8,12 +8,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
@@ -249,7 +249,7 @@ public class SelectionManager
                         trace.getHitCorner(),
                         trace.getHitVec(),
                         entity.getPositionEyes(1f).distanceTo(trace.getHitVec()));
-                KeyCallbacks.printMessage(mc, "litematica.message.grabbed_element_for_moving");
+                StringUtils.printActionbarMessage("litematica.message.grabbed_element_for_moving");
                 return true;
             }
         }
@@ -298,7 +298,7 @@ public class SelectionManager
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    KeyCallbacks.printMessage(mc, "litematica.message.set_selection_box_point", cornerIndex, posStr);
+                    StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", cornerIndex, posStr);
                 }
                 // Moving the origin point
                 else
@@ -307,7 +307,7 @@ public class SelectionManager
                     sel.setOrigin(pos);
                     String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
                     String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    KeyCallbacks.printMessage(mc, "litematica.message.moved_area_origin", posStrOld, posStrNew);
+                    StringUtils.printActionbarMessage("litematica.message.moved_area_origin", posStrOld, posStrNew);
                 }
             }
         }
