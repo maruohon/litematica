@@ -4,11 +4,11 @@ import java.io.File;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
-import fi.dy.masa.litematica.gui.button.ButtonGeneric;
-import fi.dy.masa.litematica.gui.button.IButtonActionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.resources.I18n;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase

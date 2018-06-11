@@ -65,7 +65,7 @@ public class WidgetCheckBox
         this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
 
         Icons widget = this.checked ? this.widgetChecked : this.widgetUnchecked;
-        widget.renderAt(this.x, this.y, this.zLevel);
+        widget.renderAt(this.x, this.y, this.zLevel, false, false);
 
         int iw = widget.getWidth();
         int y = this.y + this.totalHeight / 2 - this.mc.fontRenderer.FONT_HEIGHT;

@@ -3,9 +3,9 @@ package fi.dy.masa.litematica.gui;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiListBase;
-import fi.dy.masa.litematica.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacements;
+import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import net.minecraft.client.resources.I18n;
 
 public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetSchematicPlacements>

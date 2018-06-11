@@ -1,7 +1,11 @@
 package fi.dy.masa.litematica.config.gui;
 
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.gui.ConfigPanelBase;
+import fi.dy.masa.malilib.config.gui.ConfigPanelHotkeysBase;
 
 public class LitematicaConfigPanel extends ConfigPanelBase
 {
@@ -14,7 +18,7 @@ public class LitematicaConfigPanel extends ConfigPanelBase
     @Override
     protected void createSubPanels()
     {
-        this.addSubPanel(new ConfigPanelGeneric(this));
-        this.addSubPanel(new ConfigPanelGenericHotkeys(this));
+        this.addSubPanel(new ConfigPanelSubLitematica("Generic", Configs.Generic.OPTIONS.toArray(new IConfigValue[Configs.Generic.OPTIONS.size()]), this));
+        this.addSubPanel(new ConfigPanelHotkeysBase("Generic Hotkeys", Hotkeys.values(), this));
     }
 }

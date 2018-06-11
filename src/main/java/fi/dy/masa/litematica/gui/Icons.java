@@ -2,9 +2,10 @@ package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.malilib.gui.IGuiIcon;
 import net.minecraft.util.ResourceLocation;
 
-public enum Icons
+public enum Icons implements IGuiIcon
 {
     BUTTON_PLUS_MINUS_8     (  0,   0,  8,  8),
     BUTTON_PLUS_MINUS_12    ( 24,   0, 12, 12),
@@ -30,28 +31,39 @@ public enum Icons
         this.h = h;
     }
 
+    @Override
     public int getWidth()
     {
         return this.w;
     }
 
+    @Override
     public int getHeight()
     {
         return this.h;
     }
 
+    @Override
     public int getU()
     {
         return this.u;
     }
 
+    @Override
     public int getV()
     {
         return this.v;
     }
 
-    public void renderAt(int x, int y, float zLevel)
+    @Override
+    public void renderAt(int x, int y, float zLevel, boolean enabled, boolean selected)
     {
         GuiLitematicaBase.drawTexturedRect(x, y, this.u, this.v, this.w, this.h, zLevel);
+    }
+
+    @Override
+    public ResourceLocation getTexture()
+    {
+        return TEXTURE;
     }
 }

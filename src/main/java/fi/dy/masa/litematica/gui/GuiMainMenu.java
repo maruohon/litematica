@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
-import fi.dy.masa.litematica.gui.button.ButtonGeneric;
-import fi.dy.masa.litematica.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 

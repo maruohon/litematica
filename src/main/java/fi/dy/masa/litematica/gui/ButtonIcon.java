@@ -2,9 +2,10 @@ package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.malilib.gui.IGuiIcon;
 import net.minecraft.util.ResourceLocation;
 
-public enum ButtonIcon
+public enum ButtonIcon implements IGuiIcon
 {
     AREA_SELECTION          (102,   0, 14, 14),
     LOADED_SCHEMATICS       (102,  14, 14, 14),
@@ -26,26 +27,31 @@ public enum ButtonIcon
         this.h = h;
     }
 
+    @Override
     public int getWidth()
     {
         return this.w;
     }
 
+    @Override
     public int getHeight()
     {
         return this.h;
     }
 
+    @Override
     public int getU()
     {
         return this.u;
     }
 
+    @Override
     public int getV()
     {
         return this.v;
     }
 
+    @Override
     public void renderAt(int x, int y, float zLevel, boolean enabled, boolean selected)
     {
         int u = this.u;
@@ -61,5 +67,11 @@ public enum ButtonIcon
         }
 
         GuiLitematicaBase.drawTexturedRect(x, y, u, this.v, this.w, this.h, zLevel);
+    }
+
+    @Override
+    public ResourceLocation getTexture()
+    {
+        return TEXTURE;
     }
 }

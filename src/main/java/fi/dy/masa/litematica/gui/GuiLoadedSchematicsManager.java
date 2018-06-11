@@ -3,9 +3,9 @@ package fi.dy.masa.litematica.gui;
 import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiListBase;
-import fi.dy.masa.litematica.gui.button.ButtonGeneric;
 import fi.dy.masa.litematica.gui.widgets.WidgetLoadedSchematics;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicEntry;
+import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import net.minecraft.client.resources.I18n;
 
 public class GuiLoadedSchematicsManager extends GuiListBase<SchematicEntry, WidgetSchematicEntry, WidgetLoadedSchematics>

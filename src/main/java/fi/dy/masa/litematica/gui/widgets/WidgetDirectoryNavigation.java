@@ -70,8 +70,8 @@ public class WidgetDirectoryNavigation extends WidgetBase
         GlStateManager.color(1f, 1f, 1f);
 
         this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
-        Icons.FILE_ICON_DIR_ROOT  .renderAt(this.x         , this.y + 1, this.zLevel);
-        Icons.FILE_ICON_DIR_UP    .renderAt(this.x + iw + 2, this.y + 1, this.zLevel);
+        Icons.FILE_ICON_DIR_ROOT  .renderAt(this.x         , this.y + 1, this.zLevel, false, false);
+        Icons.FILE_ICON_DIR_UP    .renderAt(this.x + iw + 2, this.y + 1, this.zLevel, false, false);
 
         // Draw the directory path text background
         GuiLitematicaBase.drawRect(this.x + (iw + 2) * 2 + 2, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
