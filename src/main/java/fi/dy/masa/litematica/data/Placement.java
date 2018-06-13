@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 public class Placement
 {
     private final String name;
+    private final BlockPos defaultPos;
     private BlockPos pos;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
@@ -21,6 +22,7 @@ public class Placement
     public Placement(BlockPos pos, String name)
     {
         this.pos = pos;
+        this.defaultPos = pos;
         this.name = name;
     }
 
@@ -72,6 +74,14 @@ public class Placement
     public void setMirror(Mirror mirror)
     {
         this.mirror = mirror;
+    }
+
+    public void resetToOriginalValues()
+    {
+        this.pos = this.defaultPos;
+        this.rotation = Rotation.NONE;
+        this.mirror = Mirror.NONE;
+        this.enabled = true;
     }
 
     public boolean isRegionPlacementModified(BlockPos originalPosition)

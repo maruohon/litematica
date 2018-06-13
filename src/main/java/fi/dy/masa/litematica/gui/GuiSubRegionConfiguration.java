@@ -160,15 +160,11 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
         String areaName = this.placement.getName();
         BlockPos posOriginal = this.schematicPlacement.getSchematic().getSubRegionPosition(areaName);
         String label = I18n.format("litematica.gui.placement_sub_region.button.reset_sub_region_placement");
-        boolean enabled = true;
+        boolean enabled = this.placement.isRegionPlacementModified(posOriginal);
 
-        if (this.placement.isRegionPlacementModified(posOriginal))
+        if (enabled)
         {
             label = TXT_ORANGE + label + TXT_RST;
-        }
-        else
-        {
-            enabled = false;
         }
 
         this.buttonResetPlacement.displayString = label;

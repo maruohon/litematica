@@ -246,10 +246,11 @@ public class SchematicPlacement
     public void resetSubRegionToSchematicValues(String regionName)
     {
         BlockPos pos = this.schematic.getSubRegionPosition(regionName);
+        Placement placement = this.relativeSubRegionPlacements.get(regionName);
 
-        if (pos != null && this.relativeSubRegionPlacements.containsKey(regionName))
+        if (pos != null && placement != null)
         {
-            this.relativeSubRegionPlacements.put(regionName, new Placement(pos, regionName));
+            placement.resetToOriginalValues();
             this.checkAreSubRegionsModified();
             this.updateRenderers();
         }
