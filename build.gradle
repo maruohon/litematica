@@ -18,6 +18,12 @@ buildscript {
     }
 }
 
+repositories {
+    maven {
+        url 'https://masa.dy.fi/maven'
+    }
+}
+
 apply plugin: 'net.minecraftforge.gradle.liteloader'
 apply plugin: 'org.spongepowered.mixin'
 
@@ -45,13 +51,17 @@ minecraft {
     replace "@MOD_VERSION@", mod_version
 }
 
+dependencies {
+    deobfCompile "fi.dy.masa.malilib:malilib-" + config.minecraft_version_out + ":" + config.malilib_version + ":deobf"
+}
+
 sourceSets {
     main {
         ext.refMap = 'mixins.' + config.mod_id + '.refmap.json'
     }
 }
 
-group = config.group + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = config.group + "." + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = config.mod_id + '-' + config.minecraft_version_out
 version = project.minecraft.mod_version
 
