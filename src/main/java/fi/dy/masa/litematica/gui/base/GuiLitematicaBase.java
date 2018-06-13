@@ -183,16 +183,22 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
             }
         }
 
+        boolean handled = false;
+
         for (TextFieldEntry<?> entry : this.textFields)
         {
             if (entry.mouseClicked(mouseX, mouseY, mouseButton))
             {
                 // Don't call super if the button press got handled
-                return true;
+                handled = true;
+            }
+            else
+            {
+                entry.getTextField().setFocused(false);
             }
         }
 
-        return false;
+        return handled;
     }
 
     public boolean onMouseReleased(int mouseX, int mouseY, int mouseButton)
@@ -213,15 +219,41 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
             return true;
         }
 
+        boolean handled = false;
+        int selected = -1;
+        int i = 0;
+
         for (TextFieldEntry<?> entry : this.textFields)
         {
-            if (entry.keyTyped(typedChar, keyCode))
+            if (keyCode == Keyboard.KEY_TAB && entry.getTextField().isFocused())
             {
-                return true;
+                entry.getTextField().setFocused(false);
+                selected = i;
+                handled = true;
             }
+            else if (entry.keyTyped(typedChar, keyCode))
+            {
+                handled = true;
+            }
+
+            i++;
         }
 
-        return false;
+        if (selected >= 0)
+        {
+            if (GuiScreen.isShiftKeyDown())
+            {
+                selected = selected > 0 ? selected - 1 : this.textFields.size() - 1;
+            }
+            else
+            {
+                selected = (selected + 1) % this.textFields.size();
+            }
+
+            this.textFields.get(selected).getTextField().setFocused(true);
+        }
+
+        return handled;
     }
 
     protected void addInfoWidget(WidgetInfo widget)

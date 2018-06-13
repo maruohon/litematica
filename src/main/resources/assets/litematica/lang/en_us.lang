@@ -60,10 +60,10 @@ litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
 litematica.gui.placement_sub_region.label.region_position=Region position
-litematica.gui.placement_sub_region.button.reset_sub_region_placement=Reset placement
+litematica.gui.placement_sub_region.button.reset_sub_region_placement=Reset sub-region
 litematica.gui.placement_sub_region.button.slice_type=Slice: %s
 
-litematica.gui.schematic_placement.button.reset_sub_region_placements=Reset sub-regions
+litematica.gui.schematic_placement.button.reset_sub_region_placements=Reset all sub-regions
 
 litematica.gui.label.placement_settings.placement_origin=Placement origin
 

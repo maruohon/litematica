@@ -34,7 +34,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
         super.initGui();
 
         this.id = 0;
-        int width = 120;
+        int width = 140;
         int x = this.width - width - 10;
         int y = 20;
 
