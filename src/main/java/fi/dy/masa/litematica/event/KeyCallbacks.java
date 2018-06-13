@@ -148,6 +148,12 @@ public class KeyCallbacks
                         this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
                     }
                 }
+                else
+                {
+                    StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                }
+
+                return true;
             }
             else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
             {
@@ -164,22 +170,27 @@ public class KeyCallbacks
                         this.mc.displayGuiScreen(new GuiTextInput(128, title, name, null, new SelectedBoxRenamer(sm)));
                     }
                 }
+
+                return true;
             }
             else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.SAVE_SCHEMATIC.getKeybind())
             {
                 DataManager.save();
                 this.mc.displayGuiScreen(new GuiSchematicSave());
+                return true;
             }
             else if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
                 this.mc.displayGuiScreen(new GuiMainMenu());
+                return true;
             }
             else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind())
             {
                 this.mc.displayGuiScreen(new GuiAreaSelectionManager());
+                return true;
             }
 
-            return true;
+            return false;
         }
     }
 
