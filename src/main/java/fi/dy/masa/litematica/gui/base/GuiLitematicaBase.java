@@ -12,7 +12,7 @@ import fi.dy.masa.litematica.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetInfo;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonEntry;
+import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -47,7 +47,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     protected static final int COLOR_HORIZONTAL_BAR = 0xFF999999;
     protected static final int LEFT         = 20;
     protected static final int TOP          = 10;
-    private final List<ButtonEntry<?>> buttons = new ArrayList<>();
+    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private final List<TextFieldEntry<?>> textFields = new ArrayList<>();
     private final List<GuiLabel> labels = new ArrayList<>();
     private final List<WidgetInfo> infoWidgets = new ArrayList<>();
@@ -174,7 +174,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
 
     public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        for (ButtonEntry<?> entry : this.buttons)
+        for (ButtonWrapper<?> entry : this.buttons)
         {
             if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
             {
@@ -300,9 +300,9 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         this.mc.getTextureManager().bindTexture(texture);
     }
 
-    protected <T extends ButtonBase> ButtonEntry<T> addButton(T button, IButtonActionListener<T> listener)
+    protected <T extends ButtonBase> ButtonWrapper<T> addButton(T button, IButtonActionListener<T> listener)
     {
-        ButtonEntry<T> entry = new ButtonEntry<>(button, listener);
+        ButtonWrapper<T> entry = new ButtonWrapper<>(button, listener);
         this.buttons.add(entry);
 
         return entry;
@@ -374,7 +374,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
 
     protected void drawButtons(int mouseX, int mouseY, float partialTicks)
     {
-        for (ButtonEntry<?> entry : this.buttons)
+        for (ButtonWrapper<?> entry : this.buttons)
         {
             entry.draw(this.mc, mouseX, mouseY, partialTicks);
         }

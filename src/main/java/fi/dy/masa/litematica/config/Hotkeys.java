@@ -1,5 +1,8 @@
 package fi.dy.masa.litematica.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
@@ -16,6 +19,7 @@ public enum Hotkeys implements IHotkey
     OPERATION_MODE_CHANGE_MODIFIER      ("operationModeChangeModifier",     "LCONTROL", "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode."),
     SAVE_SCHEMATIC                      ("saveSchematic",                   "LCONTROL,LMENU,S",  "Save the current Area Selection as a Schematic"),
     SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
+    SELECTION_MODE_CYCLE                ("selectionModeCycle",              "LCONTROL,M", "The keybind to change the selection mode/type in the Area Selection mode"),
     SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,O",  "Set/move the origin point of the current selection here"),
     SET_SELECTION_BOX_POSITION_1        ("setSelectionBoxPosition1",        "M,1",  "Set the first position of the currently selected box to the player's position"),
     SET_SELECTION_BOX_POSITION_2        ("setSelectionBoxPosition2",        "M,2",  "Set the second position of the currently selected box to the player's position"),
@@ -56,5 +60,31 @@ public enum Hotkeys implements IHotkey
     public IKeybind getKeybind()
     {
         return this.keybind;
+    }
+
+    @Override
+    public JsonElement getAsJsonElement()
+    {
+        return new JsonPrimitive(this.keybind.getStorageString());
+    }
+
+    @Override
+    public void setValueFromJsonElement(JsonElement element)
+    {
+        try
+        {
+            if (element.isJsonPrimitive())
+            {
+                this.keybind.setKeysFromStorageString(element.getAsString());
+            }
+            else
+            {
+                LiteModLitematica.logger.warn("Failed to set the keybinds for '{}' from the JSON element '{}'", this.getName(), element);
+            }
+        }
+        catch (Exception e)
+        {
+            LiteModLitematica.logger.warn("Failed to set the keybinds for '{}' from the JSON element '{}'", this.getName(), element, e);
+        }
     }
 }

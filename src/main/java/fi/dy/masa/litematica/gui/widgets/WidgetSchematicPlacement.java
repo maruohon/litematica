@@ -8,7 +8,7 @@ import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonEntry;
+import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
@@ -20,7 +20,7 @@ public class WidgetSchematicPlacement extends WidgetBase
     private final WidgetSchematicPlacements parent;
     private final SchematicPlacement placement;
     private final Minecraft mc;
-    private final List<ButtonEntry<?>> buttons = new ArrayList<>();
+    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private int id;
 
     public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel,
@@ -72,13 +72,13 @@ public class WidgetSchematicPlacement extends WidgetBase
 
     private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
     {
-        this.buttons.add(new ButtonEntry<>(button, listener));
+        this.buttons.add(new ButtonWrapper<>(button, listener));
     }
 
     @Override
     protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        for (ButtonEntry<?> entry : this.buttons)
+        for (ButtonWrapper<?> entry : this.buttons)
         {
             if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
             {

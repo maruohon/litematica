@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.config;
 
 import java.io.File;
+import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,7 +9,7 @@ import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.JsonUtils;
-import fi.dy.masa.malilib.config.options.ConfigBase;
+import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigString;
@@ -25,7 +26,7 @@ public class Configs
         public static final ConfigBoolean TOOL_ITEM_ENABLED     = new ConfigBoolean("toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.");
         public static final ConfigBoolean VERBOSE_LOGGING       = new ConfigBoolean("verboseLogging", false, "If enabled, a bunch of debug messages will be printed to the console");
 
-        public static final ImmutableList<ConfigBase> OPTIONS = ImmutableList.of(
+        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 GHOST_BLOCK_ALPHA,
                 RENDER_AS_TRANSLUCENT,
                 TOOL_ITEM,
@@ -47,10 +48,11 @@ public class Configs
                 JsonObject root = element.getAsJsonObject();
 
                 readOptions(root, "Generic", Generic.OPTIONS);
+                readOptions(root, "Hotkeys", ImmutableList.copyOf(Hotkeys.values()));
             }
         }
 
-        DataManager.setToolItem(Generic.TOOL_ITEM.getValue());
+        DataManager.setToolItem(Generic.TOOL_ITEM.getStringValue());
     }
 
     public static void save()
@@ -63,18 +65,19 @@ public class Configs
             JsonObject root = new JsonObject();
 
             writeOptions(root, "Generic", Generic.OPTIONS);
+            writeOptions(root, "Hotkeys", ImmutableList.copyOf(Hotkeys.values()));
 
             JsonUtils.writeJsonToFile(root, configFile);
         }
     }
 
-    public static void readOptions(JsonObject root, String category, ImmutableList<ConfigBase> options)
+    public static void readOptions(JsonObject root, String category, List<IConfigBase> options)
     {
         JsonObject obj = JsonUtils.getNestedObject(root, category, false);
 
         if (obj != null)
         {
-            for (ConfigBase option : options)
+            for (IConfigBase option : options)
             {
                 if (obj.has(option.getName()))
                 {
@@ -84,11 +87,11 @@ public class Configs
         }
     }
 
-    public static void writeOptions(JsonObject root, String category, ImmutableList<ConfigBase> options)
+    public static void writeOptions(JsonObject root, String category, List<IConfigBase> options)
     {
         JsonObject obj = JsonUtils.getNestedObject(root, category, true);
 
-        for (ConfigBase option : options)
+        for (IConfigBase option : options)
         {
             obj.add(option.getName(), option.getAsJsonElement());
         }
