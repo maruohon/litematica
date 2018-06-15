@@ -67,7 +67,7 @@ public class LitematicaRenderer
             long finishTimeNano = Math.max((long)(1000000000 / fpsMin / 4), 0L);
 
             boolean translucentSchematic = Configs.Generic.RENDER_AS_TRANSLUCENT.getBooleanValue() && OpenGlHelper.shadersSupported;
-            float alpha = (float) Configs.Generic.GHOST_BLOCK_ALPHA.getValue();
+            float alpha = (float) Configs.Generic.GHOST_BLOCK_ALPHA.getDoubleValue();
 
             GlStateManager.pushMatrix();
 
