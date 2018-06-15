@@ -74,7 +74,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                 if (entry == null)
                 {
-                    this.gui.addGuiMessage(InfoType.ERROR, I18n.format("litematica.error.schematic_load.no_schematic_selected"));
+                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
                     return;
                 }
 
@@ -82,7 +82,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                 if (file.exists() == false || file.isFile() == false || file.canRead() == false)
                 {
-                    this.gui.addGuiMessage(InfoType.ERROR, I18n.format("litematica.error.schematic_load.cant_read_file", file.getName()));
+                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
                     return;
                 }
 
@@ -94,12 +94,12 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                     if (schematic != null)
                     {
                         SchematicHolder.getInstance().addSchematic(schematic, schematic.getMetadata().getName());
-                        this.gui.addGuiMessage(InfoType.SUCCESS, I18n.format("litematica.info.schematic_load.schematic_loaded", file.getName()));
+                        this.gui.addMessage(InfoType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
                     }
                 }
                 else
                 {
-                    this.gui.addGuiMessage(InfoType.ERROR, I18n.format("litematica.error.schematic_load.unsupported_type", file.getName()));
+                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.unsupported_type", file.getName());
                 }
             }
         }

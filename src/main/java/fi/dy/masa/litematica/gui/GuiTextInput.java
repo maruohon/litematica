@@ -22,11 +22,11 @@ public class GuiTextInput extends GuiLitematicaBase
     private int dialogLeft;
     private int dialogTop;
 
-    public GuiTextInput(int maxTextLength, String title, String text, GuiLitematicaBase parent, IStringConsumer consumer)
+    public GuiTextInput(int maxTextLength, String titleKey, String text, GuiLitematicaBase parent, IStringConsumer consumer)
     {
         this.mc = Minecraft.getMinecraft();
         this.parent = parent;
-        this.title = title;
+        this.title = I18n.format(titleKey);
         this.originalText = text;
         this.consumer = consumer;
 
@@ -91,7 +91,7 @@ public class GuiTextInput extends GuiLitematicaBase
     {
         if (this.parent != null)
         {
-            this.parent.drawContents(mouseX, mouseY, partialTicks);
+            this.parent.drawScreen(mouseX, mouseY, partialTicks);
         }
 
         drawOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
@@ -111,6 +111,11 @@ public class GuiTextInput extends GuiLitematicaBase
         if (keyCode == Keyboard.KEY_RETURN)
         {
             this.consumer.setString(this.textField.getText());
+            this.mc.displayGuiScreen(this.parent);
+            return true;
+        }
+        else if (keyCode == Keyboard.KEY_ESCAPE)
+        {
             this.mc.displayGuiScreen(this.parent);
             return true;
         }

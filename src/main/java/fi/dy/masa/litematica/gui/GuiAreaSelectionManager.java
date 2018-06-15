@@ -152,7 +152,7 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             }
             else if (this.type == Type.RENAME)
             {
-                String title = I18n.format("litematica.gui.title.rename_area_selection");
+                String title = "litematica.gui.title.rename_area_selection";
                 SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.name);
                 this.gui.mc.displayGuiScreen(new GuiTextInput(160, title, this.name, this.gui, renamer));
             }

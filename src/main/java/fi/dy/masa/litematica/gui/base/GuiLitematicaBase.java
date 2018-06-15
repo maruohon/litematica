@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
@@ -268,19 +269,14 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     }
 
     @Override
-    public void addMessage(InfoType type, String message)
+    public void addMessage(InfoType type, String messageKey, Object... args)
     {
-        this.addGuiMessage(type, message);
+        this.addGuiMessage(type, messageKey, 3000, args);
     }
 
-    public void addGuiMessage(InfoType type, String message)
+    public void addGuiMessage(InfoType type, String messageKey, int displayTimeMs, Object... args)
     {
-        this.addGuiMessage(type, message, 3000);
-    }
-
-    public void addGuiMessage(InfoType type, String message, int displayTimeMs)
-    {
-        this.messages.add(new Message(type, message, displayTimeMs, 380));
+        this.messages.add(new Message(type, displayTimeMs, 380, messageKey, args));
     }
 
     public void setNextMessageType(InfoType type)
@@ -529,7 +525,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         private final List<String> message = new ArrayList<>();
         private final FontRenderer fontRenderer;
 
-        public Message(InfoType type, String message, int displayTimeMs, int maxLineWidth)
+        public Message(InfoType type, int displayTimeMs, int maxLineWidth, String message, Object... args)
         {
             this.type = type;
             this.created = System.currentTimeMillis();
@@ -537,7 +533,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
             this.maxLineWidth = maxLineWidth;
             this.fontRenderer = Minecraft.getMinecraft().fontRenderer;
 
-            this.setMessage(message);
+            this.setMessage(I18n.format(message, args));
         }
 
         public boolean hasExpired()

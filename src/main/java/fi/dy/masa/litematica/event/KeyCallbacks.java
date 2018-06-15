@@ -166,7 +166,7 @@ public class KeyCallbacks
 
                     if (name != null)
                     {
-                        String title = I18n.format("litematica.gui.title.rename_area_sub_region");
+                        String title = "litematica.gui.title.rename_area_sub_region";
                         this.mc.displayGuiScreen(new GuiTextInput(128, title, name, null, new SelectedBoxRenamer(sm)));
                     }
                 }

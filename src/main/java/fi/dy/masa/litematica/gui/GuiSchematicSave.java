@@ -12,7 +12,6 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileUtils;
-import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
@@ -33,8 +32,8 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
         Minecraft mc = Minecraft.getMinecraft();
         this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
 
-        this.textField = new GuiTextField(0, mc.fontRenderer, 10, 32, 100, 20);
-        this.textField.setMaxStringLength(160);
+        this.textField = new GuiTextField(0, mc.fontRenderer, 10, 32, 90, 20);
+        this.textField.setMaxStringLength(256);
         this.textField.setText("");
         this.textField.setFocused(true);
         this.textField.setCursorPositionEnd();
@@ -45,7 +44,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
     {
         super.initGui();
 
-        ((IGuiTextField) this.textField).setInternalWidth(this.width - 253);
+        ((IGuiTextField) this.textField).setInternalWidth(this.width - 273);
         DirectoryEntry entry = this.widget.getSelectedEntry();
 
         if (entry != null)
@@ -55,9 +54,26 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
 
         int x = this.textField.x + this.textField.getWidth() + 12;
         int y = 32;
-        String label = I18n.format("litematica.gui.button.save_area_to_schematic");
-        ButtonGeneric button = new ButtonGeneric(1, x, y, 60, 20, label);
-        ButtonListener listener = this.createActionListener(ButtonListener.Type.SAVE);
+
+        this.createButton(1, x     , y,  80, ButtonListener.Type.SAVE);
+        this.createButton(2, x + 84, y, 140, ButtonListener.Type.CREATE_DIRECTORY);
+    }
+
+    private void createButton(int id, int x, int y, int width, ButtonListener.Type type)
+    {
+        ButtonListener listener = new ButtonListener(type, this.selectionManager, this);
+        String label = "";
+
+        if (type == ButtonListener.Type.SAVE)
+        {
+            label = "litematica.gui.button.save_area_to_schematic";
+        }
+        else if (type == ButtonListener.Type.CREATE_DIRECTORY)
+        {
+            label = "litematica.gui.button.create_directory";
+        }
+
+        ButtonGeneric button = new ButtonGeneric(id, x, y, width, 20, I18n.format(label));
         this.addButton(button, listener);
     }
 
@@ -72,8 +88,8 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
     @Override
     public void setString(String string)
     {
-        this.textField.setText(FileUtils.getNameWithoutExtension(string));
-        this.textField.setCursorPositionEnd();
+        this.setNextMessageType(InfoType.ERROR);
+        super.setString(string);
     }
 
     @Override
@@ -81,7 +97,8 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
     {
         if (entry != null)
         {
-            this.setString(entry.getName());
+            this.textField.setText(FileUtils.getNameWithoutExtension(entry.getName()));
+            this.textField.setCursorPositionEnd();
         }
     }
 
@@ -134,11 +151,6 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
         return super.onKeyTyped(typedChar, keyCode);
     }
 
-    private ButtonListener createActionListener(ButtonListener.Type type)
-    {
-        return new ButtonListener(type, this.selectionManager, this);
-    }
-
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiSchematicSave gui;
@@ -157,19 +169,18 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
         {
             if (this.type == Type.SAVE)
             {
-                IStringConsumer feedback = InfoUtils.INFO_MESSAGE_CONSUMER;
                 File dir = this.gui.widget.getCurrentDirectory();
                 String name = this.gui.textField.getText();
 
                 if (dir.isDirectory() == false)
                 {
-                    feedback.setString(I18n.format("litematica.error.message.invalid_directory", dir.getAbsolutePath()));
+                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
                     return;
                 }
 
                 if (name.isEmpty())
                 {
-                    feedback.setString(I18n.format("litematica.error.message.invalid_schematic_name", name));
+                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", name);
                     return;
                 }
 
@@ -179,12 +190,18 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
 
                 if (file.exists())
                 {
-                    
+                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.file_already_exists", file.getAbsolutePath());
                 }
                 else
                 {
                     saver.saveSchematic();
                 }
+            }
+            else if (this.type == Type.CREATE_DIRECTORY)
+            {
+                File dir = this.gui.widget.getCurrentDirectory();
+                String title = "litematica.gui.title.create_directory";
+                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui)));
             }
             else if (this.type == Type.THUMBNAIL)
             {
@@ -203,6 +220,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
         public enum Type
         {
             SAVE,
+            CREATE_DIRECTORY,
             THUMBNAIL;
         }
     }
@@ -232,21 +250,64 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
 
             if (area != null)
             {
-                IStringConsumer feedback = InfoUtils.INFO_MESSAGE_CONSUMER;
                 String author = this.mc.player.getName();
-                LitematicaSchematic schematic = LitematicaSchematic.createSchematic(this.mc.world, area, this.takeEntities, author, feedback);
+                LitematicaSchematic schematic = LitematicaSchematic.createSchematic(this.mc.world, area, this.takeEntities, author, this.gui);
 
                 if (schematic != null)
                 {
                     schematic.getMetadata().setName(this.name);
 
-                    if (schematic.writeToFile(this.dir, this.name, true, feedback))
+                    if (schematic.writeToFile(this.dir, this.name, GuiScreen.isShiftKeyDown(), this.gui))
                     {
-                        feedback.setString("litematica.message.schematic_saved");
+                        this.gui.addMessage(InfoType.SUCCESS, "litematica.message.schematic_saved_as", this.name);
                         this.gui.widget.refreshEntries();
                     }
                 }
             }
+        }
+    }
+
+    public static class DirectoryCreator implements IStringConsumer
+    {
+        private final File dir;
+        private final GuiSchematicSave parent;
+
+        public DirectoryCreator(File dir, GuiSchematicSave parent)
+        {
+            this.dir = dir;
+            this.parent = parent;
+        }
+
+        @Override
+        public void setString(String string)
+        {
+            if (this.dir.exists() == false)
+            {
+                this.parent.addMessage(InfoType.ERROR, "litematica.error.schematic_save.directory_doesnt_exist", this.dir.getAbsolutePath());
+                return;
+            }
+
+            if (string.isEmpty())
+            {
+                this.parent.addMessage(InfoType.ERROR, "litematica.error.schematic_save.invalid_directory", string);
+                return;
+            }
+
+            File file = new File(this.dir, string);
+
+            if (file.exists())
+            {
+                this.parent.addMessage(InfoType.ERROR, "litematica.error.schematic_save.file_or_directory_already_exists", file.getAbsolutePath());
+                return;
+            }
+
+            if (file.mkdirs() == false)
+            {
+                this.parent.addMessage(InfoType.ERROR, "litematica.error.schematic_save.failed_to_create_directory", file.getAbsolutePath());
+                return;
+            }
+
+            this.parent.addMessage(InfoType.SUCCESS, "litematica.message.directory_created", string);
         }
     }
 }

@@ -8,11 +8,18 @@ litematica.error.schematic_load.cant_read_file=Can't read the schematic file '%s
 litematica.error.schematic_load.no_schematic_selected=No Schematic file selected!
 litematica.error.schematic_load.unsupported_type=Unknown or unsupported file type for '%s'
 
+litematica.error.schematic_save.directory_doesnt_exist=No such directory: '%s'
+litematica.error.schematic_save.failed_to_create_directory=Failed to create directory '%s'
+litematica.error.schematic_save.file_already_exists=File '%s' already exists
+litematica.error.schematic_save.file_or_directory_already_exists=File or directory '%s' already exists
+litematica.error.schematic_save.invalid_directory=Invalid directory '%s'
+litematica.error.schematic_save.invalid_schematic_name=Invalid schematic name '%s'
+
 litematica.error.schematic_read_from_file_failed.cant_read=Failed to read schematic from file '%s'
 litematica.error.schematic_read_from_file_failed.exception=Exception while trying to read schematic from file '%s'
-litematica.error.schematic_write_to_file_failed.directory_creation_failed=Failed to create schematic directory
+litematica.error.schematic_write_to_file_failed.directory_creation_failed=Failed to create schematic directory '%s'
 litematica.error.schematic_write_to_file_failed.exception=Failed to write the schematic to file '%s'
-litematica.error.schematic_write_to_file_failed.exists=Failed to write the schematic to a file, file already exists
+litematica.error.schematic_write_to_file_failed.exists=Failed to write the schematic to file '%s', file already exists
 
 litematica.info.schematic_load.schematic_loaded=Schematic '%s' successfully loaded to memory
 
@@ -33,6 +40,7 @@ litematica.button.schematic_placements.render_enable=Enable rendering
 litematica.button.schematic_placements.render_disable=Disable rendering
 
 litematica.gui.button.cancel=Cancel
+litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.create_placement=Create placement
 litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
@@ -70,6 +78,7 @@ litematica.gui.label.placement_settings.placement_origin=Placement origin
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
+litematica.gui.title.create_directory=Create Directory
 litematica.gui.title.litematica_main_menu=Litematica Main Menu
 litematica.gui.title.load_schematic=Load Schematic
 litematica.gui.title.manage_loaded_schematics=Manage loaded Schematics
@@ -98,6 +107,7 @@ litematica.label.no=no
 litematica.label.yes=yes
 
 litematica.message.added_selection_box=Added a new selection box at %s
+litematica.message.directory_created=Directory '%s' created
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.no_placement_selected=No placement selected
@@ -108,7 +118,7 @@ litematica.message.placement.moved_placement_origin=Moved placement origin from 
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
 litematica.message.schematic_placement_created=Placement created for '%s'
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
-litematica.message.schematic_saved=Schematic saved
+litematica.message.schematic_saved_as=Schematic saved as '%s'
 litematica.message.set_area_origin=Set the area origin point to %s
 litematica.message.set_selection_box_point=Set/moved point %d to %s
 litematica.message.toggled=Toggled %s %s
