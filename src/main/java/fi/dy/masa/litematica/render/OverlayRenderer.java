@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
@@ -13,6 +14,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.Vec3f;
+import fi.dy.masa.litematica.util.Vec4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
@@ -172,9 +174,9 @@ public class OverlayRenderer
         switch (boxType)
         {
             case AREA_SELECTED:
-                colorX = this.colorX; colorY = this.colorY; colorZ = this.colorZ;
-                color1 = box.getSelectedCorner() == Corner.CORNER_1 ? this.colorSelectedCorner : this.colorPos1;
-                color2 = box.getSelectedCorner() == Corner.CORNER_2 ? this.colorSelectedCorner : this.colorPos2;
+                colorX = this.colorX;
+                colorY = this.colorY;
+                colorZ = this.colorZ;
                 break;
             case AREA_UNSELECTED:
                 colorX = this.colorArea;
@@ -192,28 +194,45 @@ public class OverlayRenderer
                 colorY = color;
                 colorZ = color;
                 break;
-            default: return;
+            default:
+                return;
         }
 
-        if (pos1 != null && pos2 != null && pos1.equals(pos2) == false)
-        {
-            RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
-        }
+        Vec4f sideColor;
 
         if (boxType == BoxType.PLACEMENT_SELECTED)
         {
             color1 = this.colorBoxPlacementSelected;
             color2 = color1;
+            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
+            sideColor = new Vec4f(color1, alpha);
         }
         else if (boxType == BoxType.PLACEMENT_UNSELECTED)
         {
             color1 = placement.getBoxesBBColor();
             color2 = color1;
+            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
+            sideColor = new Vec4f(color1, alpha);
         }
         else
         {
             color1 = box.getSelectedCorner() == Corner.CORNER_1 ? this.colorSelectedCorner : this.colorPos1;
             color2 = box.getSelectedCorner() == Corner.CORNER_2 ? this.colorSelectedCorner : this.colorPos2;
+            sideColor = Vec4f.fromColor(Configs.Visuals.SELECTION_BOX_SIDE_COLOR.getIntegerValue());
+        }
+
+        if (pos1 != null && pos2 != null && pos1.equals(pos2) == false)
+        {
+            if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
+                  Configs.Visuals.RENDER_SELECTION_BOX_SIDES.getBooleanValue())
+                ||
+                 ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
+                   Configs.Visuals.RENDER_PLACEMENT_BOX_SIDES.getBooleanValue()))
+            {
+                RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
+            }
+
+            RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
         }
 
         if (pos1 != null)

@@ -356,8 +356,8 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind())
                 {
-                    boolean enabled = ! Configs.Generic.RENDER_AS_TRANSLUCENT.getBooleanValue();
-                    Configs.Generic.RENDER_AS_TRANSLUCENT.setBooleanValue(enabled);
+                    boolean enabled = ! Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
+                    Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.setBooleanValue(enabled);
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                     return true;

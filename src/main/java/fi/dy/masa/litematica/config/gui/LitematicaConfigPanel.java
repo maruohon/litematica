@@ -19,6 +19,7 @@ public class LitematicaConfigPanel extends ConfigPanelBase
     protected void createSubPanels()
     {
         this.addSubPanel(new ConfigPanelSubLitematica("Generic", Configs.Generic.OPTIONS.toArray(new IConfigValue[Configs.Generic.OPTIONS.size()]), this));
+        this.addSubPanel(new ConfigPanelSubLitematica("Visuals", Configs.Visuals.OPTIONS.toArray(new IConfigValue[Configs.Visuals.OPTIONS.size()]), this));
         this.addSubPanel(new ConfigPanelHotkeysBase("Generic Hotkeys", Hotkeys.values(), this));
     }
 }
