@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.data.DataManager;
@@ -23,14 +24,30 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
 {
     private final SelectionManager selectionManager;
     private final GuiTextField textField;
+    @Nullable
+    private final LitematicaSchematic schematic;
 
     public GuiSchematicSave()
     {
+        this(null);
+    }
+
+    public GuiSchematicSave(@Nullable LitematicaSchematic schematic)
+    {
         super(10, 60);
 
-        this.title = I18n.format("litematica.gui.title.save_schematic");
+        if (schematic != null)
+        {
+            this.title = I18n.format("litematica.gui.title.save_schematic_from_memory");
+        }
+        else
+        {
+            this.title = I18n.format("litematica.gui.title.create_schematic_from_selection");
+        }
+
         Minecraft mc = Minecraft.getMinecraft();
         this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
+        this.schematic = schematic;
 
         this.textField = new GuiTextField(0, mc.fontRenderer, 10, 32, 90, 20);
         this.textField.setMaxStringLength(256);
@@ -50,6 +67,10 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
         if (entry != null)
         {
             this.textField.setText(FileUtils.getNameWithoutExtension(entry.getName()));
+        }
+        else if (this.schematic != null)
+        {
+            this.textField.setText(this.schematic.getMetadata().getName());
         }
 
         int x = this.textField.x + this.textField.getWidth() + 12;
@@ -184,17 +205,29 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
                     return;
                 }
 
-                File file = new File(dir, name);
                 boolean takeEntities = true; // TODO
-                SchematicSaver saver = new SchematicSaver(dir, name, takeEntities, this.gui.mc, this.selectionManager, this.gui);
+                LitematicaSchematic schematic = this.gui.schematic;
 
-                if (file.exists())
+                if (schematic == null)
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.file_already_exists", file.getAbsolutePath());
+                    schematic = this.createSchematicFromWorld(name, takeEntities);
                 }
                 else
                 {
-                    saver.saveSchematic();
+                    schematic.getMetadata().setTimeModified(System.currentTimeMillis());
+                }
+
+                if (schematic != null)
+                {
+                    if (schematic.writeToFile(dir, name, GuiScreen.isShiftKeyDown(), this.gui))
+                    {
+                        this.gui.addMessage(InfoType.SUCCESS, "litematica.message.schematic_saved_as", name);
+                        this.gui.widget.refreshEntries();
+                    }
+                }
+                else
+                {
+                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.schematic_creation_failed");
                 }
             }
             else if (this.type == Type.CREATE_DIRECTORY)
@@ -217,53 +250,32 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
             this.actionPerformed(control);
         }
 
-        public enum Type
-        {
-            SAVE,
-            CREATE_DIRECTORY,
-            THUMBNAIL;
-        }
-    }
-
-    private static class SchematicSaver
-    {
-        private final GuiSchematicSave gui;
-        private final File dir;
-        private final String name;
-        private final Minecraft mc;
-        private final SelectionManager selectionManager;
-        private final boolean takeEntities;
-
-        public SchematicSaver(File dir, String name, boolean takeEntities, Minecraft mc, SelectionManager selectionManager, GuiSchematicSave gui)
-        {
-            this.dir = dir;
-            this.name = name;
-            this.takeEntities = takeEntities;
-            this.mc = mc;
-            this.selectionManager = selectionManager;
-            this.gui = gui;
-        }
-
-        public void saveSchematic()
+        @Nullable
+        private LitematicaSchematic createSchematicFromWorld(String name, boolean takeEntities)
         {
             AreaSelection area = this.selectionManager.getCurrentSelection();
 
             if (area != null)
             {
-                String author = this.mc.player.getName();
-                LitematicaSchematic schematic = LitematicaSchematic.createSchematic(this.mc.world, area, this.takeEntities, author, this.gui);
+                String author = this.gui.mc.player.getName();
+                LitematicaSchematic schematic = LitematicaSchematic.createSchematic(this.gui.mc.world, area, takeEntities, author, this.gui);
 
                 if (schematic != null)
                 {
-                    schematic.getMetadata().setName(this.name);
-
-                    if (schematic.writeToFile(this.dir, this.name, GuiScreen.isShiftKeyDown(), this.gui))
-                    {
-                        this.gui.addMessage(InfoType.SUCCESS, "litematica.message.schematic_saved_as", this.name);
-                        this.gui.widget.refreshEntries();
-                    }
+                    schematic.getMetadata().setName(name);
                 }
+
+                return schematic;
             }
+
+            return null;
+        }
+
+        public enum Type
+        {
+            SAVE,
+            CREATE_DIRECTORY,
+            THUMBNAIL;
         }
     }
 

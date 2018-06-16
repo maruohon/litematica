@@ -6,10 +6,12 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
 import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.gui.GuiSchematicSave;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -115,7 +117,16 @@ public class WidgetSchematicEntry extends WidgetBase
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {
+                Minecraft mc = Minecraft.getMinecraft();
+                SchematicEntry entry = this.widget.schematicEntry;
+                GuiSchematicSave gui = new GuiSchematicSave(entry.schematic);
 
+                if (mc.currentScreen instanceof GuiLitematicaBase)
+                {
+                    gui.setParent((GuiLitematicaBase) mc.currentScreen);
+                }
+
+                mc.displayGuiScreen(gui);
             }
             else if (this.type == Type.UNLOAD)
             {

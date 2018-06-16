@@ -14,6 +14,7 @@ litematica.error.schematic_save.file_already_exists=File '%s' already exists
 litematica.error.schematic_save.file_or_directory_already_exists=File or directory '%s' already exists
 litematica.error.schematic_save.invalid_directory=Invalid directory '%s'
 litematica.error.schematic_save.invalid_schematic_name=Invalid schematic name '%s'
+litematica.error.schematic_save.schematic_creation_failed=Failed to create the schematic!
 
 litematica.error.schematic_read_from_file_failed.cant_read=Failed to read schematic from file '%s'
 litematica.error.schematic_read_from_file_failed.exception=Exception while trying to read schematic from file '%s'
@@ -78,14 +79,15 @@ litematica.gui.label.placement_settings.placement_origin=Placement origin
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
-litematica.gui.title.create_directory=Create Directory
+litematica.gui.title.create_directory=Create a new directory
 litematica.gui.title.litematica_main_menu=Litematica Main Menu
 litematica.gui.title.load_schematic=Load Schematic
 litematica.gui.title.manage_loaded_schematics=Manage loaded Schematics
 litematica.gui.title.manage_schematic_placements=Manage Schematic Placements
 litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.rename_area_sub_region=Rename Sub Region
-litematica.gui.title.save_schematic=Save the currently selected area as a Schematic
+litematica.gui.title.create_schematic_from_selection=Save the currently selected area as a Schematic
+litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
 litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 
