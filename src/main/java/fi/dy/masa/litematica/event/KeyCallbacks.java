@@ -14,6 +14,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.GuiTextInput;
 import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.AreaSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
@@ -48,6 +49,7 @@ public class KeyCallbacks
         Hotkeys.ADD_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
         Hotkeys.DELETE_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
         Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind().setCallback(callbackMessage);
+        Hotkeys.SELECTION_MODE_CYCLE.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_AREA_ORIGIN.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
@@ -93,7 +95,24 @@ public class KeyCallbacks
                     if (mode == OperationMode.AREA_SELECTION)
                     {
                         SelectionManager sm = dataManager.getSelectionManager();
-                        sm.setPositionOfCurrentSelectionToRayTrace(this.mc, isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2, maxDistance);
+
+                        if (Configs.Generic.SELECTION_MODE.getOptionListValue() == AreaSelectionMode.CORNERS)
+                        {
+                            sm.setPositionOfCurrentSelectionToRayTrace(this.mc, isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2, maxDistance);
+                        }
+                        else if (Configs.Generic.SELECTION_MODE.getOptionListValue() == AreaSelectionMode.CUBOID)
+                        {
+                            // Left click in Cuboid mode: Grow the selection to contain each clicked position
+                            if (isToolPrimary)
+                            {
+                                sm.growSelectionToContainClickedPosition(this.mc, maxDistance);
+                            }
+                            // Right click in Cuboid mode: Reset the area to the clicked position
+                            else
+                            {
+                                sm.resetSelectionToClickedPosition(this.mc, maxDistance);
+                            }
+                        }
                     }
                     else if (mode == OperationMode.PLACEMENT)
                     {
@@ -237,6 +256,7 @@ public class KeyCallbacks
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
                     }
+                    return true;
                 }
                 else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())
                 {
@@ -252,6 +272,7 @@ public class KeyCallbacks
                             StringUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
                         }
                     }
+                    return true;
                 }
                 else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())
                 {
@@ -267,6 +288,12 @@ public class KeyCallbacks
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.moved_selection", oldStr, posStr);
                     }
+                    return true;
+                }
+                else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeybind() && DataManager.getOperationMode() == OperationMode.AREA_SELECTION)
+                {
+                    Configs.Generic.SELECTION_MODE.setOptionListValue(Configs.Generic.SELECTION_MODE.getOptionListValue().cycle(false));
+                    return true;
                 }
                 else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
                 {
@@ -280,6 +307,7 @@ public class KeyCallbacks
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
                     }
+                    return true;
                 }
                 else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() || key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())
                 {
@@ -303,24 +331,28 @@ public class KeyCallbacks
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", p, posStr);
                     }
+                    return true;
                 }
                 else if (key == Hotkeys.TOGGLE_ALL_RENDERING.getKeybind())
                 {
                     boolean enabled = RenderEventHandler.getInstance().toggleAllRenderingEnabled();
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_ALL_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
+                    return true;
                 }
                 else if (key == Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind())
                 {
                     boolean enabled = RenderEventHandler.getInstance().toggleRenderSelectionBoxes();
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
+                    return true;
                 }
                 else if (key == Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind())
                 {
                     boolean enabled = RenderEventHandler.getInstance().toggleRenderSchematics();
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
+                    return true;
                 }
                 else if (key == Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind())
                 {
@@ -328,6 +360,7 @@ public class KeyCallbacks
                     Configs.Generic.RENDER_AS_TRANSLUCENT.setBooleanValue(enabled);
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
+                    return true;
                 }
                 else if (key == Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind())
                 {
@@ -335,9 +368,8 @@ public class KeyCallbacks
                     Configs.Generic.TOOL_ITEM_ENABLED.setBooleanValue(enabled);
                     String name = StringUtils.splitCamelCase(Configs.Generic.TOOL_ITEM_ENABLED.getName());
                     this.printToggleMessage(name, enabled);
+                    return true;
                 }
-
-                return true;
             }
 
             return false;

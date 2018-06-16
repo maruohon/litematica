@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -16,6 +17,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -268,19 +270,11 @@ public class SelectionManager
 
             if (movingCorner || movingOrigin)
             {
-                RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
+                BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance);
 
-                if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+                if (pos == null)
                 {
                     return;
-                }
-
-                BlockPos pos = trace.getBlockPos();
-
-                // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
-                if (mc.player.isSneaking() == false)
-                {
-                    pos = pos.offset(trace.sideHit);
                 }
 
                 if (movingCorner)
@@ -311,6 +305,82 @@ public class SelectionManager
                 }
             }
         }
+    }
+
+    public void resetSelectionToClickedPosition(Minecraft mc, double maxDistance)
+    {
+        AreaSelection sel = this.getCurrentSelection();
+
+        if (sel != null && sel.getSelectedSubRegionBox() != null)
+        {
+            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance);
+
+            if (pos != null)
+            {
+                sel.getSelectedSubRegionBox().setPos1(pos);
+                sel.getSelectedSubRegionBox().setPos2(pos);
+            }
+        }
+    }
+
+    public void growSelectionToContainClickedPosition(Minecraft mc, double maxDistance)
+    {
+        AreaSelection sel = this.getCurrentSelection();
+
+        if (sel != null && sel.getSelectedSubRegionBox() != null)
+        {
+            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, false);
+
+            if (pos != null)
+            {
+                Box box = sel.getSelectedSubRegionBox();
+                BlockPos pos1 = box.getPos1();
+                BlockPos pos2 = box.getPos2();
+
+                if (pos1 == null)
+                {
+                    pos1 = pos;
+                }
+
+                if (pos2 == null)
+                {
+                    pos2 = pos;
+                }
+
+                BlockPos posMin = PositionUtils.getMinCorner(PositionUtils.getMinCorner(pos1, pos2), pos);
+                BlockPos posMax = PositionUtils.getMaxCorner(PositionUtils.getMaxCorner(pos1, pos2), pos);
+
+                box.setPos1(posMin);
+                box.setPos2(posMax);
+            }
+        }
+    }
+
+    @Nullable
+    private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance)
+    {
+        return getTargetedPosition(world, player, maxDistance, true);
+    }
+
+    @Nullable
+    private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance, boolean sneakToInset)
+    {
+        RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(world, player, false, maxDistance);
+
+        if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+        {
+            return null;
+        }
+
+        BlockPos pos = trace.getBlockPos();
+
+        // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
+        if (player.isSneaking() != sneakToInset)
+        {
+            pos = pos.offset(trace.sideHit);
+        }
+
+        return pos;
     }
 
     public void releaseGrabbedElement()

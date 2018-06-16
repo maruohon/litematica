@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.render;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
@@ -88,6 +89,9 @@ public class ToolHud
                     str = I18n.format("litematica.hud.area_selection.selected_sub_region");
                     lines.add(String.format("%s: %s%s%s", str, GREEN, subRegionName, RESET));
                 }
+
+                strTmp = GuiLitematicaBase.TXT_GREEN + Configs.Generic.SELECTION_MODE.getOptionListValue().getDisplayName() + GuiLitematicaBase.TXT_RST;
+                lines.add(I18n.format("litematica.hud.area_selection.selection_mode", strTmp));
             }
         }
         else if (mode == OperationMode.PLACEMENT)

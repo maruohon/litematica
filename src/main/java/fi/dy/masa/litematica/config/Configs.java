@@ -7,11 +7,13 @@ import com.google.gson.JsonObject;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.selection.AreaSelectionMode;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigDouble;
+import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
 
 public class Configs
@@ -20,15 +22,17 @@ public class Configs
 
     public static class Generic
     {
-        public static final ConfigDouble  GHOST_BLOCK_ALPHA     = new ConfigDouble("ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
-        public static final ConfigBoolean RENDER_AS_TRANSLUCENT = new ConfigBoolean("renderAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
-        public static final ConfigString  TOOL_ITEM             = new ConfigString("toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
-        public static final ConfigBoolean TOOL_ITEM_ENABLED     = new ConfigBoolean("toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.");
-        public static final ConfigBoolean VERBOSE_LOGGING       = new ConfigBoolean("verboseLogging", false, "If enabled, a bunch of debug messages will be printed to the console");
+        public static final ConfigDouble        GHOST_BLOCK_ALPHA       = new ConfigDouble(     "ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
+        public static final ConfigBoolean       RENDER_AS_TRANSLUCENT   = new ConfigBoolean(    "renderAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
+        public static final ConfigOptionList    SELECTION_MODE          = new ConfigOptionList( "selectionMode", AreaSelectionMode.CORNERS, "The area selection mode to use");
+        public static final ConfigString        TOOL_ITEM               = new ConfigString(     "toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
+        public static final ConfigBoolean       TOOL_ITEM_ENABLED       = new ConfigBoolean(    "toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.");
+        public static final ConfigBoolean       VERBOSE_LOGGING         = new ConfigBoolean(    "verboseLogging", false, "If enabled, a bunch of debug messages will be printed to the console");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 GHOST_BLOCK_ALPHA,
                 RENDER_AS_TRANSLUCENT,
+                SELECTION_MODE,
                 TOOL_ITEM,
                 TOOL_ITEM_ENABLED,
                 VERBOSE_LOGGING

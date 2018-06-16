@@ -96,6 +96,7 @@ litematica.hud.area_selection.box_count=Boxes
 litematica.hud.area_selection.origin=Origin
 litematica.hud.area_selection.selected_area=Area
 litematica.hud.area_selection.selected_sub_region=Sub-region
+litematica.hud.area_selection.selection_mode=Selection Mode: %s
 
 litematica.hud.schematic_placement.selected_placement=Placement
 litematica.hud.schematic_placement.selected_sub_region=Sub-region

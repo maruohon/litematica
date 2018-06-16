@@ -31,8 +31,8 @@ public enum Hotkeys implements IHotkey
     TOGGLE_TRANSLUCENT_RENDERING        ("toggleTranslucentRendering",      "M,U",  "Toggle translucent vs. opaque ghost block rendering"),
     TOGGLE_WIRE_FRAME_RENDERING         ("toggleWireFrameRendering",        "M,W",  "Toggle block wire frame rendering on/off"),
     TOOL_ENABLED_TOGGLE                 ("toolEnabledToggle",               "M,T",  "The keybind to toggle the \"tool\" item functionality on/off"),
-    TOOL_PLACE_CORNER_1                 ("toolPlaceCorner1",                "BUTTON0", "The button to use while holding the \"tool\" item\nto place the primary/first corner"),
-    TOOL_PLACE_CORNER_2                 ("toolPlaceCorner2",                "BUTTON1", "The button to use while holding the \"tool\" item\nto place the second corner"),
+    TOOL_PLACE_CORNER_1                 ("toolPlaceCorner1",                "BUTTON0", false, "The button to use while holding the \"tool\" item\nto place the primary/first corner"),
+    TOOL_PLACE_CORNER_2                 ("toolPlaceCorner2",                "BUTTON1", false, "The button to use while holding the \"tool\" item\nto place the second corner"),
     TOOL_SELECT_ELEMENTS                ("toolSelectElements",              "BUTTON2", "The button to use to select corners or boxes while holding the \"tool\" item");
 
     private final String name;
@@ -41,9 +41,15 @@ public enum Hotkeys implements IHotkey
 
     private Hotkeys(String name, String defaultHotkey, String comment)
     {
+        this(name, defaultHotkey, true, comment);
+    }
+
+    private Hotkeys(String name, String defaultHotkey, boolean isStrict, String comment)
+    {
         this.name = name;
         this.comment = comment;
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey);
+        this.keybind.setIsStrict(isStrict);
     }
 
     @Override
