@@ -141,21 +141,23 @@ public class LitematicaSchematic
         }
 
         LitematicaSchematic schematic = new LitematicaSchematic(null);
-
         long time = (new Date()).getTime();
-        schematic.totalSize = PositionUtils.getEnclosingAreaSize(area);
+
         schematic.metadata.setAuthor(author);
+        schematic.metadata.setName(area.getName());
         schematic.metadata.setTimeCreated(time);
         schematic.metadata.setTimeModified(time);
         schematic.metadata.setRegionCount(boxes.size());
         schematic.metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
         schematic.metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
+        schematic.metadata.setTotalBlocks(schematic.totalBlocks);
+
+        schematic.totalSize = PositionUtils.getEnclosingAreaSize(area);
 
         schematic.setSubRegionPositions(boxes, area.getOrigin());
         schematic.setSubRegionSizes(boxes);
 
         schematic.takeBlocksFromWorld(world, boxes, area.getOrigin());
-        schematic.metadata.setTotalBlocks(schematic.totalBlocks);
 
         if (takeEntities)
         {

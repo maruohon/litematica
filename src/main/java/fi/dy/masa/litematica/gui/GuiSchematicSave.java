@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
@@ -13,8 +14,10 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileUtils;
+import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -191,7 +194,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
             if (this.type == Type.SAVE)
             {
                 File dir = this.gui.widget.getCurrentDirectory();
-                String name = this.gui.textField.getText();
+                String fileName = this.gui.textField.getText();
 
                 if (dir.isDirectory() == false)
                 {
@@ -199,9 +202,9 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
                     return;
                 }
 
-                if (name.isEmpty())
+                if (fileName.isEmpty())
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", name);
+                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
                     return;
                 }
 
@@ -210,7 +213,7 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
 
                 if (schematic == null)
                 {
-                    schematic = this.createSchematicFromWorld(name, takeEntities);
+                    schematic = this.createSchematicFromWorld(takeEntities);
                 }
                 else
                 {
@@ -219,9 +222,9 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
 
                 if (schematic != null)
                 {
-                    if (schematic.writeToFile(dir, name, GuiScreen.isShiftKeyDown(), this.gui))
+                    if (schematic.writeToFile(dir, fileName, GuiScreen.isShiftKeyDown(), this.gui))
                     {
-                        this.gui.addMessage(InfoType.SUCCESS, "litematica.message.schematic_saved_as", name);
+                        this.gui.addMessage(InfoType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                         this.gui.widget.refreshEntries();
                     }
                 }
@@ -251,21 +254,14 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
         }
 
         @Nullable
-        private LitematicaSchematic createSchematicFromWorld(String name, boolean takeEntities)
+        private LitematicaSchematic createSchematicFromWorld(boolean takeEntities)
         {
             AreaSelection area = this.selectionManager.getCurrentSelection();
 
             if (area != null)
             {
                 String author = this.gui.mc.player.getName();
-                LitematicaSchematic schematic = LitematicaSchematic.createSchematic(this.gui.mc.world, area, takeEntities, author, this.gui);
-
-                if (schematic != null)
-                {
-                    schematic.getMetadata().setName(name);
-                }
-
-                return schematic;
+                return LitematicaSchematic.createSchematic(this.gui.mc.world, area, takeEntities, author, this.gui);
             }
 
             return null;
@@ -320,6 +316,32 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
             }
 
             this.parent.addMessage(InfoType.SUCCESS, "litematica.message.directory_created", string);
+        }
+    }
+
+    public static class InMemorySchematicCreator implements IStringConsumer
+    {
+        private final AreaSelection area;
+        private final Minecraft mc;
+
+        public InMemorySchematicCreator(AreaSelection area)
+        {
+            this.area = area;
+            this.mc = Minecraft.getMinecraft();
+        }
+
+        @Override
+        public void setString(String string)
+        {
+            boolean takeEntities = true; // TODO
+            String author = this.mc.player.getName();
+            LitematicaSchematic schematic = LitematicaSchematic.createSchematic(this.mc.world, this.area, takeEntities, author, InfoUtils.INFO_MESSAGE_CONSUMER);
+
+            if (schematic != null)
+            {
+                SchematicHolder.getInstance().addSchematic(schematic, schematic.getMetadata().getName());
+                StringUtils.printActionbarMessage("litematica.message.in_memory_schematic_created", schematic.getMetadata().getName());
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
+import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
@@ -22,7 +23,7 @@ public class GuiTextInput extends GuiLitematicaBase
     private int dialogLeft;
     private int dialogTop;
 
-    public GuiTextInput(int maxTextLength, String titleKey, String text, GuiLitematicaBase parent, IStringConsumer consumer)
+    public GuiTextInput(int maxTextLength, String titleKey, String text, @Nullable GuiLitematicaBase parent, IStringConsumer consumer)
     {
         this.mc = Minecraft.getMinecraft();
         this.parent = parent;

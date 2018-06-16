@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.gui.GuiAreaSelectionManager.SelectedBoxRenamer;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
+import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.GuiTextInput;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -38,7 +39,8 @@ public class KeyCallbacks
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind().setCallback(callbackHotkeys);
-        Hotkeys.SAVE_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_1.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_2.getKeybind().setCallback(callbackHotkeys);
@@ -173,10 +175,24 @@ public class KeyCallbacks
 
                 return true;
             }
-            else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.SAVE_SCHEMATIC.getKeybind())
+            else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
             {
                 DataManager.save();
                 this.mc.displayGuiScreen(new GuiSchematicSave());
+                return true;
+            }
+            else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
+            {
+                DataManager.save();
+                SelectionManager sm = dataManager.getSelectionManager();
+                AreaSelection area = sm.getCurrentSelection();
+
+                if (area != null)
+                {
+                    String title = "litematica.gui.title.create_in_memory_schematic";
+                    this.mc.displayGuiScreen(new GuiTextInput(128, title, area.getName(), null, new InMemorySchematicCreator(area)));
+                }
+
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
