@@ -64,7 +64,12 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
 
     public GuiLitematicaBase setParent(GuiLitematicaBase parent)
     {
-        this.parent = parent;
+        // Don't allow nesting the GUI with itself...
+        if (parent == null || parent.getClass() != this.getClass())
+        {
+            this.parent = parent;
+        }
+
         return this;
     }
 
