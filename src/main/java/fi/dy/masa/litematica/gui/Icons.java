@@ -14,7 +14,9 @@ public enum Icons implements IGuiIcon
     FILE_ICON_VANILLA       (144,  24, 12, 12),
     FILE_ICON_DIR           (156,   0, 12, 12),
     FILE_ICON_DIR_UP        (156,  12, 12, 12),
-    FILE_ICON_DIR_ROOT      (156,  24, 12, 12);
+    FILE_ICON_DIR_ROOT      (156,  24, 12, 12),
+    SCHEMATIC_TYPE_FILE     (144,   0, 12, 12),
+    SCHEMATIC_TYPE_MEMORY   (186,   0, 12, 12);
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 

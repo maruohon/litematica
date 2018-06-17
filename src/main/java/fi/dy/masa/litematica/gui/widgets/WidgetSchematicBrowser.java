@@ -247,8 +247,16 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
             x += 3;
             y += 3;
             int textColor = 0xC0C0C0C0;
+            int valueColor = 0xC0FFFFFF;
 
-            String str = I18n.format("litematica.gui.label.schematic_info.author", meta.getAuthor());
+            String str = I18n.format("litematica.gui.label.schematic_info.name");
+            this.fontRenderer.drawString(str, x, y, textColor);
+            y += 12;
+
+            this.fontRenderer.drawString(meta.getName(), x + 4, y, valueColor);
+            y += 12;
+
+            str = I18n.format("litematica.gui.label.schematic_info.author", meta.getAuthor());
             this.fontRenderer.drawString(str, x, y, textColor);
             y += 12;
 
@@ -280,12 +288,13 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
             str = I18n.format("litematica.gui.label.schematic_info.enclosing_size");
             this.fontRenderer.drawString(str, x, y, textColor);
             y += 12;
+
             BlockPos p = meta.getEnclosingSize();
             String tmp = String.format("%d x %d x %d", p.getX(), p.getY(), p.getZ());
-            this.fontRenderer.drawString(tmp, x, y, textColor);
+            this.fontRenderer.drawString(tmp, x + 4, y, valueColor);
             y += 12;
 
-            str = I18n.format("litematica.gui.label.description");
+            str = I18n.format("litematica.gui.label.schematic_info.description");
             this.fontRenderer.drawString(str, x, y, textColor);
             y += 12;
         }

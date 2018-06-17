@@ -339,8 +339,9 @@ public class GuiSchematicSave extends GuiSchematicBrowserBase implements ISelect
 
             if (schematic != null)
             {
-                SchematicHolder.getInstance().addSchematic(schematic, schematic.getMetadata().getName());
-                StringUtils.printActionbarMessage("litematica.message.in_memory_schematic_created", schematic.getMetadata().getName());
+                schematic.getMetadata().setName(string);
+                SchematicHolder.getInstance().addSchematic(schematic, string, null);
+                StringUtils.printActionbarMessage("litematica.message.in_memory_schematic_created", string);
             }
         }
     }

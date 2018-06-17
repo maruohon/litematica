@@ -283,7 +283,9 @@ public class SchematicPlacementManager
                     if (placement != null)
                     {
                         this.schematicPlacements.add(placement);
-                        SchematicHolder.getInstance().addSchematic(placement.getSchematic(), placement.getSchematic().getMetadata().getName());
+                        String schematicName = placement.getSchematic().getMetadata().getName();
+                        String fileName = placement.getSchematicFile().getName();
+                        SchematicHolder.getInstance().addSchematic(placement.getSchematic(), schematicName, fileName);
                     }
                 }
                 else

@@ -33,6 +33,8 @@ public class SchematicPlacement
 
     private final Map<String, Placement> relativeSubRegionPlacements = new HashMap<>();
     private LitematicaSchematic schematic;
+    @Nullable
+    private File schematicFile;
     private BlockPos origin;
     private String name;
     private Rotation rotation = Rotation.NONE;
@@ -87,6 +89,12 @@ public class SchematicPlacement
     public LitematicaSchematic getSchematic()
     {
         return schematic;
+    }
+
+    @Nullable
+    public File getSchematicFile()
+    {
+        return this.schematicFile;
     }
 
     public BlockPos getOrigin()
@@ -440,6 +448,7 @@ public class SchematicPlacement
             Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
             Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
             SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, pos, name);
+            schematicPlacement.schematicFile = file;
             schematicPlacement.rotation = rotation;
             schematicPlacement.mirror = mirror;
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");

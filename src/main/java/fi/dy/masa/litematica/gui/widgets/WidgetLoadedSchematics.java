@@ -42,6 +42,6 @@ public class WidgetLoadedSchematics extends WidgetListBase<SchematicEntry, Widge
     @Override
     protected WidgetSchematicEntry createListWidget(int x, int y, boolean isOdd, SchematicEntry entry)
     {
-        return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, entry, this, this.mc);
+        return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, isOdd, entry, this, this.mc);
     }
 }

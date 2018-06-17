@@ -29,10 +29,10 @@ public class SchematicHolder
      * @param schematic
      * @return the index at which
      */
-    public int addSchematic(LitematicaSchematic schematic, String name)
+    public int addSchematic(LitematicaSchematic schematic, String schematicName, @Nullable String fileName)
     {
         int id = this.nextId++;
-        this.schematics.put(id, new SchematicEntry(schematic, id, name));
+        this.schematics.put(id, new SchematicEntry(schematic, id, schematicName, fileName));
         return id;
     }
 
@@ -64,15 +64,39 @@ public class SchematicHolder
 
     public static class SchematicEntry
     {
-        public final LitematicaSchematic schematic;
-        public final String name;
-        public final int schematicId;
+        private final LitematicaSchematic schematic;
+        private final String schematicName;
+        private final int schematicId;
+        @Nullable
+        private final String fileName;
 
-        public SchematicEntry(LitematicaSchematic schematic, int schematicId, String name)
+        public SchematicEntry(LitematicaSchematic schematic, int schematicId, String schematicName, @Nullable String fileName)
         {
             this.schematic = schematic;
             this.schematicId = schematicId;
-            this.name = name;
+            this.schematicName = schematicName;
+            this.fileName = fileName;
+        }
+
+        public LitematicaSchematic getSchematic()
+        {
+            return this.schematic;
+        }
+
+        public int getId()
+        {
+            return this.schematicId;
+        }
+
+        public String getSchematicName()
+        {
+            return this.schematicName;
+        }
+
+        @Nullable
+        public String getFileName()
+        {
+            return this.fileName;
         }
     }
 }

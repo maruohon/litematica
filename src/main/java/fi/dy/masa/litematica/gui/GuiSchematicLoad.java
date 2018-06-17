@@ -93,7 +93,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                     if (schematic != null)
                     {
-                        SchematicHolder.getInstance().addSchematic(schematic, schematic.getMetadata().getName());
+                        SchematicHolder.getInstance().addSchematic(schematic, schematic.getMetadata().getName(), file.getName());
                         this.gui.addMessage(InfoType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
                     }
                 }

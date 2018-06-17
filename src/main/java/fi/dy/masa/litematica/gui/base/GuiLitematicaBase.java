@@ -480,6 +480,11 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         */
     }
 
+    public static boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height)
+    {
+        return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
+    }
+
     public static void drawOutlinedBox(int x, int y, int width, int height, int colorBg, int colorBorder)
     {
         // Draw the background

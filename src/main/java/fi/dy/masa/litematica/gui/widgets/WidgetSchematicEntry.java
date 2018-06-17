@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -15,6 +16,8 @@ import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
@@ -24,8 +27,11 @@ public class WidgetSchematicEntry extends WidgetBase
     private final SchematicEntry schematicEntry;
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
+    private final int typeIconX;
+    private final int typeIconY;
+    private final boolean isOdd;
 
-    public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel,
+    public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
             SchematicEntry schematicEntry, WidgetLoadedSchematics parent, Minecraft mc)
     {
         super(x, y, width, height, zLevel);
@@ -33,8 +39,10 @@ public class WidgetSchematicEntry extends WidgetBase
         this.parent = parent;
         this.schematicEntry = schematicEntry;
         this.mc = mc;
+        this.isOdd = isOdd;
+        y += 1;
 
-        int posX = x + width - 10;
+        int posX = x + width;
         int len;
         ButtonListener listener;
         String text;
@@ -56,6 +64,9 @@ public class WidgetSchematicEntry extends WidgetBase
         posX -= (len + 4);
         listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
         this.addButton(new ButtonGeneric(0, posX, y, len, 20, text), listener);
+
+        this.typeIconX = this.x + 2;
+        this.typeIconY = y + 4;
     }
 
     protected <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
@@ -81,12 +92,49 @@ public class WidgetSchematicEntry extends WidgetBase
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        String name = this.schematicEntry.name;
-        this.mc.fontRenderer.drawString(name, this.x + 4, this.y + 3, 0xFFFFFFFF);
+        // Draw a lighter background for the hovered and the selected entry
+        if (selected || this.isMouseOver(mouseX, mouseY))
+        {
+            GuiLitematicaBase.drawRect(this.x + 18, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
+        }
+        else if (this.isOdd)
+        {
+            GuiLitematicaBase.drawRect(this.x + 18, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
+        }
+        // Draw a slightly lighter background for even entries
+        else
+        {
+            GuiLitematicaBase.drawRect(this.x + 18, this.y, this.x + this.width, this.y + this.height, 0x38FFFFFF);
+        }
+
+        String schematicName = this.schematicEntry.getSchematicName();
+        this.mc.fontRenderer.drawString(schematicName, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
         for (int i = 0; i < this.buttons.size(); ++i)
         {
             this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
+        }
+
+        String fileName = this.schematicEntry.getFileName();
+        this.parent.bindTexture(Icons.TEXTURE);
+
+        if (fileName != null)
+        {
+            Icons.SCHEMATIC_TYPE_FILE.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
+
+            if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x + 4, this.y + 3, this.mc.fontRenderer.getStringWidth(schematicName) + 16, 12))
+            {
+                this.parent.drawHoveringText(fileName, mouseX, mouseY);
+
+                GlStateManager.disableRescaleNormal();
+                RenderHelper.disableStandardItemLighting();
+                GlStateManager.disableLighting();
+                GlStateManager.color(1, 1, 1, 1);
+            }
+        }
+        else
+        {
+            Icons.SCHEMATIC_TYPE_MEMORY.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
         }
     }
 
@@ -110,7 +158,7 @@ public class WidgetSchematicEntry extends WidgetBase
                 int dimension = mc.world.provider.getDimensionType().getId();
                 BlockPos pos = new BlockPos(mc.player.getPositionVector());
                 SchematicEntry entry = this.widget.schematicEntry;
-                SchematicPlacement placement = SchematicPlacement.createFor(entry.schematic, pos, entry.name);
+                SchematicPlacement placement = SchematicPlacement.createFor(entry.getSchematic(), pos, entry.getSchematicName());
                 placement.setEnabled(true);
                 placement.setRenderSchematic(GuiScreen.isShiftKeyDown() == false);
                 DataManager.getInstance(dimension).getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
@@ -119,7 +167,7 @@ public class WidgetSchematicEntry extends WidgetBase
             {
                 Minecraft mc = Minecraft.getMinecraft();
                 SchematicEntry entry = this.widget.schematicEntry;
-                GuiSchematicSave gui = new GuiSchematicSave(entry.schematic);
+                GuiSchematicSave gui = new GuiSchematicSave(entry.getSchematic());
 
                 if (mc.currentScreen instanceof GuiLitematicaBase)
                 {
@@ -130,7 +178,7 @@ public class WidgetSchematicEntry extends WidgetBase
             }
             else if (this.type == Type.UNLOAD)
             {
-                SchematicHolder.getInstance().removeSchematic(this.widget.schematicEntry.schematicId);
+                SchematicHolder.getInstance().removeSchematic(this.widget.schematicEntry.getId());
                 this.widget.parent.refreshEntries();
             }
         }
