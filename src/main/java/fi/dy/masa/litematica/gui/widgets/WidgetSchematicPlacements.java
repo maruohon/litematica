@@ -1,29 +1,26 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
-import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
+import fi.dy.masa.litematica.gui.GuiPlacementManager;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
 import net.minecraft.client.Minecraft;
 
 public class WidgetSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
 {
-    private final IMessageConsumer messageConsumer;
+    private final GuiPlacementManager parent;
 
-    public WidgetSchematicPlacements(int x, int y, int width, int height,
-            IMessageConsumer messageConsumer, @Nullable ISelectionListener<SchematicPlacement> selectionListener)
+    public WidgetSchematicPlacements(int x, int y, int width, int height, GuiPlacementManager parent)
     {
-        super(x, y, width, height, selectionListener);
+        super(x, y, width, height, parent);
 
-        this.messageConsumer = messageConsumer;
+        this.parent = parent;
         this.browserEntryHeight = 22;
     }
 
-    public IMessageConsumer getMessageConsumer()
+    public GuiPlacementManager getParentGui()
     {
-        return this.messageConsumer;
+        return this.parent;
     }
 
     @Override

@@ -151,7 +151,7 @@ public class WidgetSchematicPlacement extends WidgetBase
             if (this.type == ButtonType.CONFIGURE)
             {
                 GuiPlacementConfiguration gui = new GuiPlacementConfiguration(this.widget.placement);
-                gui.setParent(this.widget.parent);
+                gui.setParent(this.widget.parent.getParentGui());
                 Minecraft.getMinecraft().displayGuiScreen(gui);
             }
             else if (this.type == ButtonType.REMOVE)

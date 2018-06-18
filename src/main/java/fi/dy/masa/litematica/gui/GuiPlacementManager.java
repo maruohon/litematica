@@ -81,6 +81,6 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
     @Override
     protected WidgetSchematicPlacements createListWidget(int listX, int listY)
     {
-        return new WidgetSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this, this.getSelectionListener());
+        return new WidgetSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 }
