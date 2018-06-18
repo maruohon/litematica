@@ -101,7 +101,7 @@ public class ToolHud
             if (schematicPlacement != null)
             {
                 str = I18n.format("litematica.hud.schematic_placement.selected_placement");
-                lines.add(String.format("%s: %s%s%s", str, WHITE, schematicPlacement.getName(), RESET));
+                lines.add(String.format("%s: %s%s%s", str, GREEN, schematicPlacement.getName(), RESET));
 
                 str = I18n.format("litematica.hud.schematic_placement.sub_region_count");
                 int count = schematicPlacement.getSubRegionCount();
@@ -121,7 +121,7 @@ public class ToolHud
                 {
                     String areaName = placement.getName();
                     str = I18n.format("litematica.hud.schematic_placement.selected_sub_region");
-                    lines.add(String.format("%s: %s%s%s", str, WHITE, areaName, RESET));
+                    lines.add(String.format("%s: %s%s%s", str, GREEN, areaName, RESET));
 
                     str = I18n.format("litematica.hud.schematic_placement.sub_region_modified");
                     strTmp = placement.isRegionPlacementModified(schematicPlacement.getSchematic().getSubRegionPosition(areaName)) ? strYes : strNo;

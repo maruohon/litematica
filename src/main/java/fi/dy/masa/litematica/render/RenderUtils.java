@@ -123,7 +123,7 @@ public class RenderUtils
     private static void drawBoundingBoxSides(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Vec4f color)
     {
         GlStateManager.enableBlend();
-        GlStateManager.enableCull();
+        GlStateManager.disableCull();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -175,6 +175,7 @@ public class RenderUtils
 
         tessellator.draw();
 
+        GlStateManager.enableCull();
         GlStateManager.disableBlend();
     }
 
