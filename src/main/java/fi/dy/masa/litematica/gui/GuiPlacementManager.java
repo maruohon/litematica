@@ -1,15 +1,20 @@
 package fi.dy.masa.litematica.gui;
 
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.data.SchematicPlacementManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiListBase;
+import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacements;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
-public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetSchematicPlacements>
+public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetSchematicPlacements>  implements ISelectionListener<SchematicPlacement>
 {
+    private final SchematicPlacementManager manager;
     private int id;
 
     public GuiPlacementManager()
@@ -17,6 +22,10 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
         super(10, 40);
 
         this.title = I18n.format("litematica.gui.title.manage_schematic_placements");
+
+        Minecraft mc = Minecraft.getMinecraft();
+        int dimension = mc.world.provider.getDimensionType().getId();
+        this.manager = DataManager.getInstance(dimension).getSchematicPlacementManager();
     }
 
     @Override
@@ -58,8 +67,20 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
     }
 
     @Override
+    public void onSelectionChange(SchematicPlacement entry)
+    {
+        this.manager.setSelectedSchematicPlacement(entry);
+    }
+
+    @Override
+    protected ISelectionListener<SchematicPlacement> getSelectionListener()
+    {
+        return this;
+    }
+
+    @Override
     protected WidgetSchematicPlacements createListWidget(int listX, int listY)
     {
-        return new WidgetSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this, null);
+        return new WidgetSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this, this.getSelectionListener());
     }
 }

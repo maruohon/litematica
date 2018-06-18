@@ -30,6 +30,7 @@ public class WidgetSchematicEntry extends WidgetBase
     private final int typeIconX;
     private final int typeIconY;
     private final boolean isOdd;
+    private final int buttonsStartX;
 
     public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
             SchematicEntry schematicEntry, WidgetLoadedSchematics parent, Minecraft mc)
@@ -65,6 +66,7 @@ public class WidgetSchematicEntry extends WidgetBase
         listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
         this.addButton(new ButtonGeneric(0, posX, y, len, 20, text), listener);
 
+        this.buttonsStartX = posX;
         this.typeIconX = this.x + 2;
         this.typeIconY = y + 4;
     }
@@ -92,19 +94,21 @@ public class WidgetSchematicEntry extends WidgetBase
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
+        GlStateManager.color(1, 1, 1, 1);
+
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiLitematicaBase.drawRect(this.x + 18, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
+            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
         }
         else if (this.isOdd)
         {
-            GuiLitematicaBase.drawRect(this.x + 18, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
+            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiLitematicaBase.drawRect(this.x + 18, this.y, this.x + this.width, this.y + this.height, 0x38FFFFFF);
+            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x50FFFFFF);
         }
 
         String schematicName = this.schematicEntry.getSchematicName();
@@ -122,7 +126,7 @@ public class WidgetSchematicEntry extends WidgetBase
         {
             Icons.SCHEMATIC_TYPE_FILE.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
 
-            if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x + 4, this.y + 3, this.mc.fontRenderer.getStringWidth(schematicName) + 16, 12))
+            if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
             {
                 this.parent.drawHoveringText(fileName, mouseX, mouseY);
 

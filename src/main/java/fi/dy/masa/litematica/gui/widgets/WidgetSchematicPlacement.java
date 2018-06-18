@@ -4,33 +4,41 @@ import java.util.ArrayList;
 import java.util.List;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.data.SchematicPlacementManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 
 public class WidgetSchematicPlacement extends WidgetBase
 {
+    private final SchematicPlacementManager manager;
     private final WidgetSchematicPlacements parent;
     private final SchematicPlacement placement;
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
+    private final boolean isOdd;
     private int id;
 
-    public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel,
+    public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel, boolean isOdd,
             SchematicPlacement placement, WidgetSchematicPlacements parent, Minecraft mc)
     {
         super(x, y, width, height, zLevel);
 
         this.parent = parent;
         this.placement = placement;
+        this.isOdd = isOdd;
         this.mc = mc;
+
+        int dimension = mc.world.provider.getDimensionType().getId();
+        this.manager = DataManager.getInstance(dimension).getSchematicPlacementManager();
 
         this.id = 0;
         int posX = x + width;
@@ -44,7 +52,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         String labelDis = I18n.format("litematica.button.schematic_placements.render_disable");
         String label = this.placement.getRenderSchematic() ? labelDis : labelEn;
         int len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
-        posX -= (len + 4);
+        posX -= (len + 2);
         ButtonListener listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_RENDER, this);
         this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
 
@@ -52,11 +60,10 @@ public class WidgetSchematicPlacement extends WidgetBase
         labelDis = I18n.format("litematica.button.schematic_placements.disable");
         label = this.placement.isEnabled() ? labelDis : labelEn;
         len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
-        posX -= (len + 4);
+        posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_ENABLED, this);
         this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
 
-        posX = this.createButton(posX, posY, ButtonListener.ButtonType.SELECT);
         posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
     }
 
@@ -64,7 +71,7 @@ public class WidgetSchematicPlacement extends WidgetBase
     {
         String label = I18n.format(type.getLabelKey());
         int len = mc.fontRenderer.getStringWidth(label) + 10;
-        x -= (len + 4);
+        x -= (len + 2);
         this.addButton(new ButtonGeneric(this.id++, x, y, len, 20, label), new ButtonListener(type, this));
 
         return x;
@@ -93,12 +100,28 @@ public class WidgetSchematicPlacement extends WidgetBase
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        int dimension = mc.world.provider.getDimensionType().getId();
+        GlStateManager.color(1, 1, 1, 1);
 
-        if (DataManager.getInstance(dimension).getSchematicPlacementManager().getSelectedSchematicPlacement() == this.placement)
+        boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
+
+        // Draw a lighter background for the hovered and the selected entry
+        if (selected || placementSelected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiLitematicaBase.drawOutline(this.x, this.y, this.width, this.height, 0xD0FFFFFF);
+            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
+        }
+        else if (this.isOdd)
+        {
+            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
+        }
+        // Draw a slightly lighter background for even entries
+        else
+        {
+            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
+        }
+
+        if (placementSelected)
+        {
+            GuiLitematicaBase.drawOutline(this.x, this.y, this.width, this.height, 0xFFD0D0D0);
         }
 
         String name = this.placement.getName();
@@ -125,22 +148,15 @@ public class WidgetSchematicPlacement extends WidgetBase
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-            int dimension = mc.world.provider.getDimensionType().getId();
-
             if (this.type == ButtonType.CONFIGURE)
             {
                 GuiPlacementConfiguration gui = new GuiPlacementConfiguration(this.widget.placement);
                 gui.setParent(this.widget.parent);
-                mc.displayGuiScreen(gui);
-            }
-            else if (this.type == ButtonType.SELECT)
-            {
-                DataManager.getInstance(dimension).getSchematicPlacementManager().setSelectedSchematicPlacement(this.widget.placement);
+                Minecraft.getMinecraft().displayGuiScreen(gui);
             }
             else if (this.type == ButtonType.REMOVE)
             {
-                DataManager.getInstance(dimension).getSchematicPlacementManager().removeSchematicPlacement(this.widget.placement);
+                this.widget.manager.removeSchematicPlacement(this.widget.placement);
                 this.widget.parent.refreshEntries();
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
@@ -164,7 +180,6 @@ public class WidgetSchematicPlacement extends WidgetBase
         public enum ButtonType
         {
             CONFIGURE       ("litematica.button.schematic_placements.configure"),
-            SELECT          ("litematica.button.schematic_placements.select"),
             REMOVE          ("litematica.button.schematic_placements.remove"),
             TOGGLE_ENABLED  (""),
             TOGGLE_RENDER   ("");
