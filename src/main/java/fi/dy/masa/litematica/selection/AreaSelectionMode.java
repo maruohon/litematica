@@ -1,11 +1,12 @@
 package fi.dy.masa.litematica.selection;
 
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
+import net.minecraft.client.resources.I18n;
 
 public enum AreaSelectionMode implements IConfigOptionListEntry
 {
-    CORNERS     ("Corners"),
-    CUBOID      ("Cuboid");
+    CORNERS     ("litematica.hud.area_selection.mode.corners"),
+    CUBOID      ("litematica.hud.area_selection.mode.cuboid");
 
     private final String displayName;
 
@@ -23,7 +24,7 @@ public enum AreaSelectionMode implements IConfigOptionListEntry
     @Override
     public String getDisplayName()
     {
-        return this.displayName;
+        return I18n.format(this.displayName);
     }
 
     @Override

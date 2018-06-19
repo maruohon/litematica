@@ -48,16 +48,16 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
 
-        String labelEn = I18n.format("litematica.button.schematic_placements.render_enable");
-        String labelDis = I18n.format("litematica.button.schematic_placements.render_disable");
+        String labelEn = I18n.format("litematica.gui.button.schematic_placements.render_enable");
+        String labelDis = I18n.format("litematica.gui.button.schematic_placements.render_disable");
         String label = this.placement.getRenderSchematic() ? labelDis : labelEn;
         int len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
         posX -= (len + 2);
         ButtonListener listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_RENDER, this);
         this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
 
-        labelEn = I18n.format("litematica.button.schematic_placements.enable");
-        labelDis = I18n.format("litematica.button.schematic_placements.disable");
+        labelEn = I18n.format("litematica.gui.button.schematic_placements.enable");
+        labelDis = I18n.format("litematica.gui.button.schematic_placements.disable");
         label = this.placement.isEnabled() ? labelDis : labelEn;
         len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
         posX -= (len + 2);
@@ -179,8 +179,8 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         public enum ButtonType
         {
-            CONFIGURE       ("litematica.button.schematic_placements.configure"),
-            REMOVE          ("litematica.button.schematic_placements.remove"),
+            CONFIGURE       ("litematica.gui.button.schematic_placements.configure"),
+            REMOVE          ("litematica.gui.button.schematic_placements.remove"),
             TOGGLE_ENABLED  (""),
             TOGGLE_RENDER   ("");
 

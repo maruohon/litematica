@@ -48,6 +48,14 @@ public abstract class GuiListBase<TYPE, WIDGET extends WidgetBase, WIDGETLIST ex
     }
 
     @Override
+    public void onGuiClosed()
+    {
+        super.onGuiClosed();
+
+        this.widget.onGuiClosed();
+    }
+
+    @Override
     public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
         if (this.widget.onMouseClicked(mouseX, mouseY, mouseButton))

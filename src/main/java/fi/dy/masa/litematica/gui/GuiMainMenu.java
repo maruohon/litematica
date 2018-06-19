@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
+import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -34,6 +35,9 @@ public class GuiMainMenu extends GuiLitematicaBase
         y += 44;
 
         this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SHOW_AREA_SELECTIONS);
+        y += 44;
+
+        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_MANAGER);
     }
 
     private void createChangeMenuButton(int x, int y, ButtonListenerChangeMenu.ButtonType type)
@@ -44,10 +48,11 @@ public class GuiMainMenu extends GuiLitematicaBase
 
     public static class ButtonListenerChangeMenu implements IButtonActionListener<ButtonGeneric>
     {
-        private final GuiLitematicaBase parent;
         private final ButtonType type;
+        @Nullable
+        private final GuiLitematicaBase parent;
 
-        public ButtonListenerChangeMenu(ButtonType type, GuiLitematicaBase parent)
+        public ButtonListenerChangeMenu(ButtonType type, @Nullable GuiLitematicaBase parent)
         {
             this.type = type;
             this.parent = parent;
@@ -73,6 +78,10 @@ public class GuiMainMenu extends GuiLitematicaBase
             else if (this.type == ButtonType.LOAD_SCHEMATICS)
             {
                 gui = new GuiSchematicLoad();
+            }
+            else if (this.type == ButtonType.SCHEMATIC_MANAGER)
+            {
+                gui = new GuiSchematicManager();
             }
             else if (this.type == ButtonType.MAIN_MENU)
             {
@@ -106,7 +115,7 @@ public class GuiMainMenu extends GuiLitematicaBase
             // Create a new Schematic from an area selection
             CREATE_SCHEMATIC        ("litematica.gui.button.change_menu.create_schematic_from_area", null),
             // Edit Schematics (description or icon), or convert between formats
-            MANAGE_SCHEMATICS       ("litematica.gui.button.change_menu.manage_schematics", null),
+            SCHEMATIC_MANAGER       ("litematica.gui.button.change_menu.schematic_manager", ButtonIcon.SCHEMATIC_MANAGER),
             // Switch to the Litematica main menu
             MAIN_MENU               ("litematica.gui.button.change_menu.to_main_menu", null);
 

@@ -8,11 +8,9 @@ import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.InitCompleteListener;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
-import com.mumfrey.liteloader.ScreenshotListener;
 import com.mumfrey.liteloader.ShutdownListener;
 import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoader;
-import com.mumfrey.liteloader.core.LiteLoaderEventBroker.ReturnValue;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
@@ -22,12 +20,10 @@ import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.malilib.hotkeys.KeybindEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
-import net.minecraft.util.text.ITextComponent;
 
-public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, ScreenshotListener, ShutdownListener, Tickable
+public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, ShutdownListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -84,12 +80,6 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     public void onShutDown()
     {
         Configs.save();
-    }
-
-    @Override
-    public boolean onSaveScreenshot(String screenshotName, int width, int height, Framebuffer fbo, ReturnValue<ITextComponent> message)
-    {
-        return true;
     }
 
     public static void logInfo(String message, Object... args)

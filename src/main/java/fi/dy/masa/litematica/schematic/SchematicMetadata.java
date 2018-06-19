@@ -13,8 +13,6 @@ public class SchematicMetadata
 {
     private String name = "?";
     private String author = "Unknown";
-    private String thumbnailLocation = "";
-    private String thumbnailData = "";
     private String description = "";
     private BlockPos enclosingSize = BlockPos.ORIGIN;
     private long timeCreated;
@@ -22,6 +20,7 @@ public class SchematicMetadata
     private int regionCount;
     private int totalVolume;
     private int totalBlocks;
+    private int[] thumbnailPixelData;
 
     public String getName()
     {
@@ -38,14 +37,10 @@ public class SchematicMetadata
         return this.description;
     }
 
-    public String getThumbnailLocation()
+    @Nullable
+    public int[] getPreviewImagePixelData()
     {
-        return thumbnailLocation;
-    }
-
-    public String getThumbnailData()
-    {
-        return thumbnailData;
+        return thumbnailPixelData;
     }
 
     public int getRegionCount()
@@ -98,14 +93,9 @@ public class SchematicMetadata
         this.description = description;
     }
 
-    public void setThumbnailLocation(String thumbnailLocation)
+    public void setPreviewImagePixelData(int[] pixelData)
     {
-        this.thumbnailLocation = thumbnailLocation;
-    }
-
-    public void setThumbnailData(String thumbnailData)
-    {
-        this.thumbnailData = thumbnailData;
+        this.thumbnailPixelData = pixelData;
     }
 
     public void setRegionCount(int regionCount)
@@ -145,14 +135,17 @@ public class SchematicMetadata
         nbt.setString("Name", this.name);
         nbt.setString("Author", this.author);
         nbt.setString("Description", this.description);
-        nbt.setString("ThumbnailLocation", this.thumbnailLocation);
-        nbt.setString("ThumbnailData", this.thumbnailData);
         nbt.setInteger("RegionCount", this.regionCount);
         nbt.setInteger("TotalVolume", this.totalVolume);
         nbt.setInteger("TotalBlocks", this.totalBlocks);
         nbt.setLong("TimeCreated", this.timeCreated);
         nbt.setLong("TimeModified", this.timeModified);
         nbt.setTag("EnclosingSize", NBTUtils.createBlockPosTag(this.enclosingSize));
+
+        if (this.thumbnailPixelData != null)
+        {
+            nbt.setIntArray("PreviewImageData", this.thumbnailPixelData);
+        }
 
         return nbt;
     }
@@ -162,8 +155,6 @@ public class SchematicMetadata
         this.name = nbt.getString("Name");
         this.author = nbt.getString("Author");
         this.description = nbt.getString("Description");
-        this.thumbnailLocation = nbt.getString("ThumbnailLocation");
-        this.thumbnailData = nbt.getString("ThumbnailData");
         this.regionCount = nbt.getInteger("RegionCount");
         this.totalVolume = nbt.getInteger("TotalVolume");
         this.totalBlocks = nbt.getInteger("TotalBlocks");
@@ -175,6 +166,11 @@ public class SchematicMetadata
         if (size != null)
         {
             this.enclosingSize = size;
+        }
+
+        if (nbt.hasKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
+        {
+            this.thumbnailPixelData = nbt.getIntArray("PreviewImageData");
         }
     }
 

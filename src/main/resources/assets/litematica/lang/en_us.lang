@@ -8,6 +8,9 @@ litematica.error.schematic_load.cant_read_file=Can't read the schematic file '%s
 litematica.error.schematic_load.no_schematic_selected=No Schematic file selected!
 litematica.error.schematic_load.unsupported_type=Unknown or unsupported file type for '%s'
 
+litematica.error.schematic_manager.schematic_export.unsupported_type=Only Litematica schematics can be exported in other formats!
+litematica.error.schematic_manager.schematic_import.unsupported_type=The selected schematic type isn't supported for import!
+
 litematica.error.schematic_save.directory_doesnt_exist=No such directory: '%s'
 litematica.error.schematic_save.failed_to_create_directory=Failed to create directory '%s'
 litematica.error.schematic_save.file_already_exists=File '%s' already exists
@@ -23,28 +26,35 @@ litematica.error.schematic_write_to_file_failed.exception=Failed to write the sc
 litematica.error.schematic_write_to_file_failed.exists=Failed to write the schematic to file '%s', file already exists
 
 litematica.info.schematic_load.schematic_loaded=Schematic '%s' successfully loaded to memory
+litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the button to cancel a pending preview operation
+litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot=Use the screenshot keybind to set the preview
+litematica.info.schematic_manager.preview.success=Preview image successfully set
 
 litematica.gui.button.change_menu.create_schematic_from_area=Create schematic from selection
 litematica.gui.button.change_menu.load_schematics_to_memory=Load schematics to memory
-litematica.gui.button.change_menu.manage_schematics=Manage schematics
+litematica.gui.button.change_menu.schematic_manager=Schematic Manager
 litematica.gui.button.change_menu.show_area_selections=Show area selections
 litematica.gui.button.change_menu.show_loaded_schematics=Show loaded schematics
 litematica.gui.button.change_menu.show_schematic_placements=Show schematic placements
 litematica.gui.button.change_menu.to_main_menu=Litematica menu
 
-litematica.button.schematic_placements.configure=Configure
-litematica.button.schematic_placements.remove=Remove
-litematica.button.schematic_placements.select=Select
-litematica.button.schematic_placements.disable=Disable
-litematica.button.schematic_placements.enable=Enable
-litematica.button.schematic_placements.render_enable=Enable rendering
-litematica.button.schematic_placements.render_disable=Disable rendering
+litematica.gui.button.schematic_manager.export_as=Export as:
+
+litematica.gui.button.schematic_placements.configure=Configure
+litematica.gui.button.schematic_placements.remove=Remove
+litematica.gui.button.schematic_placements.select=Select
+litematica.gui.button.schematic_placements.disable=Disable
+litematica.gui.button.schematic_placements.enable=Enable
+litematica.gui.button.schematic_placements.render_enable=Enable rendering
+litematica.gui.button.schematic_placements.render_disable=Disable rendering
 
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.create_placement=Create placement
 litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
+litematica.gui.button.import_fast=Import (fast)
+litematica.gui.button.import_proper=Import (proper)
 litematica.gui.button.load_schematic_to_memory=Load Schematic to memory
 litematica.gui.button.ok=OK
 litematica.gui.button.mirror_value=Mirror: %s
@@ -55,6 +65,7 @@ litematica.gui.button.reset=Reset
 litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_area_to_schematic=Save Area
 litematica.gui.button.save_to_file=Save to file
+litematica.gui.button.set_preview=Set preview
 litematica.gui.button.unload=Unload
 
 litematica.gui.label.area_selection_box_count=Boxes: %d
@@ -89,12 +100,16 @@ litematica.gui.title.manage_loaded_schematics=Manage loaded Schematics
 litematica.gui.title.manage_schematic_placements=Manage Schematic Placements
 litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.rename_area_sub_region=Rename Sub Region
+litematica.gui.title.rename_schematic=Rename Schematic
 litematica.gui.title.create_schematic_from_selection=Save the currently selected area as a Schematic
 litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
 litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
+litematica.gui.title.schematic_manager=Schematic Manager
 
 litematica.hud.area_selection.box_count=Boxes
+litematica.hud.area_selection.mode.corners=Corners
+litematica.hud.area_selection.mode.cuboid=Cuboid
 litematica.hud.area_selection.origin=Origin
 litematica.hud.area_selection.selected_area=Area
 litematica.hud.area_selection.selected_sub_region=Sub-region

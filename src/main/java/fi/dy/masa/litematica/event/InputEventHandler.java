@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.event;
 
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.GuiSchematicManager;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
@@ -37,6 +38,11 @@ public class InputEventHandler implements IKeybindEventHandler
     @Override
     public boolean onKeyInput(int eventKey, boolean eventKeyState)
     {
+        if (eventKeyState && Minecraft.getMinecraft().gameSettings.keyBindScreenshot.getKeyCode() == eventKey)
+        {
+            return GuiSchematicManager.setPreviewImage();
+        }
+
         return false;
     }
 

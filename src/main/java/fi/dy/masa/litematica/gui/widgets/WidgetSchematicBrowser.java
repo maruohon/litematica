@@ -7,12 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
@@ -22,7 +21,11 @@ import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.util.FileUtils;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, WidgetDirectoryEntry> implements IDirectoryNavigator
@@ -31,7 +34,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     protected Map<File, SchematicMetadata> cachedMetadata = new HashMap<>();
-    protected Set<File> checkedMetadataFiles = new HashSet<>();
+    protected Map<File, Pair<ResourceLocation, DynamicTexture>> cachedPreviewImages = new HashMap<>();
     protected File currentDirectory;
     protected final int infoWidth;
     protected final int infoHeight;
@@ -43,11 +46,27 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
         super(x, y, width, height, selectionListener);
 
         this.title = I18n.format("litematica.gui.title.schematic_browser");
-        this.infoWidth = 160;
+        this.infoWidth = 170;
         this.infoHeight = 280;
         this.currentDirectory = DataManager.getCurrentSchematicDirectory();
 
         this.setSize(width, height);
+    }
+
+    @Override
+    public void onGuiClosed()
+    {
+        super.onGuiClosed();
+
+        this.clearPreviewImages();
+    }
+
+    private void clearPreviewImages()
+    {
+        for (Pair<ResourceLocation, DynamicTexture> pair : this.cachedPreviewImages.values())
+        {
+            this.mc.getTextureManager().deleteTexture(pair.getLeft());
+        }
     }
 
     @Override
@@ -59,9 +78,9 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
             return true;
         }
         else if ((keyCode == Keyboard.KEY_RIGHT || keyCode == Keyboard.KEY_RETURN) &&
-                  this.selectedEntry != null && this.selectedEntry.getType() == DirectoryEntryType.DIRECTORY)
+                  this.getSelectedEntry() != null && this.getSelectedEntry().getType() == DirectoryEntryType.DIRECTORY)
         {
-            this.switchToDirectory(new File(this.selectedEntry.getDirectory(), this.selectedEntry.getName()));
+            this.switchToDirectory(new File(this.getSelectedEntry().getDirectory(), this.getSelectedEntry().getName()));
             return true;
         }
         else
@@ -93,7 +112,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
             this.directoryNavigationWidget.render(mouseX, mouseY, false);
         }
 
-        this.drawSelectedSchematicInfo(this.selectedEntry);
+        this.drawSelectedSchematicInfo(this.getSelectedEntry());
 
         super.drawContents(mouseX, mouseY, partialTicks);
     }
@@ -103,7 +122,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     {
         super.setSize(width, height);
 
-        this.browserWidth = width - this.infoWidth - 10;
+        this.browserWidth = width - this.infoWidth - 6;
         this.browserEntryWidth = this.browserWidth - 14;
     }
 
@@ -294,16 +313,30 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
             this.fontRenderer.drawString(tmp, x + 4, y, valueColor);
             y += 12;
 
+            /*
             str = I18n.format("litematica.gui.label.schematic_info.description");
             this.fontRenderer.drawString(str, x, y, textColor);
+            */
             y += 12;
+
+            Pair<ResourceLocation, DynamicTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
+
+            if (pair != null)
+            {
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                this.bindTexture(pair.getLeft());
+
+                int size = (int) Math.sqrt(pair.getRight().getTextureData().length);
+                Gui.drawModalRectWithCustomSizedTexture(x + 10, y, 0.0F, 0.0F, size, size, size, size);
+            }
         }
     }
 
     public void clearSchematicMetadataCache()
     {
+        this.clearPreviewImages();
         this.cachedMetadata.clear();
-        this.checkedMetadataFiles.clear();
+        this.cachedPreviewImages.clear();
     }
 
     @Nullable
@@ -312,18 +345,49 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
         File file = new File(entry.getDirectory(), entry.getName() + "_meta");
         SchematicMetadata meta = this.cachedMetadata.get(file);
 
-        if (meta == null && this.checkedMetadataFiles.contains(file) == false)
+        if (meta == null)
         {
-            this.checkedMetadataFiles.add(file);
             meta = SchematicMetadata.fromFile(file);
 
             if (meta != null)
             {
                 this.cachedMetadata.put(file, meta);
+                this.createPreviewImage(new File(entry.getDirectory(), entry.getName()), meta);
             }
         }
 
         return meta;
+    }
+
+    private void createPreviewImage(File file, SchematicMetadata meta)
+    {
+        int[] previewImageData = meta.getPreviewImagePixelData();
+
+        if (previewImageData != null && previewImageData.length > 0)
+        {
+            try
+            {
+                int size = (int) Math.sqrt(previewImageData.length);
+
+                if (size * size == previewImageData.length)
+                {
+                    //BufferedImage buf = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+                    //buf.setRGB(0, 0, size, size, previewImageData, 0, size);
+
+                    DynamicTexture tex = new DynamicTexture(size, size);
+                    ResourceLocation rl = new ResourceLocation("litematica", file.getAbsolutePath());
+                    this.mc.getTextureManager().loadTexture(rl, tex);
+
+                    System.arraycopy(previewImageData, 0, tex.getTextureData(), 0, previewImageData.length);
+                    tex.updateDynamicTexture();
+
+                    this.cachedPreviewImages.put(file, Pair.of(rl, tex));
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
     }
 
     public static class DirectoryEntry implements Comparable<DirectoryEntry>

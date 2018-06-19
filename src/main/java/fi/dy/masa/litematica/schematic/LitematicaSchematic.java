@@ -722,10 +722,8 @@ public class LitematicaSchematic
     }
 
     @Nullable
-    public static LitematicaSchematic createFromFile(File dir, String fileNameIn, IStringConsumer feedback)
+    public static LitematicaSchematic createFromFile(File dir, String fileName, IStringConsumer feedback)
     {
-        String fileName = fileNameIn;
-
         if (fileName.endsWith(FILE_EXTENSION) == false)
         {
             fileName = fileName + FILE_EXTENSION;
