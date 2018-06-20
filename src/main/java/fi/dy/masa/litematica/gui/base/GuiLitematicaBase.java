@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetInfo;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
+import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
@@ -48,8 +49,8 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     protected static final int COLOR_HORIZONTAL_BAR = 0xFF999999;
     protected static final int LEFT         = 20;
     protected static final int TOP          = 10;
-    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
-    private final List<TextFieldEntry<?>> textFields = new ArrayList<>();
+    private final List<ButtonWrapper<? extends ButtonBase>> buttons = new ArrayList<>();
+    private final List<TextFieldEntry<? extends GuiTextField>> textFields = new ArrayList<>();
     private final List<GuiLabel> labels = new ArrayList<>();
     private final List<WidgetInfo> infoWidgets = new ArrayList<>();
     private final List<Message> messages = new ArrayList<>();
@@ -115,6 +116,8 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         this.drawGuiMessages();
+
+        this.drawButtonHoverTexts(mouseX, mouseY, partialTicks);
 
         if (this.infoWidgets.isEmpty() == false)
         {
@@ -417,6 +420,19 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         for (ButtonWrapper<?> entry : this.buttons)
         {
             entry.draw(this.mc, mouseX, mouseY, partialTicks);
+        }
+    }
+
+    protected void drawButtonHoverTexts(int mouseX, int mouseY, float partialTicks)
+    {
+        for (ButtonWrapper<? extends ButtonBase> entry : this.buttons)
+        {
+            ButtonBase button = entry.getButton();
+
+            if ((button instanceof ButtonHoverText) && button.isMouseOver())
+            {
+                this.drawHoveringText(((ButtonHoverText) button).getHoverStrings(), mouseX, mouseY);
+            }
         }
     }
 
