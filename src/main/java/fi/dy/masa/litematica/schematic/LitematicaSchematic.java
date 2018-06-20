@@ -39,6 +39,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class LitematicaSchematic
@@ -51,7 +52,7 @@ public class LitematicaSchematic
     private final Map<String, BlockPos> subRegionPositions = new HashMap<>();
     private final Map<String, BlockPos> subRegionSizes = new HashMap<>();
     private final SchematicMetadata metadata = new SchematicMetadata();
-    private BlockPos totalSize = BlockPos.ORIGIN;
+    private Vec3i totalSize = BlockPos.ORIGIN;
     private int totalBlocks;
     @Nullable
     private final File schematicFile;
@@ -67,7 +68,7 @@ public class LitematicaSchematic
         return this.schematicFile;
     }
 
-    public BlockPos getTotalSize()
+    public Vec3i getTotalSize()
     {
         return this.totalSize;
     }
@@ -130,7 +131,7 @@ public class LitematicaSchematic
     }
 
     @Nullable
-    public static LitematicaSchematic createSchematic(World world, AreaSelection area, boolean takeEntities, String author, IStringConsumer feedback)
+    public static LitematicaSchematic createFromWorld(World world, AreaSelection area, boolean takeEntities, String author, IStringConsumer feedback)
     {
         List<Box> boxes = PositionUtils.getValidBoxes(area);
 
@@ -143,15 +144,6 @@ public class LitematicaSchematic
         LitematicaSchematic schematic = new LitematicaSchematic(null);
         long time = (new Date()).getTime();
 
-        schematic.metadata.setAuthor(author);
-        schematic.metadata.setName(area.getName());
-        schematic.metadata.setTimeCreated(time);
-        schematic.metadata.setTimeModified(time);
-        schematic.metadata.setRegionCount(boxes.size());
-        schematic.metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
-        schematic.metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
-        schematic.metadata.setTotalBlocks(schematic.totalBlocks);
-
         schematic.totalSize = PositionUtils.getEnclosingAreaSize(area);
 
         schematic.setSubRegionPositions(boxes, area.getOrigin());
@@ -163,6 +155,15 @@ public class LitematicaSchematic
         {
             schematic.takeEntitiesFromWorld(world, boxes, area.getOrigin());
         }
+
+        schematic.metadata.setAuthor(author);
+        schematic.metadata.setName(area.getName());
+        schematic.metadata.setTimeCreated(time);
+        schematic.metadata.setTimeModified(time);
+        schematic.metadata.setRegionCount(boxes.size());
+        schematic.metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
+        schematic.metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
+        schematic.metadata.setTotalBlocks(schematic.totalBlocks);
 
         return schematic;
     }
@@ -346,8 +347,8 @@ public class LitematicaSchematic
             if (entity != null)
             {
                 Vec3d pos = info.posVec;
-                pos = PositionUtils.transformedVec3d(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-                pos = PositionUtils.transformedVec3d(pos, placement.getMirror(), placement.getRotation());
+                pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+                pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
 
                 entity.setLocationAndAngles(pos.x + offX, pos.y + offY, pos.z + offZ, entity.rotationYaw, entity.rotationPitch);
                 world.spawnEntity(entity);

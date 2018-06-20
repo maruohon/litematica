@@ -7,14 +7,14 @@ import fi.dy.masa.litematica.util.Constants;
 import fi.dy.masa.litematica.util.NBTUtils;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 
 public class SchematicMetadata
 {
     private String name = "?";
     private String author = "Unknown";
     private String description = "";
-    private BlockPos enclosingSize = BlockPos.ORIGIN;
+    private Vec3i enclosingSize = Vec3i.NULL_VECTOR;
     private long timeCreated;
     private long timeModified;
     private int regionCount;
@@ -58,7 +58,7 @@ public class SchematicMetadata
         return this.totalBlocks;
     }
 
-    public BlockPos getEnclosingSize()
+    public Vec3i getEnclosingSize()
     {
         return this.enclosingSize;
     }
@@ -113,7 +113,7 @@ public class SchematicMetadata
         this.totalBlocks = totalBlocks;
     }
 
-    public void setEnclosingSize(BlockPos enclosingSize)
+    public void setEnclosingSize(Vec3i enclosingSize)
     {
         this.enclosingSize = enclosingSize;
     }
@@ -161,7 +161,7 @@ public class SchematicMetadata
         this.timeCreated = nbt.getLong("TimeCreated");
         this.timeModified = nbt.getLong("TimeModified");
 
-        BlockPos size = NBTUtils.readBlockPos(nbt.getCompoundTag("EnclosingSize"));
+        Vec3i size = NBTUtils.readBlockPos(nbt.getCompoundTag("EnclosingSize"));
 
         if (size != null)
         {

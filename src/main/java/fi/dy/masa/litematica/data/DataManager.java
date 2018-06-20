@@ -34,6 +34,7 @@ public class DataManager
     private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)(@(?<meta>[0-9]+))$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
     private static File lastSchematicDirectory = ROOT_SCHEMATIC_DIRECTORY;
+    private static File lastSchematicManagerSaveDirectory = ROOT_SCHEMATIC_DIRECTORY;
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static OperationMode operationMode = OperationMode.PLACEMENT;
@@ -99,6 +100,16 @@ public class DataManager
         lastSchematicDirectory = FileUtils.getCanonicalFileIfPossible(dir);
     }
 
+    public static File getCurrentSchematicManagerSaveDirectory()
+    {
+        return lastSchematicManagerSaveDirectory;
+    }
+
+    public static void setCurrentSchematicManagerSaveDirectory(File dir)
+    {
+        lastSchematicManagerSaveDirectory = FileUtils.getCanonicalFileIfPossible(dir);
+    }
+
     public static void load()
     {
         File file = getCurrentStorageFile();
@@ -130,15 +141,8 @@ public class DataManager
                 }
             }
 
-            if (JsonUtils.hasString(root, "last_directory"))
-            {
-                File dir = new File(root.get("last_directory").getAsString());
-
-                if (dir.exists() && dir.isDirectory())
-                {
-                    lastSchematicDirectory = dir;
-                }
-            }
+            lastSchematicDirectory = getDirectoryOrDefault(root, "last_directory");
+            lastSchematicManagerSaveDirectory = getDirectoryOrDefault(root, "last_directory_schem_mgr_save");
 
             if (JsonUtils.hasString(root, "operation_mode"))
             {
@@ -154,6 +158,21 @@ public class DataManager
                 }
             }
         }
+    }
+
+    private static File getDirectoryOrDefault(JsonObject obj, String key)
+    {
+        if (JsonUtils.hasString(obj, key))
+        {
+            File dir = new File(obj.get(key).getAsString());
+
+            if (dir.exists() && dir.isDirectory())
+            {
+                return dir;
+            }
+        }
+
+        return ROOT_SCHEMATIC_DIRECTORY;
     }
 
     public static void save()
@@ -175,6 +194,7 @@ public class DataManager
         }
 
         root.add("last_directory", new JsonPrimitive(lastSchematicDirectory.getAbsolutePath()));
+        root.add("last_directory_schem_mgr_save", new JsonPrimitive(lastSchematicManagerSaveDirectory.getAbsolutePath()));
         root.add("operation_mode", new JsonPrimitive(operationMode.name()));
 
         File file = getCurrentStorageFile();

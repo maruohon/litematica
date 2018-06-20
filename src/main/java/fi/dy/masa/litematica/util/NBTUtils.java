@@ -4,15 +4,16 @@ import javax.annotation.Nullable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 
 public class NBTUtils
 {
-    public static NBTTagCompound createBlockPosTag(BlockPos pos)
+    public static NBTTagCompound createBlockPosTag(Vec3i pos)
     {
         return writeBlockPosToTag(pos, new NBTTagCompound());
     }
 
-    public static NBTTagCompound writeBlockPosToTag(BlockPos pos, NBTTagCompound tag)
+    public static NBTTagCompound writeBlockPosToTag(Vec3i pos, NBTTagCompound tag)
     {
         tag.setInteger("x", pos.getX());
         tag.setInteger("y", pos.getY());

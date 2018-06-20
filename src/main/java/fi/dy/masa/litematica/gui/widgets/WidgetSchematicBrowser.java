@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.interfaces.IDirectoryNavigator;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
@@ -26,7 +27,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 
 public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, WidgetDirectoryEntry> implements IDirectoryNavigator
 {
@@ -38,17 +39,19 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     protected File currentDirectory;
     protected final int infoWidth;
     protected final int infoHeight;
+    protected final GuiSchematicBrowserBase parent;
     @Nullable
     protected WidgetDirectoryNavigation directoryNavigationWidget;
 
-    public WidgetSchematicBrowser(int x, int y, int width, int height, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
+    public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
         this.title = I18n.format("litematica.gui.title.schematic_browser");
         this.infoWidth = 170;
         this.infoHeight = 280;
-        this.currentDirectory = DataManager.getCurrentSchematicDirectory();
+        this.parent = parent;
+        this.currentDirectory = parent.getInitialDirectory();
 
         this.setSize(width, height);
     }
@@ -221,7 +224,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
         this.clearSelection();
 
         this.currentDirectory = FileUtils.getCanonicalFileIfPossible(dir);
-        DataManager.setCurrentSchematicDirectory(dir);
+        this.parent.storeCurrentDirectory(dir);
 
         this.refreshEntries();
     }
@@ -308,8 +311,8 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
             this.fontRenderer.drawString(str, x, y, textColor);
             y += 12;
 
-            BlockPos p = meta.getEnclosingSize();
-            String tmp = String.format("%d x %d x %d", p.getX(), p.getY(), p.getZ());
+            Vec3i areaSize = meta.getEnclosingSize();
+            String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
             this.fontRenderer.drawString(tmp, x + 4, y, valueColor);
             y += 12;
 
@@ -326,8 +329,8 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 this.bindTexture(pair.getLeft());
 
-                int size = (int) Math.sqrt(pair.getRight().getTextureData().length);
-                Gui.drawModalRectWithCustomSizedTexture(x + 10, y, 0.0F, 0.0F, size, size, size, size);
+                int iconSize = (int) Math.sqrt(pair.getRight().getTextureData().length);
+                Gui.drawModalRectWithCustomSizedTexture(x + 10, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
     }

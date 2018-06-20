@@ -45,6 +45,7 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
         }
     }
 
+    @Override
     @Nullable
     public IBlockState getBlockState(int indexKey)
     {

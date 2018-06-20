@@ -4,6 +4,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 
 public class LitematicaBlockStateContainer implements ILitematicaBlockStatePaletteResizer
 {
@@ -29,6 +30,11 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
         this.sizeLayer = sizeX * sizeZ;
 
         this.setBits(bits, backingLongArray);
+    }
+
+    public Vec3i getSize()
+    {
+        return new Vec3i(this.sizeX, this.sizeY, this.sizeZ);
     }
 
     public IBlockState get(int x, int y, int z)

@@ -59,8 +59,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else if (selected.getType() == DirectoryEntryType.SCHEMATICA_SCHEMATIC || selected.getType() == DirectoryEntryType.VANILLA_STRUCTURE)
             {
-                x = this.createButton(id++, x, y, ButtonListener.Type.IMPORT_SCHEMATIC_FAST);
-                x = this.createButton(id++, x, y, ButtonListener.Type.IMPORT_SCHEMATIC_PROPER);
+                x = this.createButton(id++, x, y, ButtonListener.Type.IMPORT_SCHEMATIC);
             }
         }
 
@@ -183,13 +182,14 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                     this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_manager.schematic_export.unsupported_type", file.getName());
                 }
             }
-            else if (this.type == Type.IMPORT_SCHEMATIC_FAST || this.type == Type.IMPORT_SCHEMATIC_PROPER)
+            else if (this.type == Type.IMPORT_SCHEMATIC)
             {
-                if (entry.getType() == DirectoryEntryType.SCHEMATICA_SCHEMATIC)
+                if (entry.getType() == DirectoryEntryType.SCHEMATICA_SCHEMATIC ||
+                    entry.getType() == DirectoryEntryType.VANILLA_STRUCTURE)
                 {
-                }
-                else if (entry.getType() == DirectoryEntryType.VANILLA_STRUCTURE)
-                {
+                    GuiSchematicSaveImported gui = new GuiSchematicSaveImported(entry.getType(), entry.getDirectory(), entry.getName());
+                    gui.setParent(this.gui);
+                    this.gui.mc.displayGuiScreen(gui);
                 }
                 else
                 {
@@ -225,8 +225,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
         public enum Type
         {
-            IMPORT_SCHEMATIC_FAST       ("litematica.gui.button.import_fast"),
-            IMPORT_SCHEMATIC_PROPER     ("litematica.gui.button.import_proper"),
+            IMPORT_SCHEMATIC            ("litematica.gui.button.import"),
             EXPORT_SCHEMATIC            ("litematica.gui.button.schematic_manager.export_as"),
             RENAME_SCHEMATIC            ("litematica.gui.button.rename"),
             SET_PREVIEW                 ("litematica.gui.button.set_preview", "litematica.info.schematic_manager.preview.right_click_to_cancel"),

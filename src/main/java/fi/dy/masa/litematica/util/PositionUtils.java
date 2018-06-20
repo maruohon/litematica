@@ -15,6 +15,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 
@@ -70,7 +71,7 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
-    public static BlockPos getRelativeEndPositionFromAreaSize(BlockPos size)
+    public static BlockPos getRelativeEndPositionFromAreaSize(Vec3i size)
     {
         int x = size.getX();
         int y = size.getY();
@@ -300,14 +301,14 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
-    public static Vec3d transformedVec3d(Vec3d vec, Mirror mirrorIn, Rotation rotationIn)
+    public static Vec3d getTransformedPosition(Vec3d originalPos, Mirror mirror, Rotation rotation)
     {
-        double x = vec.x;
-        double y = vec.y;
-        double z = vec.z;
-        boolean isMirrored = true;
+        double x = originalPos.x;
+        double y = originalPos.y;
+        double z = originalPos.z;
+        boolean transformed = true;
 
-        switch (mirrorIn)
+        switch (mirror)
         {
             case LEFT_RIGHT:
                 z = 1.0D - z;
@@ -316,10 +317,10 @@ public class PositionUtils
                 x = 1.0D - x;
                 break;
             default:
-                isMirrored = false;
+                transformed = false;
         }
 
-        switch (rotationIn)
+        switch (rotation)
         {
             case COUNTERCLOCKWISE_90:
                 return new Vec3d(z, y, 1.0D - x);
@@ -328,7 +329,7 @@ public class PositionUtils
             case CLOCKWISE_180:
                 return new Vec3d(1.0D - x, y, 1.0D - z);
             default:
-                return isMirrored ? new Vec3d(x, y, z) : vec;
+                return transformed ? new Vec3d(x, y, z) : originalPos;
         }
     }
 

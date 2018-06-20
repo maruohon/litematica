@@ -221,7 +221,14 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     {
         if (keyCode == Keyboard.KEY_ESCAPE)
         {
-            this.mc.displayGuiScreen(this.parent);
+            if (GuiScreen.isShiftKeyDown())
+            {
+                this.mc.displayGuiScreen(null);
+            }
+            else
+            {
+                this.mc.displayGuiScreen(this.parent);
+            }
             return true;
         }
 
