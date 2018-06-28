@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
+import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -23,6 +24,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
         this.dirSource = dirSource;
         this.inputFileName = inputFileName;
         this.title = I18n.format("litematica.gui.title.save_imported_schematic");
+        this.defaultText = FileUtils.getNameWithoutExtension(inputFileName);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
+import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.FileUtils;
@@ -21,6 +22,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     protected final GuiTextField textField;
     @Nullable
     protected final LitematicaSchematic schematic;
+    protected String defaultText = "";
 
     public GuiSchematicSaveBase(@Nullable LitematicaSchematic schematic)
     {
@@ -31,9 +33,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         Minecraft mc = Minecraft.getMinecraft();
         this.textField = new GuiTextField(0, mc.fontRenderer, 10, 32, 90, 20);
         this.textField.setMaxStringLength(256);
-        this.textField.setText("");
         this.textField.setFocused(true);
-        this.textField.setCursorPositionEnd();
     }
 
     @Override
@@ -44,7 +44,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         ((IGuiTextField) this.textField).setInternalWidth(this.width - 273);
         DirectoryEntry entry = this.widget.getSelectedEntry();
 
-        if (entry != null)
+        if (entry != null && entry.getType() != DirectoryEntryType.DIRECTORY)
         {
             this.textField.setText(FileUtils.getNameWithoutExtension(entry.getName()));
         }
@@ -52,6 +52,12 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         {
             this.textField.setText(this.schematic.getMetadata().getName());
         }
+        else
+        {
+            this.textField.setText(this.defaultText);
+        }
+
+        this.textField.setCursorPositionEnd();
 
         int x = this.textField.x + this.textField.getWidth() + 12;
         int y = 32;
@@ -91,7 +97,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     @Override
     public void onSelectionChange(DirectoryEntry entry)
     {
-        if (entry != null)
+        if (entry != null && entry.getType() != DirectoryEntryType.DIRECTORY && entry.getType() != DirectoryEntryType.INVALID)
         {
             this.textField.setText(FileUtils.getNameWithoutExtension(entry.getName()));
             this.textField.setCursorPositionEnd();
