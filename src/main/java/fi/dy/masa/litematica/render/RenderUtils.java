@@ -33,15 +33,69 @@ public class RenderUtils
         RenderGlobal.drawSelectionBoundingBox(aabb, color.x, color.y, color.z, 1f);
     }
 
-    public static void renderAreaOutline(BlockPos pos1, BlockPos pos2, float lineWidth,
-            Vec3f color, Entity renderViewEntity, float partialTicks)
+    public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
+            Vec3f color1, Vec3f color2, Vec3f color3, Entity renderViewEntity, float partialTicks)
     {
+        final double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
+        final double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
+        final double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+
+        final double minX = pos.getX() - dx - expand;
+        final double minY = pos.getY() - dy - expand;
+        final double minZ = pos.getZ() - dz - expand;
+        final double maxX = pos.getX() - dx + expand + 1;
+        final double maxY = pos.getY() - dy + expand + 1;
+        final double maxZ = pos.getZ() - dz + expand + 1;
+
         GlStateManager.glLineWidth(lineWidth);
 
-        AxisAlignedBB aabb = createEnclosingAABB(pos1, pos2, renderViewEntity, partialTicks);
-        RenderGlobal.drawSelectionBoundingBox(aabb, color.x, color.y, color.z, 1f);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+
+        // Min corner
+        buffer.pos(minX, minY, minZ).color(color1.x, color1.y, color1.z, 1.0F).endVertex();
+        buffer.pos(maxX, minY, minZ).color(color1.x, color1.y, color1.z, 1.0F).endVertex();
+
+        buffer.pos(minX, minY, minZ).color(color1.x, color1.y, color1.z, 1.0F).endVertex();
+        buffer.pos(minX, maxY, minZ).color(color1.x, color1.y, color1.z, 1.0F).endVertex();
+
+        buffer.pos(minX, minY, minZ).color(color1.x, color1.y, color1.z, 1.0F).endVertex();
+        buffer.pos(minX, minY, maxZ).color(color1.x, color1.y, color1.z, 1.0F).endVertex();
+
+        // Max corner
+        buffer.pos(minX, maxY, maxZ).color(color2.x, color2.y, color2.z, 1.0F).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color2.x, color2.y, color2.z, 1.0F).endVertex();
+
+        buffer.pos(maxX, minY, maxZ).color(color2.x, color2.y, color2.z, 1.0F).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color2.x, color2.y, color2.z, 1.0F).endVertex();
+
+        buffer.pos(maxX, maxY, minZ).color(color2.x, color2.y, color2.z, 1.0F).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color2.x, color2.y, color2.z, 1.0F).endVertex();
+
+        // The rest of the edges
+        buffer.pos(minX, maxY, minZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+        buffer.pos(maxX, maxY, minZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+
+        buffer.pos(minX, minY, maxZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+        buffer.pos(maxX, minY, maxZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+
+        buffer.pos(maxX, minY, minZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+        buffer.pos(maxX, maxY, minZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+
+        buffer.pos(minX, minY, maxZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+        buffer.pos(minX, maxY, maxZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+
+        buffer.pos(maxX, minY, minZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+        buffer.pos(maxX, minY, maxZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+
+        buffer.pos(minX, maxY, minZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+        buffer.pos(minX, maxY, maxZ).color(color3.x, color3.y, color3.z, 1.0F).endVertex();
+
+        tessellator.draw();
     }
 
+    /*
     public static void renderAreaOutline(BlockPos pos1, BlockPos pos2, float lineWidth,
             Vec3f colorX, Vec3f colorY, Vec3f colorZ, Entity renderViewEntity, float partialTicks)
     {
@@ -49,12 +103,6 @@ public class RenderUtils
 
         AxisAlignedBB aabb = createEnclosingAABB(pos1, pos2, renderViewEntity, partialTicks);
         drawBoundingBoxEdges(aabb, colorX, colorY, colorZ);
-    }
-
-    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Vec4f color, Entity renderViewEntity, float partialTicks)
-    {
-        AxisAlignedBB box = createEnclosingAABB(pos1, pos2, renderViewEntity, partialTicks);
-        drawBoundingBoxSides(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color);
     }
 
     private static void drawBoundingBoxEdges(AxisAlignedBB box, Vec3f colorX, Vec3f colorY, Vec3f colorZ)
@@ -119,8 +167,15 @@ public class RenderUtils
         buffer.pos(maxX, maxY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
         buffer.pos(maxX, maxY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
     }
+    */
 
-    private static void drawBoundingBoxSides(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Vec4f color)
+    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Vec4f color, Entity renderViewEntity, float partialTicks)
+    {
+        AxisAlignedBB box = createEnclosingAABB(pos1, pos2, renderViewEntity, partialTicks);
+        drawBoundingBoxSides(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, 0.001, color);
+    }
+
+    private static void drawBoundingBoxSides(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, double offset, Vec4f color)
     {
         GlStateManager.enableBlend();
         GlStateManager.disableCull();
@@ -129,7 +184,6 @@ public class RenderUtils
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-        double offset = 0.001;
         minX -= offset;
         minY -= offset;
         minZ -= offset;
@@ -177,6 +231,157 @@ public class RenderUtils
 
         GlStateManager.enableCull();
         GlStateManager.disableBlend();
+    }
+
+    public static void renderAreaOutline(BlockPos pos1, BlockPos pos2,
+            float lineWidth, Vec3f colorX, Vec3f colorY, Vec3f colorZ, Entity renderViewEntity, float partialTicks)
+    {
+        final int xMin = Math.min(pos1.getX(), pos2.getX());
+        final int yMin = Math.min(pos1.getY(), pos2.getY());
+        final int zMin = Math.min(pos1.getZ(), pos2.getZ());
+        final int xMax = Math.max(pos1.getX(), pos2.getX());
+        final int yMax = Math.max(pos1.getY(), pos2.getY());
+        final int zMax = Math.max(pos1.getZ(), pos2.getZ());
+
+        final double expand = 0.001;
+        final double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
+        final double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
+        final double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+
+        final double dxMin = -dx - expand;
+        final double dyMin = -dy - expand;
+        final double dzMin = -dz - expand;
+        final double dxMax = -dx + expand;
+        final double dyMax = -dy + expand;
+        final double dzMax = -dz + expand;
+
+        final double minX = xMin + dxMin;
+        final double minY = yMin + dyMin;
+        final double minZ = zMin + dzMin;
+        final double maxX = xMax + dxMax;
+        final double maxY = yMax + dyMax;
+        final double maxZ = zMax + dzMax;
+
+        int start, end;
+
+        GlStateManager.glLineWidth(lineWidth);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+
+        // Edges along the X-axis
+        start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMin) ? xMin + 1 : xMin;
+        end   = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMin) ? xMax : xMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(start + dxMin, minY, minZ).color(colorX.x, colorX.y, colorX.z, 1.0F).endVertex();
+            buffer.pos(end   + dxMax, minY, minZ).color(colorX.x, colorX.y, colorX.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMin) ? xMin + 1 : xMin;
+        end   = (pos1.getX() == xMax && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMax && pos2.getZ() == zMin) ? xMax : xMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(start + dxMin, maxY + 1, minZ).color(colorX.x, colorX.y, colorX.z, 1.0F).endVertex();
+            buffer.pos(end   + dxMax, maxY + 1, minZ).color(colorX.x, colorX.y, colorX.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMax) ? xMin + 1 : xMin;
+        end   = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMax) ? xMax : xMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(start + dxMin, minY, maxZ + 1).color(colorX.x, colorX.y, colorX.z, 1.0F).endVertex();
+            buffer.pos(end   + dxMax, minY, maxZ + 1).color(colorX.x, colorX.y, colorX.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMax) ? xMin + 1 : xMin;
+        end   = (pos1.getX() == xMax && pos1.getY() == yMax && pos1.getZ() == zMax) || (pos2.getX() == xMax && pos2.getY() == yMax && pos2.getZ() == zMax) ? xMax : xMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(start + dxMin, maxY + 1, maxZ + 1).color(colorX.x, colorX.y, colorX.z, 1.0F).endVertex();
+            buffer.pos(end   + dxMax, maxY + 1, maxZ + 1).color(colorX.x, colorX.y, colorX.z, 1.0F).endVertex();
+        }
+
+        // Edges along the Y-axis
+        start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMin) ? yMin + 1 : yMin;
+        end   = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMin) ? yMax : yMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(minX, start + dyMin, minZ).color(colorY.x, colorY.y, colorY.z, 1.0F).endVertex();
+            buffer.pos(minX, end   + dyMax, minZ).color(colorY.x, colorY.y, colorY.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMin) ? yMin + 1 : yMin;
+        end   = (pos1.getX() == xMax && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMax && pos2.getZ() == zMin) ? yMax : yMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(maxX + 1, start + dyMin, minZ).color(colorY.x, colorY.y, colorY.z, 1.0F).endVertex();
+            buffer.pos(maxX + 1, end   + dyMax, minZ).color(colorY.x, colorY.y, colorY.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMax) ? yMin + 1 : yMin;
+        end   = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMax) ? yMax : yMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(minX, start + dyMin, maxZ + 1).color(colorY.x, colorY.y, colorY.z, 1.0F).endVertex();
+            buffer.pos(minX, end   + dyMax, maxZ + 1).color(colorY.x, colorY.y, colorY.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMax) ? yMin + 1 : yMin;
+        end   = (pos1.getX() == xMax && pos1.getY() == yMax && pos1.getZ() == zMax) || (pos2.getX() == xMax && pos2.getY() == yMax && pos2.getZ() == zMax) ? yMax : yMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(maxX + 1, start + dyMin, maxZ + 1).color(colorY.x, colorY.y, colorY.z, 1.0F).endVertex();
+            buffer.pos(maxX + 1, end   + dyMax, maxZ + 1).color(colorY.x, colorY.y, colorY.z, 1.0F).endVertex();
+        }
+
+        // Edges along the Z-axis
+        start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMin) ? zMin + 1 : zMin;
+        end   = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMax) ? zMax : zMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(minX, minY, start + dzMin).color(colorZ.x, colorZ.y, colorZ.z, 1.0F).endVertex();
+            buffer.pos(minX, minY, end   + dzMax).color(colorZ.x, colorZ.y, colorZ.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMin) ? zMin + 1 : zMin;
+        end   = (pos1.getX() == xMax && pos1.getY() == yMin && pos1.getZ() == zMax) || (pos2.getX() == xMax && pos2.getY() == yMin && pos2.getZ() == zMax) ? zMax : zMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(maxX + 1, minY, start + dzMin).color(colorZ.x, colorZ.y, colorZ.z, 1.0F).endVertex();
+            buffer.pos(maxX + 1, minY, end   + dzMax).color(colorZ.x, colorZ.y, colorZ.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMin) ? zMin + 1 : zMin;
+        end   = (pos1.getX() == xMin && pos1.getY() == yMax && pos1.getZ() == zMax) || (pos2.getX() == xMin && pos2.getY() == yMax && pos2.getZ() == zMax) ? zMax : zMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(minX, maxY + 1, start + dzMin).color(colorZ.x, colorZ.y, colorZ.z, 1.0F).endVertex();
+            buffer.pos(minX, maxY + 1, end   + dzMax).color(colorZ.x, colorZ.y, colorZ.z, 1.0F).endVertex();
+        }
+
+        start = (pos1.getX() == xMax && pos1.getY() == yMax && pos1.getZ() == zMin) || (pos2.getX() == xMax && pos2.getY() == yMax && pos2.getZ() == zMin) ? zMin + 1 : zMin;
+        end   = (pos1.getX() == xMax && pos1.getY() == yMax && pos1.getZ() == zMax) || (pos2.getX() == xMax && pos2.getY() == yMax && pos2.getZ() == zMax) ? zMax : zMax + 1;
+
+        if (end > start)
+        {
+            buffer.pos(maxX + 1, maxY + 1, start + dzMin).color(colorZ.x, colorZ.y, colorZ.z, 1.0F).endVertex();
+            buffer.pos(maxX + 1, maxY + 1, end   + dzMax).color(colorZ.x, colorZ.y, colorZ.z, 1.0F).endVertex();
+        }
+
+        tessellator.draw();
     }
 
     // FIXME testing, remove

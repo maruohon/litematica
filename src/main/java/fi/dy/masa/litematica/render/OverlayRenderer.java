@@ -53,6 +53,7 @@ public class OverlayRenderer
     private final Map<SchematicPlacement, ImmutableMap<String, Box>> placements = new HashMap<>();
     private Vec3f colorPos1 = new Vec3f(1f, 0.0625f, 0.0625f);
     private Vec3f colorPos2 = new Vec3f(0.0625f, 0.0625f, 1f);
+    private Vec3f colorOverlapping = new Vec3f(1f, 0.0625f, 1f);
     private Vec3f colorX = new Vec3f(   1f, 0.25f, 0.25f);
     private Vec3f colorY = new Vec3f(0.25f,    1f, 0.25f);
     private Vec3f colorZ = new Vec3f(0.25f, 0.25f,    1f);
@@ -221,28 +222,40 @@ public class OverlayRenderer
             sideColor = Vec4f.fromColor(Configs.Visuals.SELECTION_BOX_SIDE_COLOR.getIntegerValue());
         }
 
-        if (pos1 != null && pos2 != null && pos1.equals(pos2) == false)
+        if (pos1 != null && pos2 != null)
         {
-            if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
-                  Configs.Visuals.RENDER_SELECTION_BOX_SIDES.getBooleanValue())
-                ||
-                 ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
-                   Configs.Visuals.RENDER_PLACEMENT_BOX_SIDES.getBooleanValue()))
+            if (pos1.equals(pos2) == false)
             {
-                RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
+
+                RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
+
+                if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
+                      Configs.Visuals.RENDER_SELECTION_BOX_SIDES.getBooleanValue())
+                    ||
+                     ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
+                       Configs.Visuals.RENDER_PLACEMENT_BOX_SIDES.getBooleanValue()))
+                {
+                    RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
+                }
+            }
+            else
+            {
+                RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, color1, color2, this.colorOverlapping, renderViewEntity, partialTicks);
+            }
+        }
+        else
+        {
+            if (pos1 != null)
+            {
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
             }
 
-            RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
-        }
-
-        if (pos1 != null)
-        {
-            RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
-        }
-
-        if (pos2 != null)
-        {
-            RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
+            if (pos2 != null)
+            {
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
+            }
         }
     }
 
