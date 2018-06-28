@@ -43,16 +43,18 @@ public class WorldUtils
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, schematic.getSize());
         schematic.placeSchematicToWorld(world, BlockPos.ORIGIN, new PlacementSettings(), 2);
 
+        String subRegionName = "Converted Schematic";
         AreaSelection area = new AreaSelection();
-        area.setName("Converted Schematic");
+        area.setName(subRegionName);
         area.createNewSubRegionBox(BlockPos.ORIGIN);
-        area.getSelectedSubRegionBox().setName("Converted Schematic");
+        area.getSelectedSubRegionBox().setName(subRegionName);
         area.getSelectedSubRegionBox().setPos2(new BlockPos(schematic.getSize()));
 
         LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, true, "?", feedback);
 
         if (litematicaSchematic != null)
         {
+            litematicaSchematic.takeEntityDataFromSchematicaSchematic(schematic, subRegionName);
             return litematicaSchematic.writeToFile(outputDir, outputFileName, override, feedback);
         }
         else
@@ -86,7 +88,7 @@ public class WorldUtils
             area.getSelectedSubRegionBox().setName("Converted Structure");
             area.getSelectedSubRegionBox().setPos2(new BlockPos(template.getSize()));
 
-            LitematicaSchematic schematic = LitematicaSchematic.createFromWorld(world, area, true, "?", feedback);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);
 
             if (schematic != null)
             {

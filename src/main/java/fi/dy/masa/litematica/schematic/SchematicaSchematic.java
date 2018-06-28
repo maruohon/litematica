@@ -13,10 +13,12 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.util.Constants;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.NBTUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -26,7 +28,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityStructure;
@@ -65,9 +66,23 @@ public class SchematicaSchematic
         return this.tiles;
     }
 
-    public List<NBTTagCompound> getEntities()
+    public List<EntityInfo> getEntities()
     {
-        return this.entities;
+        List<EntityInfo> entityList = new ArrayList<>();
+        final int size = this.entities.size();
+
+        for (int i = 0; i < size; ++i)
+        {
+            NBTTagCompound entityData = this.entities.get(i);
+            Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
+
+            if (posVec != null && entityData.hasNoTags() == false)
+            {
+                entityList.add(new EntityInfo(posVec, entityData));
+            }
+        }
+
+        return entityList;
     }
 
     public void placeSchematicToWorld(World world, BlockPos posStart, PlacementSettings placement, int setBlockStateFlags)
@@ -180,16 +195,10 @@ public class SchematicaSchematic
 
         for (NBTTagCompound tag : this.entities)
         {
-            NBTTagList posList = tag.getTagList("Pos", Constants.NBT.TAG_DOUBLE);
-            Vec3d relativePos = new Vec3d(posList.getDoubleAt(0), posList.getDoubleAt(1), posList.getDoubleAt(2));
+            Vec3d relativePos = NBTUtils.readEntityPositionFromTag(tag);
             Vec3d transformedRelativePos = PositionUtils.getTransformedPosition(relativePos, mirror, rotation);
             Vec3d realPos = transformedRelativePos.addVector(posStart.getX(), posStart.getY(), posStart.getZ());
-
-            posList = new NBTTagList();
-            posList.appendTag(new NBTTagDouble(realPos.x));
-            posList.appendTag(new NBTTagDouble(realPos.y));
-            posList.appendTag(new NBTTagDouble(realPos.z));
-            tag.setTag("Pos", posList);
+            NBTUtils.writeEntityPositionToTag(realPos, tag);
 
             UUID uuidOriginal = tag.getUniqueId("UUID");
             tag.setUniqueId("UUID", UUID.randomUUID());
@@ -315,11 +324,8 @@ public class SchematicaSchematic
 
             if (entity.writeToNBTOptional(tag))
             {
-                NBTTagList posList = new NBTTagList();
-                posList.appendTag(new NBTTagDouble(entity.posX - posStart.getX()));
-                posList.appendTag(new NBTTagDouble(entity.posY - posStart.getY()));
-                posList.appendTag(new NBTTagDouble(entity.posZ - posStart.getZ()));
-                tag.setTag("Pos", posList);
+                Vec3d pos = new Vec3d(entity.posX - posStart.getX(), entity.posY - posStart.getY(), entity.posZ - posStart.getZ());
+                NBTUtils.writeEntityPositionToTag(pos, tag);
 
                 this.entities.add(tag);
             }
