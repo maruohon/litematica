@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.event;
 
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager;
@@ -33,6 +34,12 @@ public class InputEventHandler implements IKeybindEventHandler
         {
             manager.addKeybindToMap(hotkey.getKeybind());
         }
+    }
+
+    @Override
+    public void addHotkeys(IKeybindManager manager)
+    {
+        manager.addHotkeysForCategory(Reference.MOD_NAME, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.values());
     }
 
     @Override
