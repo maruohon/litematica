@@ -30,10 +30,8 @@ import net.minecraft.util.text.TextFormatting;
 
 public class KeyCallbacks
 {
-    public static void init()
+    public static void init(Minecraft mc)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-
         IHotkeyCallback callbackHotkeys = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
 

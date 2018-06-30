@@ -7,22 +7,24 @@ import fi.dy.masa.litematica.gui.GuiSchematicManager;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
-import fi.dy.masa.malilib.hotkeys.IKeybindEventHandler;
+import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
+import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
+import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
-public class InputEventHandler implements IKeybindEventHandler
+public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
 {
-    private static final InputEventHandler INSTANCE = new InputEventHandler();
+    private static final InputHandler INSTANCE = new InputHandler();
 
-    private InputEventHandler()
+    private InputHandler()
     {
     }
 
-    public static InputEventHandler getInstance()
+    public static InputHandler getInstance()
     {
         return INSTANCE;
     }

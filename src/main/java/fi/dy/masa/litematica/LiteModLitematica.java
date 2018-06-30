@@ -8,22 +8,22 @@ import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.InitCompleteListener;
 import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
-import com.mumfrey.liteloader.ShutdownListener;
 import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.event.InputEventHandler;
+import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.KeyCallbacks;
-import fi.dy.masa.malilib.hotkeys.KeybindEventHandler;
+import fi.dy.masa.malilib.config.ConfigManager;
+import fi.dy.masa.malilib.event.InputEventHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, ShutdownListener, Tickable
+public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -48,14 +48,17 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     @Override
     public void init(File configPath)
     {
-        Configs.load();
-        KeybindEventHandler.getInstance().registerKeyEventHandler(InputEventHandler.getInstance());
+        Configs.loadFromFile();
+        ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
+        InputEventHandler.getInstance().registerKeybindProvider(InputHandler.getInstance());
+        InputEventHandler.getInstance().registerKeyboardInputHandler(InputHandler.getInstance());
+        InputEventHandler.getInstance().registerMouseInputHandler(InputHandler.getInstance());
     }
 
     @Override
-    public void onInitCompleted(Minecraft minecraft, LiteLoader loader)
+    public void onInitCompleted(Minecraft mc, LiteLoader loader)
     {
-        KeyCallbacks.init();
+        KeyCallbacks.init(mc);
     }
 
     @Override
@@ -73,13 +76,7 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     @Override
     public void onTick(Minecraft minecraft, float partialTicks, boolean inGame, boolean clock)
     {
-        InputEventHandler.onTick();
-    }
-
-    @Override
-    public void onShutDown()
-    {
-        Configs.save();
+        InputHandler.onTick();
     }
 
     public static void logInfo(String message, Object... args)

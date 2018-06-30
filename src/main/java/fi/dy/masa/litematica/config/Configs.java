@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.AreaSelectionMode;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.malilib.config.ConfigUtils;
+import fi.dy.masa.malilib.config.IConfigHandler;
 import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
@@ -17,7 +18,7 @@ import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
 
-public class Configs
+public class Configs implements IConfigHandler
 {
     private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
 
@@ -55,7 +56,7 @@ public class Configs
                 );
     }
 
-    public static void load()
+    public static void loadFromFile()
     {
         File configFile = new File(LiteLoader.getCommonConfigFolder(), CONFIG_FILE_NAME);
 
@@ -76,7 +77,7 @@ public class Configs
         DataManager.setToolItem(Generic.TOOL_ITEM.getStringValue());
     }
 
-    public static void save()
+    public static void saveToFile()
     {
         File dir = LiteLoader.getCommonConfigFolder();
 
@@ -90,5 +91,18 @@ public class Configs
 
             JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
         }
+    }
+
+    @Override
+    public void onConfigsChanged()
+    {
+        saveToFile();
+        loadFromFile();
+    }
+
+    @Override
+    public void save()
+    {
+        saveToFile();
     }
 }
