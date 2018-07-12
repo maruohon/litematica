@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.resources.I18n;
@@ -86,20 +87,33 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                     return;
                 }
 
+                this.gui.setNextMessageType(InfoType.ERROR);
+                LitematicaSchematic schematic = null;
+                // This name is used for showing a file icon versus an in-memory icon
+                // in the loaded schematics list.
+                String fileName = entry.getName();
+
                 if (entry.getType() == DirectoryEntryType.LITEMATICA_SCHEMATIC)
                 {
-                    this.gui.setNextMessageType(InfoType.ERROR);
-                    LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
-
-                    if (schematic != null)
-                    {
-                        SchematicHolder.getInstance().addSchematic(schematic, schematic.getMetadata().getName(), file.getName());
-                        this.gui.addMessage(InfoType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
-                    }
+                    schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
+                }
+                else if (entry.getType() == DirectoryEntryType.SCHEMATICA_SCHEMATIC)
+                {
+                    schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(entry.getDirectory(), entry.getName(), this.gui);
+                }
+                else if (entry.getType() == DirectoryEntryType.VANILLA_STRUCTURE)
+                {
+                    schematic = WorldUtils.convertStructureToLitematicaSchematic(entry.getDirectory(), entry.getName(), this.gui);
                 }
                 else
                 {
                     this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.unsupported_type", file.getName());
+                }
+
+                if (schematic != null)
+                {
+                    SchematicHolder.getInstance().addSchematic(schematic, schematic.getMetadata().getName(), fileName);
+                    this.gui.addMessage(InfoType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
                 }
             }
         }

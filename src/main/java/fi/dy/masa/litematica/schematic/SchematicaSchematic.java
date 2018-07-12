@@ -94,7 +94,9 @@ public class SchematicaSchematic
 
         if (this.blocks != null && numBlocks > 0 && this.blocks.getSize().equals(this.size))
         {
-            Block ignoredBlock = placement.getReplacedBlock();
+            final Block ignoredBlock = placement.getReplacedBlock();
+            final Rotation rotation = placement.getRotation();
+            final Mirror mirror = placement.getMirror();
 
             // Place blocks and read any TileEntity data
             for (int y = 0; y < height; ++y)
@@ -115,8 +117,8 @@ public class SchematicaSchematic
 
                         pos = Template.transformedBlockPos(placement, pos).add(posStart);
 
-                        state = state.withMirror(placement.getMirror());
-                        state = state.withRotation(placement.getRotation());
+                        state = state.withMirror(mirror);
+                        state = state.withRotation(rotation);
 
                         if (teNBT != null)
                         {
@@ -129,7 +131,7 @@ public class SchematicaSchematic
                                     ((IInventory) te).clear();
                                 }
 
-                                world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 4);
+                                world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 0x14);
                             }
                         }
 
@@ -143,34 +145,37 @@ public class SchematicaSchematic
                                 teNBT.setInteger("y", pos.getY());
                                 teNBT.setInteger("z", pos.getZ());
                                 te.readFromNBT(teNBT);
-                                te.mirror(placement.getMirror());
-                                te.rotate(placement.getRotation());
+                                te.mirror(mirror);
+                                te.rotate(rotation);
                             }
                         }
                     }
                 }
             }
 
-            // Update blocks
-            for (int y = 0; y < height; ++y)
+            if ((setBlockStateFlags & 0x01) != 0)
             {
-                for (int z = 0; z < length; ++z)
+                // Update blocks
+                for (int y = 0; y < height; ++y)
                 {
-                    for (int x = 0; x < width; ++x)
+                    for (int z = 0; z < length; ++z)
                     {
-                        BlockPos pos = new BlockPos(x, y, z);
-                        NBTTagCompound teNBT = this.tiles.get(pos);
-
-                        pos = Template.transformedBlockPos(placement, pos).add(posStart);
-                        world.notifyNeighborsRespectDebug(pos, world.getBlockState(pos).getBlock(), false);
-
-                        if (teNBT != null)
+                        for (int x = 0; x < width; ++x)
                         {
-                            TileEntity te = world.getTileEntity(pos);
+                            BlockPos pos = new BlockPos(x, y, z);
+                            NBTTagCompound teNBT = this.tiles.get(pos);
 
-                            if (te != null)
+                            pos = Template.transformedBlockPos(placement, pos).add(posStart);
+                            world.notifyNeighborsRespectDebug(pos, world.getBlockState(pos).getBlock(), false);
+
+                            if (teNBT != null)
                             {
-                                te.markDirty();
+                                TileEntity te = world.getTileEntity(pos);
+
+                                if (te != null)
+                                {
+                                    te.markDirty();
+                                }
                             }
                         }
                     }

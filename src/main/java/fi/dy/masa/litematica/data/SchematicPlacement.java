@@ -81,6 +81,16 @@ public class SchematicPlacement
         return this.regionPlacementsModified;
     }
 
+    public boolean ignoreEntities()
+    {
+        return this.ignoreEntities;
+    }
+
+    public void setIgnoreEntities(boolean ignoreEntities)
+    {
+        this.ignoreEntities = ignoreEntities;
+    }
+
     public String getName()
     {
         return this.name;

@@ -190,14 +190,18 @@ public class LitematicaSchematic
                 Map<BlockPos, NBTTagCompound> tileMap = this.tileEntities.get(regionName);
                 List<EntityInfo> entityList = this.entities.get(regionName);
 
-                if (regionPos != null && regionSize != null && container != null && tileMap != null && entityList != null)
+                if (regionPos != null && regionSize != null && container != null && tileMap != null)
                 {
                     this.placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, container, tileMap, notifyNeighbors);
-                    this.placeEntitiesToWorld(world, origin, regionPos, schematicPlacement, placement, entityList);
                 }
                 else
                 {
                     LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
+                }
+
+                if (schematicPlacement.ignoreEntities() == false && entityList != null)
+                {
+                    this.placeEntitiesToWorld(world, origin, regionPos, schematicPlacement, placement, entityList);
                 }
             }
         }
@@ -267,7 +271,7 @@ public class LitematicaSchematic
                                     ((IInventory) te).clear();
                                 }
 
-                                world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 4);
+                                world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 0x14);
                             }
                         }
 
