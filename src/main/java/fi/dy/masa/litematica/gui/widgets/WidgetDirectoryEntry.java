@@ -63,7 +63,7 @@ public class WidgetDirectoryEntry extends WidgetBase
             default: return;
         }
 
-        GlStateManager.color(1f, 1f, 1f);
+        GlStateManager.color(1, 1, 1, 1);
         this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
 
         widget.renderAt(this.x, this.y + 1, this.zLevel, false, false);

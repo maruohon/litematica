@@ -119,6 +119,8 @@ public class WidgetSchematicEntry extends WidgetBase
             this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
         }
 
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.disableBlend();
         String fileName = this.schematicEntry.getFileName();
         this.parent.bindTexture(Icons.TEXTURE);
 
