@@ -5,26 +5,28 @@ import net.minecraft.client.resources.I18n;
 
 public enum AreaSelectionMode implements IConfigOptionListEntry
 {
-    CORNERS     ("litematica.hud.area_selection.mode.corners"),
-    CUBOID      ("litematica.hud.area_selection.mode.cuboid");
+    CORNERS     ("corners",     "litematica.hud.area_selection.mode.corners"),
+    CUBOID      ("cuboid",      "litematica.hud.area_selection.mode.cuboid");
 
-    private final String displayName;
+    private final String configString;
+    private final String unlocName;
 
-    private AreaSelectionMode(String displayName)
+    private AreaSelectionMode(String configString, String displayName)
     {
-        this.displayName = displayName;
+        this.configString = configString;
+        this.unlocName = displayName;
     }
 
     @Override
     public String getStringValue()
     {
-        return this.name().toLowerCase();
+        return this.configString;
     }
 
     @Override
     public String getDisplayName()
     {
-        return I18n.format(this.displayName);
+        return I18n.format(this.unlocName);
     }
 
     @Override
@@ -58,11 +60,11 @@ public enum AreaSelectionMode implements IConfigOptionListEntry
 
     public static AreaSelectionMode fromStringStatic(String name)
     {
-        for (AreaSelectionMode al : AreaSelectionMode.values())
+        for (AreaSelectionMode mode : AreaSelectionMode.values())
         {
-            if (al.name().equalsIgnoreCase(name))
+            if (mode.configString.equalsIgnoreCase(name))
             {
-                return al;
+                return mode;
             }
         }
 

@@ -30,7 +30,6 @@ public class MixinMinecraft
     @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("RETURN"))
     private void onLoadWorldPost(@Nullable WorldClient worldClientIn, String loadingMessage, CallbackInfo ci)
     {
-        // Save the settings before the integrated server gets shut down
         if (Minecraft.getMinecraft().world != null)
         {
             SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
