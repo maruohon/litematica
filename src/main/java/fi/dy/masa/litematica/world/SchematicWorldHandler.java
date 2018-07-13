@@ -59,7 +59,7 @@ public class SchematicWorldHandler
         }
         else
         {
-            this.world = new WorldClient(null, this.settings, 0, EnumDifficulty.PEACEFUL, this.mc.mcProfiler);
+            this.world = new WorldSchematic(null, this.settings, -1, EnumDifficulty.PEACEFUL, this.mc.mcProfiler);
 
             if (this.mc.player != null)
             {

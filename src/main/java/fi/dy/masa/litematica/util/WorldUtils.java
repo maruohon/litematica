@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.world.WorldSchematic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -45,12 +46,12 @@ public class WorldUtils
         }
 
         WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
-        WorldClient world = new WorldClient(null, settings, 0, EnumDifficulty.PEACEFUL, Minecraft.getMinecraft().mcProfiler);
+        WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.PEACEFUL, Minecraft.getMinecraft().mcProfiler);
 
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, schematic.getSize());
         PlacementSettings placementSettings = new PlacementSettings();
         placementSettings.setIgnoreEntities(true);
-        schematic.placeSchematicToWorld(world, BlockPos.ORIGIN, placementSettings, 0x12);
+        schematic.placeSchematicDirectlyToChunks(world, BlockPos.ORIGIN, placementSettings);
 
         String subRegionName = FileUtils.getNameWithoutExtension(inputFileName) + " (Converted Schematic)";
         AreaSelection area = new AreaSelection();
@@ -93,7 +94,7 @@ public class WorldUtils
             is.close();
 
             WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
-            WorldClient world = new WorldClient(null, settings, 0, EnumDifficulty.PEACEFUL, Minecraft.getMinecraft().mcProfiler);
+            WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.PEACEFUL, Minecraft.getMinecraft().mcProfiler);
 
             loadChunksClientWorld(world, BlockPos.ORIGIN, template.getSize());
 

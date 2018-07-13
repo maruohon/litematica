@@ -40,6 +40,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 import net.minecraft.world.gen.structure.template.Template;
 
@@ -175,6 +176,106 @@ public class SchematicaSchematic
                                 if (te != null)
                                 {
                                     te.markDirty();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (placement.getIgnoreEntities() == false)
+            {
+                this.addEntitiesToWorld(world, posStart, placement);
+            }
+        }
+    }
+
+    public void placeSchematicDirectlyToChunks(World world, BlockPos posStart, PlacementSettings placement)
+    {
+        final int width = this.size.getX();
+        final int height = this.size.getY();
+        final int length = this.size.getZ();
+        final int numBlocks = width * height * length;
+        BlockPos posEnd = posStart.add(this.size).add(-1, -1, -1);
+        //BlockPos posEnd = Template.transformedBlockPos(placement, (new BlockPos(this.size)).add(-1, -1, -1)).add(posStart);
+
+        if (this.blocks != null && numBlocks > 0 && this.blocks.getSize().equals(this.size) &&
+            PositionUtils.arePositionsWithinWorld(world, posStart, posEnd))
+        {
+            final BlockPos posMin = PositionUtils.getMinCorner(posStart, posEnd);
+            final BlockPos posMax = PositionUtils.getMaxCorner(posStart, posEnd);
+            final Block ignoredBlock = placement.getReplacedBlock();
+            final Rotation rotation = placement.getRotation();
+            final Mirror mirror = placement.getMirror();
+            final int cxStart = posMin.getX() >> 4;
+            final int czStart = posMin.getZ() >> 4;
+            final int cxEnd = posMax.getX() >> 4;
+            final int czEnd = posMax.getZ() >> 4;
+
+            for (int cz = czStart; cz <= czEnd; ++cz)
+            {
+                for (int cx = cxStart; cx <= cxEnd; ++cx)
+                {
+                    final int xMinChunk = Math.max(cx << 4, posMin.getX());
+                    final int zMinChunk = Math.max(cz << 4, posMin.getZ());
+                    final int xMaxChunk = Math.min((cx << 4) + 15, posMax.getX());
+                    final int zMaxChunk = Math.min((cz << 4) + 15, posMax.getZ());
+                    Chunk chunk = world.getChunkFromChunkCoords(cx, cz);
+
+                    for (int y = posMin.getY(), ySrc = 0; ySrc < height; ++y, ++ySrc)
+                    {
+                        for (int z = zMinChunk, zSrc = zMinChunk - posStart.getZ(); z <= zMaxChunk; ++z, ++zSrc)
+                        {
+                            for (int x = xMinChunk, xSrc = xMinChunk - posStart.getX(); x <= xMaxChunk; ++x, ++xSrc)
+                            {
+                                IBlockState state = this.blocks.get(xSrc, ySrc, zSrc);
+
+                                if (state.getBlock() == ignoredBlock)
+                                {
+                                    continue;
+                                }
+
+                                BlockPos pos = new BlockPos(x, y, z);
+                                NBTTagCompound teNBT = this.tiles.get(pos);
+
+                                // TODO The rotations need to be transformed back to get the correct source position in the schematic...
+                                /*
+                                pos = Template.transformedBlockPos(placement, pos).add(posStart);
+
+                                state = state.withMirror(mirror);
+                                state = state.withRotation(rotation);
+                                */
+
+                                if (teNBT != null)
+                                {
+                                    TileEntity te = chunk.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
+
+                                    if (te != null)
+                                    {
+                                        if (te instanceof IInventory)
+                                        {
+                                            ((IInventory) te).clear();
+                                        }
+
+                                        world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 0x14);
+                                    }
+                                }
+
+                                chunk.setBlockState(pos, state);
+
+                                if (teNBT != null)
+                                {
+                                    TileEntity te = chunk.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
+
+                                    if (te != null)
+                                    {
+                                        teNBT.setInteger("x", pos.getX());
+                                        teNBT.setInteger("y", pos.getY());
+                                        teNBT.setInteger("z", pos.getZ());
+                                        te.readFromNBT(teNBT);
+                                        te.mirror(mirror);
+                                        te.rotate(rotation);
+                                    }
                                 }
                             }
                         }

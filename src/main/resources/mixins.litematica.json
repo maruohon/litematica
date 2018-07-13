@@ -4,7 +4,9 @@
     "refmap": "mixins.litematica.refmap.json",
     "minVersion": "0.6",
     "client": [
+        "IMixinChunkProviderClient",
         "IMixinNBTTagLongArray",
+        "IMixinWorldClient",
         "MixinBufferBuilder",
         "MixinEntityRenderer",
         "MixinGuiOverlayDebug",
