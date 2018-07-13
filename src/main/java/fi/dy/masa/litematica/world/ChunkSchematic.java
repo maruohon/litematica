@@ -6,6 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
@@ -103,8 +104,44 @@ public class ChunkSchematic extends Chunk
     }
 
     @Override
+    public int getLightFor(EnumSkyBlock type, BlockPos pos)
+    {
+        return 15;
+    }
+
+    @Override
+    public int getLightSubtracted(BlockPos pos, int amount)
+    {
+        return 15;
+    }
+
+    @Override
+    public void setLightFor(EnumSkyBlock type, BlockPos pos, int value)
+    {
+        // NO-OP
+    }
+
+    @Override
     public void onTick(boolean skipRecheckGaps)
     {
         super.onTick(true);
+    }
+
+    @Override
+    public void checkLight()
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void generateSkylightMap()
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void enqueueRelightChecks()
+    {
+        // NO-OP
     }
 }
