@@ -126,32 +126,32 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         }
         else if (this.stackExpected != null && this.stackFound != null)
         {
-            //GlStateManager.pushMatrix();
-            GlStateManager.disableLighting();
-
-            RenderHelper.enableGUIStandardItemLighting();
-
             int x = this.x + 4;
             int y = this.y + 3;
+            int x2 = this.x + maxNameLengthExpected + 50;
+
+            mc.fontRenderer.drawString(this.stackExpected.getDisplayName(), x + 20, y + 4, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(this.stackFound.getDisplayName(), x2 + 20, y + 4, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(String.valueOf(this.count), x2 + maxNameLengthFound + 50, this.y + 7, 0xFFFFFFFF);
+
+            //GlStateManager.pushMatrix();
+            GlStateManager.disableLighting();
+            RenderHelper.enableGUIStandardItemLighting();
+
             //mc.getRenderItem().zLevel -= 110;
             Gui.drawRect(x, y, x + 16, y + 16, 0x20FFFFFF); // light background for the item
             mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stackExpected, x, y);
             mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackExpected, x, y, null);
-            mc.fontRenderer.drawString(this.stackExpected.getDisplayName(), x + 20, y + 4, 0xFFFFFFFF);
 
             x = this.x + maxNameLengthExpected + 50;
             Gui.drawRect(x, y, x + 16, y + 16, 0x20FFFFFF); // light background for the item
             mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stackFound, x, y);
             mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackFound, x, y, null);
-            mc.fontRenderer.drawString(this.stackFound.getDisplayName(), x + 20, y + 4, 0xFFFFFFFF);
             //mc.getRenderItem().zLevel += 110;
 
             //GlStateManager.disableBlend();
             RenderHelper.disableStandardItemLighting();
             //GlStateManager.popMatrix();
-
-            x += maxNameLengthFound + 50;
-            mc.fontRenderer.drawString(String.valueOf(this.count), x, this.y + 7, 0xFFFFFFFF);
         }
     }
 
