@@ -44,9 +44,9 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     protected static final String BUTTON_LABEL_ADD = TextFormatting.DARK_GREEN + "+" + TextFormatting.RESET;
     protected static final String BUTTON_LABEL_REMOVE = TextFormatting.DARK_RED + "-" + TextFormatting.RESET;
 
-    protected static final int COLOR_WHITE          = 0xFFFFFFFF;
-    protected static final int TOOLTIP_BACKGROUND   = 0x80000000;
-    protected static final int COLOR_HORIZONTAL_BAR = 0xFF999999;
+    public static final int COLOR_WHITE          = 0xFFFFFFFF;
+    public static final int TOOLTIP_BACKGROUND   = 0x80000000;
+    public static final int COLOR_HORIZONTAL_BAR = 0xFF999999;
     protected static final int LEFT         = 20;
     protected static final int TOP          = 10;
     private final List<ButtonWrapper<? extends ButtonBase>> buttons = new ArrayList<>();
@@ -281,6 +281,12 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     public void setString(String string)
     {
         this.addGuiMessage(this.nextMessageType, string, 3000);
+    }
+
+    @Override
+    public void addMessage(InfoType type, String messageKey)
+    {
+        this.addMessage(type, messageKey, new Object[0]);
     }
 
     @Override

@@ -95,7 +95,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public void onSelectionChange(DirectoryEntry entry)
+    public void onSelectionChange(@Nullable DirectoryEntry entry)
     {
         if (entry != null && entry.getType() != DirectoryEntryType.DIRECTORY && entry.getType() != DirectoryEntryType.INVALID)
         {

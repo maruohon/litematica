@@ -141,11 +141,25 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
     {
         final int selected = this.selectedEntryIndex != -1 ? this.selectedEntryIndex - this.scrollBar.getValue() : -1;
 
+        WIDGET hovered = null;
+        boolean hoveredSelected = false;
+
         // Draw the currently visible directory entries
         for (int i = 0; i < this.listWidgets.size(); i++)
         {
             WIDGET widget = this.listWidgets.get(i);
             widget.render(mouseX, mouseY, i == selected);
+
+            if (widget.isMouseOver(mouseX, mouseY))
+            {
+                hovered = widget;
+                hoveredSelected = i == selected;
+            }
+        }
+
+        if (hovered != null)
+        {
+            hovered.postRenderHovered(mouseX, mouseY, hoveredSelected);
         }
 
         int scrollbarHeight = this.browserHeight - 8;

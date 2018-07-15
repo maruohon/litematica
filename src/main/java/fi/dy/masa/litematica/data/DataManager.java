@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -39,6 +40,9 @@ public class DataManager
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static OperationMode operationMode = OperationMode.PLACEMENT;
 
+    @Nullable
+    private static SchematicPlacement placementToVerify = null;
+
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
 
@@ -63,6 +67,29 @@ public class DataManager
         }
 
         return instance;
+    }
+
+    public static boolean addSchematicVerificationTask(SchematicPlacement placement)
+    {
+        if (placementToVerify == null)
+        {
+            placementToVerify = placement;
+            return true;
+        }
+
+        return false;
+    }
+
+    public static void runSchematicVerification()
+    {
+        if (placementToVerify != null)
+        {
+            // Check if the task finishes
+            if (placementToVerify.getSchematicVerifier().verifyChunks())
+            {
+                placementToVerify = null;
+            }
+        }
     }
 
     public static ItemStack getToolItem()

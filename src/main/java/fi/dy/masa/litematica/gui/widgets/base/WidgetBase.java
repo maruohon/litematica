@@ -39,4 +39,8 @@ public abstract class WidgetBase
     }
 
     public abstract void render(int mouseX, int mouseY, boolean selected);
+
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    {
+    }
 }

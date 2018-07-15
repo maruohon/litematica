@@ -70,7 +70,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     }
 
     @Override
-    public void onSelectionChange(DirectoryEntry entry)
+    public void onSelectionChange(@Nullable DirectoryEntry entry)
     {
         this.initGui();
     }

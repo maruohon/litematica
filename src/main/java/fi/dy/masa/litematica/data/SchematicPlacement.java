@@ -24,6 +24,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 
 public class SchematicPlacement
@@ -32,6 +34,7 @@ public class SchematicPlacement
     private static int nextColorIndex;
 
     private final Map<String, Placement> relativeSubRegionPlacements = new HashMap<>();
+    private SchematicVerifier verifier;
     private LitematicaSchematic schematic;
     @Nullable
     private File schematicFile;
@@ -132,6 +135,16 @@ public class SchematicPlacement
         return this.subRegionCount;
     }
 
+    public SchematicVerifier getSchematicVerifier()
+    {
+        if (this.verifier == null)
+        {
+            this.verifier = new SchematicVerifier();
+        }
+
+        return this.verifier;
+    }
+
     public PlacementSettings getPlacementSettings()
     {
         PlacementSettings placement = new PlacementSettings();
@@ -199,6 +212,65 @@ public class SchematicPlacement
         }
 
         return builder.build();
+    }
+
+    public Map<String, StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
+    {
+        ImmutableMap<String, Box> map = this.getSubRegionBoxes();
+        final int chunkXMin = chunkX << 4;
+        final int chunkZMin = chunkZ << 4;
+        final int chunkXMax = chunkXMin + 15;
+        final int chunkZMax = chunkZMin + 15;
+        Map<String, StructureBoundingBox> mapOut = new HashMap<>();
+
+        for (Map.Entry<String, Box> entry : map.entrySet())
+        {
+            Box box = entry.getValue();
+            final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX());
+            final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
+            final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX());
+            final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+
+            boolean notOverlapping = boxXMin > chunkXMax || boxZMin > chunkZMax || boxXMax < chunkXMin || boxZMax < chunkZMin;
+
+            if (notOverlapping == false)
+            {
+                final int xMin = Math.max(chunkXMin, boxXMin);
+                final int yMin = Math.min(box.getPos1().getY(), box.getPos2().getY());
+                final int zMin = Math.max(chunkZMin, boxZMin);
+                final int xMax = Math.min(chunkXMax, boxXMax);
+                final int yMax = Math.max(box.getPos1().getY(), box.getPos2().getY());
+                final int zMax = Math.min(chunkZMax, boxZMax);
+
+                mapOut.put(entry.getKey(), new StructureBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax));
+            }
+        }
+
+        return mapOut;
+    }
+
+    public Set<ChunkPos> getTouchedChunks()
+    {
+        ImmutableMap<String, Box> map = this.getSubRegionBoxes();
+        Set<ChunkPos> set = new HashSet<>();
+
+        for (Box box : map.values())
+        {
+            final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX()) >> 4;
+            final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
+            final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX()) >> 4;
+            final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
+
+            for (int cz = boxZMin; cz <= boxZMax; ++cz)
+            {
+                for (int cx = boxXMin; cx <= boxXMax; ++cx)
+                {
+                    set.add(new ChunkPos(cx, cz));
+                }
+            }
+        }
+
+        return set;
     }
 
     /**

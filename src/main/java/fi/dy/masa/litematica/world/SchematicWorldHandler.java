@@ -19,7 +19,7 @@ public class SchematicWorldHandler
     private final WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
     private final Minecraft mc = Minecraft.getMinecraft();
     @Nullable
-    private WorldClient world;
+    private WorldSchematic world;
 
     public static SchematicWorldHandler getInstance()
     {
@@ -33,7 +33,7 @@ public class SchematicWorldHandler
     }
 
     @Nullable
-    public WorldClient getSchematicWorld()
+    public WorldSchematic getSchematicWorld()
     {
         return this.world;
     }

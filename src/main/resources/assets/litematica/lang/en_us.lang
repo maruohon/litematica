@@ -3,6 +3,8 @@ language.region=US
 language.code=en_US
 
 litematica.error.duplicate_schematic_load=Error: Tried to load a duplicate schematic + placement
+litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
+litematica.error.generic.schematic_world_not_loaded=Schematic world was not loaded
 litematica.error.invalid_directory=Invalid directory '%s'
 
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=Failed to create the Litematica schematic
@@ -55,6 +57,10 @@ litematica.gui.button.schematic_placements.enable=Enable
 litematica.gui.button.schematic_placements.render_enable=Enable rendering
 litematica.gui.button.schematic_placements.render_disable=Disable rendering
 
+litematica.gui.button.schematic_verifier.start=Start verification
+litematica.gui.button.schematic_verifier.stop=Stop verification
+litematica.gui.button.schematic_verifier.reset=Reset data
+
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.create_placement=Create placement
@@ -71,6 +77,7 @@ litematica.gui.button.reset=Reset
 litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_schematic=Save Schematic
 litematica.gui.button.save_to_file=Save to file
+litematica.gui.button.schematic_verifier=Schematic Verifier
 litematica.gui.button.set_preview=Set preview
 litematica.gui.button.unload=Unload
 
@@ -86,6 +93,14 @@ litematica.gui.label.schematic_info.time_created=Created: §f%s§r
 litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
 litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
+
+litematica.gui.label.schematic_verifier.expected=Expected
+litematica.gui.label.schematic_verifier.found=Found
+litematica.gui.label.schematic_verifier_display_type.all=All (non-ignored)
+litematica.gui.label.schematic_verifier_display_type.missing=Missing Blocks
+litematica.gui.label.schematic_verifier_display_type.extra=Extra Blocks
+litematica.gui.label.schematic_verifier_display_type.wrong_blocks=Wrong Blocks
+litematica.gui.label.schematic_verifier_display_type.wrong_state=Wrong States
 
 litematica.gui.placement_sub_region.label.region_position=Region position
 litematica.gui.placement_sub_region.button.reset_sub_region_placement=Reset sub-region
@@ -113,6 +128,7 @@ litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a
 litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 litematica.gui.title.schematic_manager=Schematic Manager
+litematica.gui.title.schematic_verifier=Schematic Verifier
 
 litematica.hud.area_selection.box_count=Boxes
 litematica.hud.area_selection.mode.corners=Corners

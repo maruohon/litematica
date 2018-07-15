@@ -65,6 +65,9 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.RESET_SUB_REGIONS);
+        y += 22;
+
+        this.createButton(x, y, width, ButtonListener.Type.OPEN_VERIFIER_GUI);
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
@@ -136,6 +139,10 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
             case REMOVE_PLACEMENT:
                 label = TXT_RED + I18n.format("litematica.gui.button.remove_placement") + TXT_RST;
+                break;
+
+            case OPEN_VERIFIER_GUI:
+                label = I18n.format("litematica.gui.button.schematic_verifier");
                 break;
         }
 
@@ -222,6 +229,12 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                     DataManager.getInstance(mc.world).getSchematicPlacementManager().removeSchematicPlacement(this.placement);
                     mc.displayGuiScreen(null);
                     break;
+
+                case OPEN_VERIFIER_GUI:
+                    GuiSchematicVerifier gui = new GuiSchematicVerifier(this.placement);
+                    gui.setParent(this.parent);
+                    mc.displayGuiScreen(gui);
+                    break;
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
@@ -234,7 +247,8 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
             MOVE_HERE,
             TOGGLE_ENABLED,
             RESET_SUB_REGIONS,
-            REMOVE_PLACEMENT;
+            REMOVE_PLACEMENT,
+            OPEN_VERIFIER_GUI;
         }
     }
 

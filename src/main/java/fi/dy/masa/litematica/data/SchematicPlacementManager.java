@@ -28,6 +28,7 @@ import net.minecraft.world.World;
 public class SchematicPlacementManager
 {
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
+
     @Nullable
     private SchematicPlacement selectedPlacement;
 
