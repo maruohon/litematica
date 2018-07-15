@@ -274,18 +274,27 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())
                 {
-                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
-                    AreaSelection selection = sm.getCurrentSelection();
+                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
 
-                    if (selection != null)
+                    if (DataManager.getOperationMode() == OperationMode.AREA_SELECTION)
                     {
-                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        BlockPos old = selection.getOrigin();
-                        selection.moveEntireSelectionTo(pos);
-                        String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
-                        String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                        StringUtils.printActionbarMessage("litematica.message.moved_selection", oldStr, posStr);
+                        SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                        AreaSelection selection = sm.getCurrentSelection();
+
+                        if (selection != null)
+                        {
+                            BlockPos old = selection.getOrigin();
+                            selection.moveEntireSelectionTo(pos);
+                            String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+                            String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                            StringUtils.printActionbarMessage("litematica.message.moved_selection", oldStr, posStr);
+                        }
                     }
+                    else if (DataManager.getOperationMode() == OperationMode.PLACEMENT)
+                    {
+                        DataManager.getInstance(this.mc.world).getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
+                    }
+
                     return true;
                 }
                 else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeybind() && DataManager.getOperationMode() == OperationMode.AREA_SELECTION)

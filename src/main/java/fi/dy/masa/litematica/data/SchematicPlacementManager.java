@@ -158,8 +158,6 @@ public class SchematicPlacementManager
 
         if (schematicPlacement != null)
         {
-            boolean movingBox = schematicPlacement.getSelectedSubRegionPlacement() != null;
-
             RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
 
             if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
@@ -174,6 +172,18 @@ public class SchematicPlacementManager
             {
                 pos = pos.offset(trace.sideHit);
             }
+
+            this.setPositionOfCurrentSelectionTo(pos, mc);
+        }
+    }
+
+    public void setPositionOfCurrentSelectionTo(BlockPos pos, Minecraft mc)
+    {
+        SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
+
+        if (schematicPlacement != null)
+        {
+            boolean movingBox = schematicPlacement.getSelectedSubRegionPlacement() != null;
 
             if (movingBox)
             {
