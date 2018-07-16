@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,6 +22,8 @@ import net.minecraft.world.border.WorldBorder;
 
 public class PositionUtils
 {
+    public static final BlockPosComparator BLOCK_POS_COMPARATOR = new BlockPosComparator();
+
     public static BlockPos getMinCorner(BlockPos pos1, BlockPos pos2)
     {
         return new BlockPos(Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
@@ -420,6 +423,36 @@ public class PositionUtils
             case LEFT_RIGHT:    return "LEFT_RIGHT";
             case NONE:
             default:            return "NONE";
+        }
+    }
+
+    public static class BlockPosComparator implements Comparator<BlockPos>
+    {
+        private BlockPos posReference = BlockPos.ORIGIN;
+        private boolean closestFirst;
+
+        public void setClosestFirst(boolean closestFirst)
+        {
+            this.closestFirst = closestFirst;
+        }
+
+        public void setReferencePosition(BlockPos pos)
+        {
+            this.posReference = pos;
+        }
+
+        @Override
+        public int compare(BlockPos pos1, BlockPos pos2)
+        {
+            double dist1 = pos1.distanceSq(this.posReference);
+            double dist2 = pos2.distanceSq(this.posReference);
+
+            if (dist1 == dist2)
+            {
+                return 0;
+            }
+
+            return dist1 < dist2 == this.closestFirst ? -1 : 1;
         }
     }
 

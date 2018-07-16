@@ -57,9 +57,10 @@ litematica.gui.button.schematic_placements.enable=Enable
 litematica.gui.button.schematic_placements.render_enable=Enable rendering
 litematica.gui.button.schematic_placements.render_disable=Disable rendering
 
+litematica.gui.button.schematic_verifier.reset=Reset data
 litematica.gui.button.schematic_verifier.start=Start verification
 litematica.gui.button.schematic_verifier.stop=Stop verification
-litematica.gui.button.schematic_verifier.reset=Reset data
+litematica.gui.button.schematic_verifier.toggle_info_hud=Info HUD: %s
 
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.create_directory=Create New Directory
@@ -94,6 +95,7 @@ litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
 litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
+litematica.gui.label.schematic_verifier.count=Count
 litematica.gui.label.schematic_verifier.expected=Expected
 litematica.gui.label.schematic_verifier.found=Found
 litematica.gui.label.schematic_verifier_display_type.all=All (non-ignored)

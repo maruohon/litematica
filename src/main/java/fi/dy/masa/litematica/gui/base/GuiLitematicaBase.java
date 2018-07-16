@@ -36,6 +36,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     public static final String TXT_ORANGE = TextFormatting.GOLD.toString();
     public static final String TXT_RED = TextFormatting.RED.toString();
     public static final String TXT_WHITE = TextFormatting.WHITE.toString();
+    public static final String TXT_BOLD = TextFormatting.BOLD.toString();
     public static final String TXT_RST = TextFormatting.RESET.toString();
 
     public static final String TXT_DARK_GREEN = TextFormatting.DARK_GREEN.toString();
@@ -57,7 +58,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     private InfoType nextMessageType = InfoType.INFO;
     protected String title = "";
     @Nullable
-    protected GuiLitematicaBase parent;
+    private GuiLitematicaBase parent;
 
     public GuiLitematicaBase()
     {
@@ -72,6 +73,12 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         }
 
         return this;
+    }
+
+    @Nullable
+    public GuiLitematicaBase getParent()
+    {
+        return this.parent;
     }
 
     protected String getTitle()
@@ -232,6 +239,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
             {
                 this.mc.displayGuiScreen(this.parent);
             }
+
             return true;
         }
 

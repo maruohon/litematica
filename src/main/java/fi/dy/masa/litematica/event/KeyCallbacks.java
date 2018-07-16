@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
+import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.GuiTextInput;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -40,6 +41,7 @@ public class KeyCallbacks
         Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.SCHEMATIC_VERIFIER.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_1.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_2.getKeybind().setCallback(callbackHotkeys);
@@ -166,6 +168,21 @@ public class KeyCallbacks
                     {
                         this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
                     }
+                }
+                else
+                {
+                    StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                }
+
+                return true;
+            }
+            if (mode == OperationMode.PLACEMENT && key == Hotkeys.SCHEMATIC_VERIFIER.getKeybind())
+            {
+                SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                if (schematicPlacement != null)
+                {
+                    this.mc.displayGuiScreen(new GuiSchematicVerifier(schematicPlacement));
                 }
                 else
                 {

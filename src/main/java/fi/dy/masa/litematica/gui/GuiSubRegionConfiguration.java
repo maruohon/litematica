@@ -75,7 +75,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
         x = this.width - buttonWidth - 10;
         y = this.height - 36;
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type, this.parent));
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         this.updateElements();
     }

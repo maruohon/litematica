@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.AreaSelectionMode;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.malilib.config.ConfigUtils;
+import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.config.IConfigHandler;
 import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
@@ -24,13 +25,17 @@ public class Configs implements IConfigHandler
 
     public static class Generic
     {
+        public static final ConfigOptionList    INFO_HUD_ALIGNMENT      = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\", used for schematic verifier mismatch positions etc.");
         public static final ConfigOptionList    SELECTION_MODE          = new ConfigOptionList( "selectionMode", AreaSelectionMode.CORNERS, "The area selection mode to use");
+        public static final ConfigOptionList    TOOL_HUD_ALIGNMENT      = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
         public static final ConfigString        TOOL_ITEM               = new ConfigString(     "toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
         public static final ConfigBoolean       TOOL_ITEM_ENABLED       = new ConfigBoolean(    "toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.");
         public static final ConfigBoolean       VERBOSE_LOGGING         = new ConfigBoolean(    "verboseLogging", false, "If enabled, a bunch of debug messages will be printed to the console");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                INFO_HUD_ALIGNMENT,
                 SELECTION_MODE,
+                TOOL_HUD_ALIGNMENT,
                 TOOL_ITEM,
                 TOOL_ITEM_ENABLED,
                 VERBOSE_LOGGING
@@ -39,6 +44,7 @@ public class Configs implements IConfigHandler
 
     public static class Visuals
     {
+        public static final ConfigDouble        ERROR_HILIGHT_ALPHA             = new ConfigDouble(     "errorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
         public static final ConfigDouble        GHOST_BLOCK_ALPHA               = new ConfigDouble(     "ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA        = new ConfigDouble(     "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT    = new ConfigBoolean(    "renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
@@ -47,6 +53,7 @@ public class Configs implements IConfigHandler
         public static final ConfigColor         SELECTION_BOX_SIDE_COLOR        = new ConfigColor(      "selectionBoxSideColor", "0x30FFFFFF", "If enabled, then the area selection boxes will have their side quads rendered");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                ERROR_HILIGHT_ALPHA,
                 GHOST_BLOCK_ALPHA,
                 PLACEMENT_BOX_SIDE_ALPHA,
                 RENDER_BLOCKS_AS_TRANSLUCENT,

@@ -133,7 +133,7 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
         else if (keyCode == Keyboard.KEY_HOME)  this.offsetSelectionOrScrollbar(-this.listContents.size(), true);
         else if (keyCode == Keyboard.KEY_END)   this.offsetSelectionOrScrollbar( this.listContents.size(), true);
 
-        return super.onKeyTyped(typedChar, keyCode);
+        return false;
     }
 
     @Override

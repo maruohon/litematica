@@ -26,7 +26,7 @@ public class GuiTextInput extends GuiLitematicaBase
     public GuiTextInput(int maxTextLength, String titleKey, String text, @Nullable GuiLitematicaBase parent, IStringConsumer consumer)
     {
         this.mc = Minecraft.getMinecraft();
-        this.parent = parent;
+        this.setParent(parent);
         this.title = I18n.format(titleKey);
         this.originalText = text;
         this.consumer = consumer;
@@ -34,10 +34,10 @@ public class GuiTextInput extends GuiLitematicaBase
         this.dialogWidth = 260;
         this.dialogHeight = 100;
 
-        if (this.parent != null)
+        if (this.getParent() != null)
         {
-            this.dialogLeft = this.parent.width / 2 - this.dialogWidth / 2;
-            this.dialogTop = this.parent.height / 2 - this.dialogHeight / 2;
+            this.dialogLeft = this.getParent().width / 2 - this.dialogWidth / 2;
+            this.dialogTop = this.getParent().height / 2 - this.dialogHeight / 2;
         }
         else
         {
@@ -84,15 +84,15 @@ public class GuiTextInput extends GuiLitematicaBase
     @Override
     public boolean doesGuiPauseGame()
     {
-        return this.parent != null && this.parent.doesGuiPauseGame();
+        return this.getParent() != null && this.getParent().doesGuiPauseGame();
     }
 
     @Override
     public void drawContents(int mouseX, int mouseY, float partialTicks)
     {
-        if (this.parent != null)
+        if (this.getParent() != null)
         {
-            this.parent.drawScreen(mouseX, mouseY, partialTicks);
+            this.getParent().drawScreen(mouseX, mouseY, partialTicks);
         }
 
         drawOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
@@ -112,12 +112,12 @@ public class GuiTextInput extends GuiLitematicaBase
         if (keyCode == Keyboard.KEY_RETURN)
         {
             this.consumer.setString(this.textField.getText());
-            this.mc.displayGuiScreen(this.parent);
+            this.mc.displayGuiScreen(this.getParent());
             return true;
         }
         else if (keyCode == Keyboard.KEY_ESCAPE)
         {
-            this.mc.displayGuiScreen(this.parent);
+            this.mc.displayGuiScreen(this.getParent());
             return true;
         }
 
@@ -173,11 +173,11 @@ public class GuiTextInput extends GuiLitematicaBase
             if (this.type == Type.OK)
             {
                 this.gui.consumer.setString(this.gui.textField.getText());
-                this.gui.mc.displayGuiScreen(this.gui.parent);
+                this.gui.mc.displayGuiScreen(this.gui.getParent());
             }
             else if (this.type == Type.CANCEL)
             {
-                this.gui.mc.displayGuiScreen(this.gui.parent);
+                this.gui.mc.displayGuiScreen(this.gui.getParent());
             }
             else if (this.type == Type.RESET)
             {

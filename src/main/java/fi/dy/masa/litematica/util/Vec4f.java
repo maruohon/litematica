@@ -8,9 +8,9 @@ public class Vec4f
     public final float b;
     public final float a;
 
-    public Vec4f(Vec3f c, float a)
+    public Vec4f(float r, float g, float b)
     {
-        this(c.x, c.y, c.z, a);
+        this(r, g, b, 1f);
     }
 
     public Vec4f(float r, float g, float b, float a)
@@ -43,11 +43,16 @@ public class Vec4f
 
     public static Vec4f fromColor(int color)
     {
-        float a = ((color & 0xFF000000) >>> 24) / 255f;
+        float alpha = ((color & 0xFF000000) >>> 24) / 255f;
+        return fromColor(color, alpha);
+    }
+
+    public static Vec4f fromColor(int color, float alpha)
+    {
         float r = ((color & 0x00FF0000) >>> 16) / 255f;
         float g = ((color & 0x000FF000) >>>  8) / 255f;
         float b = ((color & 0x000000FF)       ) / 255f;
 
-        return new Vec4f(r, g, b, a);
+        return new Vec4f(r, g, b, alpha);
     }
 }

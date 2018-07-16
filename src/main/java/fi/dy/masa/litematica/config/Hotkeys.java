@@ -20,6 +20,7 @@ public enum Hotkeys implements IHotkey
     OPERATION_MODE_CHANGE_MODIFIER      ("operationModeChangeModifier",     "LCONTROL", "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode."),
     SAVE_AREA_AS_IN_MEMORY_SCHEMATIC    ("saveAreaAsInMemorySchematic",     "LCONTROL,S",  "Save the current Area Selection as an in-memory Schematic"),
     SAVE_AREA_AS_SCHEMATIC_TO_FILE      ("saveAreaAsSchematicToFile",       "LCONTROL,LMENU,S",  "Save the current Area Selection as a Schematic to a file"),
+    SCHEMATIC_VERIFIER                  ("schematicVerifier",               "M,K",  "The keybind to open the Schematic Verifier GUI for the selected placement"),
     SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
     SELECTION_MODE_CYCLE                ("selectionModeCycle",              "LCONTROL,M", "The keybind to change the selection mode/type in the Area Selection mode"),
     SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,O",  "Set/move the origin point of the current selection here"),

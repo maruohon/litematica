@@ -16,19 +16,25 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
+import fi.dy.masa.litematica.render.IStringListProvider;
+import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.Vec4f;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 
-public class SchematicVerifier
+public class SchematicVerifier implements IStringListProvider
 {
     private static MutablePair<IBlockState, IBlockState> mutablePair = new MutablePair<>();
     private static long clientTickStart;
@@ -38,6 +44,11 @@ public class SchematicVerifier
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> mismatchedBlocksPositions = ArrayListMultimap.create();
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> mismatchedStatesPositions = ArrayListMultimap.create();
     private final HashSet<Pair<IBlockState, IBlockState>> ignoredMismatches = new HashSet<>();
+    private final List<BlockPos> missingBlocksPositionsClosest = new ArrayList<>();
+    private final List<BlockPos> extraBlocksPositionsClosest = new ArrayList<>();
+    private final List<BlockPos> mismatchedBlocksPositionsClosest = new ArrayList<>();
+    private final List<BlockPos> mismatchedStatesPositionsClosest = new ArrayList<>();
+    private final List<String> infoLines = new ArrayList<>();
     private final Set<ChunkPos> requiredChunks = new HashSet<>();
     private WorldClient worldClient;
     private WorldSchematic worldSchematic;
@@ -54,6 +65,12 @@ public class SchematicVerifier
     private long matchingBlocks;
     private long mismatchedBlocks;
     private long mismatchedStates;
+
+    @Override
+    public List<String> getLines()
+    {
+        return this.infoLines;
+    }
 
     public static void onClientTickStart()
     {
@@ -141,6 +158,7 @@ public class SchematicVerifier
         this.totalRequiredChunks = this.requiredChunks.size();
         this.completionListener = completionListener;
         this.verificationActive = true;
+        InfoHud.getInstance().removeLineProvider(this);
     }
 
     public void stopVerification()
@@ -156,6 +174,8 @@ public class SchematicVerifier
         this.mismatchedStatesPositions.clear();
         this.verificationActive = false;
         this.finished = false;
+        InfoHud.getInstance().removeLineProvider(this);
+        DataManager.clearActiveMismatchPositions();
     }
 
     public boolean verifyChunks()
@@ -270,6 +290,49 @@ public class SchematicVerifier
         }
 
         return list;
+    }
+
+    public List<BlockPos> getClosestMismatchedPositionsFor(MismatchType type)
+    {
+        switch (type)
+        {
+            //case ALL:
+            //    return Collections.emptyList();
+            case MISSING:
+                return this.missingBlocksPositionsClosest;
+            case EXTRA:
+                return this.extraBlocksPositionsClosest;
+            case WRONG_BLOCK:
+                return this.mismatchedBlocksPositionsClosest;
+            case WRONG_STATE:
+                return this.mismatchedStatesPositionsClosest;
+            default:
+                return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Prepares/caches the strings, and returns a provider for the data.<br>
+     * <b>NOTE:</b> This is actually the instance of this class, there are no separate providers for different data types atm!
+     * @param type
+     * @return
+     */
+    public IStringListProvider getClosestMismatchedPositionListProviderFor(MismatchType type)
+    {
+        this.infoLines.clear();
+        List<BlockPos> list = this.getClosestMismatchedPositionsFor(type);
+
+        if (list.isEmpty() == false)
+        {
+            this.infoLines.add(String.format("%s%s%s", type.getFormattingCode(), type.getDisplayname(), TextFormatting.RESET.toString()));
+
+            for (BlockPos pos : list)
+            {
+                this.infoLines.add(String.format("x: %6d, y: %3d, z: %6d", pos.getX(), pos.getY(), pos.getZ()));
+            }
+        }
+
+        return this;
     }
 
     public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(GuiLitematicaBase gui)
@@ -406,6 +469,39 @@ public class SchematicVerifier
         }
     }
 
+    public void updateClosestPositions(int maxEntries)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc.player != null)
+        {
+            BlockPos posPlayer = new BlockPos(mc.player.getPositionVector());
+            PositionUtils.BLOCK_POS_COMPARATOR.setReferencePosition(posPlayer);
+            PositionUtils.BLOCK_POS_COMPARATOR.setClosestFirst(true);
+
+            this.addAndSortPositions(this.mismatchedBlocksPositions, this.mismatchedBlocksPositionsClosest, maxEntries);
+            this.addAndSortPositions(this.mismatchedStatesPositions, this.mismatchedStatesPositionsClosest, maxEntries);
+            this.addAndSortPositions(this.extraBlocksPositions, this.extraBlocksPositionsClosest, maxEntries);
+            this.addAndSortPositions(this.missingBlocksPositions, this.missingBlocksPositionsClosest, maxEntries);
+        }
+    }
+
+    private void addAndSortPositions(ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> sourceMap, List<BlockPos> listOut, int maxEntries)
+    {
+        listOut.clear();
+
+        List<BlockPos> tempList = new ArrayList<>();
+        tempList.addAll(sourceMap.values());
+        Collections.sort(tempList, PositionUtils.BLOCK_POS_COMPARATOR);
+
+        final int max = Math.min(maxEntries, tempList.size());
+
+        for (int i = 0; i < max; ++i)
+        {
+            listOut.add(tempList.get(i));
+        }
+    }
+
     public static class BlockMismatch implements Comparable<BlockMismatch>
     {
         public final Pair<IBlockState, IBlockState> statePair;
@@ -426,22 +522,36 @@ public class SchematicVerifier
 
     public enum MismatchType
     {
-        ALL         ("litematica.gui.label.schematic_verifier_display_type.all"),
-        MISSING     ("litematica.gui.label.schematic_verifier_display_type.missing"),
-        EXTRA       ("litematica.gui.label.schematic_verifier_display_type.extra"),
-        WRONG_BLOCK ("litematica.gui.label.schematic_verifier_display_type.wrong_blocks"),
-        WRONG_STATE ("litematica.gui.label.schematic_verifier_display_type.wrong_state");
+        ALL         (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.all", TextFormatting.WHITE.toString() + TextFormatting.BOLD),
+        MISSING     (0x00FFFF, "litematica.gui.label.schematic_verifier_display_type.missing", TextFormatting.AQUA.toString() + TextFormatting.BOLD),
+        EXTRA       (0xFF00CF, "litematica.gui.label.schematic_verifier_display_type.extra", TextFormatting.LIGHT_PURPLE.toString() + TextFormatting.BOLD),
+        WRONG_BLOCK (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.wrong_blocks", TextFormatting.RED.toString() + TextFormatting.BOLD),
+        WRONG_STATE (0xFFAF00, "litematica.gui.label.schematic_verifier_display_type.wrong_state", TextFormatting.GOLD.toString() + TextFormatting.BOLD);
 
         private final String unlocName;
+        private final String formattingCode;
+        private final Vec4f color;
 
-        private MismatchType(String unlocName)
+        private MismatchType(int color, String unlocName, String formattingCode)
         {
+            this.color = Vec4f.fromColor(color, 1f);
             this.unlocName = unlocName;
+            this.formattingCode = formattingCode;
+        }
+
+        public Vec4f getColor()
+        {
+            return this.color;
         }
 
         public String getDisplayname()
         {
             return I18n.format(this.unlocName);
+        }
+
+        public String getFormattingCode()
+        {
+            return this.formattingCode;
         }
     }
 }

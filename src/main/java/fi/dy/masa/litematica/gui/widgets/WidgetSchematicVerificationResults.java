@@ -7,15 +7,9 @@ import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TextFormatting;
 
 public class WidgetSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
 {
-    private static final String BOLD = TextFormatting.BOLD.toString();
-    private static final String RED = TextFormatting.RED.toString();
-    private static final String RESET = TextFormatting.RESET.toString();
-    private static final String WHITE = TextFormatting.WHITE.toString();
-
     private final GuiSchematicVerifier guiSchematicVerifier;
 
     public WidgetSchematicVerificationResults(int x, int y, int width, int height, GuiSchematicVerifier parent)
@@ -32,9 +26,9 @@ public class WidgetSchematicVerificationResults extends WidgetListBase<BlockMism
     {
         this.listContents.clear();
 
-        String strExpected = WHITE + BOLD + I18n.format("litematica.gui.label.schematic_verifier.expected") + RESET;
-        String strFound = WHITE + BOLD + I18n.format("litematica.gui.label.schematic_verifier.found") + RESET;
-        this.listContents.add(new BlockMismatchEntry(null, strExpected, strFound));
+        String strExpected = TXT_WHITE + TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.expected") + TXT_RST;
+        String strFound = TXT_WHITE + TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.found") + TXT_RST;
+        this.listContents.add(new BlockMismatchEntry(strExpected, strFound));
 
         MismatchType type = this.guiSchematicVerifier.getResultMode();
 
@@ -58,14 +52,14 @@ public class WidgetSchematicVerificationResults extends WidgetListBase<BlockMism
 
     private void addEntriesForType(MismatchType type)
     {
-        String title = RED + BOLD + type.getDisplayname() + RESET;
-        this.listContents.add(new BlockMismatchEntry(null, title, null));
+        String title = type.getFormattingCode() + type.getDisplayname() + TXT_RST;
+        this.listContents.add(new BlockMismatchEntry(type, title));
 
         List<BlockMismatch> list = this.guiSchematicVerifier.getPlacement().getSchematicVerifier().getMismatchOverviewFor(type);
 
         for (BlockMismatch entry : list)
         {
-            this.listContents.add(new BlockMismatchEntry(entry, null, null));
+            this.listContents.add(new BlockMismatchEntry(type, entry));
         }
     }
 

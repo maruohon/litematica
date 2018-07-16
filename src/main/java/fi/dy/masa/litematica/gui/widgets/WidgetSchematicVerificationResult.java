@@ -14,6 +14,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -21,8 +22,10 @@ public class WidgetSchematicVerificationResult extends WidgetBase
 {
     private static int maxNameLengthExpected;
     private static int maxNameLengthFound;
+    private static int maxCountLength;
     @Nullable private final String header1;
     @Nullable private final String header2;
+    @Nullable private final String header3;
     @Nullable private final IBlockState stateExpected;
     @Nullable private final IBlockState stateFound;
     private final ItemStack stackExpected;
@@ -38,10 +41,11 @@ public class WidgetSchematicVerificationResult extends WidgetBase
 
         this.isOdd = isOdd;
 
-        if (entry.title1 != null && entry.title2 != null)
+        if (entry.header1 != null && entry.header2 != null)
         {
-            this.header1 = entry.title1;
-            this.header2 = entry.title2;
+            this.header1 = entry.header1;
+            this.header2 = entry.header2;
+            this.header3 = GuiLitematicaBase.TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.count");
             this.stateExpected = null;
             this.stateFound = null;
             this.stackExpected = ItemStack.EMPTY;
@@ -50,10 +54,11 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.blockRegistrynameFound = "<null>";
             this.count = 0;
         }
-        else if (entry.title1 != null)
+        else if (entry.header1 != null)
         {
-            this.header1 = entry.title1;
+            this.header1 = entry.header1;
             this.header2 = null;
+            this.header3 = null;
             this.stateExpected = null;
             this.stateFound = null;
             this.stackExpected = ItemStack.EMPTY;
@@ -66,6 +71,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         {
             this.header1 = null;
             this.header2 = null;
+            this.header3 = null;
             this.stateExpected = entry.blockMismatch.statePair.getLeft();
             this.stateFound = entry.blockMismatch.statePair.getRight();
             this.stackExpected = ItemUtils.getItemForState(this.stateExpected);
@@ -80,6 +86,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             FontRenderer font = Minecraft.getMinecraft().fontRenderer;
             maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(this.stackExpected.getDisplayName()));
             maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(this.stackFound.getDisplayName()));
+            maxCountLength = Math.max(maxCountLength, font.getStringWidth(String.valueOf(this.count)));
         }
     }
 
@@ -87,6 +94,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
     {
         maxNameLengthExpected = 60;
         maxNameLengthFound = 60;
+        maxCountLength = 40;
     }
 
     @Override
@@ -119,6 +127,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         {
             mc.fontRenderer.drawString(this.header1, this.x + 4, this.y + 7, 0xFFFFFFFF);
             mc.fontRenderer.drawString(this.header2, this.x + maxNameLengthExpected + 50, this.y + 7, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(this.header3, this.x + maxNameLengthExpected + maxNameLengthFound + 100, this.y + 7, 0xFFFFFFFF);
         }
         else if (this.header1 != null)
         {
@@ -161,19 +170,22 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         if (this.stateExpected != null && this.stateFound != null)
         {
             Minecraft mc = Minecraft.getMinecraft();
+            List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
+            List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(0f, 0f, 200f);
 
             int x = mouseX + 10;
             int y = Math.min(mouseY, mc.currentScreen.height - 130);
+            int height = Math.max(propsExpected.size(), propsFound.size()) * (mc.fontRenderer.FONT_HEIGHT + 2) + 40;
 
             String name1 = this.stackExpected.getDisplayName();
             String name2 = this.stackFound.getDisplayName();
-            int w1 = Math.max(mc.fontRenderer.getStringWidth(name1), mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
-            int w2 = Math.max(mc.fontRenderer.getStringWidth(name2), mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
+            int w1 = Math.max(mc.fontRenderer.getStringWidth(name1) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
+            int w2 = Math.max(mc.fontRenderer.getStringWidth(name2) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
 
-            GuiLitematicaBase.drawOutlinedBox(x, y, w1 + w2 + 60, 120, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
+            GuiLitematicaBase.drawOutlinedBox(x, y, w1 + w2 + 40, height, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
 
             GlStateManager.disableLighting();
 
@@ -198,12 +210,12 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             RenderHelper.disableStandardItemLighting();
 
             y += 20;
-            mc.fontRenderer.drawString(this.blockRegistrynameExpected, x1, y, 0xB0B0B0B0);
-            mc.fontRenderer.drawString(this.blockRegistrynameFound, x2, y, 0xB0B0B0B0);
-            y += mc.fontRenderer.FONT_HEIGHT + 8;
+            mc.fontRenderer.drawString(this.blockRegistrynameExpected, x1, y, 0xFF4060FF);
+            mc.fontRenderer.drawString(this.blockRegistrynameFound, x2, y, 0xFF4060FF);
+            y += mc.fontRenderer.FONT_HEIGHT + 4;
 
-            this.renderLines(x1, y, BlockUtils.getFormattedBlockStateProperties(this.stateExpected), mc.fontRenderer);
-            this.renderLines(x2, y, BlockUtils.getFormattedBlockStateProperties(this.stateFound), mc.fontRenderer);
+            this.renderLines(x1, y, propsExpected, mc.fontRenderer);
+            this.renderLines(x2, y, propsFound, mc.fontRenderer);
 
             GlStateManager.popMatrix();
         }
@@ -215,7 +227,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         {
             for (String line : lines)
             {
-                font.drawString(line, x, y, 0xB0B0B0B0);
+                font.drawString(line, x, y, 0xFFB0B0B0);
                 y += font.FONT_HEIGHT + 2;
             }
         }

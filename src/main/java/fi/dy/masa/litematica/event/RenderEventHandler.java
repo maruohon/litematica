@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.event;
 
+import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.ToolHud;
@@ -54,6 +55,7 @@ public class RenderEventHandler
             if (this.renderSchematics)
             {
                 LitematicaRenderer.getInstance().renderSchematicWorld();
+                OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
             }
 
             OverlayRenderer.getInstance().renderSelectionAreas();
@@ -67,6 +69,7 @@ public class RenderEventHandler
         if (this.enableRendering && mc.currentScreen == null && mc.gameSettings.showDebugInfo == false && mc.player != null)
         {
             ToolHud.getInstance().renderHud();
+            InfoHud.getInstance().renderHud();
         }
     }
 }

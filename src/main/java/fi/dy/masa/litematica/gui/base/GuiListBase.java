@@ -89,7 +89,7 @@ public abstract class GuiListBase<TYPE, WIDGET extends WidgetBase, WIDGETLIST ex
     }
 
     @Override
-    public boolean  onKeyTyped(char typedChar, int keyCode)
+    public boolean onKeyTyped(char typedChar, int keyCode)
     {
         if (this.widget.onKeyTyped(typedChar, keyCode))
         {

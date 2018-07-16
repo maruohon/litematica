@@ -9,11 +9,11 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
+import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.litematica.util.Vec3f;
 import fi.dy.masa.litematica.util.Vec4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -51,16 +51,16 @@ public class OverlayRenderer
 
     private final Minecraft mc;
     private final Map<SchematicPlacement, ImmutableMap<String, Box>> placements = new HashMap<>();
-    private Vec3f colorPos1 = new Vec3f(1f, 0.0625f, 0.0625f);
-    private Vec3f colorPos2 = new Vec3f(0.0625f, 0.0625f, 1f);
-    private Vec3f colorOverlapping = new Vec3f(1f, 0.0625f, 1f);
-    private Vec3f colorX = new Vec3f(   1f, 0.25f, 0.25f);
-    private Vec3f colorY = new Vec3f(0.25f,    1f, 0.25f);
-    private Vec3f colorZ = new Vec3f(0.25f, 0.25f,    1f);
-    private Vec3f colorArea = new Vec3f(1f, 1f, 1f);
-    private Vec3f colorBoxPlacementSelected = new Vec3f(0x16 / 255f, 1f, 1f);
-    private Vec3f colorSelectedCorner = new Vec3f(0f, 1f, 1f);
-    private Vec3f colorAreaOrigin = new Vec3f(1f, 0x90 / 255f, 0x10 / 255f);
+    private Vec4f colorPos1 = new Vec4f(1f, 0.0625f, 0.0625f);
+    private Vec4f colorPos2 = new Vec4f(0.0625f, 0.0625f, 1f);
+    private Vec4f colorOverlapping = new Vec4f(1f, 0.0625f, 1f);
+    private Vec4f colorX = new Vec4f(   1f, 0.25f, 0.25f);
+    private Vec4f colorY = new Vec4f(0.25f,    1f, 0.25f);
+    private Vec4f colorZ = new Vec4f(0.25f, 0.25f,    1f);
+    private Vec4f colorArea = new Vec4f(1f, 1f, 1f);
+    private Vec4f colorBoxPlacementSelected = new Vec4f(0x16 / 255f, 1f, 1f);
+    private Vec4f colorSelectedCorner = new Vec4f(0f, 1f, 1f);
+    private Vec4f colorAreaOrigin = new Vec4f(1f, 0x90 / 255f, 0x10 / 255f);
 
     private OverlayRenderer()
     {
@@ -117,7 +117,7 @@ public class OverlayRenderer
                 this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
             }
 
-            Vec3f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
+            Vec4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
             RenderUtils.renderBlockOutline(currentSelection.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
         }
 
@@ -140,7 +140,7 @@ public class OverlayRenderer
                     this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, schematicPlacement);
                 }
 
-                Vec3f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
+                Vec4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
                 RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, 2f, color, renderViewEntity, partialTicks);
             }
         }
@@ -166,11 +166,11 @@ public class OverlayRenderer
             return;
         }
 
-        Vec3f color1;
-        Vec3f color2;
-        Vec3f colorX;
-        Vec3f colorY;
-        Vec3f colorZ;
+        Vec4f color1;
+        Vec4f color2;
+        Vec4f colorX;
+        Vec4f colorY;
+        Vec4f colorZ;
 
         switch (boxType)
         {
@@ -190,7 +190,7 @@ public class OverlayRenderer
                 colorZ = this.colorBoxPlacementSelected;
                 break;
             case PLACEMENT_UNSELECTED:
-                Vec3f color = placement.getBoxesBBColor();
+                Vec4f color = placement.getBoxesBBColor();
                 colorX = color;
                 colorY = color;
                 colorZ = color;
@@ -206,14 +206,14 @@ public class OverlayRenderer
             color1 = this.colorBoxPlacementSelected;
             color2 = color1;
             float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
-            sideColor = new Vec4f(color1, alpha);
+            sideColor = new Vec4f(color1.r, color1.g, color1.b, alpha);
         }
         else if (boxType == BoxType.PLACEMENT_UNSELECTED)
         {
             color1 = placement.getBoxesBBColor();
             color2 = color1;
             float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
-            sideColor = new Vec4f(color1, alpha);
+            sideColor = new Vec4f(color1.r, color1.g, color1.b, alpha);
         }
         else
         {
@@ -257,6 +257,33 @@ public class OverlayRenderer
                 RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
             }
         }
+    }
+
+    public void renderSchematicMismatches(float partialTicks)
+    {
+        List<BlockPos> list = DataManager.getSelectedMismatchPositions();
+        MismatchType type = DataManager.getSelectedMismatchType();
+
+        GlStateManager.disableDepth();
+        GlStateManager.depthMask(false);
+        GlStateManager.disableLighting();
+        GlStateManager.disableTexture2D();
+        GlStateManager.pushMatrix();
+
+        for (BlockPos pos : list)
+        {
+            Vec4f color = type.getColor();
+            Vec4f colorSides = new Vec4f(color.r, color.g, color.b, (float) Configs.Visuals.ERROR_HILIGHT_ALPHA.getDoubleValue());
+            RenderUtils.renderBlockOutline(pos, 0.002f, 2f, color, this.mc.player, partialTicks);
+            RenderUtils.renderAreaSides(pos, pos, colorSides, this.mc.player, partialTicks);
+        }
+
+        GlStateManager.popMatrix();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableCull();
+        GlStateManager.enableLighting();
+        GlStateManager.depthMask(true);
+        GlStateManager.enableDepth();
     }
 
     private enum BoxType
