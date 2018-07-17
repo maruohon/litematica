@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +44,7 @@ public class SchematicVerifier implements IStringListProvider
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> extraBlocksPositions = ArrayListMultimap.create();
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> mismatchedBlocksPositions = ArrayListMultimap.create();
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> mismatchedStatesPositions = ArrayListMultimap.create();
+    private final Map<BlockPos, BlockMismatch> blockMismatches = new HashMap<>();
     private final HashSet<Pair<IBlockState, IBlockState>> ignoredMismatches = new HashSet<>();
     private final List<BlockPos> missingBlocksPositionsClosest = new ArrayList<>();
     private final List<BlockPos> extraBlocksPositionsClosest = new ArrayList<>();
@@ -135,30 +137,21 @@ public class SchematicVerifier implements IStringListProvider
     public void reset()
     {
         this.stopVerification();
-
-        this.finished = false;
-        this.missingBlocksPositions.clear();
-        this.extraBlocksPositions.clear();
-        this.mismatchedBlocksPositions.clear();
-        this.mismatchedStatesPositions.clear();
     }
 
     public void startVerification(WorldClient worldClient, WorldSchematic worldSchematic,
             SchematicPlacement schematicPlacement, ICompletionListener completionListener)
     {
+        this.stopVerification();
+
         this.worldClient = worldClient;
         this.worldSchematic = worldSchematic;
         this.schematicPlacement = schematicPlacement;
-        this.requiredChunks.clear();
-        this.missingBlocksPositions.clear();
-        this.extraBlocksPositions.clear();
-        this.mismatchedBlocksPositions.clear();
-        this.mismatchedStatesPositions.clear();
+
         this.requiredChunks.addAll(schematicPlacement.getTouchedChunks());
         this.totalRequiredChunks = this.requiredChunks.size();
         this.completionListener = completionListener;
         this.verificationActive = true;
-        InfoHud.getInstance().removeLineProvider(this);
     }
 
     public void stopVerification()
@@ -168,12 +161,16 @@ public class SchematicVerifier implements IStringListProvider
         this.schematicPlacement = null;
         this.totalRequiredChunks = 0;
         this.requiredChunks.clear();
+
         this.missingBlocksPositions.clear();
         this.extraBlocksPositions.clear();
         this.mismatchedBlocksPositions.clear();
         this.mismatchedStatesPositions.clear();
+        this.blockMismatches.clear();
+
         this.verificationActive = false;
         this.finished = false;
+
         InfoHud.getInstance().removeLineProvider(this);
         DataManager.clearActiveMismatchPositions();
     }
@@ -224,43 +221,58 @@ public class SchematicVerifier implements IStringListProvider
         return this.verificationActive == false; // finished or stopped
     }
 
-    public void ignoreStateMismatch(IBlockState stateExpected, IBlockState stateFound)
+    public void ignoreStateMismatch(BlockMismatch mismatch)
     {
-        this.ignoreStateMismatch(Pair.of(stateExpected, stateFound));
-    }
+        Pair<IBlockState, IBlockState> ignore = Pair.of(mismatch.stateExpected, mismatch.stateFound);
 
-    public void ignoreStateMismatch(Pair<IBlockState, IBlockState> ignore)
-    {
         this.ignoredMismatches.add(ignore);
 
         this.missingBlocksPositions.removeAll(ignore);
         this.extraBlocksPositions.removeAll(ignore);
         this.mismatchedBlocksPositions.removeAll(ignore);
         this.mismatchedStatesPositions.removeAll(ignore);
-    }
 
-    public void addIgnoredStateMismatches(Collection<Pair<IBlockState, IBlockState>> ignore)
-    {
-        for (Pair<IBlockState, IBlockState> pair : ignore)
+        Iterator<Map.Entry<BlockPos, BlockMismatch>> iter = this.blockMismatches.entrySet().iterator();
+
+        while (iter.hasNext())
         {
-            this.ignoreStateMismatch(pair);
+            Map.Entry<BlockPos, BlockMismatch> entry = iter.next();
+
+            if (entry.getValue().equals(mismatch))
+            {
+                iter.remove();
+            }
         }
     }
 
-    public void setIgnoredStateMismatches(Collection<Pair<IBlockState, IBlockState>> ignore)
+    public void addIgnoredStateMismatches(Collection<BlockMismatch> ignore)
+    {
+        for (BlockMismatch mismatch : ignore)
+        {
+            this.ignoreStateMismatch(mismatch);
+        }
+    }
+
+    public void setIgnoredStateMismatches(Collection<BlockMismatch> ignore)
     {
         this.ignoredMismatches.clear();
         this.addIgnoredStateMismatches(ignore);
+    }
+
+    @Nullable
+    public BlockMismatch getMismatchForPosition(BlockPos pos)
+    {
+        return this.blockMismatches.get(pos);
     }
 
     public List<BlockMismatch> getMismatchOverviewCombined()
     {
         List<BlockMismatch> list = new ArrayList<>();
 
-        this.addCountFor(this.missingBlocksPositions, list);
-        this.addCountFor(this.extraBlocksPositions, list);
-        this.addCountFor(this.mismatchedBlocksPositions, list);
-        this.addCountFor(this.mismatchedStatesPositions, list);
+        this.addCountFor(MismatchType.MISSING, this.missingBlocksPositions, list);
+        this.addCountFor(MismatchType.EXTRA, this.extraBlocksPositions, list);
+        this.addCountFor(MismatchType.WRONG_BLOCK, this.mismatchedBlocksPositions, list);
+        this.addCountFor(MismatchType.WRONG_STATE, this.mismatchedStatesPositions, list);
 
         Collections.sort(list);
 
@@ -276,16 +288,16 @@ public class SchematicVerifier implements IStringListProvider
             case ALL:
                 return this.getMismatchOverviewCombined();
             case MISSING:
-                this.addCountFor(this.missingBlocksPositions, list);
+                this.addCountFor(type, this.missingBlocksPositions, list);
                 break;
             case EXTRA:
-                this.addCountFor(this.extraBlocksPositions, list);
+                this.addCountFor(type, this.extraBlocksPositions, list);
                 break;
             case WRONG_BLOCK:
-                this.addCountFor(this.mismatchedBlocksPositions, list);
+                this.addCountFor(type, this.mismatchedBlocksPositions, list);
                 break;
             case WRONG_STATE:
-                this.addCountFor(this.mismatchedStatesPositions, list);
+                this.addCountFor(type, this.mismatchedStatesPositions, list);
                 break;
         }
 
@@ -376,11 +388,11 @@ public class SchematicVerifier implements IStringListProvider
         return list;
     }
 
-    private void addCountFor(ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> map, List<BlockMismatch> list)
+    private void addCountFor(MismatchType mismatchType, ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> map, List<BlockMismatch> list)
     {
         for (Pair<IBlockState, IBlockState> pair : map.keySet())
         {
-            list.add(new BlockMismatch(pair, map.get(pair).size()));
+            list.add(new BlockMismatch(mismatchType, pair.getLeft(), pair.getRight(), map.get(pair).size()));
         }
     }
 
@@ -416,11 +428,13 @@ public class SchematicVerifier implements IStringListProvider
                         if (this.ignoredMismatches.contains(mutablePair) == false)
                         {
                             BlockPos pos = new BlockPos(x, y, z);
+                            BlockMismatch mismatch;
 
                             if (stateSchematic != air)
                             {
                                 if (stateClient == air)
                                 {
+                                    mismatch = new BlockMismatch(MismatchType.MISSING, stateSchematic, stateClient, 1);
                                     this.missingBlocksPositions.put(Pair.of(stateSchematic, stateClient), pos);
                                     this.missingBlocks++;
                                 }
@@ -428,11 +442,13 @@ public class SchematicVerifier implements IStringListProvider
                                 {
                                     if (stateSchematic.getBlock() != stateClient.getBlock())
                                     {
+                                        mismatch = new BlockMismatch(MismatchType.WRONG_BLOCK, stateSchematic, stateClient, 1);
                                         this.mismatchedBlocksPositions.put(Pair.of(stateSchematic, stateClient), pos);
                                         this.mismatchedBlocks++;
                                     }
                                     else
                                     {
+                                        mismatch = new BlockMismatch(MismatchType.WRONG_STATE, stateSchematic, stateClient, 1);
                                         this.mismatchedStatesPositions.put(Pair.of(stateSchematic, stateClient), pos);
                                         this.mismatchedStates++;
                                     }
@@ -444,10 +460,13 @@ public class SchematicVerifier implements IStringListProvider
                             }
                             else
                             {
+                                mismatch = new BlockMismatch(MismatchType.EXTRA, stateSchematic, stateClient, 1);
                                 this.extraBlocksPositions.put(Pair.of(stateSchematic, stateClient), pos);
                                 this.clientBlocks++;
                                 this.extraBlocks++;
                             }
+
+                            this.blockMismatches.put(pos, mismatch);
 
                             ItemUtils.setItemForBlock(this.worldClient, pos, stateClient);
                             ItemUtils.setItemForBlock(this.worldSchematic, pos, stateSchematic);
@@ -504,12 +523,16 @@ public class SchematicVerifier implements IStringListProvider
 
     public static class BlockMismatch implements Comparable<BlockMismatch>
     {
-        public final Pair<IBlockState, IBlockState> statePair;
+        public final MismatchType mismatchType;
+        public final IBlockState stateExpected;
+        public final IBlockState stateFound;
         public final int count;
 
-        public BlockMismatch(Pair<IBlockState, IBlockState> statePair, int count)
+        public BlockMismatch(MismatchType mismatchType, IBlockState stateExpected, IBlockState stateFound, int count)
         {
-            this.statePair = statePair;
+            this.mismatchType = mismatchType;
+            this.stateExpected = stateExpected;
+            this.stateFound = stateFound;
             this.count = count;
         }
 
@@ -517,6 +540,46 @@ public class SchematicVerifier implements IStringListProvider
         public int compareTo(BlockMismatch other)
         {
             return this.count > other.count ? -1 : (this.count < other.count ? 1 : 0);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((mismatchType == null) ? 0 : mismatchType.hashCode());
+            result = prime * result + ((stateExpected == null) ? 0 : stateExpected.hashCode());
+            result = prime * result + ((stateFound == null) ? 0 : stateFound.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            BlockMismatch other = (BlockMismatch) obj;
+            if (mismatchType != other.mismatchType)
+                return false;
+            if (stateExpected == null)
+            {
+                if (other.stateExpected != null)
+                    return false;
+            }
+            else if (stateExpected != other.stateExpected)
+                return false;
+            if (stateFound == null)
+            {
+                if (other.stateFound != null)
+                    return false;
+            }
+            else if (stateFound != other.stateFound)
+                return false;
+            return true;
         }
     }
 

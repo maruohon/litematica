@@ -48,6 +48,8 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        GHOST_BLOCK_ALPHA               = new ConfigDouble(     "ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA        = new ConfigDouble(     "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT    = new ConfigBoolean(    "renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
+        public static final ConfigBoolean       RENDER_ERROR_INFO_OVERLAY       = new ConfigBoolean(    "renderErrorInfoOverlay", true, "If enabled, then an info overlay is rendered while looking at an error marker, and holding the key for it");
+        public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES       = new ConfigBoolean(    "renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier will have\n(translucent) sides rendered instead of just the outline");
         public static final ConfigBoolean       RENDER_SELECTION_BOX_SIDES      = new ConfigBoolean(    "renderSelectionBoxSides", true, "If enabled, then the area selection boxes will have their side quads rendered");
         public static final ConfigBoolean       RENDER_PLACEMENT_BOX_SIDES      = new ConfigBoolean(    "renderPlacementBoxSides", false, "If enabled, then the placed schematic sub-region boxes will have their side quads rendered");
         public static final ConfigColor         SELECTION_BOX_SIDE_COLOR        = new ConfigColor(      "selectionBoxSideColor", "0x30FFFFFF", "If enabled, then the area selection boxes will have their side quads rendered");
@@ -57,6 +59,8 @@ public class Configs implements IConfigHandler
                 GHOST_BLOCK_ALPHA,
                 PLACEMENT_BOX_SIDE_ALPHA,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
+                RENDER_ERROR_INFO_OVERLAY,
+                RENDER_ERROR_MARKER_SIDES,
                 RENDER_SELECTION_BOX_SIDES,
                 RENDER_PLACEMENT_BOX_SIDES,
                 SELECTION_BOX_SIDE_COLOR

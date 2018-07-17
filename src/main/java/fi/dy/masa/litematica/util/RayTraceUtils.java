@@ -38,7 +38,7 @@ public class RayTraceUtils
     {
         Vec3d eyesPos = entity.getPositionEyes(1f);
         Vec3d rangedLookRot = entity.getLook(1f).scale(range);
-        Vec3d lookEndPosc = eyesPos.add(rangedLookRot);
+        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
         RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
         double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
@@ -54,24 +54,24 @@ public class RayTraceUtils
             for (Box box : area.getAllSubRegionBoxes())
             {
                 boolean hitCorner = false;
-                hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_1, eyesPos, lookEndPosc);
-                hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_2, eyesPos, lookEndPosc);
+                hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_1, eyesPos, lookEndPos);
+                hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_2, eyesPos, lookEndPos);
 
                 if (hitCorner == false)
                 {
-                    traceToSelectionBoxBody(box, eyesPos, lookEndPosc);
+                    traceToSelectionBoxBody(box, eyesPos, lookEndPos);
                 }
             }
 
-            traceToOrigin(area.getOrigin(), eyesPos, lookEndPosc, HitType.SELECTION_ORIGIN, null);
+            traceToOrigin(area.getOrigin(), eyesPos, lookEndPos, HitType.SELECTION_ORIGIN, null);
         }
 
         if (DataManager.getOperationMode() == OperationMode.PLACEMENT)
         {
             for (SchematicPlacement placement : dataManager.getSchematicPlacementManager().getAllSchematicsPlacements())
             {
-                traceToPlacementBox(placement, eyesPos, lookEndPosc);
-                traceToOrigin(placement.getOrigin(), eyesPos, lookEndPosc, HitType.PLACEMENT_ORIGIN, placement);
+                traceToPlacementBox(placement, eyesPos, lookEndPos);
+                traceToOrigin(placement.getOrigin(), eyesPos, lookEndPos, HitType.PLACEMENT_ORIGIN, placement);
             }
         }
 
@@ -234,6 +234,55 @@ public class RayTraceUtils
         }
 
         return false;
+    }
+
+    /**
+     * Ray traces to the closest position in the given list, if it's the closest
+     * or the same distance as an existing block in the world.
+     * @param world
+     * @param posList
+     * @param entity
+     * @param range
+     * @return
+     */
+    @Nullable
+    public static BlockPos traceToPositions(World world, List<BlockPos> posList, Entity entity, double range)
+    {
+        if (posList.isEmpty())
+        {
+            return null;
+        }
+
+        Vec3d eyesPos = entity.getPositionEyes(1f);
+        Vec3d rangedLookRot = entity.getLook(1f).scale(range);
+        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
+
+        RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
+        double closestInWorld = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
+        double closest = -1D;
+        BlockPos posFound = null;
+
+        for (BlockPos pos : posList)
+        {
+            if (pos != null)
+            {
+                AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
+                RayTraceResult hit = bb.calculateIntercept(eyesPos, lookEndPos);
+
+                if (hit != null)
+                {
+                    double dist = hit.hitVec.distanceTo(eyesPos);
+
+                    if (closest < 0 || (dist < closest && dist <= closestInWorld))
+                    {
+                        closest = dist;
+                        posFound = pos;
+                    }
+                }
+            }
+        }
+
+        return posFound;
     }
 
     @Nonnull

@@ -4,19 +4,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
+import fi.dy.masa.litematica.data.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
+import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult.BlockMismatchInfo;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.Vec4f;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 
@@ -259,9 +268,8 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSchematicMismatches(float partialTicks)
+    public void renderSchematicMismatches(List<BlockPos> posList, @Nullable BlockPos lookPos, float partialTicks)
     {
-        List<BlockPos> list = DataManager.getSelectedMismatchPositions();
         MismatchType type = DataManager.getSelectedMismatchType();
 
         GlStateManager.disableDepth();
@@ -270,12 +278,53 @@ public class OverlayRenderer
         GlStateManager.disableTexture2D();
         GlStateManager.pushMatrix();
 
-        for (BlockPos pos : list)
+        if (posList.isEmpty() == false)
         {
-            Vec4f color = type.getColor();
-            Vec4f colorSides = new Vec4f(color.r, color.g, color.b, (float) Configs.Visuals.ERROR_HILIGHT_ALPHA.getDoubleValue());
-            RenderUtils.renderBlockOutline(pos, 0.002f, 2f, color, this.mc.player, partialTicks);
-            RenderUtils.renderAreaSides(pos, pos, colorSides, this.mc.player, partialTicks);
+            GlStateManager.glLineWidth(2f);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+
+            for (BlockPos pos : posList)
+            {
+                if (lookPos == null || lookPos.equals(pos) == false)
+                {
+                    RenderUtils.renderBlockOutlineBatched(pos, 0.002, type.getColor(), this.mc.player, buffer, partialTicks);
+                }
+            }
+
+            if (lookPos != null)
+            {
+                tessellator.draw();
+                buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+
+                GlStateManager.glLineWidth(6f);
+                RenderUtils.renderBlockOutlineBatched(lookPos, 0.002, type.getColor(), this.mc.player, buffer, partialTicks);
+            }
+
+            tessellator.draw();
+        }
+
+        if (Configs.Visuals.RENDER_ERROR_MARKER_SIDES.getBooleanValue())
+        {
+            GlStateManager.enableBlend();
+            GlStateManager.disableCull();
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+            for (BlockPos pos : posList)
+            {
+                Vec4f color = type.getColor();
+                Vec4f colorSides = new Vec4f(color.r, color.g, color.b, (float) Configs.Visuals.ERROR_HILIGHT_ALPHA.getDoubleValue());
+                RenderUtils.renderAreaSidesBatched(pos, pos, colorSides, 0.002, this.mc.player, partialTicks, buffer);
+            }
+
+            tessellator.draw();
+
+            GlStateManager.disableBlend();
         }
 
         GlStateManager.popMatrix();
@@ -284,6 +333,35 @@ public class OverlayRenderer
         GlStateManager.enableLighting();
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
+    }
+
+    public static void renderHoverInfoForBlockMismatch(Minecraft mc)
+    {
+        if (Configs.Visuals.RENDER_ERROR_INFO_OVERLAY.getBooleanValue() &&
+            (Hotkeys.RENDER_ERROR_INFO_OVERLAY.getKeybind().isValid() == false ||
+             Hotkeys.RENDER_ERROR_INFO_OVERLAY.getKeybind().isKeybindHeld()) &&
+            mc.world != null && mc.player != null)
+        {
+            SchematicPlacement placement = DataManager.getInstance(mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+            if (placement != null)
+            {
+                List<BlockPos> posList = DataManager.getSelectedMismatchPositions();
+                BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 5);
+
+                if (posLook != null)
+                {
+                    BlockMismatch mismatch = placement.getSchematicVerifier().getMismatchForPosition(posLook);
+
+                    if (mismatch != null)
+                    {
+                        BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
+                        ScaledResolution sr = new ScaledResolution(mc);
+                        info.render(sr.getScaledWidth() / 2 - 100, sr.getScaledHeight() / 2 - 20, mc);
+                    }
+                }
+            }
+        }
     }
 
     private enum BoxType

@@ -32,6 +32,23 @@ public class RenderUtils
         RenderGlobal.drawSelectionBoundingBox(aabb, color.r, color.g, color.b, color.a);
     }
 
+    public static void renderBlockOutlineBatched(BlockPos pos, double expand,
+            Vec4f color, Entity renderViewEntity, BufferBuilder buffer, float partialTicks)
+    {
+        double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
+        double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
+        double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+
+        RenderGlobal.drawBoundingBox(buffer,
+                pos.getX() - dx - expand,
+                pos.getY() - dy - expand,
+                pos.getZ() - dz - expand,
+                pos.getX() + 1 - dx + expand,
+                pos.getY() + 1 - dy + expand,
+                pos.getZ() + 1 - dz + expand,
+                color.r, color.g, color.b, color.a);
+    }
+
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
             Vec4f color1, Vec4f color2, Vec4f color3, Entity renderViewEntity, float partialTicks)
     {
@@ -170,12 +187,6 @@ public class RenderUtils
 
     public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Vec4f color, Entity renderViewEntity, float partialTicks)
     {
-        AxisAlignedBB box = createEnclosingAABB(pos1, pos2, renderViewEntity, partialTicks);
-        drawBoundingBoxSides(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, 0.001, color);
-    }
-
-    private static void drawBoundingBoxSides(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, double offset, Vec4f color)
-    {
         GlStateManager.enableBlend();
         GlStateManager.disableCull();
 
@@ -183,12 +194,39 @@ public class RenderUtils
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-        minX -= offset;
-        minY -= offset;
-        minZ -= offset;
-        maxX += offset;
-        maxY += offset;
-        maxZ += offset;
+        renderAreaSidesBatched(pos1, pos2, color, 0.002, renderViewEntity, partialTicks, buffer);
+
+        tessellator.draw();
+
+        GlStateManager.enableCull();
+        GlStateManager.disableBlend();
+    }
+
+    public static void renderAreaSidesBatched(BlockPos pos1, BlockPos pos2, Vec4f color, double expand,
+            Entity renderViewEntity, float partialTicks, BufferBuilder buffer)
+    {
+        double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
+        double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
+        double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+        double minX = Math.min(pos1.getX(), pos2.getX()) - dx;
+        double minY = Math.min(pos1.getY(), pos2.getY()) - dy;
+        double minZ = Math.min(pos1.getZ(), pos2.getZ()) - dz;
+        double maxX = Math.max(pos1.getX(), pos2.getX()) + 1 - dx;
+        double maxY = Math.max(pos1.getY(), pos2.getY()) + 1 - dy;
+        double maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1 - dz;
+
+        drawBoundingBoxSidesBatched(minX, minY, minZ, maxX, maxY, maxZ, expand, color, buffer);
+    }
+
+    public static void drawBoundingBoxSidesBatched(double minX, double minY, double minZ, double maxX, double maxY, double maxZ,
+            double expand, Vec4f color, BufferBuilder buffer)
+    {
+        minX -= expand;
+        minY -= expand;
+        minZ -= expand;
+        maxX += expand;
+        maxY += expand;
+        maxZ += expand;
 
         // West side
         buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
@@ -225,11 +263,6 @@ public class RenderUtils
         buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
         buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
         buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-
-        tessellator.draw();
-
-        GlStateManager.enableCull();
-        GlStateManager.disableBlend();
     }
 
     public static void renderAreaOutline(BlockPos pos1, BlockPos pos2,
