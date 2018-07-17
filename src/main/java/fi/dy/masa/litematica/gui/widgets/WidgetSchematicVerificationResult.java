@@ -202,7 +202,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
                 List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
                 List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
 
-                int height = Math.max(propsExpected.size(), propsFound.size()) * (mc.fontRenderer.FONT_HEIGHT + 2) + 40;
+                int height = Math.max(propsExpected.size(), propsFound.size()) * (mc.fontRenderer.FONT_HEIGHT + 2) + 60;
 
                 String name1 = this.stackExpected.getDisplayName();
                 String name2 = this.stackFound.getDisplayName();
@@ -211,27 +211,36 @@ public class WidgetSchematicVerificationResult extends WidgetBase
 
                 GuiLitematicaBase.drawOutlinedBox(x, y, w1 + w2 + 40, height, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
 
-                GlStateManager.disableLighting();
-
-                RenderHelper.enableGUIStandardItemLighting();
-
                 int x1 = x + 10;
                 int x2 = x + w1 + 30;
                 y += 4;
+
+                String pre = GuiLitematicaBase.TXT_WHITE + GuiLitematicaBase.TXT_BOLD;
+                String strExpected = pre + I18n.format("litematica.gui.label.schematic_verifier.expected") + GuiLitematicaBase.TXT_RST;
+                String strFound =    pre + I18n.format("litematica.gui.label.schematic_verifier.found") + GuiLitematicaBase.TXT_RST;
+                mc.fontRenderer.drawString(strExpected, x1, y, 0xFFFFFFFF);
+                mc.fontRenderer.drawString(strFound,    x2, y, 0xFFFFFFFF);
+
+                y += 12;
+
+                GlStateManager.disableLighting();
+                RenderHelper.enableGUIStandardItemLighting();
+
                 //mc.getRenderItem().zLevel += 100;
                 Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
                 mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stackExpected, x1, y);
                 mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackExpected, x1, y, null);
-                mc.fontRenderer.drawString(name1, x1 + 20, y + 4, 0xFFFFFFFF);
 
                 Gui.drawRect(x2, y, x2 + 16, y + 16, 0x20FFFFFF); // light background for the item
                 mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stackFound, x2, y);
                 mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackFound, x2, y, null);
-                mc.fontRenderer.drawString(name2, x2 + 20, y + 4, 0xFFFFFFFF);
                 //mc.getRenderItem().zLevel -= 100;
 
                 //GlStateManager.disableBlend();
                 RenderHelper.disableStandardItemLighting();
+
+                mc.fontRenderer.drawString(name1, x1 + 20, y + 4, 0xFFFFFFFF);
+                mc.fontRenderer.drawString(name2, x2 + 20, y + 4, 0xFFFFFFFF);
 
                 y += 20;
                 mc.fontRenderer.drawString(this.blockRegistrynameExpected, x1, y, 0xFF4060FF);
