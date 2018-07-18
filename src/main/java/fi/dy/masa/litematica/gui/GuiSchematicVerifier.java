@@ -209,7 +209,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 this.selectedDataEntry = entry;
 
                 SchematicVerifier verifier = this.placement.getSchematicVerifier();
-                verifier.updateMismatchOverlaysForType(entry.mismatchType, 10);
+                verifier.updateMismatchOverlaysForType(entry.mismatchType);
 
                 InfoHud.getInstance().addLineProvider(verifier);
             }

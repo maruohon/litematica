@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
 import fi.dy.masa.litematica.render.IStringListProvider;
@@ -240,20 +241,20 @@ public class SchematicVerifier implements IStringListProvider
 
         if (mismatchType != null)
         {
-            this.updateMismatchOverlaysForType(mismatchType, this.maxEntries);
+            this.updateMismatchOverlaysForType(mismatchType);
         }
     }
 
-    public void updateMismatchOverlaysForType(MismatchType mismatchType, int maxEntries)
+    public void updateMismatchOverlaysForType(MismatchType mismatchType)
     {
         Minecraft mc = Minecraft.getMinecraft();
 
         if (mc.player != null)
         {
-            this.maxEntries = maxEntries;
+            this.maxEntries = Configs.Visuals.ERROR_HILIGHT_MAX_POSITIONS.getIntegerValue();
 
             // This needs to happen first
-            this.updateClosestPositions(mc.player, maxEntries);
+            this.updateClosestPositions(mc.player, this.maxEntries);
 
             List<BlockPos> positionList = this.getClosestMismatchedPositionsFor(mismatchType);
             DataManager.setActiveMismatchPositionsForRender(mismatchType, positionList);
@@ -589,8 +590,11 @@ public class SchematicVerifier implements IStringListProvider
         {
             this.infoLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), TextFormatting.RESET.toString()));
 
-            for (BlockPos pos : positionList)
+            final int count = Math.min(positionList.size(), 16);
+
+            for (int i = 0; i < count; ++i)
             {
+                BlockPos pos = positionList.get(i);
                 this.infoLines.add(String.format("x: %6d, y: %3d, z: %6d", pos.getX(), pos.getY(), pos.getZ()));
             }
         }

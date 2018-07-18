@@ -16,6 +16,7 @@ import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
 import fi.dy.masa.malilib.config.options.ConfigDouble;
+import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
 
@@ -45,6 +46,7 @@ public class Configs implements IConfigHandler
     public static class Visuals
     {
         public static final ConfigDouble        ERROR_HILIGHT_ALPHA             = new ConfigDouble(     "errorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
+        public static final ConfigInteger       ERROR_HILIGHT_MAX_POSITIONS     = new ConfigInteger(    "errorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render at once");
         public static final ConfigDouble        GHOST_BLOCK_ALPHA               = new ConfigDouble(     "ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA        = new ConfigDouble(     "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT    = new ConfigBoolean(    "renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
@@ -56,6 +58,7 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 ERROR_HILIGHT_ALPHA,
+                ERROR_HILIGHT_MAX_POSITIONS,
                 GHOST_BLOCK_ALPHA,
                 PLACEMENT_BOX_SIDE_ALPHA,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
