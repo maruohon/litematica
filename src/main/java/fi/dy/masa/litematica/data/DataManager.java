@@ -87,15 +87,24 @@ public class DataManager
         return false;
     }
 
+    public static void removeSchematicVerificationTask()
+    {
+        placementToVerify = null;
+    }
+
+    @Nullable
+    public static SchematicVerifier getActiveSchematicVerifier()
+    {
+        return placementToVerify != null ? placementToVerify.getSchematicVerifier() : null;
+    }
+
     public static void runSchematicVerification()
     {
         if (placementToVerify != null)
         {
-            // Check if the task finishes
-            if (placementToVerify.getSchematicVerifier().verifyChunks())
-            {
-                placementToVerify = null;
-            }
+            SchematicVerifier verifier = placementToVerify.getSchematicVerifier();
+            verifier.verifyChunks();
+            verifier.checkChangedPositions();
         }
     }
 

@@ -334,10 +334,12 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
                 case STOP:
                     this.parent.placement.getSchematicVerifier().stopVerification();
+                    DataManager.removeSchematicVerificationTask();
                     break;
 
                 case RESET:
                     this.parent.placement.getSchematicVerifier().reset();
+                    DataManager.removeSchematicVerificationTask();
                     break;
 
                 case TOGGLE_INFO_HUD:
