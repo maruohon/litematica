@@ -38,6 +38,14 @@ public abstract class WidgetBase
         return true;
     }
 
+    /**
+     * Returns true if this widget can be selected by clicking at the given point
+     */
+    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    {
+        return this.isMouseOver(mouseX, mouseY);
+    }
+
     public abstract void render(int mouseX, int mouseY, boolean selected);
 
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)

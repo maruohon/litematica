@@ -237,8 +237,7 @@ public class RayTraceUtils
     }
 
     /**
-     * Ray traces to the closest position in the given list, if it's the closest
-     * or the same distance as an existing block in the world.
+     * Ray traces to the closest position in the given list
      * @param world
      * @param posList
      * @param entity
@@ -257,8 +256,6 @@ public class RayTraceUtils
         Vec3d rangedLookRot = entity.getLook(1f).scale(range);
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
-        RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
-        double closestInWorld = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
         double closest = -1D;
         BlockPos posFound = null;
 
@@ -273,7 +270,7 @@ public class RayTraceUtils
                 {
                     double dist = hit.hitVec.distanceTo(eyesPos);
 
-                    if (closest < 0 || (dist < closest && dist <= closestInWorld))
+                    if (closest < 0 || dist < closest)
                     {
                         closest = dist;
                         posFound = pos;

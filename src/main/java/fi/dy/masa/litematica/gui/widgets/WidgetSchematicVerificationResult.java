@@ -1,12 +1,18 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
+import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonWrapper;
+import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -17,24 +23,33 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 
 public class WidgetSchematicVerificationResult extends WidgetBase
 {
     private static int maxNameLengthExpected;
     private static int maxNameLengthFound;
-    private static int maxCountLength;
+
+    private final GuiSchematicVerifier guiSchematicVerifier;
+    private final BlockMismatchEntry mismatchEntry;
     @Nullable private final String header1;
     @Nullable private final String header2;
     @Nullable private final String header3;
     @Nullable private final BlockMismatchInfo mismatchInfo;
+    private final Minecraft mc;
     private final int count;
     private final boolean isOdd;
+    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
+    private final ButtonGeneric buttonIgnore;
+    private int id;
 
-    public WidgetSchematicVerificationResult(int x, int y, int width, int height, float zLevel, boolean isOdd, BlockMismatchEntry entry)
+    public WidgetSchematicVerificationResult(int x, int y, int width, int height, float zLevel, boolean isOdd,
+            BlockMismatchEntry entry, GuiSchematicVerifier guiSchematicVerifier)
     {
         super(x, y, width, height, zLevel);
 
+        this.mc = Minecraft.getMinecraft();
+        this.mismatchEntry = entry;
+        this.guiSchematicVerifier = guiSchematicVerifier;
         this.isOdd = isOdd;
 
         if (entry.header1 != null && entry.header2 != null)
@@ -44,6 +59,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.header3 = GuiLitematicaBase.TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.count");
             this.mismatchInfo = null;
             this.count = 0;
+            this.buttonIgnore = null;
         }
         else if (entry.header1 != null)
         {
@@ -52,6 +68,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.header3 = null;
             this.mismatchInfo = null;
             this.count = 0;
+            this.buttonIgnore = null;
         }
         else
         {
@@ -62,9 +79,10 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.count = entry.blockMismatch.count;
 
             FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+            this.buttonIgnore = this.createButton(this.x + this.width, y + 1, ButtonListener.ButtonType.IGNORE_MISMATCH);
+
             maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(this.mismatchInfo.stackExpected.getDisplayName()));
             maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(this.mismatchInfo.stackFound.getDisplayName()));
-            maxCountLength = Math.max(maxCountLength, font.getStringWidth(String.valueOf(this.count)));
         }
     }
 
@@ -72,12 +90,42 @@ public class WidgetSchematicVerificationResult extends WidgetBase
     {
         maxNameLengthExpected = 60;
         maxNameLengthFound = 60;
-        maxCountLength = 40;
+    }
+
+    private ButtonGeneric createButton(int x, int y, ButtonListener.ButtonType type)
+    {
+        String label = I18n.format(type.getLabelKey());
+        int buttonWidth = mc.fontRenderer.getStringWidth(label) + 10;
+        x -= buttonWidth;
+        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        this.addButton(button, new ButtonListener(type, this.mismatchEntry, this.guiSchematicVerifier));
+
+        return button;
+    }
+
+    private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
+    {
+        this.buttons.add(new ButtonWrapper<>(button, listener));
+    }
+
+    @Override
+    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    {
+        return (this.buttonIgnore == null || mouseX < this.buttonIgnore.x) && super.canSelectAt(mouseX, mouseY, mouseButton);
     }
 
     @Override
     protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
+        for (ButtonWrapper<?> entry : this.buttons)
+        {
+            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
+            {
+                // Don't call super if the button press got handled
+                return true;
+            }
+        }
+
         return true;
     }
 
@@ -100,59 +148,80 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         }
 
         Minecraft mc = Minecraft.getMinecraft();
+        int x1 = this.x + 4;
+        int x2 = this.x + maxNameLengthExpected + 50;
+        int x3 = x2 + maxNameLengthFound + 50;
+        int y = this.y + 7;
+        int color = 0xFFFFFFFF;
 
         if (this.header1 != null && this.header2 != null)
         {
-            mc.fontRenderer.drawString(this.header1, this.x + 4, this.y + 7, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(this.header2, this.x + maxNameLengthExpected + 50, this.y + 7, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(this.header3, this.x + maxNameLengthExpected + maxNameLengthFound + 100, this.y + 7, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(this.header1, x1, y, color);
+            mc.fontRenderer.drawString(this.header2, x2, y, color);
+            mc.fontRenderer.drawString(this.header3, x3, y, color);
         }
         else if (this.header1 != null)
         {
-            mc.fontRenderer.drawString(this.header1, this.x + 4, this.y + 7, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(this.header1, this.x + 4, this.y + 7, color);
         }
         else if (this.mismatchInfo != null)
         {
-            int x = this.x + 4;
-            int y = this.y + 3;
-            int x2 = this.x + maxNameLengthExpected + 50;
-
-            mc.fontRenderer.drawString(this.mismatchInfo.stackExpected.getDisplayName(), x + 20, y + 4, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(this.mismatchInfo.stackFound.getDisplayName(), x2 + 20, y + 4, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(String.valueOf(this.count), x2 + maxNameLengthFound + 50, this.y + 7, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(this.mismatchInfo.stackExpected.getDisplayName(), x1 + 20, y, color);
+            mc.fontRenderer.drawString(this.mismatchInfo.stackFound.getDisplayName(),    x2 + 20, y, color);
+            mc.fontRenderer.drawString(String.valueOf(this.count),                       x3     , y, color);
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
             RenderHelper.enableGUIStandardItemLighting();
 
             //mc.getRenderItem().zLevel -= 110;
-            Gui.drawRect(x, y, x + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackExpected, x, y);
-            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackExpected, x, y, null);
+            y = this.y + 3;
+            Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
+            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackExpected, x1, y);
+            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackExpected, x1, y, null);
 
-            x = this.x + maxNameLengthExpected + 50;
-            Gui.drawRect(x, y, x + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackFound, x, y);
-            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackFound, x, y, null);
+            Gui.drawRect(x2, y, x2 + 16, y + 16, 0x20FFFFFF); // light background for the item
+            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackFound, x2, y);
+            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackFound, x2, y, null);
             //mc.getRenderItem().zLevel += 110;
 
             GlStateManager.disableBlend();
             RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
         }
+
+        for (int i = 0; i < this.buttons.size(); ++i)
+        {
+            this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
+        }
     }
 
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        if (this.mismatchInfo != null)
+        if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.x)
         {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0f, 0f, 200f);
 
             Minecraft mc = Minecraft.getMinecraft();
 
-            this.mismatchInfo.render(mouseX + 10, Math.min(mouseY, mc.currentScreen.height - 130), mc);
+            int x = mouseX + 10;
+            int y = mouseY;
+            int width = this.mismatchInfo.getTotalWidth();
+            int height = this.mismatchInfo.getTotalHeight();
+
+            if (x + width > mc.currentScreen.width)
+            {
+                x = mouseX - width - 10;
+            }
+
+            if (y + height > mc.currentScreen.height)
+            {
+                y = mouseY - height - 2;
+            }
+
+            this.mismatchInfo.render(x, y, mc);
 
             GlStateManager.popMatrix();
         }
@@ -172,12 +241,17 @@ public class WidgetSchematicVerificationResult extends WidgetBase
 
     public static class BlockMismatchInfo
     {
-        public final IBlockState stateExpected;
-        public final IBlockState stateFound;
-        public final ItemStack stackExpected;
-        public final ItemStack stackFound;
-        public final String blockRegistrynameExpected;
-        public final String blockRegistrynameFound;
+        private final IBlockState stateExpected;
+        private final IBlockState stateFound;
+        private final ItemStack stackExpected;
+        private final ItemStack stackFound;
+        private final String blockRegistrynameExpected;
+        private final String blockRegistrynameFound;
+        private final String stackNameExpected;
+        private final String stackNameFound;
+        private final int totalWidth;
+        private final int totalHeight;
+        private final int columnWidthExpected;
 
         public BlockMismatchInfo(IBlockState stateExpected, IBlockState stateFound)
         {
@@ -191,6 +265,27 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             ResourceLocation rl2 = Block.REGISTRY.getNameForObject(this.stateFound.getBlock());
             this.blockRegistrynameExpected = rl1 != null ? rl1.toString() : "<null>";
             this.blockRegistrynameFound = rl2 != null ? rl2.toString() : "<null>";
+
+            Minecraft mc = Minecraft.getMinecraft();
+            this.stackNameExpected = this.stackExpected.getDisplayName();
+            this.stackNameFound = this.stackFound.getDisplayName();
+            this.columnWidthExpected = Math.max(mc.fontRenderer.getStringWidth(this.stackNameExpected) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
+            int w2 = Math.max(mc.fontRenderer.getStringWidth(this.stackNameFound) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
+
+            List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
+            List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
+            this.totalWidth = this.columnWidthExpected + w2 + 40;
+            this.totalHeight = Math.max(propsExpected.size(), propsFound.size()) * (mc.fontRenderer.FONT_HEIGHT + 2) + 60;
+        }
+
+        public int getTotalWidth()
+        {
+            return this.totalWidth;
+        }
+
+        public int getTotalHeight()
+        {
+            return this.totalHeight;
         }
 
         public void render(int x, int y, Minecraft mc)
@@ -199,20 +294,10 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             {
                 GlStateManager.pushMatrix();
 
-                List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
-                List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
-
-                int height = Math.max(propsExpected.size(), propsFound.size()) * (mc.fontRenderer.FONT_HEIGHT + 2) + 60;
-
-                String name1 = this.stackExpected.getDisplayName();
-                String name2 = this.stackFound.getDisplayName();
-                int w1 = Math.max(mc.fontRenderer.getStringWidth(name1) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
-                int w2 = Math.max(mc.fontRenderer.getStringWidth(name2) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
-
-                GuiLitematicaBase.drawOutlinedBox(x, y, w1 + w2 + 40, height, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
+                GuiLitematicaBase.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
 
                 int x1 = x + 10;
-                int x2 = x + w1 + 30;
+                int x2 = x + this.columnWidthExpected + 30;
                 y += 4;
 
                 String pre = GuiLitematicaBase.TXT_WHITE + GuiLitematicaBase.TXT_BOLD;
@@ -239,25 +324,68 @@ public class WidgetSchematicVerificationResult extends WidgetBase
                 //GlStateManager.disableBlend();
                 RenderHelper.disableStandardItemLighting();
 
-                mc.fontRenderer.drawString(name1, x1 + 20, y + 4, 0xFFFFFFFF);
-                mc.fontRenderer.drawString(name2, x2 + 20, y + 4, 0xFFFFFFFF);
+                mc.fontRenderer.drawString(this.stackNameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
+                mc.fontRenderer.drawString(this.stackNameFound,    x2 + 20, y + 4, 0xFFFFFFFF);
 
                 y += 20;
                 mc.fontRenderer.drawString(this.blockRegistrynameExpected, x1, y, 0xFF4060FF);
-                mc.fontRenderer.drawString(this.blockRegistrynameFound, x2, y, 0xFF4060FF);
+                mc.fontRenderer.drawString(this.blockRegistrynameFound,    x2, y, 0xFF4060FF);
                 y += mc.fontRenderer.FONT_HEIGHT + 4;
 
+                List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
+                List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
                 renderLines(x1, y, propsExpected, mc.fontRenderer);
                 renderLines(x2, y, propsFound, mc.fontRenderer);
 
                 GlStateManager.popMatrix();
             }
         }
+    }
 
-        @Nullable
-        public static BlockMismatchInfo forPosition(BlockPos pos)
+    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    {
+        private final ButtonType type;
+        private final GuiSchematicVerifier guiSchematicVerifier;
+        private final BlockMismatchEntry mismatchEntry;
+
+        public ButtonListener(ButtonType type, BlockMismatchEntry mismatchEntry, GuiSchematicVerifier guiSchematicVerifier)
         {
-            return null;
+            this.type = type;
+            this.mismatchEntry = mismatchEntry;
+            this.guiSchematicVerifier = guiSchematicVerifier;
+        }
+
+        @Override
+        public void actionPerformed(ButtonGeneric control)
+        {
+            if (this.type == ButtonType.IGNORE_MISMATCH)
+            {
+                this.guiSchematicVerifier.getPlacement().getSchematicVerifier().ignoreStateMismatch(this.mismatchEntry.blockMismatch);
+                this.guiSchematicVerifier.initGui();
+            }
+        }
+
+        @Override
+        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        {
+            this.actionPerformed(control);
+        }
+
+        public enum ButtonType
+        {
+            IGNORE_MISMATCH ("litematica.gui.button.schematic_verifier.ignore");
+
+            private final String labelKey;
+
+            private ButtonType(String labelKey)
+            {
+                this.labelKey = labelKey;
+            }
+
+            public String getLabelKey()
+            {
+                return this.labelKey;
+            }
         }
     }
 }

@@ -57,7 +57,9 @@ litematica.gui.button.schematic_placements.enable=Enable
 litematica.gui.button.schematic_placements.render_enable=Enable rendering
 litematica.gui.button.schematic_placements.render_disable=Disable rendering
 
+litematica.gui.button.schematic_verifier.ignore=Ignore
 litematica.gui.button.schematic_verifier.reset=Reset data
+litematica.gui.button.schematic_verifier.reset_ignored=Reset ignored
 litematica.gui.button.schematic_verifier.start=Start verification
 litematica.gui.button.schematic_verifier.stop=Stop verification
 litematica.gui.button.schematic_verifier.toggle_info_hud=Info HUD: %s

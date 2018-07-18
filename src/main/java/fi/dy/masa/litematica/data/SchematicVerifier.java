@@ -28,6 +28,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -178,7 +179,7 @@ public class SchematicVerifier implements IStringListProvider
         verifierActive = false;
 
         InfoHud.getInstance().removeLineProvider(this);
-        DataManager.clearActiveMismatchPositions();
+        DataManager.clearActiveMismatchRenderPositions();
     }
 
     public void markBlockChanged(BlockPos pos)
@@ -226,18 +227,35 @@ public class SchematicVerifier implements IStringListProvider
                 }
             }
 
-            this.updateClosestPositions(10);
-
-            MismatchType mismatchType = DataManager.getSelectedMismatchType();
-
-            if (mismatchType != null)
-            {
-                List<BlockPos> list = this.getClosestMismatchedPositionsFor(mismatchType);
-                DataManager.setActiveMismatchPositions(mismatchType, list);
-                this.getClosestMismatchedPositionListProviderFor(mismatchType);
-            }
+            this.updateActiveMismatchOverlay();
 
             this.recheckQueue.clear();
+        }
+    }
+
+    private void updateActiveMismatchOverlay()
+    {
+        MismatchType mismatchType = DataManager.getSelectedMismatchTypeForRender();
+
+        if (mismatchType != null)
+        {
+            this.updateMismatchOverlaysForType(mismatchType, 10);
+        }
+    }
+
+    public void updateMismatchOverlaysForType(MismatchType mismatchType, int maxEntries)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc.player != null)
+        {
+            // This needs to happen first
+            this.updateClosestPositions(mc.player, maxEntries);
+
+            List<BlockPos> positionList = this.getClosestMismatchedPositionsFor(mismatchType);
+            DataManager.setActiveMismatchPositionsForRender(mismatchType, positionList);
+
+            this.updateMismatchPositionStringList(mismatchType, positionList);
         }
     }
 
@@ -307,21 +325,34 @@ public class SchematicVerifier implements IStringListProvider
 
     public void ignoreStateMismatch(BlockMismatch mismatch)
     {
+        this.ignoreStateMismatch(mismatch, true);
+    }
+
+    private void ignoreStateMismatch(BlockMismatch mismatch, boolean updateOverlay)
+    {
         Pair<IBlockState, IBlockState> ignore = Pair.of(mismatch.stateExpected, mismatch.stateFound);
 
-        this.ignoredMismatches.add(ignore);
-        this.getMapForMismatchType(mismatch.mismatchType).removeAll(ignore);
-
-        Iterator<Map.Entry<BlockPos, BlockMismatch>> iter = this.blockMismatches.entrySet().iterator();
-
-        while (iter.hasNext())
+        if (this.ignoredMismatches.contains(ignore) == false)
         {
-            Map.Entry<BlockPos, BlockMismatch> entry = iter.next();
+            this.ignoredMismatches.add(ignore);
+            this.getMapForMismatchType(mismatch.mismatchType).removeAll(ignore);
 
-            if (entry.getValue().equals(mismatch))
+            Iterator<Map.Entry<BlockPos, BlockMismatch>> iter = this.blockMismatches.entrySet().iterator();
+
+            while (iter.hasNext())
             {
-                iter.remove();
+                Map.Entry<BlockPos, BlockMismatch> entry = iter.next();
+
+                if (entry.getValue().equals(mismatch))
+                {
+                    iter.remove();
+                }
             }
+        }
+
+        if (updateOverlay)
+        {
+            this.updateActiveMismatchOverlay();
         }
     }
 
@@ -329,14 +360,21 @@ public class SchematicVerifier implements IStringListProvider
     {
         for (BlockMismatch mismatch : ignore)
         {
-            this.ignoreStateMismatch(mismatch);
+            this.ignoreStateMismatch(mismatch, false);
         }
+
+        this.updateActiveMismatchOverlay();
     }
 
     public void setIgnoredStateMismatches(Collection<BlockMismatch> ignore)
     {
         this.ignoredMismatches.clear();
         this.addIgnoredStateMismatches(ignore);
+    }
+
+    public Set<Pair<IBlockState, IBlockState>> getIgnoredMismatches()
+    {
+        return this.ignoredMismatches;
     }
 
     @Nullable
@@ -381,49 +419,6 @@ public class SchematicVerifier implements IStringListProvider
         {
             list.add(new BlockMismatch(mismatchType, pair.getLeft(), pair.getRight(), map.get(pair).size()));
         }
-    }
-
-    public List<BlockPos> getClosestMismatchedPositionsFor(MismatchType type)
-    {
-        switch (type)
-        {
-            //case ALL:
-            //    return Collections.emptyList();
-            case MISSING:
-                return this.missingBlocksPositionsClosest;
-            case EXTRA:
-                return this.extraBlocksPositionsClosest;
-            case WRONG_BLOCK:
-                return this.mismatchedBlocksPositionsClosest;
-            case WRONG_STATE:
-                return this.mismatchedStatesPositionsClosest;
-            default:
-                return Collections.emptyList();
-        }
-    }
-
-    /**
-     * Prepares/caches the strings, and returns a provider for the data.<br>
-     * <b>NOTE:</b> This is actually the instance of this class, there are no separate providers for different data types atm!
-     * @param type
-     * @return
-     */
-    public IStringListProvider getClosestMismatchedPositionListProviderFor(MismatchType type)
-    {
-        this.infoLines.clear();
-        List<BlockPos> list = this.getClosestMismatchedPositionsFor(type);
-
-        if (list.isEmpty() == false)
-        {
-            this.infoLines.add(String.format("%s%s%s", type.getFormattingCode(), type.getDisplayname(), TextFormatting.RESET.toString()));
-
-            for (BlockPos pos : list)
-            {
-                this.infoLines.add(String.format("x: %6d, y: %3d, z: %6d", pos.getX(), pos.getY(), pos.getZ()));
-            }
-        }
-
-        return this;
     }
 
     public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(GuiLitematicaBase gui)
@@ -546,21 +541,15 @@ public class SchematicVerifier implements IStringListProvider
         }
     }
 
-    public void updateClosestPositions(int maxEntries)
+    public void updateClosestPositions(EntityPlayer player, int maxEntries)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        PositionUtils.BLOCK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPositionVector()));
+        PositionUtils.BLOCK_POS_COMPARATOR.setClosestFirst(true);
 
-        if (mc.player != null)
-        {
-            BlockPos posPlayer = new BlockPos(mc.player.getPositionVector());
-            PositionUtils.BLOCK_POS_COMPARATOR.setReferencePosition(posPlayer);
-            PositionUtils.BLOCK_POS_COMPARATOR.setClosestFirst(true);
-
-            this.addAndSortPositions(this.wrongBlocksPositions, this.mismatchedBlocksPositionsClosest, maxEntries);
-            this.addAndSortPositions(this.wrongStatesPositions, this.mismatchedStatesPositionsClosest, maxEntries);
-            this.addAndSortPositions(this.extraBlocksPositions, this.extraBlocksPositionsClosest, maxEntries);
-            this.addAndSortPositions(this.missingBlocksPositions, this.missingBlocksPositionsClosest, maxEntries);
-        }
+        this.addAndSortPositions(this.wrongBlocksPositions, this.mismatchedBlocksPositionsClosest, maxEntries);
+        this.addAndSortPositions(this.wrongStatesPositions, this.mismatchedStatesPositionsClosest, maxEntries);
+        this.addAndSortPositions(this.extraBlocksPositions, this.extraBlocksPositionsClosest, maxEntries);
+        this.addAndSortPositions(this.missingBlocksPositions, this.missingBlocksPositionsClosest, maxEntries);
     }
 
     private void addAndSortPositions(ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> sourceMap, List<BlockPos> listOut, int maxEntries)
@@ -577,6 +566,59 @@ public class SchematicVerifier implements IStringListProvider
         {
             listOut.add(tempList.get(i));
         }
+    }
+
+    /*
+    private void updateMismatchOverlayRendererPositions(MismatchType mismatchType)
+    {
+        List<BlockPos> list = this.getClosestMismatchedPositionsFor(mismatchType);
+        DataManager.setActiveMismatchPositions(mismatchType, list);
+    }
+    */
+
+    private void updateMismatchPositionStringList(MismatchType mismatchType, List<BlockPos> positionList)
+    {
+        this.infoLines.clear();
+
+        if (positionList.isEmpty() == false)
+        {
+            this.infoLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), TextFormatting.RESET.toString()));
+
+            for (BlockPos pos : positionList)
+            {
+                this.infoLines.add(String.format("x: %6d, y: %3d, z: %6d", pos.getX(), pos.getY(), pos.getZ()));
+            }
+        }
+    }
+
+    public List<BlockPos> getClosestMismatchedPositionsFor(MismatchType type)
+    {
+        switch (type)
+        {
+            //case ALL:
+            //    return Collections.emptyList();
+            case MISSING:
+                return this.missingBlocksPositionsClosest;
+            case EXTRA:
+                return this.extraBlocksPositionsClosest;
+            case WRONG_BLOCK:
+                return this.mismatchedBlocksPositionsClosest;
+            case WRONG_STATE:
+                return this.mismatchedStatesPositionsClosest;
+            default:
+                return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Prepares/caches the strings, and returns a provider for the data.<br>
+     * <b>NOTE:</b> This is actually the instance of this class, there are no separate providers for different data types atm!
+     * @param type
+     * @return
+     */
+    public IStringListProvider getClosestMismatchedPositionListProviderFor(MismatchType type)
+    {
+        return this;
     }
 
     public static class BlockMismatch implements Comparable<BlockMismatch>

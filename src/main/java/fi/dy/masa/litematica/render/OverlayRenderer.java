@@ -270,7 +270,7 @@ public class OverlayRenderer
 
     public void renderSchematicMismatches(List<BlockPos> posList, @Nullable BlockPos lookPos, float partialTicks)
     {
-        MismatchType type = DataManager.getSelectedMismatchType();
+        MismatchType type = DataManager.getSelectedMismatchTypeForRender();
 
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
@@ -346,8 +346,8 @@ public class OverlayRenderer
 
             if (placement != null)
             {
-                List<BlockPos> posList = DataManager.getSelectedMismatchPositions();
-                BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 5);
+                List<BlockPos> posList = DataManager.getSelectedMismatchPositionsForRender();
+                BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 10);
 
                 if (posLook != null)
                 {
@@ -357,7 +357,7 @@ public class OverlayRenderer
                     {
                         BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
                         ScaledResolution sr = new ScaledResolution(mc);
-                        info.render(sr.getScaledWidth() / 2 - 100, sr.getScaledHeight() / 2 - 20, mc);
+                        info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
                     }
                 }
             }

@@ -66,6 +66,6 @@ public class WidgetSchematicVerificationResults extends WidgetListBase<BlockMism
     @Override
     protected WidgetSchematicVerificationResult createListWidget(int x, int y, boolean isOdd, BlockMismatchEntry entry)
     {
-        return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, isOdd, entry);
+        return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, isOdd, entry, this.guiSchematicVerifier);
     }
 }

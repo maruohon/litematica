@@ -60,8 +60,8 @@ public class RenderEventHandler
             {
                 LitematicaRenderer.getInstance().renderSchematicWorld();
 
-                List<BlockPos> posList = DataManager.getSelectedMismatchPositions();
-                BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 5);
+                List<BlockPos> posList = DataManager.getSelectedMismatchPositionsForRender();
+                BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 10);
                 OverlayRenderer.getInstance().renderSchematicMismatches(posList, posLook, partialTicks);
             }
 

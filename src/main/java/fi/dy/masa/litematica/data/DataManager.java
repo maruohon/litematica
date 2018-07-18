@@ -108,25 +108,25 @@ public class DataManager
         }
     }
 
-    public static void setActiveMismatchPositions(MismatchType type, List<BlockPos> list)
+    public static void setActiveMismatchPositionsForRender(MismatchType type, List<BlockPos> list)
     {
         selectedMismatchType = type;
         selectedMismatchPositions.clear();
         selectedMismatchPositions.addAll(list);
     }
 
-    public static void clearActiveMismatchPositions()
+    public static void clearActiveMismatchRenderPositions()
     {
         selectedMismatchPositions.clear();
     }
 
     @Nullable
-    public static MismatchType getSelectedMismatchType()
+    public static MismatchType getSelectedMismatchTypeForRender()
     {
         return selectedMismatchType;
     }
 
-    public static List<BlockPos> getSelectedMismatchPositions()
+    public static List<BlockPos> getSelectedMismatchPositionsForRender()
     {
         return selectedMismatchPositions;
     }

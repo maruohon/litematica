@@ -73,14 +73,17 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
             relativeY < this.maxVisibleBrowserEntries * this.browserEntryHeight &&
             mouseX >= this.browserEntriesStartX &&
             mouseX < this.browserEntriesStartX + this.browserEntryWidth &&
+            widgetIndex < this.listWidgets.size() &&
             entryIndex < Math.min(this.listContents.size(), this.maxVisibleBrowserEntries + this.scrollBar.getValue()))
         {
-            this.setSelectedEntry(this.listContents.get(entryIndex), entryIndex);
+            WIDGET widget = this.listWidgets.get(widgetIndex);
 
-            if (widgetIndex < this.listWidgets.size())
+            if (widget.canSelectAt(mouseX, mouseY, mouseButton))
             {
-                return this.listWidgets.get(widgetIndex).onMouseClicked(mouseX, mouseY, mouseButton);
+                this.setSelectedEntry(this.listContents.get(entryIndex), entryIndex);
             }
+
+            return widget.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
         return super.onMouseClicked(mouseX, mouseY, mouseButton);

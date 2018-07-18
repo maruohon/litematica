@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.util.List;
+import java.util.Collections;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.ICompletionListener;
@@ -21,7 +21,6 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetSchematicVerificationResults>
                                     implements ISelectionListener<BlockMismatchEntry>, ICompletionListener
@@ -70,6 +69,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         x += this.createButton(x, y, -1, ButtonListener.Type.START) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.STOP) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.RESET) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.RESET_IGNORED) + 4;
         this.createButton(x, y, -1, ButtonListener.Type.TOGGLE_INFO_HUD);
         y += 22;
 
@@ -137,6 +137,11 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 enabled = this.placement.getSchematicVerifier().isFinished();
                 break;
 
+            case RESET_IGNORED:
+                label = I18n.format("litematica.gui.button.schematic_verifier.reset_ignored");
+                enabled = this.placement.getSchematicVerifier().getIgnoredMismatches().size() > 0;
+                break;
+
             case TOGGLE_INFO_HUD:
             {
                 boolean val = InfoHud.getInstance().isEnabled();
@@ -197,21 +202,16 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 this.selectedDataEntry = null;
                 this.widget.clearSelection();
                 InfoHud.getInstance().removeLineProvidersOfType(SchematicVerifier.class);
-                DataManager.clearActiveMismatchPositions();
+                DataManager.clearActiveMismatchRenderPositions();
             }
             else if (entry.type == BlockMismatchEntry.Type.DATA || entry.type == BlockMismatchEntry.Type.CATEGORY_TITLE)
             {
                 this.selectedDataEntry = entry;
 
-                InfoHud.getInstance().removeLineProvidersOfType(SchematicVerifier.class);
-                MismatchType mismatchType = entry.mismatchType;
-
                 SchematicVerifier verifier = this.placement.getSchematicVerifier();
-                verifier.updateClosestPositions(10);
+                verifier.updateMismatchOverlaysForType(entry.mismatchType, 10);
 
-                List<BlockPos> list = verifier.getClosestMismatchedPositionsFor(mismatchType);
-                InfoHud.getInstance().addLineProvider(verifier.getClosestMismatchedPositionListProviderFor(mismatchType));
-                DataManager.setActiveMismatchPositions(mismatchType, list);
+                InfoHud.getInstance().addLineProvider(verifier);
             }
         }
     }
@@ -342,6 +342,10 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     DataManager.removeSchematicVerificationTask();
                     break;
 
+                case RESET_IGNORED:
+                    this.parent.placement.getSchematicVerifier().setIgnoredStateMismatches(Collections.emptyList());
+                    break;
+
                 case TOGGLE_INFO_HUD:
                     InfoHud.getInstance().toggleEnabled();
                     break;
@@ -360,6 +364,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             START,
             STOP,
             RESET,
+            RESET_IGNORED,
             TOGGLE_INFO_HUD;
         }
     }
