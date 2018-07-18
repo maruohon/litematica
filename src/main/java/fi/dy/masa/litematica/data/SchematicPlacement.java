@@ -55,6 +55,7 @@ public class SchematicPlacement
     private SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name)
     {
         this.schematic = schematic;
+        this.schematicFile = schematic.getFile();
         this.origin = origin;
         this.name = name;
         this.subRegionCount = schematic.getSubRegionCount();
@@ -530,7 +531,6 @@ public class SchematicPlacement
             Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
             Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
             SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, pos, name);
-            schematicPlacement.schematicFile = file;
             schematicPlacement.rotation = rotation;
             schematicPlacement.mirror = mirror;
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");

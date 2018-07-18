@@ -6,6 +6,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -26,6 +27,7 @@ public class WidgetSchematicPlacement extends WidgetBase
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private final boolean isOdd;
     private int id;
+    private int buttonsStartX;
 
     public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel, boolean isOdd,
             SchematicPlacement placement, WidgetSchematicPlacements parent, Minecraft mc)
@@ -65,6 +67,8 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
 
         posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
+
+        this.buttonsStartX = posX;
     }
 
     private int createButton(int x, int y, ButtonListener.ButtonType type)
@@ -83,7 +87,7 @@ public class WidgetSchematicPlacement extends WidgetBase
     }
 
     @Override
-    protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
+    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
     {
         for (ButtonWrapper<?> entry : this.buttons)
         {
@@ -121,16 +125,53 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         if (placementSelected)
         {
-            GuiLitematicaBase.drawOutline(this.x, this.y, this.width, this.height, 0xFFD0D0D0);
+            GlStateManager.translate(0, 0, 1);
+            GuiLitematicaBase.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
+            GlStateManager.translate(0, 0, -1);
         }
 
         String name = this.placement.getName();
         String pre = this.placement.isEnabled() ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        this.mc.fontRenderer.drawString(pre + name, this.x + 4, this.y + 7, 0xFFFFFFFF);
+        this.mc.fontRenderer.drawString(pre + name, this.x + 20, this.y + 7, 0xFFFFFFFF);
+
+        Icons icon;
+        String fileName = this.placement.getSchematicFile() != null ? this.placement.getSchematicFile().getName() : null;
+
+        if (fileName != null)
+        {
+            icon = Icons.SCHEMATIC_TYPE_FILE;
+        }
+        else
+        {
+            icon = Icons.SCHEMATIC_TYPE_MEMORY;
+        }
+
+        //GlStateManager.disableRescaleNormal();
+        //RenderHelper.disableStandardItemLighting();
+        //GlStateManager.disableLighting();
+        GlStateManager.color(1, 1, 1, 1);
+
+        this.parent.bindTexture(Icons.TEXTURE);
+        icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
 
         for (int i = 0; i < this.buttons.size(); ++i)
         {
             this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
+        }
+    }
+
+    @Override
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    {
+        String fileName = this.placement.getSchematicFile() != null ? this.placement.getSchematicFile().getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
+
+        List<String> text = new ArrayList<>();
+        text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
+        text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
+
+        if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
+        {
+            this.parent.drawHoveringText(text, mouseX, mouseY);
         }
     }
 

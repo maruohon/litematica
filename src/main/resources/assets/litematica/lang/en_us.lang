@@ -97,6 +97,11 @@ litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
 litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
+litematica.gui.label.schematic_placement.in_memory=IN-MEMORY ONLY
+litematica.gui.label.schematic_placement.schematic_file=File: %s
+litematica.gui.label.schematic_placement.schematic_name=Schematic: %s
+litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
+
 litematica.gui.label.schematic_verifier.count=Count
 litematica.gui.label.schematic_verifier.expected=Expected
 litematica.gui.label.schematic_verifier.found=Found

@@ -23,6 +23,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
@@ -555,6 +556,120 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         buffer.pos(x        , y         , zLevel).tex( u          * pixelWidth,  v           * pixelWidth).endVertex();
 
         tessellator.draw();
+    }
+
+    public static void drawHoverText(int x, int y, List<String> textLines)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (textLines.isEmpty() == false && mc.currentScreen != null)
+        {
+            FontRenderer font = mc.fontRenderer;
+            GlStateManager.disableRescaleNormal();
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            int maxLineLength = 0;
+            int maxWidth = mc.currentScreen.width;
+            int maxHeight = mc.currentScreen.height;
+
+            for (String s : textLines)
+            {
+                int length = font.getStringWidth(s);
+
+                if (length > maxLineLength)
+                {
+                    maxLineLength = length;
+                }
+            }
+
+            int textStartX = x + 12;
+            int textStartY = y - 12;
+            int textHeight = 8;
+
+            if (textLines.size() > 1)
+            {
+                textHeight += 2 + (textLines.size() - 1) * 10;
+            }
+
+            if (textStartX + maxLineLength > maxWidth)
+            {
+                textStartX -= 28 + maxLineLength;
+            }
+
+            if (textStartY + textHeight + 6 > maxHeight)
+            {
+                textStartY = maxHeight - textHeight - 6;
+            }
+
+            double zLevel = 300;
+            int borderColor = 0xF0100010;
+            drawGradientRect(textStartX - 3, textStartY - 4, textStartX + maxLineLength + 3, textStartY - 3, zLevel, borderColor, borderColor);
+            drawGradientRect(textStartX - 3, textStartY + textHeight + 3, textStartX + maxLineLength + 3, textStartY + textHeight + 4, zLevel, borderColor, borderColor);
+            drawGradientRect(textStartX - 3, textStartY - 3, textStartX + maxLineLength + 3, textStartY + textHeight + 3, zLevel, borderColor, borderColor);
+            drawGradientRect(textStartX - 4, textStartY - 3, textStartX - 3, textStartY + textHeight + 3, zLevel, borderColor, borderColor);
+            drawGradientRect(textStartX + maxLineLength + 3, textStartY - 3, textStartX + maxLineLength + 4, textStartY + textHeight + 3, zLevel, borderColor, borderColor);
+
+            int fillColor1 = 0x505000FF;
+            int fillColor2 = 0x5028007F;
+            drawGradientRect(textStartX - 3, textStartY - 3 + 1, textStartX - 3 + 1, textStartY + textHeight + 3 - 1, zLevel, fillColor1, fillColor2);
+            drawGradientRect(textStartX + maxLineLength + 2, textStartY - 3 + 1, textStartX + maxLineLength + 3, textStartY + textHeight + 3 - 1, zLevel, fillColor1, fillColor2);
+            drawGradientRect(textStartX - 3, textStartY - 3, textStartX + maxLineLength + 3, textStartY - 3 + 1, zLevel, fillColor1, fillColor1);
+            drawGradientRect(textStartX - 3, textStartY + textHeight + 2, textStartX + maxLineLength + 3, textStartY + textHeight + 3, zLevel, fillColor2, fillColor2);
+
+            for (int i = 0; i < textLines.size(); ++i)
+            {
+                String str = textLines.get(i);
+                font.drawStringWithShadow(str, textStartX, textStartY, 0xFFFFFFFF);
+
+                if (i == 0)
+                {
+                    textStartY += 2;
+                }
+
+                textStartY += 10;
+            }
+
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
+            RenderHelper.enableStandardItemLighting();
+            GlStateManager.enableRescaleNormal();
+        }
+    }
+
+    public static void drawGradientRect(int left, int top, int right, int bottom, double zLevel, int startColor, int endColor)
+    {
+        float sa = (float)(startColor >> 24 & 0xFF) / 255.0F;
+        float sr = (float)(startColor >> 16 & 0xFF) / 255.0F;
+        float sg = (float)(startColor >>  8 & 0xFF) / 255.0F;
+        float sb = (float)(startColor & 0xFF) / 255.0F;
+
+        float ea = (float)(endColor >> 24 & 0xFF) / 255.0F;
+        float er = (float)(endColor >> 16 & 0xFF) / 255.0F;
+        float eg = (float)(endColor >>  8 & 0xFF) / 255.0F;
+        float eb = (float)(endColor & 0xFF) / 255.0F;
+
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+        bufferbuilder.pos(right, top,    zLevel).color(sr, sg, sb, sa).endVertex();
+        bufferbuilder.pos(left,  top,    zLevel).color(sr, sg, sb, sa).endVertex();
+        bufferbuilder.pos(left,  bottom, zLevel).color(er, eg, eb, ea).endVertex();
+        bufferbuilder.pos(right, bottom, zLevel).color(er, eg, eb, ea).endVertex();
+
+        tessellator.draw();
+
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     public static class Message

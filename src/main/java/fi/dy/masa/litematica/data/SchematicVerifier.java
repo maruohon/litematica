@@ -68,6 +68,7 @@ public class SchematicVerifier implements IStringListProvider
     private long schematicBlocks;
     private long clientBlocks;
     private long matchingBlocks;
+    private int maxEntries;
 
     public static boolean isVerifierActive()
     {
@@ -239,7 +240,7 @@ public class SchematicVerifier implements IStringListProvider
 
         if (mismatchType != null)
         {
-            this.updateMismatchOverlaysForType(mismatchType, 10);
+            this.updateMismatchOverlaysForType(mismatchType, this.maxEntries);
         }
     }
 
@@ -249,6 +250,8 @@ public class SchematicVerifier implements IStringListProvider
 
         if (mc.player != null)
         {
+            this.maxEntries = maxEntries;
+
             // This needs to happen first
             this.updateClosestPositions(mc.player, maxEntries);
 
@@ -462,7 +465,7 @@ public class SchematicVerifier implements IStringListProvider
         return list;
     }
 
-    private void verifyChunk(Chunk chunkClient, Chunk chunkSchematic, StructureBoundingBox box)
+    private boolean verifyChunk(Chunk chunkClient, Chunk chunkSchematic, StructureBoundingBox box)
     {
         for (int y = box.minY; y <= box.maxY; ++y)
         {
@@ -488,6 +491,8 @@ public class SchematicVerifier implements IStringListProvider
                 }
             }
         }
+
+        return true;
     }
 
     private void checkBlockStates(int x, int y, int z, IBlockState stateSchematic, IBlockState stateClient)

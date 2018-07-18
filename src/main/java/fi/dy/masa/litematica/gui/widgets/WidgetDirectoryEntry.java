@@ -35,7 +35,7 @@ public class WidgetDirectoryEntry extends WidgetBase
     }
 
     @Override
-    protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
+    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
     {
         if (this.entry.getType() == DirectoryEntryType.DIRECTORY)
         {
@@ -43,7 +43,7 @@ public class WidgetDirectoryEntry extends WidgetBase
         }
         else
         {
-            return super.onMouseClicked(mouseX, mouseY, mouseButton);
+            return super.onMouseClickedImpl(mouseX, mouseY, mouseButton);
         }
 
         return true;

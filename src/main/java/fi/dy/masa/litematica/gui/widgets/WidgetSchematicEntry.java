@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
@@ -63,8 +64,9 @@ public class WidgetSchematicEntry extends WidgetBase
         text = I18n.format("litematica.gui.button.create_placement");
         len = mc.fontRenderer.getStringWidth(text) + 10;
         posX -= (len + 4);
+        String tip = I18n.format("litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled");
         listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
-        this.addButton(new ButtonGeneric(0, posX, y, len, 20, text), listener);
+        this.addButton(new ButtonHoverText(0, posX, y, len, 20, text, tip), listener);
 
         this.buttonsStartX = posX;
         this.typeIconX = this.x + 2;
@@ -77,7 +79,7 @@ public class WidgetSchematicEntry extends WidgetBase
     }
 
     @Override
-    protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
+    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
     {
         for (ButtonWrapper<?> entry : this.buttons)
         {
@@ -114,34 +116,49 @@ public class WidgetSchematicEntry extends WidgetBase
         String schematicName = this.schematicEntry.getSchematicName();
         this.mc.fontRenderer.drawString(schematicName, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
-        for (int i = 0; i < this.buttons.size(); ++i)
-        {
-            this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-        }
-
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.disableBlend();
         String fileName = this.schematicEntry.getFileName();
         this.parent.bindTexture(Icons.TEXTURE);
 
+        Icons icon;
+        String text;
+
         if (fileName != null)
         {
-            Icons.SCHEMATIC_TYPE_FILE.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
-
-            if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
-            {
-                this.parent.drawHoveringText(fileName, mouseX, mouseY);
-
-                GlStateManager.disableRescaleNormal();
-                RenderHelper.disableStandardItemLighting();
-                GlStateManager.disableLighting();
-                GlStateManager.color(1, 1, 1, 1);
-            }
+            icon = Icons.SCHEMATIC_TYPE_FILE;
+            text = fileName;
         }
         else
         {
-            Icons.SCHEMATIC_TYPE_MEMORY.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
+            icon = Icons.SCHEMATIC_TYPE_MEMORY;
+            text = I18n.format("litematica.gui.label.schematic_placement.in_memory");
         }
+
+        icon.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
+
+        for (int i = 0; i < this.buttons.size(); ++i)
+        {
+            this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
+        }
+
+        if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
+        {
+            this.parent.drawHoveringText(text, mouseX, mouseY);
+        }
+
+        for (ButtonWrapper<? extends ButtonBase> entry : this.buttons)
+        {
+            ButtonBase button = entry.getButton();
+
+            if ((button instanceof ButtonHoverText) && button.isMouseOver())
+            {
+                GuiLitematicaBase.drawHoverText(mouseX, mouseY, ((ButtonHoverText) button).getHoverStrings());
+            }
+        }
+
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableLighting();
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
@@ -165,8 +182,9 @@ public class WidgetSchematicEntry extends WidgetBase
                 BlockPos pos = new BlockPos(mc.player.getPositionVector());
                 SchematicEntry entry = this.widget.schematicEntry;
                 SchematicPlacement placement = SchematicPlacement.createFor(entry.getSchematic(), pos, entry.getSchematicName());
-                placement.setEnabled(true);
-                placement.setRenderSchematic(GuiScreen.isShiftKeyDown() == false);
+                boolean enabled = GuiScreen.isShiftKeyDown() == false;
+                placement.setEnabled(enabled);
+                placement.setRenderSchematic(enabled);
                 DataManager.getInstance(dimension).getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
             }
             else if (this.type == Type.SAVE_TO_FILE)

@@ -29,7 +29,7 @@ public class WidgetDirectoryNavigation extends WidgetBase
     }
 
     @Override
-    protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
+    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
     {
         if (this.isHoveringIcon(mouseX, mouseY, 0))
         {

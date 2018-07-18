@@ -95,7 +95,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     @Override
     public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        if (this.directoryNavigationWidget != null && this.directoryNavigationWidget.onMouseClicked(mouseX, mouseY, mouseButton))
+        if (this.directoryNavigationWidget != null && this.directoryNavigationWidget.onMouseClickedImpl(mouseX, mouseY, mouseButton))
         {
             return true;
         }

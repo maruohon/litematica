@@ -115,7 +115,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
     }
 
     @Override
-    protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
+    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
     {
         for (ButtonWrapper<?> entry : this.buttons)
         {

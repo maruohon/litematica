@@ -8,6 +8,7 @@ import com.mumfrey.liteloader.client.gui.GuiSimpleScrollBar;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 
 public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends GuiLitematicaBase
 {
@@ -83,7 +84,7 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
                 this.setSelectedEntry(this.listContents.get(entryIndex), entryIndex);
             }
 
-            return widget.mouseClicked(mouseX, mouseY, mouseButton);
+            return widget.onMouseClicked(mouseX, mouseY, mouseButton);
         }
 
         return super.onMouseClicked(mouseX, mouseY, mouseButton);
@@ -154,6 +155,9 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
 
         int scrollbarHeight = this.browserHeight - 8;
         int totalHeight = Math.max(this.listContents.size() * this.browserEntryHeight, scrollbarHeight);
+
+        GlStateManager.disableLighting();
+        GlStateManager.color(1, 1, 1, 1);
 
         this.scrollBar.drawScrollBar(mouseX, mouseY, partialTicks,
                 this.posX + this.browserWidth - 9, this.browserEntriesStartY, 8, scrollbarHeight, totalHeight);
