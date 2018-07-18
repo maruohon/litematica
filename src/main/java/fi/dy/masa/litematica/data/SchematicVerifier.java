@@ -160,6 +160,8 @@ public class SchematicVerifier implements IStringListProvider
         this.totalRequiredChunks = this.requiredChunks.size();
         this.completionListener = completionListener;
         this.verificationActive = true;
+
+        this.updateRequiredChunksStringList();
     }
 
     public void stopVerification()
@@ -285,6 +287,7 @@ public class SchematicVerifier implements IStringListProvider
         if (this.verificationActive)
         {
             Iterator<ChunkPos> iter = this.requiredChunks.iterator();
+            boolean checkedSome = false;
 
             while (iter.hasNext())
             {
@@ -308,7 +311,13 @@ public class SchematicVerifier implements IStringListProvider
                     }
 
                     iter.remove();
+                    checkedSome = true;
                 }
+            }
+
+            if (checkedSome)
+            {
+                this.updateRequiredChunksStringList();
             }
 
             if (this.requiredChunks.isEmpty())
@@ -596,6 +605,35 @@ public class SchematicVerifier implements IStringListProvider
             {
                 BlockPos pos = positionList.get(i);
                 this.infoLines.add(String.format("x: %6d, y: %3d, z: %6d", pos.getX(), pos.getY(), pos.getZ()));
+            }
+        }
+    }
+
+    public void updateRequiredChunksStringList()
+    {
+        this.infoLines.clear();
+
+        EntityPlayer player = Minecraft.getMinecraft().player;
+
+        if (this.requiredChunks.isEmpty() == false && player != null)
+        {
+            String pre = TextFormatting.WHITE.toString() + TextFormatting.BOLD.toString();
+            String title = I18n.format("litematica.gui.label.schematic_verifier.missing_chunks", this.requiredChunks.size());
+            this.infoLines.add(String.format("%s%s%s", pre, title, TextFormatting.RESET.toString()));
+
+            List<ChunkPos> list = new ArrayList<>();
+            list.addAll(this.requiredChunks);
+
+            PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPositionVector()));
+            PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
+            Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
+
+            final int count = Math.min(list.size(), 16);
+
+            for (int i = 0; i < count; ++i)
+            {
+                ChunkPos pos = list.get(i);
+                this.infoLines.add(String.format("cx: %5d, cz: %5d (x: %d, z: %d)", pos.x, pos.z, pos.x << 4, pos.z << 4));
             }
         }
     }

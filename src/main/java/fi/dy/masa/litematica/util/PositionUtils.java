@@ -15,6 +15,7 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -23,6 +24,7 @@ import net.minecraft.world.border.WorldBorder;
 public class PositionUtils
 {
     public static final BlockPosComparator BLOCK_POS_COMPARATOR = new BlockPosComparator();
+    public static final ChunkPosComparator CHUNK_POS_COMPARATOR = new ChunkPosComparator();
 
     public static BlockPos getMinCorner(BlockPos pos1, BlockPos pos2)
     {
@@ -453,6 +455,44 @@ public class PositionUtils
             }
 
             return dist1 < dist2 == this.closestFirst ? -1 : 1;
+        }
+    }
+
+    public static class ChunkPosComparator implements Comparator<ChunkPos>
+    {
+        private BlockPos posReference = BlockPos.ORIGIN;
+        private boolean closestFirst;
+
+        public void setClosestFirst(boolean closestFirst)
+        {
+            this.closestFirst = closestFirst;
+        }
+
+        public void setReferencePosition(BlockPos pos)
+        {
+            this.posReference = pos;
+        }
+
+        @Override
+        public int compare(ChunkPos pos1, ChunkPos pos2)
+        {
+            double dist1 = this.distanceSq(pos1);
+            double dist2 = this.distanceSq(pos2);
+
+            if (dist1 == dist2)
+            {
+                return 0;
+            }
+
+            return dist1 < dist2 == this.closestFirst ? -1 : 1;
+        }
+
+        private double distanceSq(ChunkPos pos)
+        {
+            double dx = (double) (pos.x << 4) - this.posReference.getX();
+            double dz = (double) (pos.z << 4) - this.posReference.getZ();
+
+            return dx * dx + dz * dz;
         }
     }
 

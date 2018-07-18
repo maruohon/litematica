@@ -213,6 +213,12 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
                 InfoHud.getInstance().addLineProvider(verifier);
             }
+            else if (entry.type == BlockMismatchEntry.Type.HEADER)
+            {
+                SchematicVerifier verifier = this.placement.getSchematicVerifier();
+                verifier.updateRequiredChunksStringList();
+                InfoHud.getInstance().addLineProvider(verifier);
+            }
         }
     }
 
@@ -323,7 +329,10 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
                     if (world != null)
                     {
-                        this.parent.placement.getSchematicVerifier().startVerification(mc.world, world, this.parent.placement, this.parent);
+                        SchematicVerifier verifier = this.parent.placement.getSchematicVerifier();
+                        verifier.startVerification(mc.world, world, this.parent.placement, this.parent);
+                        verifier.updateRequiredChunksStringList();
+                        InfoHud.getInstance().addLineProvider(verifier);
                         DataManager.addSchematicVerificationTask(this.parent.placement);
                     }
                     else
