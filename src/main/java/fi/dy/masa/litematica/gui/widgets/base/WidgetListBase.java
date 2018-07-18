@@ -59,15 +59,10 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
     @Override
     public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        boolean ret = false;
-
-        if (mouseButton == 0)
+        if (mouseButton == 0 && this.scrollBar.wasMouseOver())
         {
-            if (this.scrollBar.wasMouseOver())
-            {
-                this.scrollBar.setDragging(true);
-                ret = true;
-            }
+            this.scrollBar.setDragging(true);
+            return true;
         }
 
         final int relativeY = mouseY - this.browserEntriesStartY - this.browserEntriesOffsetY;
@@ -77,23 +72,15 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
         if (relativeY >= 0 &&
             relativeY < this.maxVisibleBrowserEntries * this.browserEntryHeight &&
             mouseX >= this.browserEntriesStartX &&
-            mouseX < this.browserEntriesStartX + this.browserEntryWidth)
+            mouseX < this.browserEntriesStartX + this.browserEntryWidth &&
+            entryIndex < Math.min(this.listContents.size(), this.maxVisibleBrowserEntries + this.scrollBar.getValue()))
         {
-            if (entryIndex < Math.min(this.listContents.size(), this.maxVisibleBrowserEntries + this.scrollBar.getValue()))
+            this.setSelectedEntry(this.listContents.get(entryIndex), entryIndex);
+
+            if (widgetIndex < this.listWidgets.size())
             {
-                this.setSelectedEntry(this.listContents.get(entryIndex), entryIndex);
-
-                if (widgetIndex < this.listWidgets.size())
-                {
-                    this.listWidgets.get(widgetIndex).onMouseClicked(mouseX, mouseY, mouseButton);
-                    ret = true;
-                }
+                return this.listWidgets.get(widgetIndex).onMouseClicked(mouseX, mouseY, mouseButton);
             }
-        }
-
-        if (ret)
-        {
-            return true;
         }
 
         return super.onMouseClicked(mouseX, mouseY, mouseButton);
