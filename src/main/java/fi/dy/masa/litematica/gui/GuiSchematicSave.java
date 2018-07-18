@@ -9,12 +9,14 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.InfoUtils;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.world.World;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase
 {
@@ -40,6 +42,13 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
 
         Minecraft mc = Minecraft.getMinecraft();
         this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
+
+        AreaSelection area = this.selectionManager.getCurrentSelection();
+
+        if (area != null)
+        {
+            this.defaultText = area.getName();
+        }
     }
 
     @Override
@@ -128,7 +137,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
             if (area != null)
             {
                 String author = this.gui.mc.player.getName();
-                return LitematicaSchematic.createFromWorld(this.gui.mc.world, area, takeEntities, author, this.gui);
+                World world = WorldUtils.getBestWorld(this.gui.mc);
+
+                if (world != null)
+                {
+                    return LitematicaSchematic.createFromWorld(world, area, takeEntities, author, this.gui);
+                }
             }
 
             return null;

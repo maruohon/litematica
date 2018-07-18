@@ -14,12 +14,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
@@ -154,6 +156,26 @@ public class WorldUtils
             {
                 world.getChunkProvider().loadChunk(cx, cz);
             }
+        }
+    }
+
+    /**
+     * Best name. Returns the integrated server world for the current dimension
+     * in single player, otherwise just the client world.
+     * @param mc
+     * @return
+     */
+    @Nullable
+    public static World getBestWorld(Minecraft mc)
+    {
+        if (mc.isSingleplayer())
+        {
+            IntegratedServer server = mc.getIntegratedServer();
+            return server.getWorld(mc.world.provider.getDimensionType().getId());
+        }
+        else
+        {
+            return mc.world;
         }
     }
 }
