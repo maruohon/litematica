@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonWrapper;
@@ -294,7 +295,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             {
                 GlStateManager.pushMatrix();
 
-                GuiLitematicaBase.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
+                RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
 
                 int x1 = x + 10;
                 int x2 = x + this.columnWidthExpected + 30;

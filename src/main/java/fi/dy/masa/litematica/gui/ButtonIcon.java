@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.malilib.gui.IGuiIcon;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import net.minecraft.util.ResourceLocation;
 
 public enum ButtonIcon implements IGuiIcon
@@ -67,7 +67,7 @@ public enum ButtonIcon implements IGuiIcon
             u += this.w;
         }
 
-        GuiLitematicaBase.drawTexturedRect(x, y, u, this.v, this.w, this.h, zLevel);
+        RenderUtils.drawTexturedRect(x, y, u, this.v, this.w, this.h, zLevel);
     }
 
     @Override

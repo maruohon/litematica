@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonHoverText;
@@ -153,7 +154,7 @@ public class WidgetSchematicEntry extends WidgetBase
 
             if ((button instanceof ButtonHoverText) && button.isMouseOver())
             {
-                GuiLitematicaBase.drawHoverText(mouseX, mouseY, ((ButtonHoverText) button).getHoverStrings());
+                RenderUtils.drawHoverText(mouseX, mouseY, ((ButtonHoverText) button).getHoverStrings());
             }
         }
 

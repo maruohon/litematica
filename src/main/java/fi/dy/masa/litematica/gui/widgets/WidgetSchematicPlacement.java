@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonWrapper;
@@ -126,7 +127,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         if (placementSelected)
         {
             GlStateManager.translate(0, 0, 1);
-            GuiLitematicaBase.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
+            RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
             GlStateManager.translate(0, 0, -1);
         }
 

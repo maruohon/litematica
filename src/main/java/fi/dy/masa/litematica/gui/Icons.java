@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.malilib.gui.IGuiIcon;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import net.minecraft.util.ResourceLocation;
 
 public enum Icons implements IGuiIcon
@@ -60,7 +60,7 @@ public enum Icons implements IGuiIcon
     @Override
     public void renderAt(int x, int y, float zLevel, boolean enabled, boolean selected)
     {
-        GuiLitematicaBase.drawTexturedRect(x, y, this.u, this.v, this.w, this.h, zLevel);
+        RenderUtils.drawTexturedRect(x, y, this.u, this.v, this.w, this.h, zLevel);
     }
 
     @Override

@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.util.FileUtils;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -87,7 +88,7 @@ public class WidgetDirectoryEntry extends WidgetBase
         // Draw an outline if this is the currently selected entry
         if (selected)
         {
-            GuiLitematicaBase.drawOutline(this.x + iw + 2, this.y, this.width - iw - 2, this.height, 0xEEEEEEEE);
+            RenderUtils.drawOutline(this.x + iw + 2, this.y, this.width - iw - 2, this.height, 0xEEEEEEEE);
         }
 
         String name = FileUtils.getNameWithoutExtension(this.entry.getName());

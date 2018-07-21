@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.input.Keyboard;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.interfaces.IDirectoryNavigator;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
@@ -22,6 +21,7 @@ import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.util.FileUtils;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -107,7 +107,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
     public void drawContents(int mouseX, int mouseY, float partialTicks)
     {
         // Draw an outline around the entire file browser
-        GuiLitematicaBase.drawOutlinedBox(this.posX, this.posY, this.browserWidth, this.browserHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(this.posX, this.posY, this.browserWidth, this.browserHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
 
         // Draw the root/up widget, is the current directory has that (ie. is not the root directory)
         if (this.directoryNavigationWidget != null)
@@ -255,7 +255,7 @@ public class WidgetSchematicBrowser extends WidgetListBase<DirectoryEntry, Widge
         int x = this.posX + this.totalWidth - this.infoWidth;
         int y = this.posY;
 
-        GuiLitematicaBase.drawOutlinedBox(x, y, this.infoWidth, this.infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, this.infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
         if (entry == null)
         {

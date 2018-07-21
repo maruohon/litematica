@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.interfaces.IDirectoryNavigator;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.util.FileUtils;
+import fi.dy.masa.malilib.gui.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 
@@ -60,11 +61,11 @@ public class WidgetDirectoryNavigation extends WidgetBase
         // Hovering the "to root directory" widget/icon
         if (this.isHoveringIcon(mouseX, mouseY, 0))
         {
-            GuiLitematicaBase.drawOutlinedBox(this.x     , this.y + 1, iw, iw, 0x20C0C0C0, 0xE0FFFFFF);
+            RenderUtils.drawOutlinedBox(this.x     , this.y + 1, iw, iw, 0x20C0C0C0, 0xE0FFFFFF);
         }
         else if (this.isHoveringIcon(mouseX, mouseY, 1))
         {
-            GuiLitematicaBase.drawOutlinedBox(this.x + iw + 2, this.y + 1, iw, iw, 0x20C0C0C0, 0xE0FFFFFF);
+            RenderUtils.drawOutlinedBox(this.x + iw + 2, this.y + 1, iw, iw, 0x20C0C0C0, 0xE0FFFFFF);
         }
 
         GlStateManager.color(1f, 1f, 1f);
