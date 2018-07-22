@@ -26,7 +26,6 @@ public class Configs implements IConfigHandler
 
     public static class Generic
     {
-        public static final ConfigOptionList    INFO_HUD_ALIGNMENT      = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\", used for schematic verifier mismatch positions etc.");
         public static final ConfigBoolean       LOAD_ENTIRE_SCHEMATICS  = new ConfigBoolean(    "loadEntireSchematics", true, "If true, then the entire schematic is always loaded at once.\nIf false, then only the part that is within the client's view distance is loaded.");
         public static final ConfigOptionList    SELECTION_MODE          = new ConfigOptionList( "selectionMode", AreaSelectionMode.CORNERS, "The area selection mode to use");
         public static final ConfigOptionList    TOOL_HUD_ALIGNMENT      = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
@@ -35,7 +34,6 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       VERBOSE_LOGGING         = new ConfigBoolean(    "verboseLogging", false, "If enabled, a bunch of debug messages will be printed to the console");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
-                INFO_HUD_ALIGNMENT,
                 LOAD_ENTIRE_SCHEMATICS,
                 SELECTION_MODE,
                 TOOL_HUD_ALIGNMENT,
@@ -50,6 +48,8 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        ERROR_HILIGHT_ALPHA             = new ConfigDouble(     "errorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
         public static final ConfigInteger       ERROR_HILIGHT_MAX_POSITIONS     = new ConfigInteger(    "errorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render at once");
         public static final ConfigDouble        GHOST_BLOCK_ALPHA               = new ConfigDouble(     "ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
+        public static final ConfigOptionList    INFO_HUD_ALIGNMENT              = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\", used for schematic verifier mismatch positions etc.");
+        public static final ConfigInteger       INFO_HUD_MAX_LINES              = new ConfigInteger(    "infoHudMaxLines", 10, 1, 32, "The maximum number of info lines to show on the HUD at once");
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA        = new ConfigDouble(     "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT    = new ConfigBoolean(    "renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
         public static final ConfigBoolean       RENDER_ERROR_INFO_OVERLAY       = new ConfigBoolean(    "renderErrorInfoOverlay", true, "If enabled, then an info overlay is rendered while looking at an error marker, and holding the key for it");
@@ -62,6 +62,8 @@ public class Configs implements IConfigHandler
                 ERROR_HILIGHT_ALPHA,
                 ERROR_HILIGHT_MAX_POSITIONS,
                 GHOST_BLOCK_ALPHA,
+                INFO_HUD_ALIGNMENT,
+                INFO_HUD_MAX_LINES,
                 PLACEMENT_BOX_SIDE_ALPHA,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
                 RENDER_ERROR_INFO_OVERLAY,

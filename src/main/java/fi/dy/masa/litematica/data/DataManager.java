@@ -116,7 +116,7 @@ public class DataManager
         return placementToVerify != null ? placementToVerify.getSchematicVerifier() : null;
     }
 
-    public static void runSchematicVerification()
+    public static void runTasks()
     {
         DataManager manager = getInstance();
 

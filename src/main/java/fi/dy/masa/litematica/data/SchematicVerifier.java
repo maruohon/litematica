@@ -42,7 +42,6 @@ public class SchematicVerifier implements IStringListProvider
     private static final MutablePair<IBlockState, IBlockState> MUTABLE_PAIR = new MutablePair<>();
     private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
     private static final IBlockState AIR = Blocks.AIR.getDefaultState();
-    private static boolean verifierActive;
 
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> missingBlocksPositions = ArrayListMultimap.create();
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> extraBlocksPositions = ArrayListMultimap.create();
@@ -62,6 +61,7 @@ public class SchematicVerifier implements IStringListProvider
     private SchematicPlacement schematicPlacement;
     @Nullable
     private ICompletionListener completionListener;
+    private boolean verificationStarted;
     private boolean verificationActive;
     private boolean finished;
     private int totalRequiredChunks;
@@ -69,11 +69,6 @@ public class SchematicVerifier implements IStringListProvider
     private long clientBlocks;
     private long matchingBlocks;
     private int maxEntries;
-
-    public static boolean isVerifierActive()
-    {
-        return verifierActive;
-    }
 
     @Override
     public List<String> getLines()
@@ -86,6 +81,16 @@ public class SchematicVerifier implements IStringListProvider
         return this.verificationActive;
     }
 
+    public boolean isPaused()
+    {
+        return this.verificationStarted && this.verificationActive == false && this.finished == false;
+    }
+
+    public boolean isFinished()
+    {
+        return this.finished;
+    }
+
     public int getTotalChunks()
     {
         return this.totalRequiredChunks;
@@ -94,11 +99,6 @@ public class SchematicVerifier implements IStringListProvider
     public int getUnseenChunks()
     {
         return this.requiredChunks.size();
-    }
-
-    public boolean isFinished()
-    {
-        return this.finished;
     }
 
     public long getSchematicTotalBlocks()
@@ -136,33 +136,64 @@ public class SchematicVerifier implements IStringListProvider
         return this.wrongStatesPositions.size();
     }
 
-    public void reset()
-    {
-        this.stopVerification();
-    }
-
     public void startVerification(WorldClient worldClient, WorldSchematic worldSchematic,
             SchematicPlacement schematicPlacement, ICompletionListener completionListener)
     {
-        this.stopVerification();
+        if (this.verificationStarted == false)
+        {
+            this.reset();
 
-        this.worldClient = worldClient;
-        this.worldSchematic = worldSchematic;
-        this.schematicPlacement = schematicPlacement;
+            this.worldClient = worldClient;
+            this.worldSchematic = worldSchematic;
+            this.schematicPlacement = schematicPlacement;
 
-        this.requiredChunks.addAll(schematicPlacement.getTouchedChunks());
-        this.totalRequiredChunks = this.requiredChunks.size();
-        this.completionListener = completionListener;
+            this.requiredChunks.addAll(schematicPlacement.getTouchedChunks());
+            this.totalRequiredChunks = this.requiredChunks.size();
+            this.completionListener = completionListener;
+            this.verificationStarted = true;
+
+            InfoHud.getInstance().addLineProvider(this);
+            DataManager.addSchematicVerificationTask(this.schematicPlacement);
+        }
+
         this.verificationActive = true;
 
         this.updateRequiredChunksStringList();
     }
 
+    public void resume()
+    {
+        if (this.verificationStarted)
+        {
+            this.verificationActive = true;
+            this.updateRequiredChunksStringList();
+        }
+    }
+
     public void stopVerification()
+    {
+        this.verificationActive = false;
+    }
+
+    public void reset()
+    {
+        this.stopVerification();
+        this.clearReferences();
+        this.clearData();
+    }
+
+    private void clearReferences()
     {
         this.worldClient = null;
         this.worldSchematic = null;
         this.schematicPlacement = null;
+    }
+
+    private void clearData()
+    {
+        this.verificationActive = false;
+        this.verificationStarted = false;
+        this.finished = false;
         this.totalRequiredChunks = 0;
         this.requiredChunks.clear();
 
@@ -171,10 +202,6 @@ public class SchematicVerifier implements IStringListProvider
         this.wrongBlocksPositions.clear();
         this.wrongStatesPositions.clear();
         this.blockMismatches.clear();
-
-        this.verificationActive = false;
-        this.finished = false;
-        verifierActive = false;
 
         InfoHud.getInstance().removeLineProvider(this);
         DataManager.clearActiveMismatchRenderPositions();
@@ -316,9 +343,12 @@ public class SchematicVerifier implements IStringListProvider
 
             if (this.requiredChunks.isEmpty())
             {
+                System.out.printf("finished\n");
                 this.verificationActive = false;
+                this.verificationStarted = false;
+                this.clearReferences();
+
                 this.finished = true;
-                verifierActive = true;
 
                 if (this.completionListener != null)
                 {
@@ -593,7 +623,7 @@ public class SchematicVerifier implements IStringListProvider
         {
             this.infoLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), TextFormatting.RESET.toString()));
 
-            final int count = Math.min(positionList.size(), 16);
+            final int count = Math.min(positionList.size(), Configs.Visuals.INFO_HUD_MAX_LINES.getIntegerValue());
 
             for (int i = 0; i < count; ++i)
             {
@@ -622,7 +652,7 @@ public class SchematicVerifier implements IStringListProvider
             PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
             Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
 
-            final int count = Math.min(list.size(), 16);
+            final int count = Math.min(list.size(), Configs.Visuals.INFO_HUD_MAX_LINES.getIntegerValue());
 
             for (int i = 0; i < count; ++i)
             {

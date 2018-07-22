@@ -68,7 +68,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
         x += this.createButton(x, y, -1, ButtonListener.Type.START) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.STOP) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.RESET) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.RESET_VERIFIER) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.RESET_IGNORED) + 4;
         this.createButton(x, y, -1, ButtonListener.Type.TOGGLE_INFO_HUD);
         y += 22;
@@ -123,8 +123,15 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 break;
 
             case START:
-                label = I18n.format("litematica.gui.button.schematic_verifier.start");
-                enabled = this.placement.getSchematicVerifier().isActive() == false;
+                if (this.placement.getSchematicVerifier().isPaused())
+                {
+                    label = I18n.format("litematica.gui.button.schematic_verifier.resume");
+                }
+                else
+                {
+                    label = I18n.format("litematica.gui.button.schematic_verifier.start");
+                    enabled = this.placement.getSchematicVerifier().isActive() == false;
+                }
                 break;
 
             case STOP:
@@ -132,8 +139,8 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 enabled = this.placement.getSchematicVerifier().isActive();
                 break;
 
-            case RESET:
-                label = I18n.format("litematica.gui.button.schematic_verifier.reset");
+            case RESET_VERIFIER:
+                label = I18n.format("litematica.gui.button.schematic_verifier.reset_verifier");
                 enabled = this.placement.getSchematicVerifier().isFinished();
                 break;
 
@@ -210,14 +217,11 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
                 SchematicVerifier verifier = this.placement.getSchematicVerifier();
                 verifier.updateMismatchOverlaysForType(entry.mismatchType);
-
-                InfoHud.getInstance().addLineProvider(verifier);
             }
             else if (entry.type == BlockMismatchEntry.Type.HEADER)
             {
                 SchematicVerifier verifier = this.placement.getSchematicVerifier();
                 verifier.updateRequiredChunksStringList();
-                InfoHud.getInstance().addLineProvider(verifier);
             }
         }
     }
@@ -330,10 +334,15 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     if (world != null)
                     {
                         SchematicVerifier verifier = this.parent.placement.getSchematicVerifier();
-                        verifier.startVerification(mc.world, world, this.parent.placement, this.parent);
-                        verifier.updateRequiredChunksStringList();
-                        InfoHud.getInstance().addLineProvider(verifier);
-                        DataManager.addSchematicVerificationTask(this.parent.placement);
+
+                        if (this.parent.placement.getSchematicVerifier().isPaused())
+                        {
+                            verifier.resume();
+                        }
+                        else
+                        {
+                            verifier.startVerification(mc.world, world, this.parent.placement, this.parent);
+                        }
                     }
                     else
                     {
@@ -346,7 +355,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     DataManager.removeSchematicVerificationTask();
                     break;
 
-                case RESET:
+                case RESET_VERIFIER:
                     this.parent.placement.getSchematicVerifier().reset();
                     DataManager.removeSchematicVerificationTask();
                     break;
@@ -372,7 +381,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             SET_RESULT_MODE_MISSING,
             START,
             STOP,
-            RESET,
+            RESET_VERIFIER,
             RESET_IGNORED,
             TOGGLE_INFO_HUD;
         }

@@ -59,13 +59,13 @@ public class RenderEventHandler
             if (this.renderSchematics)
             {
                 LitematicaRenderer.getInstance().renderSchematicWorld();
-
-                List<BlockPos> posList = DataManager.getSelectedMismatchPositionsForRender();
-                BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 10);
-                OverlayRenderer.getInstance().renderSchematicMismatches(posList, posLook, partialTicks);
             }
 
             OverlayRenderer.getInstance().renderSelectionAreas();
+
+            List<BlockPos> posList = DataManager.getSelectedMismatchPositionsForRender();
+            BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 10);
+            OverlayRenderer.getInstance().renderSchematicMismatches(posList, posLook, partialTicks);
         }
     }
 
