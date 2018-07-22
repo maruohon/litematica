@@ -224,37 +224,45 @@ public class SchematicVerifier implements IStringListProvider
     {
         if (this.finished && this.recheckQueue.isEmpty() == false)
         {
-            for (BlockPos pos : this.recheckQueue)
+            Iterator<BlockPos> iter = this.recheckQueue.iterator();
+
+            while (iter.hasNext())
             {
-                BlockMismatch mismatch = this.blockMismatches.get(pos);
+                BlockPos pos = iter.next();
 
-                if (mismatch != null)
+                if (this.worldClient.isBlockLoaded(pos, false) &&
+                    this.worldSchematic.isBlockLoaded(pos, false))
                 {
-                    this.blockMismatches.remove(pos);
+                    BlockMismatch mismatch = this.blockMismatches.get(pos);
 
-                    IBlockState stateFound = this.worldClient.getBlockState(pos).getActualState(this.worldClient, pos);
-                    MUTABLE_PAIR.setLeft(mismatch.stateExpected);
-                    MUTABLE_PAIR.setRight(mismatch.stateFound);
-
-                    this.getMapForMismatchType(mismatch.mismatchType).remove(MUTABLE_PAIR, pos);
-                    this.checkBlockStates(pos.getX(), pos.getY(), pos.getZ(), mismatch.stateExpected, stateFound);
-
-                    if (stateFound != AIR && mismatch.stateFound == AIR)
+                    if (mismatch != null)
                     {
-                        this.clientBlocks++;
+                        this.blockMismatches.remove(pos);
+
+                        IBlockState stateFound = this.worldClient.getBlockState(pos).getActualState(this.worldClient, pos);
+                        MUTABLE_PAIR.setLeft(mismatch.stateExpected);
+                        MUTABLE_PAIR.setRight(mismatch.stateFound);
+
+                        this.getMapForMismatchType(mismatch.mismatchType).remove(MUTABLE_PAIR, pos);
+                        this.checkBlockStates(pos.getX(), pos.getY(), pos.getZ(), mismatch.stateExpected, stateFound);
+
+                        if (stateFound != AIR && mismatch.stateFound == AIR)
+                        {
+                            this.clientBlocks++;
+                        }
                     }
-                }
-                else
-                {
-                    IBlockState stateExpected = this.worldSchematic.getBlockState(pos);
-                    IBlockState stateFound = this.worldClient.getBlockState(pos).getActualState(this.worldClient, pos);
-                    this.checkBlockStates(pos.getX(), pos.getY(), pos.getZ(), stateExpected, stateFound);
+                    else
+                    {
+                        IBlockState stateExpected = this.worldSchematic.getBlockState(pos);
+                        IBlockState stateFound = this.worldClient.getBlockState(pos).getActualState(this.worldClient, pos);
+                        this.checkBlockStates(pos.getX(), pos.getY(), pos.getZ(), stateExpected, stateFound);
+                    }
+
+                    iter.remove();
                 }
             }
 
             this.updateActiveMismatchOverlay();
-
-            this.recheckQueue.clear();
         }
     }
 

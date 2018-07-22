@@ -70,7 +70,7 @@ public class SchematicPlacementManager
 
             while (iter.hasNext())
             {
-                if ((System.nanoTime() - DataManager.getClientTickStartTime()) >= 50000000L)
+                if ((System.nanoTime() - DataManager.getClientTickStartTime()) >= 45000000L)
                 {
                     break;
                 }
