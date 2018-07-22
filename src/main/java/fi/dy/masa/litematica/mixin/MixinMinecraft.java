@@ -27,15 +27,6 @@ public class MixinMinecraft
         SchematicWorldHandler.getInstance().onClientWorldChange(worldClientIn);
     }
 
-    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("RETURN"))
-    private void onLoadWorldPost(@Nullable WorldClient worldClientIn, String loadingMessage, CallbackInfo ci)
-    {
-        if (Minecraft.getMinecraft().world != null)
-        {
-            SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
-        }
-    }
-
     @Inject(method = "runTick()V", at = @At("HEAD"))
     private void onRunTickStart(CallbackInfo ci)
     {
