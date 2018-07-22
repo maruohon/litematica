@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.data;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -207,6 +208,11 @@ public class SchematicPlacement
     public Placement getRelativeSubRegionPlacement(String areaName)
     {
         return this.relativeSubRegionPlacements.get(areaName);
+    }
+
+    public Collection<Placement> getAllSubRegionsPlacements()
+    {
+        return this.relativeSubRegionPlacements.values();
     }
 
     public ImmutableMap<String, Placement> getEnabledRelativeSubRegionPlacements()
@@ -513,6 +519,16 @@ public class SchematicPlacement
         if (render != this.renderSchematic)
         {
             this.renderSchematic = render;
+        }
+    }
+
+    public void toggleSubRegionRenderingEnabled(String regionName)
+    {
+        Placement placement = this.relativeSubRegionPlacements.get(regionName);
+
+        if (placement != null)
+        {
+            placement.toggleRenderingEnabled();
         }
     }
 

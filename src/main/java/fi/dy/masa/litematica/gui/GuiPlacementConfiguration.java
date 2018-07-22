@@ -1,11 +1,15 @@
 package fi.dy.masa.litematica.gui;
 
+import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.base.GuiListBase;
 import fi.dy.masa.litematica.gui.base.GuiTextFieldGeneric;
 import fi.dy.masa.litematica.gui.base.GuiTextFieldNumeric;
+import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegion;
+import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegions;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -14,7 +18,8 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class GuiPlacementConfiguration extends GuiLitematicaBase
+public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPlacementSubRegion, WidgetPlacementSubRegions>
+                                        implements ISelectionListener<Placement>
 {
     private final SchematicPlacement placement;
     private ButtonGeneric buttonResetPlacement;
@@ -23,8 +28,21 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
     {
+        super(20, 60);
         this.placement = placement;
         this.title = I18n.format("litematica.gui.title.configure_schematic_placement");
+    }
+
+    @Override
+    protected int getBrowserWidth()
+    {
+        return this.width - 160;
+    }
+
+    @Override
+    protected int getBrowserHeight()
+    {
+        return this.height - 94;
     }
 
     @Override
@@ -43,12 +61,16 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         this.addTextField(this.textFieldRename, null);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
 
+        y += 20;
+        String label = I18n.format("litematica.gui.label.schematic_placement.sub_regions");
+        this.addLabel(this.id++, x, y, -1, 20, 0xFFFFFFFF, label);
+
         width = 120;
         x = this.width - width - 10;
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
         y += 32;
 
-        String label = I18n.format("litematica.gui.label.placement_settings.placement_origin");
+        label = I18n.format("litematica.gui.label.placement_settings.placement_origin");
         this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
         y += 20;
 
@@ -182,6 +204,29 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
         this.buttonResetPlacement.displayString = label;
         this.buttonResetPlacement.enabled = enabled;
+    }
+
+    public SchematicPlacement getSchematicPlacement()
+    {
+        return this.placement;
+    }
+
+    @Override
+    protected ISelectionListener<Placement> getSelectionListener()
+    {
+        return this;
+    }
+
+    @Override
+    public void onSelectionChange(Placement entry)
+    {
+        this.placement.setSelectedSubRegionName(entry != null && entry.getName().equals(this.placement.getSelectedSubRegionName()) == false ? entry.getName() : null);
+    }
+
+    @Override
+    protected WidgetPlacementSubRegions createListWidget(int listX, int listY)
+    {
+        return new WidgetPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>

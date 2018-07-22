@@ -372,6 +372,14 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     {
         if (lines != null && lines.length >= 1)
         {
+            if (width == -1)
+            {
+                for (String line : lines)
+                {
+                    width = Math.max(width, this.fontRenderer.getStringWidth(line));
+                }
+            }
+
             GuiLabel label = new GuiLabel(this.mc.fontRenderer, id, x, y, width, height, colour);
 
             for (String line : lines)

@@ -36,12 +36,15 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
         this.id = 0;
         int width = 140;
         int x = this.width - width - 10;
-        int y = 20;
+        int y = 22;
+
+        String label = I18n.format("litematica.gui.placement_sub_region.label.region_name", this.placement.getName());
+        this.addLabel(this.id++, 20, y, -1, 16, 0xFFFFFFFF, label);
 
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
         y += 32;
 
-        String label = I18n.format("litematica.gui.placement_sub_region.label.region_position");
+        label = I18n.format("litematica.gui.placement_sub_region.label.region_position");
         this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
         y += 20;
 
@@ -76,6 +79,12 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
         y = this.height - 36;
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+
+        label = I18n.format("litematica.gui.placement_sub_region.button.placement_configuration");
+        buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
+        x = 20;
+        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
 
         this.updateElements();
     }
@@ -144,6 +153,8 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
                 label = I18n.format("litematica.gui.placement_sub_region.button.slice_type", value);
                 break;
             }
+
+            default:
         }
 
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
@@ -200,6 +211,10 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
 
             switch (this.type)
             {
+                case PLACEMENT_CONFIGURATION:
+                    mc.displayGuiScreen(new GuiPlacementConfiguration(this.schematicPlacement));
+                    break;
+
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
@@ -235,6 +250,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
 
         public enum Type
         {
+            PLACEMENT_CONFIGURATION,
             TOGGLE_ENABLED,
             MOVE_HERE,
             ROTATE,

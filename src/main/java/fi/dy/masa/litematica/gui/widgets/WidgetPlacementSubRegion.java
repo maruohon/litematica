@@ -2,10 +2,9 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
-import fi.dy.masa.litematica.data.SchematicPlacementManager;
-import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
@@ -19,29 +18,27 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 
-public class WidgetSchematicPlacement extends WidgetBase
+public class WidgetPlacementSubRegion extends WidgetBase
 {
-    private final SchematicPlacementManager manager;
-    private final WidgetSchematicPlacements parent;
-    private final SchematicPlacement placement;
+    private final SchematicPlacement schematicPlacement;
+    private final WidgetPlacementSubRegions parent;
+    private final Placement placement;
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private final boolean isOdd;
     private int id;
     private int buttonsStartX;
 
-    public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            SchematicPlacement placement, WidgetSchematicPlacements parent, Minecraft mc)
+    public WidgetPlacementSubRegion(int x, int y, int width, int height, float zLevel, boolean isOdd,
+            SchematicPlacement schematicPlacement, Placement placement, WidgetPlacementSubRegions parent, Minecraft mc)
     {
         super(x, y, width, height, zLevel);
 
         this.parent = parent;
+        this.schematicPlacement = schematicPlacement;
         this.placement = placement;
         this.isOdd = isOdd;
         this.mc = mc;
-
-        int dimension = mc.world.provider.getDimensionType().getId();
-        this.manager = DataManager.getInstance(dimension).getSchematicPlacementManager();
 
         this.id = 0;
         int posX = x + width;
@@ -49,11 +46,9 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         // Note: These are placed from right to left
 
-        posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
-
         String labelEn = I18n.format("litematica.gui.button.schematic_placements.render_enable");
         String labelDis = I18n.format("litematica.gui.button.schematic_placements.render_disable");
-        String label = this.placement.getRenderSchematic() ? labelDis : labelEn;
+        String label = this.placement.isRenderingEnabled() ? labelDis : labelEn;
         int len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
         posX -= (len + 2);
         ButtonListener listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_RENDER, this);
@@ -113,7 +108,7 @@ public class WidgetSchematicPlacement extends WidgetBase
     {
         GlStateManager.color(1, 1, 1, 1);
 
-        boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
+        boolean placementSelected = this.schematicPlacement.getSelectedSubRegionPlacement() == this.placement;
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || placementSelected || this.isMouseOver(mouseX, mouseY))
@@ -142,7 +137,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.mc.fontRenderer.drawString(pre + name, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
         Icons icon;
-        String fileName = this.placement.getSchematicFile() != null ? this.placement.getSchematicFile().getName() : null;
+        String fileName = this.schematicPlacement.getSchematicFile() != null ? this.schematicPlacement.getSchematicFile().getName() : null;
 
         if (fileName != null)
         {
@@ -170,10 +165,10 @@ public class WidgetSchematicPlacement extends WidgetBase
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        String fileName = this.placement.getSchematicFile() != null ? this.placement.getSchematicFile().getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
+        String fileName = this.schematicPlacement.getSchematicFile() != null ? this.schematicPlacement.getSchematicFile().getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
 
         List<String> text = new ArrayList<>();
-        text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
+        text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.schematicPlacement.getSchematic().getMetadata().getName()));
         text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
 
         if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
@@ -185,9 +180,9 @@ public class WidgetSchematicPlacement extends WidgetBase
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final ButtonType type;
-        private final WidgetSchematicPlacement widget;
+        private final WidgetPlacementSubRegion widget;
 
-        public ButtonListener(ButtonType type, WidgetSchematicPlacement widget)
+        public ButtonListener(ButtonType type, WidgetPlacementSubRegion widget)
         {
             this.type = type;
             this.widget = widget;
@@ -198,23 +193,18 @@ public class WidgetSchematicPlacement extends WidgetBase
         {
             if (this.type == ButtonType.CONFIGURE)
             {
-                GuiPlacementConfiguration gui = new GuiPlacementConfiguration(this.widget.placement);
+                GuiSubRegionConfiguration gui = new GuiSubRegionConfiguration(this.widget.schematicPlacement, this.widget.placement);
                 gui.setParent(this.widget.parent.getParentGui());
                 Minecraft.getMinecraft().displayGuiScreen(gui);
             }
-            else if (this.type == ButtonType.REMOVE)
-            {
-                this.widget.manager.removeSchematicPlacement(this.widget.placement);
-                this.widget.parent.refreshEntries();
-            }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {
-                this.widget.placement.setEnabled(! this.widget.placement.isEnabled());
+                this.widget.schematicPlacement.toggleSubRegionEnabled(this.widget.placement.getName());
                 this.widget.parent.refreshEntries();
             }
             else if (this.type == ButtonType.TOGGLE_RENDER)
             {
-                this.widget.placement.setRenderSchematic(! this.widget.placement.getRenderSchematic());
+                this.widget.schematicPlacement.toggleSubRegionRenderingEnabled(this.widget.placement.getName());
                 this.widget.parent.refreshEntries();
             }
         }
@@ -228,7 +218,6 @@ public class WidgetSchematicPlacement extends WidgetBase
         public enum ButtonType
         {
             CONFIGURE       ("litematica.gui.button.schematic_placements.configure"),
-            REMOVE          ("litematica.gui.button.schematic_placements.remove"),
             TOGGLE_ENABLED  (""),
             TOGGLE_RENDER   ("");
 
