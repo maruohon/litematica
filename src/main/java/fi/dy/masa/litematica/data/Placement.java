@@ -18,6 +18,7 @@ public class Placement
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
     private boolean enabled = true;
+    private boolean renderingEnabled = true;
 
     public Placement(BlockPos pos, String name)
     {
@@ -29,6 +30,26 @@ public class Placement
     public boolean isEnabled()
     {
         return this.enabled;
+    }
+
+    public boolean isRenderingEnabled()
+    {
+        return this.renderingEnabled;
+    }
+
+    public boolean matchesRequirement(RequiredEnabled required)
+    {
+        if (required == RequiredEnabled.ANY)
+        {
+            return true;
+        }
+
+        if (required == RequiredEnabled.PLACEMENT_ENABLED)
+        {
+            return this.isEnabled();
+        }
+
+        return this.isEnabled() && this.isRenderingEnabled();
     }
 
     public String getName()
@@ -51,32 +72,42 @@ public class Placement
         return this.mirror;
     }
 
-    public void setEnabled(boolean enabled)
+    public void setRenderingEnabled(boolean renderingEnabled)
+    {
+        this.renderingEnabled = renderingEnabled;
+    }
+
+    public void toggleRenderingEnabled()
+    {
+        this.setRenderingEnabled(! this.isRenderingEnabled());
+    }
+
+    void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
     }
 
-    public void toggleEnabled()
+    void toggleEnabled()
     {
         this.setEnabled(! this.isEnabled());
     }
 
-    public void setPos(BlockPos pos)
+    void setPos(BlockPos pos)
     {
         this.pos = pos;
     }
 
-    public void setRotation(Rotation rotation)
+    void setRotation(Rotation rotation)
     {
         this.rotation = rotation;
     }
 
-    public void setMirror(Mirror mirror)
+    void setMirror(Mirror mirror)
     {
         this.mirror = mirror;
     }
 
-    public void resetToOriginalValues()
+    void resetToOriginalValues()
     {
         this.pos = this.defaultPos;
         this.rotation = Rotation.NONE;
@@ -106,6 +137,7 @@ public class Placement
         obj.add("rotation", new JsonPrimitive(this.rotation.name()));
         obj.add("mirror", new JsonPrimitive(this.mirror.name()));
         obj.add("enabled", new JsonPrimitive(this.enabled));
+        obj.add("rendering_enabled", new JsonPrimitive(this.renderingEnabled));
 
         return obj;
     }
@@ -129,6 +161,7 @@ public class Placement
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
             Placement placement = new Placement(pos, obj.get("name").getAsString());
             placement.setEnabled(JsonUtils.getBoolean(obj, "enabled"));
+            placement.setRenderingEnabled(JsonUtils.getBoolean(obj, "rendering_enabled"));
 
             try
             {
@@ -147,5 +180,12 @@ public class Placement
         }
 
         return null;
+    }
+
+    public enum RequiredEnabled
+    {
+        ANY,
+        PLACEMENT_ENABLED,
+        RENDERING_ENABLED;
     }
 }

@@ -27,6 +27,7 @@ public class Configs implements IConfigHandler
     public static class Generic
     {
         public static final ConfigOptionList    INFO_HUD_ALIGNMENT      = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\", used for schematic verifier mismatch positions etc.");
+        public static final ConfigBoolean       LOAD_ENTIRE_SCHEMATICS  = new ConfigBoolean(    "loadEntireSchematics", true, "If true, then the entire schematic is always loaded at once.\nIf false, then only the part that is within the client's view distance is loaded.");
         public static final ConfigOptionList    SELECTION_MODE          = new ConfigOptionList( "selectionMode", AreaSelectionMode.CORNERS, "The area selection mode to use");
         public static final ConfigOptionList    TOOL_HUD_ALIGNMENT      = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
         public static final ConfigString        TOOL_ITEM               = new ConfigString(     "toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
@@ -35,6 +36,7 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 INFO_HUD_ALIGNMENT,
+                LOAD_ENTIRE_SCHEMATICS,
                 SELECTION_MODE,
                 TOOL_HUD_ALIGNMENT,
                 TOOL_ITEM,

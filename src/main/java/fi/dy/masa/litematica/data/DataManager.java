@@ -49,12 +49,20 @@ public class DataManager
 
     @Nullable
     private static SchematicPlacement placementToVerify = null;
+    private static long clientTickStart;
 
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
 
     private DataManager()
     {
+    }
+
+    @Nullable
+    public static DataManager getInstance()
+    {
+        World world = Minecraft.getMinecraft().world;
+        return world != null ? getInstance(world) : null;
     }
 
     public static DataManager getInstance(World world)
@@ -74,6 +82,16 @@ public class DataManager
         }
 
         return instance;
+    }
+
+    public static void onClientTickStart()
+    {
+        clientTickStart = System.nanoTime();
+    }
+
+    public static long getClientTickStartTime()
+    {
+        return clientTickStart;
     }
 
     public static boolean addSchematicVerificationTask(SchematicPlacement placement)
@@ -100,6 +118,13 @@ public class DataManager
 
     public static void runSchematicVerification()
     {
+        DataManager manager = getInstance();
+
+        if (manager != null)
+        {
+            manager.getSchematicPlacementManager().processQueuedChunks();
+        }
+
         if (placementToVerify != null)
         {
             SchematicVerifier verifier = placementToVerify.getSchematicVerifier();

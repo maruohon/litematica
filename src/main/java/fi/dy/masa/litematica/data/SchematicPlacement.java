@@ -12,6 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.Box;
@@ -19,7 +20,6 @@ import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.Vec4f;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -80,6 +80,21 @@ public class SchematicPlacement
         return this.isEnabled() && this.renderSchematic;
     }
 
+    public boolean matchesRequirement(RequiredEnabled required)
+    {
+        if (required == RequiredEnabled.ANY)
+        {
+            return true;
+        }
+
+        if (required == RequiredEnabled.PLACEMENT_ENABLED)
+        {
+            return this.isEnabled();
+        }
+
+        return this.isEnabled() && this.renderSchematic;
+    }
+
     public boolean isRegionPlacementModified()
     {
         return this.regionPlacementsModified;
@@ -109,6 +124,19 @@ public class SchematicPlacement
     public File getSchematicFile()
     {
         return this.schematicFile;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public SchematicPlacement setBoxesBBColor(int color)
+    {
+        this.boxesBBColor = color;
+        this.boxesBBColorVec = new Vec4f(((color >> 16) & 0xFF) / 255f, ((color >> 8) & 0xFF) / 255f, (color & 0xFF) / 255f);
+        USED_COLORS.add(color);
+        return this;
     }
 
     public BlockPos getOrigin()
@@ -181,19 +209,31 @@ public class SchematicPlacement
         return this.relativeSubRegionPlacements.get(areaName);
     }
 
-    public ImmutableMap<String, Placement> getRelativeSubRegionPlacements()
+    public ImmutableMap<String, Placement> getEnabledRelativeSubRegionPlacements()
     {
         ImmutableMap.Builder<String, Placement> builder = ImmutableMap.builder();
 
         for (Map.Entry<String, Placement> entry : this.relativeSubRegionPlacements.entrySet())
         {
-            builder.put(entry.getKey(), entry.getValue());
+            Placement placement = entry.getValue();
+
+            if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
+            {
+                builder.put(entry.getKey(), entry.getValue());
+            }
         }
 
         return builder.build();
     }
 
-    public ImmutableMap<String, Box> getSubRegionBoxes()
+    /*
+    public ImmutableMap<String, Box> getAllSubRegionBoxes()
+    {
+        return this.getSubRegionBoxes(RequiredEnabled.ANY);
+    }
+    */
+
+    public ImmutableMap<String, Box> getSubRegionBoxes(RequiredEnabled required)
     {
         ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
         Map<String, BlockPos> areaSizes = this.schematic.getAreaSizes();
@@ -203,26 +243,53 @@ public class SchematicPlacement
             String name = entry.getKey();
             Placement placement = entry.getValue();
 
-            BlockPos boxOriginRelative = placement.getPos();
-            BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
-            BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSizes.get(name));
-            pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
-            pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
+            if (placement.matchesRequirement(required))
+            {
+                BlockPos boxOriginRelative = placement.getPos();
+                BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
+                BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSizes.get(name));
+                pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
+                pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
 
-            builder.put(name, new Box(boxOriginAbsolute, pos2, name));
+                builder.put(name, new Box(boxOriginAbsolute, pos2, name));
+            }
         }
 
         return builder.build();
     }
 
-    public Map<String, StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
+    public ImmutableMap<String, Box> getSubRegionBoxFor(String regionName, RequiredEnabled required)
     {
-        ImmutableMap<String, Box> map = this.getSubRegionBoxes();
+        ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
+        Map<String, BlockPos> areaSizes = this.schematic.getAreaSizes();
+
+        Placement placement = this.relativeSubRegionPlacements.get(regionName);
+
+        if (placement != null)
+        {
+            if (placement.matchesRequirement(required))
+            {
+                BlockPos boxOriginRelative = placement.getPos();
+                BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
+                BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSizes.get(regionName));
+                pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
+                pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
+
+                builder.put(regionName, new Box(boxOriginAbsolute, pos2, regionName));
+            }
+        }
+
+        return builder.build();
+    }
+
+    public Set<String> getRegionsTouchingChunk(int chunkX, int chunkZ)
+    {
+        ImmutableMap<String, Box> map = this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
         final int chunkXMin = chunkX << 4;
         final int chunkZMin = chunkZ << 4;
         final int chunkXMax = chunkXMin + 15;
         final int chunkZMax = chunkZMin + 15;
-        Map<String, StructureBoundingBox> mapOut = new HashMap<>();
+        Set<String> set = new HashSet<>();
 
         for (Map.Entry<String, Box> entry : map.entrySet())
         {
@@ -236,26 +303,54 @@ public class SchematicPlacement
 
             if (notOverlapping == false)
             {
-                final int xMin = Math.max(chunkXMin, boxXMin);
-                final int yMin = Math.min(box.getPos1().getY(), box.getPos2().getY());
-                final int zMin = Math.max(chunkZMin, boxZMin);
-                final int xMax = Math.min(chunkXMax, boxXMax);
-                final int yMax = Math.max(box.getPos1().getY(), box.getPos2().getY());
-                final int zMax = Math.min(chunkZMax, boxZMax);
+                set.add(entry.getKey());
+            }
+        }
 
-                mapOut.put(entry.getKey(), new StructureBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax));
+        return set;
+    }
+
+    public Map<String, StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
+    {
+        ImmutableMap<String, Box> map = this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
+        Map<String, StructureBoundingBox> mapOut = new HashMap<>();
+
+        for (Map.Entry<String, Box> entry : map.entrySet())
+        {
+            Box box = entry.getValue();
+            StructureBoundingBox bb = box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
+
+            if (bb != null)
+            {
+                mapOut.put(entry.getKey(), bb);
             }
         }
 
         return mapOut;
     }
 
+    @Nullable
+    public StructureBoundingBox getBoxWithinChunkForRegion(String regionName, int chunkX, int chunkZ)
+    {
+        Box box = this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED).get(regionName);
+        return box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
+    }
+
     public Set<ChunkPos> getTouchedChunks()
     {
-        ImmutableMap<String, Box> map = this.getSubRegionBoxes();
+        return this.getTouchedChunks(this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED));
+    }
+
+    public Set<ChunkPos> getTouchedChunksForRegion(String regionName)
+    {
+        return this.getTouchedChunks(this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED));
+    }
+
+    private Set<ChunkPos> getTouchedChunks(ImmutableMap<String, Box> boxes)
+    {
         Set<ChunkPos> set = new HashSet<>();
 
-        for (Box box : map.values())
+        for (Box box : boxes.values())
         {
             final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX()) >> 4;
             final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
@@ -274,80 +369,7 @@ public class SchematicPlacement
         return set;
     }
 
-    /**
-     * Moves the sub-region to the given <b>absolute</b> position.
-     * @param regionName
-     * @param newPos
-     */
-    public void moveSubRegionTo(String regionName, BlockPos newPos)
-    {
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
-        {
-            this.relativeSubRegionPlacements.get(regionName).setPos(newPos.subtract(this.origin));
-            this.checkAreSubRegionsModified();
-            this.updateRenderers();
-        }
-    }
-
-    public void setSubRegionRotation(String regionName, Rotation rotation)
-    {
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
-        {
-            this.relativeSubRegionPlacements.get(regionName).setRotation(rotation);
-            this.checkAreSubRegionsModified();
-            this.updateRenderers();
-        }
-    }
-
-    public void setSubRegionMirror(String regionName, Mirror mirror)
-    {
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
-        {
-            this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
-            this.checkAreSubRegionsModified();
-            this.updateRenderers();
-        }
-    }
-
-    public void toggleSubRegionEnabled(String regionName)
-    {
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
-        {
-            this.relativeSubRegionPlacements.get(regionName).toggleEnabled();
-            this.checkAreSubRegionsModified();
-            this.updateRenderers();
-        }
-    }
-
-    public void resetAllSubRegionsToSchematicValues()
-    {
-        Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
-        this.relativeSubRegionPlacements.clear();
-        this.regionPlacementsModified = false;
-
-        for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
-        {
-            String name = entry.getKey();
-            this.relativeSubRegionPlacements.put(name, new Placement(entry.getValue(), name));
-        }
-
-        this.updateRenderers();
-    }
-
-    public void resetSubRegionToSchematicValues(String regionName)
-    {
-        BlockPos pos = this.schematic.getSubRegionPosition(regionName);
-        Placement placement = this.relativeSubRegionPlacements.get(regionName);
-
-        if (pos != null && placement != null)
-        {
-            placement.resetToOriginalValues();
-            this.checkAreSubRegionsModified();
-            this.updateRenderers();
-        }
-    }
-
-    public void checkAreSubRegionsModified()
+    private void checkAreSubRegionsModified()
     {
         Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
 
@@ -371,12 +393,113 @@ public class SchematicPlacement
         this.regionPlacementsModified = false;
     }
 
+    /**
+     * Moves the sub-region to the given <b>absolute</b> position.
+     * @param regionName
+     * @param newPos
+     */
+    public void moveSubRegionTo(String regionName, BlockPos newPos)
+    {
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            this.relativeSubRegionPlacements.get(regionName).setPos(newPos.subtract(this.origin));
+            this.checkAreSubRegionsModified();
+            this.onModified(regionName, manager);
+        }
+    }
+
+    public void setSubRegionRotation(String regionName, Rotation rotation)
+    {
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            this.relativeSubRegionPlacements.get(regionName).setRotation(rotation);
+            this.checkAreSubRegionsModified();
+            this.onModified(regionName, manager);
+        }
+    }
+
+    public void setSubRegionMirror(String regionName, Mirror mirror)
+    {
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
+            this.checkAreSubRegionsModified();
+            this.onModified(regionName, manager);
+        }
+    }
+
+    public void toggleSubRegionEnabled(String regionName)
+    {
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            this.relativeSubRegionPlacements.get(regionName).toggleEnabled();
+            this.checkAreSubRegionsModified();
+            this.onModified(regionName, manager);
+        }
+    }
+
+    public void resetAllSubRegionsToSchematicValues()
+    {
+        // Marks the currently touched chunks before doing the modification
+        SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+        manager.onPrePlacementChange(this);
+
+        Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
+        this.relativeSubRegionPlacements.clear();
+        this.regionPlacementsModified = false;
+
+        for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
+        {
+            String name = entry.getKey();
+            this.relativeSubRegionPlacements.put(name, new Placement(entry.getValue(), name));
+        }
+
+        this.onModified(manager);
+    }
+
+    public void resetSubRegionToSchematicValues(String regionName)
+    {
+        BlockPos pos = this.schematic.getSubRegionPosition(regionName);
+        Placement placement = this.relativeSubRegionPlacements.get(regionName);
+
+        if (pos != null && placement != null)
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            placement.resetToOriginalValues();
+            this.checkAreSubRegionsModified();
+            this.onModified(regionName, manager);
+        }
+    }
+
     public void setEnabled(boolean enabled)
     {
         if (enabled != this.enabled)
         {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
             this.enabled = enabled;
-            this.updateRenderers();
+            this.onModified(manager);
         }
     }
 
@@ -390,41 +513,51 @@ public class SchematicPlacement
         if (render != this.renderSchematic)
         {
             this.renderSchematic = render;
-            this.updateRenderers();
         }
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public SchematicPlacement setOrigin(BlockPos origin)
     {
-        this.origin = origin;
-        this.updateRenderers();
+        if (this.origin.equals(origin) == false)
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            this.origin = origin;
+            this.onModified(manager);
+        }
+
         return this;
     }
 
     public SchematicPlacement setRotation(Rotation rotation)
     {
-        this.rotation = rotation;
-        this.updateRenderers();
+        if (this.rotation != rotation)
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            this.rotation = rotation;
+            this.onModified(manager);
+        }
+
         return this;
     }
 
     public SchematicPlacement setMirror(Mirror mirror)
     {
-        this.mirror = mirror;
-        this.updateRenderers();
-        return this;
-    }
+        if (this.mirror != mirror)
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
 
-    public SchematicPlacement setBoxesBBColor(int color)
-    {
-        this.boxesBBColor = color;
-        this.boxesBBColorVec = new Vec4f(((color >> 16) & 0xFF) / 255f, ((color >> 8) & 0xFF) / 255f, (color & 0xFF) / 255f);
-        USED_COLORS.add(color);
+            this.mirror = mirror;
+            this.onModified(manager);
+        }
+
         return this;
     }
 
@@ -433,10 +566,16 @@ public class SchematicPlacement
         return this.setBoxesBBColor(getNextBoxColor());
     }
 
-    public void updateRenderers()
+    private void onModified(SchematicPlacementManager manager)
     {
+        manager.onPostPlacementChange(this);
         OverlayRenderer.getInstance().updatePlacementCache();
-        SchematicWorldHandler.getInstance().rebuildSchematicWorld(true);
+    }
+
+    private void onModified(String regionName, SchematicPlacementManager manager)
+    {
+        manager.onPostPlacementChange(this);
+        OverlayRenderer.getInstance().updatePlacementCache();
     }
 
     public void onRemoved()
@@ -581,49 +720,6 @@ public class SchematicPlacement
         }
 
         return null;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((mirror == null) ? 0 : mirror.hashCode());
-        result = prime * result + ((origin == null) ? 0 : origin.hashCode());
-        result = prime * result + ((rotation == null) ? 0 : rotation.hashCode());
-        result = prime * result + ((schematic == null) ? 0 : schematic.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        SchematicPlacement other = (SchematicPlacement) obj;
-        if (mirror != other.mirror)
-            return false;
-        if (origin == null)
-        {
-            if (other.origin != null)
-                return false;
-        }
-        else if (!origin.equals(other.origin))
-            return false;
-        if (rotation != other.rotation)
-            return false;
-        if (schematic == null)
-        {
-            if (other.schematic != null)
-                return false;
-        }
-        else if (!schematic.equals(other.schematic))
-            return false;
-        return true;
     }
 
     private static int getNextBoxColor()

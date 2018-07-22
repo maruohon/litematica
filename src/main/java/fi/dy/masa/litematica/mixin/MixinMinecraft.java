@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.data.SchematicVerifier;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -40,7 +39,7 @@ public class MixinMinecraft
     @Inject(method = "runTick()V", at = @At("HEAD"))
     private void onRunTickStart(CallbackInfo ci)
     {
-        SchematicVerifier.onClientTickStart();
+        DataManager.onClientTickStart();
     }
 
     @Inject(method = "runTick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getSystemTime()J"))

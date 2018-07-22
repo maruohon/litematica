@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -177,7 +178,7 @@ public class RayTraceUtils
 
     private static boolean traceToPlacementBox(SchematicPlacement placement, Vec3d start, Vec3d end)
     {
-        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes();
+        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
         boolean hitSomething = false;
 
         for (Map.Entry<String, Box> entry : boxes.entrySet())

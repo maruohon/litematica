@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
+import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
 import fi.dy.masa.litematica.data.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult.BlockMismatchInfo;
@@ -90,7 +91,7 @@ public class OverlayRenderer
         {
             if (placement.isEnabled())
             {
-                this.placements.put(placement, placement.getSubRegionBoxes());
+                this.placements.put(placement, placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED));
             }
         }
     }

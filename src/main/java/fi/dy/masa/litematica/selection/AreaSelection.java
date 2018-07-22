@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.JsonUtils;
@@ -46,7 +47,7 @@ public class AreaSelection
 
     public static AreaSelection fromPlacement(SchematicPlacement placement)
     {
-        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes();
+        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
         BlockPos origin = placement.getOrigin();
 
         AreaSelection selection = new AreaSelection();

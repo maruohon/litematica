@@ -42,7 +42,6 @@ public class SchematicVerifier implements IStringListProvider
     private static final MutablePair<IBlockState, IBlockState> MUTABLE_PAIR = new MutablePair<>();
     private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
     private static final IBlockState AIR = Blocks.AIR.getDefaultState();
-    private static long clientTickStart;
     private static boolean verifierActive;
 
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> missingBlocksPositions = ArrayListMultimap.create();
@@ -80,11 +79,6 @@ public class SchematicVerifier implements IStringListProvider
     public List<String> getLines()
     {
         return this.infoLines;
-    }
-
-    public static void onClientTickStart()
-    {
-        clientTickStart = System.nanoTime();
     }
 
     public boolean isActive()
@@ -291,7 +285,7 @@ public class SchematicVerifier implements IStringListProvider
 
             while (iter.hasNext())
             {
-                if ((System.nanoTime() - clientTickStart) >= 50000000L)
+                if ((System.nanoTime() - DataManager.getClientTickStartTime()) >= 50000000L)
                 {
                     break;
                 }

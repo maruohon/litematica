@@ -20,6 +20,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class PositionUtils
 {
@@ -183,6 +184,36 @@ public class PositionUtils
         return volume;
     }
 
+    @Nullable
+    public static StructureBoundingBox getBoundsWithinChunkForBox(Box box, int chunkX, int chunkZ)
+    {
+        final int chunkXMin = chunkX << 4;
+        final int chunkZMin = chunkZ << 4;
+        final int chunkXMax = chunkXMin + 15;
+        final int chunkZMax = chunkZMin + 15;
+
+        final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX());
+        final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
+        final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX());
+        final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+
+        boolean notOverlapping = boxXMin > chunkXMax || boxZMin > chunkZMax || boxXMax < chunkXMin || boxZMax < chunkZMin;
+
+        if (notOverlapping == false)
+        {
+            final int xMin = Math.max(chunkXMin, boxXMin);
+            final int yMin = Math.min(box.getPos1().getY(), box.getPos2().getY());
+            final int zMin = Math.max(chunkZMin, boxZMin);
+            final int xMax = Math.min(chunkXMax, boxXMax);
+            final int yMax = Math.max(box.getPos1().getY(), box.getPos2().getY());
+            final int zMax = Math.min(chunkZMax, boxZMax);
+
+            return new StructureBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax);
+        }
+
+        return null;
+    }
+
     /**
      * Creates an enclosing AABB around the given positions. They will both be inside the box.
      */
@@ -257,6 +288,52 @@ public class PositionUtils
             default:
                 return isMirrored ? new BlockPos(x, y, z) : pos;
         }
+    }
+
+    public static BlockPos getReverseTransformedBlockPos(BlockPos pos, Mirror mirror, Rotation rotation)
+    {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        boolean isRotated = true;
+        int tmp = x;
+
+        switch (rotation)
+        {
+            case CLOCKWISE_90:
+                x = z;
+                z = -tmp;
+                break;
+            case COUNTERCLOCKWISE_90:
+                x = -z;
+                z = tmp;
+                break;
+            case CLOCKWISE_180:
+                x = -x;
+                z = -z;
+                break;
+            default:
+                isRotated = false;
+        }
+
+        switch (mirror)
+        {
+            // LEFT_RIGHT is essentially NORTH_SOUTH
+            case LEFT_RIGHT:
+                z = -z;
+                break;
+            // FRONT_BACK is essentially EAST_WEST
+            case FRONT_BACK:
+                x = -x;
+                break;
+            default:
+                if (isRotated == false)
+                {
+                    return pos;
+                }
+        }
+
+        return new BlockPos(x, y, z);
     }
 
     /**
