@@ -99,6 +99,7 @@ litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
 litematica.gui.label.schematic_placement.in_memory=IN-MEMORY ONLY
+litematica.gui.label.schematic_placement.rename_placement=Rename placement:
 litematica.gui.label.schematic_placement.schematic_file=File: %s
 litematica.gui.label.schematic_placement.schematic_name=Schematic: %s
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created

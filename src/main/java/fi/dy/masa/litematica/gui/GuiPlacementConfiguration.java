@@ -1,9 +1,9 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.base.GuiTextFieldGeneric;
 import fi.dy.masa.litematica.gui.base.GuiTextFieldNumeric;
 import fi.dy.masa.litematica.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -18,6 +18,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 {
     private final SchematicPlacement placement;
     private ButtonGeneric buttonResetPlacement;
+    private GuiTextField textFieldRename;
     private int id;
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
@@ -32,13 +33,18 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         super.initGui();
 
         this.id = 0;
-        int width = 120;
-        int x = this.width - width - 10;
-        int y = 20;
+        int width = 300;
+        int x = 20;
+        int y = 22;
 
-        this.createButton(x, y, width, ButtonListener.Type.REMOVE_PLACEMENT);
-        y += 22;
+        this.textFieldRename = new GuiTextFieldGeneric(this.id++, this.mc.fontRenderer, x, y + 2, width, 16);
+        this.textFieldRename.setMaxStringLength(256);
+        this.textFieldRename.setText(this.placement.getName());
+        this.addTextField(this.textFieldRename, null);
+        this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
 
+        width = 120;
+        x = this.width - width - 10;
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
         y += 32;
 
@@ -99,7 +105,7 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
         GuiTextFieldNumeric textField = new GuiTextFieldNumeric(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.placement, this);
-        this.addtextField(textField, listener);
+        this.addTextField(textField, listener);
     }
 
     private void createButton(int x, int y, int width, ButtonListener.Type type)
@@ -109,6 +115,10 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
         switch (type)
         {
+            case RENAME_PLACEMENT:
+                label = I18n.format("litematica.gui.button.rename");
+                break;
+
             case ROTATE:
             {
                 String value = PositionUtils.getRotationNameShort(this.placement.getRotation());
@@ -137,13 +147,14 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
             case RESET_SUB_REGIONS:
                 break;
 
-            case REMOVE_PLACEMENT:
-                label = TXT_RED + I18n.format("litematica.gui.button.remove_placement") + TXT_RST;
-                break;
-
             case OPEN_VERIFIER_GUI:
                 label = I18n.format("litematica.gui.button.schematic_verifier");
                 break;
+        }
+
+        if (width == -1)
+        {
+            width = this.fontRenderer.getStringWidth(label) + 10;
         }
 
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
@@ -175,11 +186,11 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
-        private final GuiLitematicaBase parent;
+        private final GuiPlacementConfiguration parent;
         private final SchematicPlacement placement;
         private final Type type;
 
-        public ButtonListener(Type type, SchematicPlacement placement, GuiLitematicaBase parent)
+        public ButtonListener(Type type, SchematicPlacement placement, GuiPlacementConfiguration parent)
         {
             this.parent = parent;
             this.placement = placement;
@@ -198,6 +209,10 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
             switch (this.type)
             {
+                case RENAME_PLACEMENT:
+                    this.placement.setName(this.parent.textFieldRename.getText());
+                    break;
+
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
@@ -225,11 +240,6 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
                     this.placement.resetAllSubRegionsToSchematicValues();
                     break;
 
-                case REMOVE_PLACEMENT:
-                    DataManager.getInstance(mc.world).getSchematicPlacementManager().removeSchematicPlacement(this.placement);
-                    mc.displayGuiScreen(null);
-                    break;
-
                 case OPEN_VERIFIER_GUI:
                     GuiSchematicVerifier gui = new GuiSchematicVerifier(this.placement);
                     gui.setParent(this.parent);
@@ -242,12 +252,12 @@ public class GuiPlacementConfiguration extends GuiLitematicaBase
 
         public enum Type
         {
+            RENAME_PLACEMENT,
             ROTATE,
             MIRROR,
             MOVE_HERE,
             TOGGLE_ENABLED,
             RESET_SUB_REGIONS,
-            REMOVE_PLACEMENT,
             OPEN_VERIFIER_GUI;
         }
     }

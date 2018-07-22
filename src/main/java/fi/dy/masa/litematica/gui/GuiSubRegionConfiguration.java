@@ -100,7 +100,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
         GuiTextFieldNumeric textField = new GuiTextFieldNumeric(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
-        this.addtextField(textField, listener);
+        this.addTextField(textField, listener);
     }
 
     private void createButton(int x, int y, int width, ButtonListener.Type type)

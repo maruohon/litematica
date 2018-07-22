@@ -44,7 +44,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     protected static final String BUTTON_LABEL_REMOVE = TextFormatting.DARK_RED + "-" + TextFormatting.RESET;
 
     public static final int COLOR_WHITE          = 0xFFFFFFFF;
-    public static final int TOOLTIP_BACKGROUND   = 0x80000000;
+    public static final int TOOLTIP_BACKGROUND   = 0xB0000000;
     public static final int COLOR_HORIZONTAL_BAR = 0xFF999999;
     protected static final int LEFT         = 20;
     protected static final int TOP          = 10;
@@ -363,7 +363,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
         return entry;
     }
 
-    protected <T extends GuiTextField> void addtextField(T textField, @Nullable ITextFieldListener<T> listener)
+    protected <T extends GuiTextField> void addTextField(T textField, @Nullable ITextFieldListener<T> listener)
     {
         this.textFields.add(new TextFieldEntry<>(textField, listener));
     }

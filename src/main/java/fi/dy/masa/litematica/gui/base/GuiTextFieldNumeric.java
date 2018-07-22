@@ -3,9 +3,8 @@ package fi.dy.masa.litematica.gui.base;
 import java.util.regex.Pattern;
 import com.google.common.base.Predicate;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiTextField;
 
-public class GuiTextFieldNumeric extends GuiTextField
+public class GuiTextFieldNumeric extends GuiTextFieldGeneric
 {
     private static final Pattern PATTER_NUMBER = Pattern.compile("-?[0-9]*");
 
