@@ -28,7 +28,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
     {
-        super(20, 60);
+        super(10, 60);
         this.placement = placement;
         this.title = I18n.format("litematica.gui.title.configure_schematic_placement");
     }
@@ -52,8 +52,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
 
         this.id = 0;
         int width = 300;
-        int x = 20;
-        int y = 22;
+        int x = 10;
+        int y = 28;
 
         this.textFieldRename = new GuiTextFieldGeneric(this.id++, this.mc.fontRenderer, x, y + 2, width, 16);
         this.textFieldRename.setMaxStringLength(256);

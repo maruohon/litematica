@@ -156,6 +156,12 @@ public class WidgetPlacementSubRegion extends WidgetBase
         this.parent.bindTexture(Icons.TEXTURE);
         icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
 
+        if (this.placement.isRegionPlacementModified(this.schematicPlacement.getSchematic().getAreaPositions().get(name)))
+        {
+            icon = Icons.NOTICE_EXCLAMATION_11;
+            icon.renderAt(this.buttonsStartX - icon.getWidth() - 2, this.y + 6, this.zLevel, false, false);
+        }
+
         for (int i = 0; i < this.buttons.size(); ++i)
         {
             this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
@@ -171,9 +177,16 @@ public class WidgetPlacementSubRegion extends WidgetBase
         text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.schematicPlacement.getSchematic().getMetadata().getName()));
         text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
 
-        if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
+        int offset = 12 + 11 + 2; // this.x + modified icon + gap to buttons
+
+        if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
             this.parent.drawHoveringText(text, mouseX, mouseY);
+        }
+        else if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - offset, this.y + 6, 11, 11))
+        {
+            String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_sub_region_modified");
+            this.parent.drawHoveringText(str, mouseX, mouseY);
         }
     }
 

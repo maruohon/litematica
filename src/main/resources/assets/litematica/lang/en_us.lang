@@ -153,6 +153,8 @@ litematica.hud.area_selection.selected_area=Area
 litematica.hud.area_selection.selected_sub_region=Sub-region
 litematica.hud.area_selection.selection_mode=Selection Mode: %s
 
+litematica.hud.schematic_placement.hover_info.placement_modified=This placement has been modified
+litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=This sub-region has been modified
 litematica.hud.schematic_placement.selected_placement=Placement
 litematica.hud.schematic_placement.selected_sub_region=Sub-region
 litematica.hud.schematic_placement.sub_region_count=Regions
