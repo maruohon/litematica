@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
+import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -28,15 +28,15 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
     }
 
     @Override
-    public File getInitialDirectory()
+    public String getBrowserContext()
     {
-        return DataManager.getCurrentSchematicManagerSaveDirectory();
+        return "schematic_save_imported";
     }
 
     @Override
-    public void storeCurrentDirectory(File dir)
+    public File getDefaultDirectory()
     {
-        DataManager.setCurrentSchematicManagerSaveDirectory(dir);
+        return DataManager.ROOT_SCHEMATIC_DIRECTORY;
     }
 
     @Override

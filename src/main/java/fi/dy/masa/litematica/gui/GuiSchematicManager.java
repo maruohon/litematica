@@ -4,12 +4,13 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
+import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.InfoUtils;
@@ -35,6 +36,18 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         super(10, 40);
 
         this.title = I18n.format("litematica.gui.title.schematic_manager");
+    }
+
+    @Override
+    public String getBrowserContext()
+    {
+        return "schematic_manager";
+    }
+
+    @Override
+    public File getDefaultDirectory()
+    {
+        return DataManager.ROOT_SCHEMATIC_DIRECTORY;
     }
 
     @Override

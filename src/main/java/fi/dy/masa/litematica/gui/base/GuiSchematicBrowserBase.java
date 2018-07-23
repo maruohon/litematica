@@ -1,11 +1,10 @@
 package fi.dy.masa.litematica.gui.base;
 
 import java.io.File;
-import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetDirectoryEntry;
+import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
 
 public abstract class GuiSchematicBrowserBase extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicBrowser>
 {
@@ -23,15 +22,14 @@ public abstract class GuiSchematicBrowserBase extends GuiListBase<DirectoryEntry
         return widget;
     }
 
-    public File getInitialDirectory()
-    {
-        return DataManager.getCurrentSchematicDirectory();
-    }
+    /**
+     * This is the string the DataManager uses for saving/loading/storing the last used directory
+     * for each browser GUI type/contet.
+     * @return
+     */
+    public abstract String getBrowserContext();
 
-    public void storeCurrentDirectory(File dir)
-    {
-        DataManager.setCurrentSchematicDirectory(dir);
-    }
+    public abstract File getDefaultDirectory();
 
     @Override
     protected ISelectionListener<DirectoryEntry> getSelectionListener()

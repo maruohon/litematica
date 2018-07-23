@@ -1,11 +1,12 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntry;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.DirectoryEntryType;
+import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -21,6 +22,18 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         super(10, 40);
 
         this.title = I18n.format("litematica.gui.title.load_schematic");
+    }
+
+    @Override
+    public String getBrowserContext()
+    {
+        return "schematic_load";
+    }
+
+    @Override
+    public File getDefaultDirectory()
+    {
+        return DataManager.ROOT_SCHEMATIC_DIRECTORY;
     }
 
     @Override

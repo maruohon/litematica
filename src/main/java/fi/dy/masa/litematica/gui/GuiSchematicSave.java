@@ -52,6 +52,18 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
     }
 
     @Override
+    public String getBrowserContext()
+    {
+        return "schematic_save";
+    }
+
+    @Override
+    public File getDefaultDirectory()
+    {
+        return DataManager.ROOT_SCHEMATIC_DIRECTORY;
+    }
+
+    @Override
     protected IButtonActionListener<ButtonGeneric> createButtonListener(ButtonType type)
     {
         return new ButtonListener(type, this.selectionManager, this);

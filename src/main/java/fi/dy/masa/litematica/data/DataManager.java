@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.data;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -38,8 +39,7 @@ public class DataManager
 
     private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)(@(?<meta>[0-9]+))$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
-    private static File lastSchematicDirectory = ROOT_SCHEMATIC_DIRECTORY;
-    private static File lastSchematicManagerSaveDirectory = ROOT_SCHEMATIC_DIRECTORY;
+    private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static OperationMode operationMode = OperationMode.PLACEMENT;
@@ -181,24 +181,23 @@ public class DataManager
         operationMode = mode;
     }
 
-    public static File getCurrentSchematicDirectory()
+    @Nullable
+    public static File getCurrentDirectoryForContext(String context, boolean useFallback)
     {
-        return lastSchematicDirectory;
+        File dir = LAST_DIRECTORIES.get(context);
+
+        if (dir == null && useFallback)
+        {
+            dir = ROOT_SCHEMATIC_DIRECTORY;
+            LAST_DIRECTORIES.put(context, dir);
+        }
+
+        return dir;
     }
 
-    public static void setCurrentSchematicDirectory(File dir)
+    public static void setCurrentDirectoryForContext(String context, File dir)
     {
-        lastSchematicDirectory = FileUtils.getCanonicalFileIfPossible(dir);
-    }
-
-    public static File getCurrentSchematicManagerSaveDirectory()
-    {
-        return lastSchematicManagerSaveDirectory;
-    }
-
-    public static void setCurrentSchematicManagerSaveDirectory(File dir)
-    {
-        lastSchematicManagerSaveDirectory = FileUtils.getCanonicalFileIfPossible(dir);
+        LAST_DIRECTORIES.put(context, dir);
     }
 
     public static void load()
@@ -232,8 +231,28 @@ public class DataManager
                 }
             }
 
-            lastSchematicDirectory = getDirectoryOrDefault(root, "last_directory");
-            lastSchematicManagerSaveDirectory = getDirectoryOrDefault(root, "last_directory_schem_mgr_save");
+            LAST_DIRECTORIES.clear();
+
+            if (JsonUtils.hasObject(root, "last_directories"))
+            {
+                JsonObject obj = root.get("last_directories").getAsJsonObject();
+
+                for (Map.Entry<String, JsonElement> entry : obj.entrySet())
+                {
+                    String name = entry.getKey();
+                    JsonElement el = entry.getValue();
+
+                    if (el.isJsonPrimitive())
+                    {
+                        File dir = new File(el.getAsString());
+
+                        if (dir.exists() && dir.isDirectory())
+                        {
+                            LAST_DIRECTORIES.put(name, dir);
+                        }
+                    }
+                }
+            }
 
             if (JsonUtils.hasString(root, "operation_mode"))
             {
@@ -249,21 +268,6 @@ public class DataManager
                 }
             }
         }
-    }
-
-    private static File getDirectoryOrDefault(JsonObject obj, String key)
-    {
-        if (JsonUtils.hasString(obj, key))
-        {
-            File dir = new File(obj.get(key).getAsString());
-
-            if (dir.exists() && dir.isDirectory())
-            {
-                return dir;
-            }
-        }
-
-        return ROOT_SCHEMATIC_DIRECTORY;
     }
 
     public static void save()
@@ -284,8 +288,14 @@ public class DataManager
             root.add("data", arr);
         }
 
-        root.add("last_directory", new JsonPrimitive(lastSchematicDirectory.getAbsolutePath()));
-        root.add("last_directory_schem_mgr_save", new JsonPrimitive(lastSchematicManagerSaveDirectory.getAbsolutePath()));
+        JsonObject o = new JsonObject();
+
+        for (Map.Entry<String, File> entry : LAST_DIRECTORIES.entrySet())
+        {
+            o.add(entry.getKey(), new JsonPrimitive(entry.getValue().getAbsolutePath()));
+            root.add("last_directories", o);
+        }
+
         root.add("operation_mode", new JsonPrimitive(operationMode.name()));
 
         File file = getCurrentStorageFile();
