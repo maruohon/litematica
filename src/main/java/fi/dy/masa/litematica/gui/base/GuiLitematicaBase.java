@@ -298,7 +298,7 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
     @Override
     public void addMessage(InfoType type, String messageKey, Object... args)
     {
-        this.addGuiMessage(type, messageKey, 3000, args);
+        this.addGuiMessage(type, messageKey, 5000, args);
     }
 
     public void addGuiMessage(InfoType type, String messageKey, int displayTimeMs, Object... args)
@@ -577,11 +577,39 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
             {
                 int width = this.fontRenderer.getStringWidth(str);
 
-                if (lineWidth > 0 && (lineWidth + width + spaceWidth) > this.maxLineWidth)
+                if ((lineWidth + width + spaceWidth) > this.maxLineWidth)
                 {
-                    this.message.add(sb.toString());
-                    sb = new StringBuilder(this.maxLineWidth + 32);
-                    lineWidth = 0;
+                    if (lineWidth > 0)
+                    {
+                        this.message.add(sb.toString());
+                        sb = new StringBuilder(this.maxLineWidth + 32);
+                        lineWidth = 0;
+                    }
+
+                    // Long continuous string
+                    if (width > this.maxLineWidth)
+                    {
+                        final int chars = str.length();
+
+                        for (int i = 0; i < chars; ++i)
+                        {
+                            String c = str.substring(i, i + 1);
+                            lineWidth += this.fontRenderer.getStringWidth(c);
+
+                            if (lineWidth > this.maxLineWidth)
+                            {
+                                this.message.add(sb.toString());
+                                sb = new StringBuilder(this.maxLineWidth + 32);
+                                lineWidth = 0;
+                            }
+
+                            sb.append(c);
+                        }
+
+                        this.message.add(sb.toString());
+                        sb = new StringBuilder(this.maxLineWidth + 32);
+                        lineWidth = 0;
+                    }
                 }
 
                 if (lineWidth > 0)
@@ -589,8 +617,11 @@ public abstract class GuiLitematicaBase extends GuiScreen implements IMessageCon
                     sb.append(" ");
                 }
 
-                sb.append(str);
-                lineWidth += width;
+                if (width <= this.maxLineWidth)
+                {
+                    sb.append(str);
+                    lineWidth += width;
+                }
             }
 
             this.message.add(sb.toString());
