@@ -1,14 +1,10 @@
 package fi.dy.masa.litematica.event;
 
-import java.util.List;
-import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.ToolHud;
-import fi.dy.masa.litematica.util.RayTraceUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.BlockPos;
 
 public class RenderEventHandler
 {
@@ -62,10 +58,7 @@ public class RenderEventHandler
             }
 
             OverlayRenderer.getInstance().renderSelectionAreas();
-
-            List<BlockPos> posList = DataManager.getSelectedMismatchPositionsForRender();
-            BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 10);
-            OverlayRenderer.getInstance().renderSchematicMismatches(posList, posLook, partialTicks);
+            OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
         }
     }
 

@@ -1,9 +1,7 @@
 package fi.dy.masa.litematica.data;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,7 +13,6 @@ import com.google.gson.JsonPrimitive;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
@@ -28,7 +25,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class DataManager
@@ -44,9 +40,6 @@ public class DataManager
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static OperationMode operationMode = OperationMode.PLACEMENT;
-    private static List<BlockPos> selectedMismatchPositions = new ArrayList<>();
-    @Nullable
-    private static MismatchType selectedMismatchType = null;
 
     @Nullable
     private static SchematicPlacement placementToVerify = null;
@@ -132,29 +125,6 @@ public class DataManager
             verifier.verifyChunks();
             verifier.checkChangedPositions();
         }
-    }
-
-    public static void setActiveMismatchPositionsForRender(MismatchType type, List<BlockPos> list)
-    {
-        selectedMismatchType = type;
-        selectedMismatchPositions.clear();
-        selectedMismatchPositions.addAll(list);
-    }
-
-    public static void clearActiveMismatchRenderPositions()
-    {
-        selectedMismatchPositions.clear();
-    }
-
-    @Nullable
-    public static MismatchType getSelectedMismatchTypeForRender()
-    {
-        return selectedMismatchType;
-    }
-
-    public static List<BlockPos> getSelectedMismatchPositionsForRender()
-    {
-        return selectedMismatchPositions;
     }
 
     public static ItemStack getToolItem()

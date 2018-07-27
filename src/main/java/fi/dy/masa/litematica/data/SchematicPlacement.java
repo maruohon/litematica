@@ -165,6 +165,11 @@ public class SchematicPlacement
         return this.subRegionCount;
     }
 
+    public boolean hasVerifier()
+    {
+        return this.verifier != null;
+    }
+
     public SchematicVerifier getSchematicVerifier()
     {
         if (this.verifier == null)

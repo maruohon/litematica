@@ -140,9 +140,12 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 break;
 
             case RESET_VERIFIER:
+            {
                 label = I18n.format("litematica.gui.button.schematic_verifier.reset_verifier");
-                enabled = true;//this.placement.getSchematicVerifier().isFinished();
+                SchematicVerifier verifier = this.placement.getSchematicVerifier();
+                enabled = verifier.isActive() || verifier.isPaused() || verifier.isFinished();
                 break;
+            }
 
             case RESET_IGNORED:
                 label = I18n.format("litematica.gui.button.schematic_verifier.reset_ignored");
@@ -209,7 +212,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 this.selectedDataEntry = null;
                 this.widget.clearSelection();
                 InfoHud.getInstance().removeLineProvidersOfType(SchematicVerifier.class);
-                DataManager.clearActiveMismatchRenderPositions();
+                this.placement.getSchematicVerifier().clearActiveMismatchRenderPositions();
             }
             else if (entry.type == BlockMismatchEntry.Type.DATA || entry.type == BlockMismatchEntry.Type.CATEGORY_TITLE)
             {

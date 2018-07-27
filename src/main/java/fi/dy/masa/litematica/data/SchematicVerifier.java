@@ -61,6 +61,9 @@ public class SchematicVerifier implements IStringListProvider
     private SchematicPlacement schematicPlacement;
     @Nullable
     private ICompletionListener completionListener;
+    private List<BlockPos> selectedMismatchPositions = new ArrayList<>();
+    @Nullable
+    private MismatchType selectedMismatchType = null;
     private boolean verificationStarted;
     private boolean verificationActive;
     private boolean finished;
@@ -136,6 +139,29 @@ public class SchematicVerifier implements IStringListProvider
         return this.wrongStatesPositions.size();
     }
 
+    public void setActiveMismatchPositionsForRender(MismatchType type, List<BlockPos> list)
+    {
+        this.selectedMismatchType = type;
+        this.selectedMismatchPositions.clear();
+        this.selectedMismatchPositions.addAll(list);
+    }
+
+    public void clearActiveMismatchRenderPositions()
+    {
+        this.selectedMismatchPositions.clear();
+    }
+
+    @Nullable
+    public MismatchType getSelectedMismatchTypeForRender()
+    {
+        return this.selectedMismatchType;
+    }
+
+    public List<BlockPos> getSelectedMismatchPositionsForRender()
+    {
+        return this.selectedMismatchPositions;
+    }
+
     public void startVerification(WorldClient worldClient, WorldSchematic worldSchematic,
             SchematicPlacement schematicPlacement, ICompletionListener completionListener)
     {
@@ -204,7 +230,7 @@ public class SchematicVerifier implements IStringListProvider
         this.blockMismatches.clear();
 
         InfoHud.getInstance().removeLineProvider(this);
-        DataManager.clearActiveMismatchRenderPositions();
+        this.clearActiveMismatchRenderPositions();
     }
 
     public void markBlockChanged(BlockPos pos)
@@ -268,11 +294,9 @@ public class SchematicVerifier implements IStringListProvider
 
     private void updateActiveMismatchOverlay()
     {
-        MismatchType mismatchType = DataManager.getSelectedMismatchTypeForRender();
-
-        if (mismatchType != null)
+        if (this.selectedMismatchType != null)
         {
-            this.updateMismatchOverlaysForType(mismatchType);
+            this.updateMismatchOverlaysForType(this.selectedMismatchType);
         }
     }
 
@@ -288,7 +312,7 @@ public class SchematicVerifier implements IStringListProvider
             this.updateClosestPositions(mc.player, this.maxEntries);
 
             List<BlockPos> positionList = this.getClosestMismatchedPositionsFor(mismatchType);
-            DataManager.setActiveMismatchPositionsForRender(mismatchType, positionList);
+            this.setActiveMismatchPositionsForRender(mismatchType, positionList);
 
             this.updateMismatchPositionStringList(mismatchType, positionList);
         }

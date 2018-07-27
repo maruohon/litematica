@@ -9,9 +9,10 @@ import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
-import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
+import fi.dy.masa.litematica.data.SchematicVerifier;
 import fi.dy.masa.litematica.data.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult.BlockMismatchInfo;
@@ -269,10 +270,30 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSchematicMismatches(List<BlockPos> posList, @Nullable BlockPos lookPos, float partialTicks)
+    public void renderSchematicMismatches(float partialTicks)
     {
-        MismatchType type = DataManager.getSelectedMismatchTypeForRender();
+        DataManager manager = DataManager.getInstance();
 
+        if (manager != null)
+        {
+            SchematicPlacement placement = manager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+            if (placement != null && placement.hasVerifier())
+            {
+                SchematicVerifier verifier = placement.getSchematicVerifier();
+
+                if (verifier.getSelectedMismatchTypeForRender() != null)
+                {
+                    List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
+                    BlockPos posLook = RayTraceUtils.traceToPositions(this.mc.world, posList, this.mc.player, 10);
+                    this.renderSchematicMismatches(verifier.getSelectedMismatchTypeForRender(), posList, posLook, partialTicks);
+                }
+            }
+        }
+    }
+
+    private void renderSchematicMismatches(MismatchType type, List<BlockPos> posList, @Nullable BlockPos lookPos, float partialTicks)
+    {
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
         GlStateManager.disableLighting();
@@ -345,14 +366,15 @@ public class OverlayRenderer
         {
             SchematicPlacement placement = DataManager.getInstance(mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-            if (placement != null)
+            if (placement != null && placement.hasVerifier())
             {
-                List<BlockPos> posList = DataManager.getSelectedMismatchPositionsForRender();
+                SchematicVerifier verifier = placement.getSchematicVerifier();
+                List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
                 BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 10);
 
                 if (posLook != null)
                 {
-                    BlockMismatch mismatch = placement.getSchematicVerifier().getMismatchForPosition(posLook);
+                    BlockMismatch mismatch = verifier.getMismatchForPosition(posLook);
 
                     if (mismatch != null)
                     {
