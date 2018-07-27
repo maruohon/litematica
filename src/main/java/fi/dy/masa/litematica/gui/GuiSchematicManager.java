@@ -1,9 +1,12 @@
 package fi.dy.masa.litematica.gui;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
@@ -324,28 +327,39 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
             if (schematic != null)
             {
-                Minecraft mc = Minecraft.getMinecraft();
-                BufferedImage buf = ScreenShotHelper.createScreenshot(mc.displayWidth, mc.displayHeight, mc.getFramebuffer());
+                try
+                {
+                    Minecraft mc = Minecraft.getMinecraft();
+                    BufferedImage screenshot = ScreenShotHelper.createScreenshot(mc.displayWidth, mc.displayHeight, mc.getFramebuffer());
 
-                int x = buf.getWidth() >= buf.getHeight() ? (buf.getWidth() - buf.getHeight()) / 2 : 0;
-                int y = buf.getHeight() >= buf.getWidth() ? (buf.getHeight() - buf.getWidth()) / 2 : 0;
-                int size = Math.min(buf.getWidth(), buf.getHeight());
-                System.out.printf("w: %d, h: %d, x: %d, y: %d\n", buf.getWidth(), buf.getHeight(), x, y);
-                //int[] pixels = buf.getRGB(x, y, size, size, null, 0, buf.getWidth());
+                    int x = screenshot.getWidth() >= screenshot.getHeight() ? (screenshot.getWidth() - screenshot.getHeight()) / 2 : 0;
+                    int y = screenshot.getHeight() >= screenshot.getWidth() ? (screenshot.getHeight() - screenshot.getWidth()) / 2 : 0;
+                    int longerSide = Math.min(screenshot.getWidth(), screenshot.getHeight());
+                    //System.out.printf("w: %d, h: %d, x: %d, y: %d\n", screenshot.getWidth(), screenshot.getHeight(), x, y);
 
-                int previewDimensions = 140;
-                BufferedImage smallBuf = new BufferedImage(previewDimensions, previewDimensions, 1);
-                Graphics graphics = smallBuf.createGraphics();
-                graphics.drawImage(buf, 0, 0, previewDimensions, previewDimensions, x, y, x + size, y + size, null);
-                graphics.dispose();
-                int[] pixels = smallBuf.getRGB(0, 0, previewDimensions, previewDimensions, null, 0, smallBuf.getWidth());
+                    int previewDimensions = 140;
+                    double scaleFactor = (double) previewDimensions / longerSide;
+                    BufferedImage scaled = new BufferedImage(previewDimensions, previewDimensions, BufferedImage.TYPE_INT_ARGB);
+                    AffineTransform at = new AffineTransform();
+                    at.scale(scaleFactor, scaleFactor);
+                    AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
 
-                schematic.getMetadata().setPreviewImagePixelData(pixels);
-                schematic.getMetadata().setTimeModified(System.currentTimeMillis());
+                    Graphics2D graphics = scaled.createGraphics();
+                    graphics.drawImage(screenshot.getSubimage(x, y, longerSide, longerSide), scaleOp, 0, 0);
 
-                schematic.writeToFile(this.dir, this.fileName, true, InfoUtils.INFO_MESSAGE_CONSUMER);
+                    int[] pixels = scaled.getRGB(0, 0, previewDimensions, previewDimensions, null, 0, scaled.getWidth());
 
-                InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiLitematicaBase.TXT_GREEN + I18n.format("litematica.info.schematic_manager.preview.success"));
+                    schematic.getMetadata().setPreviewImagePixelData(pixels);
+                    schematic.getMetadata().setTimeModified(System.currentTimeMillis());
+
+                    schematic.writeToFile(this.dir, this.fileName, true, InfoUtils.INFO_MESSAGE_CONSUMER);
+
+                    InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiLitematicaBase.TXT_GREEN + I18n.format("litematica.info.schematic_manager.preview.success"));
+                }
+                catch (Exception e)
+                {
+                    LiteModLitematica.logger.warn("Exception while creating preview image", e);
+                }
             }
             else
             {
