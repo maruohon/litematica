@@ -297,17 +297,46 @@ public class SelectionManager
                 // Moving the origin point
                 else
                 {
-                    BlockPos old = sel.getOrigin();
-                    sel.setOrigin(pos);
-                    String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
-                    String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    StringUtils.printActionbarMessage("litematica.message.moved_area_origin", posStrOld, posStrNew);
+                    this.moveSelectionOrigin(sel, pos);
                 }
             }
         }
     }
 
-    public void resetSelectionToClickedPosition(Minecraft mc, double maxDistance)
+    public void moveSelectionOrigin(AreaSelection selection, BlockPos newOrigin)
+    {
+        BlockPos old = selection.getOrigin();
+        selection.setOrigin(newOrigin);
+        String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+        String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
+        StringUtils.printActionbarMessage("litematica.message.moved_area_origin", posStrOld, posStrNew);
+    }
+
+    public void handleCuboidModeMouseClick(Minecraft mc, double maxDistance, boolean isRightClick)
+    {
+        AreaSelection selection = this.getCurrentSelection();
+
+        if (selection != null)
+        {
+            if (selection.isOriginSelected())
+            {
+                BlockPos newOrigin = this.getTargetedPosition(mc.world, mc.player, maxDistance);
+                this.moveSelectionOrigin(selection, newOrigin);
+            }
+            // Right click in Cuboid mode: Reset the area to the clicked position
+            else if (isRightClick)
+            {
+                this.resetSelectionToClickedPosition(mc, maxDistance);
+            }
+            // Left click in Cuboid mode: Grow the selection to contain each clicked position
+            else
+            {
+                this.growSelectionToContainClickedPosition(mc, maxDistance);
+            }
+        }
+    }
+
+    private void resetSelectionToClickedPosition(Minecraft mc, double maxDistance)
     {
         AreaSelection sel = this.getCurrentSelection();
 
@@ -323,7 +352,7 @@ public class SelectionManager
         }
     }
 
-    public void growSelectionToContainClickedPosition(Minecraft mc, double maxDistance)
+    private void growSelectionToContainClickedPosition(Minecraft mc, double maxDistance)
     {
         AreaSelection sel = this.getCurrentSelection();
 

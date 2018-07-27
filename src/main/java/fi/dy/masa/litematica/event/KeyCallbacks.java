@@ -102,16 +102,7 @@ public class KeyCallbacks
                         }
                         else if (Configs.Generic.SELECTION_MODE.getOptionListValue() == AreaSelectionMode.CUBOID)
                         {
-                            // Left click in Cuboid mode: Grow the selection to contain each clicked position
-                            if (isToolPrimary)
-                            {
-                                sm.growSelectionToContainClickedPosition(this.mc, maxDistance);
-                            }
-                            // Right click in Cuboid mode: Reset the area to the clicked position
-                            else
-                            {
-                                sm.resetSelectionToClickedPosition(this.mc, maxDistance);
-                            }
+                            sm.handleCuboidModeMouseClick(mc, maxDistance, isToolSecondary);
                         }
                     }
                     else if (mode == OperationMode.PLACEMENT)
