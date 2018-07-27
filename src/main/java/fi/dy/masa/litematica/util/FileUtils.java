@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 public class FileUtils
 {
@@ -63,5 +64,10 @@ public class FileUtils
     {
         int i = name.lastIndexOf(".");
         return i != -1 ? name.substring(0, i) : name;
+    }
+
+    public static String generateSafeFileName(String name)
+    {
+        return name.toLowerCase(Locale.US).replaceAll("\\W", "_");
     }
 }

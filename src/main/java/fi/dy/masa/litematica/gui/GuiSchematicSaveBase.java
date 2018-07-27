@@ -4,6 +4,7 @@ import java.io.File;
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
@@ -156,9 +157,9 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     public static class DirectoryCreator implements IStringConsumer
     {
         private final File dir;
-        private final GuiSchematicSaveBase parent;
+        private final GuiLitematicaBase parent;
 
-        public DirectoryCreator(File dir, GuiSchematicSaveBase parent)
+        public DirectoryCreator(File dir, GuiLitematicaBase parent)
         {
             this.dir = dir;
             this.parent = parent;
@@ -167,12 +168,6 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         @Override
         public void setString(String string)
         {
-            if (this.dir.exists() == false)
-            {
-                this.parent.addMessage(InfoType.ERROR, "litematica.error.schematic_save.directory_doesnt_exist", this.dir.getAbsolutePath());
-                return;
-            }
-
             if (string.isEmpty())
             {
                 this.parent.addMessage(InfoType.ERROR, "litematica.error.schematic_save.invalid_directory", string);

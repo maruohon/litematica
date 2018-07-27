@@ -15,9 +15,9 @@ import net.minecraft.client.renderer.GlStateManager;
 public class WidgetDirectoryEntry extends WidgetBase
 {
     protected final IDirectoryNavigator navigator;
-    private final DirectoryEntry entry;
-    private final Minecraft mc;
-    private final boolean isOdd;
+    protected final DirectoryEntry entry;
+    protected final Minecraft mc;
+    protected final boolean isOdd;
 
     public WidgetDirectoryEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
             DirectoryEntry entry, Minecraft mc, IDirectoryNavigator navigator)
@@ -53,45 +53,55 @@ public class WidgetDirectoryEntry extends WidgetBase
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        Icons widget;
+        Icons icon = null;
 
         switch (this.entry.getType())
         {
-            case DIRECTORY:             widget = Icons.FILE_ICON_DIR; break;
-            case LITEMATICA_SCHEMATIC:  widget = Icons.FILE_ICON_LITEMATIC; break;
-            case SCHEMATICA_SCHEMATIC:  widget = Icons.FILE_ICON_SCHEMATIC; break;
-            case VANILLA_STRUCTURE:     widget = Icons.FILE_ICON_VANILLA; break;
-            default: return;
+            case DIRECTORY:             icon = Icons.FILE_ICON_DIR; break;
+            //case JSON:                  icon = Icons.FILE_ICON_JSON; break;
+            case LITEMATICA_SCHEMATIC:  icon = Icons.FILE_ICON_LITEMATIC; break;
+            case SCHEMATICA_SCHEMATIC:  icon = Icons.FILE_ICON_SCHEMATIC; break;
+            case VANILLA_STRUCTURE:     icon = Icons.FILE_ICON_VANILLA; break;
+            default:
         }
 
-        GlStateManager.color(1, 1, 1, 1);
-        this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
+        int iconWidth = icon != null ? icon.getWidth() : 0;
+        int xOffset = iconWidth + 2;
 
-        widget.renderAt(this.x, this.y + 1, this.zLevel, false, false);
-        int iw = widget.getWidth();
+        if (icon != null)
+        {
+            GlStateManager.color(1, 1, 1, 1);
+            this.mc.getTextureManager().bindTexture(Icons.TEXTURE);
+            icon.renderAt(this.x, this.y + (this.height - icon.getHeight()) / 2, this.zLevel, false, false);
+        }
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiLitematicaBase.drawRect(this.x + iw + 2, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
+            GuiLitematicaBase.drawRect(this.x + xOffset, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
         }
         else if (this.isOdd)
         {
-            GuiLitematicaBase.drawRect(this.x + iw + 2, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
+            GuiLitematicaBase.drawRect(this.x + xOffset, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiLitematicaBase.drawRect(this.x + iw + 2, this.y, this.x + this.width, this.y + this.height, 0x38FFFFFF);
+            GuiLitematicaBase.drawRect(this.x + xOffset, this.y, this.x + this.width, this.y + this.height, 0x38FFFFFF);
         }
 
         // Draw an outline if this is the currently selected entry
         if (selected)
         {
-            RenderUtils.drawOutline(this.x + iw + 2, this.y, this.width - iw - 2, this.height, 0xEEEEEEEE);
+            RenderUtils.drawOutline(this.x + xOffset, this.y, this.width - iconWidth - 2, this.height, 0xEEEEEEEE);
         }
 
-        String name = FileUtils.getNameWithoutExtension(this.entry.getName());
-        this.mc.fontRenderer.drawString(name, this.x + iw + 4, this.y + 3, 0xFFFFFFFF);
+        int yOffset = (this.height - this.mc.fontRenderer.FONT_HEIGHT) / 2 + 1;
+        this.mc.fontRenderer.drawString(this.getDisplayName(), this.x + xOffset + 2, this.y + yOffset, 0xFFFFFFFF);
+    }
+
+    protected String getDisplayName()
+    {
+        return FileUtils.getNameWithoutExtension(this.entry.getName());
     }
 }

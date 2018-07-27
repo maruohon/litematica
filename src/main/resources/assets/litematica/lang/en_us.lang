@@ -2,6 +2,8 @@ language.name=English
 language.region=US
 language.code=en_US
 
+litematica.error.area_selection.rename.already_exists=Error: An area already exists with the given name '%s'
+
 litematica.error.duplicate_schematic_load=Error: Tried to load a duplicate schematic + placement
 litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
 litematica.error.generic.schematic_world_not_loaded=Schematic world was not loaded
@@ -39,6 +41,9 @@ litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the 
 litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot=Use the screenshot keybind to set the preview
 litematica.info.schematic_manager.preview.success=Preview image successfully set
 
+litematica.gui.button.area_selections.create_directory=Create directory
+litematica.gui.button.area_selections.create_selection=Create selection
+
 litematica.gui.button.change_menu.create_schematic_from_area=Create schematic from selection
 litematica.gui.button.change_menu.load_schematics_to_memory=Load schematics to memory
 litematica.gui.button.change_menu.schematic_manager=Schematic Manager
@@ -66,6 +71,7 @@ litematica.gui.button.schematic_verifier.stop=Stop verification
 litematica.gui.button.schematic_verifier.toggle_info_hud=Info HUD: %s
 
 litematica.gui.button.cancel=Cancel
+litematica.gui.button.configure=Configure
 litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.create_placement=Create placement
 litematica.gui.button.disable=Disable

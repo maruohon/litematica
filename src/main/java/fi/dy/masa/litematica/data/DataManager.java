@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 
 public class DataManager
 {
+    public static final File ROOT_AREA_SELECTIONS_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(getCurrentConfigDirectory(), "area_selections"));
     public static final File ROOT_SCHEMATIC_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getMinecraft().mcDataDir, "schematics"));
 
     private static final Int2ObjectOpenHashMap<DataManager> INSTANCES = new Int2ObjectOpenHashMap<>();
@@ -182,17 +183,9 @@ public class DataManager
     }
 
     @Nullable
-    public static File getCurrentDirectoryForContext(String context, boolean useFallback)
+    public static File getCurrentDirectoryForContext(String context)
     {
-        File dir = LAST_DIRECTORIES.get(context);
-
-        if (dir == null && useFallback)
-        {
-            dir = ROOT_SCHEMATIC_DIRECTORY;
-            LAST_DIRECTORIES.put(context, dir);
-        }
-
-        return dir;
+        return LAST_DIRECTORIES.get(context);
     }
 
     public static void setCurrentDirectoryForContext(String context, File dir)
@@ -326,9 +319,14 @@ public class DataManager
         return obj;
     }
 
+    public static File getCurrentConfigDirectory()
+    {
+        return new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+    }
+
     private static File getCurrentStorageFile()
     {
-        File dir = new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+        File dir = getCurrentConfigDirectory();
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {

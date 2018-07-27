@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
-import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.interfaces.IDirectoryNavigator;
@@ -79,7 +78,7 @@ public class WidgetDirectoryNavigation extends WidgetBase
 
         int textColor = 0xC0C0C0C0;
         int maxLen = (this.width - 40) / this.mc.fontRenderer.getStringWidth("a") - 4;
-        String path = FileUtils.getJoinedTrailingPathElements(this.currentDir, DataManager.ROOT_SCHEMATIC_DIRECTORY, maxLen, " / ");
+        String path = FileUtils.getJoinedTrailingPathElements(this.currentDir, this.rootDir, maxLen, " / ");
         this.mc.fontRenderer.drawString(path, this.x + iw * 2 + 9, this.y + 3, textColor);
     }
 }

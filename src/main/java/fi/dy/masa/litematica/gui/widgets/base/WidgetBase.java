@@ -17,6 +17,16 @@ public abstract class WidgetBase
         this.zLevel = zLevel;
     }
 
+    public int getWidth()
+    {
+        return this.width;
+    }
+
+    public int getHeight()
+    {
+        return this.height;
+    }
+
     public boolean isMouseOver(int mouseX, int mouseY)
     {
         return mouseX >= this.x && mouseX < this.x + this.width &&

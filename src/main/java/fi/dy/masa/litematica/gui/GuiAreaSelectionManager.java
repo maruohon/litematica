@@ -1,34 +1,49 @@
 package fi.dy.masa.litematica.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.litematica.gui.GuiSchematicSaveBase.DirectoryCreator;
+import fi.dy.masa.litematica.gui.base.GuiListBase;
+import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
+import fi.dy.masa.litematica.gui.widgets.WidgetAreaSelectionBrowser;
+import fi.dy.masa.litematica.gui.widgets.WidgetDirectoryEntry;
+import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
-import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 
-public class GuiAreaSelectionManager extends GuiLitematicaBase
+public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetAreaSelectionBrowser> implements ISelectionListener<DirectoryEntry>
 {
-    private final List<String> selectionNames = new ArrayList<>();
     private SelectionManager selectionManager;
+    private int id;
 
     public GuiAreaSelectionManager()
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        this.title = I18n.format("litematica.gui.title.area_selection_manager");
+        super(10, 50);
 
-        if (mc.world != null)
+        this.title = I18n.format("litematica.gui.title.area_selection_manager");
+        this.mc = Minecraft.getMinecraft();
+
+        if (this.mc.world != null)
         {
-            this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
+            this.selectionManager = DataManager.getInstance(this.mc.world).getSelectionManager();
         }
+    }
+
+    @Override
+    protected int getBrowserWidth()
+    {
+        return this.width - 20;
+    }
+
+    @Override
+    protected int getBrowserHeight()
+    {
+        return this.height - 80;
     }
 
     @Override
@@ -36,125 +51,103 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
     {
         super.initGui();
 
-        this.updateEntries();
+        this.id = 0;
+        int x = this.mc.currentScreen.width - 13;
+        int y = 24;
+
+        x = this.createButton(x, y, ButtonListener.ButtonType.CREATE_DIRECTORY);
+        x = this.createButton(x, y, ButtonListener.ButtonType.CREATE_SELECTION);
     }
 
-    private void updateNames()
+    private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
-        this.selectionNames.clear();
+        String label = I18n.format(type.getLabelKey());
+        int len = this.mc.fontRenderer.getStringWidth(label) + 10;
+        x -= (len + 2);
+        this.addButton(new ButtonGeneric(this.id++, x, y, len, 20, label), new ButtonListener(type, this));
 
-        if (this.selectionManager != null)
+        return x;
+    }
+
+    /**
+     * This is the string the DataManager uses for saving/loading/storing the last used directory
+     * for each browser GUI type/contet.
+     * @return
+     */
+    public String getBrowserContext()
+    {
+        return "area_selections";
+    }
+
+    public File getDefaultDirectory()
+    {
+        return DataManager.ROOT_AREA_SELECTIONS_DIRECTORY;
+    }
+
+    @Override
+    protected ISelectionListener<DirectoryEntry> getSelectionListener()
+    {
+        return this;
+    }
+
+    @Override
+    public void onSelectionChange(DirectoryEntry entry)
+    {
+        if (entry.getType() == DirectoryEntryType.JSON)
         {
-            this.selectionNames.addAll(this.selectionManager.getAllSelectionNames());
-            Collections.sort(this.selectionNames);
+            String selectionId = entry.getFullPath().getAbsolutePath();
+
+            if (selectionId.equals(this.selectionManager.getCurrentSelectionId()))
+            {
+                this.selectionManager.setCurrentSelection(null);
+            }
+            else
+            {
+                this.selectionManager.setCurrentSelection(selectionId);
+            }
         }
     }
 
-    private void updateEntries()
+    public SelectionManager getSelectionManager()
     {
-        this.updateNames();
-
-        if (this.selectionManager == null)
-        {
-            return;
-        }
-
-        int xStart = LEFT;
-        int x = xStart;
-        int y = TOP + 20;
-        int nameWidth = 300;
-        int id = 0;
-        String currentName = this.selectionManager.getCurrentSelectionName();
-        ButtonGeneric button;
-        ButtonListener listener;
-        String labelRename = I18n.format("litematica.gui.button.rename");
-        int widthRename = this.mc.fontRenderer.getStringWidth(labelRename) + 10;
-
-        for (String name : this.selectionNames)
-        {
-            x = xStart;
-            String label = name.equals(currentName) ? TextFormatting.AQUA + name : name;
-            button = new ButtonGeneric(id++, x, y, nameWidth, 20, label);
-            listener = this.createActionListener(ButtonListener.Type.SELECT, name);
-            this.addButton(button, listener);
-            x += nameWidth + 4;
-
-            button = new ButtonGeneric(id++, x, y, widthRename, 20, labelRename);
-            listener = this.createActionListener(ButtonListener.Type.RENAME, name);
-            this.addButton(button, listener);
-            x += widthRename + 4;
-
-            button = new ButtonGeneric(id++, x, y, 20, 20, BUTTON_LABEL_REMOVE);
-            listener = this.createActionListener(ButtonListener.Type.REMOVE, name);
-            this.addButton(button, listener);
-
-            AreaSelection selection = this.selectionManager.getSelection(name);
-            int count = selection != null ? selection.getAllSubRegionBoxes().size() : 0;
-            label = I18n.format("litematica.gui.label.area_selection_box_count", count);
-            BlockPos o = selection.getOrigin();
-            String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
-            label += ", " + I18n.format("litematica.gui.label.area_selection_origin", strOrigin);
-            int w = this.fontRenderer.getStringWidth(label);
-            this.addLabel(id++, x + 28, y, w, 20, COLOR_WHITE, label);
-            y += button.getButtonHeight() + 2;
-        }
-
-        button = new ButtonGeneric(id++, xStart + nameWidth + widthRename + 8, y, 20, 20, BUTTON_LABEL_ADD);
-        listener = this.createActionListener(ButtonListener.Type.ADD, "");
-        this.addButton(button, listener);
+        return this.selectionManager;
     }
 
-    private ButtonListener createActionListener(ButtonListener.Type type, String name)
+    @Override
+    protected WidgetAreaSelectionBrowser createListWidget(int listX, int listY)
     {
-        return new ButtonListener(type, name, this.selectionManager, this);
+        // The width and height will be set to the actual values in initGui()
+        WidgetAreaSelectionBrowser widget = new WidgetAreaSelectionBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
+        widget.setParent(this.getParent());
+        return widget;
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiAreaSelectionManager gui;
         private final SelectionManager selectionManager;
-        private final Type type;
-        private final String name;
+        private final ButtonType type;
 
-        public ButtonListener(Type type, String name, SelectionManager selectionManager, GuiAreaSelectionManager gui)
+        public ButtonListener(ButtonType type, GuiAreaSelectionManager gui)
         {
             this.type = type;
-            this.name = name;
-            this.selectionManager = selectionManager;
             this.gui = gui;
+            this.selectionManager = gui.selectionManager;
         }
 
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            if (this.type == Type.SELECT)
+            if (this.type == ButtonType.CREATE_DIRECTORY)
             {
-                this.selectionManager.setCurrentSelection(this.name);
-                this.gui.initGui();
+                File dir = this.gui.widget.getCurrentDirectory();
+                String title = "litematica.gui.title.create_directory";
+                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui)));
             }
-            else if (this.type == Type.ADD)
+            else if (this.type == ButtonType.CREATE_SELECTION)
             {
-                this.selectionManager.createNewSelection();
-                this.gui.initGui();
-            }
-            else if (this.type == Type.REMOVE)
-            {
-                this.selectionManager.removeSelection(this.name);
-                this.gui.initGui();
-
-                int size = this.gui.selectionNames.size();
-
-                if (size > 0 && this.name.equals(this.selectionManager.getCurrentSelectionName()))
-                {
-                    this.selectionManager.setCurrentSelection(this.gui.selectionNames.get(size - 1));
-                    this.gui.initGui();
-                }
-            }
-            else if (this.type == Type.RENAME)
-            {
-                String title = "litematica.gui.title.rename_area_selection";
-                SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.name);
-                this.gui.mc.displayGuiScreen(new GuiTextInput(160, title, this.name, this.gui, renamer));
+                this.selectionManager.createNewSelection(this.gui.widget.getCurrentDirectory());
+                this.gui.widget.refreshEntries();
             }
         }
 
@@ -164,30 +157,22 @@ public class GuiAreaSelectionManager extends GuiLitematicaBase
             this.actionPerformed(control);
         }
 
-        public enum Type
+        public enum ButtonType
         {
-            SELECT,
-            ADD,
-            RENAME,
-            REMOVE;
-        }
-    }
+            CREATE_DIRECTORY    ("litematica.gui.button.area_selections.create_directory"),
+            CREATE_SELECTION    ("litematica.gui.button.area_selections.create_selection");
 
-    private static class SelectionRenamer implements IStringConsumer
-    {
-        private final SelectionManager selectionManager;
-        private final String oldName;
+            private final String labelKey;
 
-        public SelectionRenamer(SelectionManager selectionManager, String oldName)
-        {
-            this.selectionManager = selectionManager;
-            this.oldName = oldName;
-        }
+            private ButtonType(String labelKey)
+            {
+                this.labelKey = labelKey;
+            }
 
-        @Override
-        public void setString(String string)
-        {
-            this.selectionManager.renameSelection(this.oldName, string);
+            public String getLabelKey()
+            {
+                return this.labelKey;
+            }
         }
     }
 

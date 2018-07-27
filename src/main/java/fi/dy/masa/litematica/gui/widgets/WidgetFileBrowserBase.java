@@ -10,7 +10,6 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.interfaces.IDirectoryNavigator;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
@@ -31,12 +30,12 @@ public abstract class WidgetFileBrowserBase extends WidgetListBase<DirectoryEntr
     protected WidgetDirectoryNavigation directoryNavigationWidget;
 
     public WidgetFileBrowserBase(int x, int y, int width, int height,
-            String browserContext, File defaultDirectory, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
+            String browserContext, File defaultDirectory, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
         this.browserContext = browserContext;
-        this.currentDirectory = DataManager.getCurrentDirectoryForContext(this.browserContext, false);
+        this.currentDirectory = DataManager.getCurrentDirectoryForContext(this.browserContext);
 
         if (this.currentDirectory == null)
         {
@@ -110,15 +109,21 @@ public abstract class WidgetFileBrowserBase extends WidgetListBase<DirectoryEntr
         return width - 6;
     }
 
-    protected void updateBrowserOffsets()
+    protected void updateDirectoryNavigationWidget()
     {
-        if (this.currentDirectoryIsRoot())
+        if (this.currentDirectoryIsRoot() == false)
         {
-            this.browserEntriesOffsetY = 0;
+            int x = this.posX + 2;
+            int y = this.posY + 4;
+
+            this.directoryNavigationWidget = new WidgetDirectoryNavigation(x, y, this.browserEntryWidth, 14, this.zLevel,
+                    this.currentDirectory, this.getRootDirectory(), this.mc, this);
+            this.browserEntriesOffsetY = this.directoryNavigationWidget.getHeight() + 2;
         }
         else
         {
-            this.browserEntriesOffsetY = this.browserEntryHeight + 2;
+            this.directoryNavigationWidget = null;
+            this.browserEntriesOffsetY = 0;
         }
     }
 
@@ -141,10 +146,7 @@ public abstract class WidgetFileBrowserBase extends WidgetListBase<DirectoryEntr
             this.listContents.addAll(list);
         }
 
-        this.scrollBar.setMaxValue(this.listContents.size() - this.maxVisibleBrowserEntries);
-
-        this.updateBrowserOffsets();
-        this.updateBrowserMaxVisibleEntries();
+        this.updateDirectoryNavigationWidget();
         this.recreateListWidgets();
     }
 
@@ -164,31 +166,9 @@ public abstract class WidgetFileBrowserBase extends WidgetListBase<DirectoryEntr
     protected abstract void addFileEntriesToList(File dir, List<DirectoryEntry> list);
 
     @Override
-    protected void recreateListWidgets()
-    {
-        super.recreateListWidgets();
-
-        int x = this.posX + 2;
-        int y = this.posY + 4;
-        int width = this.browserEntryWidth;
-        int height = this.browserEntryHeight;
-
-        if (this.currentDirectoryIsRoot() == false)
-        {
-            this.directoryNavigationWidget = new WidgetDirectoryNavigation(x, y, width, height, height,
-                    this.currentDirectory, this.getRootDirectory(), this.mc, this);
-            y += this.browserEntriesOffsetY;
-        }
-        else
-        {
-            this.directoryNavigationWidget = null;
-        }
-    }
-
-    @Override
     protected WidgetDirectoryEntry createListWidget(int x, int y, boolean isOdd, DirectoryEntry entry)
     {
-        return new WidgetDirectoryEntry(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, isOdd, entry, this.mc, this);
+        return new WidgetDirectoryEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this.mc, this);
     }
 
     protected boolean currentDirectoryIsRoot()
@@ -278,6 +258,7 @@ public abstract class WidgetFileBrowserBase extends WidgetListBase<DirectoryEntr
     {
         INVALID,
         DIRECTORY,
+        JSON,
         LITEMATICA_SCHEMATIC,
         SCHEMATICA_SCHEMATIC,
         VANILLA_STRUCTURE;
@@ -303,6 +284,10 @@ public abstract class WidgetFileBrowserBase extends WidgetListBase<DirectoryEntr
                 else if (name.endsWith(".nbt"))
                 {
                     return DirectoryEntryType.VANILLA_STRUCTURE;
+                }
+                else if (name.endsWith(".json"))
+                {
+                    return DirectoryEntryType.JSON;
                 }
 
                 return DirectoryEntryType.INVALID;

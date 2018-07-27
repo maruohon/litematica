@@ -58,7 +58,7 @@ public class ToolHud extends InfoHud
             if (selection != null)
             {
                 str = I18n.format("litematica.hud.area_selection.selected_area");
-                String strTmp = sm.getCurrentSelectionName();
+                String strTmp = selection.getName();
                 lines.add(String.format("%s: %s%s%s", str, GREEN, strTmp, RESET));
 
                 str = I18n.format("litematica.hud.area_selection.box_count");

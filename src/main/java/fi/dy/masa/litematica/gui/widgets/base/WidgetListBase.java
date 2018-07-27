@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.MathHelper;
 
 public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends GuiLitematicaBase
 {
@@ -53,7 +54,6 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
         super.initGui();
 
         Keyboard.enableRepeatEvents(true);
-        this.updateBrowserMaxVisibleEntries();
         this.refreshEntries();
     }
 
@@ -67,24 +67,30 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
         }
 
         final int relativeY = mouseY - this.browserEntriesStartY - this.browserEntriesOffsetY;
-        final int widgetIndex = relativeY / this.browserEntryHeight;
-        final int entryIndex = widgetIndex + this.scrollBar.getValue();
 
         if (relativeY >= 0 &&
-            relativeY < this.maxVisibleBrowserEntries * this.browserEntryHeight &&
             mouseX >= this.browserEntriesStartX &&
-            mouseX < this.browserEntriesStartX + this.browserEntryWidth &&
-            widgetIndex < this.listWidgets.size() &&
-            entryIndex < Math.min(this.listContents.size(), this.maxVisibleBrowserEntries + this.scrollBar.getValue()))
+            mouseX < this.browserEntriesStartX + this.browserEntryWidth)
         {
-            WIDGET widget = this.listWidgets.get(widgetIndex);
-
-            if (widget.canSelectAt(mouseX, mouseY, mouseButton))
+            for (int i = 0; i < this.listWidgets.size(); ++i)
             {
-                this.setSelectedEntry(this.listContents.get(entryIndex), entryIndex);
-            }
+                WIDGET widget = this.listWidgets.get(i);
 
-            return widget.onMouseClicked(mouseX, mouseY, mouseButton);
+                if (widget.isMouseOver(mouseX, mouseY))
+                {
+                    if (widget.canSelectAt(mouseX, mouseY, mouseButton))
+                    {
+                        int entryIndex = this.scrollBar.getValue() + i;
+
+                        if (entryIndex < this.listContents.size())
+                        {
+                            this.setSelectedEntry(this.listContents.get(entryIndex), entryIndex);
+                        }
+                    }
+
+                    return widget.onMouseClicked(mouseX, mouseY, mouseButton);
+                }
+            }
         }
 
         return super.onMouseClicked(mouseX, mouseY, mouseButton);
@@ -154,7 +160,14 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
         }
 
         int scrollbarHeight = this.browserHeight - 8;
-        int totalHeight = Math.max(this.listContents.size() * this.browserEntryHeight, scrollbarHeight);
+        int totalHeight = 0;
+
+        for (int i = 0; i < this.listContents.size(); ++i)
+        {
+            totalHeight += this.getBrowserEntryHeightFor(this.listContents.get(i));
+        }
+
+        totalHeight = Math.max(totalHeight, scrollbarHeight);
 
         GlStateManager.disableLighting();
         GlStateManager.color(1, 1, 1, 1);
@@ -181,31 +194,40 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
         this.browserEntriesStartX = this.posX + this.browserPaddingX;
         this.browserEntriesStartY = this.posY + this.browserPaddingY;
         this.browserEntryWidth = this.browserWidth - 14;
-
-        this.updateBrowserMaxVisibleEntries();
     }
 
-    protected void updateBrowserMaxVisibleEntries()
+    protected int getBrowserEntryHeightFor(TYPE type)
     {
-        this.maxVisibleBrowserEntries = (this.browserHeight - this.browserPaddingY - this.browserEntriesOffsetY) / this.browserEntryHeight;
-        this.scrollBar.setMaxValue(this.listContents.size() - this.maxVisibleBrowserEntries);
+        return this.browserEntryHeight;
     }
 
     protected void recreateListWidgets()
     {
         this.listWidgets.clear();
+        this.maxVisibleBrowserEntries = 0;
 
         final int numEntries = this.listContents.size();
-        final int maxShown = Math.min(this.maxVisibleBrowserEntries, numEntries);
         int x = this.posX + 2;
         int y = this.posY + 4 + this.browserEntriesOffsetY;
-        int height = this.browserEntryHeight;
+        int usableHeight = this.browserHeight - this.browserPaddingY - this.browserEntriesOffsetY;
+        int usedHeight = 0;
 
-        for (int i = 0, index = this.scrollBar.getValue(); i < maxShown && index < numEntries; i++, index++)
+        for (int index = this.scrollBar.getValue(); index < numEntries; ++index)
         {
-            this.listWidgets.add(this.createListWidget(x, y, (index & 0x1) != 0, this.listContents.get(index)));
-            y += height;
+            WIDGET widget = this.createListWidget(x, y, (index & 0x1) != 0, this.listContents.get(index));
+
+            if ((usedHeight + widget.getHeight()) > usableHeight)
+            {
+                break;
+            }
+
+            this.listWidgets.add(widget);
+            this.maxVisibleBrowserEntries++;
+            y += widget.getHeight();
+            usedHeight += widget.getHeight();
         }
+
+        this.scrollBar.setMaxValue(this.listContents.size() - this.maxVisibleBrowserEntries);
     }
 
     public abstract void refreshEntries();
@@ -240,10 +262,9 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
         {
             this.scrollBar.offsetValue(amount);
         }
-        else if (this.selectedEntryIndex >= 0)
+        else if (this.selectedEntryIndex >= 0 && this.listContents.size() > 0)
         {
-            int max = Math.max(this.listContents.size() - 1, 0);
-            int index = Math.min(Math.max(this.selectedEntryIndex + amount, 0), max);
+            int index = MathHelper.clamp(this.selectedEntryIndex + amount, 0, this.listContents.size() - 1);
 
             if (index != this.selectedEntryIndex)
             {
@@ -257,7 +278,7 @@ public abstract class WidgetListBase<TYPE, WIDGET extends WidgetBase> extends Gu
         }
         else
         {
-            //this.scrollBar.offsetValue(amount);
+            this.scrollBar.offsetValue(amount);
 
             int index = this.scrollBar.getValue();
 

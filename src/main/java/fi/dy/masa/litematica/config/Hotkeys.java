@@ -35,7 +35,7 @@ public enum Hotkeys implements IHotkey
     TOOL_ENABLED_TOGGLE                 ("toolEnabledToggle",               "M,T",  "The keybind to toggle the \"tool\" item functionality on/off"),
     TOOL_PLACE_CORNER_1                 ("toolPlaceCorner1",                "BUTTON0", false, "The button to use while holding the \"tool\" item\nto place the primary/first corner"),
     TOOL_PLACE_CORNER_2                 ("toolPlaceCorner2",                "BUTTON1", false, "The button to use while holding the \"tool\" item\nto place the second corner"),
-    TOOL_SELECT_ELEMENTS                ("toolSelectElements",              "BUTTON2", "The button to use to select corners or boxes while holding the \"tool\" item");
+    TOOL_SELECT_ELEMENTS                ("toolSelectElements",              "BUTTON2", false, "The button to use to select corners or boxes while holding the \"tool\" item");
 
     private final String name;
     private final String comment;

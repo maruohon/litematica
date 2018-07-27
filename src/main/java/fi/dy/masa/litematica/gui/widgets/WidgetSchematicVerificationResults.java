@@ -44,9 +44,6 @@ public class WidgetSchematicVerificationResults extends WidgetListBase<BlockMism
             this.addEntriesForType(type);
         }
 
-        this.scrollBar.setMaxValue(this.listContents.size() - this.maxVisibleBrowserEntries);
-
-        this.updateBrowserMaxVisibleEntries();
         this.recreateListWidgets();
     }
 
@@ -66,6 +63,6 @@ public class WidgetSchematicVerificationResults extends WidgetListBase<BlockMism
     @Override
     protected WidgetSchematicVerificationResult createListWidget(int x, int y, boolean isOdd, BlockMismatchEntry entry)
     {
-        return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, isOdd, entry, this.guiSchematicVerifier);
+        return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this.guiSchematicVerifier);
     }
 }

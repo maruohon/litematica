@@ -12,6 +12,7 @@ public enum Icons implements IGuiIcon
     FILE_ICON_LITEMATIC     (144,   0, 12, 12),
     FILE_ICON_SCHEMATIC     (144,  12, 12, 12),
     FILE_ICON_VANILLA       (144,  24, 12, 12),
+    FILE_ICON_JSON          (144,  36, 12, 12),
     FILE_ICON_DIR           (156,   0, 12, 12),
     FILE_ICON_DIR_UP        (156,  12, 12, 12),
     FILE_ICON_DIR_ROOT      (156,  24, 12, 12),

@@ -33,15 +33,12 @@ public class WidgetLoadedSchematics extends WidgetListBase<SchematicEntry, Widge
         SchematicHolder holder = SchematicHolder.getInstance();
         this.listContents.addAll(holder.getAllSchematics());
 
-        this.scrollBar.setMaxValue(this.listContents.size() - this.maxVisibleBrowserEntries);
-
-        this.updateBrowserMaxVisibleEntries();
         this.recreateListWidgets();
     }
 
     @Override
     protected WidgetSchematicEntry createListWidget(int x, int y, boolean isOdd, SchematicEntry entry)
     {
-        return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, isOdd, entry, this, this.mc);
+        return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this, this.mc);
     }
 }

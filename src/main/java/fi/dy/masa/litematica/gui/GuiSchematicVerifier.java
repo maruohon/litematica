@@ -141,7 +141,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
             case RESET_VERIFIER:
                 label = I18n.format("litematica.gui.button.schematic_verifier.reset_verifier");
-                enabled = this.placement.getSchematicVerifier().isFinished();
+                enabled = true;//this.placement.getSchematicVerifier().isFinished();
                 break;
 
             case RESET_IGNORED:

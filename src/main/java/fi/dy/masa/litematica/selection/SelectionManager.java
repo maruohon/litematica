@@ -1,13 +1,16 @@
 package fi.dy.masa.litematica.selection;
 
-import java.util.Collection;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
+import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -27,59 +30,94 @@ import net.minecraft.world.World;
 public class SelectionManager
 {
     private final Map<String, AreaSelection> selections = new HashMap<>();
+    private final Map<String, AreaSelection> readOnlySelections = new HashMap<>();
     @Nullable
-    private String currentSelection;
+    private String currentSelectionId;
+    @Nullable
     private GrabbedElement grabbedElement;
 
-    public Collection<String> getAllSelectionNames()
+    @Nullable
+    public String getCurrentSelectionId()
     {
-        return this.selections.keySet();
-    }
-
-    public Collection<AreaSelection> getAllSelections()
-    {
-        return this.selections.values();
-    }
-
-    public String getCurrentSelectionName()
-    {
-        return this.currentSelection != null ? this.currentSelection : "";
+        return this.currentSelectionId;
     }
 
     @Nullable
     public AreaSelection getCurrentSelection()
     {
-        return this.currentSelection != null ? this.getSelection(this.currentSelection) : null;
+        return this.getSelection(this.currentSelectionId);
     }
 
     @Nullable
-    public AreaSelection getSelection(String name)
+    public AreaSelection getSelection(String selectionId)
     {
-        return this.selections.get(name);
+        return selectionId != null ? this.selections.get(selectionId) : null;
     }
 
-    public boolean removeSelection(String name)
+    @Nullable
+    public AreaSelection getOrLoadSelection(String selectionId)
     {
-        return this.selections.remove(name) != null;
-    }
+        AreaSelection selection = this.getSelection(selectionId);
 
-    public boolean removeCurrentSelection()
-    {
-        return this.currentSelection != null ? this.selections.remove(this.currentSelection) != null : false;
-    }
-
-    public boolean renameSelection(String oldName, String newName)
-    {
-        AreaSelection selection = this.selections.remove(oldName);
-
-        if (selection != null)
+        if (selection == null)
         {
-            selection.setName(newName);
-            this.selections.put(newName, selection);
+            selection = this.tryLoadSelectionFromFile(selectionId);
 
-            if (this.currentSelection != null && this.currentSelection.equals(oldName))
+            if (selection != null)
             {
-                this.currentSelection = newName;
+                this.selections.put(selectionId, selection);
+            }
+        }
+
+        return selection;
+    }
+
+    @Nullable
+    public AreaSelection getOrLoadSelectionReadOnly(String selectionId)
+    {
+        AreaSelection selection = this.getSelection(selectionId);
+
+        if (selection == null)
+        {
+            selection = this.readOnlySelections.get(selectionId);
+
+            if (selection == null)
+            {
+                selection = this.tryLoadSelectionFromFile(selectionId);
+
+                if (selection != null)
+                {
+                    this.readOnlySelections.put(selectionId, selection);
+                }
+            }
+        }
+
+        return selection;
+    }
+
+    @Nullable
+    private AreaSelection tryLoadSelectionFromFile(String selectionId)
+    {
+        File file = new File(selectionId);
+        JsonElement el = JsonUtils.parseJsonFile(file);
+
+        if (el != null && el.isJsonObject())
+        {
+            return AreaSelection.fromJson(el.getAsJsonObject());
+        }
+
+        return null;
+    }
+
+    public boolean removeSelection(String selectionId)
+    {
+        if (selectionId != null && this.selections.remove(selectionId) != null)
+        {
+            File file = new File(selectionId);
+
+            if (file.exists() && file.isFile())
+            {
+                file.delete();
             }
 
             return true;
@@ -88,21 +126,57 @@ public class SelectionManager
         return false;
     }
 
-    public boolean renameSelectedSubRegionBox(String newName)
+    public boolean renameSelection(File dir, String selectionId, String newName, IMessageConsumer feedback)
     {
-        String selectedArea = this.getCurrentSelectionName();
+        File file = new File(selectionId);
 
-        if (selectedArea != null)
+        if (file.exists() && file.isFile())
         {
-            return this.renameSelectedSubRegionBox(selectedArea, newName);
+            String newFileName = FileUtils.generateSafeFileName(newName);
+            File newFile = new File(dir, newFileName + ".json");
+
+            if (newFile.exists() == false && file.renameTo(newFile))
+            {
+                AreaSelection selection = this.selections.remove(selectionId);
+
+                if (selection != null)
+                {
+                    String newId = newFile.getAbsolutePath();
+                    selection.setName(newName);
+                    this.selections.put(newId, selection);
+
+                    if (selectionId.equals(this.currentSelectionId))
+                    {
+                        this.currentSelectionId = newId;
+                    }
+
+                    return true;
+                }
+            }
+            else
+            {
+                feedback.addMessage(InfoType.ERROR, "litematica.error.area_selection.rename.already_exists", newName);
+            }
         }
 
         return false;
     }
 
-    public boolean renameSelectedSubRegionBox(String selectionName, String newName)
+    public boolean renameSelectedSubRegionBox(String newName)
     {
-        AreaSelection selection = this.selections.get(selectionName);
+        String selectionId = this.getCurrentSelectionId();
+
+        if (selectionId != null)
+        {
+            return this.renameSubRegionBox(selectionId, newName);
+        }
+
+        return false;
+    }
+
+    public boolean renameSubRegionBox(String selectionId, String newName)
+    {
+        AreaSelection selection = this.getSelection(selectionId);
 
         if (selection != null)
         {
@@ -117,17 +191,17 @@ public class SelectionManager
         return false;
     }
 
-    public boolean renameSubRegionBox(String selectionName, String oldName, String newName)
+    public boolean renameSubRegionBox(String selectionId, String oldName, String newName)
     {
-        AreaSelection selection = this.selections.get(selectionName);
+        AreaSelection selection = this.getSelection(selectionId);
         return selection != null && selection.renameSubRegionBox(oldName, newName);
     }
 
-    public void setCurrentSelection(@Nullable String name)
+    public void setCurrentSelection(@Nullable String selectionId)
     {
-        if (name == null || this.selections.containsKey(name))
+        if (selectionId == null || this.selections.containsKey(selectionId))
         {
-            this.currentSelection = name;
+            this.currentSelectionId = selectionId;
         }
     }
 
@@ -135,20 +209,30 @@ public class SelectionManager
      * Creates a new schematic selection and returns the name of it
      * @return
      */
-    public String createNewSelection()
+    public String createNewSelection(File dir)
     {
-        String name = "Unnamed ";
-        int i = 1;
+        int i = 0;
+        String name = "New Selection ";
+        String selectionId;
+        File file;
 
-        while (this.selections.containsKey(name + i))
+        do
         {
             i++;
+            file = new File(dir, FileUtils.generateSafeFileName(name + i) + ".json");
+            selectionId = file.getAbsolutePath();
         }
+        while (this.selections.containsKey(selectionId) || file.exists());
 
-        this.selections.put(name + i, new AreaSelection());
-        this.currentSelection = name + i;
+        AreaSelection selection = new AreaSelection();
+        selection.setName(name + i);
 
-        return this.currentSelection;
+        this.selections.put(selectionId, selection);
+        this.currentSelectionId = selectionId;
+
+        JsonUtils.writeJsonToFile(selection.toJson(), file);
+
+        return this.currentSelectionId;
     }
 
     public boolean changeSelection(World world, Entity entity, int maxDistance)
@@ -438,47 +522,45 @@ public class SelectionManager
     {
         this.selections.clear();
 
-        if (JsonUtils.hasArray(obj, "areas"))
-        {
-            JsonArray arr = obj.get("areas").getAsJsonArray();
-            final int size = arr.size();
-
-            for (int i = 0; i < size; i++)
-            {
-                JsonElement el = arr.get(i);
-
-                if (el.isJsonObject())
-                {
-                    AreaSelection area = AreaSelection.fromJson(el.getAsJsonObject());
-                    this.selections.put(area.getName(), area);
-                }
-            }
-        }
-
         if (JsonUtils.hasString(obj, "current"))
         {
-            this.setCurrentSelection(obj.get("current").getAsString());
+            String currentId = obj.get("current").getAsString();
+            AreaSelection selection = this.tryLoadSelectionFromFile(currentId);
+
+            if (selection != null)
+            {
+                this.selections.put(currentId, selection);
+                this.setCurrentSelection(currentId);
+            }
         }
     }
 
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
-        JsonArray arr = new JsonArray();
 
-        for (AreaSelection area : this.selections.values())
+        try
         {
-            arr.add(area.toJson());
+            for (Map.Entry<String, AreaSelection> entry : this.selections.entrySet())
+            {
+                JsonUtils.writeJsonToFile(entry.getValue().toJson(), new File(entry.getKey()));
+            }
+        }
+        catch (Exception e)
+        {
+            LiteModLitematica.logger.warn("Exception while writing area selections to disk", e);
         }
 
-        if (arr.size() > 0)
-        {
-            if (this.currentSelection != null)
-            {
-                obj.add("current", new JsonPrimitive(this.currentSelection));
-            }
+        AreaSelection current = this.currentSelectionId != null ? this.selections.get(this.currentSelectionId) : null;
 
-            obj.add("areas", arr);
+        // Clear the loaded selections, except for the currently selected one
+        this.selections.clear();
+        this.readOnlySelections.clear();
+
+        if (current != null)
+        {
+            obj.add("current", new JsonPrimitive(this.currentSelectionId));
+            this.selections.put(this.currentSelectionId, current);
         }
 
         return obj;

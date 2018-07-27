@@ -4,7 +4,6 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiPlacementManager;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
-import net.minecraft.client.Minecraft;
 
 public class WidgetSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
 {
@@ -27,20 +26,14 @@ public class WidgetSchematicPlacements extends WidgetListBase<SchematicPlacement
     public void refreshEntries()
     {
         this.listContents.clear();
+        this.listContents.addAll(DataManager.getInstance().getSchematicPlacementManager().getAllSchematicsPlacements());
 
-        Minecraft mc = Minecraft.getMinecraft();
-        int dimension = mc.world.provider.getDimensionType().getId();
-        this.listContents.addAll(DataManager.getInstance(dimension).getSchematicPlacementManager().getAllSchematicsPlacements());
-
-        this.scrollBar.setMaxValue(this.listContents.size() - this.maxVisibleBrowserEntries);
-
-        this.updateBrowserMaxVisibleEntries();
         this.recreateListWidgets();
     }
 
     @Override
     protected WidgetSchematicPlacement createListWidget(int x, int y, boolean isOdd, SchematicPlacement entry)
     {
-        return new WidgetSchematicPlacement(x, y, this.browserEntryWidth, this.browserEntryHeight, this.zLevel, isOdd, entry, this, this.mc);
+        return new WidgetSchematicPlacement(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this, this.mc);
     }
 }
