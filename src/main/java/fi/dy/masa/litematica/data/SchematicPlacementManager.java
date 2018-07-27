@@ -42,27 +42,26 @@ public class SchematicPlacementManager
     private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
     private final Set<ChunkPos> chunksToUnload = new HashSet<>();
     private final Set<ChunkPos> chunksPreChange = new HashSet<>();
-    private boolean rebuildActive;
 
     @Nullable
     private SchematicPlacement selectedPlacement;
 
     public boolean processQueuedChunks()
     {
-        if (this.rebuildActive && this.chunksToUnload.isEmpty() == false)
+        if (this.chunksToUnload.isEmpty() == false)
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getInstance().getSchematicWorld();
 
             for (ChunkPos pos : this.chunksToUnload)
             {
-                worldSchematic.getChunkProvider().unloadChunk(pos.x, pos.z);
-                worldSchematic.markBlockRangeForRenderUpdate(pos.x << 4, 0, pos.z << 4, (pos.x << 4) + 15, 256, (pos.z << 4) + 15);
+                this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
             }
 
             this.chunksToUnload.clear();
         }
 
-        if (this.rebuildActive && this.chunksToRebuild.isEmpty() == false)
+        //System.out.printf("processQueuedChunks, size: %d\n", this.chunksToRebuild.size());
+        if (this.chunksToRebuild.isEmpty() == false)
         {
             WorldClient worldClient = Minecraft.getMinecraft().world;
             WorldSchematic worldSchematic = SchematicWorldHandler.getInstance().getSchematicWorld();
@@ -77,20 +76,29 @@ public class SchematicPlacementManager
 
                 ChunkPos pos = iter.next();
 
+                if (this.schematicsTouchingChunk.containsKey(pos) == false)
+                {
+                    iter.remove();
+                    continue;
+                }
+
                 if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() ||
                     worldClient.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
                 {
                     // Wipe the old chunk if it exists
                     if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
                     {
-                        worldSchematic.getChunkProvider().unloadChunk(pos.x, pos.z);
+                        //System.out.printf("wiping chunk at %s\n", pos);
+                        this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
                     }
 
+                    //System.out.printf("loading chunk at %s\n", pos);
                     worldSchematic.getChunkProvider().loadChunk(pos.x, pos.z);
                 }
 
                 if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
                 {
+                    //System.out.printf("placing at %s\n", pos);
                     Collection<SchematicPlacement> placements = this.schematicsTouchingChunk.get(pos);
 
                     if (placements.isEmpty() == false)
@@ -105,20 +113,42 @@ public class SchematicPlacementManager
 
                         worldSchematic.markBlockRangeForRenderUpdate(pos.x << 4, 0, pos.z << 4, (pos.x << 4) + 15, 256, (pos.z << 4) + 15);
                     }
-                }
 
-                // Always remove the entry. If the chunk wasn't loaded, it will get handled when it loads the next time.
-                iter.remove();
+                    iter.remove();
+                }
             }
 
             if (this.chunksToRebuild.isEmpty())
             {
-                this.rebuildActive = false;
                 return true;
             }
         }
 
         return false;
+    }
+
+    public void onClientChunkUnload(int chunkX, int chunkZ)
+    {
+        if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() == false)
+        {
+            WorldSchematic worldSchematic = SchematicWorldHandler.getInstance().getSchematicWorld();
+
+            if (worldSchematic != null)
+            {
+                this.unloadSchematicChunk(worldSchematic, chunkX, chunkZ);
+                this.chunksToRebuild.add(new ChunkPos(chunkX, chunkZ));
+            }
+        }
+    }
+
+    private void unloadSchematicChunk(WorldSchematic worldSchematic, int chunkX, int chunkZ)
+    {
+        if (worldSchematic.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
+        {
+            //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
+            worldSchematic.getChunkProvider().unloadChunk(chunkX, chunkZ);
+            worldSchematic.markBlockRangeForRenderUpdate(chunkX << 4, 0, chunkZ << 4, (chunkX << 4) + 15, 256, (chunkZ << 4) + 15);
+        }
     }
 
     public List<SchematicPlacement> getAllSchematicsPlacements()
@@ -302,9 +332,8 @@ public class SchematicPlacementManager
 
     void markChunksForRebuild(Collection<ChunkPos> chunks)
     {
-        //System.out.printf("rebuilding: %s\n", chunks);
+        //System.out.printf("rebuilding %d chunks: %s\n", chunks.size(), chunks);
         this.chunksToRebuild.addAll(chunks);
-        this.rebuildActive = true;
     }
 
     private void onPlacementModified(SchematicPlacement placement)

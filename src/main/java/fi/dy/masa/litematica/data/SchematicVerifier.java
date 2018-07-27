@@ -351,10 +351,8 @@ public class SchematicVerifier implements IStringListProvider
 
             if (this.requiredChunks.isEmpty())
             {
-                System.out.printf("finished\n");
                 this.verificationActive = false;
                 this.verificationStarted = false;
-                this.clearReferences();
 
                 this.finished = true;
 

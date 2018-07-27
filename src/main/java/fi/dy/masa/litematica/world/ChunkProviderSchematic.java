@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.world;
 
-import fi.dy.masa.litematica.mixin.IMixinChunkProviderClient;
+import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
