@@ -12,6 +12,7 @@ public enum Hotkeys implements IHotkey
 {
     ADD_SELECTION_BOX                   ("addSelectionBox",                 "M,A",  "Add a new selection box (position 1) here"),
     DELETE_SELECTION_BOX                ("deleteSelectionBox",              "M,D",  "Delete the currently selected box"),
+    EXECUTE_OPERATION                   ("executeOperation",                "LCONTROL,LMENU,R",  "Execute the current operation with the current selection or placement\nin the Fill, Replace, Paste Schematic etc. modes"),
     MOVE_ENTIRE_SELECTION               ("moveEntireSelection",             "M,V",  "Move the entire current selection here"),
     OPEN_GUI_AREA_SETTINGS              ("openGuiAreaSettings",             "M,P",  "Open the Area Settings GUI for the currently selected area"),
     OPEN_GUI_PLACEMENT_SETTINGS         ("openGuiPlacementSettings",        "M,P",  "Open the Placement Settings GUI for the currently selected placement"),

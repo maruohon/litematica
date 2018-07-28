@@ -454,7 +454,8 @@ public class LitematicaSchematic
 
         if (startX < 0 || startZ < 0 || endX >= container.getSize().getX() || endZ >= container.getSize().getZ())
         {
-            System.out.printf("============= OUT OF BOUNDS =============\n");
+            System.out.printf("DEBUG ============= OUT OF BOUNDS - region: %s, sx: %d, sz: %d, ex: %d, ez: %d - size x: %d z: %d =============\n",
+                    regionName, startX, startZ, endX, endZ, container.getSize().getX(), container.getSize().getZ());
             return;
         }
 

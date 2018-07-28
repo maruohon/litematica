@@ -36,6 +36,7 @@ public class KeyCallbacks
         IHotkeyCallback callbackHotkeys = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
 
+        Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind().setCallback(callbackHotkeys);
@@ -105,7 +106,7 @@ public class KeyCallbacks
                             sm.handleCuboidModeMouseClick(mc, maxDistance, isToolSecondary);
                         }
                     }
-                    else if (mode == OperationMode.PLACEMENT)
+                    else if (mode.getUsesSchematic())
                     {
                         dataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionToRayTrace(this.mc, maxDistance);
                     }
@@ -134,7 +135,7 @@ public class KeyCallbacks
                             sm.changeSelection(this.mc.world, this.mc.player, maxDistance);
                         }
                     }
-                    else if (mode == OperationMode.PLACEMENT)
+                    else if (mode.getUsesSchematic())
                     {
                         dataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
                     }
@@ -143,7 +144,7 @@ public class KeyCallbacks
                 }
             }
 
-            if (mode == OperationMode.PLACEMENT && key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
+            if (mode.getUsesSchematic() && key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
             {
                 SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -167,7 +168,7 @@ public class KeyCallbacks
 
                 return true;
             }
-            if (mode == OperationMode.PLACEMENT && key == Hotkeys.SCHEMATIC_VERIFIER.getKeybind())
+            else if (mode == OperationMode.SCHEMATIC_PLACEMENT && key == Hotkeys.SCHEMATIC_VERIFIER.getKeybind())
             {
                 SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -229,6 +230,14 @@ public class KeyCallbacks
             {
                 this.mc.displayGuiScreen(new GuiAreaSelectionManager());
                 return true;
+            }
+            else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && hasTool && toolEnabled)
+            {
+                if (mode == OperationMode.PASTE_SCHEMATIC)
+                {
+                    dataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
+                    return true;
+                }
             }
 
             return false;
@@ -298,7 +307,7 @@ public class KeyCallbacks
                             StringUtils.printActionbarMessage("litematica.message.moved_selection", oldStr, posStr);
                         }
                     }
-                    else if (DataManager.getOperationMode() == OperationMode.PLACEMENT)
+                    else if (DataManager.getOperationMode().getUsesSchematic())
                     {
                         DataManager.getInstance(this.mc.world).getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
                     }

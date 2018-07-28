@@ -39,7 +39,7 @@ public class DataManager
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
-    private static OperationMode operationMode = OperationMode.PLACEMENT;
+    private static OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
 
     @Nullable
     private static SchematicPlacement placementToVerify = null;
@@ -227,7 +227,7 @@ public class DataManager
 
                 if (operationMode == null)
                 {
-                    operationMode = OperationMode.PLACEMENT;
+                    operationMode = OperationMode.SCHEMATIC_PLACEMENT;
                 }
             }
         }

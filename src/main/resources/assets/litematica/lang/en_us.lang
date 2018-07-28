@@ -178,12 +178,14 @@ litematica.message.directory_created=Directory '%s' created
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.in_memory_schematic_created=Created an in-memory schematic as '%s'
-litematica.message.no_placement_selected=No placement selected
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
-litematica.message.removed_selection_box=Removed selection box %s
+litematica.message.no_placement_selected=§cNo placement selected§r
+litematica.message.only_works_in_single_player=§cThis operation only works in single player§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
+litematica.message.removed_selection_box=Removed selection box %s
+litematica.message.schematic_pasted=Schematic Pasted in world
 litematica.message.schematic_placement_created=Placement created for '%s'
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
 litematica.message.schematic_saved_as=Schematic saved as '%s'
@@ -196,12 +198,9 @@ litematica.message.value.off=OFF
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
 
 litematica.operation_mode.name.area_selection=Area Selection
-litematica.operation_mode.name.placement=Schematic Placement
-litematica.operation_mode.name.fill=Fill
-litematica.operation_mode.name.replace=Replace
-litematica.operation_mode.name.clone_source=Clone (from)
-litematica.operation_mode.name.clone_destination=Clone (to)
-litematica.operation_mode.name.move_source=Move (from)
-litematica.operation_mode.name.move_destination=Move (to)
-litematica.operation_mode.name.stack=Stack
 litematica.operation_mode.name.delete=Delete
+litematica.operation_mode.name.fill=Fill
+litematica.operation_mode.name.grid_paste=Grid Paste Schematic in world
+litematica.operation_mode.name.paste_schematic=Paste Schematic in world
+litematica.operation_mode.name.replace_block=Replace block
+litematica.operation_mode.name.schematic_placement=Schematic Placement

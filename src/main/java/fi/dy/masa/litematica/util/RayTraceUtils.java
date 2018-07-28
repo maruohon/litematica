@@ -67,7 +67,7 @@ public class RayTraceUtils
             traceToOrigin(area.getOrigin(), eyesPos, lookEndPos, HitType.SELECTION_ORIGIN, null);
         }
 
-        if (DataManager.getOperationMode() == OperationMode.PLACEMENT)
+        if (DataManager.getOperationMode() == OperationMode.SCHEMATIC_PLACEMENT)
         {
             for (SchematicPlacement placement : dataManager.getSchematicPlacementManager().getAllSchematicsPlacements())
             {

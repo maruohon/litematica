@@ -34,6 +34,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 public class SchematicPlacementManager
 {
@@ -451,6 +452,32 @@ public class SchematicPlacementManager
             {
                 BlockPos old = schematicPlacement.getOrigin();
                 schematicPlacement.setOrigin(old.offset(direction, amount));
+            }
+        }
+    }
+
+    public void pasteCurrentPlacementToWorld(Minecraft mc)
+    {
+        if (mc.player != null && mc.player.capabilities.isCreativeMode)
+        {
+            SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
+
+            if (schematicPlacement != null)
+            {
+                if (mc.isSingleplayer())
+                {
+                    WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
+                    schematicPlacement.getSchematic().placeToWorld(world, schematicPlacement, false);
+                    StringUtils.printActionbarMessage("litematica.message.schematic_pasted");
+                }
+                else
+                {
+                    StringUtils.printActionbarMessage("litematica.message.only_works_in_single_player");
+                }
+            }
+            else
+            {
+                StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
             }
         }
     }

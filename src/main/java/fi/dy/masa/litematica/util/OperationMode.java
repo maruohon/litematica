@@ -1,25 +1,35 @@
 package fi.dy.masa.litematica.util;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 
 public enum OperationMode
 {
-    AREA_SELECTION      ("litematica.operation_mode.name.area_selection"),
-    PLACEMENT           ("litematica.operation_mode.name.placement"),
-    FILL                ("litematica.operation_mode.name.fill"),
-    REPLACE             ("litematica.operation_mode.name.replace"),
-    CLONE_SOURCE        ("litematica.operation_mode.name.clone_source"),
-    CLONE_DESTINATION   ("litematica.operation_mode.name.clone_destination"),
-    MOVE_SOURCE         ("litematica.operation_mode.name.move_source"),
-    MOVE_DESTINATION    ("litematica.operation_mode.name.move_destination"),
-    STACK               ("litematica.operation_mode.name.stack"),
-    DELETE              ("litematica.operation_mode.name.delete");
+    AREA_SELECTION      ("litematica.operation_mode.name.area_selection", false),
+    SCHEMATIC_PLACEMENT ("litematica.operation_mode.name.schematic_placement", true),
+    FILL                ("litematica.operation_mode.name.fill", false),
+    REPLACE_BLOCK       ("litematica.operation_mode.name.replace_block", false),
+    PASTE_SCHEMATIC     ("litematica.operation_mode.name.paste_schematic", true),
+    GRID_PASTE          ("litematica.operation_mode.name.grid_paste", true),
+    DELETE              ("litematica.operation_mode.name.delete", false);
 
     private final String unlocName;
+    private final boolean usesSchematic;
 
-    private OperationMode(String unlocName)
+    private OperationMode(String unlocName, boolean usesSchematic)
     {
         this.unlocName = unlocName;
+        this.usesSchematic = usesSchematic;
+    }
+
+    public boolean getUsesSchematic()
+    {
+        return this.usesSchematic;
+    }
+
+    public boolean getUsesAreaSelection()
+    {
+        return this.usesSchematic == false;
     }
 
     public String getName()
@@ -27,13 +37,14 @@ public enum OperationMode
         return I18n.format(this.unlocName);
     }
 
-    public OperationMode cycle(boolean forward)
+    public OperationMode cycle(EntityPlayer player, boolean forward)
     {
         int id = this.ordinal();
+        int numModes = player.capabilities.isCreativeMode ? values().length : 2;
 
         if (forward)
         {
-            if (++id >= values().length)
+            if (++id >= numModes)
             {
                 id = 0;
             }
@@ -42,7 +53,7 @@ public enum OperationMode
         {
             if (--id < 0)
             {
-                id = values().length - 1;
+                id = numModes - 1;
             }
         }
 

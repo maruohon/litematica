@@ -7,10 +7,10 @@ import fi.dy.masa.litematica.gui.GuiSchematicManager;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
+import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
-import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -95,7 +95,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                             return true;
                         }
                     }
-                    else if (mode == OperationMode.PLACEMENT)
+                    else if (mode == OperationMode.SCHEMATIC_PLACEMENT)
                     {
                         EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
                         DataManager.getInstance(world).getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
@@ -104,7 +104,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
                 else if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
                 {
-                    DataManager.setOperationMode(DataManager.getOperationMode().cycle(amount < 0));
+                    DataManager.setOperationMode(DataManager.getOperationMode().cycle(player, amount < 0));
                     return true;
                 }
             }
