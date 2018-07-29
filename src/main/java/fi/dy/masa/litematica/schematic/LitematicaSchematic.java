@@ -250,6 +250,17 @@ public class LitematicaSchematic
             final int sizeZ = posMaxRel.getZ() - posMinRel.getZ() + 1;
             BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
+            final Rotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation());
+            final Mirror mirrorMain = schematicPlacement.getMirror();
+            Mirror mirrorSub = placement.getMirror();
+
+            if (mirrorSub != Mirror.NONE &&
+                (schematicPlacement.getRotation() == Rotation.CLOCKWISE_90 ||
+                 schematicPlacement.getRotation() == Rotation.COUNTERCLOCKWISE_90))
+            {
+                mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
+            }
+
             for (int y = 0; y < sizeY; ++y)
             {
                 for (int z = 0; z < sizeZ; ++z)
@@ -274,13 +285,9 @@ public class LitematicaSchematic
                         BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
                         pos = pos.add(regionPosTransformed).add(origin);
 
-                        Mirror mirror = schematicPlacement.getMirror();
-                        if (mirror != Mirror.NONE) { state = state.withMirror(mirror); }
-                        mirror = placement.getMirror();
-                        if (mirror != Mirror.NONE) { state = state.withMirror(mirror); }
-
-                        Rotation rotation = schematicPlacement.getRotation().add(placement.getRotation());
-                        if (rotation != Rotation.NONE) { state = state.withRotation(rotation); }
+                        if (mirrorMain != Mirror.NONE) { state = state.withMirror(mirrorMain); }
+                        if (mirrorSub != Mirror.NONE)  { state = state.withMirror(mirrorSub); }
+                        if (rotationCombined != Rotation.NONE) { state = state.withRotation(rotationCombined); }
 
                         if (teNBT != null)
                         {
@@ -453,6 +460,17 @@ public class LitematicaSchematic
             return;
         }
 
+        final Rotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation());
+        final Mirror mirrorMain = schematicPlacement.getMirror();
+        Mirror mirrorSub = placement.getMirror();
+
+        if (mirrorSub != Mirror.NONE &&
+            (schematicPlacement.getRotation() == Rotation.CLOCKWISE_90 ||
+             schematicPlacement.getRotation() == Rotation.COUNTERCLOCKWISE_90))
+        {
+            mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
+        }
+
         for (int y = startY; y <= endY; ++y)
         {
             for (int z = startZ; z <= endZ; ++z)
@@ -477,13 +495,9 @@ public class LitematicaSchematic
                     BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
                     pos = pos.add(regionPosTransformed).add(origin);
 
-                    Mirror mirror = schematicPlacement.getMirror();
-                    if (mirror != Mirror.NONE) { state = state.withMirror(mirror); }
-                    mirror = placement.getMirror();
-                    if (mirror != Mirror.NONE) { state = state.withMirror(mirror); }
-
-                    Rotation rotation = schematicPlacement.getRotation().add(placement.getRotation());
-                    if (rotation != Rotation.NONE) { state = state.withRotation(rotation); }
+                    if (mirrorMain != Mirror.NONE) { state = state.withMirror(mirrorMain); }
+                    if (mirrorSub != Mirror.NONE)  { state = state.withMirror(mirrorSub); }
+                    if (rotationCombined != Rotation.NONE) { state = state.withRotation(rotationCombined); }
 
                     if (teNBT != null)
                     {
