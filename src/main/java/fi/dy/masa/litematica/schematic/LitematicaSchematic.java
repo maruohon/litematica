@@ -413,38 +413,32 @@ public class LitematicaSchematic
         // These are the untransformed relative positions
         BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
         BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
+
+        // The transformed sub-region origin position
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
 
-        // Calculate the absolute offset of the region's untransformed minimum corner to the region's position (region's origin corner)
-        BlockPos posMinOffset = posMinRel.subtract(regionPos);
-        // And then transform it by the region's rotation and mirror
-        BlockPos posMinOffsetTransformed = PositionUtils.getTransformedBlockPos(posMinOffset, placement.getMirror(), placement.getRotation());
+        // The relative offset of the affected region's corners, to the sub-region's origin corner
+        BlockPos boxMinRel = new BlockPos(bounds.minX - origin.getX() - regionPosTransformed.getX(), 0, bounds.minZ - origin.getZ() - regionPosTransformed.getZ());
+        BlockPos boxMaxRel = new BlockPos(bounds.maxX - origin.getX() - regionPosTransformed.getX(), 0, bounds.maxZ - origin.getZ() - regionPosTransformed.getZ());
 
-        // The absolute position of the minimum corner is found by first transforming the relative minimum corner
-        // by the entire placement's rotation and mirror...
-        BlockPos posMinAbsTransformed = PositionUtils.getTransformedBlockPos(posMinRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        // ... and then adding the relative offset between the region origin and the region minimum corner,
-        // that has been transformed by the region's rotation and mirror
-        posMinAbsTransformed = posMinAbsTransformed.add(posMinOffsetTransformed).add(origin);
+        // Reverse transform that relative offset, to get the untransformed orientation's offsets
+        boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, placement.getMirror(), placement.getRotation());
+        boxMaxRel = PositionUtils.getReverseTransformedBlockPos(boxMaxRel, placement.getMirror(), placement.getRotation());
 
-        //System.out.printf("regionPos: %s => posEndRel: %s - regionSize: %s\n", regionPos, posEndRel, regionSize);
-        //System.out.printf("posMinRel: %s, posMinOffset: %s\nposMinOffsetTransformed: %s, posMinAbsTransformed: %s\n", posMinRel, posMinOffset, posMinOffsetTransformed, posMinAbsTransformed);
-        BlockPos pos1 = new BlockPos(bounds.minX - posMinAbsTransformed.getX(), 0, bounds.minZ - posMinAbsTransformed.getZ());
-        BlockPos pos2 = new BlockPos(bounds.maxX - posMinAbsTransformed.getX(), 0, bounds.maxZ - posMinAbsTransformed.getZ());
-        //System.out.printf("bounds: %s\n", bounds);
-        //System.out.printf("bounds relative non-transformed: pos1: %s - pos2: %s\n", pos1, pos2);
+        boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+        boxMaxRel = PositionUtils.getReverseTransformedBlockPos(boxMaxRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
 
-        pos1 = PositionUtils.getReverseTransformedBlockPos(pos1, placement.getMirror(), placement.getRotation());
-        pos2 = PositionUtils.getReverseTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation());
+        // Get the offset relative to the sub-region's minimum corner, instead of the origin corner (which can be at any corner)
+        boxMinRel = boxMinRel.subtract(posMinRel.subtract(regionPos));
+        boxMaxRel = boxMaxRel.subtract(posMinRel.subtract(regionPos));
 
-        pos1 = PositionUtils.getReverseTransformedBlockPos(pos1, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        pos2 = PositionUtils.getReverseTransformedBlockPos(pos2, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        //System.out.printf("bounds relative transformed: pos1: %s - pos2: %s\n", pos1, pos2);
+        BlockPos posMin = PositionUtils.getMinCorner(boxMinRel, boxMaxRel);
+        BlockPos posMax = PositionUtils.getMaxCorner(boxMinRel, boxMaxRel);
 
-        final int startX = Math.min(Math.abs(pos1.getX()), Math.abs(pos2.getX()));
-        final int startZ = Math.min(Math.abs(pos1.getZ()), Math.abs(pos2.getZ()));
-        final int endX = startX + Math.abs(pos2.getX() - pos1.getX());
-        final int endZ = startZ + Math.abs(pos2.getZ() - pos1.getZ());
+        final int startX = posMin.getX();
+        final int startZ = posMin.getZ();
+        final int endX = posMax.getX();
+        final int endZ = posMax.getZ();
 
         final int startY = 0;
         final int endY = regionSize.getY() - 1;
