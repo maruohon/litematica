@@ -670,7 +670,7 @@ public class SchematicPlacement
             JsonUtils.hasArray(obj, "placements"))
         {
             File file = new File(obj.get("schematic").getAsString());
-            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName(), InfoUtils.INFO_MESSAGE_CONSUMER);
+            LitematicaSchematic schematic = SchematicHolder.getInstance().getOrLoad(file, InfoUtils.INFO_MESSAGE_CONSUMER);
 
             if (schematic == null)
             {

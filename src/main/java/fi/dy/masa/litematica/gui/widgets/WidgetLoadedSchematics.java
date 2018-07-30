@@ -2,17 +2,17 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
 import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 
-public class WidgetLoadedSchematics extends WidgetListBase<SchematicEntry, WidgetSchematicEntry>
+public class WidgetLoadedSchematics extends WidgetListBase<LitematicaSchematic, WidgetSchematicEntry>
 {
     private final IMessageConsumer messageConsumer;
 
     public WidgetLoadedSchematics(int x, int y, int width, int height,
-            IMessageConsumer messageConsumer, @Nullable ISelectionListener<SchematicEntry> selectionListener)
+            IMessageConsumer messageConsumer, @Nullable ISelectionListener<LitematicaSchematic> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
@@ -37,7 +37,7 @@ public class WidgetLoadedSchematics extends WidgetListBase<SchematicEntry, Widge
     }
 
     @Override
-    protected WidgetSchematicEntry createListWidget(int x, int y, boolean isOdd, SchematicEntry entry)
+    protected WidgetSchematicEntry createListWidget(int x, int y, boolean isOdd, LitematicaSchematic entry)
     {
         return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this, this.mc);
     }

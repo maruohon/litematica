@@ -3,27 +3,21 @@ package fi.dy.masa.litematica;
 import java.io.File;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.mojang.realmsclient.dto.RealmsServer;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.InitCompleteListener;
-import com.mumfrey.liteloader.JoinGameListener;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
-import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.network.INetHandler;
-import net.minecraft.network.play.server.SPacketJoinGame;
 
-public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, JoinGameListener, Tickable
+public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, Tickable
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -64,13 +58,6 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     @Override
     public void upgradeSettings(String version, File configPath, File oldConfigPath)
     {
-    }
-
-    @Override
-    public void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer)
-    {
-        System.out.printf("onJoinGame -> DataManager.load()\n");
-        DataManager.load();
     }
 
     @Override

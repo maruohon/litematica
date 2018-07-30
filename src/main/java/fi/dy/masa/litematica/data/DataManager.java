@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -17,7 +16,6 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.OperationMode;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.init.Items;
@@ -25,14 +23,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 
 public class DataManager
 {
     public static final File ROOT_AREA_SELECTIONS_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(getCurrentConfigDirectory(), "area_selections"));
     public static final File ROOT_SCHEMATIC_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getMinecraft().mcDataDir, "schematics"));
 
-    private static final Int2ObjectOpenHashMap<DataManager> INSTANCES = new Int2ObjectOpenHashMap<>();
+    private static final DataManager INSTANCE = new DataManager();
 
     private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)(@(?<meta>[0-9]+))$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
@@ -52,30 +49,9 @@ public class DataManager
     {
     }
 
-    @Nullable
     public static DataManager getInstance()
     {
-        World world = Minecraft.getMinecraft().world;
-        return world != null ? getInstance(world) : null;
-    }
-
-    public static DataManager getInstance(World world)
-    {
-        final int dimension = world.provider.getDimensionType().getId();
-        return getInstance(dimension);
-    }
-
-    public static DataManager getInstance(int dimension)
-    {
-        DataManager instance = INSTANCES.get(dimension);
-
-        if (instance == null)
-        {
-            instance = new DataManager();
-            INSTANCES.put(dimension, instance);
-        }
-
-        return instance;
+        return INSTANCE;
     }
 
     public static void onClientTickStart()
@@ -112,12 +88,7 @@ public class DataManager
 
     public static void runTasks()
     {
-        DataManager manager = getInstance();
-
-        if (manager != null)
-        {
-            manager.getSchematicPlacementManager().processQueuedChunks();
-        }
+        INSTANCE.schematicPlacementManager.processQueuedChunks();
 
         if (placementToVerify != null)
         {
@@ -165,36 +136,16 @@ public class DataManager
 
     public static void load()
     {
-        File file = getCurrentStorageFile();
+        INSTANCE.loadPerDimensionData();
+
+        File file = getCurrentStorageFile(true);
         JsonElement element = JsonUtils.parseJsonFile(file);
 
         if (element != null && element.isJsonObject())
         {
-            JsonObject root = element.getAsJsonObject();
-
-            if (JsonUtils.hasArray(root, "data"))
-            {
-                JsonArray arr = root.get("data").getAsJsonArray();
-                final int size = arr.size();
-
-                for (int i = 0; i < size; i++)
-                {
-                    JsonElement el = arr.get(i);
-
-                    if (el.isJsonObject())
-                    {
-                        JsonObject obj = el.getAsJsonObject();
-
-                        if (JsonUtils.hasInteger(obj, "dim") && JsonUtils.hasObject(obj, "data"))
-                        {
-                            DataManager manager = getInstance(obj.get("dim").getAsInt());
-                            manager.fromJson(obj.get("data").getAsJsonObject());
-                        }
-                    }
-                }
-            }
-
             LAST_DIRECTORIES.clear();
+
+            JsonObject root = element.getAsJsonObject();
 
             if (JsonUtils.hasObject(root, "last_directories"))
             {
@@ -235,39 +186,48 @@ public class DataManager
 
     public static void save()
     {
+        INSTANCE.savePerDimensionData();
+
         JsonObject root = new JsonObject();
-        JsonArray arr = new JsonArray();
-
-        for (Map.Entry<Integer, DataManager> entry : INSTANCES.entrySet())
-        {
-            JsonObject o = new JsonObject();
-            o.add("dim", new JsonPrimitive(entry.getKey()));
-            o.add("data", entry.getValue().toJson());
-            arr.add(o);
-        }
-
-        if (arr.size() > 0)
-        {
-            root.add("data", arr);
-        }
-
-        JsonObject o = new JsonObject();
+        JsonObject objDirs = new JsonObject();
 
         for (Map.Entry<String, File> entry : LAST_DIRECTORIES.entrySet())
         {
-            o.add(entry.getKey(), new JsonPrimitive(entry.getValue().getAbsolutePath()));
-            root.add("last_directories", o);
+            objDirs.add(entry.getKey(), new JsonPrimitive(entry.getValue().getAbsolutePath()));
         }
 
+        root.add("last_directories", objDirs);
         root.add("operation_mode", new JsonPrimitive(operationMode.name()));
 
-        File file = getCurrentStorageFile();
-
+        File file = getCurrentStorageFile(true);
         JsonUtils.writeJsonToFile(root, file);
+    }
+
+    private void savePerDimensionData()
+    {
+        JsonObject root = this.toJson();
+
+        File file = getCurrentStorageFile(false);
+        JsonUtils.writeJsonToFile(root, file);
+    }
+
+    private void loadPerDimensionData()
+    {
+        File file = getCurrentStorageFile(false);
+        JsonElement element = JsonUtils.parseJsonFile(file);
+
+        if (element != null && element.isJsonObject())
+        {
+            JsonObject root = element.getAsJsonObject();
+            this.fromJson(root);
+        }
     }
 
     private void fromJson(JsonObject obj)
     {
+        this.selectionManager.clear();
+        this.schematicPlacementManager.clear();
+
         if (JsonUtils.hasObject(obj, "selections"))
         {
             this.selectionManager.loadFromJson(obj.get("selections").getAsJsonObject());
@@ -294,7 +254,7 @@ public class DataManager
         return new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
     }
 
-    private static File getCurrentStorageFile()
+    private static File getCurrentStorageFile(boolean globalData)
     {
         File dir = getCurrentConfigDirectory();
 
@@ -303,27 +263,37 @@ public class DataManager
             LiteModLitematica.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
         }
 
-        return new File(dir, getStorageFileName());
+        return new File(dir, getStorageFileName(globalData));
     }
 
-    private static String getStorageFileName()
+    private static String getStorageFileName(boolean globalData)
     {
-        if (Minecraft.getMinecraft().isSingleplayer())
-        {
-            IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
+        Minecraft mc = Minecraft.getMinecraft();
 
-            if (server != null)
+        if (mc.world != null)
+        {
+            // TODO How to fix this for Forge custom dimensions compatibility (if the type ID is not unique)?
+            final int dimension = mc.world.provider.getDimensionType().getId();
+
+            if (mc.isSingleplayer())
             {
-                return Reference.MOD_ID + "_" + server.getFolderName() + ".json";
+                IntegratedServer server = mc.getIntegratedServer();
+
+                if (server != null)
+                {
+                    String nameEnd = globalData ? ".json" : "_dim" + dimension + ".json";
+                    return Reference.MOD_ID + "_" + server.getFolderName() + nameEnd;
+                }
             }
-        }
-        else
-        {
-            ServerData server = Minecraft.getMinecraft().getCurrentServerData();
-
-            if (server != null)
+            else
             {
-                return Reference.MOD_ID + "_" + server.serverIP.replace(':', '_') + ".json";
+                ServerData server = mc.getCurrentServerData();
+
+                if (server != null)
+                {
+                    String nameEnd = globalData ? ".json" : "_dim" + dimension + ".json";
+                    return Reference.MOD_ID + "_" + server.serverIP.replace(':', '_') + nameEnd;
+                }
             }
         }
 

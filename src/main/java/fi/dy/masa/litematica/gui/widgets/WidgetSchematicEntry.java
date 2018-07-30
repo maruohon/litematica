@@ -1,15 +1,16 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.data.SchematicHolder.SchematicEntry;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -26,7 +27,7 @@ import net.minecraft.util.math.BlockPos;
 public class WidgetSchematicEntry extends WidgetBase
 {
     private final WidgetLoadedSchematics parent;
-    private final SchematicEntry schematicEntry;
+    private final LitematicaSchematic schematic;
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private final int typeIconX;
@@ -35,12 +36,12 @@ public class WidgetSchematicEntry extends WidgetBase
     private final int buttonsStartX;
 
     public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            SchematicEntry schematicEntry, WidgetLoadedSchematics parent, Minecraft mc)
+            LitematicaSchematic schematic, WidgetLoadedSchematics parent, Minecraft mc)
     {
         super(x, y, width, height, zLevel);
 
         this.parent = parent;
-        this.schematicEntry = schematicEntry;
+        this.schematic = schematic;
         this.mc = mc;
         this.isOdd = isOdd;
         y += 1;
@@ -114,12 +115,13 @@ public class WidgetSchematicEntry extends WidgetBase
             GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x50FFFFFF);
         }
 
-        String schematicName = this.schematicEntry.getSchematicName();
+        String schematicName = this.schematic.getMetadata().getName();
         this.mc.fontRenderer.drawString(schematicName, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.disableBlend();
-        String fileName = this.schematicEntry.getFileName();
+        File schematicFile = this.schematic.getFile();
+        String fileName = schematicFile != null ? schematicFile.getName() : null;
         this.parent.bindTexture(Icons.TEXTURE);
 
         Icons icon;
@@ -179,20 +181,20 @@ public class WidgetSchematicEntry extends WidgetBase
             if (this.type == Type.CREATE_PLACEMENT)
             {
                 Minecraft mc = Minecraft.getMinecraft();
-                int dimension = mc.world.provider.getDimensionType().getId();
                 BlockPos pos = new BlockPos(mc.player.getPositionVector());
-                SchematicEntry entry = this.widget.schematicEntry;
-                SchematicPlacement placement = SchematicPlacement.createFor(entry.getSchematic(), pos, entry.getSchematicName());
+                LitematicaSchematic entry = this.widget.schematic;
+                String name = entry.getMetadata().getName();
+                SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name);
                 boolean enabled = GuiScreen.isShiftKeyDown() == false;
                 placement.setEnabled(enabled);
                 placement.setRenderSchematic(enabled);
-                DataManager.getInstance(dimension).getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
+                DataManager.getInstance().getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {
                 Minecraft mc = Minecraft.getMinecraft();
-                SchematicEntry entry = this.widget.schematicEntry;
-                GuiSchematicSave gui = new GuiSchematicSave(entry.getSchematic());
+                LitematicaSchematic entry = this.widget.schematic;
+                GuiSchematicSave gui = new GuiSchematicSave(entry);
 
                 if (mc.currentScreen instanceof GuiLitematicaBase)
                 {
@@ -203,7 +205,7 @@ public class WidgetSchematicEntry extends WidgetBase
             }
             else if (this.type == Type.UNLOAD)
             {
-                SchematicHolder.getInstance().removeSchematic(this.widget.schematicEntry.getId());
+                SchematicHolder.getInstance().removeSchematic(this.widget.schematic);
                 this.widget.parent.refreshEntries();
             }
         }

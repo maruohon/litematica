@@ -147,8 +147,8 @@ public class SchematicPlacementManager
         if (worldSchematic.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
         {
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
+            worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4) - 1, 0, (chunkZ << 4) - 1, (chunkX << 4) + 16, 256, (chunkZ << 4) + 16);
             worldSchematic.getChunkProvider().unloadChunk(chunkX, chunkZ);
-            worldSchematic.markBlockRangeForRenderUpdate(chunkX << 4, 0, chunkZ << 4, (chunkX << 4) + 15, 256, (chunkZ << 4) + 15);
         }
     }
 
@@ -482,6 +482,17 @@ public class SchematicPlacementManager
         }
     }
 
+    public void clear()
+    {
+        SchematicHolder.getInstance().clearLoadedSchematics();
+        this.schematicPlacements.clear();
+        this.selectedPlacement = null;
+        this.schematicsTouchingChunk.clear();
+        this.chunksPreChange.clear();
+        this.chunksToRebuild.clear();
+        this.chunksToUnload.clear();
+    }
+
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
@@ -526,8 +537,7 @@ public class SchematicPlacementManager
 
     public void loadFromJson(JsonObject obj)
     {
-        this.schematicPlacements.clear();
-        this.selectedPlacement = null;
+        this.clear();
 
         if (JsonUtils.hasArray(obj, "placements"))
         {
@@ -545,10 +555,6 @@ public class SchematicPlacementManager
 
                     if (placement != null)
                     {
-                        String schematicName = placement.getSchematic().getMetadata().getName();
-                        String fileName = placement.getSchematicFile().getName();
-
-                        SchematicHolder.getInstance().addSchematic(placement.getSchematic(), schematicName, fileName);
                         this.addSchematicPlacement(placement, null);
                     }
                 }

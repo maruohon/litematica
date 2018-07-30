@@ -18,13 +18,25 @@ public class MixinMinecraft
     private void onLoadWorldPre(@Nullable WorldClient worldClientIn, String loadingMessage, CallbackInfo ci)
     {
         // Save the settings before the integrated server gets shut down
-        if (Minecraft.getMinecraft().world != null && worldClientIn == null)
+        if (Minecraft.getMinecraft().world != null)
         {
             DataManager.save();
+        }
+    }
+
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("RETURN"))
+    private void onLoadWorldPost(@Nullable WorldClient worldClientIn, String loadingMessage, CallbackInfo ci)
+    {
+        SchematicWorldHandler.getInstance().recreateSchematicWorld(worldClientIn == null);
+
+        if (worldClientIn != null)
+        {
+            DataManager.load();
+        }
+        else
+        {
             SchematicHolder.getInstance().clearLoadedSchematics();
         }
-
-        SchematicWorldHandler.getInstance().onClientWorldChange(worldClientIn);
     }
 
     @Inject(method = "runTick()V", at = @At("HEAD"))

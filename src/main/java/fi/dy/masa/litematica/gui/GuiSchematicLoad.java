@@ -102,9 +102,6 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                 this.gui.setNextMessageType(InfoType.ERROR);
                 LitematicaSchematic schematic = null;
-                // This name is used for showing a file icon versus an in-memory icon
-                // in the loaded schematics list.
-                String fileName = entry.getName();
 
                 if (entry.getType() == DirectoryEntryType.LITEMATICA_SCHEMATIC)
                 {
@@ -125,7 +122,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                 if (schematic != null)
                 {
-                    SchematicHolder.getInstance().addSchematic(schematic, schematic.getMetadata().getName(), fileName);
+                    SchematicHolder.getInstance().addSchematic(schematic, true);
                     this.gui.addMessage(InfoType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
                 }
             }

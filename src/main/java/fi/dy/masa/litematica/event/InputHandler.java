@@ -14,7 +14,6 @@ import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
 
 public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
 {
@@ -63,7 +62,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         // Not in a GUI
         if (mc.currentScreen == null && mc.world != null && mc.player != null)
         {
-            World world = mc.world;
             EntityPlayer player = mc.player;
             final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.getToolItem());
 
@@ -82,7 +80,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 {
                     if (mode == OperationMode.AREA_SELECTION)
                     {
-                        SelectionManager sm = DataManager.getInstance(world).getSelectionManager();
+                        SelectionManager sm = DataManager.getInstance().getSelectionManager();
 
                         if (sm.hasGrabbedElement())
                         {
@@ -98,7 +96,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     else if (mode == OperationMode.SCHEMATIC_PLACEMENT)
                     {
                         EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
-                        DataManager.getInstance(world).getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
+                        DataManager.getInstance().getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
                         return true;
                     }
                 }
@@ -119,7 +117,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (mc.world != null && mc.player != null)
         {
-            SelectionManager sm = DataManager.getInstance(mc.world).getSelectionManager();
+            SelectionManager sm = DataManager.getInstance().getSelectionManager();
 
             if (sm.hasGrabbedElement())
             {

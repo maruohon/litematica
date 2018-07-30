@@ -518,9 +518,15 @@ public class SelectionManager
         }
     }
 
-    public void loadFromJson(JsonObject obj)
+    public void clear()
     {
         this.selections.clear();
+        this.readOnlySelections.clear();
+    }
+
+    public void loadFromJson(JsonObject obj)
+    {
+        this.clear();
 
         if (JsonUtils.hasString(obj, "current"))
         {

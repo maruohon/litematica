@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.world;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
@@ -23,18 +22,13 @@ public class SchematicWorldHandler
         return INSTANCE;
     }
 
-    public void onClientWorldChange(WorldClient worldClient)
-    {
-        this.recreateSchematicWorld(worldClient == null);
-    }
-
     @Nullable
     public WorldSchematic getSchematicWorld()
     {
         return this.world;
     }
 
-    private void recreateSchematicWorld(boolean remove)
+    public void recreateSchematicWorld(boolean remove)
     {
         if (remove)
         {
@@ -44,6 +38,7 @@ public class SchematicWorldHandler
         {
             // Note: The dimension used here must have no skylight, because the custom Chunks don't have those arrays
             this.world = new WorldSchematic(null, this.settings, -1, EnumDifficulty.PEACEFUL, this.mc.mcProfiler);
+            this.world.addEventListener(LitematicaRenderer.getInstance().getRenderGlobal());
         }
 
         LitematicaRenderer.getInstance().onSchematicWorldChanged(this.world);

@@ -6,8 +6,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
+import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -44,7 +44,7 @@ public class RayTraceUtils
         RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
         double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
 
-        DataManager dataManager = DataManager.getInstance(world);
+        DataManager dataManager = DataManager.getInstance();
         AreaSelection area = dataManager.getSelectionManager().getCurrentSelection();
         RayTraceWrapper wrapper = null;
 

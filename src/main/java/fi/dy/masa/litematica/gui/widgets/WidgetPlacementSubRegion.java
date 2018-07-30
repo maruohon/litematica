@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import fi.dy.masa.litematica.data.Placement;
@@ -137,9 +138,8 @@ public class WidgetPlacementSubRegion extends WidgetBase
         this.mc.fontRenderer.drawString(pre + name, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
         Icons icon;
-        String fileName = this.schematicPlacement.getSchematicFile() != null ? this.schematicPlacement.getSchematicFile().getName() : null;
 
-        if (fileName != null)
+        if (this.schematicPlacement.getSchematic().getFile() != null)
         {
             icon = Icons.SCHEMATIC_TYPE_FILE;
         }
@@ -171,7 +171,8 @@ public class WidgetPlacementSubRegion extends WidgetBase
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        String fileName = this.schematicPlacement.getSchematicFile() != null ? this.schematicPlacement.getSchematicFile().getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
+        File schematicFile = this.schematicPlacement.getSchematic().getFile();
+        String fileName = schematicFile != null ? schematicFile.getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
 
         List<String> text = new ArrayList<>();
         text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.schematicPlacement.getSchematic().getMetadata().getName()));

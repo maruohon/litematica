@@ -86,7 +86,7 @@ public class OverlayRenderer
     public void updatePlacementCache()
     {
         this.placements.clear();
-        List<SchematicPlacement> list = DataManager.getInstance(this.mc.world).getSchematicPlacementManager().getAllSchematicsPlacements();
+        List<SchematicPlacement> list = DataManager.getInstance().getSchematicPlacementManager().getAllSchematicsPlacements();
 
         for (SchematicPlacement placement : list)
         {
@@ -105,7 +105,7 @@ public class OverlayRenderer
         float lineWidthBlockBox = 2f;
         float lineWidthArea = 1.5f;
 
-        DataManager dataManager = DataManager.getInstance(this.mc.world);
+        DataManager dataManager = DataManager.getInstance();
         SelectionManager sm = dataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         final boolean hasWork = currentSelection != null || this.placements.isEmpty() == false;
@@ -364,7 +364,7 @@ public class OverlayRenderer
              Hotkeys.RENDER_ERROR_INFO_OVERLAY.getKeybind().isKeybindHeld()) &&
             mc.world != null && mc.player != null)
         {
-            SchematicPlacement placement = DataManager.getInstance(mc.world).getSchematicPlacementManager().getSelectedSchematicPlacement();
+            SchematicPlacement placement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
 
             if (placement != null && placement.hasVerifier())
             {

@@ -1,17 +1,17 @@
 package fi.dy.masa.litematica.data;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import net.minecraft.client.Minecraft;
 
 public class SchematicHolder
 {
     private static final SchematicHolder INSTANCE = new SchematicHolder();
-    private final Map<Integer, SchematicEntry> schematics = new TreeMap<>();
-    private int nextId;
+    private final List<LitematicaSchematic> schematics = new ArrayList<>();
 
     public static SchematicHolder getInstance()
     {
@@ -21,82 +21,61 @@ public class SchematicHolder
     public void clearLoadedSchematics()
     {
         this.schematics.clear();
-        this.nextId = 0;
-    }
-
-    /**
-     * Adds the given schematic
-     * @param schematic
-     * @return the index at which
-     */
-    public int addSchematic(LitematicaSchematic schematic, String schematicName, @Nullable String fileName)
-    {
-        int id = this.nextId++;
-        this.schematics.put(id, new SchematicEntry(schematic, id, schematicName, fileName));
-        return id;
     }
 
     @Nullable
-    public SchematicEntry getSchematic(int id)
+    public LitematicaSchematic getOrLoad(File file, IStringConsumer feedback)
     {
-        return this.schematics.get(id);
+        for (LitematicaSchematic schematic : this.schematics)
+        {
+            if (file.equals(schematic.getFile()))
+            {
+                return schematic;
+            }
+        }
+
+        LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName(), feedback);
+
+        if (schematic != null)
+        {
+            this.schematics.add(schematic);
+        }
+
+        return schematic;
     }
 
-    public boolean removeSchematic(int id)
+    public void addSchematic(LitematicaSchematic schematic, boolean allowDuplicates)
     {
-        SchematicEntry entry = this.schematics.remove(id);
-
-        if (entry != null)
+        if (allowDuplicates || this.schematics.contains(schematic) == false)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-            int dimension = mc.world.provider.getDimensionType().getId();
-            DataManager.getInstance(dimension).getSchematicPlacementManager().removeAllPlacementsOfSchematic(entry.schematic);
+            if (allowDuplicates == false && schematic.getFile() != null)
+            {
+                for (LitematicaSchematic tmp : this.schematics)
+                {
+                    if (schematic.getFile().equals(tmp.getFile()))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            this.schematics.add(schematic);
+        }
+    }
+
+    public boolean removeSchematic(LitematicaSchematic schematic)
+    {
+        if (this.schematics.remove(schematic))
+        {
+            DataManager.getInstance().getSchematicPlacementManager().removeAllPlacementsOfSchematic(schematic);
             return true;
         }
 
         return false;
     }
 
-    public Collection<SchematicEntry> getAllSchematics()
+    public Collection<LitematicaSchematic> getAllSchematics()
     {
-        return this.schematics.values();
-    }
-
-    public static class SchematicEntry
-    {
-        private final LitematicaSchematic schematic;
-        private final String schematicName;
-        private final int schematicId;
-        @Nullable
-        private final String fileName;
-
-        public SchematicEntry(LitematicaSchematic schematic, int schematicId, String schematicName, @Nullable String fileName)
-        {
-            this.schematic = schematic;
-            this.schematicId = schematicId;
-            this.schematicName = schematicName;
-            this.fileName = fileName;
-        }
-
-        public LitematicaSchematic getSchematic()
-        {
-            return this.schematic;
-        }
-
-        public int getId()
-        {
-            return this.schematicId;
-        }
-
-        public String getSchematicName()
-        {
-            return this.schematicName;
-        }
-
-        @Nullable
-        public String getFileName()
-        {
-            return this.fileName;
-        }
+        return this.schematics;
     }
 }

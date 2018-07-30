@@ -40,8 +40,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
             this.title = I18n.format("litematica.gui.title.create_schematic_from_selection");
         }
 
-        Minecraft mc = Minecraft.getMinecraft();
-        this.selectionManager = DataManager.getInstance(mc.world).getSelectionManager();
+        this.selectionManager = DataManager.getInstance().getSelectionManager();
 
         AreaSelection area = this.selectionManager.getCurrentSelection();
 
@@ -182,7 +181,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
             if (schematic != null)
             {
                 schematic.getMetadata().setName(string);
-                SchematicHolder.getInstance().addSchematic(schematic, string, null);
+                SchematicHolder.getInstance().addSchematic(schematic, true);
                 StringUtils.printActionbarMessage("litematica.message.in_memory_schematic_created", string);
             }
         }

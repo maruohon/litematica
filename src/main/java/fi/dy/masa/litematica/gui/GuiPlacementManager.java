@@ -10,7 +10,6 @@ import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacements;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
 public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetSchematicPlacements>  implements ISelectionListener<SchematicPlacement>
@@ -23,10 +22,7 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
         super(10, 40);
 
         this.title = I18n.format("litematica.gui.title.manage_schematic_placements");
-
-        Minecraft mc = Minecraft.getMinecraft();
-        int dimension = mc.world.provider.getDimensionType().getId();
-        this.manager = DataManager.getInstance(dimension).getSchematicPlacementManager();
+        this.manager = DataManager.getInstance().getSchematicPlacementManager();
     }
 
     @Override

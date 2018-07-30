@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import fi.dy.masa.litematica.data.DataManager;
@@ -39,9 +40,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.placement = placement;
         this.isOdd = isOdd;
         this.mc = mc;
-
-        int dimension = mc.world.provider.getDimensionType().getId();
-        this.manager = DataManager.getInstance(dimension).getSchematicPlacementManager();
+        this.manager = DataManager.getInstance().getSchematicPlacementManager();
 
         this.id = 0;
         int posX = x + width;
@@ -142,9 +141,8 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.mc.fontRenderer.drawString(pre + name, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
         Icons icon;
-        String fileName = this.placement.getSchematicFile() != null ? this.placement.getSchematicFile().getName() : null;
 
-        if (fileName != null)
+        if (this.placement.getSchematic().getFile() != null)
         {
             icon = Icons.SCHEMATIC_TYPE_FILE;
         }
@@ -176,7 +174,8 @@ public class WidgetSchematicPlacement extends WidgetBase
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        String fileName = this.placement.getSchematicFile() != null ? this.placement.getSchematicFile().getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
+        File schematicFile = this.placement.getSchematic().getFile();
+        String fileName = schematicFile != null ? schematicFile.getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
 
         List<String> text = new ArrayList<>();
         text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));

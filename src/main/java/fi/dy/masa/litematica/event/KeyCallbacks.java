@@ -79,7 +79,7 @@ public class KeyCallbacks
             }
 
             OperationMode mode = DataManager.getOperationMode();
-            DataManager dataManager = DataManager.getInstance(this.mc.world);
+            DataManager dataManager = DataManager.getInstance();
 
             boolean toolEnabled = RenderEventHandler.getInstance().isEnabled() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
             boolean hasTool = EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem());
@@ -260,7 +260,7 @@ public class KeyCallbacks
             {
                 if (key == Hotkeys.ADD_SELECTION_BOX.getKeybind())
                 {
-                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
@@ -275,7 +275,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())
                 {
-                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
@@ -295,7 +295,7 @@ public class KeyCallbacks
 
                     if (DataManager.getOperationMode() == OperationMode.AREA_SELECTION)
                     {
-                        SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                        SelectionManager sm = DataManager.getInstance().getSelectionManager();
                         AreaSelection selection = sm.getCurrentSelection();
 
                         if (selection != null)
@@ -309,7 +309,7 @@ public class KeyCallbacks
                     }
                     else if (DataManager.getOperationMode().getUsesSchematic())
                     {
-                        DataManager.getInstance(this.mc.world).getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
+                        DataManager.getInstance().getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
                     }
 
                     return true;
@@ -321,7 +321,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
                 {
-                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
@@ -335,7 +335,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() || key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())
                 {
-                    SelectionManager sm = DataManager.getInstance(this.mc.world).getSelectionManager();
+                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null && selection.getSelectedSubRegionBox() != null)
