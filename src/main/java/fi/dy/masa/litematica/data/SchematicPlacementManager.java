@@ -19,6 +19,7 @@ import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.JsonUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
@@ -444,7 +445,9 @@ public class SchematicPlacementManager
             if (placement != null)
             {
                 // getPos returns a relative position, but moveSubRegionTo takes an absolute position...
-                BlockPos old = placement.getPos().add(schematicPlacement.getOrigin());
+                BlockPos old = PositionUtils.getTransformedBlockPos(placement.getPos(), schematicPlacement.getMirror(), schematicPlacement.getRotation());
+                old = old.add(schematicPlacement.getOrigin());
+
                 schematicPlacement.moveSubRegionTo(placement.getName(), old.offset(direction, amount));
             }
             // Moving the origin point

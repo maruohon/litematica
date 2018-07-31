@@ -289,14 +289,16 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
                 int value = Integer.parseInt(textField.getText());
                 // The sub-region placements are relative (but the setter below uses the
                 // absolute position and subtracts the placement origin internally)
-                BlockPos posOld = this.placement.getPos().add(this.schematicPlacement.getOrigin());
+                BlockPos posOld = this.placement.getPos();
+                posOld = PositionUtils.getTransformedBlockPos(posOld, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
+                posOld = posOld.add(this.schematicPlacement.getOrigin());
                 BlockPos pos = posOld;
 
                 switch (this.type)
                 {
-                    case X: pos = new BlockPos(value, posOld.getY(), posOld.getZ()); break;
-                    case Y: pos = new BlockPos(posOld.getX(), value, posOld.getZ()); break;
-                    case Z: pos = new BlockPos(posOld.getX(), posOld.getY(), value); break;
+                    case X: pos = new BlockPos(value        , posOld.getY(), posOld.getZ()); break;
+                    case Y: pos = new BlockPos(posOld.getX(), value        , posOld.getZ()); break;
+                    case Z: pos = new BlockPos(posOld.getX(), posOld.getY(), value        ); break;
                 }
 
                 this.schematicPlacement.moveSubRegionTo(this.placement.getName(), pos);

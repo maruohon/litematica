@@ -417,7 +417,12 @@ public class SchematicPlacement
             SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
-            this.relativeSubRegionPlacements.get(regionName).setPos(newPos.subtract(this.origin));
+            // The input argument position is an absolute position, so need to convert to relative position here
+            newPos = newPos.subtract(this.origin);
+            // The absolute-based input position needs to be transformed if the entire placement has been rotated or mirrored
+            newPos = PositionUtils.getReverseTransformedBlockPos(newPos, this.mirror, this.rotation);
+
+            this.relativeSubRegionPlacements.get(regionName).setPos(newPos);
             this.checkAreSubRegionsModified();
             this.onModified(regionName, manager);
         }
