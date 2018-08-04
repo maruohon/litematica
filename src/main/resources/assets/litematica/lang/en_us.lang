@@ -185,6 +185,7 @@ litematica.message.only_works_in_single_player=§cThis operation only works in s
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
 litematica.message.removed_selection_box=Removed selection box %s
+litematica.message.scheduled_task_added=Scheduled task added...
 litematica.message.schematic_pasted=Schematic Pasted in world
 litematica.message.schematic_placement_created=Placement created for '%s'
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'

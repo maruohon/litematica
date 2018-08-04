@@ -480,6 +480,8 @@ public class SchematicPlacementManager
                             StringUtils.printActionbarMessage("litematica.message.schematic_pasted");
                         }
                     });
+
+                    StringUtils.printActionbarMessage("litematica.message.scheduled_task_added");
                 }
                 else
                 {
