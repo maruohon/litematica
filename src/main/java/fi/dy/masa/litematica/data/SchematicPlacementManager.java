@@ -463,15 +463,23 @@ public class SchematicPlacementManager
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
-            SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
+            final SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
             if (schematicPlacement != null)
             {
                 if (mc.isSingleplayer())
                 {
-                    WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
-                    schematicPlacement.getSchematic().placeToWorld(world, schematicPlacement, false);
-                    StringUtils.printActionbarMessage("litematica.message.schematic_pasted");
+                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
+                    final LitematicaSchematic schematic = schematicPlacement.getSchematic();
+
+                    world.addScheduledTask(new Runnable()
+                    {
+                        public void run()
+                        {
+                            schematic.placeToWorld(world, schematicPlacement, false);
+                            StringUtils.printActionbarMessage("litematica.message.schematic_pasted");
+                        }
+                    });
                 }
                 else
                 {
