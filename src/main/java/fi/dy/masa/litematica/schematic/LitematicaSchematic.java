@@ -224,30 +224,15 @@ public class LitematicaSchematic
         // These are the untransformed relative positions
         BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
         BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
-        BlockPos posMaxRel = PositionUtils.getMaxCorner(regionPos, posEndRel);
 
-        // Calculate the absolute offset of the region's untransformed minimum corner to the region's position (region's origin corner)
-        BlockPos posMinOffset = posMinRel.subtract(regionPos);
-        BlockPos posMaxOffset = posMaxRel.subtract(regionPos);
-        // And then transform it by the region's rotation and mirror
-        BlockPos posMinOffsetTransformed = PositionUtils.getTransformedBlockPos(posMinOffset, placement.getMirror(), placement.getRotation());
-        BlockPos posMaxOffsetTransformed = PositionUtils.getTransformedBlockPos(posMaxOffset, placement.getMirror(), placement.getRotation());
+        BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+        BlockPos posEndAbs = PositionUtils.getTransformedPlacementPosition(regionSize.add(-1, -1, -1), schematicPlacement, placement).add(regionPosTransformed).add(origin);
 
-        // The absolute position of the minimum corner is found by first transforming the relative minimum corner
-        // by the entire placement's rotation and mirror...
-        BlockPos posMinAbsTransformed = PositionUtils.getTransformedBlockPos(posMinRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        BlockPos posMaxAbsTransformed = PositionUtils.getTransformedBlockPos(posMaxRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        // ... and then adding the relative offset between the region origin and the region minimum corner,
-        // that has been transformed by the region's rotation and mirror
-        posMinAbsTransformed = posMinAbsTransformed.add(posMinOffsetTransformed).add(origin);
-        posMaxAbsTransformed = posMaxAbsTransformed.add(posMaxOffsetTransformed).add(origin);
-
-        if (PositionUtils.arePositionsWithinWorld(world, posMinAbsTransformed, posMaxAbsTransformed))
+        if (PositionUtils.arePositionsWithinWorld(world, regionPosTransformed.add(origin), posEndAbs))
         {
-            BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-            final int sizeX = posMaxRel.getX() - posMinRel.getX() + 1;
-            final int sizeY = posMaxRel.getY() - posMinRel.getY() + 1;
-            final int sizeZ = posMaxRel.getZ() - posMinRel.getZ() + 1;
+            final int sizeX = Math.abs(regionSize.getX());
+            final int sizeY = Math.abs(regionSize.getY());
+            final int sizeZ = Math.abs(regionSize.getZ());
             BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
             final Rotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation());
