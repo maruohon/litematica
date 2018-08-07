@@ -114,7 +114,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     {
         // The width and height will be set to the actual values in initGui()
         WidgetAreaSelectionBrowser widget = new WidgetAreaSelectionBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
-        widget.setParent(this.getParent());
+        widget.setParent(this);
         return widget;
     }
 

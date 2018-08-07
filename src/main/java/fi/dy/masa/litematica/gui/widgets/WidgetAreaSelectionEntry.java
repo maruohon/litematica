@@ -219,7 +219,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         public void setString(String string)
         {
             String oldName = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
-            this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), oldName, string, this.widget.parent.getParent());
+            this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), oldName, string, this.widget.parent.getSelectionManagerGui());
         }
     }
 }
