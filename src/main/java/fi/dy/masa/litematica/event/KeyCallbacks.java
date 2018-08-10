@@ -56,6 +56,7 @@ public class KeyCallbacks
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind().setCallback(callbackMessage);
+        Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(callbackMessage);
@@ -375,6 +376,13 @@ public class KeyCallbacks
                 {
                     boolean enabled = RenderEventHandler.getInstance().toggleRenderSchematics();
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getName());
+                    this.printToggleMessage(name, enabled);
+                    return true;
+                }
+                else if (key == Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind())
+                {
+                    boolean enabled = RenderEventHandler.getInstance().toggleRenderMismatches();
+                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                     return true;
                 }

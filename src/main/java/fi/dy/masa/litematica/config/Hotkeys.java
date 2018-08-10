@@ -30,6 +30,7 @@ public enum Hotkeys implements IHotkey
     SET_SELECTION_BOX_POSITION_2        ("setSelectionBoxPosition2",        "M,2",  "Set the second position of the currently selected box to the player's position"),
     TOGGLE_ALL_RENDERING                ("toggleAllRendering",              "M,R",  "Toggle all rendering on/off"),
     TOGGLE_GHOST_BLOCK_RENDERING        ("toggleGhostBlockRendering",       "M,G",  "Toggle ghost block rendering on/off"),
+    TOGGLE_MISMATCH_OVERLAY_RENDERING   ("toggleMismatchOverlayRendering",  "M,E",  "Toggle the mismatch overlay rendering (for Schematic Verifier)"),
     TOGGLE_SELECTION_BOXES_RENDERING    ("toggleSelectionBoxesRendering",   "M,B",  "Toggle selection boxes rendering on/off"),
     TOGGLE_TRANSLUCENT_RENDERING        ("toggleTranslucentRendering",      "M,U",  "Toggle translucent vs. opaque ghost block rendering"),
     TOGGLE_WIRE_FRAME_RENDERING         ("toggleWireFrameRendering",        "M,W",  "Toggle block wire frame rendering on/off"),

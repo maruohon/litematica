@@ -9,9 +9,10 @@ import net.minecraft.client.Minecraft;
 public class RenderEventHandler
 {
     private static final RenderEventHandler INSTANCE = new RenderEventHandler();
-    private boolean enableRendering;
-    private boolean renderSelections;
-    private boolean renderSchematics;
+    private boolean enableRendering = true;
+    private boolean renderMismatches = true;
+    private boolean renderSchematics = true;
+    private boolean renderSelections = true;
 
     public static RenderEventHandler getInstance()
     {
@@ -27,6 +28,12 @@ public class RenderEventHandler
     {
         this.enableRendering = ! this.enableRendering;
         return this.enableRendering;
+    }
+
+    public boolean toggleRenderMismatches()
+    {
+        this.renderMismatches = ! this.renderMismatches;
+        return this.renderMismatches;
     }
 
     public boolean toggleRenderSelectionBoxes()
@@ -57,8 +64,15 @@ public class RenderEventHandler
                 LitematicaRenderer.getInstance().renderSchematicWorld();
             }
 
-            OverlayRenderer.getInstance().renderSelectionAreas();
-            OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
+            if (this.renderSelections)
+            {
+                OverlayRenderer.getInstance().renderSelectionAreas();
+            }
+
+            if (this.renderMismatches)
+            {
+                OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
+            }
         }
     }
 
@@ -70,7 +84,11 @@ public class RenderEventHandler
         {
             ToolHud.getInstance().renderHud();
             InfoHud.getInstance().renderHud();
-            OverlayRenderer.renderHoverInfoForBlockMismatch(mc);
+
+            if (this.renderMismatches)
+            {
+                OverlayRenderer.renderHoverInfoForBlockMismatch(mc);
+            }
         }
     }
 }
