@@ -3,18 +3,24 @@ package fi.dy.masa.litematica.render.schematic;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
 import fi.dy.masa.litematica.interfaces.IMixinRenderGlobal;
+import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.BlockFluidRenderer;
+import net.minecraft.client.renderer.BlockModelShapes;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.ChunkRenderContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -23,6 +29,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderList;
 import net.minecraft.client.renderer.VboRenderList;
 import net.minecraft.client.renderer.ViewFrustum;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.IRenderChunkFactory;
@@ -32,17 +39,22 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ReportedException;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -50,9 +62,12 @@ public class RenderGlobalSchematic extends RenderGlobal
 {
     private final Minecraft mc;
     private final RenderManager renderManager;
+    private final BlockModelShapes blockModelShapes;
+    private final BlockModelRendererSchematic blockModelRenderer;
+    private final BlockFluidRenderer fluidRenderer;
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private WorldClient world;
-    private Set<RenderChunk> chunksToUpdate = Sets.<RenderChunk>newLinkedHashSet();
+    private Set<RenderChunk> chunksToUpdate = new LinkedHashSet<>();
     private List<RenderChunk> renderInfos = new ArrayList<>(69696);
     private ViewFrustum viewFrustum;
     private double frustumUpdatePosX = Double.MIN_VALUE;
@@ -64,8 +79,8 @@ public class RenderGlobalSchematic extends RenderGlobal
     private double lastViewEntityX = Double.MIN_VALUE;
     private double lastViewEntityY = Double.MIN_VALUE;
     private double lastViewEntityZ = Double.MIN_VALUE;
-    private double lastViewEntityPitch = Double.MIN_VALUE;
-    private double lastViewEntityYaw = Double.MIN_VALUE;
+    private float lastViewEntityPitch = Float.MIN_VALUE;
+    private float lastViewEntityYaw = Float.MIN_VALUE;
     private ChunkRenderDispatcher renderDispatcher;
     private ChunkRenderContainer renderContainer;
     private IRenderChunkFactory renderChunkFactory;
@@ -90,6 +105,11 @@ public class RenderGlobalSchematic extends RenderGlobal
 
         this.mc = mc;
         this.renderManager = mc.getRenderManager();
+
+        BlockRendererDispatcher dispatcher = mc.getBlockRendererDispatcher();
+        this.blockModelShapes = dispatcher.getBlockModelShapes();
+        this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColors());
+        this.fluidRenderer = ((IMixinBlockRendererDispatcher) dispatcher).getFluidRenderer();
     }
 
     @Override
@@ -276,12 +296,12 @@ public class RenderGlobalSchematic extends RenderGlobal
         RenderChunk renderChunk = ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(viewPos);
         BlockPos blockpos = new BlockPos(MathHelper.floor(x / 16.0D) * 16, MathHelper.floor(y / 16.0D) * 16, MathHelper.floor(z / 16.0D) * 16);
 
-        this.displayListEntitiesDirty = this.displayListEntitiesDirty || !this.chunksToUpdate.isEmpty() || viewEntity.posX != this.lastViewEntityX || viewEntity.posY != this.lastViewEntityY || viewEntity.posZ != this.lastViewEntityZ || (double)viewEntity.rotationPitch != this.lastViewEntityPitch || (double)viewEntity.rotationYaw != this.lastViewEntityYaw;
+        this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false || viewEntity.posX != this.lastViewEntityX || viewEntity.posY != this.lastViewEntityY || viewEntity.posZ != this.lastViewEntityZ || viewEntity.rotationPitch != this.lastViewEntityPitch || viewEntity.rotationYaw != this.lastViewEntityYaw;
         this.lastViewEntityX = viewEntity.posX;
         this.lastViewEntityY = viewEntity.posY;
         this.lastViewEntityZ = viewEntity.posZ;
-        this.lastViewEntityPitch = (double) viewEntity.rotationPitch;
-        this.lastViewEntityYaw = (double) viewEntity.rotationYaw;
+        this.lastViewEntityPitch = viewEntity.rotationPitch;
+        this.lastViewEntityYaw = viewEntity.rotationYaw;
 
         this.mc.mcProfiler.endStartSection("update");
 
@@ -290,7 +310,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             this.displayListEntitiesDirty = false;
             this.renderInfos = new ArrayList<>(69696);
             Queue<RenderChunk> queue = Queues.newArrayDeque();
-            Entity.setRenderDistanceWeight(MathHelper.clamp((double)this.mc.gameSettings.renderDistanceChunks / 8.0D, 1.0D, 2.5D));
+            Entity.setRenderDistanceWeight(MathHelper.clamp((double) this.mc.gameSettings.renderDistanceChunks / 8.0D, 1.0D, 2.5D));
             //boolean flag1 = this.mc.renderChunksMany;
 
             if (renderChunk != null)
@@ -394,7 +414,7 @@ public class RenderGlobalSchematic extends RenderGlobal
 
         this.mc.mcProfiler.endStartSection("rebuildNear");
         Set<RenderChunk> set = this.chunksToUpdate;
-        this.chunksToUpdate = Sets.<RenderChunk>newLinkedHashSet();
+        this.chunksToUpdate = new LinkedHashSet<>();
 
         for (RenderChunk renderChunkTmp : this.renderInfos)
         {
@@ -402,7 +422,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             {
                 this.displayListEntitiesDirty = true;
                 BlockPos pos = renderChunkTmp.getPosition().add(8, 8, 8);
-                boolean isNear = pos.distanceSq(viewPos) < 768.0D;
+                boolean isNear = pos.distanceSq(viewPos) < 1024.0D;
 
                 if (renderChunkTmp.needsImmediateUpdate() == false && isNear == false)
                 {
@@ -541,13 +561,13 @@ public class RenderGlobalSchematic extends RenderGlobal
 
         if (OpenGlHelper.useVbo())
         {
-            GlStateManager.glEnableClientState(32884);
+            GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
             OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
-            GlStateManager.glEnableClientState(32888);
+            GlStateManager.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
             OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapTexUnit);
-            GlStateManager.glEnableClientState(32888);
+            GlStateManager.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
             OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
-            GlStateManager.glEnableClientState(32886);
+            GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
         }
 
         this.renderContainer.renderChunkLayer(blockLayerIn);
@@ -562,15 +582,15 @@ public class RenderGlobalSchematic extends RenderGlobal
                 switch (vertexformatelement$enumusage)
                 {
                     case POSITION:
-                        GlStateManager.glDisableClientState(32884);
+                        GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
                         break;
                     case UV:
                         OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + index);
-                        GlStateManager.glDisableClientState(32888);
+                        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                         OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
                         break;
                     case COLOR:
-                        GlStateManager.glDisableClientState(32886);
+                        GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
                         GlStateManager.resetColor();
                     default:
                 }
@@ -578,6 +598,45 @@ public class RenderGlobalSchematic extends RenderGlobal
         }
 
         this.mc.entityRenderer.disableLightmap();
+    }
+
+    public boolean renderBlock(IBlockState state, BlockPos pos, IBlockAccess blockAccess, BufferBuilder bufferBuilderIn)
+    {
+        try
+        {
+            EnumBlockRenderType renderType = state.getRenderType();
+
+            if (renderType == EnumBlockRenderType.INVISIBLE)
+            {
+                return false;
+            }
+            else
+            {
+                switch (renderType)
+                {
+                    case MODEL:
+                        return this.blockModelRenderer.renderModel(blockAccess, this.getModelForState(state), state, pos, bufferBuilderIn);
+                    case ENTITYBLOCK_ANIMATED:
+                        return false;
+                    case LIQUID:
+                        return this.fluidRenderer.renderFluid(blockAccess, state, pos, bufferBuilderIn);
+                    default:
+                        return false;
+                }
+            }
+        }
+        catch (Throwable throwable)
+        {
+            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block in world");
+            CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being tesselated");
+            CrashReportCategory.addBlockInfo(crashreportcategory, pos, state.getBlock(), state.getBlock().getMetaFromState(state));
+            throw new ReportedException(crashreport);
+        }
+    }
+
+    private IBakedModel getModelForState(IBlockState state)
+    {
+        return this.blockModelShapes.getModelForState(state);
     }
 
     @Override

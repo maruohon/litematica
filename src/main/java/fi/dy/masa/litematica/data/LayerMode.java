@@ -1,17 +1,18 @@
-package fi.dy.masa.litematica.selection;
+package fi.dy.masa.litematica.data;
 
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import net.minecraft.client.resources.I18n;
 
-public enum AreaSelectionMode implements IConfigOptionListEntry
+public enum LayerMode implements IConfigOptionListEntry
 {
-    CORNERS     ("corners",     "litematica.hud.area_selection.mode.corners"),
-    CUBOID      ("cuboid",      "litematica.hud.area_selection.mode.cuboid");
+    ALL             ("all",             "litematica.gui.label.layer_mode.all"),
+    SINGLE_LAYER    ("single_layer",    "litematica.gui.label.layer_mode.single_layer"),
+    LAYER_RANGE     ("layer_range",     "litematica.gui.label.layer_mode.layer_range");
 
     private final String configString;
     private final String translationKey;
 
-    private AreaSelectionMode(String configString, String translationKey)
+    private LayerMode(String configString, String translationKey)
     {
         this.configString = configString;
         this.translationKey = translationKey;
@@ -53,14 +54,14 @@ public enum AreaSelectionMode implements IConfigOptionListEntry
     }
 
     @Override
-    public AreaSelectionMode fromString(String name)
+    public LayerMode fromString(String name)
     {
         return fromStringStatic(name);
     }
 
-    public static AreaSelectionMode fromStringStatic(String name)
+    public static LayerMode fromStringStatic(String name)
     {
-        for (AreaSelectionMode mode : AreaSelectionMode.values())
+        for (LayerMode mode : LayerMode.values())
         {
             if (mode.configString.equalsIgnoreCase(name))
             {
@@ -68,6 +69,6 @@ public enum AreaSelectionMode implements IConfigOptionListEntry
             }
         }
 
-        return AreaSelectionMode.CORNERS;
+        return LayerMode.ALL;
     }
 }

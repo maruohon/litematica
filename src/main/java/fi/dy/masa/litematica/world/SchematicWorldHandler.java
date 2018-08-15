@@ -10,37 +10,30 @@ import net.minecraft.world.WorldType;
 
 public class SchematicWorldHandler
 {
-    private static final SchematicWorldHandler INSTANCE = new SchematicWorldHandler();
-
-    private final WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
-    private final Minecraft mc = Minecraft.getMinecraft();
+    private static final WorldSettings SETTINGS = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
+    private static final Minecraft MC = Minecraft.getMinecraft();
     @Nullable
-    private WorldSchematic world;
-
-    public static SchematicWorldHandler getInstance()
-    {
-        return INSTANCE;
-    }
+    private static WorldSchematic world;
 
     @Nullable
-    public WorldSchematic getSchematicWorld()
+    public static WorldSchematic getSchematicWorld()
     {
-        return this.world;
+        return world;
     }
 
-    public void recreateSchematicWorld(boolean remove)
+    public static void recreateSchematicWorld(boolean remove)
     {
         if (remove)
         {
-            this.world = null;
+            world = null;
         }
         else
         {
             // Note: The dimension used here must have no skylight, because the custom Chunks don't have those arrays
-            this.world = new WorldSchematic(null, this.settings, -1, EnumDifficulty.PEACEFUL, this.mc.mcProfiler);
+            world = new WorldSchematic(null, SETTINGS, -1, EnumDifficulty.PEACEFUL, MC.mcProfiler);
             //this.world.addEventListener(LitematicaRenderer.getInstance().getRenderGlobal());
         }
 
-        LitematicaRenderer.getInstance().onSchematicWorldChanged(this.world);
+        LitematicaRenderer.getInstance().onSchematicWorldChanged(world);
     }
 }

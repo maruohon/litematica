@@ -332,7 +332,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     break;
 
                 case START:
-                    WorldSchematic world = SchematicWorldHandler.getInstance().getSchematicWorld();
+                    WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
 
                     if (world != null)
                     {

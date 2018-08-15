@@ -31,7 +31,7 @@ public class MixinGuiOverlayDebug
         String rst = TextFormatting.RESET.toString();
 
         RenderGlobal render = LitematicaRenderer.getInstance().getRenderGlobal();
-        WorldClient world = SchematicWorldHandler.getInstance().getSchematicWorld();
+        WorldClient world = SchematicWorldHandler.getSchematicWorld();
 
         list.add("");
         list.add(String.format("%s[Litematica]%s %s", pre, rst, render.getDebugInfoRenders()));

@@ -4,12 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
 import fi.dy.masa.litematica.mixin.IMixinRenderChunk;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
@@ -19,10 +20,12 @@ import net.minecraft.client.renderer.chunk.VisGraph;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -30,15 +33,16 @@ public class RenderChunkSchematicVbo extends RenderChunk
 {
     public static int schematicRenderChunksUpdated;
 
-    private final RenderGlobal renderGlobal;
+    private final RenderGlobalSchematic renderGlobal;
     private final Set<TileEntity> setTileEntities = new HashSet<>();
-    private ChunkCacheSchematic worldView;
+    private ChunkCacheSchematic schematicWorldView;
+    private ChunkCacheSchematic clientWorldView;
 
     public RenderChunkSchematicVbo(World worldIn, RenderGlobal renderGlobalIn, int indexIn)
     {
         super(worldIn, renderGlobalIn, indexIn);
 
-        this.renderGlobal = renderGlobalIn;
+        this.renderGlobal = (RenderGlobalSchematic) renderGlobalIn;
     }
 
     @Override
@@ -46,11 +50,27 @@ public class RenderChunkSchematicVbo extends RenderChunk
     {
         CompiledChunk compiledchunk = generator.getCompiledChunk();
 
-        if (compiledchunk.getState() != null && !compiledchunk.isLayerEmpty(BlockRenderLayer.TRANSLUCENT))
+        if (compiledchunk.getState() != null)
         {
-            this.preRenderBlocks(generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT), this.getPosition());
-            generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT).setVertexState(compiledchunk.getState());
-            this.postRenderBlocks(BlockRenderLayer.TRANSLUCENT, x, y, z, generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT), compiledchunk);
+            if (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue())
+            {
+                for (BlockRenderLayer layer : BlockRenderLayer.values())
+                {
+                    BufferBuilder buffer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(layer);
+
+                    this.preRenderBlocks(buffer, this.getPosition());
+                    buffer.setVertexState(compiledchunk.getState());
+                    this.postRenderBlocks(layer, x, y, z, buffer, compiledchunk);
+                }
+            }
+            else if (compiledchunk.isLayerEmpty(BlockRenderLayer.TRANSLUCENT) == false)
+            {
+                BufferBuilder buffer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
+
+                this.preRenderBlocks(buffer, this.getPosition());
+                buffer.setVertexState(compiledchunk.getState());
+                this.postRenderBlocks(BlockRenderLayer.TRANSLUCENT, x, y, z, buffer, compiledchunk);
+            }
         }
     }
 
@@ -76,20 +96,30 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
         VisGraph visGraph = new VisGraph();
         HashSet<TileEntity> tileEntities = Sets.newHashSet();
+        BlockPos pos = this.getPosition();
+        final int yMin = DataManager.getLayerMin();
+        final int yMax = DataManager.getLayerMax();
 
-        if (this.worldView.isEmpty() == false)
+        if (this.schematicWorldView.isEmpty() == false &&
+            pos.getY() + 15 >= yMin &&
+            pos.getY()      <= yMax)
         {
             ++schematicRenderChunksUpdated;
             boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
-            BlockRendererDispatcher rendererDispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+            BlockPos posFrom = new BlockPos(pos.getX()     , MathHelper.clamp(yMin, pos.getY(), pos.getY() + 15), pos.getZ()     );
+            BlockPos posTo   = new BlockPos(pos.getX() + 15, MathHelper.clamp(yMax, pos.getY(), pos.getY() + 15), pos.getZ() + 15);
 
-            BlockPos posFrom = this.getPosition();
-            BlockPos posTo = posFrom.add(15, 15, 15);
-
-            for (BlockPos.MutableBlockPos blockpos$mutableblockpos : BlockPos.getAllInBoxMutable(posFrom, posTo))
+            for (BlockPos.MutableBlockPos posMutable : BlockPos.getAllInBoxMutable(posFrom, posTo))
             {
-                IBlockState iblockstate = this.worldView.getBlockState(blockpos$mutableblockpos);
-                Block block = iblockstate.getBlock();
+                IBlockState stateClient = this.clientWorldView.getBlockState(posMutable);
+
+                if (stateClient.getBlock() != Blocks.AIR)
+                {
+                    continue;
+                }
+
+                IBlockState state = this.schematicWorldView.getBlockState(posMutable);
+                Block block = state.getBlock();
 
                 /*
                 if (iblockstate.isOpaqueCube())
@@ -100,7 +130,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
                 if (block.hasTileEntity())
                 {
-                    TileEntity tileentity = this.worldView.getTileEntity(blockpos$mutableblockpos, Chunk.EnumCreateEntityType.CHECK);
+                    TileEntity tileentity = this.schematicWorldView.getTileEntity(posMutable, Chunk.EnumCreateEntityType.CHECK);
 
                     if (tileentity != null)
                     {
@@ -118,10 +148,10 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     }
                 }
 
-                BlockRenderLayer layer = block.getBlockLayer();
+                BlockRenderLayer layer = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() ? BlockRenderLayer.TRANSLUCENT : block.getBlockLayer();
                 int layerIndex = layer.ordinal();
 
-                if (block.getDefaultState().getRenderType() != EnumBlockRenderType.INVISIBLE)
+                if (state.getRenderType() != EnumBlockRenderType.INVISIBLE)
                 {
                     BufferBuilder buffer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayerId(layerIndex);
 
@@ -131,7 +161,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                         this.preRenderBlocks(buffer, this.getPosition());
                     }
 
-                    usedLayers[layerIndex] |= rendererDispatcher.renderBlock(iblockstate, blockpos$mutableblockpos, this.worldView, buffer);
+                    usedLayers[layerIndex] |= this.renderGlobal.renderBlock(state, posMutable, this.schematicWorldView, buffer);
                 }
             }
 
@@ -185,6 +215,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         bufferBuilderIn.finishDrawing();
     }
 
+    @Override
     public ChunkCompileTaskGenerator makeCompileTaskChunk()
     {
         this.getLockCompileTask().lock();
@@ -207,6 +238,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
     private void rebuildWorldView()
     {
-        this.worldView = new ChunkCacheSchematic(this.getWorld(), this.getPosition(), 2);
+        this.schematicWorldView = new ChunkCacheSchematic(this.getWorld(), this.getPosition(), 2);
+        this.clientWorldView    = new ChunkCacheSchematic(Minecraft.getMinecraft().world, this.getPosition(), 2);
     }
 }

@@ -97,10 +97,9 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSelectionAreas()
+    public void renderSelectionAreas(float partialTicks)
     {
         Entity renderViewEntity = this.mc.getRenderViewEntity();
-        float partialTicks = this.mc.getRenderPartialTicks();
         float expand = 0.001f;
         float lineWidthBlockBox = 2f;
         float lineWidthArea = 1.5f;

@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.event;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.LayerMode;
 import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
@@ -37,6 +38,10 @@ public class KeyCallbacks
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
 
         Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.LAYER_MODE_NEXT.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.LAYER_MODE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.LAYER_NEXT.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.LAYER_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind().setCallback(callbackHotkeys);
@@ -82,7 +87,7 @@ public class KeyCallbacks
             OperationMode mode = DataManager.getOperationMode();
             DataManager dataManager = DataManager.getInstance();
 
-            boolean toolEnabled = RenderEventHandler.getInstance().isEnabled() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
+            boolean toolEnabled = DataManager.isRenderingEnabled() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
             boolean hasTool = EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem());
             boolean isToolPrimary = key == Hotkeys.TOOL_PLACE_CORNER_1.getKeybind();
             boolean isToolSecondary = key == Hotkeys.TOOL_PLACE_CORNER_2.getKeybind();
@@ -143,6 +148,27 @@ public class KeyCallbacks
 
                     return true;
                 }
+            }
+
+            if (key == Hotkeys.LAYER_NEXT.getKeybind())
+            {
+                DataManager.moveLayer(1);
+                return true;
+            }
+            else if (key == Hotkeys.LAYER_PREVIOUS.getKeybind())
+            {
+                DataManager.moveLayer(-1);
+                return true;
+            }
+            else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())
+            {
+                DataManager.setLayerMode((LayerMode) DataManager.getLayerMode().cycle(true));
+                return true;
+            }
+            else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeybind())
+            {
+                DataManager.setLayerMode((LayerMode) DataManager.getLayerMode().cycle(false));
+                return true;
             }
 
             if (mode.getUsesSchematic() && key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
@@ -360,28 +386,28 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.TOGGLE_ALL_RENDERING.getKeybind())
                 {
-                    boolean enabled = RenderEventHandler.getInstance().toggleAllRenderingEnabled();
+                    boolean enabled = DataManager.toggleAllRenderingEnabled();
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_ALL_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
                 else if (key == Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind())
                 {
-                    boolean enabled = RenderEventHandler.getInstance().toggleRenderSelectionBoxes();
+                    boolean enabled = DataManager.toggleRenderSelectionBoxes();
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
                 else if (key == Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind())
                 {
-                    boolean enabled = RenderEventHandler.getInstance().toggleRenderSchematics();
+                    boolean enabled = DataManager.toggleRenderSchematics();
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
                 else if (key == Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind())
                 {
-                    boolean enabled = RenderEventHandler.getInstance().toggleRenderMismatches();
+                    boolean enabled = DataManager.toggleRenderMismatches();
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                     return true;

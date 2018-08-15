@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicVerifier;
+import fi.dy.masa.litematica.util.WorldUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.profiler.Profiler;
@@ -31,6 +32,11 @@ public abstract class MixinWorldClient extends World
         if (verifier != null)
         {
             verifier.markBlockChanged(pos);
+        }
+
+        if (DataManager.isRenderingEnabled() && DataManager.renderSchematics())
+        {
+            WorldUtils.markSchematicChunkForRenderUpdate(pos);
         }
     }
 }

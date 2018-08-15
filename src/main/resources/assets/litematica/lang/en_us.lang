@@ -94,6 +94,10 @@ litematica.gui.button.unload=Unload
 litematica.gui.label.area_selection_box_count=Boxes: %d
 litematica.gui.label.area_selection_origin=Origin: %s
 
+litematica.gui.label.layer_mode.all=All
+litematica.gui.label.layer_mode.layer_range=Layer Range
+litematica.gui.label.layer_mode.single_layer=Single Layer
+
 litematica.gui.label.schematic_info.author=Author: §f%s§r
 litematica.gui.label.schematic_info.description=Description:
 litematica.gui.label.schematic_info.enclosing_size=Enclosing size:
@@ -191,6 +195,8 @@ litematica.message.schematic_placement_created=Placement created for '%s'
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
 litematica.message.schematic_saved_as=Schematic saved as '%s'
 litematica.message.set_area_origin=Set the area origin point to %s
+litematica.message.set_layer_mode_to=Set layer mode to %s
+litematica.message.set_layer_to=Set layer to %s
 litematica.message.set_selection_box_point=Set/moved point %d to %s
 litematica.message.toggled=Toggled %s %s
 litematica.message.value.on=ON

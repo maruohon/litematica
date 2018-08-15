@@ -27,7 +27,7 @@ public class MixinMinecraft
     @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("RETURN"))
     private void onLoadWorldPost(@Nullable WorldClient worldClientIn, String loadingMessage, CallbackInfo ci)
     {
-        SchematicWorldHandler.getInstance().recreateSchematicWorld(worldClientIn == null);
+        SchematicWorldHandler.recreateSchematicWorld(worldClientIn == null);
 
         if (worldClientIn != null)
         {

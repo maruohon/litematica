@@ -52,7 +52,7 @@ public class SchematicPlacementManager
     {
         if (this.chunksToUnload.isEmpty() == false)
         {
-            WorldSchematic worldSchematic = SchematicWorldHandler.getInstance().getSchematicWorld();
+            WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
             for (ChunkPos pos : this.chunksToUnload)
             {
@@ -66,7 +66,7 @@ public class SchematicPlacementManager
         if (this.chunksToRebuild.isEmpty() == false)
         {
             WorldClient worldClient = Minecraft.getMinecraft().world;
-            WorldSchematic worldSchematic = SchematicWorldHandler.getInstance().getSchematicWorld();
+            WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             Iterator<ChunkPos> iter = this.chunksToRebuild.iterator();
 
             while (iter.hasNext())
@@ -133,7 +133,7 @@ public class SchematicPlacementManager
     {
         if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() == false)
         {
-            WorldSchematic worldSchematic = SchematicWorldHandler.getInstance().getSchematicWorld();
+            WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
             if (worldSchematic != null)
             {

@@ -45,17 +45,15 @@ public class LitematicaRenderer
 
     public void loadRenderers()
     {
-        System.out.printf("LitematicaRenderer#loadRenderers()\n");
         this.getRenderGlobal().loadRenderers();
     }
 
     public void onSchematicWorldChanged(@Nullable WorldClient worldClient)
     {
-        System.out.printf("LitematicaRenderer#onSchematicWorldChanged(): %s\n", worldClient);
         this.getRenderGlobal().setWorldAndLoadRenderers(worldClient);
     }
 
-    public void renderSchematicWorld()
+    public void renderSchematicWorld(float partialTicks)
     {
         if (this.mc.skipRenderWorld == false)
         {
@@ -78,7 +76,7 @@ public class LitematicaRenderer
                 GL20.glUniform1f(GL20.glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), alpha);
             }
 
-            this.renderWorld(this.mc.getRenderPartialTicks(), finishTimeNano);
+            this.renderWorld(partialTicks, finishTimeNano);
 
             if (translucentSchematic)
             {
@@ -123,6 +121,8 @@ public class LitematicaRenderer
         {
             this.renderWorldPass(2, partialTicks, finishTimeNano);
         }
+
+        GlStateManager.disableAlpha();
 
         this.mc.mcProfiler.endSection();
     }
@@ -245,15 +245,17 @@ public class LitematicaRenderer
 
         this.mc.mcProfiler.endStartSection("translucent");
         GlStateManager.depthMask(false);
+
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 
         renderGlobal.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, pass, entity);
+
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
-        GlStateManager.depthMask(true);
 
+        GlStateManager.depthMask(true);
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableCull();
 
