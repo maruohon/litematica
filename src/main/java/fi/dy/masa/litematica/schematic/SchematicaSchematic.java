@@ -743,7 +743,7 @@ public class SchematicaSchematic
 
                 return this.readFromNBT(nbt);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 LiteModLitematica.logger.error("SchematicaSchematic: Failed to read Schematic data from file '{}'", file.getAbsolutePath());
             }

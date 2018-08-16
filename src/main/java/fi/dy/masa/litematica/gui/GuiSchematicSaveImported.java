@@ -86,8 +86,9 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
                     {
                         this.gui.addMessage(InfoType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                         this.gui.widget.refreshEntries();
-                        return;
                     }
+
+                    return;
                 }
                 else if (this.gui.type == DirectoryEntryType.VANILLA_STRUCTURE)
                 {
@@ -95,15 +96,14 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
                     {
                         this.gui.addMessage(InfoType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                         this.gui.widget.refreshEntries();
-                        return;
                     }
+
+                    return;
                 }
                 else
                 {
                     this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.unsupported_type", this.gui.inputFileName);
                 }
-
-                this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_import.failed_generic", this.gui.inputFileName);
             }
             else if (this.type == ButtonType.CREATE_DIRECTORY)
             {
