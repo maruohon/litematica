@@ -8,7 +8,8 @@ import net.minecraft.world.World;
 
 public class RenderChunkSchematicList extends RenderChunkSchematicVbo
 {
-    private static final int LIST_SIZE = BlockRenderLayer.values().length + 2;
+    private static final int BLOCK_LAYERS = BlockRenderLayer.values().length;
+    private static final int LIST_SIZE = BLOCK_LAYERS + OverlayType.values().length;
 
     private final int baseDisplayList = GLAllocation.generateDisplayLists(LIST_SIZE);
 
@@ -22,14 +23,14 @@ public class RenderChunkSchematicList extends RenderChunkSchematicVbo
         return compiledChunk.isLayerEmpty(layer) == false ? this.baseDisplayList + layer.ordinal() : -1;
     }
 
-    public int getOverlayDisplayList(boolean outlineBuffer)
+    public int getOverlayDisplayList(OverlayType type)
     {
         if (this.hasOverlay() == false)
         {
             return -1;
         }
 
-        return this.baseDisplayList + (outlineBuffer ? LIST_SIZE - 2 : LIST_SIZE - 1);
+        return this.baseDisplayList + BLOCK_LAYERS + type.ordinal();
     }
 
     public void deleteGlResources()

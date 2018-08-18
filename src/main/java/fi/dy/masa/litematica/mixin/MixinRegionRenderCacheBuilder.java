@@ -5,6 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 
@@ -16,12 +18,18 @@ public class MixinRegionRenderCacheBuilder implements IRegionRenderCacheBuilder
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onConstruct(CallbackInfo ci)
     {
-        this.overlayBufferBuilders = new BufferBuilder[] { new BufferBuilder(262144), new BufferBuilder(262144) };
+        this.overlayBufferBuilders = new BufferBuilder[OverlayType.values().length];
+
+        for (int i = 0; i < this.overlayBufferBuilders.length; ++i)
+        {
+            this.overlayBufferBuilders[i] = new BufferBuilder(262144);
+        }
     }
 
     @Override
-    public BufferBuilder getOverlayBuffer(boolean outlineBuffer)
+    public BufferBuilder getOverlayBuffer(OverlayType type)
     {
-        return this.overlayBufferBuilders[outlineBuffer ? 0 : 1];
+        if (GuiScreen.isCtrlKeyDown()) System.out.printf("getOverlayBuffer(): type: %s, buf: %s\n", type, this.overlayBufferBuilders[type.ordinal()]);
+        return this.overlayBufferBuilders[type.ordinal()];
     }
 }

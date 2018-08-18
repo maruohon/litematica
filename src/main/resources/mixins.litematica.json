@@ -12,8 +12,6 @@
         "IMixinWorldClient",
         "MixinBufferBuilder",
         "MixinChunkProviderClient",
-        "MixinChunkRenderDispatcher",
-        "MixinChunkRenderWorker",
         "MixinEntityRenderer",
         "MixinGuiOverlayDebug",
         "MixinMinecraft",

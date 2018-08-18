@@ -1,5 +1,7 @@
 package fi.dy.masa.litematica.render.schematic;
 
+import java.util.EnumSet;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.chunk.ListedRenderChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
@@ -35,15 +37,18 @@ public class RenderListSchematic extends ChunkRenderContainerSchematic
             {
                 RenderChunkSchematicList listedRenderChunk = (RenderChunkSchematicList) renderChunk;
 
-                GlStateManager.pushMatrix();
-                this.preRenderChunk(renderChunk);
-                GlStateManager.callList(listedRenderChunk.getOverlayDisplayList(true));
-                GlStateManager.popMatrix();
+                EnumSet<OverlayType> types = listedRenderChunk.getOverlayTypes();
 
-                GlStateManager.pushMatrix();
-                this.preRenderChunk(renderChunk);
-                GlStateManager.callList(listedRenderChunk.getOverlayDisplayList(false));
-                GlStateManager.popMatrix();
+                if (types.isEmpty() == false)
+                {
+                    for (OverlayType type : types)
+                    {
+                        GlStateManager.pushMatrix();
+                        this.preRenderChunk(renderChunk);
+                        GlStateManager.callList(listedRenderChunk.getOverlayDisplayList(type));
+                        GlStateManager.popMatrix();
+                    }
+                }
             }
 
             GlStateManager.resetColor();

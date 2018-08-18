@@ -230,6 +230,18 @@ public class RenderUtils
         drawBoundingBoxSidesBatched(minX, minY, minZ, maxX, maxY, maxZ, expand, color, buffer);
     }
 
+    public static void drawBlockBoundingBoxBatched(BlockPos pos, double expand, Vec4f color, BufferBuilder buffer)
+    {
+        double minX = pos.getX() - expand;
+        double minY = pos.getY() - expand;
+        double minZ = pos.getZ() - expand;
+        double maxX = pos.getX() + expand + 1;
+        double maxY = pos.getY() + expand + 1;
+        double maxZ = pos.getZ() + expand + 1;
+
+        drawBoundingBoxSidesBatched(minX, minY, minZ, maxX, maxY, maxZ, expand, color, buffer);
+    }
+
     public static void drawBoundingBoxSidesBatched(double minX, double minY, double minZ, double maxX, double maxY, double maxZ,
             double expand, Vec4f color, BufferBuilder buffer)
     {

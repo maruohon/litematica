@@ -7,7 +7,6 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
 import fi.dy.masa.litematica.render.shader.ShaderProgram;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -181,7 +180,7 @@ public class LitematicaRenderer
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         RenderHelper.disableStandardItemLighting();
 
-        if (GuiScreen.isCtrlKeyDown()) System.out.printf("renderWorldPass\n");
+        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("renderWorldPass\n");
         this.mc.mcProfiler.endStartSection("terrain_setup");
         renderGlobal.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
 
@@ -260,6 +259,7 @@ public class LitematicaRenderer
 
         GlStateManager.disableTexture2D();
         GlStateManager.disableCull();
+        GlStateManager.glLineWidth(1.0f);
         GlStateManager.color(1f, 1f, 1f, 1f);
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);

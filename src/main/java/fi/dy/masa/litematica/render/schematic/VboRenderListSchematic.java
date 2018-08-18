@@ -1,7 +1,8 @@
 package fi.dy.masa.litematica.render.schematic;
 
+import java.util.EnumSet;
 import org.lwjgl.opengl.GL11;
-import net.minecraft.client.gui.GuiScreen;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.chunk.RenderChunk;
@@ -40,13 +41,17 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
     {
         if (this.initialized)
         {
-            GlStateManager.glLineWidth(1.0f);
-
-            if (GuiScreen.isCtrlKeyDown()) System.out.printf("VboRenderListSchematic.renderBlockOverlays()\n");
             for (RenderChunkSchematicVbo renderChunk : this.overlayRenderChunks)
             {
-                this.renderOverlay(renderChunk.getOverlayVertexBuffer(true), renderChunk, GL11.GL_QUADS);
-                this.renderOverlay(renderChunk.getOverlayVertexBuffer(false), renderChunk, GL11.GL_QUADS);
+                EnumSet<OverlayType> types = renderChunk.getOverlayTypes();
+
+                if (types.isEmpty() == false)
+                {
+                    for (OverlayType type : types)
+                    {
+                        this.renderOverlay(renderChunk.getOverlayVertexBuffer(type), renderChunk, type.getGlMode());
+                    }
+                }
             }
 
             OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);
@@ -67,14 +72,14 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
         GlStateManager.popMatrix();
     }
 
-    private void renderOverlay(VertexBuffer vertexBuffer, RenderChunk renderChunk, int mode)
+    private void renderOverlay(VertexBuffer vertexBuffer, RenderChunk renderChunk, int glMode)
     {
         GlStateManager.pushMatrix();
         this.preRenderChunk(renderChunk);
         renderChunk.multModelviewMatrix();
         vertexBuffer.bindBuffer();
         this.setupArrayPointersOverlay();
-        vertexBuffer.drawArrays(mode);
+        vertexBuffer.drawArrays(glMode);
         GlStateManager.popMatrix();
     }
 

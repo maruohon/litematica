@@ -11,12 +11,10 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import fi.dy.masa.litematica.interfaces.IMixinRenderGlobal;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.BlockModelShapes;
@@ -28,7 +26,6 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.IRenderChunkFactory;
 import net.minecraft.client.renderer.chunk.RenderChunk;
@@ -79,7 +76,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     private double lastViewEntityZ = Double.MIN_VALUE;
     private float lastViewEntityPitch = Float.MIN_VALUE;
     private float lastViewEntityYaw = Float.MIN_VALUE;
-    private ChunkRenderDispatcher renderDispatcher;
+    private ChunkRenderDispatcherLitematica renderDispatcher;
     private ChunkRenderContainerSchematic renderContainer;
     private IRenderChunkFactory renderChunkFactory;
     //private ShaderGroup entityOutlineShader;
@@ -175,13 +172,10 @@ public class RenderGlobalSchematic extends RenderGlobal
                 this.viewFrustum = null;
             }
 
-            // Using the same dispatcher as Minecraft itself, don't stop it here
-            /*
             if (this.renderDispatcher != null)
             {
                 this.renderDispatcher.stopWorkerThreads();
             }
-            */
 
             this.renderDispatcher = null;
         }
@@ -196,9 +190,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         {
             if (this.renderDispatcher == null)
             {
-                // Use the vanilla dispatcher/worker stuff
-                this.renderDispatcher = ((IMixinRenderGlobal) this.mc.renderGlobal).getChunkRenderDispatcher();
-                //this.renderDispatcher = new ChunkRenderDispatcher();
+                this.renderDispatcher = new ChunkRenderDispatcherLitematica();
             }
 
             this.displayListEntitiesDirty = true;
@@ -247,8 +239,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     protected void stopChunkUpdates()
     {
         this.chunksToUpdate.clear();
-        // Using the same dispatcher as Minecraft itself, don't stop it here
-        //this.renderDispatcher.stopChunkUpdates();
+        this.renderDispatcher.stopChunkUpdates();
     }
 
     @Override
@@ -599,7 +590,6 @@ public class RenderGlobalSchematic extends RenderGlobal
     {
         this.mc.mcProfiler.startSection("overlay_filter_empty");
 
-        if (GuiScreen.isCtrlKeyDown()) System.out.printf("renderBlockOverlays\n");
         for (int i = this.renderInfos.size() - 1; i >= 0; --i)
         {
             RenderChunkSchematicVbo renderChunk = this.renderInfos.get(i);
