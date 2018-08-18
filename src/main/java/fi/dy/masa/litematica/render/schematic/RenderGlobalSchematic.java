@@ -16,18 +16,16 @@ import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.ChunkRenderContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderList;
-import net.minecraft.client.renderer.VboRenderList;
 import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
@@ -68,7 +66,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private WorldClient world;
     private Set<RenderChunk> chunksToUpdate = new LinkedHashSet<>();
-    private List<RenderChunk> renderInfos = new ArrayList<>(69696);
+    private List<RenderChunkSchematicVbo> renderInfos = new ArrayList<>(69696);
     private ViewFrustum viewFrustum;
     private double frustumUpdatePosX = Double.MIN_VALUE;
     private double frustumUpdatePosY = Double.MIN_VALUE;
@@ -82,7 +80,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     private float lastViewEntityPitch = Float.MIN_VALUE;
     private float lastViewEntityYaw = Float.MIN_VALUE;
     private ChunkRenderDispatcher renderDispatcher;
-    private ChunkRenderContainer renderContainer;
+    private ChunkRenderContainerSchematic renderContainer;
     private IRenderChunkFactory renderChunkFactory;
     //private ShaderGroup entityOutlineShader;
     //private boolean entityOutlinesRendered;
@@ -211,12 +209,12 @@ public class RenderGlobalSchematic extends RenderGlobal
 
             if (vboEnabledPrevious && this.vboEnabled == false)
             {
-                this.renderContainer = new RenderList();
+                this.renderContainer = new RenderListSchematic();
                 this.renderChunkFactory = new RenderChunkFactoryList();
             }
             else if (vboEnabledPrevious == false && this.vboEnabled)
             {
-                this.renderContainer = new VboRenderList();
+                this.renderContainer = new VboRenderListSchematic();
                 this.renderChunkFactory = new RenderChunkFactoryVbo();
             }
 
@@ -234,14 +232,11 @@ public class RenderGlobalSchematic extends RenderGlobal
 
             this.viewFrustum = new ViewFrustum(world, this.mc.gameSettings.renderDistanceChunks, this, this.renderChunkFactory);
 
-            if (world != null)
-            {
-                Entity entity = this.mc.getRenderViewEntity();
+            Entity entity = this.mc.getRenderViewEntity();
 
-                if (entity != null)
-                {
-                    this.viewFrustum.updateChunkPositions(entity.posX, entity.posZ);
-                }
+            if (entity != null)
+            {
+                this.viewFrustum.updateChunkPositions(entity.posX, entity.posZ);
             }
 
             this.renderEntitiesStartupCounter = 2;
@@ -259,7 +254,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     @Override
     public void setupTerrain(Entity viewEntity, double partialTicks, ICamera camera, int frameCount, boolean playerSpectator)
     {
-        if (this.mc.gameSettings.renderDistanceChunks != this.renderDistanceChunks)
+        if (this.viewFrustum == null || this.mc.gameSettings.renderDistanceChunks != this.renderDistanceChunks)
         {
             this.loadRenderers();
         }
@@ -377,7 +372,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             while (queue.isEmpty() == false)
             {
                 renderChunk = queue.poll();
-                this.renderInfos.add(renderChunk);
+                this.renderInfos.add((RenderChunkSchematicVbo) renderChunk);
 
                 for (EnumFacing facing : EnumFacing.values())
                 {
@@ -518,9 +513,9 @@ public class RenderGlobalSchematic extends RenderGlobal
                 this.prevRenderSortZ = entityIn.posZ;
                 int i = 0;
 
-                for (RenderChunk renderChunk : this.renderInfos)
+                for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
                 {
-                    if (renderChunk.compiledChunk.isLayerStarted(blockLayerIn) && i++ < 15)
+                    if ((renderChunk.compiledChunk.isLayerStarted(blockLayerIn) || renderChunk.hasOverlay()) && i++ < 15)
                     {
                         this.renderDispatcher.updateTransparencyLater(renderChunk);
                     }
@@ -555,7 +550,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         return count;
     }
 
-    private void renderBlockLayer(BlockRenderLayer blockLayerIn)
+    private void renderBlockLayer(BlockRenderLayer layer)
     {
         this.mc.entityRenderer.enableLightmap();
 
@@ -570,7 +565,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
         }
 
-        this.renderContainer.renderChunkLayer(blockLayerIn);
+        this.renderContainer.renderChunkLayer(layer);
 
         if (OpenGlHelper.useVbo())
         {
@@ -586,6 +581,67 @@ public class RenderGlobalSchematic extends RenderGlobal
                         break;
                     case UV:
                         OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + index);
+                        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        break;
+                    case COLOR:
+                        GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
+                        GlStateManager.resetColor();
+                    default:
+                }
+            }
+        }
+
+        this.mc.entityRenderer.disableLightmap();
+    }
+
+    public void renderBlockOverlays()
+    {
+        this.mc.mcProfiler.startSection("overlay_filter_empty");
+
+        if (GuiScreen.isCtrlKeyDown()) System.out.printf("renderBlockOverlays\n");
+        for (int i = this.renderInfos.size() - 1; i >= 0; --i)
+        {
+            RenderChunkSchematicVbo renderChunk = this.renderInfos.get(i);
+
+            if (renderChunk.hasOverlay())
+            {
+                this.renderContainer.addOverlayChunk(renderChunk);
+            }
+        }
+
+        this.mc.mcProfiler.endStartSection("overlay_render");
+
+        this.renderBlockOverlayBuffers();
+
+        this.mc.mcProfiler.endSection();
+    }
+
+    private void renderBlockOverlayBuffers()
+    {
+        this.mc.entityRenderer.enableLightmap();
+
+        if (OpenGlHelper.useVbo())
+        {
+            GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+            GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
+        }
+
+        this.renderContainer.renderBlockOverlays();
+
+        if (OpenGlHelper.useVbo())
+        {
+            for (VertexFormatElement element : DefaultVertexFormats.POSITION_COLOR.getElements())
+            {
+                VertexFormatElement.EnumUsage usage = element.getUsage();
+
+                switch (usage)
+                {
+                    case POSITION:
+                        GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                        break;
+                    case UV:
+                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + element.getIndex());
                         GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
                         OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
                         break;

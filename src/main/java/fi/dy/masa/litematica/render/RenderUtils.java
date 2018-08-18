@@ -49,6 +49,18 @@ public class RenderUtils
                 color.r, color.g, color.b, color.a);
     }
 
+    public static void renderBlockOverlay(BlockPos pos, double expand, Vec4f color, BufferBuilder buffer)
+    {
+        RenderGlobal.drawBoundingBox(buffer,
+                pos.getX() - expand,
+                pos.getY() - expand,
+                pos.getZ() - expand,
+                pos.getX() + 1 + expand,
+                pos.getY() + 1 + expand,
+                pos.getZ() + 1 + expand,
+                color.r, color.g, color.b, color.a);
+    }
+
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
             Vec4f color1, Vec4f color2, Vec4f color3, Entity renderViewEntity, float partialTicks)
     {

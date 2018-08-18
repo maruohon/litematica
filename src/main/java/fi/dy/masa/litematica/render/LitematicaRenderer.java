@@ -7,10 +7,10 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
 import fi.dy.masa.litematica.render.shader.ShaderProgram;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -24,7 +24,7 @@ public class LitematicaRenderer
 
     private static final ShaderProgram SHADER_ALPHA = new ShaderProgram("litematica", null, "shaders/alpha.frag");
     private Minecraft mc;
-    private RenderGlobal renderGlobal;
+    private RenderGlobalSchematic renderGlobal;
     private int frameCount;
 
     public static LitematicaRenderer getInstance()
@@ -32,7 +32,7 @@ public class LitematicaRenderer
         return INSTANCE;
     }
 
-    public RenderGlobal getRenderGlobal()
+    public RenderGlobalSchematic getRenderGlobal()
     {
         if (this.renderGlobal == null)
         {
@@ -107,6 +107,7 @@ public class LitematicaRenderer
 
         if (this.mc.gameSettings.anaglyph)
         {
+            /*
             //anaglyphField = 0;
             GlStateManager.colorMask(false, true, true, false);
             this.renderWorldPass(0, partialTicks, finishTimeNano);
@@ -116,20 +117,21 @@ public class LitematicaRenderer
             this.renderWorldPass(1, partialTicks, finishTimeNano);
 
             GlStateManager.colorMask(true, true, true, false);
+            */
         }
         else
         {
             this.renderWorldPass(2, partialTicks, finishTimeNano);
         }
 
-        GlStateManager.disableAlpha();
+        //GlStateManager.disableAlpha();
 
         this.mc.mcProfiler.endSection();
     }
 
     private void renderWorldPass(int pass, float partialTicks, long finishTimeNano)
     {
-        RenderGlobal renderGlobal = this.getRenderGlobal();
+        RenderGlobalSchematic renderGlobal = this.getRenderGlobal();
         //ParticleManager particlemanager = this.mc.effectRenderer;
         //boolean flag = this.isDrawBlockOutline();
         //GlStateManager.enableCull();
@@ -137,7 +139,7 @@ public class LitematicaRenderer
         //this.mc.mcProfiler.endStartSection("clear");
         //GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
         //this.updateFogColor(partialTicks);
-        //GlStateManager.clear(16640);
+        //GlStateManager.clear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
         //this.mc.mcProfiler.endStartSection("camera");
         //this.setupCameraTransform(partialTicks, pass);
@@ -179,6 +181,7 @@ public class LitematicaRenderer
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         RenderHelper.disableStandardItemLighting();
 
+        if (GuiScreen.isCtrlKeyDown()) System.out.printf("renderWorldPass\n");
         this.mc.mcProfiler.endStartSection("terrain_setup");
         renderGlobal.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
 
@@ -252,6 +255,19 @@ public class LitematicaRenderer
 
         renderGlobal.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, pass, entity);
 
+        GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableCull();
+        GlStateManager.color(1f, 1f, 1f, 1f);
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+
+        renderGlobal.renderBlockOverlays();
+
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
 
