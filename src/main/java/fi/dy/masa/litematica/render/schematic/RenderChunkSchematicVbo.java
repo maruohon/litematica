@@ -1,7 +1,9 @@
 package fi.dy.masa.litematica.render.schematic;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
@@ -11,6 +13,7 @@ import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
 import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
 import fi.dy.masa.litematica.mixin.IMixinRenderChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
+import fi.dy.masa.litematica.util.SubChunkPos;
 import fi.dy.masa.litematica.util.Vec4f;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -36,6 +39,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class RenderChunkSchematicVbo extends RenderChunk
 {
@@ -46,6 +50,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     private final BufferBuilder.State bufferStates[] = new BufferBuilder.State[OverlayType.values().length];
     private final EnumSet<OverlayType> existingOverlays = EnumSet.noneOf(OverlayType.class);
     private final Set<TileEntity> setTileEntities = new HashSet<>();
+    private final List<StructureBoundingBox> boxes = new ArrayList<>();
 
     private ChunkCacheSchematic schematicWorldView;
     private ChunkCacheSchematic clientWorldView;
@@ -152,99 +157,108 @@ public class RenderChunkSchematicVbo extends RenderChunk
         VisGraph visGraph = new VisGraph();
         Set<TileEntity> tileEntities = new HashSet<>();
         BlockPos posChunk = this.getPosition();
-        final int yMin = DataManager.getLayerMin();
-        final int yMax = DataManager.getLayerMax();
+        final int renderMinY = DataManager.getLayerMin();
+        final int renderMaxY = DataManager.getLayerMax();
+
         this.existingOverlays.clear();
 
-        if (this.schematicWorldView.isEmpty() == false &&
-            posChunk.getY() + 15 >= yMin &&
-            posChunk.getY()      <= yMax)
+        if (this.schematicWorldView.isEmpty() == false && this.boxes.isEmpty() == false &&
+            posChunk.getY() + 15 >= renderMinY &&
+            posChunk.getY()      <= renderMaxY)
         {
             ++schematicRenderChunksUpdated;
 
+            boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
             RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
             BufferBuilder bufferOverlayOutlines = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.OUTLINE);
             BufferBuilder bufferOverlayQuads    = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.QUAD);
 
-            boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
-            BlockPos posFrom = new BlockPos(posChunk.getX()     , MathHelper.clamp(yMin, posChunk.getY(), posChunk.getY() + 15), posChunk.getZ()     );
-            BlockPos posTo   = new BlockPos(posChunk.getX() + 15, MathHelper.clamp(yMax, posChunk.getY(), posChunk.getY() + 15), posChunk.getZ() + 15);
+            if (GuiScreen.isCtrlKeyDown()) System.out.printf("rebuildChunk OL start pos: %s gen: %s\n", this.getPosition(), generator);
+            this.preRenderOverlayIfNotStarted(bufferOverlayOutlines, OverlayType.OUTLINE);
+            this.preRenderOverlayIfNotStarted(bufferOverlayQuads, OverlayType.QUAD);
 
-            for (BlockPos.MutableBlockPos posMutable : BlockPos.getAllInBoxMutable(posFrom, posTo))
+            for (StructureBoundingBox box : this.boxes)
             {
-                IBlockState stateSchematic = this.schematicWorldView.getBlockState(posMutable);
-                IBlockState stateClient    = this.clientWorldView.getBlockState(posMutable);
-                stateClient = stateClient.getActualState(this.clientWorldView, posMutable);
-                Block blockSchematic = stateSchematic.getBlock();
-                Block blockClient = stateClient.getBlock();
-
-                if (blockClient == Blocks.AIR)
+                // The rendered layer(s) don't intersect this sub-volume
+                if (renderMinY > box.maxY || renderMaxY < box.minY)
                 {
-                    // Both are air
-                    if (blockSchematic == Blocks.AIR)
+                    continue;
+                }
+
+                BlockPos posFrom = new BlockPos(box.minX, MathHelper.clamp(renderMinY, box.minY, box.maxY), box.minZ);
+                BlockPos posTo   = new BlockPos(box.maxX, MathHelper.clamp(renderMaxY, box.minY, box.maxY), box.maxZ);
+
+                for (BlockPos.MutableBlockPos posMutable : BlockPos.getAllInBoxMutable(posFrom, posTo))
+                {
+                    IBlockState stateSchematic = this.schematicWorldView.getBlockState(posMutable);
+                    IBlockState stateClient    = this.clientWorldView.getBlockState(posMutable);
+                    stateClient = stateClient.getActualState(this.clientWorldView, posMutable);
+                    Block blockSchematic = stateSchematic.getBlock();
+                    Block blockClient = stateClient.getBlock();
+
+                    if (blockClient == Blocks.AIR)
                     {
-                        continue;
-                    }
-
-                    // Schematic has a block, client has air
-
-                    /*
-                    if (iblockstate.isOpaqueCube())
-                    {
-                        visGraph.setOpaqueCube(blockpos$mutableblockpos);
-                    }
-                    */
-
-                    if (blockSchematic.hasTileEntity())
-                    {
-                        this.addTileEntity(posMutable, compiledChunk, tileEntities);
-                    }
-
-                    BlockRenderLayer layer = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() ? BlockRenderLayer.TRANSLUCENT : blockSchematic.getBlockLayer();
-                    int layerIndex = layer.ordinal();
-
-                    if (stateSchematic.getRenderType() != EnumBlockRenderType.INVISIBLE)
-                    {
-                        BufferBuilder bufferSchematic = buffers.getWorldRendererByLayerId(layerIndex);
-
-                        if (compiledChunk.isLayerStarted(layer) == false)
+                        // Both are air
+                        if (blockSchematic == Blocks.AIR)
                         {
-                            compiledChunk.setLayerStarted(layer);
-                            this.preRenderBlocks(bufferSchematic, this.getPosition());
+                            continue;
                         }
 
-                        this.preRenderOverlayIfNotStarted(bufferOverlayOutlines, OverlayType.OUTLINE);
-                        this.preRenderOverlayIfNotStarted(bufferOverlayQuads, OverlayType.QUAD);
+                        // Schematic has a block, client has air
 
-                        usedLayers[layerIndex] |= this.renderGlobal.renderBlock(stateSchematic, posMutable, this.schematicWorldView, bufferSchematic);
+                        /*
+                        if (iblockstate.isOpaqueCube())
+                        {
+                            visGraph.setOpaqueCube(blockpos$mutableblockpos);
+                        }
+                        */
 
-                        //RenderUtils.renderBlockOverlay(posMutable, 0.01, new Vec4f(0.5f, 0.9f, 0.9f, 0.5f), bufferOverlayOutlines);
-                        //float r = 0.5f, g = 1f, b = 1f, a = 0.3f;
-                        double expand = 0.001;
-                        RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(0.5f, 0.9f, 0.9f, 0.3f), bufferOverlayQuads);
-                        RenderUtils.renderBlockOverlay(posMutable, expand, new Vec4f(0.5f, 0.9f, 0.9f, 1.0f), bufferOverlayOutlines);
-                    }
-                }
-                else if (stateSchematic != stateClient)
-                {
-                    this.preRenderOverlayIfNotStarted(bufferOverlayOutlines, OverlayType.OUTLINE);
-                    this.preRenderOverlayIfNotStarted(bufferOverlayQuads, OverlayType.QUAD);
-                    double expand = 0.001;
+                        if (blockSchematic.hasTileEntity())
+                        {
+                            this.addTileEntity(posMutable, compiledChunk, tileEntities);
+                        }
 
-                    // Extra block
-                    if (blockSchematic == Blocks.AIR)
-                    {
-                        RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1.0f, 0.3f, 0.9f, 0.3f), bufferOverlayQuads);
+                        BlockRenderLayer layer = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() ? BlockRenderLayer.TRANSLUCENT : blockSchematic.getBlockLayer();
+                        int layerIndex = layer.ordinal();
+
+                        if (stateSchematic.getRenderType() != EnumBlockRenderType.INVISIBLE)
+                        {
+                            BufferBuilder bufferSchematic = buffers.getWorldRendererByLayerId(layerIndex);
+
+                            if (compiledChunk.isLayerStarted(layer) == false)
+                            {
+                                compiledChunk.setLayerStarted(layer);
+                                this.preRenderBlocks(bufferSchematic, this.getPosition());
+                            }
+
+                            usedLayers[layerIndex] |= this.renderGlobal.renderBlock(stateSchematic, posMutable, this.schematicWorldView, bufferSchematic);
+
+                            //RenderUtils.renderBlockOverlay(posMutable, 0.01, new Vec4f(0.5f, 0.9f, 0.9f, 0.5f), bufferOverlayOutlines);
+                            //float r = 0.5f, g = 1f, b = 1f, a = 0.3f;
+                            double expand = 0.0;
+                            RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(0.2f, 0.7f, 0.9f, 0.3f), bufferOverlayQuads);
+                            //RenderUtils.renderBlockOverlay(posMutable, expand, new Vec4f(0.5f, 0.9f, 0.9f, 1.0f), bufferOverlayOutlines);
+                        }
                     }
-                    // Wrong block
-                    else if (blockClient != blockSchematic)
+                    else if (stateSchematic != stateClient)
                     {
-                        RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1.0f, 0.2f, 0.2f, 0.3f), bufferOverlayQuads);
-                    }
-                    // Wrong state
-                    else
-                    {
-                        RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1f, 0x90 / 255f, 0x10 / 255f, 0.3f), bufferOverlayQuads);
+                        double expand = 0.0;
+
+                        // Extra block
+                        if (blockSchematic == Blocks.AIR)
+                        {
+                            RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1.0f, 0.3f, 0.9f, 0.3f), bufferOverlayQuads);
+                        }
+                        // Wrong block
+                        else if (blockClient != blockSchematic)
+                        {
+                            RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1.0f, 0.2f, 0.2f, 0.3f), bufferOverlayQuads);
+                        }
+                        // Wrong state
+                        else
+                        {
+                            RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1f, 0x90 / 255f, 0x10 / 255f, 0.3f), bufferOverlayQuads);
+                        }
                     }
                 }
             }
@@ -326,14 +340,14 @@ public class RenderChunkSchematicVbo extends RenderChunk
         if (this.existingOverlays.contains(type) == false)
         {
             this.preRenderOverlay(buffer, type);
-            this.existingOverlays.add(type);
         }
     }
 
     private void preRenderOverlay(BufferBuilder buffer, OverlayType type)
     {
-        BlockPos pos = this.getPosition();
+        this.existingOverlays.add(type);
 
+        BlockPos pos = this.getPosition();
         buffer.begin(type.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         buffer.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
@@ -403,6 +417,11 @@ public class RenderChunkSchematicVbo extends RenderChunk
     {
         this.schematicWorldView = new ChunkCacheSchematic(this.getWorld(), this.getPosition(), 2);
         this.clientWorldView    = new ChunkCacheSchematic(Minecraft.getMinecraft().world, this.getPosition(), 2);
+
+        this.boxes.clear();
+        BlockPos pos = this.getPosition();
+        SubChunkPos subChunk = new SubChunkPos(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+        this.boxes.addAll(DataManager.getInstance().getSchematicPlacementManager().getTouchedBoxesInSubChunk(subChunk));
     }
 
     public enum OverlayType

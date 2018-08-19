@@ -52,7 +52,7 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         String labelEn = I18n.format("litematica.gui.button.schematic_placements.render_enable");
         String labelDis = I18n.format("litematica.gui.button.schematic_placements.render_disable");
-        String label = this.placement.getRenderSchematic() ? labelDis : labelEn;
+        String label = this.placement.isRenderingEnabled() ? labelDis : labelEn;
         int len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
         posX -= (len + 2);
         ButtonListener listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_RENDER, this);
@@ -226,7 +226,7 @@ public class WidgetSchematicPlacement extends WidgetBase
             }
             else if (this.type == ButtonType.TOGGLE_RENDER)
             {
-                this.widget.placement.setRenderSchematic(! this.widget.placement.getRenderSchematic());
+                this.widget.placement.setRenderSchematic(! this.widget.placement.isRenderingEnabled());
                 this.widget.parent.refreshEntries();
             }
         }

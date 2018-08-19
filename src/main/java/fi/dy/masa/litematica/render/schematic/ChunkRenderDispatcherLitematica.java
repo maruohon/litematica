@@ -53,8 +53,6 @@ public class ChunkRenderDispatcherLitematica
     {
         int threadLimitMemory = Math.max(1, (int)((double)Runtime.getRuntime().maxMemory() * 0.3D) / 10485760);
         int threadLimitCPU = Math.max(1, MathHelper.clamp(Runtime.getRuntime().availableProcessors(), 1, threadLimitMemory / 5));
-        //threadLimitCPU = 0;
-        System.out.printf("init ChunkRenderDispatcherLitematica\n");
         this.countRenderBuilders = MathHelper.clamp(threadLimitCPU * 10, 1, threadLimitMemory);
 
         if (threadLimitCPU > 1)
@@ -278,6 +276,7 @@ public class ChunkRenderDispatcherLitematica
                 {
                     for (OverlayType type : types)
                     {
+                        if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunk() overlay: %s\n", type);
                         BufferBuilder overlayBuffer = ((IRegionRenderCacheBuilder) generator.getRegionRenderCacheBuilder()).getOverlayBuffer(type);
                         this.uploadVertexBuffer(overlayBuffer, renderChunk.getOverlayVertexBuffer(type));
                     }

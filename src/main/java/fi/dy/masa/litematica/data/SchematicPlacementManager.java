@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -23,6 +25,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.litematica.util.SubChunkPos;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -36,11 +39,13 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class SchematicPlacementManager
 {
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
     private final HashMultimap<ChunkPos, SchematicPlacement> schematicsTouchingChunk = HashMultimap.create();
+    private final ArrayListMultimap<SubChunkPos, StructureBoundingBox> touchedVolumesInSubChunk = ArrayListMultimap.create();
     private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
     private final Set<ChunkPos> chunksToUnload = new HashSet<>();
     private final Set<ChunkPos> chunksPreChange = new HashSet<>();
@@ -158,6 +163,16 @@ public class SchematicPlacementManager
         return this.schematicPlacements;
     }
 
+    public List<StructureBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
+    {
+        return this.touchedVolumesInSubChunk.get(subChunk);
+    }
+
+    public Set<SubChunkPos> getAllTouchedSubChunks()
+    {
+        return this.touchedVolumesInSubChunk.keySet();
+    }
+
     public void addSchematicPlacement(SchematicPlacement placement, @Nullable IMessageConsumer messageConsumer)
     {
         if (this.schematicPlacements.contains(placement) == false)
@@ -244,11 +259,14 @@ public class SchematicPlacementManager
     {
         if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
         {
-            for (ChunkPos pos : placement.getTouchedChunks())
+            Set<ChunkPos> chunks = placement.getTouchedChunks();
+
+            for (ChunkPos pos : chunks)
             {
                 if (this.schematicsTouchingChunk.containsEntry(pos, placement) == false)
                 {
                     this.schematicsTouchingChunk.put(pos, placement);
+                    this.updateTouchedBoxesInChunk(pos);
                 }
 
                 this.chunksToUnload.remove(pos);
@@ -268,6 +286,7 @@ public class SchematicPlacementManager
             for (ChunkPos pos : chunks)
             {
                 this.schematicsTouchingChunk.remove(pos, placement);
+                this.updateTouchedBoxesInChunk(pos);
 
                 if (this.schematicsTouchingChunk.containsKey(pos) == false)
                 {
@@ -290,14 +309,15 @@ public class SchematicPlacementManager
     void onPostPlacementChange(SchematicPlacement placement)
     {
         Set<ChunkPos> chunksPost = placement.getTouchedChunks();
-        Set<ChunkPos> toRebuild = new HashSet<>();
-        toRebuild.addAll(chunksPost);
+        Set<ChunkPos> toRebuild = new HashSet<>(chunksPost);
+
         //System.out.printf("chunkPre: %s - chunkPost: %s\n", this.chunksPreChange, chunksPost);
         this.chunksPreChange.removeAll(chunksPost);
 
         for (ChunkPos pos : this.chunksPreChange)
         {
             this.schematicsTouchingChunk.remove(pos, placement);
+            this.updateTouchedBoxesInChunk(pos);
             //System.out.printf("removing placement from: %s\n", pos);
 
             if (this.schematicsTouchingChunk.containsKey(pos) == false)
@@ -318,10 +338,50 @@ public class SchematicPlacementManager
             {
                 this.schematicsTouchingChunk.put(pos, placement);
             }
+
+            this.updateTouchedBoxesInChunk(pos);
         }
 
         this.markChunksForRebuild(toRebuild);
         this.onPlacementModified(placement);
+    }
+
+    private void updateTouchedBoxesInChunk(ChunkPos pos)
+    {
+        for (int y = 0; y < 16; ++y)
+        {
+            SubChunkPos subChunk = new SubChunkPos(pos.x, y, pos.z);
+            this.touchedVolumesInSubChunk.removeAll(subChunk);
+        }
+
+        Collection<SchematicPlacement> placements = this.schematicsTouchingChunk.get(pos);
+
+        if (placements.isEmpty() == false)
+        {
+            for (SchematicPlacement placement : placements)
+            {
+                if (placement.matchesRequirement(RequiredEnabled.RENDERING_ENABLED))
+                {
+                    Map<String, StructureBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
+
+                    for (StructureBoundingBox bbOrig : boxMap.values())
+                    {
+                        final int startCY = (bbOrig.minY >> 4);
+                        final int endCY = (bbOrig.maxY >> 4);
+
+                        for (int cy = startCY; cy <= endCY; ++cy)
+                        {
+                            int y1 = Math.max((cy << 4)     , bbOrig.minY);
+                            int y2 = Math.min((cy << 4) + 15, bbOrig.maxY);
+
+                            StructureBoundingBox bbSub = new StructureBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
+                            this.touchedVolumesInSubChunk.put(new SubChunkPos(pos.x, cy, pos.z), bbSub);
+                            //System.out.printf("updateTouchedBoxesInChunk box at %d, %d, %d: %s\n", pos.x, cy, pos.z, bbSub);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void markChunksForRebuild(SchematicPlacement placement)
@@ -497,13 +557,15 @@ public class SchematicPlacementManager
 
     public void clear()
     {
-        SchematicHolder.getInstance().clearLoadedSchematics();
         this.schematicPlacements.clear();
         this.selectedPlacement = null;
         this.schematicsTouchingChunk.clear();
+        this.touchedVolumesInSubChunk.clear();
         this.chunksPreChange.clear();
         this.chunksToRebuild.clear();
         this.chunksToUnload.clear();
+
+        SchematicHolder.getInstance().clearLoadedSchematics();
     }
 
     public JsonObject toJson()

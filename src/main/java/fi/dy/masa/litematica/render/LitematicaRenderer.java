@@ -263,9 +263,13 @@ public class LitematicaRenderer
         GlStateManager.color(1f, 1f, 1f, 1f);
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.enablePolygonOffset();
+        GlStateManager.doPolygonOffset(-0.1f, -0.8f);
 
         renderGlobal.renderBlockOverlays();
 
+        GlStateManager.doPolygonOffset(0f, 0f);
+        GlStateManager.disablePolygonOffset();
         GlStateManager.enableTexture2D();
         GlStateManager.enableAlpha();
         GlStateManager.disableBlend();

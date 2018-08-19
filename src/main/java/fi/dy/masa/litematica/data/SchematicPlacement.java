@@ -76,24 +76,22 @@ public class SchematicPlacement
         return this.enabled;
     }
 
-    public boolean getRenderSchematic()
+    public boolean isRenderingEnabled()
     {
         return this.isEnabled() && this.renderSchematic;
     }
 
     public boolean matchesRequirement(RequiredEnabled required)
     {
-        if (required == RequiredEnabled.ANY)
+        switch (required)
         {
-            return true;
+            case ANY:
+                return true;
+            case PLACEMENT_ENABLED:
+                return this.isEnabled();
+            default:
+                return this.isEnabled() && this.renderSchematic;
         }
-
-        if (required == RequiredEnabled.PLACEMENT_ENABLED)
-        {
-            return this.isEnabled();
-        }
-
-        return this.isEnabled() && this.renderSchematic;
     }
 
     public boolean isRegionPlacementModified()

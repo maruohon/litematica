@@ -5,16 +5,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
+import fi.dy.masa.litematica.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.BlockModelShapes;
@@ -279,8 +282,7 @@ public class RenderGlobalSchematic extends RenderGlobal
 
         this.mc.mcProfiler.endStartSection("culling");
         BlockPos viewPos = new BlockPos(x, y + (double) viewEntity.getEyeHeight(), z);
-        RenderChunk renderChunk = ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(viewPos);
-        BlockPos blockpos = new BlockPos(MathHelper.floor(x / 16.0D) * 16, MathHelper.floor(y / 16.0D) * 16, MathHelper.floor(z / 16.0D) * 16);
+        //RenderChunk renderChunk = ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(viewPos);
 
         this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false || viewEntity.posX != this.lastViewEntityX || viewEntity.posY != this.lastViewEntityY || viewEntity.posZ != this.lastViewEntityZ || viewEntity.rotationPitch != this.lastViewEntityPitch || viewEntity.rotationYaw != this.lastViewEntityYaw;
         this.lastViewEntityX = viewEntity.posX;
@@ -294,77 +296,29 @@ public class RenderGlobalSchematic extends RenderGlobal
         if (this.displayListEntitiesDirty)
         {
             this.displayListEntitiesDirty = false;
-            this.renderInfos = new ArrayList<>(69696);
-            Queue<RenderChunk> queue = Queues.newArrayDeque();
+            this.renderInfos = new ArrayList<>(256);
+            Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewEntity.getPositionVector()));
+            //Queue<RenderChunk> queue = Queues.newArrayDeque();
             Entity.setRenderDistanceWeight(MathHelper.clamp((double) this.mc.gameSettings.renderDistanceChunks / 8.0D, 1.0D, 2.5D));
-            //boolean flag1 = this.mc.renderChunksMany;
-
-            if (renderChunk != null)
-            {
-                renderChunk.setFrameIndex(frameCount);
-                queue.add(renderChunk);
-
-                //this.renderInfos.add(renderChunk);
-
-                /*
-                boolean flag2 = false;
-                RenderGlobal.ContainerLocalRenderInformation renderglobal$containerlocalrenderinformation3 = new RenderGlobal.ContainerLocalRenderInformation(renderChunk, (EnumFacing)null, 0);
-                Set<EnumFacing> set1 = this.getVisibleFacings(viewPos);
-
-                if (set1.size() == 1)
-                {
-                    Vector3f vector3f = this.getViewVector(viewEntity, partialTicks);
-                    EnumFacing enumfacing = EnumFacing.getFacingFromVector(vector3f.x, vector3f.y, vector3f.z).getOpposite();
-                    set1.remove(enumfacing);
-                }
-
-                if (set1.isEmpty())
-                {
-                    flag2 = true;
-                }
-
-                if (flag2 && !playerSpectator)
-                {
-                    this.renderInfos.add(renderglobal$containerlocalrenderinformation3);
-                }
-                else
-                {
-                    if (playerSpectator && world.getBlockState(viewPos).isOpaqueCube())
-                    {
-                        flag1 = false;
-                    }
-
-                    renderChunk.setFrameIndex(frameCount);
-                    queue.add(renderglobal$containerlocalrenderinformation3);
-                }
-                */
-            }
-            else
-            {
-                int i = viewPos.getY() > 0 ? 248 : 8;
-
-                for (int cx = -this.renderDistanceChunks; cx <= this.renderDistanceChunks; ++cx)
-                {
-                    for (int cz = -this.renderDistanceChunks; cz <= this.renderDistanceChunks; ++cz)
-                    {
-                        renderChunk = ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(new BlockPos((cx << 4) + 8, i, (cz << 4) + 8));
-
-                        if (renderChunk != null && camera.isBoundingBoxInFrustum(renderChunk.boundingBox))
-                        {
-                            renderChunk.setFrameIndex(frameCount);
-                            queue.add(renderChunk);
-                        }
-                    }
-                }
-            }
+            Set<SubChunkPos> set = DataManager.getInstance().getSchematicPlacementManager().getAllTouchedSubChunks();
+            if (GuiScreen.isCtrlKeyDown()) System.out.printf("queue positions: %s\n", set);
+            queuePositions.addAll(set);
 
             this.mc.mcProfiler.startSection("iteration");
 
-            while (queue.isEmpty() == false)
+            while (queuePositions.isEmpty() == false)
             {
-                renderChunk = queue.poll();
-                this.renderInfos.add((RenderChunkSchematicVbo) renderChunk);
+                SubChunkPos subChunk = queuePositions.poll();
+                BlockPos pos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
+                RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(pos);
 
+                if (renderChunk != null && camera.isBoundingBoxInFrustum(renderChunk.boundingBox))
+                {
+                    renderChunk.setFrameIndex(frameCount);
+                    this.renderInfos.add(renderChunk);
+                }
+
+                /*
                 for (EnumFacing facing : EnumFacing.values())
                 {
                     RenderChunk renderChunkTmp = this.getRenderChunkOffset(blockpos, renderChunk, facing);
@@ -374,6 +328,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                         queue.add(renderChunkTmp);
                     }
                 }
+                */
 
                 /*
                 RenderGlobal.ContainerLocalRenderInformation localRenderInfo = queue.poll();

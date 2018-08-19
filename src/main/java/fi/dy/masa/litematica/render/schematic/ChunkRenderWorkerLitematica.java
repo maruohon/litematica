@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import fi.dy.masa.litematica.LiteModLitematica;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
@@ -137,9 +138,10 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
             if (generatorType == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK)
             {
+                if (GuiScreen.isCtrlKeyDown()) System.out.printf("pre uploadChunk()\n");
                 for (BlockRenderLayer layer : BlockRenderLayer.values())
                 {
-                    if (compiledChunk.isLayerStarted(layer))
+                    if (compiledChunk.isLayerStarted(layer) || renderChunk.hasOverlay())
                     {
                         BufferBuilder buffer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(layer);
                         futuresList.add(this.chunkRenderDispatcher.uploadChunk(generator, layer, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
