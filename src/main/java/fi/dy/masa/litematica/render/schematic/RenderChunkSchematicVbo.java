@@ -14,7 +14,7 @@ import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
 import fi.dy.masa.litematica.mixin.IMixinRenderChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.util.SubChunkPos;
-import fi.dy.masa.litematica.util.Vec4f;
+import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
@@ -195,6 +196,8 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     stateClient = stateClient.getActualState(this.clientWorldView, posMutable);
                     Block blockSchematic = stateSchematic.getBlock();
                     Block blockClient = stateClient.getBlock();
+                    Color4f overlayColor = null;
+                    boolean missing = false;
 
                     if (blockClient == Blocks.AIR)
                     {
@@ -233,31 +236,59 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
                             usedLayers[layerIndex] |= this.renderGlobal.renderBlock(stateSchematic, posMutable, this.schematicWorldView, bufferSchematic);
 
-                            //RenderUtils.renderBlockOverlay(posMutable, 0.01, new Vec4f(0.5f, 0.9f, 0.9f, 0.5f), bufferOverlayOutlines);
-                            //float r = 0.5f, g = 1f, b = 1f, a = 0.3f;
-                            double expand = 0.0;
-                            RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(0.2f, 0.7f, 0.9f, 0.3f), bufferOverlayQuads);
-                            //RenderUtils.renderBlockOverlay(posMutable, expand, new Vec4f(0.5f, 0.9f, 0.9f, 1.0f), bufferOverlayOutlines);
+                            overlayColor = Configs.Visuals.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
+                            missing = true;
                         }
                     }
                     else if (stateSchematic != stateClient)
                     {
-                        double expand = 0.0;
-
                         // Extra block
                         if (blockSchematic == Blocks.AIR)
                         {
-                            RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1.0f, 0.3f, 0.9f, 0.3f), bufferOverlayQuads);
+                            overlayColor = Configs.Visuals.SCHEMATIC_OVERLAY_COLOR_EXTRA.getColor();
                         }
                         // Wrong block
                         else if (blockClient != blockSchematic)
                         {
-                            RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1.0f, 0.2f, 0.2f, 0.3f), bufferOverlayQuads);
+                            overlayColor = Configs.Visuals.SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK.getColor();
                         }
                         // Wrong state
                         else
                         {
-                            RenderUtils.drawBlockBoundingBoxBatched(posMutable, expand, new Vec4f(1f, 0x90 / 255f, 0x10 / 255f, 0.3f), bufferOverlayQuads);
+                            overlayColor = Configs.Visuals.SCHEMATIC_OVERLAY_COLOR_WRONG_STATE.getColor();
+                        }
+                    }
+
+                    if (overlayColor != null)
+                    {
+                        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue())
+                        {
+                            // Only render the model-based outlines or sides for missing blocks
+                            if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.getBooleanValue())
+                            {
+                                IBakedModel bakedModel = this.renderGlobal.getModelForState(stateSchematic);
+                                RenderUtils.drawBlockModelQuadOverlayBatched(bakedModel, stateSchematic, posMutable, overlayColor, 0, bufferOverlayQuads);
+                            }
+                            else
+                            {
+                                RenderUtils.drawBlockBoundingBoxSidesBatched(posMutable, overlayColor, 0, bufferOverlayQuads);
+                            }
+                        }
+
+                        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue())
+                        {
+                            overlayColor = new Color4f(overlayColor.r, overlayColor.g, overlayColor.b, 1f);
+
+                            // Only render the model-based outlines or sides for missing blocks
+                            if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue())
+                            {
+                                IBakedModel bakedModel = this.renderGlobal.getModelForState(stateSchematic);
+                                RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, posMutable, overlayColor, 0, bufferOverlayOutlines);
+                            }
+                            else
+                            {
+                                RenderUtils.drawBlockBoundingBoxOutlinesBatched(posMutable, overlayColor, 0, bufferOverlayOutlines);
+                            }
                         }
                     }
                 }
@@ -426,7 +457,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
     public enum OverlayType
     {
-        OUTLINE     (GL11.GL_LINE_STRIP),
+        OUTLINE     (GL11.GL_LINES),
         QUAD        (GL11.GL_QUADS);
 
         private final int glMode;

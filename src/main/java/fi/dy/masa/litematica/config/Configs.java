@@ -45,33 +45,51 @@ public class Configs implements IConfigHandler
 
     public static class Visuals
     {
+        public static final ConfigColor         AREA_SELECTION_BOX_SIDE_COLOR   = new ConfigColor(      "areaSelectionBoxSideColor", "0x30FFFFFF", "The color of the area selection boxes, when they are unselected");
         public static final ConfigDouble        ERROR_HILIGHT_ALPHA             = new ConfigDouble(     "errorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
         public static final ConfigInteger       ERROR_HILIGHT_MAX_POSITIONS     = new ConfigInteger(    "errorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render at once");
         public static final ConfigDouble        GHOST_BLOCK_ALPHA               = new ConfigDouble(     "ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
         public static final ConfigOptionList    INFO_HUD_ALIGNMENT              = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\", used for schematic verifier mismatch positions etc.");
         public static final ConfigInteger       INFO_HUD_MAX_LINES              = new ConfigInteger(    "infoHudMaxLines", 10, 1, 32, "The maximum number of info lines to show on the HUD at once");
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA        = new ConfigDouble(     "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
+        public static final ConfigBoolean       RENDER_AREA_SELECTION_BOX_SIDES = new ConfigBoolean(    "renderAreaSelectionBoxSides", true, "If enabled, then the area selection boxes will have their side quads rendered");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT    = new ConfigBoolean(    "renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
         public static final ConfigBoolean       RENDER_ERROR_INFO_OVERLAY       = new ConfigBoolean(    "renderErrorInfoOverlay", true, "If enabled, then an info overlay is rendered while looking at an error marker, and holding the key for it");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES       = new ConfigBoolean(    "renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier will have\n(translucent) sides rendered instead of just the outline");
-        public static final ConfigBoolean       RENDER_SELECTION_BOX_SIDES      = new ConfigBoolean(    "renderSelectionBoxSides", true, "If enabled, then the area selection boxes will have their side quads rendered");
         public static final ConfigBoolean       RENDER_PLACEMENT_BOX_SIDES      = new ConfigBoolean(    "renderPlacementBoxSides", false, "If enabled, then the placed schematic sub-region boxes will have their side quads rendered");
-        public static final ConfigColor         SELECTION_BOX_SIDE_COLOR        = new ConfigColor(      "selectionBoxSideColor", "0x30FFFFFF", "If enabled, then the area selection boxes will have their side quads rendered");
+        public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_EXTRA       = new ConfigColor(  "schematicOverlayColorExtra",      "0x4CFF4CE6", "The color of the blocks overlay for extra blocks");
+        public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_MISSING     = new ConfigColor(  "schematicOverlayColorMissing",    "0x2C33B3E6", "The color of the blocks overlay for missing blocks");
+        public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK = new ConfigColor(  "schematicOverlayColorWrongBlock", "0x4CFF3333", "The color of the blocks overlay for wrong blocks");
+        public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_WRONG_STATE = new ConfigColor(  "schematicOverlayColorWrongState", "0x4CFF9010", "The color of the blocks overlay for wrong block states");
+        public static final ConfigBoolean       SCHEMATIC_OVERLAY_ENABLE_OUTLINES   = new ConfigBoolean("schematicOverlayEnableOutlines",  true, "Enables rendering a wire frame outline for the schematic block overlay");
+        public static final ConfigBoolean       SCHEMATIC_OVERLAY_ENABLE_SIDES      = new ConfigBoolean("schematicOverlayEnableSides",     true, "Enables rendering translucent boxes/sides for the schematic block overlay");
+        public static final ConfigBoolean       SCHEMATIC_OVERLAY_MODEL_OUTLINE     = new ConfigBoolean("schematicOverlayModelOutline",    true, "If enabled, then the schematic overlay will use the block model\nquads/vertices instead of the traditional full block overlay");
+        public static final ConfigBoolean       SCHEMATIC_OVERLAY_MODEL_SIDES       = new ConfigBoolean("schematicOverlayModelSides",      true, "If enabled, then the schematic overlay will use the block model\nquads/vertices instead of the traditional full block overlay");
+        public static final ConfigDouble        SCHEMATIC_OVERLAY_OUTLINE_WIDTH     = new ConfigDouble( "schematicOverlayOutlineWidth",  1.5, 0, 5, "The line width of the block (model) outlines");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                AREA_SELECTION_BOX_SIDE_COLOR,
                 ERROR_HILIGHT_ALPHA,
                 ERROR_HILIGHT_MAX_POSITIONS,
                 GHOST_BLOCK_ALPHA,
                 INFO_HUD_ALIGNMENT,
                 INFO_HUD_MAX_LINES,
                 PLACEMENT_BOX_SIDE_ALPHA,
+                RENDER_AREA_SELECTION_BOX_SIDES,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
                 RENDER_ERROR_INFO_OVERLAY,
                 RENDER_ERROR_MARKER_SIDES,
-                RENDER_SELECTION_BOX_SIDES,
                 RENDER_PLACEMENT_BOX_SIDES,
-                SELECTION_BOX_SIDE_COLOR
-                );
+                SCHEMATIC_OVERLAY_COLOR_EXTRA,
+                SCHEMATIC_OVERLAY_COLOR_MISSING,
+                SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK,
+                SCHEMATIC_OVERLAY_COLOR_WRONG_STATE,
+                SCHEMATIC_OVERLAY_ENABLE_OUTLINES,
+                SCHEMATIC_OVERLAY_ENABLE_SIDES,
+                SCHEMATIC_OVERLAY_MODEL_OUTLINE,
+                SCHEMATIC_OVERLAY_MODEL_SIDES,
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH
+        );
     }
 
     public static void loadFromFile()

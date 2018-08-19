@@ -20,7 +20,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.util.Vec4f;
+import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -49,7 +49,7 @@ public class SchematicPlacement
     private boolean regionPlacementsModified;
     private int boxesBBColor;
     private final int subRegionCount;
-    private Vec4f boxesBBColorVec = new Vec4f(0xFF, 0xFF, 0xFF);
+    private Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
     @Nullable
     private String selectedSubRegionName;
 
@@ -133,7 +133,7 @@ public class SchematicPlacement
     public SchematicPlacement setBoxesBBColor(int color)
     {
         this.boxesBBColor = color;
-        this.boxesBBColorVec = new Vec4f(((color >> 16) & 0xFF) / 255f, ((color >> 8) & 0xFF) / 255f, (color & 0xFF) / 255f);
+        this.boxesBBColorVec = new Color4f(((color >> 16) & 0xFF) / 255f, ((color >> 8) & 0xFF) / 255f, (color & 0xFF) / 255f);
         USED_COLORS.add(color);
         return this;
     }
@@ -153,7 +153,7 @@ public class SchematicPlacement
         return mirror;
     }
 
-    public Vec4f getBoxesBBColor()
+    public Color4f getBoxesBBColor()
     {
         return this.boxesBBColorVec;
     }

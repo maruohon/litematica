@@ -635,7 +635,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         }
     }
 
-    private IBakedModel getModelForState(IBlockState state)
+    public IBakedModel getModelForState(IBlockState state)
     {
         return this.blockModelShapes.getModelForState(state);
     }

@@ -21,7 +21,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
-import fi.dy.masa.litematica.util.Vec4f;
+import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -62,16 +62,16 @@ public class OverlayRenderer
 
     private final Minecraft mc;
     private final Map<SchematicPlacement, ImmutableMap<String, Box>> placements = new HashMap<>();
-    private Vec4f colorPos1 = new Vec4f(1f, 0.0625f, 0.0625f);
-    private Vec4f colorPos2 = new Vec4f(0.0625f, 0.0625f, 1f);
-    private Vec4f colorOverlapping = new Vec4f(1f, 0.0625f, 1f);
-    private Vec4f colorX = new Vec4f(   1f, 0.25f, 0.25f);
-    private Vec4f colorY = new Vec4f(0.25f,    1f, 0.25f);
-    private Vec4f colorZ = new Vec4f(0.25f, 0.25f,    1f);
-    private Vec4f colorArea = new Vec4f(1f, 1f, 1f);
-    private Vec4f colorBoxPlacementSelected = new Vec4f(0x16 / 255f, 1f, 1f);
-    private Vec4f colorSelectedCorner = new Vec4f(0f, 1f, 1f);
-    private Vec4f colorAreaOrigin = new Vec4f(1f, 0x90 / 255f, 0x10 / 255f);
+    private Color4f colorPos1 = new Color4f(1f, 0.0625f, 0.0625f);
+    private Color4f colorPos2 = new Color4f(0.0625f, 0.0625f, 1f);
+    private Color4f colorOverlapping = new Color4f(1f, 0.0625f, 1f);
+    private Color4f colorX = new Color4f(   1f, 0.25f, 0.25f);
+    private Color4f colorY = new Color4f(0.25f,    1f, 0.25f);
+    private Color4f colorZ = new Color4f(0.25f, 0.25f,    1f);
+    private Color4f colorArea = new Color4f(1f, 1f, 1f);
+    private Color4f colorBoxPlacementSelected = new Color4f(0x16 / 255f, 1f, 1f);
+    private Color4f colorSelectedCorner = new Color4f(0f, 1f, 1f);
+    private Color4f colorAreaOrigin = new Color4f(1f, 0x90 / 255f, 0x10 / 255f);
 
     private OverlayRenderer()
     {
@@ -127,7 +127,7 @@ public class OverlayRenderer
                 this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
             }
 
-            Vec4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
+            Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
             RenderUtils.renderBlockOutline(currentSelection.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
         }
 
@@ -150,7 +150,7 @@ public class OverlayRenderer
                     this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, schematicPlacement);
                 }
 
-                Vec4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
+                Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
                 RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, 2f, color, renderViewEntity, partialTicks);
             }
         }
@@ -176,11 +176,11 @@ public class OverlayRenderer
             return;
         }
 
-        Vec4f color1;
-        Vec4f color2;
-        Vec4f colorX;
-        Vec4f colorY;
-        Vec4f colorZ;
+        Color4f color1;
+        Color4f color2;
+        Color4f colorX;
+        Color4f colorY;
+        Color4f colorZ;
 
         switch (boxType)
         {
@@ -200,7 +200,7 @@ public class OverlayRenderer
                 colorZ = this.colorBoxPlacementSelected;
                 break;
             case PLACEMENT_UNSELECTED:
-                Vec4f color = placement.getBoxesBBColor();
+                Color4f color = placement.getBoxesBBColor();
                 colorX = color;
                 colorY = color;
                 colorZ = color;
@@ -209,27 +209,27 @@ public class OverlayRenderer
                 return;
         }
 
-        Vec4f sideColor;
+        Color4f sideColor;
 
         if (boxType == BoxType.PLACEMENT_SELECTED)
         {
             color1 = this.colorBoxPlacementSelected;
             color2 = color1;
             float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
-            sideColor = new Vec4f(color1.r, color1.g, color1.b, alpha);
+            sideColor = new Color4f(color1.r, color1.g, color1.b, alpha);
         }
         else if (boxType == BoxType.PLACEMENT_UNSELECTED)
         {
             color1 = placement.getBoxesBBColor();
             color2 = color1;
             float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
-            sideColor = new Vec4f(color1.r, color1.g, color1.b, alpha);
+            sideColor = new Color4f(color1.r, color1.g, color1.b, alpha);
         }
         else
         {
             color1 = box.getSelectedCorner() == Corner.CORNER_1 ? this.colorSelectedCorner : this.colorPos1;
             color2 = box.getSelectedCorner() == Corner.CORNER_2 ? this.colorSelectedCorner : this.colorPos2;
-            sideColor = Vec4f.fromColor(Configs.Visuals.SELECTION_BOX_SIDE_COLOR.getIntegerValue());
+            sideColor = Color4f.fromColor(Configs.Visuals.AREA_SELECTION_BOX_SIDE_COLOR.getIntegerValue());
         }
 
         if (pos1 != null && pos2 != null)
@@ -242,7 +242,7 @@ public class OverlayRenderer
                 RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
 
                 if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
-                      Configs.Visuals.RENDER_SELECTION_BOX_SIDES.getBooleanValue())
+                      Configs.Visuals.RENDER_AREA_SELECTION_BOX_SIDES.getBooleanValue())
                     ||
                      ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
                        Configs.Visuals.RENDER_PLACEMENT_BOX_SIDES.getBooleanValue()))
@@ -338,8 +338,8 @@ public class OverlayRenderer
 
             for (BlockPos pos : posList)
             {
-                Vec4f color = type.getColor();
-                Vec4f colorSides = new Vec4f(color.r, color.g, color.b, (float) Configs.Visuals.ERROR_HILIGHT_ALPHA.getDoubleValue());
+                Color4f color = type.getColor();
+                Color4f colorSides = new Color4f(color.r, color.g, color.b, (float) Configs.Visuals.ERROR_HILIGHT_ALPHA.getDoubleValue());
                 RenderUtils.renderAreaSidesBatched(pos, pos, colorSides, 0.002, this.mc.player, partialTicks, buffer);
             }
 

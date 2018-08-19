@@ -2,21 +2,16 @@ package fi.dy.masa.litematica.render;
 
 import java.util.List;
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.litematica.interfaces.IBufferBuilder;
-import fi.dy.masa.litematica.util.Vec4f;
+import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -24,7 +19,7 @@ import net.minecraft.util.math.BlockPos;
 public class RenderUtils
 {
     public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth,
-            Vec4f color, Entity renderViewEntity, float partialTicks)
+            Color4f color, Entity renderViewEntity, float partialTicks)
     {
         GlStateManager.glLineWidth(lineWidth);
 
@@ -33,7 +28,7 @@ public class RenderUtils
     }
 
     public static void renderBlockOutlineBatched(BlockPos pos, double expand,
-            Vec4f color, Entity renderViewEntity, BufferBuilder buffer, float partialTicks)
+            Color4f color, Entity renderViewEntity, BufferBuilder buffer, float partialTicks)
     {
         double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
@@ -49,7 +44,7 @@ public class RenderUtils
                 color.r, color.g, color.b, color.a);
     }
 
-    public static void renderBlockOverlay(BlockPos pos, double expand, Vec4f color, BufferBuilder buffer)
+    public static void renderBlockOverlay(BlockPos pos, double expand, Color4f color, BufferBuilder buffer)
     {
         RenderGlobal.drawBoundingBox(buffer,
                 pos.getX() - expand,
@@ -62,7 +57,7 @@ public class RenderUtils
     }
 
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
-            Vec4f color1, Vec4f color2, Vec4f color3, Entity renderViewEntity, float partialTicks)
+            Color4f color1, Color4f color2, Color4f color3, Entity renderViewEntity, float partialTicks)
     {
         final double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         final double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
@@ -197,7 +192,7 @@ public class RenderUtils
     }
     */
 
-    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Vec4f color, Entity renderViewEntity, float partialTicks)
+    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, Entity renderViewEntity, float partialTicks)
     {
         GlStateManager.enableBlend();
         GlStateManager.disableCull();
@@ -214,23 +209,23 @@ public class RenderUtils
         GlStateManager.disableBlend();
     }
 
-    public static void renderAreaSidesBatched(BlockPos pos1, BlockPos pos2, Vec4f color, double expand,
+    public static void renderAreaSidesBatched(BlockPos pos1, BlockPos pos2, Color4f color, double expand,
             Entity renderViewEntity, float partialTicks, BufferBuilder buffer)
     {
         double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
         double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
-        double minX = Math.min(pos1.getX(), pos2.getX()) - dx;
-        double minY = Math.min(pos1.getY(), pos2.getY()) - dy;
-        double minZ = Math.min(pos1.getZ(), pos2.getZ()) - dz;
-        double maxX = Math.max(pos1.getX(), pos2.getX()) + 1 - dx;
-        double maxY = Math.max(pos1.getY(), pos2.getY()) + 1 - dy;
-        double maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1 - dz;
+        double minX = Math.min(pos1.getX(), pos2.getX()) - dx - expand;
+        double minY = Math.min(pos1.getY(), pos2.getY()) - dy - expand;
+        double minZ = Math.min(pos1.getZ(), pos2.getZ()) - dz - expand;
+        double maxX = Math.max(pos1.getX(), pos2.getX()) + 1 - dx + expand;
+        double maxY = Math.max(pos1.getY(), pos2.getY()) + 1 - dy + expand;
+        double maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1 - dz + expand;
 
-        drawBoundingBoxSidesBatched(minX, minY, minZ, maxX, maxY, maxZ, expand, color, buffer);
+        drawBoundingBoxSidesBatched(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 
-    public static void drawBlockBoundingBoxBatched(BlockPos pos, double expand, Vec4f color, BufferBuilder buffer)
+    public static void drawBlockBoundingBoxSidesBatched(BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
         double minX = pos.getX() - expand;
         double minY = pos.getY() - expand;
@@ -239,19 +234,24 @@ public class RenderUtils
         double maxY = pos.getY() + expand + 1;
         double maxZ = pos.getZ() + expand + 1;
 
-        drawBoundingBoxSidesBatched(minX, minY, minZ, maxX, maxY, maxZ, expand, color, buffer);
+        drawBoundingBoxSidesBatched(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
+    }
+
+    public static void drawBlockBoundingBoxOutlinesBatched(BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
+    {
+        double minX = pos.getX() - expand;
+        double minY = pos.getY() - expand;
+        double minZ = pos.getZ() - expand;
+        double maxX = pos.getX() + expand + 1;
+        double maxY = pos.getY() + expand + 1;
+        double maxZ = pos.getZ() + expand + 1;
+
+        drawBoundingBoxOutlinesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 
     public static void drawBoundingBoxSidesBatched(double minX, double minY, double minZ, double maxX, double maxY, double maxZ,
-            double expand, Vec4f color, BufferBuilder buffer)
+            Color4f color, BufferBuilder buffer)
     {
-        minX -= expand;
-        minY -= expand;
-        minZ -= expand;
-        maxX += expand;
-        maxY += expand;
-        maxZ += expand;
-
         // West side
         buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
         buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
@@ -289,8 +289,93 @@ public class RenderUtils
         buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
+    /**
+     * Assumes a BufferBuilder in GL_LINES mode has been initialized
+     */
+    public static void drawBoundingBoxOutlinesBatchedLines(double minX, double minY, double minZ, double maxX, double maxY, double maxZ,
+            Color4f color, BufferBuilder buffer)
+    {
+        // West side
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        // East side
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        // North side
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        // South side
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        // Bottom side
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        // Top side
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+    }
+
     public static void renderAreaOutline(BlockPos pos1, BlockPos pos2,
-            float lineWidth, Vec4f colorX, Vec4f colorY, Vec4f colorZ, Entity renderViewEntity, float partialTicks)
+            float lineWidth, Color4f colorX, Color4f colorY, Color4f colorZ, Entity renderViewEntity, float partialTicks)
     {
         final int xMin = Math.min(pos1.getX(), pos2.getX());
         final int yMin = Math.min(pos1.getY(), pos2.getY());
@@ -440,103 +525,93 @@ public class RenderUtils
         tessellator.draw();
     }
 
-    // FIXME testing, remove
-    public static void renderGhostBlocks(IBlockState[] blocks, BlockPos size, BlockPos posStart, Entity entity, float partialTicks)
+    /**
+     * Assumes a BufferBuilder in the GL_LINES mode has been initialized
+     */
+    public static void drawBlockModelOutlinesBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
-        double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-        double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-        double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
-        float a = 0.8f;
-
-        Minecraft mc = Minecraft.getMinecraft();
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        GlStateManager.color(1f, 1f, 1f, 1f);
-
-        final int width = size.getX();
-        final int height = size.getY();
-        final int length = size.getZ();
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
-        int index = 0;
-
-        for (int y = 0; y < height; ++y)
+        for (final EnumFacing side : EnumFacing.values())
         {
-            for (int z = 0; z < length; ++z)
-            {
-                for (int x = 0; x < width; ++x, index++)
-                {
-                    IBlockState state = blocks[index];
+            renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, 0));
+        }
 
-                    if (state.getBlock() == Blocks.AIR)
-                    {
-                        continue;
-                    }
+        renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, null, 0));
+    }
 
-                    posMutable.setPos(posStart.getX() + x, posStart.getY() + y, posStart.getZ() + z);
+    private static void renderModelQuadOutlines(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
+    {
+        final int size = quads.size();
 
-                    GlStateManager.pushMatrix();
-                    GlStateManager.enableCull();
-                    GlStateManager.enableDepth();
-                    GlStateManager.translate(posMutable.getX() - dx, posMutable.getY() - dy, posMutable.getZ() - dz);
-
-                    GlStateManager.color(1f, 1f, 1f, 1f);
-
-                    // Existing block
-                    if (mc.world.isAirBlock(posMutable) == false)
-                    {
-                        GlStateManager.translate(-0.001, -0.001, -0.001);
-                        GlStateManager.scale(1.002, 1.002, 1.002);
-                    }
-
-                    // Translucent ghost block rendering
-                    //if (Configs.buildersWandUseTranslucentGhostBlocks)
-                    {
-                        IBakedModel model = mc.getBlockRendererDispatcher().getModelForState(state);
-                        int alpha = ((int)(a * 0xFF)) << 24;
-
-                        GlStateManager.enableBlend();
-                        GlStateManager.enableTexture2D();
-
-                        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                        GlStateManager.colorMask(false, false, false, false);
-                        renderModel(state, model, posMutable, alpha);
-
-                        GlStateManager.colorMask(true, true, true, true);
-                        GlStateManager.depthFunc(GL11.GL_LEQUAL);
-                        renderModel(state, model, posMutable, alpha);
-
-                        GlStateManager.disableBlend();
-                    }
-                    // Normal fully opaque ghost block rendering
-                    /*
-                    else
-                    {
-                        GlStateManager.rotate(-90, 0, 1, 0);
-                        Minecraft.getMinecraft().getBlockRendererDispatcher().renderBlockBrightness(stateActual, 0.9f);
-                    }
-                    */
-
-                    GlStateManager.popMatrix();
-                }
-            }
+        for (int i = 0; i < size; i++)
+        {
+            renderQuadOutlinesBatched(pos, buffer, color, quads.get(i).getVertexData());
         }
     }
 
-    private static void renderModel(final IBlockState state, final IBakedModel model, final BlockPos pos, final int alpha)
+    private static void renderQuadOutlinesBatched(BlockPos pos, BufferBuilder buffer, Color4f color, int[] vertexData)
     {
-        //BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        //dispatcher.getBlockModelRenderer().renderModelBrightnessColor(model, 1f, 1f, 1f, 1f);
+        final int x = pos.getX();
+        final int y = pos.getY();
+        final int z = pos.getZ();
+        float fx[] = new float[4];
+        float fy[] = new float[4];
+        float fz[] = new float[4];
 
-        final Tessellator tessellator = Tessellator.getInstance();
-        final BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
-
-        for (final EnumFacing facing : EnumFacing.values())
+        for (int index = 0; index < 4; ++index)
         {
-            renderQuads(state, pos, buffer, model.getQuads(state, facing, 0), alpha);
+            fx[index] = x + Float.intBitsToFloat(vertexData[index * 7 + 0]);
+            fy[index] = y + Float.intBitsToFloat(vertexData[index * 7 + 1]);
+            fz[index] = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
         }
 
-        renderQuads(state, pos, buffer, model.getQuads(state, null, 0), alpha);
-        tessellator.draw();
+        buffer.pos(fx[0], fy[0], fz[0]).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(fx[1], fy[1], fz[1]).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(fx[1], fy[1], fz[1]).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(fx[2], fy[2], fz[2]).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(fx[2], fy[2], fz[2]).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(fx[3], fy[3], fz[3]).color(color.r, color.g, color.b, color.a).endVertex();
+
+        buffer.pos(fx[3], fy[3], fz[3]).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(fx[0], fy[0], fz[0]).color(color.r, color.g, color.b, color.a).endVertex();
+    }
+
+    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
+    {
+        for (final EnumFacing side : EnumFacing.values())
+        {
+            renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, 0));
+        }
+
+        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, 0));
+    }
+
+    private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
+    {
+        final int size = quads.size();
+
+        for (int i = 0; i < size; i++)
+        {
+            renderModelQuadOverlayBatched(pos, buffer, color, quads.get(i).getVertexData());
+        }
+    }
+
+    private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, int[] vertexData)
+    {
+        final int x = pos.getX();
+        final int y = pos.getY();
+        final int z = pos.getZ();
+        float fx, fy, fz;
+
+        for (int index = 0; index < 4; ++index)
+        {
+            fx = x + Float.intBitsToFloat(vertexData[index * 7 + 0]);
+            fy = y + Float.intBitsToFloat(vertexData[index * 7 + 1]);
+            fz = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
+
+            buffer.pos(fx, fy, fz).color(color.r, color.g, color.b, color.a).endVertex();
+        }
     }
 
     /*
@@ -578,6 +653,25 @@ public class RenderUtils
         }
     }
     */
+
+    /*
+    private static void renderModel(final IBlockState state, final IBakedModel model, final BlockPos pos, final int alpha)
+    {
+        //BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+        //dispatcher.getBlockModelRenderer().renderModelBrightnessColor(model, 1f, 1f, 1f, 1f);
+
+        final Tessellator tessellator = Tessellator.getInstance();
+        final BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+
+        for (final EnumFacing facing : EnumFacing.values())
+        {
+            renderQuads(state, pos, buffer, model.getQuads(state, facing, 0), alpha);
+        }
+
+        renderQuads(state, pos, buffer, model.getQuads(state, null, 0), alpha);
+        tessellator.draw();
+    }
 
     private static void renderQuads(final IBlockState state, final BlockPos pos, final BufferBuilder buffer, final List<BakedQuad> quads, final int alpha)
     {
@@ -630,6 +724,7 @@ public class RenderUtils
             bufferMixin.putColorRGBA(bufferMixin.getColorIndexAccessor(4 - i), ncr, ncg, ncb, nca);
         }
     }
+    */
 
     /*
     public static void renderQuadColorSlow(BufferBuilder wr, BakedQuad quad, int auxColor)

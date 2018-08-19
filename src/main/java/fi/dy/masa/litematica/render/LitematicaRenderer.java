@@ -259,12 +259,12 @@ public class LitematicaRenderer
 
         GlStateManager.disableTexture2D();
         GlStateManager.disableCull();
-        GlStateManager.glLineWidth(1.0f);
-        GlStateManager.color(1f, 1f, 1f, 1f);
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.enablePolygonOffset();
         GlStateManager.doPolygonOffset(-0.1f, -0.8f);
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.glLineWidth((float) Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
+        GlStateManager.color(1f, 1f, 1f, 1f);
 
         renderGlobal.renderBlockOverlays();
 

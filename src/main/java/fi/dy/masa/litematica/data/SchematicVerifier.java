@@ -21,8 +21,8 @@ import fi.dy.masa.litematica.render.IStringListProvider;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.util.Vec4f;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.util.Color4f;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -794,16 +794,16 @@ public class SchematicVerifier implements IStringListProvider
 
         private final String unlocName;
         private final String formattingCode;
-        private final Vec4f color;
+        private final Color4f color;
 
         private MismatchType(int color, String unlocName, String formattingCode)
         {
-            this.color = Vec4f.fromColor(color, 1f);
+            this.color = Color4f.fromColor(color, 1f);
             this.unlocName = unlocName;
             this.formattingCode = formattingCode;
         }
 
-        public Vec4f getColor()
+        public Color4f getColor()
         {
             return this.color;
         }
