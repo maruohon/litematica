@@ -472,7 +472,6 @@ public class LitematicaSchematic
                     posMutable.setPos(x, y, z);
                     NBTTagCompound teNBT = tileMap.get(posMutable);
 
-
                     posMutable.setPos(  posMinRel.getX() + x - regionPos.getX(),
                                         posMinRel.getY() + y - regionPos.getY(),
                                         posMinRel.getZ() + z - regionPos.getZ());
@@ -643,7 +642,7 @@ public class LitematicaSchematic
                             if (te != null)
                             {
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
-                                BlockPos pos = new BlockPos(x + startX - origin.getX(), y + startY - origin.getY(), z + startZ - origin.getZ());
+                                BlockPos pos = new BlockPos(x, y, z);
                                 NBTTagCompound tag = te.writeToNBT(new NBTTagCompound());
                                 NBTUtils.writeBlockPosToTag(pos, tag);
                                 tileEntityMap.put(pos, tag);
