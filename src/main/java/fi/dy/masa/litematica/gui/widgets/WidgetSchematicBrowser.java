@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.malilib.gui.RenderUtils;
 import net.minecraft.client.gui.Gui;
@@ -178,17 +179,18 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     @Nullable
     protected SchematicMetadata getSchematicMetadata(DirectoryEntry entry)
     {
-        File file = new File(entry.getDirectory(), entry.getName() + "_meta");
+        File file = new File(entry.getDirectory(), entry.getName());
         SchematicMetadata meta = this.cachedMetadata.get(file);
 
         if (meta == null)
         {
-            meta = SchematicMetadata.fromFile(file);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this);
 
-            if (meta != null)
+            if (schematic != null)
             {
+                meta = schematic.getMetadata();
                 this.cachedMetadata.put(file, meta);
-                this.createPreviewImage(new File(entry.getDirectory(), entry.getName()), meta);
+                this.createPreviewImage(file, meta);
             }
         }
 
