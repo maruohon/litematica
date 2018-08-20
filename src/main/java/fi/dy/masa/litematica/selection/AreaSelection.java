@@ -155,7 +155,7 @@ public class AreaSelection
 
         this.subRegionBoxes.put(name, box);
 
-        return this.currentBox;
+        return name;
     }
 
     public void clearCurrentSelectedCorner()
