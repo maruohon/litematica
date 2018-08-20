@@ -184,10 +184,9 @@ public class WidgetSchematicEntry extends WidgetBase
                 BlockPos pos = new BlockPos(mc.player.getPositionVector());
                 LitematicaSchematic entry = this.widget.schematic;
                 String name = entry.getMetadata().getName();
-                SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name);
                 boolean enabled = GuiScreen.isShiftKeyDown() == false;
-                placement.setEnabled(enabled);
-                placement.setRenderSchematic(enabled);
+
+                SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name, enabled, enabled);
                 DataManager.getInstance().getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
             }
             else if (this.type == Type.SAVE_TO_FILE)

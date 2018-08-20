@@ -45,7 +45,7 @@ public class SchematicPlacement
     private Mirror mirror = Mirror.NONE;
     private boolean ignoreEntities;
     private boolean enabled;
-    private boolean renderSchematic;
+    private boolean enableRender;
     private boolean regionPlacementsModified;
     private int boxesBBColor;
     private final int subRegionCount;
@@ -53,18 +53,20 @@ public class SchematicPlacement
     @Nullable
     private String selectedSubRegionName;
 
-    private SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name)
+    private SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
     {
         this.schematic = schematic;
         this.schematicFile = schematic.getFile();
         this.origin = origin;
         this.name = name;
         this.subRegionCount = schematic.getSubRegionCount();
+        this.enabled = enabled;
+        this.enableRender = enableRender;
     }
 
-    public static SchematicPlacement createFor(LitematicaSchematic schematic, BlockPos origin, String name)
+    public static SchematicPlacement createFor(LitematicaSchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
     {
-        SchematicPlacement placement = new SchematicPlacement(schematic, origin, name);
+        SchematicPlacement placement = new SchematicPlacement(schematic, origin, name, enabled, enableRender);
         placement.setBoxesBBColorNext();
         placement.resetAllSubRegionsToSchematicValues();
 
@@ -78,7 +80,7 @@ public class SchematicPlacement
 
     public boolean isRenderingEnabled()
     {
-        return this.isEnabled() && this.renderSchematic;
+        return this.isEnabled() && this.enableRender;
     }
 
     public boolean matchesRequirement(RequiredEnabled required)
@@ -90,7 +92,7 @@ public class SchematicPlacement
             case PLACEMENT_ENABLED:
                 return this.isEnabled();
             default:
-                return this.isEnabled() && this.renderSchematic;
+                return this.isEnabled() && this.enableRender;
         }
     }
 
@@ -524,9 +526,14 @@ public class SchematicPlacement
 
     public void setRenderSchematic(boolean render)
     {
-        if (render != this.renderSchematic)
+        if (render != this.enableRender)
         {
-            this.renderSchematic = render;
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            this.enableRender = render;
+            this.onModified(manager);
         }
     }
 
@@ -631,8 +638,8 @@ public class SchematicPlacement
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
             obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities));
             obj.add("enabled", new JsonPrimitive(this.enabled));
+            obj.add("enable_render", new JsonPrimitive(this.enableRender));
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
-            obj.add("render_schematic", new JsonPrimitive(this.renderSchematic));
 
             if (this.selectedSubRegionName != null)
             {
@@ -693,12 +700,13 @@ public class SchematicPlacement
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
             Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
             Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
-            SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, pos, name);
+            boolean enabled = JsonUtils.getBoolean(obj, "enabled");
+            boolean enableRender = JsonUtils.getBoolean(obj, "enable_render");
+
+            SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, pos, name, enabled, enableRender);
             schematicPlacement.rotation = rotation;
             schematicPlacement.mirror = mirror;
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
-            schematicPlacement.enabled = JsonUtils.getBoolean(obj, "enabled");
-            schematicPlacement.renderSchematic = JsonUtils.getBoolean(obj, "render_schematic");
 
             if (JsonUtils.hasInteger(obj, "bb_color"))
             {
