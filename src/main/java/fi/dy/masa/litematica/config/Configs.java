@@ -66,6 +66,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       SCHEMATIC_OVERLAY_MODEL_OUTLINE     = new ConfigBoolean("schematicOverlayModelOutline",    true, "If enabled, then the schematic overlay will use the block model\nquads/vertices instead of the traditional full block overlay");
         public static final ConfigBoolean       SCHEMATIC_OVERLAY_MODEL_SIDES       = new ConfigBoolean("schematicOverlayModelSides",      true, "If enabled, then the schematic overlay will use the block model\nquads/vertices instead of the traditional full block overlay");
         public static final ConfigDouble        SCHEMATIC_OVERLAY_OUTLINE_WIDTH     = new ConfigDouble( "schematicOverlayOutlineWidth",  1.5, 0, 5, "The line width of the block (model) outlines");
+        public static final ConfigBoolean       SCHEMATIC_OVERLAY_RENDER_THROUGH    = new ConfigBoolean("schematicOverlayRenderThroughBlocks", false, "If enabled, then the schematic overlay will be rendered through blocks\nThis is probably only useful once you are finished building\nand want to see any errors easier");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 AREA_SELECTION_BOX_SIDE_COLOR,
@@ -88,7 +89,8 @@ public class Configs implements IConfigHandler
                 SCHEMATIC_OVERLAY_ENABLE_SIDES,
                 SCHEMATIC_OVERLAY_MODEL_OUTLINE,
                 SCHEMATIC_OVERLAY_MODEL_SIDES,
-                SCHEMATIC_OVERLAY_OUTLINE_WIDTH
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH,
+                SCHEMATIC_OVERLAY_RENDER_THROUGH
         );
     }
 

@@ -267,8 +267,14 @@ public class LitematicaRenderer
         GlStateManager.glLineWidth((float) Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
         GlStateManager.color(1f, 1f, 1f, 1f);
 
+        if (Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue())
+        {
+            GlStateManager.disableDepth();
+        }
+
         renderGlobal.renderBlockOverlays();
 
+        GlStateManager.enableDepth();
         GlStateManager.doPolygonOffset(0f, 0f);
         GlStateManager.disablePolygonOffset();
         GlStateManager.enableTexture2D();
