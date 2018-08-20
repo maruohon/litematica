@@ -138,6 +138,7 @@ litematica.gui.label.placement_settings.placement_origin=Placement origin
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
+litematica.gui.title.create_area_selection=Create a new Area Selection
 litematica.gui.title.create_directory=Create a new directory
 litematica.gui.title.create_in_memory_schematic=Create an in-memory Schematic
 litematica.gui.title.litematica_main_menu=Litematica Main Menu

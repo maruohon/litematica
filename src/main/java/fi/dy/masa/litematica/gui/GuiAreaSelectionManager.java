@@ -121,14 +121,12 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiAreaSelectionManager gui;
-        private final SelectionManager selectionManager;
         private final ButtonType type;
 
         public ButtonListener(ButtonType type, GuiAreaSelectionManager gui)
         {
             this.type = type;
             this.gui = gui;
-            this.selectionManager = gui.selectionManager;
         }
 
         @Override
@@ -142,8 +140,9 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             }
             else if (this.type == ButtonType.CREATE_SELECTION)
             {
-                this.selectionManager.createNewSelection(this.gui.widget.getCurrentDirectory());
-                this.gui.widget.refreshEntries();
+                File dir = this.gui.widget.getCurrentDirectory();
+                String title = "litematica.gui.title.create_area_selection";
+                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new SelectionCreator(dir, this.gui)));
             }
         }
 
@@ -185,6 +184,25 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         public void setString(String string)
         {
             this.selectionManager.renameSelectedSubRegionBox(string);
+        }
+    }
+
+    public static class SelectionCreator implements IStringConsumer
+    {
+        private final File dir;
+        private final GuiAreaSelectionManager gui;
+
+        public SelectionCreator(File dir, GuiAreaSelectionManager gui)
+        {
+            this.dir = dir;
+            this.gui = gui;
+        }
+
+        @Override
+        public void setString(String string)
+        {
+            this.gui.selectionManager.createNewSelection(this.dir, string);
+            this.gui.widget.refreshEntries();
         }
     }
 }

@@ -209,23 +209,23 @@ public class SelectionManager
      * Creates a new schematic selection and returns the name of it
      * @return
      */
-    public String createNewSelection(File dir)
+    public String createNewSelection(File dir, final String nameIn)
     {
-        int i = 0;
-        String name = "New Selection ";
-        String selectionId;
-        File file;
+        String name = nameIn;
+        File file = new File(dir, FileUtils.generateSafeFileName(name) + ".json");
+        String selectionId = file.getAbsolutePath();
+        int i = 1;
 
-        do
+        while (this.selections.containsKey(selectionId) || file.exists())
         {
-            i++;
-            file = new File(dir, FileUtils.generateSafeFileName(name + i) + ".json");
+            name = nameIn + " " + i;
+            file = new File(dir, FileUtils.generateSafeFileName(name) + ".json");
             selectionId = file.getAbsolutePath();
+            i++;
         }
-        while (this.selections.containsKey(selectionId) || file.exists());
 
         AreaSelection selection = new AreaSelection();
-        selection.setName(name + i);
+        selection.setName(name);
 
         this.selections.put(selectionId, selection);
         this.currentSelectionId = selectionId;
