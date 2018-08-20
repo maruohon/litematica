@@ -93,6 +93,12 @@ public class InfoHud
         }
     }
 
+    public void reset()
+    {
+        this.providers.clear();
+        this.lineList.clear();
+    }
+
     public void setLines(List<String> lines)
     {
         this.lineList.clear();

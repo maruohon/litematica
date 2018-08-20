@@ -64,6 +64,8 @@ public class SchematicVerifier implements IStringListProvider
     private List<BlockPos> selectedMismatchPositions = new ArrayList<>();
     @Nullable
     private MismatchType selectedMismatchType = null;
+    @Nullable
+    private Pair<IBlockState, IBlockState> selectedMismatchPair = null;
     private boolean verificationStarted;
     private boolean verificationActive;
     private boolean finished;
@@ -139,9 +141,10 @@ public class SchematicVerifier implements IStringListProvider
         return this.wrongStatesPositions.size();
     }
 
-    public void setActiveMismatchPositionsForRender(MismatchType type, List<BlockPos> list)
+    public void setActiveMismatchPositionsForRender(MismatchType type, @Nullable Pair<IBlockState, IBlockState> pair, List<BlockPos> list)
     {
         this.selectedMismatchType = type;
+        this.selectedMismatchPair = pair;
         this.selectedMismatchPositions.clear();
         this.selectedMismatchPositions.addAll(list);
     }
@@ -288,7 +291,10 @@ public class SchematicVerifier implements IStringListProvider
                 }
             }
 
-            this.updateActiveMismatchOverlay();
+            if (this.recheckQueue.isEmpty())
+            {
+                this.updateActiveMismatchOverlay();
+            }
         }
     }
 
@@ -296,11 +302,16 @@ public class SchematicVerifier implements IStringListProvider
     {
         if (this.selectedMismatchType != null)
         {
-            this.updateMismatchOverlaysForType(this.selectedMismatchType);
+            this.updateMismatchOverlaysForType(this.selectedMismatchType, this.selectedMismatchPair);
         }
     }
 
-    public void updateMismatchOverlaysForType(MismatchType mismatchType)
+    public void updateMismatchOverlaysForType(MismatchType mismatchType, @Nullable BlockMismatch mismatch)
+    {
+        this.updateMismatchOverlaysForType(mismatchType, mismatch != null ? Pair.of(mismatch.stateExpected, mismatch.stateFound) : null);
+    }
+
+    private void updateMismatchOverlaysForType(MismatchType mismatchType, @Nullable Pair<IBlockState, IBlockState> pair)
     {
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -309,10 +320,11 @@ public class SchematicVerifier implements IStringListProvider
             this.maxEntries = Configs.Visuals.ERROR_HILIGHT_MAX_POSITIONS.getIntegerValue();
 
             // This needs to happen first
-            this.updateClosestPositions(mc.player, this.maxEntries);
+            BlockPos centerPos = new BlockPos(mc.player.getPositionVector());
+            this.updateClosestPositions(centerPos, pair, this.maxEntries);
 
             List<BlockPos> positionList = this.getClosestMismatchedPositionsFor(mismatchType);
-            this.setActiveMismatchPositionsForRender(mismatchType, positionList);
+            this.setActiveMismatchPositionsForRender(mismatchType, pair, positionList);
 
             this.updateMismatchPositionStringList(mismatchType, positionList);
         }
@@ -610,23 +622,33 @@ public class SchematicVerifier implements IStringListProvider
         }
     }
 
-    public void updateClosestPositions(EntityPlayer player, int maxEntries)
+    private void updateClosestPositions(BlockPos centerPos, @Nullable Pair<IBlockState, IBlockState> pair, int maxEntries)
     {
-        PositionUtils.BLOCK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPositionVector()));
+        PositionUtils.BLOCK_POS_COMPARATOR.setReferencePosition(centerPos);
         PositionUtils.BLOCK_POS_COMPARATOR.setClosestFirst(true);
 
-        this.addAndSortPositions(this.wrongBlocksPositions, this.mismatchedBlocksPositionsClosest, maxEntries);
-        this.addAndSortPositions(this.wrongStatesPositions, this.mismatchedStatesPositionsClosest, maxEntries);
-        this.addAndSortPositions(this.extraBlocksPositions, this.extraBlocksPositionsClosest, maxEntries);
-        this.addAndSortPositions(this.missingBlocksPositions, this.missingBlocksPositionsClosest, maxEntries);
+        this.addAndSortPositions(pair, this.wrongBlocksPositions, this.mismatchedBlocksPositionsClosest, maxEntries);
+        this.addAndSortPositions(pair, this.wrongStatesPositions, this.mismatchedStatesPositionsClosest, maxEntries);
+        this.addAndSortPositions(pair, this.extraBlocksPositions, this.extraBlocksPositionsClosest, maxEntries);
+        this.addAndSortPositions(pair, this.missingBlocksPositions, this.missingBlocksPositionsClosest, maxEntries);
     }
 
-    private void addAndSortPositions(ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> sourceMap, List<BlockPos> listOut, int maxEntries)
+    private void addAndSortPositions(@Nullable Pair<IBlockState, IBlockState> pair,
+            ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> sourceMap, List<BlockPos> listOut, int maxEntries)
     {
         listOut.clear();
 
         List<BlockPos> tempList = new ArrayList<>();
-        tempList.addAll(sourceMap.values());
+
+        if (pair != null)
+        {
+            tempList.addAll(sourceMap.get(pair));
+        }
+        else
+        {
+            tempList.addAll(sourceMap.values());
+        }
+
         Collections.sort(tempList, PositionUtils.BLOCK_POS_COMPARATOR);
 
         final int max = Math.min(maxEntries, tempList.size());

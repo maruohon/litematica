@@ -206,6 +206,8 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     {
         if (entry != null)
         {
+            SchematicVerifier verifier = this.placement.getSchematicVerifier();
+
             // Clear the selection when clicking again on the selected entry
             if (this.selectedDataEntry == entry)
             {
@@ -214,17 +216,22 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 InfoHud.getInstance().removeLineProvidersOfType(SchematicVerifier.class);
                 this.placement.getSchematicVerifier().clearActiveMismatchRenderPositions();
             }
-            else if (entry.type == BlockMismatchEntry.Type.DATA || entry.type == BlockMismatchEntry.Type.CATEGORY_TITLE)
-            {
-                this.selectedDataEntry = entry;
-
-                SchematicVerifier verifier = this.placement.getSchematicVerifier();
-                verifier.updateMismatchOverlaysForType(entry.mismatchType);
-            }
+            // Main header - show the currently missing/unseen chunks
             else if (entry.type == BlockMismatchEntry.Type.HEADER)
             {
-                SchematicVerifier verifier = this.placement.getSchematicVerifier();
                 verifier.updateRequiredChunksStringList();
+            }
+            // Category title - show all mismatches of that type
+            else if (entry.type == BlockMismatchEntry.Type.CATEGORY_TITLE)
+            {
+                this.selectedDataEntry = entry;
+                verifier.updateMismatchOverlaysForType(entry.mismatchType, null);
+            }
+            // A specific mismatch pair - show only those state pairs
+            else if (entry.type == BlockMismatchEntry.Type.DATA)
+            {
+                this.selectedDataEntry = entry;
+                verifier.updateMismatchOverlaysForType(entry.mismatchType, entry.blockMismatch);
             }
         }
     }

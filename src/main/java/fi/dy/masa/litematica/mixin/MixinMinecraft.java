@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -36,6 +37,8 @@ public class MixinMinecraft
         else
         {
             SchematicHolder.getInstance().clearLoadedSchematics();
+            InfoHud.getInstance().reset(); // remove the line providers and clear the data
+            DataManager.removeSchematicVerificationTask();
         }
     }
 
