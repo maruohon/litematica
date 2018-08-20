@@ -76,6 +76,12 @@ public class SchematicVerifier implements IStringListProvider
     private int maxEntries;
 
     @Override
+    public boolean shouldRenderStrings()
+    {
+        return DataManager.renderMismatches();
+    }
+
+    @Override
     public List<String> getLines()
     {
         return this.infoLines;

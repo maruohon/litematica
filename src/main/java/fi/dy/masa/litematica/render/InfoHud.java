@@ -60,7 +60,10 @@ public class InfoHud
             {
                 for (IStringListProvider provider : this.providers)
                 {
-                    y = renderTextLines(this.mc, 4, y, 0xFFFFFFFF, 0x80000000, true, true, this.getHudAlignment(), provider.getLines());
+                    if (provider.shouldRenderStrings())
+                    {
+                        y = renderTextLines(this.mc, 4, y, 0xFFFFFFFF, 0x80000000, true, true, this.getHudAlignment(), provider.getLines());
+                    }
                 }
             }
 
