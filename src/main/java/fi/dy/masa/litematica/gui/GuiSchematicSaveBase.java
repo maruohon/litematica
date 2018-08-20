@@ -6,6 +6,7 @@ import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
+import fi.dy.masa.litematica.gui.interfaces.IDirectoryNavigator;
 import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
@@ -158,11 +159,13 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         private final File dir;
         private final GuiLitematicaBase parent;
+        private final IDirectoryNavigator navigator;
 
-        public DirectoryCreator(File dir, GuiLitematicaBase parent)
+        public DirectoryCreator(File dir, GuiLitematicaBase parent, IDirectoryNavigator navigator)
         {
             this.dir = dir;
             this.parent = parent;
+            this.navigator = navigator;
         }
 
         @Override
@@ -188,6 +191,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
                 return;
             }
 
+            this.navigator.switchToDirectory(file);
             this.parent.addMessage(InfoType.SUCCESS, "litematica.message.directory_created", string);
         }
     }

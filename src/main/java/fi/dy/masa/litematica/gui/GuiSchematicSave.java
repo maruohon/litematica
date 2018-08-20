@@ -130,7 +130,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
             {
                 File dir = this.gui.widget.getCurrentDirectory();
                 String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui)));
+                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.widget)));
             }
         }
 
