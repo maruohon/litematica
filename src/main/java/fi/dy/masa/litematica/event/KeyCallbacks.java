@@ -291,7 +291,7 @@ public class KeyCallbacks
                     if (selection != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        selection.createNewSubRegionBox(pos);
+                        selection.createNewSubRegionBox(pos, selection.getName() + ", Box");
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);

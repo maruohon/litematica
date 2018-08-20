@@ -65,8 +65,7 @@ public class WorldUtils
         String subRegionName = FileUtils.getNameWithoutExtension(inputFileName) + " (Converted Schematic)";
         AreaSelection area = new AreaSelection();
         area.setName(subRegionName);
-        area.createNewSubRegionBox(BlockPos.ORIGIN);
-        area.getSelectedSubRegionBox().setName(subRegionName);
+        area.createNewSubRegionBox(BlockPos.ORIGIN, subRegionName);
         area.getSelectedSubRegionBox().setPos2(new BlockPos(schematic.getSize()));
 
         LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);
@@ -114,8 +113,7 @@ public class WorldUtils
             String subRegionName = FileUtils.getNameWithoutExtension(structureFileName) + " (Converted Structure)";
             AreaSelection area = new AreaSelection();
             area.setName(subRegionName);
-            area.createNewSubRegionBox(BlockPos.ORIGIN);
-            area.getSelectedSubRegionBox().setName(subRegionName);
+            area.createNewSubRegionBox(BlockPos.ORIGIN, subRegionName);
             area.getSelectedSubRegionBox().setPos2(template.getSize().add(-1, -1, -1));
 
             LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);

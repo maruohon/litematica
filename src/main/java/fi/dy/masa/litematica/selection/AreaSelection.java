@@ -122,30 +122,38 @@ public class AreaSelection
         return this.subRegionBoxes.values();
     }
 
-    public String createNewSubRegionBox(BlockPos pos1)
+    public String createNewSubRegionBox(BlockPos pos1, final String nameIn)
     {
         this.clearCurrentSelectedCorner();
-
-        if (this.origin.equals(BlockPos.ORIGIN) && this.subRegionBoxes.isEmpty())
-        {
-            this.origin = pos1;
-        }
-
-        String name = "Box ";
+        String name = nameIn;
         int i = 1;
 
-        while (this.subRegionBoxes.containsKey(name + i))
+        while (this.subRegionBoxes.containsKey(name))
         {
+            name = nameIn + " " + i;
             i++;
         }
 
         Box box = new Box();
-        box.setName(name + i);
-        box.setPos1(pos1);
-        box.setSelectedCorner(Corner.CORNER_1);
+        box.setName(name);
 
-        this.subRegionBoxes.put(name + i, box);
-        this.currentBox = name + i;
+        // When creating the first sub-region box, select the origin by default, and offset the position by one
+        // block, so that it can be selected without having to move the overlapping origin box first
+        if (this.origin.equals(BlockPos.ORIGIN) && this.subRegionBoxes.isEmpty())
+        {
+            this.origin = pos1;
+            this.originSelected = true;
+            pos1 = pos1.add(0, 1, 0);
+        }
+        else
+        {
+            box.setSelectedCorner(Corner.CORNER_1);
+            this.currentBox = name;
+        }
+
+        box.setPos1(pos1);
+
+        this.subRegionBoxes.put(name, box);
 
         return this.currentBox;
     }
