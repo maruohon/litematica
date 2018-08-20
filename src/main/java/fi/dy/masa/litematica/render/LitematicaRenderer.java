@@ -63,24 +63,9 @@ public class LitematicaRenderer
             fpsMin = Math.max(fpsMin, 60);
             long finishTimeNano = Math.max((long)(1000000000 / fpsMin / 4), 0L);
 
-            boolean translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && OpenGlHelper.shadersSupported;
-            float alpha = (float) Configs.Visuals.GHOST_BLOCK_ALPHA.getDoubleValue();
-
             GlStateManager.pushMatrix();
 
-            if (translucentSchematic)
-            {
-                //System.out.printf("alpha: %s\n", SHADER_ALPHA.getProgram());
-                GL20.glUseProgram(SHADER_ALPHA.getProgram());
-                GL20.glUniform1f(GL20.glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), alpha);
-            }
-
             this.renderWorld(partialTicks, finishTimeNano);
-
-            if (translucentSchematic)
-            {
-                GL20.glUseProgram(0);
-            }
 
             GlStateManager.popMatrix();
 
@@ -172,6 +157,16 @@ public class LitematicaRenderer
         }
         */
 
+        boolean translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && OpenGlHelper.shadersSupported;
+        float alpha = (float) Configs.Visuals.GHOST_BLOCK_ALPHA.getDoubleValue();
+
+        if (translucentSchematic)
+        {
+            //System.out.printf("alpha: %s\n", SHADER_ALPHA.getProgram());
+            GL20.glUseProgram(SHADER_ALPHA.getProgram());
+            GL20.glUniform1f(GL20.glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), alpha);
+        }
+
         //this.setupFog(0, partialTicks);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
@@ -255,6 +250,12 @@ public class LitematicaRenderer
         renderGlobal.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, pass, entity);
 
         GlStateManager.popMatrix();
+
+        if (translucentSchematic)
+        {
+            GL20.glUseProgram(0);
+        }
+
         GlStateManager.pushMatrix();
 
         GlStateManager.disableTexture2D();
