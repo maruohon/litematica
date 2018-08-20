@@ -49,6 +49,7 @@ public class DataManager
     private static int layerSingle = 0;
     private static int layerMin = 0;
     private static int layerMax = 0;
+    private static boolean canSave;
 
     @Nullable
     private static SchematicPlacement placementToVerify = null;
@@ -355,10 +356,22 @@ public class DataManager
             layerMin = JsonUtils.getIntegerOrDefault(root, "layer_min", 0);
             layerMax = JsonUtils.getIntegerOrDefault(root, "layer_max", 0);
         }
+
+        canSave = true;
     }
 
     public static void save()
     {
+        save(false);
+    }
+
+    public static void save(boolean forceSave)
+    {
+        if (canSave == false && forceSave == false)
+        {
+            return;
+        }
+
         INSTANCE.savePerDimensionData();
 
         JsonObject root = new JsonObject();
@@ -384,6 +397,8 @@ public class DataManager
 
         File file = getCurrentStorageFile(true);
         JsonUtils.writeJsonToFile(root, file);
+
+        canSave = false;
     }
 
     private void savePerDimensionData()

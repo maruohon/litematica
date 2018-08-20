@@ -230,13 +230,11 @@ public class KeyCallbacks
             }
             else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
             {
-                DataManager.save();
                 this.mc.displayGuiScreen(new GuiSchematicSave());
                 return true;
             }
             else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
             {
-                DataManager.save();
                 SelectionManager sm = dataManager.getSelectionManager();
                 AreaSelection area = sm.getCurrentSelection();
 
