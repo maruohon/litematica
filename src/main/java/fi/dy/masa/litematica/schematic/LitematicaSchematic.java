@@ -1027,7 +1027,6 @@ public class LitematicaSchematic
         }
 
         File fileSchematic = new File(dir, fileName);
-        File fileMeta = new File(dir, fileName + "_meta");
 
         try
         {
@@ -1043,18 +1042,8 @@ public class LitematicaSchematic
                 return false;
             }
 
-            if (override == false && fileMeta.exists())
-            {
-                feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.exists", fileMeta.getAbsolutePath()));
-                return false;
-            }
-
             FileOutputStream os = new FileOutputStream(fileSchematic);
             CompressedStreamTools.writeCompressed(this.writeToNBT(), os);
-            os.close();
-
-            os = new FileOutputStream(fileMeta);
-            CompressedStreamTools.writeCompressed(this.metadata.writeToNBT(), os);
             os.close();
 
             return true;
