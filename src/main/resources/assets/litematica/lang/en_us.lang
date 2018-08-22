@@ -94,6 +94,9 @@ litematica.gui.button.unload=Unload
 litematica.gui.label.area_selection_box_count=Boxes: %d
 litematica.gui.label.area_selection_origin=Origin: %s
 
+litematica.gui.label.block_info.state_client=Client World Block State
+litematica.gui.label.block_info.state_schematic=Schematic World Block State
+
 litematica.gui.label.layer_mode.all=All
 litematica.gui.label.layer_mode.all_above=All above
 litematica.gui.label.layer_mode.all_below=All below

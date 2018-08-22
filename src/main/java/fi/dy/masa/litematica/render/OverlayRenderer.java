@@ -19,9 +19,13 @@ import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult.Block
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.Color4f;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -29,7 +33,10 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.World;
 
 public class OverlayRenderer
 {
@@ -284,7 +291,8 @@ public class OverlayRenderer
                 if (verifier.getSelectedMismatchTypeForRender() != null)
                 {
                     List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
-                    BlockPos posLook = RayTraceUtils.traceToPositions(this.mc.world, posList, this.mc.player, 10);
+                    RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 10);
+                    BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
                     this.renderSchematicMismatches(verifier.getSelectedMismatchTypeForRender(), posList, posLook, partialTicks);
                 }
             }
@@ -356,31 +364,74 @@ public class OverlayRenderer
         GlStateManager.enableDepth();
     }
 
-    public static void renderHoverInfoForBlockMismatch(Minecraft mc)
+    public static void renderHoverInfo(Minecraft mc)
     {
-        if (Configs.Visuals.RENDER_ERROR_INFO_OVERLAY.getBooleanValue() &&
-            (Hotkeys.RENDER_ERROR_INFO_OVERLAY.getKeybind().isValid() == false ||
-             Hotkeys.RENDER_ERROR_INFO_OVERLAY.getKeybind().isKeybindHeld()) &&
-            mc.world != null && mc.player != null)
+        if (mc.world != null && mc.player != null)
         {
-            SchematicPlacement placement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
-
-            if (placement != null && placement.hasVerifier())
+            if (DataManager.renderMismatches() &&
+                Configs.Visuals.RENDER_INFO_OVERLAY.getBooleanValue() &&
+                (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
+                Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld()))
             {
-                SchematicVerifier verifier = placement.getSchematicVerifier();
-                List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
-                BlockPos posLook = RayTraceUtils.traceToPositions(mc.world, posList, mc.player, 10);
+                SchematicPlacement placement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-                if (posLook != null)
+                if (placement != null && placement.hasVerifier())
                 {
-                    BlockMismatch mismatch = verifier.getMismatchForPosition(posLook);
+                    SchematicVerifier verifier = placement.getSchematicVerifier();
+                    List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
+                    RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 10);
 
-                    if (mismatch != null)
+                    if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
                     {
-                        BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                        ScaledResolution sr = new ScaledResolution(mc);
-                        info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                        BlockMismatch mismatch = verifier.getMismatchForPosition(trace.getBlockPos());
+
+                        if (mismatch != null)
+                        {
+                            BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
+                            ScaledResolution sr = new ScaledResolution(mc);
+                            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                            return;
+                        }
                     }
+                }
+            }
+
+            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+
+            if (traceWrapper != null &&
+                (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
+                 Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld()))
+            {
+                ScaledResolution sr = new ScaledResolution(mc);
+
+                BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
+                IBlockState stateClient = mc.world.getBlockState(pos);
+                stateClient = stateClient.getActualState(mc.world, pos);
+
+                World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+                IBlockState stateSchematic = worldSchematic.getBlockState(pos);
+                stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
+                IBlockState air = Blocks.AIR.getDefaultState();
+
+                // Not just a missing block
+                if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
+                {
+                    ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
+                    ItemUtils.setItemForBlock(mc.world, pos, stateClient);
+                    BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
+                    info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                }
+                else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
+                {
+                    ItemUtils.setItemForBlock(mc.world, pos, stateClient);
+                    BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
+                    info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                }
+                else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
+                {
+                    ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
+                    BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
+                    info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
                 }
             }
         }

@@ -54,7 +54,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA        = new ConfigDouble(     "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_AREA_SELECTION_BOX_SIDES = new ConfigBoolean(    "renderAreaSelectionBoxSides", true, "If enabled, then the area selection boxes will have their side quads rendered");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT    = new ConfigBoolean(    "renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
-        public static final ConfigBoolean       RENDER_ERROR_INFO_OVERLAY       = new ConfigBoolean(    "renderErrorInfoOverlay", true, "If enabled, then an info overlay is rendered while looking at an error marker, and holding the key for it");
+        public static final ConfigBoolean       RENDER_INFO_OVERLAY             = new ConfigBoolean(    "renderInfoOverlay", true, "If enabled, then an info overlay is rendered while looking at schematic blocks\nor schematic verifier error markers, and holding the key for it");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES       = new ConfigBoolean(    "renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier will have\n(translucent) sides rendered instead of just the outline");
         public static final ConfigBoolean       RENDER_PLACEMENT_BOX_SIDES      = new ConfigBoolean(    "renderPlacementBoxSides", false, "If enabled, then the placed schematic sub-region boxes will have their side quads rendered");
         public static final ConfigBoolean       RENDER_TRANSLUCENT_INNER_SIDES  = new ConfigBoolean(    "renderTranslucentBlockInnerSides", false, "If enabled, then the model sides are also rendered for inner sides in the translucent mode");
@@ -79,7 +79,7 @@ public class Configs implements IConfigHandler
                 PLACEMENT_BOX_SIDE_ALPHA,
                 RENDER_AREA_SELECTION_BOX_SIDES,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
-                RENDER_ERROR_INFO_OVERLAY,
+                RENDER_INFO_OVERLAY,
                 RENDER_ERROR_MARKER_SIDES,
                 RENDER_PLACEMENT_BOX_SIDES,
                 RENDER_TRANSLUCENT_INNER_SIDES,

@@ -23,7 +23,7 @@ public enum Hotkeys implements IHotkey
     OPEN_GUI_MAIN_MENU                  ("openGuiMainMenu",                 "M,C",  "Open the Litematica main GUI"),
     OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the area selection manager GUI"),
     OPERATION_MODE_CHANGE_MODIFIER      ("operationModeChangeModifier",     "LCONTROL", "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode."),
-    RENDER_ERROR_INFO_OVERLAY           ("renderErrorInfoOverlay",          "LMENU", false, "The key that enables rendering the error marker info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in Visuals to disable the overlay completely."),
+    RENDER_INFO_OVERLAY                 ("renderInfoOverlay",               "LMENU", false, "The key that enables rendering the block info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in Visuals to disable the overlay completely."),
     SAVE_AREA_AS_IN_MEMORY_SCHEMATIC    ("saveAreaAsInMemorySchematic",     "LCONTROL,S",  "Save the current Area Selection as an in-memory Schematic"),
     SAVE_AREA_AS_SCHEMATIC_TO_FILE      ("saveAreaAsSchematicToFile",       "LCONTROL,LMENU,S",  "Save the current Area Selection as a Schematic to a file"),
     SCHEMATIC_VERIFIER                  ("schematicVerifier",               "M,K",  "The keybind to open the Schematic Verifier GUI for the selected placement"),

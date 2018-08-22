@@ -228,18 +228,6 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         }
     }
 
-    private static void renderLines(int x, int y, List<String> lines, FontRenderer font)
-    {
-        if (lines.isEmpty() == false)
-        {
-            for (String line : lines)
-            {
-                font.drawString(line, x, y, 0xFFB0B0B0);
-                y += font.FONT_HEIGHT + 2;
-            }
-        }
-    }
-
     public static class BlockMismatchInfo
     {
         private final IBlockState stateExpected;
@@ -335,8 +323,8 @@ public class WidgetSchematicVerificationResult extends WidgetBase
 
                 List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
                 List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
-                renderLines(x1, y, propsExpected, mc.fontRenderer);
-                renderLines(x2, y, propsFound, mc.fontRenderer);
+                RenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected, mc.fontRenderer);
+                RenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound, mc.fontRenderer);
 
                 GlStateManager.popMatrix();
             }

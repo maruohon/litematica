@@ -8,10 +8,12 @@ import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
 import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.data.SchematicVerifier;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -21,6 +23,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -238,15 +241,14 @@ public class RayTraceUtils
     }
 
     /**
-     * Ray traces to the closest position in the given list
-     * @param world
+     * Ray traces to the closest position on the given list
      * @param posList
      * @param entity
      * @param range
      * @return
      */
     @Nullable
-    public static BlockPos traceToPositions(World world, List<BlockPos> posList, Entity entity, double range)
+    public static RayTraceResult traceToPositions(List<BlockPos> posList, Entity entity, double range)
     {
         if (posList.isEmpty())
         {
@@ -258,7 +260,7 @@ public class RayTraceUtils
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
         double closest = -1D;
-        BlockPos posFound = null;
+        RayTraceResult trace = null;
 
         for (BlockPos pos : posList)
         {
@@ -273,14 +275,89 @@ public class RayTraceUtils
 
                     if (closest < 0 || dist < closest)
                     {
+                        trace = new RayTraceResult(Type.BLOCK, hit.hitVec, hit.sideHit, pos);
                         closest = dist;
-                        posFound = pos;
                     }
                 }
             }
         }
 
-        return posFound;
+        return trace;
+    }
+
+    @Nullable
+    public static RayTraceResult traceToSchematicWorld(Entity entity, double range, boolean respectRenderRange)
+    {
+        World world = SchematicWorldHandler.getSchematicWorld();
+
+        if (world == null)
+        {
+            return null;
+        }
+
+        Vec3d eyesPos = entity.getPositionEyes(1f);
+        Vec3d rangedLookRot = entity.getLook(1f).scale(range);
+        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
+
+        return rayTraceSchematicWorldBlocks(world, eyesPos, lookEndPos, true, false, true, respectRenderRange, 200);
+    }
+
+    @Nullable
+    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range, boolean respectRenderRange)
+    {
+        RayTraceResult traceClient = getRayTraceFromEntity(worldClient, entity, true, range);
+        RayTraceResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange);
+        double distClosest = -1D;
+        HitType type = HitType.MISS;
+        Vec3d eyesPos = entity.getPositionEyes(1f);
+        RayTraceResult trace = null;
+
+        if (traceSchematic != null && traceSchematic.typeOfHit == RayTraceResult.Type.BLOCK)
+        {
+            double dist = eyesPos.squareDistanceTo(traceSchematic.hitVec);
+
+            if (distClosest < 0 || dist < distClosest)
+            {
+                trace = traceSchematic;
+                distClosest = eyesPos.squareDistanceTo(traceSchematic.hitVec);
+                type = HitType.SCHEMATIC_BLOCK;
+            }
+        }
+
+        if (traceClient != null && traceClient.typeOfHit == RayTraceResult.Type.BLOCK)
+        {
+            double dist = eyesPos.squareDistanceTo(traceClient.hitVec);
+
+            if (distClosest < 0 || dist < distClosest)
+            {
+                trace = traceClient;
+                distClosest = dist;
+                type = HitType.VANILLA;
+            }
+        }
+
+        SchematicPlacement placement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+        if (placement != null && placement.hasVerifier())
+        {
+            SchematicVerifier verifier = placement.getSchematicVerifier();
+            List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
+            RayTraceResult traceMismatch = traceToPositions(posList, entity, range);
+
+            // Mismatch overlay has priority over other hits
+            if (traceMismatch != null)
+            {
+                trace = traceMismatch;
+                type = HitType.MISMATCH_OVERLAY;
+            }
+        }
+
+        if (trace != null)
+        {
+            return new RayTraceWrapper(type, trace);
+        }
+
+        return null;
     }
 
     @Nonnull
@@ -512,6 +589,184 @@ public class RayTraceUtils
         return returnLastUncollidableBlock ? trace : null;
     }
 
+    @Nullable
+    public static RayTraceResult rayTraceSchematicWorldBlocks(World world, Vec3d posStart, Vec3d posEnd,
+            boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock, boolean respectRenderRange, int maxSteps)
+    {
+        if (Double.isNaN(posStart.x) || Double.isNaN(posStart.y) || Double.isNaN(posStart.z) ||
+            Double.isNaN(posEnd.x) || Double.isNaN(posEnd.y) || Double.isNaN(posEnd.z))
+        {
+            return null;
+        }
+
+        final int xEnd = MathHelper.floor(posEnd.x);
+        final int yEnd = MathHelper.floor(posEnd.y);
+        final int zEnd = MathHelper.floor(posEnd.z);
+        int x = MathHelper.floor(posStart.x);
+        int y = MathHelper.floor(posStart.y);
+        int z = MathHelper.floor(posStart.z);
+        BlockPos pos = new BlockPos(x, y, z);
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        LayerRange range = DataManager.getRenderLayerRange();
+
+        if ((respectRenderRange == false || range.isPositionWithinRange(x, y, z)) &&
+            (ignoreBlockWithoutBoundingBox == false || state.getCollisionBoundingBox(world, pos) != Block.NULL_AABB) &&
+             block.canCollideCheck(state, stopOnLiquid))
+        {
+            RayTraceResult raytraceresult = state.collisionRayTrace(world, pos, posStart, posEnd);
+
+            if (raytraceresult != null)
+            {
+                return raytraceresult;
+            }
+        }
+
+        RayTraceResult trace = null;
+
+        while (--maxSteps >= 0)
+        {
+            if (Double.isNaN(posStart.x) || Double.isNaN(posStart.y) || Double.isNaN(posStart.z))
+            {
+                return null;
+            }
+
+            if (x == xEnd && y == yEnd && z == zEnd)
+            {
+                return returnLastUncollidableBlock ? trace : null;
+            }
+
+            boolean flag2 = true;
+            boolean flag = true;
+            boolean flag1 = true;
+            double d0 = 999.0D;
+            double d1 = 999.0D;
+            double d2 = 999.0D;
+
+            if (xEnd > x)
+            {
+                d0 = (double)x + 1.0D;
+            }
+            else if (xEnd < x)
+            {
+                d0 = (double)x + 0.0D;
+            }
+            else
+            {
+                flag2 = false;
+            }
+
+            if (yEnd > y)
+            {
+                d1 = (double)y + 1.0D;
+            }
+            else if (yEnd < y)
+            {
+                d1 = (double)y + 0.0D;
+            }
+            else
+            {
+                flag = false;
+            }
+
+            if (zEnd > z)
+            {
+                d2 = (double)z + 1.0D;
+            }
+            else if (zEnd < z)
+            {
+                d2 = (double)z + 0.0D;
+            }
+            else
+            {
+                flag1 = false;
+            }
+
+            double d3 = 999.0D;
+            double d4 = 999.0D;
+            double d5 = 999.0D;
+            double d6 = posEnd.x - posStart.x;
+            double d7 = posEnd.y - posStart.y;
+            double d8 = posEnd.z - posStart.z;
+
+            if (flag2)
+            {
+                d3 = (d0 - posStart.x) / d6;
+            }
+
+            if (flag)
+            {
+                d4 = (d1 - posStart.y) / d7;
+            }
+
+            if (flag1)
+            {
+                d5 = (d2 - posStart.z) / d8;
+            }
+
+            if (d3 == -0.0D)
+            {
+                d3 = -1.0E-4D;
+            }
+
+            if (d4 == -0.0D)
+            {
+                d4 = -1.0E-4D;
+            }
+
+            if (d5 == -0.0D)
+            {
+                d5 = -1.0E-4D;
+            }
+
+            EnumFacing enumfacing;
+
+            if (d3 < d4 && d3 < d5)
+            {
+                enumfacing = xEnd > x ? EnumFacing.WEST : EnumFacing.EAST;
+                posStart = new Vec3d(d0, posStart.y + d7 * d3, posStart.z + d8 * d3);
+            }
+            else if (d4 < d5)
+            {
+                enumfacing = yEnd > y ? EnumFacing.DOWN : EnumFacing.UP;
+                posStart = new Vec3d(posStart.x + d6 * d4, d1, posStart.z + d8 * d4);
+            }
+            else
+            {
+                enumfacing = zEnd > z ? EnumFacing.NORTH : EnumFacing.SOUTH;
+                posStart = new Vec3d(posStart.x + d6 * d5, posStart.y + d7 * d5, d2);
+            }
+
+            x = MathHelper.floor(posStart.x) - (enumfacing == EnumFacing.EAST ? 1 : 0);
+            y = MathHelper.floor(posStart.y) - (enumfacing == EnumFacing.UP ? 1 : 0);
+            z = MathHelper.floor(posStart.z) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
+            pos = new BlockPos(x, y, z);
+            IBlockState iblockstate1 = world.getBlockState(pos);
+            Block block1 = iblockstate1.getBlock();
+
+            if ((respectRenderRange == false || range.isPositionWithinRange(x, y, z)) &&
+                (!ignoreBlockWithoutBoundingBox || iblockstate1.getMaterial() == Material.PORTAL ||
+                iblockstate1.getCollisionBoundingBox(world, pos) != Block.NULL_AABB))
+            {
+                if (block1.canCollideCheck(iblockstate1, stopOnLiquid))
+                {
+                    RayTraceResult raytraceresult1 = iblockstate1.collisionRayTrace(world, pos, posStart, posEnd);
+
+                    if (raytraceresult1 != null)
+                    {
+                        return raytraceresult1;
+                    }
+                }
+                else
+                {
+                    trace = new RayTraceResult(RayTraceResult.Type.MISS, posStart, enumfacing, pos);
+                }
+            }
+        }
+
+        return returnLastUncollidableBlock ? trace : null;
+    }
+
     public static class RayTraceWrapper
     {
         private final HitType type;
@@ -554,6 +809,17 @@ public class RayTraceUtils
             this.corner = Corner.NONE;
             this.hitVec = Vec3d.ZERO;
             this.trace = null;
+            this.box = null;
+            this.schematicPlacement = null;
+            this.placementRegionName = null;
+        }
+
+        public RayTraceWrapper(HitType type, RayTraceResult trace)
+        {
+            this.type = type;
+            this.corner = Corner.NONE;
+            this.hitVec = trace.hitVec;
+            this.trace = trace;
             this.box = null;
             this.schematicPlacement = null;
             this.placementRegionName = null;
@@ -628,7 +894,9 @@ public class RayTraceUtils
             SELECTION_BOX_CORNER,
             SELECTION_ORIGIN,
             PLACEMENT_SUBREGION,
-            PLACEMENT_ORIGIN;
+            PLACEMENT_ORIGIN,
+            SCHEMATIC_BLOCK,
+            MISMATCH_OVERLAY;
         }
     }
 }

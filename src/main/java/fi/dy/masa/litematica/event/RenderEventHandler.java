@@ -47,11 +47,7 @@ public class RenderEventHandler
         {
             ToolHud.getInstance().renderHud();
             InfoHud.getInstance().renderHud();
-
-            if (DataManager.renderMismatches())
-            {
-                OverlayRenderer.renderHoverInfoForBlockMismatch(mc);
-            }
+            OverlayRenderer.renderHoverInfo(mc);
         }
     }
 }
