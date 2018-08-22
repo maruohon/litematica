@@ -193,8 +193,10 @@ public class WorldUtils
         if (world != null)
         {
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getChunkMapping();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getChunkMapping();
+            long key = ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
 
-            if (schematicChunks.containsKey(ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4)))
+            if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
             {
                 RenderGlobal rg = LitematicaRenderer.getInstance().getRenderGlobal();
                 rg.markBlockRangeForRenderUpdate(pos.getX() - 1, pos.getY() - 1, pos.getZ() - 1,pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
@@ -202,7 +204,35 @@ public class WorldUtils
         }
     }
 
-    public static void markSchematicChunksForRenderUpdateBetween(int y1, int y2)
+    public static void markSchematicChunksForRenderUpdateBetweenX(int x1, int x2)
+    {
+        World world = SchematicWorldHandler.getSchematicWorld();
+
+        if (world != null)
+        {
+            final int xMin = Math.min(x1, x2);
+            final int xMax = Math.max(x1, x2);
+            final int cxMin = (xMin >> 4);
+            final int cxMax = (xMax >> 4);
+            RenderGlobal rg = LitematicaRenderer.getInstance().getRenderGlobal();
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getChunkMapping();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getChunkMapping();
+
+            for (Chunk chunk : schematicChunks.values())
+            {
+                // Only mark chunks that are actually rendered (if the schematic world contains more chunks)
+                if (chunk.x >= cxMin && chunk.x <= cxMax && chunk.isEmpty() == false &&
+                    clientChunks.containsKey(ChunkPos.asLong(chunk.x, chunk.z)))
+                {
+                    x1 = Math.max( chunk.x << 4      , xMin);
+                    x2 = Math.min((chunk.x << 4) + 15, xMax);
+                    rg.markBlockRangeForRenderUpdate(x1, 0, (chunk.z << 4), x2, 255, (chunk.z << 4) + 15);
+                }
+            }
+        }
+    }
+
+    public static void markSchematicChunksForRenderUpdateBetweenY(int y1, int y2)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
 
@@ -218,6 +248,34 @@ public class WorldUtils
                 if (chunk.isEmpty() == false && clientChunks.containsKey(ChunkPos.asLong(chunk.x, chunk.z)))
                 {
                     rg.markBlockRangeForRenderUpdate((chunk.x << 4) - 1, y1, (chunk.z << 4) - 1, (chunk.x << 4) + 16, y2, (chunk.z << 4) + 16);
+                }
+            }
+        }
+    }
+
+    public static void markSchematicChunksForRenderUpdateBetweenZ(int z1, int z2)
+    {
+        World world = SchematicWorldHandler.getSchematicWorld();
+
+        if (world != null)
+        {
+            final int zMin = Math.min(z1, z2);
+            final int zMax = Math.max(z1, z2);
+            final int czMin = (zMin >> 4);
+            final int czMax = (zMax >> 4);
+            RenderGlobal rg = LitematicaRenderer.getInstance().getRenderGlobal();
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getChunkMapping();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getChunkMapping();
+
+            for (Chunk chunk : schematicChunks.values())
+            {
+                // Only mark chunks that are actually rendered (if the schematic world contains more chunks)
+                if (chunk.z >= czMin && chunk.z <= czMax && chunk.isEmpty() == false &&
+                    clientChunks.containsKey(ChunkPos.asLong(chunk.x, chunk.z)))
+                {
+                    z1 = Math.max( chunk.z << 4      , zMin);
+                    z2 = Math.min((chunk.z << 4) + 15, zMax);
+                    rg.markBlockRangeForRenderUpdate((chunk.x << 4), 0, z1, (chunk.x << 4) + 15, 255, z2);
                 }
             }
         }

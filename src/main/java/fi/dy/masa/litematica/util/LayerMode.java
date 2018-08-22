@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.data;
+package fi.dy.masa.litematica.util;
 
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import net.minecraft.client.resources.I18n;
@@ -7,7 +7,9 @@ public enum LayerMode implements IConfigOptionListEntry
 {
     ALL             ("all",             "litematica.gui.label.layer_mode.all"),
     SINGLE_LAYER    ("single_layer",    "litematica.gui.label.layer_mode.single_layer"),
-    LAYER_RANGE     ("layer_range",     "litematica.gui.label.layer_mode.layer_range");
+    LAYER_RANGE     ("layer_range",     "litematica.gui.label.layer_mode.layer_range"),
+    ALL_BELOW       ("all_below",       "litematica.gui.label.layer_mode.all_below"),
+    ALL_ABOVE       ("all_above",       "litematica.gui.label.layer_mode.all_above");
 
     private final String configString;
     private final String translationKey;

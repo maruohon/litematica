@@ -125,9 +125,8 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
     private boolean shouldRenderModelSide(IBlockAccess worldIn, IBlockState stateIn, BlockPos posIn, EnumFacing side)
     {
-        return (side == EnumFacing.UP   && posIn.getY() == DataManager.getLayerMax()) ||
-               (side == EnumFacing.DOWN && posIn.getY() == DataManager.getLayerMin()) ||
-               Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() ||
+        return DataManager.getRenderLayerRange().isPositionAtRenderEdgeOnSide(posIn, side) ||
+               (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.getBooleanValue()) ||
                stateIn.shouldSideBeRendered(worldIn, posIn, side);
     }
 

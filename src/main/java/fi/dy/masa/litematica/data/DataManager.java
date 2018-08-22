@@ -16,8 +16,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.OperationMode;
-import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.litematica.util.LayerRange;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.init.Items;
@@ -25,8 +24,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
 
 public class DataManager
 {
@@ -41,14 +38,11 @@ public class DataManager
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
-    private static LayerMode layerMode = LayerMode.ALL;
+    private static LayerRange renderRange = new LayerRange();
     private static boolean enableRendering = true;
     private static boolean renderMismatches = true;
     private static boolean renderSchematics = true;
     private static boolean renderSelections = true;
-    private static int layerSingle = 0;
-    private static int layerMin = 0;
-    private static int layerMax = 0;
     private static boolean canSave;
 
     @Nullable
@@ -185,93 +179,9 @@ public class DataManager
         operationMode = mode;
     }
 
-    public static LayerMode getLayerMode()
+    public static LayerRange getRenderLayerRange()
     {
-        return layerMode;
-    }
-
-    public static void setLayerMode(LayerMode mode)
-    {
-        layerMode = mode;
-
-        WorldUtils.markSchematicChunksForRenderUpdateBetween(0, 255);
-        String val = TextFormatting.GREEN.toString() + mode.getDisplayName();
-        StringUtils.printActionbarMessage("litematica.message.set_layer_mode_to", val);
-    }
-
-    public static int getLayerMin()
-    {
-        if (layerMode == LayerMode.SINGLE_LAYER)
-        {
-            return layerSingle;
-        }
-        else if (layerMode == LayerMode.LAYER_RANGE)
-        {
-            return layerMin;
-        }
-        else
-        {
-            return Integer.MIN_VALUE;
-        }
-    }
-
-    public static int getLayerMax()
-    {
-        if (layerMode == LayerMode.SINGLE_LAYER)
-        {
-            return layerSingle;
-        }
-        else if (layerMode == LayerMode.LAYER_RANGE)
-        {
-            return layerMax;
-        }
-        else
-        {
-            return Integer.MAX_VALUE;
-        }
-    }
-
-    public static void setSingleLayer(int layer)
-    {
-        // TODO different axes
-        layerSingle = MathHelper.clamp(layer, 0, 255);
-        String val = TextFormatting.GREEN.toString() + String.valueOf(layerSingle);
-        StringUtils.printActionbarMessage("litematica.message.set_layer_to", val);
-    }
-
-    public static void setMinLayer(int layer)
-    {
-        layerMin = layer;
-    }
-
-    public static void setMaxLayer(int layer)
-    {
-        layerMax = layer;
-    }
-
-    public static boolean moveLayer(int amount)
-    {
-        if (layerMode == LayerMode.SINGLE_LAYER)
-        {
-            // TODO proper bounds checks
-            int y1 = layerSingle - 1;
-            setSingleLayer(layerSingle + amount);
-            int y2 = layerSingle + 1;
-
-            WorldUtils.markSchematicChunksForRenderUpdateBetween(y1, y2);
-
-            return true;
-        }
-        else if (layerMode == LayerMode.LAYER_RANGE)
-        {
-            layerMin += amount;
-            layerMax += amount;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return renderRange;
     }
 
     @Nullable
@@ -333,28 +243,15 @@ public class DataManager
                 }
             }
 
-            if (JsonUtils.hasString(root, "layer_mode"))
+            if (JsonUtils.hasObject(root, "render_range"))
             {
-                try
-                {
-                    layerMode = LayerMode.valueOf(root.get("layer_mode").getAsString());
-                }
-                catch (Exception e) {}
-
-                if (layerMode == null)
-                {
-                    layerMode = LayerMode.ALL;
-                }
+                renderRange = LayerRange.fromJson(JsonUtils.getNestedObject(root, "render_range", false));
             }
 
             enableRendering = JsonUtils.getBoolean(root, "rendering_enabled");
             renderMismatches = JsonUtils.getBoolean(root, "render_mismatched");
             renderSchematics = JsonUtils.getBoolean(root, "render_schematic");
             renderSelections = JsonUtils.getBoolean(root, "render_selections");
-
-            layerSingle = JsonUtils.getIntegerOrDefault(root, "layer_single", 0);
-            layerMin = JsonUtils.getIntegerOrDefault(root, "layer_min", 0);
-            layerMax = JsonUtils.getIntegerOrDefault(root, "layer_max", 0);
         }
 
         canSave = true;
@@ -390,10 +287,7 @@ public class DataManager
         root.add("render_selections", new JsonPrimitive(renderSelections));
 
         root.add("operation_mode", new JsonPrimitive(operationMode.name()));
-        root.add("layer_mode", new JsonPrimitive(layerMode.name()));
-        root.add("layer_single", new JsonPrimitive(layerSingle));
-        root.add("layer_min", new JsonPrimitive(layerMin));
-        root.add("layer_max", new JsonPrimitive(layerMax));
+        root.add("render_range", renderRange.toJson());
 
         File file = getCurrentStorageFile(true);
         JsonUtils.writeJsonToFile(root, file);

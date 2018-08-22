@@ -13,6 +13,7 @@ import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
 import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
 import fi.dy.masa.litematica.mixin.IMixinRenderChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
+import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.litematica.util.SubChunkPos;
 import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.block.Block;
@@ -37,7 +38,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
@@ -158,14 +158,12 @@ public class RenderChunkSchematicVbo extends RenderChunk
         VisGraph visGraph = new VisGraph();
         Set<TileEntity> tileEntities = new HashSet<>();
         BlockPos posChunk = this.getPosition();
-        final int renderMinY = DataManager.getLayerMin();
-        final int renderMaxY = DataManager.getLayerMax();
+        LayerRange range = DataManager.getRenderLayerRange();
 
         this.existingOverlays.clear();
 
         if (this.schematicWorldView.isEmpty() == false && this.boxes.isEmpty() == false &&
-            posChunk.getY() + 15 >= renderMinY &&
-            posChunk.getY()      <= renderMaxY)
+            range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
         {
             ++schematicRenderChunksUpdated;
 
@@ -180,14 +178,16 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
             for (StructureBoundingBox box : this.boxes)
             {
+                box = range.getClampedRenderBoundingBox(box);
+
                 // The rendered layer(s) don't intersect this sub-volume
-                if (renderMinY > box.maxY || renderMaxY < box.minY)
+                if (box == null)
                 {
                     continue;
                 }
 
-                BlockPos posFrom = new BlockPos(box.minX, MathHelper.clamp(renderMinY, box.minY, box.maxY), box.minZ);
-                BlockPos posTo   = new BlockPos(box.maxX, MathHelper.clamp(renderMaxY, box.minY, box.maxY), box.maxZ);
+                BlockPos posFrom = new BlockPos(box.minX, box.minY, box.minZ);
+                BlockPos posTo   = new BlockPos(box.maxX, box.maxY, box.maxZ);
 
                 for (BlockPos.MutableBlockPos posMutable : BlockPos.getAllInBoxMutable(posFrom, posTo))
                 {

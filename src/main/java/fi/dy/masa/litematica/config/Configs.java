@@ -57,6 +57,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       RENDER_ERROR_INFO_OVERLAY       = new ConfigBoolean(    "renderErrorInfoOverlay", true, "If enabled, then an info overlay is rendered while looking at an error marker, and holding the key for it");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES       = new ConfigBoolean(    "renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier will have\n(translucent) sides rendered instead of just the outline");
         public static final ConfigBoolean       RENDER_PLACEMENT_BOX_SIDES      = new ConfigBoolean(    "renderPlacementBoxSides", false, "If enabled, then the placed schematic sub-region boxes will have their side quads rendered");
+        public static final ConfigBoolean       RENDER_TRANSLUCENT_INNER_SIDES  = new ConfigBoolean(    "renderTranslucentBlockInnerSides", false, "If enabled, then the model sides are also rendered for inner sides in the translucent mode");
         public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_EXTRA       = new ConfigColor(  "schematicOverlayColorExtra",      "0x4CFF4CE6", "The color of the blocks overlay for extra blocks");
         public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_MISSING     = new ConfigColor(  "schematicOverlayColorMissing",    "0x2C33B3E6", "The color of the blocks overlay for missing blocks");
         public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK = new ConfigColor(  "schematicOverlayColorWrongBlock", "0x4CFF3333", "The color of the blocks overlay for wrong blocks");
@@ -81,6 +82,7 @@ public class Configs implements IConfigHandler
                 RENDER_ERROR_INFO_OVERLAY,
                 RENDER_ERROR_MARKER_SIDES,
                 RENDER_PLACEMENT_BOX_SIDES,
+                RENDER_TRANSLUCENT_INNER_SIDES,
                 SCHEMATIC_OVERLAY_COLOR_EXTRA,
                 SCHEMATIC_OVERLAY_COLOR_MISSING,
                 SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK,

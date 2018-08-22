@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.event;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.LayerMode;
 import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
@@ -19,6 +18,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.AreaSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.LayerMode;
 import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
@@ -152,22 +152,22 @@ public class KeyCallbacks
 
             if (key == Hotkeys.LAYER_NEXT.getKeybind())
             {
-                DataManager.moveLayer(1);
+                DataManager.getRenderLayerRange().moveLayer(1);
                 return true;
             }
             else if (key == Hotkeys.LAYER_PREVIOUS.getKeybind())
             {
-                DataManager.moveLayer(-1);
+                DataManager.getRenderLayerRange().moveLayer(-1);
                 return true;
             }
             else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())
             {
-                DataManager.setLayerMode((LayerMode) DataManager.getLayerMode().cycle(true));
+                DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(true));
                 return true;
             }
             else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeybind())
             {
-                DataManager.setLayerMode((LayerMode) DataManager.getLayerMode().cycle(false));
+                DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
                 return true;
             }
 
