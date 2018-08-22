@@ -193,6 +193,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 {
                     IBlockState stateSchematic = this.schematicWorldView.getBlockState(posMutable);
                     IBlockState stateClient    = this.clientWorldView.getBlockState(posMutable);
+                    stateSchematic = stateSchematic.getActualState(this.schematicWorldView, posMutable);
                     stateClient = stateClient.getActualState(this.clientWorldView, posMutable);
                     Block blockSchematic = stateSchematic.getBlock();
                     Block blockClient = stateClient.getBlock();
