@@ -25,6 +25,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -426,12 +427,15 @@ public class OverlayRenderer
                     ItemUtils.setItemForBlock(mc.world, pos, stateClient);
                     BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
                     info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                    World world = WorldUtils.getBestWorld(mc);
+                    RenderUtils.renderInventoryOverlay(world, pos, mc);
                 }
                 else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
                 {
                     ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
                     BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
                     info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                    RenderUtils.renderInventoryOverlay(worldSchematic, pos, mc);
                 }
             }
         }

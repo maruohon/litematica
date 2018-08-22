@@ -3,7 +3,10 @@ package fi.dy.masa.litematica.render;
 import java.util.List;
 import org.lwjgl.opengl.GL11;
 import fi.dy.masa.malilib.util.Color4f;
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -12,9 +15,16 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryLargeChest;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityBrewingStand;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ILockableContainer;
+import net.minecraft.world.World;
 
 public class RenderUtils
 {
@@ -611,6 +621,81 @@ public class RenderUtils
             fz = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
 
             buffer.pos(fx, fy, fz).color(color.r, color.g, color.b, color.a).endVertex();
+        }
+    }
+
+    public static void renderInventoryOverlay(World world, BlockPos pos, Minecraft mc)
+    {
+        IInventory inv = null;
+        TileEntity te = world.getTileEntity(pos);
+
+        if (te instanceof IInventory)
+        {
+            inv = (IInventory) te;
+            IBlockState state = world.getBlockState(pos);
+
+            if (state.getBlock() instanceof BlockChest)
+            {
+                ILockableContainer cont = ((BlockChest) state.getBlock()).getLockableContainer(world, pos);
+
+                if (cont instanceof InventoryLargeChest)
+                {
+                    inv = (InventoryLargeChest) cont;
+                }
+            }
+        }
+
+        if (inv != null)
+        {
+            final int totalSlots = inv.getSizeInventory();
+            int slotsPerRow = 9;
+            int slotOffsetX =  8;
+            int slotOffsetY = 18;
+
+            if (totalSlots <= 5)
+            {
+                slotOffsetX += 2 * 18;
+                slotOffsetY += 2;
+            }
+            else if (totalSlots <= 9)
+            {
+                slotsPerRow = 3;
+                slotOffsetX += 3 * 18;
+                slotOffsetY += -1;
+            }
+
+            final int rows = (int) Math.ceil(totalSlots / slotsPerRow);
+            int height = 0;
+
+            switch (totalSlots)
+            {
+                case 3:
+                case 5:  height =  56; break;
+                case 9:  height =  86; break;
+                case 27: height =  88; break;
+                case 54: height = 142; break;
+            }
+
+            if ((inv instanceof TileEntityFurnace) || (inv instanceof TileEntityBrewingStand))
+            {
+                height = 83;
+                slotOffsetX = 0;
+                slotOffsetY = 0;
+            }
+
+            ScaledResolution res = new ScaledResolution(mc);
+            final int xCenter = res.getScaledWidth() / 2;
+            final int yCenter = res.getScaledHeight() / 2;
+            int x = xCenter - 176 / 2;
+            int y = yCenter - 10 - height;
+
+            if (rows > 6)
+            {
+                y += (rows - 6) * 18;
+            }
+
+            fi.dy.masa.malilib.gui.RenderUtils.renderInventoryBackground(x, y, slotsPerRow, totalSlots, inv, mc);
+            fi.dy.masa.malilib.gui.RenderUtils.renderInventoryStacks(inv, x + slotOffsetX, y + slotOffsetY, slotsPerRow, 0, -1, mc);
         }
     }
 
