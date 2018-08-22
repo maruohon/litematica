@@ -207,7 +207,8 @@ public class RenderGlobalSchematic extends RenderGlobal
                 this.renderContainer = new RenderListSchematic();
                 this.renderChunkFactory = new RenderChunkFactoryList();
             }
-            else if (vboEnabledPrevious == false && this.vboEnabled)
+            // Fall back to VBO mode
+            else if ((vboEnabledPrevious == false && this.vboEnabled) || this.renderChunkFactory == null)
             {
                 this.renderContainer = new VboRenderListSchematic();
                 this.renderChunkFactory = new RenderChunkFactoryVbo();
