@@ -35,6 +35,8 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -421,6 +423,10 @@ public class OverlayRenderer
                     ItemUtils.setItemForBlock(mc.world, pos, stateClient);
                     BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
                     info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+
+                    RenderUtils.renderInventoryOverlay(-90, worldSchematic, pos, mc);
+                    World world = WorldUtils.getBestWorld(mc);
+                    RenderUtils.renderInventoryOverlay(90, world, pos, mc);
                 }
                 else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
                 {
@@ -428,14 +434,24 @@ public class OverlayRenderer
                     BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
                     info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
                     World world = WorldUtils.getBestWorld(mc);
-                    RenderUtils.renderInventoryOverlay(world, pos, mc);
+                    RenderUtils.renderInventoryOverlay(0, world, pos, mc);
                 }
                 else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
                 {
                     ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
                     BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
                     info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-                    RenderUtils.renderInventoryOverlay(worldSchematic, pos, mc);
+
+                    int xOffset = 0;
+                    TileEntity te = mc.world.getTileEntity(pos);
+
+                    if (te instanceof IInventory)
+                    {
+                        RenderUtils.renderInventoryOverlay(90, WorldUtils.getBestWorld(mc), pos, mc);
+                        xOffset = -90;
+                    }
+
+                    RenderUtils.renderInventoryOverlay(xOffset, worldSchematic, pos, mc);
                 }
             }
         }

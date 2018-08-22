@@ -624,7 +624,7 @@ public class RenderUtils
         }
     }
 
-    public static void renderInventoryOverlay(World world, BlockPos pos, Minecraft mc)
+    public static void renderInventoryOverlay(int xOffset, World world, BlockPos pos, Minecraft mc)
     {
         IInventory inv = null;
         TileEntity te = world.getTileEntity(pos);
@@ -686,7 +686,7 @@ public class RenderUtils
             ScaledResolution res = new ScaledResolution(mc);
             final int xCenter = res.getScaledWidth() / 2;
             final int yCenter = res.getScaledHeight() / 2;
-            int x = xCenter - 176 / 2;
+            int x = xCenter - 176 / 2 + xOffset;
             int y = yCenter - 10 - height;
 
             if (rows > 6)
