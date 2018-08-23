@@ -51,7 +51,7 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
 public class LitematicaSchematic
 {
     public static final String FILE_EXTENSION = ".litematic";
-    public static final int SCHEMATIC_VERSION = 3;
+    public static final int SCHEMATIC_VERSION = 4;
     private final Map<String, LitematicaBlockStateContainer> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, NBTTagCompound>> tileEntities = new HashMap<>();
     private final Map<String, Map<BlockPos, NextTickListEntry>> pendingBlockTicks = new HashMap<>();
@@ -197,10 +197,11 @@ public class LitematicaSchematic
                 LitematicaBlockStateContainer container = this.blockContainers.get(regionName);
                 Map<BlockPos, NBTTagCompound> tileMap = this.tileEntities.get(regionName);
                 List<EntityInfo> entityList = this.entities.get(regionName);
+                Map<BlockPos, NextTickListEntry> scheduledTicks = this.pendingBlockTicks.get(regionName);
 
                 if (regionPos != null && regionSize != null && container != null && tileMap != null)
                 {
-                    this.placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, container, tileMap, notifyNeighbors);
+                    this.placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, container, tileMap, scheduledTicks, notifyNeighbors);
                 }
                 else
                 {
@@ -219,7 +220,8 @@ public class LitematicaSchematic
 
     private void placeBlocksToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
             SchematicPlacement schematicPlacement, Placement placement,
-            LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
+            LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap,
+            @Nullable Map<BlockPos, NextTickListEntry> scheduledTicks, boolean notifyNeighbors)
     {
         // These are the untransformed relative positions
         BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
@@ -227,8 +229,9 @@ public class LitematicaSchematic
 
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         BlockPos posEndAbs = PositionUtils.getTransformedPlacementPosition(regionSize.add(-1, -1, -1), schematicPlacement, placement).add(regionPosTransformed).add(origin);
+        BlockPos regionPosAbs = regionPosTransformed.add(origin);
 
-        if (PositionUtils.arePositionsWithinWorld(world, regionPosTransformed.add(origin), posEndAbs))
+        if (PositionUtils.arePositionsWithinWorld(world, regionPosAbs, posEndAbs))
         {
             final int sizeX = Math.abs(regionSize.getX());
             final int sizeY = Math.abs(regionSize.getY());
@@ -322,6 +325,16 @@ public class LitematicaSchematic
                             world.notifyNeighborsRespectDebug(pos, world.getBlockState(pos).getBlock(), false);
                         }
                     }
+                }
+            }
+
+            if (scheduledTicks != null && scheduledTicks.isEmpty() == false)
+            {
+                for (Map.Entry<BlockPos, NextTickListEntry> entry : scheduledTicks.entrySet())
+                {
+                    BlockPos pos = entry.getKey().add(regionPosAbs);
+                    NextTickListEntry tick = entry.getValue();
+                    world.scheduleBlockUpdate(pos, world.getBlockState(pos).getBlock(), (int) tick.scheduledTime, tick.priority);
                 }
             }
         }
@@ -615,7 +628,7 @@ public class LitematicaSchematic
             // We want to loop nice & easy from 0 to n here, but the per-sub-region pos1 can be at
             // any corner of the area. Thus we need to offset from the total area origin
             // to the minimum/negative corner (ie. 0,0 in the loop) corner here.
-            BlockPos minCorner = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            final BlockPos minCorner = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
             final int startX = minCorner.getX();
             final int startY = minCorner.getY();
             final int startZ = minCorner.getZ();
@@ -673,9 +686,9 @@ public class LitematicaSchematic
                         {
                             // Store the delay, ie. relative time
                             BlockPos posRelative = new BlockPos(
-                                    entry.position.getX() - origin.getX(),
-                                    entry.position.getY() - origin.getY(),
-                                    entry.position.getZ() - origin.getZ());
+                                    entry.position.getX() - minCorner.getX(),
+                                    entry.position.getY() - minCorner.getY(),
+                                    entry.position.getZ() - minCorner.getZ());
                             NextTickListEntry newEntry = new NextTickListEntry(posRelative, entry.getBlock());
                             newEntry.setPriority(entry.priority);
                             newEntry.setScheduledTime(entry.scheduledTime - currentTime);
@@ -794,7 +807,7 @@ public class LitematicaSchematic
 
                     tag.setString("Block", rl.toString());
                     tag.setInteger("Priority", entry.priority);
-                    tag.setLong("Time", entry.scheduledTime);
+                    tag.setInteger("Time", (int) entry.scheduledTime);
                     tag.setInteger("x", entry.position.getX());
                     tag.setInteger("y", entry.position.getY());
                     tag.setInteger("z", entry.position.getZ());
@@ -950,7 +963,7 @@ public class LitematicaSchematic
             NBTTagCompound tag = tagList.getCompoundTagAt(i);
 
             if (tag.hasKey("Block", Constants.NBT.TAG_STRING) &&
-                tag.hasKey("Time", Constants.NBT.TAG_INT))
+                tag.hasKey("Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
             {
                 Block block = Block.REGISTRY.getObject(new ResourceLocation(tag.getString("Block")));
 
