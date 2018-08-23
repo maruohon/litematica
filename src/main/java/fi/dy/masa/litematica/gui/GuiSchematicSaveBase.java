@@ -14,6 +14,7 @@ import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
@@ -75,7 +76,17 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         String label = I18n.format(type.getLabelKey());
         int width = this.mc.fontRenderer.getStringWidth(label) + 10;
 
-        ButtonGeneric button = new ButtonGeneric(id, x, y, width, 20, label);
+        ButtonGeneric button;
+
+        if (type == ButtonType.SAVE)
+        {
+            button = new ButtonHoverText(id, x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
+        }
+        else
+        {
+            button = new ButtonGeneric(id, x, y, width, 20, label);
+        }
+
         this.addButton(button, this.createButtonListener(type));
 
         return x + width + 4;
