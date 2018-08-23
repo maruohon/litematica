@@ -23,6 +23,7 @@ import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.util.Color4f;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -47,6 +48,7 @@ public class SchematicVerifier implements IStringListProvider
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> extraBlocksPositions = ArrayListMultimap.create();
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> wrongBlocksPositions = ArrayListMultimap.create();
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> wrongStatesPositions = ArrayListMultimap.create();
+    private final Object2IntOpenHashMap<IBlockState> correctStateCounts = new Object2IntOpenHashMap<>();
     private final Object2ObjectOpenHashMap<BlockPos, BlockMismatch> blockMismatches = new Object2ObjectOpenHashMap<>();
     private final HashSet<Pair<IBlockState, IBlockState>> ignoredMismatches = new HashSet<>();
     private final List<BlockPos> missingBlocksPositionsClosest = new ArrayList<>();
@@ -158,6 +160,7 @@ public class SchematicVerifier implements IStringListProvider
     public void clearActiveMismatchRenderPositions()
     {
         this.selectedMismatchPositions.clear();
+        InfoHud.getInstance().removeLineProvidersOfType(SchematicVerifier.class);
     }
 
     @Nullable
@@ -237,6 +240,7 @@ public class SchematicVerifier implements IStringListProvider
         this.wrongBlocksPositions.clear();
         this.wrongStatesPositions.clear();
         this.blockMismatches.clear();
+        this.correctStateCounts.clear();
 
         InfoHud.getInstance().removeLineProvider(this);
         this.clearActiveMismatchRenderPositions();
@@ -314,7 +318,14 @@ public class SchematicVerifier implements IStringListProvider
 
     public void updateMismatchOverlaysForType(MismatchType mismatchType, @Nullable BlockMismatch mismatch)
     {
-        this.updateMismatchOverlaysForType(mismatchType, mismatch != null ? Pair.of(mismatch.stateExpected, mismatch.stateFound) : null);
+        if (mismatchType == MismatchType.CORRECT_STATE)
+        {
+            this.clearActiveMismatchRenderPositions();
+        }
+        else
+        {
+            this.updateMismatchOverlaysForType(mismatchType, mismatch != null ? Pair.of(mismatch.stateExpected, mismatch.stateFound) : null);
+        }
     }
 
     private void updateMismatchOverlaysForType(MismatchType mismatchType, @Nullable Pair<IBlockState, IBlockState> pair)
@@ -462,24 +473,15 @@ public class SchematicVerifier implements IStringListProvider
         return this.ignoredMismatches;
     }
 
+    public Object2IntOpenHashMap<IBlockState> getCorrectStates()
+    {
+        return this.correctStateCounts;
+    }
+
     @Nullable
     public BlockMismatch getMismatchForPosition(BlockPos pos)
     {
         return this.blockMismatches.get(pos);
-    }
-
-    public List<BlockMismatch> getMismatchOverviewCombined()
-    {
-        List<BlockMismatch> list = new ArrayList<>();
-
-        this.addCountFor(MismatchType.MISSING, this.missingBlocksPositions, list);
-        this.addCountFor(MismatchType.EXTRA, this.extraBlocksPositions, list);
-        this.addCountFor(MismatchType.WRONG_BLOCK, this.wrongBlocksPositions, list);
-        this.addCountFor(MismatchType.WRONG_STATE, this.wrongStatesPositions, list);
-
-        Collections.sort(list);
-
-        return list;
     }
 
     public List<BlockMismatch> getMismatchOverviewFor(MismatchType type)
@@ -494,6 +496,20 @@ public class SchematicVerifier implements IStringListProvider
         {
             this.addCountFor(type, this.getMapForMismatchType(type), list);
         }
+
+        return list;
+    }
+
+    private List<BlockMismatch> getMismatchOverviewCombined()
+    {
+        List<BlockMismatch> list = new ArrayList<>();
+
+        this.addCountFor(MismatchType.MISSING, this.missingBlocksPositions, list);
+        this.addCountFor(MismatchType.EXTRA, this.extraBlocksPositions, list);
+        this.addCountFor(MismatchType.WRONG_BLOCK, this.wrongBlocksPositions, list);
+        this.addCountFor(MismatchType.WRONG_STATE, this.wrongStatesPositions, list);
+
+        Collections.sort(list);
 
         return list;
     }
@@ -579,6 +595,8 @@ public class SchematicVerifier implements IStringListProvider
 
     private void checkBlockStates(int x, int y, int z, IBlockState stateSchematic, IBlockState stateClient)
     {
+        BlockPos pos = new BlockPos(x, y, z);
+
         if (stateClient != stateSchematic)
         {
             MUTABLE_PAIR.setLeft(stateSchematic);
@@ -586,7 +604,6 @@ public class SchematicVerifier implements IStringListProvider
 
             if (this.ignoredMismatches.contains(MUTABLE_PAIR) == false)
             {
-                BlockPos pos = new BlockPos(x, y, z);
                 BlockMismatch mismatch;
 
                 if (stateSchematic != AIR)
@@ -624,6 +641,8 @@ public class SchematicVerifier implements IStringListProvider
         }
         else
         {
+            ItemUtils.setItemForBlock(this.worldClient, pos, stateClient);
+            this.correctStateCounts.addTo(stateClient, 1);
             this.matchingBlocks++;
         }
     }
@@ -814,11 +833,12 @@ public class SchematicVerifier implements IStringListProvider
 
     public enum MismatchType
     {
-        ALL         (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.all", TextFormatting.WHITE.toString() + TextFormatting.BOLD),
-        MISSING     (0x00FFFF, "litematica.gui.label.schematic_verifier_display_type.missing", TextFormatting.AQUA.toString() + TextFormatting.BOLD),
-        EXTRA       (0xFF00CF, "litematica.gui.label.schematic_verifier_display_type.extra", TextFormatting.LIGHT_PURPLE.toString() + TextFormatting.BOLD),
-        WRONG_BLOCK (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.wrong_blocks", TextFormatting.RED.toString() + TextFormatting.BOLD),
-        WRONG_STATE (0xFFAF00, "litematica.gui.label.schematic_verifier_display_type.wrong_state", TextFormatting.GOLD.toString() + TextFormatting.BOLD);
+        ALL             (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.all", TextFormatting.WHITE.toString() + TextFormatting.BOLD),
+        MISSING         (0x00FFFF, "litematica.gui.label.schematic_verifier_display_type.missing", TextFormatting.AQUA.toString() + TextFormatting.BOLD),
+        EXTRA           (0xFF00CF, "litematica.gui.label.schematic_verifier_display_type.extra", TextFormatting.LIGHT_PURPLE.toString() + TextFormatting.BOLD),
+        WRONG_BLOCK     (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.wrong_blocks", TextFormatting.RED.toString() + TextFormatting.BOLD),
+        WRONG_STATE     (0xFFAF00, "litematica.gui.label.schematic_verifier_display_type.wrong_state", TextFormatting.GOLD.toString() + TextFormatting.BOLD),
+        CORRECT_STATE   (0x11FF11, "litematica.gui.label.schematic_verifier_display_type.correct_state", TextFormatting.GREEN.toString() + TextFormatting.BOLD);
 
         private final String unlocName;
         private final String formattingCode;

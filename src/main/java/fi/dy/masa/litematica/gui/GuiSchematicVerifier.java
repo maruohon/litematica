@@ -79,6 +79,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         x += this.createButton(x, y, -1, ButtonListener.Type.SET_RESULT_MODE_WRONG_STATES) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SET_RESULT_MODE_EXTRA) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SET_RESULT_MODE_MISSING) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.SET_RESULT_MODE_CORRECT) + 4;
 
         y = this.height - 36;
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
@@ -120,6 +121,11 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             case SET_RESULT_MODE_MISSING:
                 label = MismatchType.MISSING.getDisplayname();
                 enabled = resultMode != MismatchType.MISSING;
+                break;
+
+            case SET_RESULT_MODE_CORRECT:
+                label = MismatchType.CORRECT_STATE.getDisplayname();
+                enabled = resultMode != MismatchType.CORRECT_STATE;
                 break;
 
             case START:
@@ -213,7 +219,6 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             {
                 this.selectedDataEntry = null;
                 this.widget.clearSelection();
-                InfoHud.getInstance().removeLineProvidersOfType(SchematicVerifier.class);
                 this.placement.getSchematicVerifier().clearActiveMismatchRenderPositions();
             }
             // Main header - show the currently missing/unseen chunks
@@ -338,6 +343,10 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     this.parent.setResultMode(MismatchType.MISSING);
                     break;
 
+                case SET_RESULT_MODE_CORRECT:
+                    this.parent.setResultMode(MismatchType.CORRECT_STATE);
+                    break;
+
                 case START:
                     WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
 
@@ -389,6 +398,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             SET_RESULT_MODE_WRONG_STATES,
             SET_RESULT_MODE_EXTRA,
             SET_RESULT_MODE_MISSING,
+            SET_RESULT_MODE_CORRECT,
             START,
             STOP,
             RESET_VERIFIER,

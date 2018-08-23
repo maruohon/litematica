@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
@@ -22,6 +23,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -40,7 +42,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
     private final int count;
     private final boolean isOdd;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
-    private final ButtonGeneric buttonIgnore;
+    @Nullable private final ButtonGeneric buttonIgnore;
     private int id;
 
     public WidgetSchematicVerificationResult(int x, int y, int width, int height, float zLevel, boolean isOdd,
@@ -80,7 +82,15 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.count = entry.blockMismatch.count;
 
             FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-            this.buttonIgnore = this.createButton(this.x + this.width, y + 1, ButtonListener.ButtonType.IGNORE_MISMATCH);
+
+            if (entry.mismatchType != MismatchType.CORRECT_STATE)
+            {
+                this.buttonIgnore = this.createButton(this.x + this.width, y + 1, ButtonListener.ButtonType.IGNORE_MISMATCH);
+            }
+            else
+            {
+                this.buttonIgnore = null;
+            }
 
             maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(this.mismatchInfo.stackExpected.getDisplayName()));
             maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(this.mismatchInfo.stackFound.getDisplayName()));
@@ -165,11 +175,18 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         {
             mc.fontRenderer.drawString(this.header1, this.x + 4, this.y + 7, color);
         }
-        else if (this.mismatchInfo != null)
+        else if (this.mismatchInfo != null &&
+                (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE ||
+                 this.mismatchEntry.blockMismatch.stateExpected.getBlock() != Blocks.AIR)) 
         {
             mc.fontRenderer.drawString(this.mismatchInfo.stackExpected.getDisplayName(), x1 + 20, y, color);
-            mc.fontRenderer.drawString(this.mismatchInfo.stackFound.getDisplayName(),    x2 + 20, y, color);
-            mc.fontRenderer.drawString(String.valueOf(this.count),                       x3     , y, color);
+
+            if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
+            {
+                mc.fontRenderer.drawString(this.mismatchInfo.stackFound.getDisplayName(), x2 + 20, y, color);
+            }
+
+            mc.fontRenderer.drawString(String.valueOf(this.count), x3, y, color);
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -181,9 +198,13 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackExpected, x1, y);
             mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackExpected, x1, y, null);
 
-            Gui.drawRect(x2, y, x2 + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackFound, x2, y);
-            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackFound, x2, y, null);
+            if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
+            {
+                Gui.drawRect(x2, y, x2 + 16, y + 16, 0x20FFFFFF); // light background for the item
+                mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackFound, x2, y);
+                mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackFound, x2, y, null);
+            }
+
             //mc.getRenderItem().zLevel += 110;
 
             GlStateManager.disableBlend();

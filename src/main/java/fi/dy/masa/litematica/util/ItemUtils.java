@@ -4,6 +4,8 @@ import java.util.IdentityHashMap;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -50,19 +52,46 @@ public class ItemUtils
             return stack;
         }
 
-        stack = state.getBlock().getItem(world, pos, state);
+        stack = getStateToItemOverride(state);
+
+        if (stack.isEmpty())
+        {
+            stack = state.getBlock().getItem(world, pos, state);
+        }
 
         if (stack.isEmpty())
         {
             stack = ItemStack.EMPTY;
         }
-        else if (state.getBlock() instanceof BlockSlab && ((BlockSlab) state.getBlock()).isDouble())
+        else
         {
-            stack.setCount(2);
+            overrideStackSize(state, stack);
         }
 
         ITEMS_FOR_STATES.put(state, stack);
 
         return stack;
+    }
+
+    public static ItemStack getStateToItemOverride(IBlockState state)
+    {
+        if (state.getBlock() == Blocks.LAVA || state.getBlock() == Blocks.FLOWING_LAVA)
+        {
+            return new ItemStack(Items.LAVA_BUCKET);
+        }
+        else if (state.getBlock() == Blocks.WATER || state.getBlock() == Blocks.FLOWING_WATER)
+        {
+            return new ItemStack(Items.WATER_BUCKET);
+        }
+
+        return ItemStack.EMPTY;
+    }
+
+    private static void overrideStackSize(IBlockState state, ItemStack stack)
+    {
+        if (state.getBlock() instanceof BlockSlab && ((BlockSlab) state.getBlock()).isDouble())
+        {
+            stack.setCount(2);
+        }
     }
 }
