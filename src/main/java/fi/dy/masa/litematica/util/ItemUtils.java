@@ -22,12 +22,22 @@ public class ItemUtils
     {
         if (ITEMS_FOR_STATES.containsKey(state) == false)
         {
-            ITEMS_FOR_STATES.put(state, getItemForBlock(world, pos, state));
+            ITEMS_FOR_STATES.put(state, getItemForBlock(world, pos, state, false));
         }
     }
 
-    public static ItemStack getItemForBlock(World world, BlockPos pos, IBlockState state)
+    public static ItemStack getItemForBlock(World world, BlockPos pos, IBlockState state, boolean checkCache)
     {
+        if (checkCache)
+        {
+            ItemStack stack = ITEMS_FOR_STATES.get(state);
+
+            if (stack != null)
+            {
+                return stack;
+            }
+        }
+
         if (state.getMaterial() == Material.AIR)
         {
             return ItemStack.EMPTY;

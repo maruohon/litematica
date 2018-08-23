@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
@@ -13,10 +14,13 @@ import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.util.InventoryUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -279,5 +283,39 @@ public class WorldUtils
                 }
             }
         }
+    }
+
+    public static boolean doSchematicWorldPickBlock(boolean closest, Minecraft mc)
+    {
+        if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() == false)
+        {
+            return false;
+        }
+
+        BlockPos pos = null;
+
+        if (closest)
+        {
+            pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, mc.player, 6);
+        }
+        else
+        {
+            pos = RayTraceUtils.getFurthestSchematicWorldTrace(mc.world, mc.player, 6);
+        }
+
+        if (pos != null)
+        {
+            World world = SchematicWorldHandler.getSchematicWorld();
+            IBlockState state = world.getBlockState(pos);
+            ItemStack stack = ItemUtils.getItemForBlock(world, pos, state, true);
+
+            // Don't pick-block and cancel further processing if the correct item is already in the player's hand
+            if (stack.isEmpty() == false)
+            {
+                return InventoryUtils.swapItemToMainHand(stack, mc);
+            }
+        }
+
+        return false;
     }
 }

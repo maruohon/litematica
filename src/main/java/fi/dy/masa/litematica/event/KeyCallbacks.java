@@ -21,6 +21,8 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.LayerMode;
 import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -45,6 +47,9 @@ public class KeyCallbacks
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.PICK_BLOCK_FIRST.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.PICK_BLOCK_LAST.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.PICK_BLOCK_TOGGLE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SCHEMATIC_VERIFIER.getKeybind().setCallback(callbackHotkeys);
@@ -168,6 +173,21 @@ public class KeyCallbacks
             else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeybind())
             {
                 DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
+                return true;
+            }
+            else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
+            {
+                return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
+            }
+            else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
+            {
+                return WorldUtils.doSchematicWorldPickBlock(false, this.mc);
+            }
+            else if (key == Hotkeys.PICK_BLOCK_TOGGLE.getKeybind())
+            {
+                ConfigBoolean config = Configs.Generic.PICK_BLOCK_ENABLED;
+                config.setBooleanValue(! config.getBooleanValue());
+                StringUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
                 return true;
             }
 
