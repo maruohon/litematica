@@ -11,8 +11,12 @@ import net.minecraft.client.renderer.EntityRenderer;
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer
 {
-    @Inject(method = "renderWorld(FJ)V", at = @At(value = "RETURN"))
-    private void onRenderWorldLast(float partialTicks, long finishTimeNano, CallbackInfo ci)
+    @Inject(method = "renderWorldPass(IFJ)V", at = @At(
+            value = "INVOKE_STRING",
+            target = "Lnet/minecraft/profiler/Profiler;endStartSection(Ljava/lang/String;)V",
+            args = "ldc=hand", shift = Shift.AFTER
+        ))
+    private void onRenderWorldLast(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
         RenderEventHandler.getInstance().onRenderWorldLast(partialTicks);
     }

@@ -20,7 +20,6 @@ import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -129,7 +128,7 @@ public class ChunkRenderDispatcherLitematica
 
     public boolean updateChunkLater(RenderChunk chunkRenderer)
     {
-        if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateChunkLater()\n");
+        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateChunkLater()\n");
         chunkRenderer.getLockCompileTask().lock();
         boolean flag1;
 
@@ -164,7 +163,7 @@ public class ChunkRenderDispatcherLitematica
 
     public boolean updateChunkNow(RenderChunk chunkRenderer)
     {
-        if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateChunkNow()\n");
+        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateChunkNow()\n");
         chunkRenderer.getLockCompileTask().lock();
         boolean flag;
 
@@ -228,7 +227,7 @@ public class ChunkRenderDispatcherLitematica
 
     public boolean updateTransparencyLater(RenderChunk renderChunk)
     {
-        if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateTransparencyLater()\n");
+        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateTransparencyLater()\n");
         renderChunk.getLockCompileTask().lock();
         boolean flag;
 
@@ -265,7 +264,7 @@ public class ChunkRenderDispatcherLitematica
     {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
         {
-            if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunk()\n");
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunk()\n");
             if (OpenGlHelper.useVbo())
             {
                 this.uploadVertexBuffer(buffer, renderChunk.getVertexBufferByLayer(layer.ordinal()));
@@ -276,7 +275,7 @@ public class ChunkRenderDispatcherLitematica
                 {
                     for (OverlayType type : types)
                     {
-                        if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunk() overlay: %s\n", type);
+                        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunk() overlay: %s\n", type);
                         BufferBuilder overlayBuffer = ((IRegionRenderCacheBuilder) generator.getRegionRenderCacheBuilder()).getOverlayBuffer(type);
                         this.uploadVertexBuffer(overlayBuffer, renderChunk.getOverlayVertexBuffer(type));
                     }

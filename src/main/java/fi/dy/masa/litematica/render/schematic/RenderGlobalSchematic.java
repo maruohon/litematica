@@ -667,17 +667,6 @@ public class RenderGlobalSchematic extends RenderGlobal
             List<Entity> entities = this.world.getLoadedEntityList();
             this.countEntitiesTotal = entities.size();
 
-            for (int i = 0; i < this.world.weatherEffects.size(); ++i)
-            {
-                Entity entityTmp = this.world.weatherEffects.get(i);
-                ++this.countEntitiesRendered;
-
-                if (entityTmp.isInRangeToRender3d(renderX, renderY, renderZ))
-                {
-                    this.renderManager.renderEntityStatic(entityTmp, partialTicks, false);
-                }
-            }
-
             this.world.profiler.endStartSection("litematica_entities");
             List<Entity> entitiesOutlined = Lists.<Entity>newArrayList();
             List<Entity> entitiesMultipass = Lists.<Entity>newArrayList();
