@@ -691,7 +691,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                                 (entityTmp.posY < 0.0D || entityTmp.posY >= 256.0D || this.world.isBlockLoaded(posMutable.setPos(entityTmp))))
                             {
                                 ++this.countEntitiesRendered;
-                                this.renderManager.renderEntityStatic(entityTmp, partialTicks, false);
+                                this.renderManager.renderEntityStatic(entityTmp, 0f, false);
 
                                 if (this.isOutlineActive(entityTmp, entity, camera))
                                 {
