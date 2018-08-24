@@ -19,7 +19,6 @@ import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
@@ -128,9 +127,12 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 this.postRenderBlocks(BlockRenderLayer.TRANSLUCENT, x, y, z, buffer, compiledChunk);
             }
 
-            if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparency\n");
-            this.resortTransparencyPreRenderOverlays(generator);
-            this.postRenderOverlays(x, y, z, generator);
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparency\n");
+            if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
+            {
+                this.resortTransparencyPreRenderOverlays(generator);
+                this.postRenderOverlays(x, y, z, generator);
+            }
         }
     }
 
@@ -154,7 +156,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
             generator.getLock().unlock();
         }
 
-        if (GuiScreen.isCtrlKeyDown()) System.out.printf("rebuildChunk pos: %s gen: %s\n", this.getPosition(), generator);
+        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("rebuildChunk pos: %s gen: %s\n", this.getPosition(), generator);
         VisGraph visGraph = new VisGraph();
         Set<TileEntity> tileEntities = new HashSet<>();
         BlockPos posChunk = this.getPosition();
@@ -172,7 +174,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
             BufferBuilder bufferOverlayOutlines = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.OUTLINE);
             BufferBuilder bufferOverlayQuads    = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.QUAD);
 
-            if (GuiScreen.isCtrlKeyDown()) System.out.printf("rebuildChunk OL start pos: %s gen: %s\n", this.getPosition(), generator);
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("rebuildChunk OL start pos: %s gen: %s\n", this.getPosition(), generator);
             this.preRenderOverlayIfNotStarted(bufferOverlayOutlines, OverlayType.OUTLINE);
             this.preRenderOverlayIfNotStarted(bufferOverlayQuads, OverlayType.QUAD);
 
@@ -260,7 +262,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                         }
                     }
 
-                    if (overlayColor != null)
+                    if (overlayColor != null && Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
                     {
                         if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue())
                         {
@@ -388,7 +390,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     {
         if (this.hasOverlay())
         {
-            if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparencyPreRenderOverlays\n");
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparencyPreRenderOverlays\n");
             RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
 
             for (OverlayType type : this.existingOverlays)
@@ -409,7 +411,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     {
         if (this.hasOverlay())
         {
-            if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
             RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
 
             for (OverlayType type : this.existingOverlays)
@@ -431,7 +433,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
         try
         {
-            if (GuiScreen.isCtrlKeyDown()) System.out.printf("makeCompileTaskChunk()\n");
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("makeCompileTaskChunk()\n");
             this.finishCompileTask();
             ((IMixinRenderChunk) this).setCompileTask(new ChunkCompileTaskGenerator(this, ChunkCompileTaskGenerator.Type.REBUILD_CHUNK, this.getDistanceSq()));
             this.rebuildWorldView();

@@ -17,7 +17,6 @@ import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import fi.dy.masa.litematica.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.BlockModelShapes;
@@ -255,7 +254,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         }
 
         World world = this.world;
-        world.profiler.startSection("camera");
+        world.profiler.startSection("litematica_camera");
 
         double diffX = viewEntity.posX - this.frustumUpdatePosX;
         double diffY = viewEntity.posY - this.frustumUpdatePosY;
@@ -275,15 +274,19 @@ public class RenderGlobalSchematic extends RenderGlobal
             this.viewFrustum.updateChunkPositions(viewEntity.posX, viewEntity.posZ);
         }
 
-        world.profiler.endStartSection("renderlistcamera");
+        world.profiler.endStartSection("litematica_renderlist_camera");
         double x = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks;
         double y = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks;
         double z = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks;
         this.renderContainer.initialize(x, y, z);
 
-        this.mc.mcProfiler.endStartSection("culling");
+        this.mc.mcProfiler.endStartSection("litematica_culling");
         BlockPos viewPos = new BlockPos(x, y + (double) viewEntity.getEyeHeight(), z);
-        //RenderChunk renderChunk = ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(viewPos);
+        final int centerChunkX = (viewPos.getX() >> 4);
+        final int centerChunkZ = (viewPos.getZ() >> 4);
+        final int renderDistance = this.mc.gameSettings.renderDistanceChunks;
+        SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ);
+        BlockPos viewPosSubChunk = new BlockPos(viewSubChunk.getX() << 4, viewSubChunk.getY() << 4, viewSubChunk.getZ() << 4);
 
         this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false || viewEntity.posX != this.lastViewEntityX || viewEntity.posY != this.lastViewEntityY || viewEntity.posZ != this.lastViewEntityZ || viewEntity.rotationPitch != this.lastViewEntityPitch || viewEntity.rotationYaw != this.lastViewEntityYaw;
         this.lastViewEntityX = viewEntity.posX;
@@ -292,69 +295,58 @@ public class RenderGlobalSchematic extends RenderGlobal
         this.lastViewEntityPitch = viewEntity.rotationPitch;
         this.lastViewEntityYaw = viewEntity.rotationYaw;
 
-        this.mc.mcProfiler.endStartSection("update");
+        this.mc.mcProfiler.endStartSection("litematica_update");
 
         if (this.displayListEntitiesDirty)
         {
             this.displayListEntitiesDirty = false;
             this.renderInfos = new ArrayList<>(256);
-            Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewEntity.getPositionVector()));
-            //Queue<RenderChunk> queue = Queues.newArrayDeque();
-            Entity.setRenderDistanceWeight(MathHelper.clamp((double) this.mc.gameSettings.renderDistanceChunks / 8.0D, 1.0D, 2.5D));
-            Set<SubChunkPos> set = DataManager.getInstance().getSchematicPlacementManager().getAllTouchedSubChunks();
-            if (GuiScreen.isCtrlKeyDown()) System.out.printf("queue positions: %s\n", set);
-            queuePositions.addAll(set);
 
-            this.mc.mcProfiler.startSection("iteration");
+            Set<SubChunkPos> set = DataManager.getInstance().getSchematicPlacementManager().getAllTouchedSubChunks();
+
+            Entity.setRenderDistanceWeight(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
+            //List<SubChunkPos> positions = new ArrayList<>(256);
+            //positions.addAll(set);
+
+            Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
+            queuePositions.addAll(set);
+            //Collections.sort(positions, new SubChunkPos.DistanceComparator(new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ)));
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("sorted positions: %s\n", positions);
+
+            this.mc.mcProfiler.startSection("litematica_iteration");
 
             while (queuePositions.isEmpty() == false)
+            //for (int i = 0; i < positions.size(); ++i)
             {
                 SubChunkPos subChunk = queuePositions.poll();
+                //SubChunkPos subChunk = positions.get(i);
                 BlockPos pos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
-                RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(pos);
 
-                if (renderChunk != null && camera.isBoundingBoxInFrustum(renderChunk.boundingBox))
+                if (Math.abs(subChunk.getX() - centerChunkX) < renderDistance &&
+                    Math.abs(subChunk.getZ() - centerChunkZ) < renderDistance)
                 {
-                    renderChunk.setFrameIndex(frameCount);
-                    this.renderInfos.add(renderChunk);
-                }
+                    RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(pos);
 
-                /*
-                for (EnumFacing facing : EnumFacing.values())
-                {
-                    RenderChunk renderChunkTmp = this.getRenderChunkOffset(blockpos, renderChunk, facing);
-
-                    if (renderChunkTmp != null && renderChunkTmp.setFrameIndex(frameCount) && camera.isBoundingBoxInFrustum(renderChunkTmp.boundingBox))
+                    if (renderChunk != null)
                     {
-                        queue.add(renderChunkTmp);
+                        if (renderChunk.setFrameIndex(frameCount) && camera.isBoundingBoxInFrustum(renderChunk.boundingBox))
+                        {
+                            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("add @ %s\n", subChunk);
+                            if (pos.equals(viewPosSubChunk) && renderChunk.needsUpdate())
+                            {
+                                renderChunk.setNeedsUpdate(true);
+                            }
+
+                            this.renderInfos.add(renderChunk);
+                        }
                     }
                 }
-                */
-
-                /*
-                RenderGlobal.ContainerLocalRenderInformation localRenderInfo = queue.poll();
-                renderChunk = localRenderInfo.renderChunk;
-                EnumFacing enumfacing2 = localRenderInfo.facing;
-                this.renderInfos.add(localRenderInfo);
-
-                for (EnumFacing enumfacing1 : EnumFacing.values())
-                {
-                    RenderChunk renderchunk2 = this.getRenderChunkOffset(blockpos, renderChunk, enumfacing1);
-
-                    if ((!flag1 || !localRenderInfo.hasDirection(enumfacing1.getOpposite())) && (!flag1 || enumfacing2 == null || renderchunk3.getCompiledChunk().isVisible(enumfacing2.getOpposite(), enumfacing1)) && renderchunk2 != null && renderchunk2.setFrameIndex(frameCount) && camera.isBoundingBoxInFrustum(renderchunk2.boundingBox))
-                    {
-                        RenderGlobal.ContainerLocalRenderInformation localRenderInfoNew = new RenderGlobal.ContainerLocalRenderInformation(renderchunk2, enumfacing1, localRenderInfo.counter + 1);
-                        localRenderInfoNew.setDirection(localRenderInfo.setFacing, enumfacing1);
-                        queue.add(localRenderInfoNew);
-                    }
-                }
-                */
             }
 
             this.mc.mcProfiler.endSection();
         }
 
-        this.mc.mcProfiler.endStartSection("rebuildNear");
+        this.mc.mcProfiler.endStartSection("litematica_rebuild_near");
         Set<RenderChunk> set = this.chunksToUpdate;
         this.chunksToUpdate = new LinkedHashSet<>();
 
@@ -372,7 +364,8 @@ public class RenderGlobalSchematic extends RenderGlobal
                 }
                 else
                 {
-                    this.mc.mcProfiler.startSection("build near");
+                    //if (GuiScreen.isCtrlKeyDown()) System.out.printf("====== update now\n");
+                    this.mc.mcProfiler.startSection("litematica_build_near");
                     this.renderDispatcher.updateChunkNow(renderChunkTmp);
                     renderChunkTmp.clearNeedsUpdate();
                     this.mc.mcProfiler.endSection();
@@ -448,7 +441,7 @@ public class RenderGlobalSchematic extends RenderGlobal
 
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
-            this.mc.mcProfiler.startSection("translucent_sort");
+            this.mc.mcProfiler.startSection("litematica_translucent_sort");
             double diffX = entityIn.posX - this.prevRenderSortX;
             double diffY = entityIn.posY - this.prevRenderSortY;
             double diffZ = entityIn.posZ - this.prevRenderSortZ;
@@ -462,7 +455,8 @@ public class RenderGlobalSchematic extends RenderGlobal
 
                 for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
                 {
-                    if ((renderChunk.compiledChunk.isLayerStarted(blockLayerIn) || renderChunk.hasOverlay()) && i++ < 15)
+                    if ((renderChunk.getCompiledChunk().isLayerStarted(blockLayerIn) ||
+                        (renderChunk.getCompiledChunk() != CompiledChunk.DUMMY && renderChunk.hasOverlay())) && i++ < 15)
                     {
                         this.renderDispatcher.updateTransparencyLater(renderChunk);
                     }
@@ -472,7 +466,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             this.mc.mcProfiler.endSection();
         }
 
-        this.mc.mcProfiler.startSection("filterempty");
+        this.mc.mcProfiler.startSection("litematica_filter_empty");
         boolean reverse = blockLayerIn == BlockRenderLayer.TRANSLUCENT;
         int startIndex = reverse ? this.renderInfos.size() - 1 : 0;
         int stopIndex = reverse ? -1 : this.renderInfos.size();
@@ -490,7 +484,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             }
         }
 
-        this.mc.mcProfiler.endStartSection("render_" + blockLayerIn);
+        this.mc.mcProfiler.endStartSection("litematica_render_" + blockLayerIn);
         this.renderBlockLayer(blockLayerIn);
         this.mc.mcProfiler.endSection();
 
@@ -544,19 +538,19 @@ public class RenderGlobalSchematic extends RenderGlobal
 
     public void renderBlockOverlays()
     {
-        this.mc.mcProfiler.startSection("overlay_filter_empty");
+        this.mc.mcProfiler.startSection("litematica_overlay_filter_empty");
 
         for (int i = this.renderInfos.size() - 1; i >= 0; --i)
         {
             RenderChunkSchematicVbo renderChunk = this.renderInfos.get(i);
 
-            if (renderChunk.hasOverlay())
+            if (renderChunk.getCompiledChunk() != CompiledChunk.DUMMY && renderChunk.hasOverlay())
             {
                 this.renderContainer.addOverlayChunk(renderChunk);
             }
         }
 
-        this.mc.mcProfiler.endStartSection("overlay_render");
+        this.mc.mcProfiler.endStartSection("litematica_overlay_render");
 
         this.renderBlockOverlayBuffers();
 
@@ -653,7 +647,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             double renderX = renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * (double)partialTicks;
             double renderY = renderViewEntity.prevPosY + (renderViewEntity.posY - renderViewEntity.prevPosY) * (double)partialTicks;
             double renderZ = renderViewEntity.prevPosZ + (renderViewEntity.posZ - renderViewEntity.prevPosZ) * (double)partialTicks;
-            this.world.profiler.startSection("prepare");
+            this.world.profiler.startSection("litematica_prepare");
             TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.objectMouseOver, partialTicks);
             this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
             this.countEntitiesTotal = 0;
@@ -669,7 +663,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             TileEntityRendererDispatcher.staticPlayerZ = entityZ;
             this.renderManager.setRenderPosition(entityX, entityY, entityZ);
             this.mc.entityRenderer.enableLightmap();
-            this.world.profiler.endStartSection("global");
+            this.world.profiler.endStartSection("litematica_global");
             List<Entity> entities = this.world.getLoadedEntityList();
             this.countEntitiesTotal = entities.size();
 
@@ -684,7 +678,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                 }
             }
 
-            this.world.profiler.endStartSection("entities");
+            this.world.profiler.endStartSection("litematica_entities");
             List<Entity> entitiesOutlined = Lists.<Entity>newArrayList();
             List<Entity> entitiesMultipass = Lists.<Entity>newArrayList();
             BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
@@ -775,7 +769,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             }
             */
 
-            this.world.profiler.endStartSection("blockentities");
+            this.world.profiler.endStartSection("litematica_block_entities");
             RenderHelper.enableStandardItemLighting();
 
             for (RenderChunk renderChunk : this.renderInfos)
