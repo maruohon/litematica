@@ -13,6 +13,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.KeyCallbacks;
+import fi.dy.masa.litematica.render.DebugScreenMessages;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
 import net.minecraft.client.Minecraft;
@@ -61,9 +62,10 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     }
 
     @Override
-    public void onTick(Minecraft minecraft, float partialTicks, boolean inGame, boolean clock)
+    public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
     {
         InputHandler.onTick();
+        DebugScreenMessages.update(mc);
     }
 
     public static void logInfo(String message, Object... args)

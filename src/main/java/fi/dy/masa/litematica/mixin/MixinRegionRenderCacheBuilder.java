@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 
@@ -29,7 +28,6 @@ public class MixinRegionRenderCacheBuilder implements IRegionRenderCacheBuilder
     @Override
     public BufferBuilder getOverlayBuffer(OverlayType type)
     {
-        if (GuiScreen.isCtrlKeyDown()) System.out.printf("getOverlayBuffer(): type: %s, buf: %s\n", type, this.overlayBufferBuilders[type.ordinal()]);
         return this.overlayBufferBuilders[type.ordinal()];
     }
 }
