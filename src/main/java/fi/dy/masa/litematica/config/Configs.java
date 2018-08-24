@@ -64,6 +64,7 @@ public class Configs implements IConfigHandler
         public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_MISSING     = new ConfigColor(  "schematicOverlayColorMissing",    "0x2C33B3E6", "The color of the blocks overlay for missing blocks");
         public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK = new ConfigColor(  "schematicOverlayColorWrongBlock", "0x4CFF3333", "The color of the blocks overlay for wrong blocks");
         public static final ConfigColor         SCHEMATIC_OVERLAY_COLOR_WRONG_STATE = new ConfigColor(  "schematicOverlayColorWrongState", "0x4CFF9010", "The color of the blocks overlay for wrong block states");
+        public static final ConfigBoolean       SCHEMATIC_OVERLAY_ENABLED           = new ConfigBoolean("schematicOverlayEnabled",  true, "The main toggle option for the schematic block overlay rendering");
         public static final ConfigBoolean       SCHEMATIC_OVERLAY_ENABLE_OUTLINES   = new ConfigBoolean("schematicOverlayEnableOutlines",  true, "Enables rendering a wire frame outline for the schematic block overlay");
         public static final ConfigBoolean       SCHEMATIC_OVERLAY_ENABLE_SIDES      = new ConfigBoolean("schematicOverlayEnableSides",     true, "Enables rendering translucent boxes/sides for the schematic block overlay");
         public static final ConfigBoolean       SCHEMATIC_OVERLAY_MODEL_OUTLINE     = new ConfigBoolean("schematicOverlayModelOutline",    true, "If enabled, then the schematic overlay will use the block model\nquads/vertices instead of the traditional full block overlay");
@@ -89,6 +90,7 @@ public class Configs implements IConfigHandler
                 SCHEMATIC_OVERLAY_COLOR_MISSING,
                 SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK,
                 SCHEMATIC_OVERLAY_COLOR_WRONG_STATE,
+                SCHEMATIC_OVERLAY_ENABLED,
                 SCHEMATIC_OVERLAY_ENABLE_OUTLINES,
                 SCHEMATIC_OVERLAY_ENABLE_SIDES,
                 SCHEMATIC_OVERLAY_MODEL_OUTLINE,

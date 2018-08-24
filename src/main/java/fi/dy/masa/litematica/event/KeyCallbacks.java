@@ -67,6 +67,9 @@ public class KeyCallbacks
         Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind().setCallback(callbackMessage);
+        Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind().setCallback(callbackMessage);
+        Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getKeybind().setCallback(callbackMessage);
+        Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(callbackMessage);
@@ -435,6 +438,30 @@ public class KeyCallbacks
                     boolean enabled = ! Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
                     Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.setBooleanValue(enabled);
                     String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getName());
+                    this.printToggleMessage(name, enabled);
+                    return true;
+                }
+                else if (key == Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind())
+                {
+                    boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue();
+                    Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.setBooleanValue(enabled);
+                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_OVERLAY_RENDERING.getName());
+                    this.printToggleMessage(name, enabled);
+                    return true;
+                }
+                else if (key == Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getKeybind())
+                {
+                    boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue();
+                    Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.setBooleanValue(enabled);
+                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getName());
+                    this.printToggleMessage(name, enabled);
+                    return true;
+                }
+                else if (key == Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getKeybind())
+                {
+                    boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue();
+                    Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.setBooleanValue(enabled);
+                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getName());
                     this.printToggleMessage(name, enabled);
                     return true;
                 }

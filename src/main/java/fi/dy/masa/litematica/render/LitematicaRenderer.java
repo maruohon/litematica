@@ -199,32 +199,36 @@ public class LitematicaRenderer
             GL20.glUseProgram(0);
         }
 
-        GlStateManager.pushMatrix();
-
-        this.mc.mcProfiler.endStartSection("litematica_overlay");
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableCull();
-        GlStateManager.enablePolygonOffset();
-        GlStateManager.doPolygonOffset(-0.1f, -0.8f);
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.glLineWidth((float) Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
-        GlStateManager.color(1f, 1f, 1f, 1f);
-
-        if (Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue())
+        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
         {
-            GlStateManager.disableDepth();
+            GlStateManager.pushMatrix();
+
+            this.mc.mcProfiler.endStartSection("litematica_overlay");
+            GlStateManager.disableTexture2D();
+            GlStateManager.disableCull();
+            GlStateManager.enablePolygonOffset();
+            GlStateManager.doPolygonOffset(-0.1f, -0.8f);
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+            GlStateManager.glLineWidth((float) Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
+            GlStateManager.color(1f, 1f, 1f, 1f);
+
+            if (Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue())
+            {
+                GlStateManager.disableDepth();
+            }
+
+            renderGlobal.renderBlockOverlays();
+
+            GlStateManager.enableDepth();
+            GlStateManager.doPolygonOffset(0f, 0f);
+            GlStateManager.disablePolygonOffset();
+            GlStateManager.enableTexture2D();
+            GlStateManager.popMatrix();
         }
 
-        renderGlobal.renderBlockOverlays();
-
-        GlStateManager.enableDepth();
-        GlStateManager.doPolygonOffset(0f, 0f);
-        GlStateManager.disablePolygonOffset();
-        GlStateManager.enableTexture2D();
         GlStateManager.enableAlpha();
         GlStateManager.disableBlend();
-        GlStateManager.popMatrix();
 
         GlStateManager.depthMask(true);
         GlStateManager.shadeModel(GL11.GL_FLAT);
