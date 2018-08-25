@@ -16,6 +16,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -503,6 +504,41 @@ public class PositionUtils
             case NONE:
             default:            return "NONE";
         }
+    }
+
+    public static float getRotatedYaw(float yaw, Rotation rotation)
+    {
+        switch (rotation)
+        {
+            case CLOCKWISE_180:
+                yaw += 180.0F;
+                break;
+            case COUNTERCLOCKWISE_90:
+                yaw += 270.0F;
+                break;
+            case CLOCKWISE_90:
+                yaw += 90.0F;
+                break;
+            default:
+        }
+
+        return MathHelper.wrapDegrees(yaw);
+    }
+
+    public static float getMirroredYaw(float yaw, Mirror mirror)
+    {
+        switch (mirror)
+        {
+            case LEFT_RIGHT:
+                yaw = 180.0F - yaw;
+                break;
+            case FRONT_BACK:
+                yaw = -yaw;
+                break;
+            default:
+        }
+
+        return MathHelper.wrapDegrees(yaw);
     }
 
     public static class BlockPosComparator implements Comparator<BlockPos>

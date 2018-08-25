@@ -27,6 +27,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -347,6 +348,17 @@ public class LitematicaSchematic
         final int offY = regionPosRelTransformed.getY() + origin.getY();
         final int offZ = regionPosRelTransformed.getZ() + origin.getZ();
 
+        final Rotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation());
+        final Mirror mirrorMain = schematicPlacement.getMirror();
+        Mirror mirrorSub = placement.getMirror();
+
+        if (mirrorSub != Mirror.NONE &&
+            (schematicPlacement.getRotation() == Rotation.CLOCKWISE_90 ||
+             schematicPlacement.getRotation() == Rotation.COUNTERCLOCKWISE_90))
+        {
+            mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
+        }
+
         for (EntityInfo info : entityList)
         {
             Entity entity = EntityList.createEntityFromNBT(info.nbt, world);
@@ -356,13 +368,12 @@ public class LitematicaSchematic
                 Vec3d pos = info.posVec;
                 pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
+                double x = pos.x + offX;
+                double y = pos.y + offY;
+                double z = pos.z + offZ;
 
-                entity.setLocationAndAngles(pos.x + offX, pos.y + offY, pos.z + offZ, entity.rotationYaw, entity.rotationPitch);
+                this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
                 world.spawnEntity(entity);
-
-                entity.prevRotationYaw = entity.rotationYaw;
-                entity.prevRotationPitch = entity.rotationPitch;
-                entity.ticksExisted = 2;
             }
         }
     }
@@ -560,6 +571,17 @@ public class LitematicaSchematic
         final double maxX = (chunkPos.x << 4) + 16;
         final double maxZ = (chunkPos.z << 4) + 16;
 
+        final Rotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation());
+        final Mirror mirrorMain = schematicPlacement.getMirror();
+        Mirror mirrorSub = placement.getMirror();
+
+        if (mirrorSub != Mirror.NONE &&
+            (schematicPlacement.getRotation() == Rotation.CLOCKWISE_90 ||
+             schematicPlacement.getRotation() == Rotation.COUNTERCLOCKWISE_90))
+        {
+            mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
+        }
+
         for (EntityInfo info : entityList)
         {
             Entity entity = EntityList.createEntityFromNBT(info.nbt, world);
@@ -575,14 +597,34 @@ public class LitematicaSchematic
 
                 if (x >= minX && x < maxX && z >= minZ && z < maxZ)
                 {
-                    entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
+                    this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
+                    //System.out.printf("post: %.1f - rot: %s, mm: %s, ms: %s\n", rotationYaw, rotationCombined, mirrorMain, mirrorSub);
                     world.spawnEntity(entity);
-
-                    entity.prevRotationYaw = entity.rotationYaw;
-                    entity.prevRotationPitch = entity.rotationPitch;
-                    entity.ticksExisted = 2;
                 }
             }
+        }
+    }
+
+    private void rotateEntity(Entity entity, double x, double y, double z, Rotation rotationCombined, Mirror mirrorMain, Mirror mirrorSub)
+    {
+        float rotationYaw = entity.rotationYaw;
+
+        if (mirrorMain != Mirror.NONE)          { rotationYaw = PositionUtils.getMirroredYaw(rotationYaw, mirrorMain); }
+        if (mirrorSub != Mirror.NONE)           { rotationYaw = PositionUtils.getMirroredYaw(rotationYaw, mirrorSub); }
+        if (rotationCombined != Rotation.NONE)  { rotationYaw = PositionUtils.getRotatedYaw(rotationYaw, rotationCombined); }
+
+        entity.setLocationAndAngles(x, y, z, rotationYaw, entity.rotationPitch);
+
+        entity.prevRotationYaw = rotationYaw;
+        entity.prevRotationPitch = entity.rotationPitch;
+
+        if (entity instanceof EntityLivingBase)
+        {
+            EntityLivingBase livingBase = (EntityLivingBase) entity;
+            livingBase.rotationYawHead = rotationYaw;
+            livingBase.prevRotationYawHead = rotationYaw;
+            livingBase.renderYawOffset = rotationYaw;
+            livingBase.prevRenderYawOffset = rotationYaw;
         }
     }
 
