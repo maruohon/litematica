@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager.SelectedBoxRenamer;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.GuiPlacementManager;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
@@ -45,14 +46,17 @@ public class KeyCallbacks
         Hotkeys.LAYER_NEXT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.OPEN_GUI_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_FIRST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_LAST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_TOGGLE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
-        Hotkeys.SCHEMATIC_VERIFIER.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_1.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_2.getKeybind().setCallback(callbackHotkeys);
@@ -158,118 +162,128 @@ public class KeyCallbacks
                 }
             }
 
-            if (key == Hotkeys.LAYER_NEXT.getKeybind())
+            if (mode.getUsesSchematic())
             {
-                DataManager.getRenderLayerRange().moveLayer(1);
-                return true;
-            }
-            else if (key == Hotkeys.LAYER_PREVIOUS.getKeybind())
-            {
-                DataManager.getRenderLayerRange().moveLayer(-1);
-                return true;
-            }
-            else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())
-            {
-                DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(true));
-                return true;
-            }
-            else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeybind())
-            {
-                DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
-                return true;
-            }
-            else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
-            {
-                return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
-            }
-            else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
-            {
-                return WorldUtils.doSchematicWorldPickBlock(false, this.mc);
-            }
-            else if (key == Hotkeys.PICK_BLOCK_TOGGLE.getKeybind())
-            {
-                ConfigBoolean config = Configs.Generic.PICK_BLOCK_ENABLED;
-                config.setBooleanValue(! config.getBooleanValue());
-                StringUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
-                return true;
-            }
-
-            if (mode.getUsesSchematic() && key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
-            {
-                SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
-
-                if (schematicPlacement != null)
+                if (key == Hotkeys.LAYER_NEXT.getKeybind())
                 {
-                    Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
+                    DataManager.getRenderLayerRange().moveLayer(1);
+                    return true;
+                }
+                else if (key == Hotkeys.LAYER_PREVIOUS.getKeybind())
+                {
+                    DataManager.getRenderLayerRange().moveLayer(-1);
+                    return true;
+                }
+                else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())
+                {
+                    DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(true));
+                    return true;
+                }
+                else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeybind())
+                {
+                    DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
+                    return true;
+                }
+                else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
+                {
+                    return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
+                }
+                else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
+                {
+                    return WorldUtils.doSchematicWorldPickBlock(false, this.mc);
+                }
+                else if (key == Hotkeys.PICK_BLOCK_TOGGLE.getKeybind())
+                {
+                    ConfigBoolean config = Configs.Generic.PICK_BLOCK_ENABLED;
+                    config.setBooleanValue(! config.getBooleanValue());
+                    StringUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
+                    return true;
+                }
+                else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
+                {
+                    SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-                    if (placement != null)
+                    if (schematicPlacement != null)
                     {
-                        this.mc.displayGuiScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
+                        Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
+
+                        if (placement != null)
+                        {
+                            this.mc.displayGuiScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
+                        }
+                        else
+                        {
+                            this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
+                        }
                     }
                     else
                     {
-                        this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
+                        StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
                     }
+
+                    return true;
                 }
-                else
+                else if (mode == OperationMode.SCHEMATIC_PLACEMENT && key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind())
                 {
-                    StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
-                }
+                    SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-                return true;
-            }
-            else if (mode == OperationMode.SCHEMATIC_PLACEMENT && key == Hotkeys.SCHEMATIC_VERIFIER.getKeybind())
-            {
-                SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
-
-                if (schematicPlacement != null)
-                {
-                    this.mc.displayGuiScreen(new GuiSchematicVerifier(schematicPlacement));
-                }
-                else
-                {
-                    StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
-                }
-
-                return true;
-            }
-            else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
-            {
-                SelectionManager sm = dataManager.getSelectionManager();
-                AreaSelection sel = sm.getCurrentSelection();
-
-                if (sel != null)
-                {
-                    String name = sel.getCurrentSubRegionBoxName();
-
-                    if (name != null)
+                    if (schematicPlacement != null)
                     {
-                        String title = "litematica.gui.title.rename_area_sub_region";
-                        this.mc.displayGuiScreen(new GuiTextInput(128, title, name, null, new SelectedBoxRenamer(sm)));
+                        this.mc.displayGuiScreen(new GuiSchematicVerifier(schematicPlacement));
+                    }
+                    else
+                    {
+                        StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                    }
+
+                    return true;
+                }
+            }
+            else if (mode == OperationMode.AREA_SELECTION)
+            {
+                if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind())
+                {
+                    SelectionManager sm = dataManager.getSelectionManager();
+                    AreaSelection sel = sm.getCurrentSelection();
+
+                    if (sel != null)
+                    {
+                        String name = sel.getCurrentSubRegionBoxName();
+
+                        if (name != null)
+                        {
+                            String title = "litematica.gui.title.rename_area_sub_region";
+                            this.mc.displayGuiScreen(new GuiTextInput(128, title, name, null, new SelectedBoxRenamer(sm)));
+                            return true;
+                        }
                     }
                 }
-
-                return true;
-            }
-            else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
-            {
-                this.mc.displayGuiScreen(new GuiSchematicSave());
-                return true;
-            }
-            else if (mode == OperationMode.AREA_SELECTION && key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
-            {
-                SelectionManager sm = dataManager.getSelectionManager();
-                AreaSelection area = sm.getCurrentSelection();
-
-                if (area != null)
+                else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
                 {
-                    String title = "litematica.gui.title.create_in_memory_schematic";
-                    this.mc.displayGuiScreen(new GuiTextInput(128, title, area.getName(), null, new InMemorySchematicCreator(area)));
-                }
+                    SelectionManager sm = dataManager.getSelectionManager();
+                    AreaSelection area = sm.getCurrentSelection();
 
-                return true;
+                    if (area != null)
+                    {
+                        this.mc.displayGuiScreen(new GuiSchematicSave());
+                        return true;
+                    }
+                }
+                else if (key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
+                {
+                    SelectionManager sm = dataManager.getSelectionManager();
+                    AreaSelection area = sm.getCurrentSelection();
+
+                    if (area != null)
+                    {
+                        String title = "litematica.gui.title.create_in_memory_schematic";
+                        this.mc.displayGuiScreen(new GuiTextInput(128, title, area.getName(), null, new InMemorySchematicCreator(area)));
+                        return true;
+                    }
+                }
             }
-            else if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
+
+            if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
                 this.mc.displayGuiScreen(new GuiMainMenu());
                 return true;
@@ -277,6 +291,15 @@ public class KeyCallbacks
             else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind())
             {
                 this.mc.displayGuiScreen(new GuiAreaSelectionManager());
+                return true;
+            }
+            else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind())
+            {
+                this.mc.displayGuiScreen(new GuiPlacementManager());
+                return true;
+            }
+            else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeybind())
+            {
                 return true;
             }
             else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && hasTool && toolEnabled)
@@ -318,8 +341,9 @@ public class KeyCallbacks
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
+
+                        return true;
                     }
-                    return true;
                 }
                 else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())
                 {
@@ -333,9 +357,9 @@ public class KeyCallbacks
                         if (name != null && selection.removeSelectedSubRegionBox())
                         {
                             StringUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
+                            return true;
                         }
                     }
-                    return true;
                 }
                 else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())
                 {
@@ -353,14 +377,14 @@ public class KeyCallbacks
                             String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
                             String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                             StringUtils.printActionbarMessage("litematica.message.moved_selection", oldStr, posStr);
+                            return true;
                         }
                     }
                     else if (DataManager.getOperationMode().getUsesSchematic())
                     {
                         DataManager.getInstance().getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
+                        return true;
                     }
-
-                    return true;
                 }
                 else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeybind() && DataManager.getOperationMode() == OperationMode.AREA_SELECTION)
                 {
@@ -378,10 +402,11 @@ public class KeyCallbacks
                         selection.setOrigin(pos);
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
+                        return true;
                     }
-                    return true;
                 }
-                else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() || key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())
+                else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ||
+                         key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())
                 {
                     SelectionManager sm = DataManager.getInstance().getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
@@ -402,34 +427,34 @@ public class KeyCallbacks
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", p, posStr);
+                        return true;
                     }
-                    return true;
                 }
                 else if (key == Hotkeys.TOGGLE_ALL_RENDERING.getKeybind())
                 {
                     boolean enabled = DataManager.toggleAllRenderingEnabled();
-                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_ALL_RENDERING.getName());
+                    String name = Hotkeys.TOGGLE_ALL_RENDERING.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
                 else if (key == Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind())
                 {
                     boolean enabled = DataManager.toggleRenderSelectionBoxes();
-                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getName());
+                    String name = Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
                 else if (key == Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind())
                 {
                     boolean enabled = DataManager.toggleRenderSchematics();
-                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getName());
+                    String name = Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
                 else if (key == Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind())
                 {
                     boolean enabled = DataManager.toggleRenderMismatches();
-                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getName());
+                    String name = Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
@@ -437,7 +462,7 @@ public class KeyCallbacks
                 {
                     boolean enabled = ! Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
                     Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.setBooleanValue(enabled);
-                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getName());
+                    String name = Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
@@ -445,7 +470,7 @@ public class KeyCallbacks
                 {
                     boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue();
                     Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.setBooleanValue(enabled);
-                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_OVERLAY_RENDERING.getName());
+                    String name = Hotkeys.TOGGLE_OVERLAY_RENDERING.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
@@ -453,7 +478,7 @@ public class KeyCallbacks
                 {
                     boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue();
                     Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.setBooleanValue(enabled);
-                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getName());
+                    String name = Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
@@ -461,7 +486,7 @@ public class KeyCallbacks
                 {
                     boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue();
                     Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.setBooleanValue(enabled);
-                    String name = StringUtils.splitCamelCase(Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getName());
+                    String name = Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }
@@ -469,7 +494,7 @@ public class KeyCallbacks
                 {
                     boolean enabled = ! Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
                     Configs.Generic.TOOL_ITEM_ENABLED.setBooleanValue(enabled);
-                    String name = StringUtils.splitCamelCase(Configs.Generic.TOOL_ITEM_ENABLED.getName());
+                    String name = Configs.Generic.TOOL_ITEM_ENABLED.getPrettyName();
                     this.printToggleMessage(name, enabled);
                     return true;
                 }

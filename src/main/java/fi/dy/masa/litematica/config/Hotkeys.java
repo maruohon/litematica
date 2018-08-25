@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.config;
 
+import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
@@ -7,6 +8,7 @@ import fi.dy.masa.malilib.config.ConfigType;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public enum Hotkeys implements IHotkey
 {
@@ -17,32 +19,34 @@ public enum Hotkeys implements IHotkey
     LAYER_MODE_PREVIOUS                 ("layerModePrevious",               "M,NEXT",  "Cycle the rendering mode (all, layers) backwards"),
     LAYER_NEXT                          ("layerNext",                       "PRIOR", "Move the rendered layer selection up"),
     LAYER_PREVIOUS                      ("layerPrevious",                   "NEXT",  "Move the rendered layer selection down"),
-    MOVE_ENTIRE_SELECTION               ("moveEntireSelection",             "M,V",  "Move the entire current selection here"),
+    MOVE_ENTIRE_SELECTION               ("moveEntireSelection",             "M,H",  "Move the entire current selection here"),
     OPEN_GUI_AREA_SETTINGS              ("openGuiAreaSettings",             "M,P",  "Open the Area Settings GUI for the currently selected area"),
-    OPEN_GUI_PLACEMENT_SETTINGS         ("openGuiPlacementSettings",        "M,P",  "Open the Placement Settings GUI for the currently selected placement"),
-    OPEN_GUI_MAIN_MENU                  ("openGuiMainMenu",                 "M,C",  "Open the Litematica main GUI"),
-    OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the area selection manager GUI"),
+    OPEN_GUI_PLACEMENT_SETTINGS         ("openGuiPlacementSettings",        "SUBTRACT",  "Open the Placement Settings GUI for the currently selected placement or sub-region"),
+    OPEN_GUI_MAIN_MENU                  ("openGuiMainMenu",                 "M,N",  "Open the Litematica main menu"),
+    OPEN_GUI_SCHEMATIC_PLACEMENTS       ("openGuiSchematicPlacements",      "M,P",  "Open the Schematic Placements GUI"),
+    OPEN_GUI_SCHEMATIC_VERIFIER         ("openGuiSchematicVerifier",        "M,K",  "Open the Schematic Verifier GUI for the currently selected schematic placement"),
+    OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the Area Selection manager GUI"),
+    OPEN_GUI_SETTINGS                   ("openGuiSettings",                 "M,C",  "Open the Config GUI"),
     OPERATION_MODE_CHANGE_MODIFIER      ("operationModeChangeModifier",     "LCONTROL", "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode."),
-    PICK_BLOCK_FIRST                    ("pickBlockFirst",                  "", false, "A key to pick block the first schematic block ray traced to"),
-    PICK_BLOCK_LAST                     ("pickBlockLast",                   "", false, "A key to pick block the last schematic block ray traced to,\nbefore the first (possible) client world block traced to"),
+    PICK_BLOCK_FIRST                    ("pickBlockFirst",                  "LSHIFT,BUTTON2", false, "A key to pick block the first schematic block ray traced to"),
+    PICK_BLOCK_LAST                     ("pickBlockLast",                   "", false, "A key to pick block the last schematic block ray traced to,\nbefore the first (possible) client world block ray traced to.\nBasically this would get you the block you could place against an existing block."),
     PICK_BLOCK_TOGGLE                   ("pickBlockToggle",                 "M,BUTTON2", "A hotkey to toggle the pick block toggle option in the Generic configs.\nThis is provided as a quick way to enable or disable\nthe pick block keys, if they interfere with something."),
     RENDER_INFO_OVERLAY                 ("renderInfoOverlay",               "LMENU", false, "The key that enables rendering the block info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in Visuals to disable the overlay completely."),
     SAVE_AREA_AS_IN_MEMORY_SCHEMATIC    ("saveAreaAsInMemorySchematic",     "LCONTROL,S",  "Save the current Area Selection as an in-memory Schematic"),
     SAVE_AREA_AS_SCHEMATIC_TO_FILE      ("saveAreaAsSchematicToFile",       "LCONTROL,LMENU,S",  "Save the current Area Selection as a Schematic to a file"),
-    SCHEMATIC_VERIFIER                  ("schematicVerifier",               "M,K",  "The keybind to open the Schematic Verifier GUI for the selected placement"),
     SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
-    SELECTION_MODE_CYCLE                ("selectionModeCycle",              "LCONTROL,M", "The keybind to change the selection mode/type in the Area Selection mode"),
+    SELECTION_MODE_CYCLE                ("selectionModeCycle",              "LCONTROL,M", "Change the mode between Corners and Cuboid in the Area Selection mode"),
     SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,Z",  "Set/move the origin point of the current selection here"),
     SET_SELECTION_BOX_POSITION_1        ("setSelectionBoxPosition1",        "M,1",  "Set the first position of the currently selected box to the player's position"),
     SET_SELECTION_BOX_POSITION_2        ("setSelectionBoxPosition2",        "M,2",  "Set the second position of the currently selected box to the player's position"),
-    TOGGLE_ALL_RENDERING                ("toggleAllRendering",              "M,R",  "Toggle all rendering on/off"),
-    TOGGLE_GHOST_BLOCK_RENDERING        ("toggleGhostBlockRendering",       "M,G",  "Toggle ghost block rendering on/off"),
-    TOGGLE_MISMATCH_OVERLAY_RENDERING   ("toggleMismatchOverlayRendering",  "M,E",  "Toggle the mismatch overlay rendering (for Schematic Verifier)"),
-    TOGGLE_OVERLAY_RENDERING            ("toggleOverlayRendering",          "M,O",  "Toggle the block overlay outline rendering on/off"),
-    TOGGLE_OVERLAY_OUTLINE_RENDERING    ("toggleOverlayOutlineRendering",   "M,B",  "Toggle the block overlay outline rendering on/off"),
-    TOGGLE_OVERLAY_SIDE_RENDERING       ("toggleOverlaySideRendering",      "M,I",  "Toggle the block overlay side rendering on/off"),
-    TOGGLE_SELECTION_BOXES_RENDERING    ("toggleSelectionBoxesRendering",   "M,X",  "Toggle selection boxes rendering on/off"),
-    TOGGLE_TRANSLUCENT_RENDERING        ("toggleTranslucentRendering",      "M,U",  "Toggle translucent vs. opaque ghost block rendering"),
+    TOGGLE_ALL_RENDERING                ("toggleAllRendering",              "M,R",  "Toggle all rendering on/off", "All Rendering"),
+    TOGGLE_GHOST_BLOCK_RENDERING        ("toggleGhostBlockRendering",       "M,G",  "Toggle ghost block rendering on/off", "Ghost Block Rendering"),
+    TOGGLE_MISMATCH_OVERLAY_RENDERING   ("toggleMismatchOverlayRendering",  "M,E",  "Toggle the mismatch overlay rendering (for Schematic Verifier)", "Verifier Mismatch Overlay"),
+    TOGGLE_OVERLAY_RENDERING            ("toggleOverlayRendering",          "M,O",  "Toggle the block overlay rendering on/off", "All Block Overlay Rendering"),
+    TOGGLE_OVERLAY_OUTLINE_RENDERING    ("toggleOverlayOutlineRendering",   "M,B",  "Toggle the block overlay outline rendering on/off", "Block Overlay Outline Rendering"),
+    TOGGLE_OVERLAY_SIDE_RENDERING       ("toggleOverlaySideRendering",      "M,I",  "Toggle the block overlay side rendering on/off", "Block Overlay Sides/Quads Rendering"),
+    TOGGLE_SELECTION_BOXES_RENDERING    ("toggleSelectionBoxesRendering",   "M,X",  "Toggle selection boxes rendering on/off", "Selection Boxes Rendering"),
+    TOGGLE_TRANSLUCENT_RENDERING        ("toggleTranslucentRendering",      "M,U",  "Toggle translucent vs. opaque ghost block rendering", "Translucent Schematic Blocks Rendering"),
     TOOL_ENABLED_TOGGLE                 ("toolEnabledToggle",               "M,T",  "The keybind to toggle the \"tool\" item functionality on/off"),
     TOOL_PLACE_CORNER_1                 ("toolPlaceCorner1",                "BUTTON0", false, "The button to use while holding the \"tool\" item\nto place the primary/first corner"),
     TOOL_PLACE_CORNER_2                 ("toolPlaceCorner2",                "BUTTON1", false, "The button to use while holding the \"tool\" item\nto place the second corner"),
@@ -50,6 +54,7 @@ public enum Hotkeys implements IHotkey
 
     private final String name;
     private final String comment;
+    private final String prettyName;
     private final IKeybind keybind;
 
     private Hotkeys(String name, String defaultHotkey, String comment)
@@ -59,8 +64,19 @@ public enum Hotkeys implements IHotkey
 
     private Hotkeys(String name, String defaultHotkey, boolean isStrict, String comment)
     {
+        this(name, defaultHotkey, true, comment, null);
+    }
+
+    private Hotkeys(String name, String defaultHotkey, String comment, String prettyName)
+    {
+        this(name, defaultHotkey, true, comment, prettyName);
+    }
+
+    private Hotkeys(String name, String defaultHotkey, boolean isStrict, String comment, @Nullable String prettyName)
+    {
         this.name = name;
         this.comment = comment;
+        this.prettyName = prettyName != null ? prettyName : StringUtils.splitCamelCase(name);
         this.keybind = KeybindMulti.fromStorageString(defaultHotkey);
         this.keybind.setIsStrict(isStrict);
     }
@@ -81,6 +97,11 @@ public enum Hotkeys implements IHotkey
     public String getComment()
     {
         return comment != null ? this.comment : "";
+    }
+
+    public String getPrettyName()
+    {
+        return this.prettyName;
     }
 
     @Override
