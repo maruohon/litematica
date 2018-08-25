@@ -82,7 +82,7 @@ public class ToolHud extends InfoHud
                 lines.add(I18n.format("litematica.hud.area_selection.selection_mode", strTmp));
             }
         }
-        else if (mode == OperationMode.SCHEMATIC_PLACEMENT)
+        else if (mode.getUsesSchematic())
         {
             SchematicPlacement schematicPlacement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
 

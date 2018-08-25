@@ -93,7 +93,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                             return true;
                         }
                     }
-                    else if (mode == OperationMode.SCHEMATIC_PLACEMENT)
+                    else if (mode.getUsesSchematic())
                     {
                         EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
                         DataManager.getInstance().getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);

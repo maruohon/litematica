@@ -223,7 +223,7 @@ public class KeyCallbacks
 
                     return true;
                 }
-                else if (mode == OperationMode.SCHEMATIC_PLACEMENT && key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind())
+                else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind())
                 {
                     SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
