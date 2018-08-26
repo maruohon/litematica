@@ -79,7 +79,7 @@ litemod {
         // Uncomment any of the following lines and fill in your own details as required
         //requiredAPIs = [ 'someapi' ]
         //tweakClass = 'name.of.tweaker.here'
-        dependsOn = [ 'modid', 'malilib' ]
+        dependsOn = [ 'malilib' ]
         mixinConfigs = [ 'mixins.' + config.mod_id + '.json' ]
     }
 }
