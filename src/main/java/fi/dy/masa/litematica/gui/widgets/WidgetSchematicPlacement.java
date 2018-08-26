@@ -8,13 +8,13 @@ import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
-import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
@@ -23,7 +23,7 @@ import net.minecraft.util.text.TextFormatting;
 public class WidgetSchematicPlacement extends WidgetBase
 {
     private final SchematicPlacementManager manager;
-    private final WidgetSchematicPlacements parent;
+    private final WidgetListSchematicPlacements parent;
     private final SchematicPlacement placement;
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
@@ -32,7 +32,7 @@ public class WidgetSchematicPlacement extends WidgetBase
     private int buttonsStartX;
 
     public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            SchematicPlacement placement, WidgetSchematicPlacements parent, Minecraft mc)
+            SchematicPlacement placement, WidgetListSchematicPlacements parent, Minecraft mc)
     {
         super(x, y, width, height, zLevel);
 
@@ -117,16 +117,16 @@ public class WidgetSchematicPlacement extends WidgetBase
         // Draw a lighter background for the hovered and the selected entry
         if (selected || placementSelected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
         }
 
         if (placementSelected)
@@ -183,11 +183,11 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         int offset = 12 + 11 + 2; // this.x + modified icon + gap to buttons
 
-        if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
+        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
             this.parent.drawHoveringText(text, mouseX, mouseY);
         }
-        else if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - offset, this.y + 6, 11, 11))
+        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - offset, this.y + 6, 11, 11))
         {
             String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_modified");
             this.parent.drawHoveringText(str, mouseX, mouseY);

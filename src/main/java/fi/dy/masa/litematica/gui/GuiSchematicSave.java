@@ -4,14 +4,16 @@ import java.io.File;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.util.InfoUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -91,13 +93,13 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
 
                 if (dir.isDirectory() == false)
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
                     return;
                 }
 
                 if (fileName.isEmpty())
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
                     return;
                 }
 
@@ -117,13 +119,13 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
                 {
                     if (schematic.writeToFile(dir, fileName, GuiScreen.isShiftKeyDown(), this.gui))
                     {
-                        this.gui.addMessage(InfoType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
+                        this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                         this.gui.widget.refreshEntries();
                     }
                 }
                 else
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_save.schematic_creation_failed");
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.schematic_creation_failed");
                 }
             }
             else if (this.type == ButtonType.CREATE_DIRECTORY)

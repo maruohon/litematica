@@ -239,7 +239,7 @@ public class OverlayRenderer
         {
             color1 = box.getSelectedCorner() == Corner.CORNER_1 ? this.colorSelectedCorner : this.colorPos1;
             color2 = box.getSelectedCorner() == Corner.CORNER_2 ? this.colorSelectedCorner : this.colorPos2;
-            sideColor = Color4f.fromColor(Configs.Visuals.AREA_SELECTION_BOX_SIDE_COLOR.getIntegerValue());
+            sideColor = Color4f.fromColor(Configs.Colors.AREA_SELECTION_BOX_SIDE_COLOR.getIntegerValue());
         }
 
         if (pos1 != null && pos2 != null)

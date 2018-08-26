@@ -239,7 +239,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
                             usedLayers[layerIndex] |= this.renderGlobal.renderBlock(stateSchematic, posMutable, this.schematicWorldView, bufferSchematic);
 
-                            overlayColor = Configs.Visuals.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
+                            overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
                             missing = true;
                         }
                     }
@@ -248,17 +248,17 @@ public class RenderChunkSchematicVbo extends RenderChunk
                         // Extra block
                         if (blockSchematic == Blocks.AIR)
                         {
-                            overlayColor = Configs.Visuals.SCHEMATIC_OVERLAY_COLOR_EXTRA.getColor();
+                            overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_EXTRA.getColor();
                         }
                         // Wrong block
                         else if (blockClient != blockSchematic)
                         {
-                            overlayColor = Configs.Visuals.SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK.getColor();
+                            overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK.getColor();
                         }
                         // Wrong state
                         else
                         {
-                            overlayColor = Configs.Visuals.SCHEMATIC_OVERLAY_COLOR_WRONG_STATE.getColor();
+                            overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_STATE.getColor();
                         }
                     }
 

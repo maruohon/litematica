@@ -2,17 +2,20 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.litematica.gui.GuiTextInput;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
-import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.FileType;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
+import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -27,9 +30,10 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     private int buttonsStartX;
 
     public WidgetAreaSelectionEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            DirectoryEntry entry, SelectionManager selectionManager, Minecraft mc, WidgetAreaSelectionBrowser parent)
+            DirectoryEntry entry, SelectionManager selectionManager, Minecraft mc,
+            WidgetAreaSelectionBrowser parent, IFileBrowserIconProvider iconProvider)
     {
-        super(x, y, width, height, zLevel, isOdd, entry, mc, parent);
+        super(x, y, width, height, zLevel, isOdd, entry, mc, parent, iconProvider);
 
         this.selectionManager = selectionManager;
         this.parent = parent;
@@ -40,7 +44,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
         // Note: These are placed from right to left
 
-        if (entry.getType() == DirectoryEntryType.JSON)
+        if (entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(entry.getFullPath()) == FileType.JSON)
         {
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
             //posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
@@ -89,7 +93,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        if (this.entry.getType() == DirectoryEntryType.JSON)
+        if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
         {
             selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentSelectionId());
             super.render(mouseX, mouseY, selected);
@@ -108,7 +112,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     @Override
     protected String getDisplayName()
     {
-        if (this.entry.getType() == DirectoryEntryType.JSON)
+        if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
         {
             AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(this.getDirectoryEntry().getFullPath().getAbsolutePath());
             return selection != null ? selection.getName() : "<error>";
@@ -135,7 +139,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
         int offset = 12;
 
-        if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
+        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
             this.parent.drawHoveringText(text, mouseX, mouseY);
         }

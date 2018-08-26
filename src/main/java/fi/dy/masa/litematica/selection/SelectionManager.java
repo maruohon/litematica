@@ -8,15 +8,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
-import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
-import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -155,7 +155,7 @@ public class SelectionManager
             }
             else
             {
-                feedback.addMessage(InfoType.ERROR, "litematica.error.area_selection.rename.already_exists", newName);
+                feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.already_exists", newName);
             }
         }
 

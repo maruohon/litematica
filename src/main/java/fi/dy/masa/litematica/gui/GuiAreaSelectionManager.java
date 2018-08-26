@@ -3,16 +3,18 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicSaveBase.DirectoryCreator;
-import fi.dy.masa.litematica.gui.base.GuiListBase;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetAreaSelectionBrowser;
-import fi.dy.masa.litematica.gui.widgets.WidgetDirectoryEntry;
-import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.FileType;
+import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -89,7 +91,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     @Override
     public void onSelectionChange(DirectoryEntry entry)
     {
-        if (entry.getType() == DirectoryEntryType.JSON)
+        if (entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(entry.getFullPath()) == FileType.JSON)
         {
             String selectionId = entry.getFullPath().getAbsolutePath();
 

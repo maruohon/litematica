@@ -1,12 +1,16 @@
 package fi.dy.masa.litematica.gui;
 
+import java.io.File;
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.malilib.gui.IGuiIcon;
+import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.RenderUtils;
+import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
+import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import net.minecraft.util.ResourceLocation;
 
-public enum Icons implements IGuiIcon
+public enum Icons implements IGuiIcon, IFileBrowserIconProvider
 {
+    DUMMY                   (  0,   0,  0,  0),
     BUTTON_PLUS_MINUS_8     (  0,   0,  8,  8),
     BUTTON_PLUS_MINUS_12    ( 24,   0, 12, 12),
     FILE_ICON_LITEMATIC     (144,   0, 12, 12),
@@ -69,5 +73,47 @@ public enum Icons implements IGuiIcon
     public ResourceLocation getTexture()
     {
         return TEXTURE;
+    }
+
+    @Override
+    public IGuiIcon getIconRoot()
+    {
+        return FILE_ICON_DIR_ROOT;
+    }
+
+    @Override
+    public IGuiIcon getIconUp()
+    {
+        return FILE_ICON_DIR_UP;
+    }
+
+    @Override
+    public IGuiIcon getIconDirectory()
+    {
+        return FILE_ICON_DIR;
+    }
+
+    @Override
+    public IGuiIcon getIconForFile(File file)
+    {
+        FileType fileType = FileType.fromFile(file);
+
+        switch (fileType)
+        {
+            case LITEMATICA_SCHEMATIC:
+                return FILE_ICON_LITEMATIC;
+
+            case SCHEMATICA_SCHEMATIC:
+                return FILE_ICON_SCHEMATIC;
+
+            case VANILLA_STRUCTURE:
+                return FILE_ICON_VANILLA;
+
+            case JSON:
+                return FILE_ICON_JSON;
+
+            default:
+                return DUMMY;
+        }
     }
 }

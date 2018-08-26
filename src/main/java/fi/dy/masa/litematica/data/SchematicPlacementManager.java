@@ -16,8 +16,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
-import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.JsonUtils;
@@ -28,6 +26,8 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.util.SubChunkPos;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -182,12 +182,12 @@ public class SchematicPlacementManager
 
             if (messageConsumer != null)
             {
-                messageConsumer.addMessage(InfoType.SUCCESS, I18n.format("litematica.message.schematic_placement_created", placement.getName()));
+                messageConsumer.addMessage(MessageType.SUCCESS, I18n.format("litematica.message.schematic_placement_created", placement.getName()));
             }
         }
         else if (messageConsumer != null)
         {
-            messageConsumer.addMessage(InfoType.ERROR, I18n.format("litematica.error.duplicate_schematic_load"));
+            messageConsumer.addMessage(MessageType.ERROR, I18n.format("litematica.error.duplicate_schematic_load"));
         }
     }
 

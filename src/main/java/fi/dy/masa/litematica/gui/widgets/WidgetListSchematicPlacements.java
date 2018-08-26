@@ -3,13 +3,13 @@ package fi.dy.masa.litematica.gui.widgets;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiPlacementManager;
-import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
-public class WidgetSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
+public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
 {
     private final GuiPlacementManager parent;
 
-    public WidgetSchematicPlacements(int x, int y, int width, int height, GuiPlacementManager parent)
+    public WidgetListSchematicPlacements(int x, int y, int width, int height, GuiPlacementManager parent)
     {
         super(x, y, width, height, parent);
 

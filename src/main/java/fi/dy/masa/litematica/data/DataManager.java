@@ -12,11 +12,13 @@ import com.google.gson.JsonPrimitive;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.util.FileUtils;
 import fi.dy.masa.litematica.util.JsonUtils;
-import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.LayerRange;
+import fi.dy.masa.litematica.util.OperationMode;
+import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
+import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.init.Items;
@@ -25,7 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ResourceLocation;
 
-public class DataManager
+public class DataManager implements IDirectoryCache
 {
     public static final File ROOT_AREA_SELECTIONS_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(getCurrentConfigDirectory(), "area_selections"));
     public static final File ROOT_SCHEMATIC_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getMinecraft().mcDataDir, "schematics"));
@@ -38,6 +40,7 @@ public class DataManager
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
+    private static ConfigGuiTab configGuiTab = ConfigGuiTab.GENERIC;
     private static LayerRange renderRange = new LayerRange();
     private static boolean enableRendering = true;
     private static boolean renderMismatches = true;
@@ -179,18 +182,30 @@ public class DataManager
         operationMode = mode;
     }
 
+    public static ConfigGuiTab getConfigGuiTab()
+    {
+        return configGuiTab;
+    }
+
+    public static void setConfigGuiTab(ConfigGuiTab tab)
+    {
+        configGuiTab = tab;
+    }
+
     public static LayerRange getRenderLayerRange()
     {
         return renderRange;
     }
 
+    @Override
     @Nullable
-    public static File getCurrentDirectoryForContext(String context)
+    public File getCurrentDirectoryForContext(String context)
     {
         return LAST_DIRECTORIES.get(context);
     }
 
-    public static void setCurrentDirectoryForContext(String context, File dir)
+    @Override
+    public void setCurrentDirectoryForContext(String context, File dir)
     {
         LAST_DIRECTORIES.put(context, dir);
     }
@@ -243,6 +258,20 @@ public class DataManager
                 }
             }
 
+            if (JsonUtils.hasString(root, "config_gui_tab"))
+            {
+                try
+                {
+                    configGuiTab = ConfigGuiTab.valueOf(root.get("config_gui_tab").getAsString());
+                }
+                catch (Exception e) {}
+
+                if (configGuiTab == null)
+                {
+                    configGuiTab = ConfigGuiTab.GENERIC;
+                }
+            }
+
             if (JsonUtils.hasObject(root, "render_range"))
             {
                 renderRange = LayerRange.fromJson(JsonUtils.getNestedObject(root, "render_range", false));
@@ -287,6 +316,7 @@ public class DataManager
         root.add("render_selections", new JsonPrimitive(renderSelections));
 
         root.add("operation_mode", new JsonPrimitive(operationMode.name()));
+        root.add("config_gui_tab", new JsonPrimitive(configGuiTab.name()));
         root.add("render_range", renderRange.toJson());
 
         File file = getCurrentStorageFile(true);

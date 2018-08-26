@@ -3,18 +3,18 @@ package fi.dy.masa.litematica.gui;
 import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
-import fi.dy.masa.litematica.gui.base.GuiTextFieldNumeric;
-import fi.dy.masa.litematica.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class GuiSubRegionConfiguration extends GuiLitematicaBase
+public class GuiSubRegionConfiguration extends GuiBase
 {
     private final SchematicPlacement schematicPlacement;
     private final Placement placement;
@@ -106,7 +106,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
             case Z: text = String.valueOf(pos.getZ()); break;
         }
 
-        GuiTextFieldNumeric textField = new GuiTextFieldNumeric(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
         this.addTextField(textField, listener);
@@ -175,7 +175,7 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
 
         if (enabled)
         {
-            label = TXT_ORANGE + label + TXT_RST;
+            label = TXT_GOLD + label + TXT_RST;
         }
 
         this.buttonResetPlacement.displayString = label;
@@ -184,13 +184,13 @@ public class GuiSubRegionConfiguration extends GuiLitematicaBase
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
-        private final GuiLitematicaBase parent;
+        private final GuiBase parent;
         private final SchematicPlacement schematicPlacement;
         private final Placement placement;
         private final Type type;
         private final String subRegionName;
 
-        public ButtonListener(Type type, SchematicPlacement schematicPlacement, Placement placement, GuiLitematicaBase parent)
+        public ButtonListener(Type type, SchematicPlacement schematicPlacement, Placement placement, GuiBase parent)
         {
             this.type = type;
             this.schematicPlacement = schematicPlacement;

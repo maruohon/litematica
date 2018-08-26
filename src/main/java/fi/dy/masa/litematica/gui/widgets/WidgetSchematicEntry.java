@@ -8,15 +8,15 @@ import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
-import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -26,7 +26,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class WidgetSchematicEntry extends WidgetBase
 {
-    private final WidgetLoadedSchematics parent;
+    private final WidgetListLoadedSchematics parent;
     private final LitematicaSchematic schematic;
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
@@ -36,7 +36,7 @@ public class WidgetSchematicEntry extends WidgetBase
     private final int buttonsStartX;
 
     public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            LitematicaSchematic schematic, WidgetLoadedSchematics parent, Minecraft mc)
+            LitematicaSchematic schematic, WidgetListLoadedSchematics parent, Minecraft mc)
     {
         super(x, y, width, height, zLevel);
 
@@ -103,16 +103,16 @@ public class WidgetSchematicEntry extends WidgetBase
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x70FFFFFF);
         }
         else if (this.isOdd)
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x50FFFFFF);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x50FFFFFF);
         }
 
         String schematicName = this.schematic.getMetadata().getName();
@@ -145,7 +145,7 @@ public class WidgetSchematicEntry extends WidgetBase
             this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
         }
 
-        if (GuiLitematicaBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
+        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
         {
             this.parent.drawHoveringText(text, mouseX, mouseY);
         }
@@ -195,9 +195,9 @@ public class WidgetSchematicEntry extends WidgetBase
                 LitematicaSchematic entry = this.widget.schematic;
                 GuiSchematicSave gui = new GuiSchematicSave(entry);
 
-                if (mc.currentScreen instanceof GuiLitematicaBase)
+                if (mc.currentScreen instanceof GuiBase)
                 {
-                    gui.setParent((GuiLitematicaBase) mc.currentScreen);
+                    gui.setParent((GuiBase) mc.currentScreen);
                 }
 
                 mc.displayGuiScreen(gui);

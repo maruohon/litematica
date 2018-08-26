@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
+import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 
 public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
 {
@@ -16,7 +18,8 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     public WidgetAreaSelectionBrowser(int x, int y, int width, int height,
             GuiAreaSelectionManager parent, ISelectionListener<DirectoryEntry> selectionListener)
     {
-        super(x, y, width, height, parent.getBrowserContext(), parent.getDefaultDirectory(), selectionListener);
+        super(x, y, width, height, DataManager.getInstance(), parent.getBrowserContext(),
+                parent.getDefaultDirectory(), selectionListener, Icons.DUMMY);
 
         this.browserEntryHeight = 22;
         this.guiAreaSelectionManager = parent;
@@ -53,7 +56,7 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     protected WidgetAreaSelectionEntry createListWidget(int x, int y, boolean isOdd, DirectoryEntry entry)
     {
         return new WidgetAreaSelectionEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd,
-                entry, this.guiAreaSelectionManager.getSelectionManager(), this.mc, this);
+                entry, this.guiAreaSelectionManager.getSelectionManager(), this.mc, this, this.iconProvider);
     }
 
     public static class FileFilterJson implements FileFilter

@@ -1,13 +1,13 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
-public class GuiMainMenu extends GuiLitematicaBase
+public class GuiMainMenu extends GuiBase
 {
     private int id;
 
@@ -50,9 +50,9 @@ public class GuiMainMenu extends GuiLitematicaBase
     {
         private final ButtonType type;
         @Nullable
-        private final GuiLitematicaBase parent;
+        private final GuiBase parent;
 
-        public ButtonListenerChangeMenu(ButtonType type, @Nullable GuiLitematicaBase parent)
+        public ButtonListenerChangeMenu(ButtonType type, @Nullable GuiBase parent)
         {
             this.type = type;
             this.parent = parent;
@@ -61,7 +61,7 @@ public class GuiMainMenu extends GuiLitematicaBase
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            GuiLitematicaBase gui = null;
+            GuiBase gui = null;
 
             if (this.type == ButtonType.SHOW_LOADED)
             {

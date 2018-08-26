@@ -15,13 +15,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase.InfoType;
 import fi.dy.masa.litematica.render.IStringListProvider;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.Color4f;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -522,7 +522,7 @@ public class SchematicVerifier implements IStringListProvider
         }
     }
 
-    public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(GuiLitematicaBase gui)
+    public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(GuiBase gui)
     {
         List<Pair<IBlockState, IBlockState>> list = Lists.newArrayList(this.ignoredMismatches);
 
@@ -557,7 +557,7 @@ public class SchematicVerifier implements IStringListProvider
         }
         catch (Exception e)
         {
-            gui.addMessage(InfoType.ERROR, "litematica.error.generic.failed_to_sort_list_of_ignored_states");
+            gui.addMessage(MessageType.ERROR, "litematica.error.generic.failed_to_sort_list_of_ignored_states");
         }
 
         return list;

@@ -2,13 +2,13 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
-import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
-public class WidgetPlacementSubRegions extends WidgetListBase<Placement, WidgetPlacementSubRegion>
+public class WidgetListPlacementSubRegions extends WidgetListBase<Placement, WidgetPlacementSubRegion>
 {
     private final GuiPlacementConfiguration parent;
 
-    public WidgetPlacementSubRegions(int x, int y, int width, int height, GuiPlacementConfiguration parent)
+    public WidgetListPlacementSubRegions(int x, int y, int width, int height, GuiPlacementConfiguration parent)
     {
         super(x, y, width, height, parent);
 

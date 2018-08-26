@@ -8,9 +8,9 @@ import fi.dy.masa.litematica.data.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
-import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
 import fi.dy.masa.litematica.util.ItemType;
 import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.state.IBlockState;
@@ -18,11 +18,11 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
-public class WidgetSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
+public class WidgetListSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
 {
     private final GuiSchematicVerifier guiSchematicVerifier;
 
-    public WidgetSchematicVerificationResults(int x, int y, int width, int height, GuiSchematicVerifier parent)
+    public WidgetListSchematicVerificationResults(int x, int y, int width, int height, GuiSchematicVerifier parent)
     {
         super(x, y, width, height, parent);
 

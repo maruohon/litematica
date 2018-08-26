@@ -3,22 +3,22 @@ package fi.dy.masa.litematica.gui;
 import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.base.GuiListBase;
-import fi.dy.masa.litematica.gui.base.GuiTextFieldGeneric;
-import fi.dy.masa.litematica.gui.base.GuiTextFieldNumeric;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
-import fi.dy.masa.litematica.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegion;
-import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegions;
+import fi.dy.masa.litematica.gui.widgets.WidgetListPlacementSubRegions;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
+import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPlacementSubRegion, WidgetPlacementSubRegions>
+public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
                                         implements ISelectionListener<Placement>
 {
     private final SchematicPlacement placement;
@@ -124,7 +124,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
             case Z: text = String.valueOf(pos.getZ()); break;
         }
 
-        GuiTextFieldNumeric textField = new GuiTextFieldNumeric(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.placement, this);
         this.addTextField(textField, listener);
@@ -195,7 +195,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
 
         if (this.placement.isRegionPlacementModified())
         {
-            label = TXT_ORANGE + label + TXT_RST;
+            label = TXT_GOLD + label + TXT_RST;
         }
         else
         {
@@ -224,9 +224,9 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
     }
 
     @Override
-    protected WidgetPlacementSubRegions createListWidget(int listX, int listY)
+    protected WidgetListPlacementSubRegions createListWidget(int listX, int listY)
     {
-        return new WidgetPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+        return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>

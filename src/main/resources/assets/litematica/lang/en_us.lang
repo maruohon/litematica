@@ -52,6 +52,10 @@ litematica.gui.button.change_menu.show_loaded_schematics=Show loaded schematics
 litematica.gui.button.change_menu.show_schematic_placements=Show schematic placements
 litematica.gui.button.change_menu.to_main_menu=Litematica menu
 
+litematica.gui.button.config_gui.colors=Colors
+litematica.gui.button.config_gui.generic=Generic
+litematica.gui.button.config_gui.visuals=Visuals
+
 litematica.gui.button.schematic_manager.export_as=Export as:
 
 litematica.gui.button.schematic_placements.configure=Configure
@@ -70,7 +74,6 @@ litematica.gui.button.schematic_verifier.start=Start verification
 litematica.gui.button.schematic_verifier.stop=Stop verification
 litematica.gui.button.schematic_verifier.toggle_info_hud=Info HUD: %s
 
-litematica.gui.button.cancel=Cancel
 litematica.gui.button.configure=Configure
 litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.create_placement=Create placement
@@ -78,12 +81,10 @@ litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
 litematica.gui.button.import=Import
 litematica.gui.button.load_schematic_to_memory=Load Schematic to memory
-litematica.gui.button.ok=OK
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_here=Move here
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
-litematica.gui.button.reset=Reset
 litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_schematic=Save Schematic
 litematica.gui.button.save_to_file=Save to file
@@ -146,6 +147,7 @@ litematica.gui.label.placement_settings.placement_origin=Placement origin
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
+litematica.gui.title.configs=Configs
 litematica.gui.title.create_area_selection=Create a new Area Selection
 litematica.gui.title.create_directory=Create a new directory
 litematica.gui.title.create_in_memory_schematic=Create an in-memory Schematic

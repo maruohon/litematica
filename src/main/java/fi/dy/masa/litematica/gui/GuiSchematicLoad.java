@@ -5,12 +5,13 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
-import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import net.minecraft.client.resources.I18n;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
@@ -88,7 +89,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                 if (entry == null)
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
                     return;
                 }
 
@@ -96,34 +97,35 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                 if (file.exists() == false || file.isFile() == false || file.canRead() == false)
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
                     return;
                 }
 
-                this.gui.setNextMessageType(InfoType.ERROR);
+                this.gui.setNextMessageType(MessageType.ERROR);
                 LitematicaSchematic schematic = null;
+                FileType fileType = FileType.fromFile(entry.getFullPath());
 
-                if (entry.getType() == DirectoryEntryType.LITEMATICA_SCHEMATIC)
+                if (fileType == FileType.LITEMATICA_SCHEMATIC)
                 {
                     schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
                 }
-                else if (entry.getType() == DirectoryEntryType.SCHEMATICA_SCHEMATIC)
+                else if (fileType == FileType.SCHEMATICA_SCHEMATIC)
                 {
                     schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(entry.getDirectory(), entry.getName(), this.gui);
                 }
-                else if (entry.getType() == DirectoryEntryType.VANILLA_STRUCTURE)
+                else if (fileType == FileType.VANILLA_STRUCTURE)
                 {
                     schematic = WorldUtils.convertStructureToLitematicaSchematic(entry.getDirectory(), entry.getName(), this.gui);
                 }
                 else
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.unsupported_type", file.getName());
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", file.getName());
                 }
 
                 if (schematic != null)
                 {
                     SchematicHolder.getInstance().addSchematic(schematic, true);
-                    this.gui.addMessage(InfoType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
+                    this.gui.addMessage(MessageType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
                 }
             }
         }

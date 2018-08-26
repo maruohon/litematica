@@ -9,21 +9,23 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
-import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.litematica.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.litematica.interfaces.IStringConsumer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.util.InfoUtils;
+import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.config.IConfigOptionList;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -66,14 +68,16 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
         if (selected != null)
         {
-            if (selected.getType() == DirectoryEntryType.LITEMATICA_SCHEMATIC)
+            FileType type = FileType.fromFile(selected.getFullPath());
+
+            if (type == FileType.LITEMATICA_SCHEMATIC)
             {
                 x = this.createButton(id++, x, y, ButtonListener.Type.RENAME_SCHEMATIC);
                 x = this.createButton(id++, x, y, ButtonListener.Type.SET_PREVIEW);
                 x = this.createButton(id++, x, y, ButtonListener.Type.EXPORT_SCHEMATIC);
                 x = this.createButton(id++, x, y, ButtonListener.Type.EXPORT_TYPE);
             }
-            else if (selected.getType() == DirectoryEntryType.SCHEMATICA_SCHEMATIC || selected.getType() == DirectoryEntryType.VANILLA_STRUCTURE)
+            else if (type == FileType.SCHEMATICA_SCHEMATIC || type == FileType.VANILLA_STRUCTURE)
             {
                 x = this.createButton(id++, x, y, ButtonListener.Type.IMPORT_SCHEMATIC);
             }
@@ -176,7 +180,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
             if (entry == null)
             {
-                this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
+                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
                 return;
             }
 
@@ -184,24 +188,26 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
             if (file.exists() == false || file.isFile() == false || file.canRead() == false)
             {
-                this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
+                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
                 return;
             }
 
+            FileType fileType = FileType.fromFile(entry.getFullPath());
+
             if (this.type == Type.EXPORT_SCHEMATIC)
             {
-                if (entry.getType() == DirectoryEntryType.LITEMATICA_SCHEMATIC)
+                if (fileType == FileType.LITEMATICA_SCHEMATIC)
                 {
                 }
                 else
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_manager.schematic_export.unsupported_type", file.getName());
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_manager.schematic_export.unsupported_type", file.getName());
                 }
             }
             else if (this.type == Type.IMPORT_SCHEMATIC)
             {
-                if (entry.getType() == DirectoryEntryType.SCHEMATICA_SCHEMATIC ||
-                    entry.getType() == DirectoryEntryType.VANILLA_STRUCTURE)
+                if (fileType == FileType.SCHEMATICA_SCHEMATIC ||
+                    fileType == FileType.VANILLA_STRUCTURE)
                 {
                     GuiSchematicSaveImported gui = new GuiSchematicSaveImported(entry.getType(), entry.getDirectory(), entry.getName());
                     gui.setParent(this.gui);
@@ -209,7 +215,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 }
                 else
                 {
-                    this.gui.addMessage(InfoType.ERROR, "litematica.error.schematic_manager.schematic_import.unsupported_type", file.getName());
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_manager.schematic_import.unsupported_type", file.getName());
                 }
             }
             else if (this.type == Type.RENAME_SCHEMATIC)
@@ -354,7 +360,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
                     schematic.writeToFile(this.dir, this.fileName, true, InfoUtils.INFO_MESSAGE_CONSUMER);
 
-                    InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiLitematicaBase.TXT_GREEN + I18n.format("litematica.info.schematic_manager.preview.success"));
+                    InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiBase.TXT_GREEN + I18n.format("litematica.info.schematic_manager.preview.success"));
                 }
                 catch (Exception e)
                 {
@@ -363,7 +369,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else
             {
-                InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiLitematicaBase.TXT_RED + I18n.format("litematica.error.schematic_rename.read_failed"));
+                InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiBase.TXT_RED + I18n.format("litematica.error.schematic_rename.read_failed"));
             }
         }
     }

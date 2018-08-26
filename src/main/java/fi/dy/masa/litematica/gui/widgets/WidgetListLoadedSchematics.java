@@ -2,16 +2,16 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.gui.interfaces.IMessageConsumer;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
-import fi.dy.masa.litematica.gui.widgets.base.WidgetListBase;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
-public class WidgetLoadedSchematics extends WidgetListBase<LitematicaSchematic, WidgetSchematicEntry>
+public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchematic, WidgetSchematicEntry>
 {
     private final IMessageConsumer messageConsumer;
 
-    public WidgetLoadedSchematics(int x, int y, int width, int height,
+    public WidgetListLoadedSchematics(int x, int y, int width, int height,
             IMessageConsumer messageConsumer, @Nullable ISelectionListener<LitematicaSchematic> selectionListener)
     {
         super(x, y, width, height, selectionListener);

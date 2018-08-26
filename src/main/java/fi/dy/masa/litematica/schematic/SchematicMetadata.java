@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.util.Constants;
-import fi.dy.masa.litematica.util.NBTUtils;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.NBTUtils;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
 

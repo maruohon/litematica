@@ -11,16 +11,10 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.text.TextFormatting;
 
 public class InfoHud
 {
     private static final InfoHud INSTANCE = new InfoHud();
-
-    public static final String GREEN = TextFormatting.GREEN.toString();
-    public static final String WHITE = TextFormatting.WHITE.toString();
-    public static final String WHITE_ITA = TextFormatting.WHITE.toString() + TextFormatting.ITALIC.toString();
-    public static final String RESET = TextFormatting.RESET.toString();
 
     protected final Minecraft mc;
     protected final List<String> lineList = new ArrayList<>();

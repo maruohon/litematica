@@ -5,14 +5,14 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.data.SchematicPlacementManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.base.GuiListBase;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacements;
+import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicPlacements;
+import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import net.minecraft.client.resources.I18n;
 
-public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetSchematicPlacements>  implements ISelectionListener<SchematicPlacement>
+public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetListSchematicPlacements>  implements ISelectionListener<SchematicPlacement>
 {
     private final SchematicPlacementManager manager;
     private int id;
@@ -76,8 +76,8 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
     }
 
     @Override
-    protected WidgetSchematicPlacements createListWidget(int listX, int listY)
+    protected WidgetListSchematicPlacements createListWidget(int listX, int listY)
     {
-        return new WidgetSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+        return new WidgetListSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 }

@@ -10,19 +10,20 @@ import fi.dy.masa.litematica.data.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
-import fi.dy.masa.litematica.gui.base.GuiListBase;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResults;
+import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVerificationResults;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
-public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetSchematicVerificationResults>
+public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetListSchematicVerificationResults>
                                     implements ISelectionListener<BlockMismatchEntry>, ICompletionListener
 {
     private final SchematicPlacement placement;
@@ -248,9 +249,9 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     }
 
     @Override
-    protected WidgetSchematicVerificationResults createListWidget(int listX, int listY)
+    protected WidgetListSchematicVerificationResults createListWidget(int listX, int listY)
     {
-        return new WidgetSchematicVerificationResults(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+        return new WidgetListSchematicVerificationResults(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 
     public static class BlockMismatchEntry
@@ -365,7 +366,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     }
                     else
                     {
-                        this.parent.addMessage(InfoType.ERROR, "litematica.error.generic.schematic_world_not_loaded");
+                        this.parent.addMessage(MessageType.ERROR, "litematica.error.generic.schematic_world_not_loaded");
                     }
                     break;
 

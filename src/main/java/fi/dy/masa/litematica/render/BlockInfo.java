@@ -1,9 +1,9 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
 import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -29,8 +29,8 @@ public class BlockInfo
 
     public BlockInfo(IBlockState state, String titleKey)
     {
-        String pre = GuiLitematicaBase.TXT_WHITE + GuiLitematicaBase.TXT_BOLD;
-        this.title = pre + I18n.format(titleKey) + GuiLitematicaBase.TXT_RST;
+        String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
+        this.title = pre + I18n.format(titleKey) + GuiBase.TXT_RST;
         this.state = state;
         this.stack = ItemUtils.getItemForState(this.state);
 
@@ -66,7 +66,7 @@ public class BlockInfo
         {
             GlStateManager.pushMatrix();
 
-            RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
+            RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
             int x1 = x + 10;
             y += 4;

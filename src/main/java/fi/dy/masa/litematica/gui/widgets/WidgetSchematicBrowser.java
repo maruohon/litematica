@@ -9,11 +9,13 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
-import fi.dy.masa.litematica.gui.interfaces.ISelectionListener;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.malilib.gui.RenderUtils;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -31,7 +33,8 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
     public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
-        super(x, y, width, height, parent.getBrowserContext(), parent.getDefaultDirectory(), selectionListener);
+        super(x, y, width, height, DataManager.getInstance(), parent.getBrowserContext(),
+                parent.getDefaultDirectory(), selectionListener, Icons.DUMMY);
 
         this.title = I18n.format("litematica.gui.title.schematic_browser");
         this.infoWidth = 170;

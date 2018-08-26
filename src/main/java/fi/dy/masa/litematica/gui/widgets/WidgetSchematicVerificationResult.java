@@ -6,15 +6,15 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
-import fi.dy.masa.litematica.gui.base.GuiLitematicaBase;
-import fi.dy.masa.litematica.gui.widgets.base.WidgetBase;
 import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonWrapper;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -59,7 +59,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         {
             this.header1 = entry.header1;
             this.header2 = entry.header2;
-            this.header3 = GuiLitematicaBase.TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.count");
+            this.header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.count");
             this.mismatchInfo = null;
             this.count = 0;
             this.buttonIgnore = null;
@@ -146,16 +146,16 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiLitematicaBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
+            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
         }
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -304,15 +304,15 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             {
                 GlStateManager.pushMatrix();
 
-                RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiLitematicaBase.COLOR_HORIZONTAL_BAR);
+                RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
                 int x1 = x + 10;
                 int x2 = x + this.columnWidthExpected + 30;
                 y += 4;
 
-                String pre = GuiLitematicaBase.TXT_WHITE + GuiLitematicaBase.TXT_BOLD;
-                String strExpected = pre + I18n.format("litematica.gui.label.schematic_verifier.expected") + GuiLitematicaBase.TXT_RST;
-                String strFound =    pre + I18n.format("litematica.gui.label.schematic_verifier.found") + GuiLitematicaBase.TXT_RST;
+                String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
+                String strExpected = pre + I18n.format("litematica.gui.label.schematic_verifier.expected") + GuiBase.TXT_RST;
+                String strFound =    pre + I18n.format("litematica.gui.label.schematic_verifier.found") + GuiBase.TXT_RST;
                 mc.fontRenderer.drawString(strExpected, x1, y, 0xFFFFFFFF);
                 mc.fontRenderer.drawString(strFound,    x2, y, 0xFFFFFFFF);
 
