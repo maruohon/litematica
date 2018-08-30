@@ -27,11 +27,11 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<Placement, Wid
         this.listContents.clear();
         this.listContents.addAll(this.parent.getSchematicPlacement().getAllSubRegionsPlacements());
 
-        this.recreateListWidgets();
+        this.reCreateListEntryWidgets();
     }
 
     @Override
-    protected WidgetPlacementSubRegion createListWidget(int x, int y, boolean isOdd, Placement entry)
+    protected WidgetPlacementSubRegion createListEntryWidget(int x, int y, boolean isOdd, Placement entry)
     {
         return new WidgetPlacementSubRegion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd,
                 this.parent.getSchematicPlacement(), entry, this, this.mc);

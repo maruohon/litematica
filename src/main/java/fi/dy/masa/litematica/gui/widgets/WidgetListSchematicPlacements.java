@@ -28,11 +28,11 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
         this.listContents.clear();
         this.listContents.addAll(DataManager.getInstance().getSchematicPlacementManager().getAllSchematicsPlacements());
 
-        this.recreateListWidgets();
+        this.reCreateListEntryWidgets();
     }
 
     @Override
-    protected WidgetSchematicPlacement createListWidget(int x, int y, boolean isOdd, SchematicPlacement entry)
+    protected WidgetSchematicPlacement createListEntryWidget(int x, int y, boolean isOdd, SchematicPlacement entry)
     {
         return new WidgetSchematicPlacement(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this, this.mc);
     }

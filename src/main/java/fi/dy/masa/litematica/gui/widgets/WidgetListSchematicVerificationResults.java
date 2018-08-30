@@ -62,7 +62,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
             this.addEntriesForType(type);
         }
 
-        this.recreateListWidgets();
+        this.reCreateListEntryWidgets();
     }
 
     private void addEntriesForType(MismatchType type)
@@ -126,7 +126,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
     }
 
     @Override
-    protected WidgetSchematicVerificationResult createListWidget(int x, int y, boolean isOdd, BlockMismatchEntry entry)
+    protected WidgetSchematicVerificationResult createListEntryWidget(int x, int y, boolean isOdd, BlockMismatchEntry entry)
     {
         return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this.guiSchematicVerifier);
     }
