@@ -1,138 +1,90 @@
 package fi.dy.masa.litematica.config;
 
-import javax.annotation.Nullable;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.malilib.config.ConfigType;
-import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.hotkeys.IKeybind;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
-import fi.dy.masa.malilib.util.StringUtils;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.options.ConfigHotkey;
 
-public enum Hotkeys implements IHotkey
+public class Hotkeys
 {
-    ADD_SELECTION_BOX                   ("addSelectionBox",                 "M,A",  "Add a new selection box (position 1) here"),
-    DELETE_SELECTION_BOX                ("deleteSelectionBox",              "M,D",  "Delete the currently selected box"),
-    EXECUTE_OPERATION                   ("executeOperation",                "LCONTROL,LMENU,R",  "Execute the current operation with the current selection or placement\nin the Fill, Replace, Paste Schematic etc. modes"),
-    LAYER_MODE_NEXT                     ("layerModeNext",                   "M,PRIOR", "Cycle the rendering mode (all, layers) forward"),
-    LAYER_MODE_PREVIOUS                 ("layerModePrevious",               "M,NEXT",  "Cycle the rendering mode (all, layers) backwards"),
-    LAYER_NEXT                          ("layerNext",                       "PRIOR", "Move the rendered layer selection up"),
-    LAYER_PREVIOUS                      ("layerPrevious",                   "NEXT",  "Move the rendered layer selection down"),
-    MOVE_ENTIRE_SELECTION               ("moveEntireSelection",             "M,H",  "Move the entire current selection here"),
-    OPEN_GUI_AREA_SETTINGS              ("openGuiAreaSettings",             "M,P",  "Open the Area Settings GUI for the currently selected area"),
-    OPEN_GUI_PLACEMENT_SETTINGS         ("openGuiPlacementSettings",        "SUBTRACT",  "Open the Placement Settings GUI for the currently selected placement or sub-region"),
-    OPEN_GUI_MAIN_MENU                  ("openGuiMainMenu",                 "M,N",  "Open the Litematica main menu"),
-    OPEN_GUI_SCHEMATIC_PLACEMENTS       ("openGuiSchematicPlacements",      "M,P",  "Open the Schematic Placements GUI"),
-    OPEN_GUI_SCHEMATIC_VERIFIER         ("openGuiSchematicVerifier",        "M,K",  "Open the Schematic Verifier GUI for the currently selected schematic placement"),
-    OPEN_GUI_SELECTION_MANAGER          ("openGuiSelectionManager",         "M,S",  "Open the Area Selection manager GUI"),
-    OPEN_GUI_SETTINGS                   ("openGuiSettings",                 "M,C",  "Open the Config GUI"),
-    OPERATION_MODE_CHANGE_MODIFIER      ("operationModeChangeModifier",     "LCONTROL", "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode."),
-    PICK_BLOCK_FIRST                    ("pickBlockFirst",                  "LSHIFT,BUTTON2", false, "A key to pick block the first schematic block ray traced to"),
-    PICK_BLOCK_LAST                     ("pickBlockLast",                   "", false, "A key to pick block the last schematic block ray traced to,\nbefore the first (possible) client world block ray traced to.\nBasically this would get you the block you could place against an existing block."),
-    PICK_BLOCK_TOGGLE                   ("pickBlockToggle",                 "M,BUTTON2", "A hotkey to toggle the pick block toggle option in the Generic configs.\nThis is provided as a quick way to enable or disable\nthe pick block keys, if they interfere with something."),
-    RENDER_INFO_OVERLAY                 ("renderInfoOverlay",               "LMENU", false, "The key that enables rendering the block info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in Visuals to disable the overlay completely."),
-    SAVE_AREA_AS_IN_MEMORY_SCHEMATIC    ("saveAreaAsInMemorySchematic",     "LCONTROL,S",  "Save the current Area Selection as an in-memory Schematic"),
-    SAVE_AREA_AS_SCHEMATIC_TO_FILE      ("saveAreaAsSchematicToFile",       "LCONTROL,LMENU,S",  "Save the current Area Selection as a Schematic to a file"),
-    SELECTION_GRAB_MODIFIER             ("selectionGrabModifier",           "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner."),
-    SELECTION_MODE_CYCLE                ("selectionModeCycle",              "LCONTROL,M", "Change the mode between Corners and Cuboid in the Area Selection mode"),
-    SET_AREA_ORIGIN                     ("setAreaOrigin",                   "M,Z",  "Set/move the origin point of the current selection here"),
-    SET_SELECTION_BOX_POSITION_1        ("setSelectionBoxPosition1",        "M,1",  "Set the first position of the currently selected box to the player's position"),
-    SET_SELECTION_BOX_POSITION_2        ("setSelectionBoxPosition2",        "M,2",  "Set the second position of the currently selected box to the player's position"),
-    TOGGLE_ALL_RENDERING                ("toggleAllRendering",              "M,R",  "Toggle all rendering on/off", "All Rendering"),
-    TOGGLE_GHOST_BLOCK_RENDERING        ("toggleGhostBlockRendering",       "M,G",  "Toggle ghost block rendering on/off", "Ghost Block Rendering"),
-    TOGGLE_MISMATCH_OVERLAY_RENDERING   ("toggleMismatchOverlayRendering",  "M,E",  "Toggle the mismatch overlay rendering (for Schematic Verifier)", "Verifier Mismatch Overlay"),
-    TOGGLE_OVERLAY_RENDERING            ("toggleOverlayRendering",          "M,O",  "Toggle the block overlay rendering on/off", "All Block Overlay Rendering"),
-    TOGGLE_OVERLAY_OUTLINE_RENDERING    ("toggleOverlayOutlineRendering",   "M,B",  "Toggle the block overlay outline rendering on/off", "Block Overlay Outline Rendering"),
-    TOGGLE_OVERLAY_SIDE_RENDERING       ("toggleOverlaySideRendering",      "M,I",  "Toggle the block overlay side rendering on/off", "Block Overlay Sides/Quads Rendering"),
-    TOGGLE_SELECTION_BOXES_RENDERING    ("toggleSelectionBoxesRendering",   "M,X",  "Toggle selection boxes rendering on/off", "Selection Boxes Rendering"),
-    TOGGLE_TRANSLUCENT_RENDERING        ("toggleTranslucentRendering",      "M,U",  "Toggle translucent vs. opaque ghost block rendering", "Translucent Schematic Blocks Rendering"),
-    TOOL_ENABLED_TOGGLE                 ("toolEnabledToggle",               "M,T",  "The keybind to toggle the \"tool\" item functionality on/off"),
-    TOOL_PLACE_CORNER_1                 ("toolPlaceCorner1",                "BUTTON0", false, "The button to use while holding the \"tool\" item\nto place the primary/first corner"),
-    TOOL_PLACE_CORNER_2                 ("toolPlaceCorner2",                "BUTTON1", false, "The button to use while holding the \"tool\" item\nto place the second corner"),
-    TOOL_SELECT_ELEMENTS                ("toolSelectElements",              "BUTTON2", false, "The button to use to select corners or boxes while holding the \"tool\" item");
+    public static final ConfigHotkey ADD_SELECTION_BOX                  = new ConfigHotkey("addSelectionBox",                   "M,A",  "Add a new selection box (position 1) here");
+    public static final ConfigHotkey DELETE_SELECTION_BOX               = new ConfigHotkey("deleteSelectionBox",                "M,D",  "Delete the currently selected box");
+    public static final ConfigHotkey EXECUTE_OPERATION                  = new ConfigHotkey("executeOperation",                  "LCONTROL,LMENU,R",  "Execute the current operation with the current selection or placement\nin the Fill, Replace, Paste Schematic etc. modes");
+    public static final ConfigHotkey LAYER_MODE_NEXT                    = new ConfigHotkey("layerModeNext",                     "M,PRIOR", "Cycle the rendering mode (all, layers) forward");
+    public static final ConfigHotkey LAYER_MODE_PREVIOUS                = new ConfigHotkey("layerModePrevious",                 "M,NEXT",  "Cycle the rendering mode (all, layers) backwards");
+    public static final ConfigHotkey LAYER_NEXT                         = new ConfigHotkey("layerNext",                         "PRIOR", "Move the rendered layer selection up");
+    public static final ConfigHotkey LAYER_PREVIOUS                     = new ConfigHotkey("layerPrevious",                     "NEXT",  "Move the rendered layer selection down");
+    public static final ConfigHotkey MOVE_ENTIRE_SELECTION              = new ConfigHotkey("moveEntireSelection",               "M,H",  "Move the entire current selection here");
+    public static final ConfigHotkey OPEN_GUI_AREA_SETTINGS             = new ConfigHotkey("openGuiAreaSettings",               "M,P",  "Open the Area Settings GUI for the currently selected area");
+    public static final ConfigHotkey OPEN_GUI_PLACEMENT_SETTINGS        = new ConfigHotkey("openGuiPlacementSettings",          "SUBTRACT",  "Open the Placement Settings GUI for the currently selected placement or sub-region");
+    public static final ConfigHotkey OPEN_GUI_MAIN_MENU                 = new ConfigHotkey("openGuiMainMenu",                   "M,N",  "Open the Litematica main menu");
+    public static final ConfigHotkey OPEN_GUI_SCHEMATIC_PLACEMENTS      = new ConfigHotkey("openGuiSchematicPlacements",        "M,P",  "Open the Schematic Placements GUI");
+    public static final ConfigHotkey OPEN_GUI_SCHEMATIC_VERIFIER        = new ConfigHotkey("openGuiSchematicVerifier",          "M,K",  "Open the Schematic Verifier GUI for the currently selected schematic placement");
+    public static final ConfigHotkey OPEN_GUI_SELECTION_MANAGER         = new ConfigHotkey("openGuiSelectionManager",           "M,S",  "Open the Area Selection manager GUI");
+    public static final ConfigHotkey OPEN_GUI_SETTINGS                  = new ConfigHotkey("openGuiSettings",                   "M,C",  "Open the Config GUI");
+    public static final ConfigHotkey OPERATION_MODE_CHANGE_MODIFIER     = new ConfigHotkey("operationModeChangeModifier",       "LCONTROL", "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode.");
+    public static final ConfigHotkey PICK_BLOCK_FIRST                   = new ConfigHotkey("pickBlockFirst",                    "LSHIFT,BUTTON2", false, "A key to pick block the first schematic block ray traced to");
+    public static final ConfigHotkey PICK_BLOCK_LAST                    = new ConfigHotkey("pickBlockLast",                     "", false, "A key to pick block the last schematic block ray traced to,\nbefore the first (possible) client world block ray traced to.\nBasically this would get you the block you could place against an existing block.");
+    public static final ConfigHotkey PICK_BLOCK_TOGGLE                  = new ConfigHotkey("pickBlockToggle",                   "M,BUTTON2", "A hotkey to toggle the pick block toggle option in the Generic configs.\nThis is provided as a quick way to enable or disable\nthe pick block keys, if they interfere with something.");
+    public static final ConfigHotkey RENDER_INFO_OVERLAY                = new ConfigHotkey("renderInfoOverlay",                 "LMENU", false, "The key that enables rendering the block info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in Visuals to disable the overlay completely.");
+    public static final ConfigHotkey SAVE_AREA_AS_IN_MEMORY_SCHEMATIC   = new ConfigHotkey("saveAreaAsInMemorySchematic",       "LCONTROL,S",  "Save the current Area Selection as an in-memory Schematic");
+    public static final ConfigHotkey SAVE_AREA_AS_SCHEMATIC_TO_FILE     = new ConfigHotkey("saveAreaAsSchematicToFile",         "LCONTROL,LMENU,S",  "Save the current Area Selection as a Schematic to a file");
+    public static final ConfigHotkey SELECTION_GRAB_MODIFIER            = new ConfigHotkey("selectionGrabModifier",             "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner.");
+    public static final ConfigHotkey SELECTION_MODE_CYCLE               = new ConfigHotkey("selectionModeCycle",                "LCONTROL,M", "Change the mode between Corners and Cuboid in the Area Selection mode");
+    public static final ConfigHotkey SET_AREA_ORIGIN                    = new ConfigHotkey("setAreaOrigin",                     "M,Z",  "Set/move the origin point of the current selection here");
+    public static final ConfigHotkey SET_SELECTION_BOX_POSITION_1       = new ConfigHotkey("setSelectionBoxPosition1",          "M,1",  "Set the first position of the currently selected box to the player's position");
+    public static final ConfigHotkey SET_SELECTION_BOX_POSITION_2       = new ConfigHotkey("setSelectionBoxPosition2",          "M,2",  "Set the second position of the currently selected box to the player's position");
+    public static final ConfigHotkey TOGGLE_ALL_RENDERING               = new ConfigHotkey("toggleAllRendering",                "M,R",  "Toggle all rendering on/off", "All Rendering");
+    public static final ConfigHotkey TOGGLE_GHOST_BLOCK_RENDERING       = new ConfigHotkey("toggleGhostBlockRendering",         "M,G",  "Toggle ghost block rendering on/off", "Ghost Block Rendering");
+    public static final ConfigHotkey TOGGLE_MISMATCH_OVERLAY_RENDERING  = new ConfigHotkey("toggleMismatchOverlayRendering",    "M,E",  "Toggle the mismatch overlay rendering (for Schematic Verifier)", "Verifier Mismatch Overlay");
+    public static final ConfigHotkey TOGGLE_OVERLAY_RENDERING           = new ConfigHotkey("toggleOverlayRendering",            "M,O",  "Toggle the block overlay rendering on/off", "All Block Overlay Rendering");
+    public static final ConfigHotkey TOGGLE_OVERLAY_OUTLINE_RENDERING   = new ConfigHotkey("toggleOverlayOutlineRendering",     "M,B",  "Toggle the block overlay outline rendering on/off", "Block Overlay Outline Rendering");
+    public static final ConfigHotkey TOGGLE_OVERLAY_SIDE_RENDERING      = new ConfigHotkey("toggleOverlaySideRendering",        "M,I",  "Toggle the block overlay side rendering on/off", "Block Overlay Sides/Quads Rendering");
+    public static final ConfigHotkey TOGGLE_SELECTION_BOXES_RENDERING   = new ConfigHotkey("toggleSelectionBoxesRendering",     "M,X",  "Toggle selection boxes rendering on/off", "Selection Boxes Rendering");
+    public static final ConfigHotkey TOGGLE_TRANSLUCENT_RENDERING       = new ConfigHotkey("toggleTranslucentRendering",        "M,U",  "Toggle translucent vs. opaque ghost block rendering", "Translucent Schematic Blocks Rendering");
+    public static final ConfigHotkey TOOL_ENABLED_TOGGLE                = new ConfigHotkey("toolEnabledToggle",                 "M,T",  "The keybind to toggle the \"tool\" item functionality on/off");
+    public static final ConfigHotkey TOOL_PLACE_CORNER_1                = new ConfigHotkey("toolPlaceCorner1",                  "BUTTON0", false, "The button to use while holding the \"tool\" item\nto place the primary/first corner");
+    public static final ConfigHotkey TOOL_PLACE_CORNER_2                = new ConfigHotkey("toolPlaceCorner2",                  "BUTTON1", false, "The button to use while holding the \"tool\" item\nto place the second corner");
+    public static final ConfigHotkey TOOL_SELECT_ELEMENTS               = new ConfigHotkey("toolSelectElements",                "BUTTON2", false, "The button to use to select corners or boxes while holding the \"tool\" item");
 
-    private final String name;
-    private final String comment;
-    private final String prettyName;
-    private final IKeybind keybind;
-
-    private Hotkeys(String name, String defaultHotkey, String comment)
-    {
-        this(name, defaultHotkey, true, comment);
-    }
-
-    private Hotkeys(String name, String defaultHotkey, boolean isStrict, String comment)
-    {
-        this(name, defaultHotkey, true, comment, null);
-    }
-
-    private Hotkeys(String name, String defaultHotkey, String comment, String prettyName)
-    {
-        this(name, defaultHotkey, true, comment, prettyName);
-    }
-
-    private Hotkeys(String name, String defaultHotkey, boolean isStrict, String comment, @Nullable String prettyName)
-    {
-        this.name = name;
-        this.comment = comment;
-        this.prettyName = prettyName != null ? prettyName : StringUtils.splitCamelCase(name);
-        this.keybind = KeybindMulti.fromStorageString(defaultHotkey);
-        this.keybind.setIsStrict(isStrict);
-    }
-
-    @Override
-    public ConfigType getType()
-    {
-        return ConfigType.HOTKEY;
-    }
-
-    @Override
-    public String getName()
-    {
-        return this.name;
-    }
-
-    @Override
-    public String getComment()
-    {
-        return comment != null ? this.comment : "";
-    }
-
-    public String getPrettyName()
-    {
-        return this.prettyName;
-    }
-
-    @Override
-    public IKeybind getKeybind()
-    {
-        return this.keybind;
-    }
-
-    @Override
-    public JsonElement getAsJsonElement()
-    {
-        return new JsonPrimitive(this.keybind.getStringValue());
-    }
-
-    @Override
-    public void setValueFromJsonElement(JsonElement element)
-    {
-        try
-        {
-            if (element.isJsonPrimitive())
-            {
-                this.keybind.setValueFromString(element.getAsString());
-            }
-            else
-            {
-                LiteModLitematica.logger.warn("Failed to set the keybinds for '{}' from the JSON element '{}'", this.getName(), element);
-            }
-        }
-        catch (Exception e)
-        {
-            LiteModLitematica.logger.warn("Failed to set the keybinds for '{}' from the JSON element '{}'", this.getName(), element, e);
-        }
-    }
+    public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
+            ADD_SELECTION_BOX,
+            DELETE_SELECTION_BOX,
+            EXECUTE_OPERATION,
+            LAYER_MODE_NEXT,
+            LAYER_MODE_PREVIOUS,
+            LAYER_NEXT,
+            LAYER_PREVIOUS,
+            MOVE_ENTIRE_SELECTION,
+            OPEN_GUI_AREA_SETTINGS,
+            OPEN_GUI_PLACEMENT_SETTINGS,
+            OPEN_GUI_MAIN_MENU,
+            OPEN_GUI_SCHEMATIC_PLACEMENTS,
+            OPEN_GUI_SCHEMATIC_VERIFIER,
+            OPEN_GUI_SELECTION_MANAGER,
+            OPEN_GUI_SETTINGS,
+            OPERATION_MODE_CHANGE_MODIFIER,
+            PICK_BLOCK_FIRST,
+            PICK_BLOCK_LAST,
+            PICK_BLOCK_TOGGLE,
+            RENDER_INFO_OVERLAY,
+            SAVE_AREA_AS_IN_MEMORY_SCHEMATIC,
+            SAVE_AREA_AS_SCHEMATIC_TO_FILE,
+            SELECTION_GRAB_MODIFIER,
+            SELECTION_MODE_CYCLE,
+            SET_AREA_ORIGIN,
+            SET_SELECTION_BOX_POSITION_1,
+            SET_SELECTION_BOX_POSITION_2,
+            TOGGLE_ALL_RENDERING,
+            TOGGLE_GHOST_BLOCK_RENDERING,
+            TOGGLE_MISMATCH_OVERLAY_RENDERING,
+            TOGGLE_OVERLAY_RENDERING,
+            TOGGLE_OVERLAY_OUTLINE_RENDERING,
+            TOGGLE_OVERLAY_SIDE_RENDERING,
+            TOGGLE_SELECTION_BOXES_RENDERING,
+            TOGGLE_TRANSLUCENT_RENDERING,
+            TOOL_ENABLED_TOGGLE,
+            TOOL_PLACE_CORNER_1,
+            TOOL_PLACE_CORNER_2,
+            TOOL_SELECT_ELEMENTS
+    );
 }

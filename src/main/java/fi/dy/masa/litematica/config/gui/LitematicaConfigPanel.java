@@ -23,6 +23,6 @@ public class LitematicaConfigPanel extends ConfigPanelBase
         this.addSubPanel(new ConfigPanelSub(modId, "Generic", Configs.Generic.OPTIONS.toArray(new IConfigValue[Configs.Generic.OPTIONS.size()]), this));
         this.addSubPanel(new ConfigPanelSub(modId, "Visuals", Configs.Visuals.OPTIONS.toArray(new IConfigValue[Configs.Visuals.OPTIONS.size()]), this));
         this.addSubPanel(new ConfigPanelSub(modId, "Colors", Configs.Colors.OPTIONS.toArray(new IConfigValue[Configs.Colors.OPTIONS.size()]), this));
-        this.addSubPanel(new ConfigPanelHotkeysBase(modId, "Generic Hotkeys", Hotkeys.values(), this));
+        this.addSubPanel(new ConfigPanelHotkeysBase(modId, "Generic Hotkeys", Hotkeys.HOTKEY_LIST, this));
     }
 }

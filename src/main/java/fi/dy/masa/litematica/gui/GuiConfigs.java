@@ -3,11 +3,13 @@ package fi.dy.masa.litematica.gui;
 import java.util.Collections;
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
 public class GuiConfigs extends GuiConfigsBase
@@ -30,9 +32,11 @@ public class GuiConfigs extends GuiConfigsBase
         this.id = 0;
         int x = 10;
         int y = 26;
+
         x += this.createButton(x, y, 80, ConfigGuiTab.GENERIC) + 4;
         x += this.createButton(x, y, 80, ConfigGuiTab.VISUALS) + 4;
         x += this.createButton(x, y, 80, ConfigGuiTab.COLORS) + 4;
+        x += this.createButton(x, y, 80, ConfigGuiTab.HOTKEYS) + 4;
     }
 
     private int createButton(int x, int y, int width, ConfigGuiTab tab)
@@ -54,7 +58,7 @@ public class GuiConfigs extends GuiConfigsBase
     }
 
     @Override
-    public List<IConfigValue> getConfigs()
+    public List<? extends IConfigValue> getConfigs()
     {
         ConfigGuiTab tab = DataManager.getConfigGuiTab();
 
@@ -69,6 +73,10 @@ public class GuiConfigs extends GuiConfigsBase
         else if (tab == ConfigGuiTab.COLORS)
         {
             return Configs.Colors.OPTIONS;
+        }
+        else if (tab == ConfigGuiTab.HOTKEYS)
+        {
+            return Hotkeys.HOTKEY_LIST;
         }
 
         return Collections.emptyList();
@@ -101,9 +109,10 @@ public class GuiConfigs extends GuiConfigsBase
 
     public enum ConfigGuiTab
     {
-        GENERIC ("litematica.gui.button.config_gui.generic"),
-        VISUALS ("litematica.gui.button.config_gui.visuals"),
-        COLORS  ("litematica.gui.button.config_gui.colors");
+        GENERIC         ("litematica.gui.button.config_gui.generic"),
+        VISUALS         ("litematica.gui.button.config_gui.visuals"),
+        COLORS          ("litematica.gui.button.config_gui.colors"),
+        HOTKEYS         ("litematica.gui.button.config_gui.hotkeys");
 
         private final String translationKey;
 
