@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.render.IStringListProvider;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.util.ItemUtils;
