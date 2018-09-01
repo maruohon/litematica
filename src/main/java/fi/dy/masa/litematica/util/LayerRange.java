@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -98,6 +99,27 @@ public class LayerRange
         }
     }
 
+    public int getCurrentLayerValue(boolean isSecondValue)
+    {
+        switch (this.layerMode)
+        {
+            case SINGLE_LAYER:
+                return this.layerSingle;
+
+            case ALL_ABOVE:
+                return this.layerAbove;
+
+            case ALL_BELOW:
+                return this.layerBelow;
+
+            case LAYER_RANGE:
+                return isSecondValue ? this.layerRangeMax : this.layerRangeMin;
+
+            default:
+                return 0;
+        }
+    }
+
     public int getWorldMinValueForAxis(EnumFacing.Axis axis)
     {
         switch (axis)
@@ -128,7 +150,7 @@ public class LayerRange
     {
         this.layerMode = mode;
 
-        WorldUtils.markSchematicChunksForRenderUpdateBetweenY(0, 255);
+        WorldUtils.markSchematicChunksForRenderUpdateBetweenY(WORLD_VERTICAL_SIZE_MIN, WORLD_VERTICAL_SIZE_MAX);
         String val = TextFormatting.GREEN.toString() + mode.getDisplayName();
         StringUtils.printActionbarMessage("litematica.message.set_layer_mode_to", val);
     }
@@ -137,7 +159,7 @@ public class LayerRange
     {
         this.axis = axis;
 
-        WorldUtils.markSchematicChunksForRenderUpdateBetweenY(0, 255);
+        WorldUtils.markSchematicChunksForRenderUpdateBetweenY(WORLD_VERTICAL_SIZE_MIN, WORLD_VERTICAL_SIZE_MAX);
         String val = TextFormatting.GREEN.toString() + axis.getName();
         StringUtils.printActionbarMessage("litematica.message.set_layer_axis_to", val);
     }
@@ -165,16 +187,74 @@ public class LayerRange
 
     public void setLayerRangeMin(int layer)
     {
+        this.setLayerRangeMin(layer, false);
+    }
+
+    private void setLayerRangeMin(int layer, boolean force)
+    {
         this.markAffectedLayersForRenderUpdate();
         this.layerRangeMin = this.getClampedValue(layer);
+
+        if (force == false)
+        {
+            this.layerRangeMin = MathHelper.clamp(this.layerRangeMin, this.layerRangeMin, this.layerRangeMax);
+        }
+
         this.markAffectedLayersForRenderUpdate();
     }
 
     public void setLayerRangeMax(int layer)
     {
+        this.setLayerRangeMax(layer, false);
+    }
+
+    private void setLayerRangeMax(int layer, boolean force)
+    {
         this.markAffectedLayersForRenderUpdate();
         this.layerRangeMax = this.getClampedValue(layer);
+
+        if (force == false)
+        {
+            this.layerRangeMax = MathHelper.clamp(this.layerRangeMax, this.layerRangeMin, this.layerRangeMax);
+        }
+
         this.markAffectedLayersForRenderUpdate();
+    }
+
+    public void setToPosition(Entity entity)
+    {
+        int pos = 0;
+
+        switch (this.axis)
+        {
+            case X:
+                pos = (int) entity.posX;
+                break;
+            case Y:
+                pos = (int) entity.posY;
+                break;
+            case Z:
+                pos = (int) entity.posZ;
+                break;
+        }
+
+        switch (this.layerMode)
+        {
+            case SINGLE_LAYER:
+                this.setLayerSingle(pos);
+                break;
+            case ALL_ABOVE:
+                this.setLayerAbove(pos);
+                break;
+            case ALL_BELOW:
+                this.setLayerBelow(pos);
+                break;
+            case LAYER_RANGE:
+                this.setLayerRangeMin(pos, true);
+                this.setLayerRangeMax(pos, true);
+                break;
+            default:
+        }
     }
 
     private void markAffectedLayersForRenderUpdate()

@@ -5,7 +5,7 @@ import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import net.minecraft.util.ResourceLocation;
 
-public enum ButtonIcon implements IGuiIcon
+public enum ButtonIcons implements IGuiIcon
 {
     AREA_SELECTION          (102,   0, 14, 14),
     LOADED_SCHEMATICS       (102,  14, 14, 14),
@@ -20,7 +20,7 @@ public enum ButtonIcon implements IGuiIcon
     private final int w;
     private final int h;
 
-    private ButtonIcon(int u, int v, int w, int h)
+    private ButtonIcons(int u, int v, int w, int h)
     {
         this.u = u;
         this.v = v;

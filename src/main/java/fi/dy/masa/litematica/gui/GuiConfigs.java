@@ -33,10 +33,11 @@ public class GuiConfigs extends GuiConfigsBase
         int x = 10;
         int y = 26;
 
-        x += this.createButton(x, y, 80, ConfigGuiTab.GENERIC) + 4;
-        x += this.createButton(x, y, 80, ConfigGuiTab.VISUALS) + 4;
-        x += this.createButton(x, y, 80, ConfigGuiTab.COLORS) + 4;
-        x += this.createButton(x, y, 80, ConfigGuiTab.HOTKEYS) + 4;
+        x += this.createButton(x, y, -1, ConfigGuiTab.GENERIC) + 4;
+        x += this.createButton(x, y, -1, ConfigGuiTab.VISUALS) + 4;
+        x += this.createButton(x, y, -1, ConfigGuiTab.COLORS) + 4;
+        x += this.createButton(x, y, -1, ConfigGuiTab.HOTKEYS) + 4;
+        x += this.createButton(x, y, -1, ConfigGuiTab.RENDER_LAYERS) + 4;
     }
 
     private int createButton(int x, int y, int width, ConfigGuiTab tab)
@@ -45,7 +46,7 @@ public class GuiConfigs extends GuiConfigsBase
         boolean enabled = DataManager.getConfigGuiTab() != tab;
         String label = tab.getDisplayName();
 
-        if (width == -1)
+        if (width < 0)
         {
             width = this.mc.fontRenderer.getStringWidth(label) + 10;
         }
@@ -102,8 +103,16 @@ public class GuiConfigs extends GuiConfigsBase
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             DataManager.setConfigGuiTab(this.tab);
-            this.parent.widget.resetScrollbarPosition();
-            this.parent.initGui();
+
+            if (this.tab != ConfigGuiTab.RENDER_LAYERS)
+            {
+                this.parent.widget.resetScrollbarPosition();
+                this.parent.initGui();
+            }
+            else
+            {
+                Minecraft.getMinecraft().displayGuiScreen(new GuiRenderLayer());
+            }
         }
     }
 
@@ -112,7 +121,8 @@ public class GuiConfigs extends GuiConfigsBase
         GENERIC         ("litematica.gui.button.config_gui.generic"),
         VISUALS         ("litematica.gui.button.config_gui.visuals"),
         COLORS          ("litematica.gui.button.config_gui.colors"),
-        HOTKEYS         ("litematica.gui.button.config_gui.hotkeys");
+        HOTKEYS         ("litematica.gui.button.config_gui.hotkeys"),
+        RENDER_LAYERS   ("litematica.gui.button.config_gui.render_layers");
 
         private final String translationKey;
 

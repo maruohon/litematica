@@ -105,24 +105,24 @@ public class GuiMainMenu extends GuiBase
         public enum ButtonType
         {
             // List loaded Schematics in SchematicHolder
-            SHOW_LOADED             ("litematica.gui.button.change_menu.show_loaded_schematics", ButtonIcon.LOADED_SCHEMATICS),
+            SHOW_LOADED             ("litematica.gui.button.change_menu.show_loaded_schematics", ButtonIcons.LOADED_SCHEMATICS),
             // List Schematics placements
-            SHOW_PLACEMENTS         ("litematica.gui.button.change_menu.show_schematic_placements", ButtonIcon.SCHEMATIC_PLACEMENTS),
+            SHOW_PLACEMENTS         ("litematica.gui.button.change_menu.show_schematic_placements", ButtonIcons.SCHEMATIC_PLACEMENTS),
             // Load Schematics from file to memory
-            SHOW_AREA_SELECTIONS    ("litematica.gui.button.change_menu.show_area_selections", ButtonIcon.AREA_SELECTION),
+            SHOW_AREA_SELECTIONS    ("litematica.gui.button.change_menu.show_area_selections", ButtonIcons.AREA_SELECTION),
             // Load Schematics from file to memory
-            LOAD_SCHEMATICS         ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcon.SCHEMATIC_BROWSER),
+            LOAD_SCHEMATICS         ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcons.SCHEMATIC_BROWSER),
             // Create a new Schematic from an area selection
             CREATE_SCHEMATIC        ("litematica.gui.button.change_menu.create_schematic_from_area", null),
             // Edit Schematics (description or icon), or convert between formats
-            SCHEMATIC_MANAGER       ("litematica.gui.button.change_menu.schematic_manager", ButtonIcon.SCHEMATIC_MANAGER),
+            SCHEMATIC_MANAGER       ("litematica.gui.button.change_menu.schematic_manager", ButtonIcons.SCHEMATIC_MANAGER),
             // Switch to the Litematica main menu
             MAIN_MENU               ("litematica.gui.button.change_menu.to_main_menu", null);
 
             private final String labelKey;
-            private final ButtonIcon icon;
+            private final ButtonIcons icon;
 
-            private ButtonType(String labelKey, ButtonIcon icon)
+            private ButtonType(String labelKey, ButtonIcons icon)
             {
                 this.labelKey = labelKey;
                 this.icon = icon;
@@ -133,7 +133,7 @@ public class GuiMainMenu extends GuiBase
                 return this.labelKey;
             }
 
-            public ButtonIcon getIcon()
+            public ButtonIcons getIcon()
             {
                 return this.icon;
             }

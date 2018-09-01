@@ -58,6 +58,10 @@ litematica.gui.button.config_gui.hotkeys=Hotkeys
 litematica.gui.button.config_gui.render_layers=Render Layers
 litematica.gui.button.config_gui.visuals=Visuals
 
+litematica.gui.button.render_layers_gui.axis=Axis: %s
+litematica.gui.button.render_layers_gui.layers=Layers: %s
+litematica.gui.button.render_layers_gui.set_here=Set Here
+
 litematica.gui.button.schematic_manager.export_as=Export as:
 
 litematica.gui.button.schematic_placements.configure=Configure
@@ -105,6 +109,10 @@ litematica.gui.label.layer_mode.all_above=All above
 litematica.gui.label.layer_mode.all_below=All below
 litematica.gui.label.layer_mode.layer_range=Layer Range
 litematica.gui.label.layer_mode.single_layer=Single Layer
+
+litematica.gui.label.render_layers.layer=Layer
+litematica.gui.label.render_layers.layer_max=Max layer
+litematica.gui.label.render_layers.layer_min=Min layer
 
 litematica.gui.label.schematic_info.author=Author: §f%s§r
 litematica.gui.label.schematic_info.description=Description:

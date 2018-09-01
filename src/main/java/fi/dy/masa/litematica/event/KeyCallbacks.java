@@ -8,9 +8,11 @@ import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager.SelectedBoxRenamer;
 import fi.dy.masa.litematica.gui.GuiConfigs;
+import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiPlacementManager;
+import fi.dy.masa.litematica.gui.GuiRenderLayer;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
@@ -301,7 +303,15 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeybind())
             {
-                this.mc.displayGuiScreen(new GuiConfigs());
+                if (DataManager.getConfigGuiTab() == ConfigGuiTab.RENDER_LAYERS)
+                {
+                    this.mc.displayGuiScreen(new GuiRenderLayer());
+                }
+                else
+                {
+                    this.mc.displayGuiScreen(new GuiConfigs());
+                }
+
                 return true;
             }
             else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && hasTool && toolEnabled)

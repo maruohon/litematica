@@ -13,6 +13,7 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
     DUMMY                   (  0,   0,  0,  0),
     BUTTON_PLUS_MINUS_8     (  0,   0,  8,  8),
     BUTTON_PLUS_MINUS_12    ( 24,   0, 12, 12),
+    BUTTON_PLUS_MINUS_16    (  0, 128, 16, 16),
     FILE_ICON_LITEMATIC     (144,   0, 12, 12),
     FILE_ICON_SCHEMATIC     (144,  12, 12, 12),
     FILE_ICON_VANILLA       (144,  24, 12, 12),
