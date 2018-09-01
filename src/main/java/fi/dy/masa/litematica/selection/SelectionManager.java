@@ -520,6 +520,8 @@ public class SelectionManager
 
     public void clear()
     {
+        this.grabbedElement = null;
+        this.currentSelectionId = null;
         this.selections.clear();
         this.readOnlySelections.clear();
     }

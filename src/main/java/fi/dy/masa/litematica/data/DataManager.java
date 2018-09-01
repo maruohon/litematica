@@ -335,6 +335,9 @@ public class DataManager implements IDirectoryCache
 
     private void loadPerDimensionData()
     {
+        this.selectionManager.clear();
+        this.schematicPlacementManager.clear();
+
         File file = getCurrentStorageFile(false);
         JsonElement element = JsonUtils.parseJsonFile(file);
 
@@ -347,9 +350,6 @@ public class DataManager implements IDirectoryCache
 
     private void fromJson(JsonObject obj)
     {
-        this.selectionManager.clear();
-        this.schematicPlacementManager.clear();
-
         if (JsonUtils.hasObject(obj, "selections"))
         {
             this.selectionManager.loadFromJson(obj.get("selections").getAsJsonObject());
