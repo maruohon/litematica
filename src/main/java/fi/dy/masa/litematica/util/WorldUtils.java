@@ -4,27 +4,35 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InventoryUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
@@ -33,6 +41,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
@@ -318,5 +327,93 @@ public class WorldUtils
         }
 
         return false;
+    }
+
+    public static void deleteSelectionVolumes(Minecraft mc)
+    {
+        if (mc.player != null && mc.player.capabilities.isCreativeMode)
+        {
+            final AreaSelection area = DataManager.getInstance().getSelectionManager().getCurrentSelection();
+
+            if (area != null)
+            {
+                if (mc.isSingleplayer())
+                {
+                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
+
+                    world.addScheduledTask(new Runnable()
+                    {
+                        public void run()
+                        {
+                            Box currentBox = area.getSelectedSubRegionBox();
+                            Collection<Box> boxes;
+
+                            if (currentBox != null)
+                            {
+                                boxes = ImmutableList.of(currentBox);
+                            }
+                            else
+                            {
+                                boxes = area.getAllSubRegionBoxes();
+                            }
+
+                            if (deleteSelectionVolumes(world, boxes))
+                            {
+                                StringUtils.printActionbarMessage("litematica.message.area_cleared");
+                            }
+                            else
+                            {
+                                StringUtils.printActionbarMessage("litematica.message.area_clear_fail");
+                            }
+                        }
+                    });
+
+                    StringUtils.printActionbarMessage("litematica.message.scheduled_task_added");
+                }
+                else
+                {
+                    StringUtils.printActionbarMessage("litematica.message.only_works_in_single_player");
+                }
+            }
+            else
+            {
+                StringUtils.printActionbarMessage("litematica.message.no_area_selected");
+            }
+        }
+    }
+
+    public static boolean deleteSelectionVolumes(World world, Collection<Box> boxes)
+    {
+        IBlockState air = Blocks.AIR.getDefaultState();
+        IBlockState barrier = Blocks.BARRIER.getDefaultState();
+        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+
+        for (Box box : boxes)
+        {
+            BlockPos posMin = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            BlockPos posMax = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+
+            for (int z = posMin.getZ(); z <= posMax.getZ(); ++z)
+            {
+                for (int x = posMin.getX(); x <= posMax.getX(); ++x)
+                {
+                    for (int y = posMax.getY(); y >= posMin.getY(); --y)
+                    {
+                        posMutable.setPos(x, y, z);
+                        TileEntity te = world.getTileEntity(posMutable);
+
+                        if (te instanceof IInventory)
+                        {
+                            ((IInventory) te).clear();
+                            world.setBlockState(posMutable, barrier, 0x12);
+                        }
+
+                        world.setBlockState(posMutable, air, 0x12);
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }

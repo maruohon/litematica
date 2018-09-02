@@ -136,7 +136,11 @@ public class KeyCallbacks
                 }
                 else if (isToolSelect)
                 {
-                    if (mode == OperationMode.AREA_SELECTION)
+                    if (mode.getUsesSchematic())
+                    {
+                        dataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
+                    }
+                    else
                     {
                         SelectionManager sm = dataManager.getSelectionManager();
 
@@ -155,10 +159,6 @@ public class KeyCallbacks
                         {
                             sm.changeSelection(this.mc.world, this.mc.player, maxDistance);
                         }
-                    }
-                    else if (mode.getUsesSchematic())
-                    {
-                        dataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
                     }
 
                     return true;
@@ -319,6 +319,11 @@ public class KeyCallbacks
                 if (mode == OperationMode.PASTE_SCHEMATIC)
                 {
                     dataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
+                    return true;
+                }
+                else if (mode == OperationMode.DELETE)
+                {
+                    WorldUtils.deleteSelectionVolumes(this.mc);
                     return true;
                 }
             }

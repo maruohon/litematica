@@ -55,7 +55,7 @@ public class RayTraceUtils
 
         clearTraceVars();
 
-        if (DataManager.getOperationMode() == OperationMode.AREA_SELECTION && area != null)
+        if (DataManager.getOperationMode().getUsesSchematic() == false && area != null)
         {
             for (Box box : area.getAllSubRegionBoxes())
             {
