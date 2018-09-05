@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
+import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.litematica.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -671,6 +672,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             List<Entity> entitiesOutlined = Lists.<Entity>newArrayList();
             List<Entity> entitiesMultipass = Lists.<Entity>newArrayList();
             BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
+            LayerRange layerRange = DataManager.getRenderLayerRange();
 
             for (RenderChunk renderChunk : this.renderInfos)
             {
@@ -681,6 +683,11 @@ public class RenderGlobalSchematic extends RenderGlobal
                 {
                     for (Entity entityTmp : classinheritancemultimap)
                     {
+                        if (layerRange.isPositionWithinRange((int) entityTmp.posX, (int) entityTmp.posY, (int) entityTmp.posZ) == false)
+                        {
+                            continue;
+                        }
+
                         boolean shouldRender = this.renderManager.shouldRender(entityTmp, camera, renderX, renderY, renderZ) || entityTmp.isRidingOrBeingRiddenBy(this.mc.player);
 
                         if (shouldRender)

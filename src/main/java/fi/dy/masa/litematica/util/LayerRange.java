@@ -357,6 +357,11 @@ public class LayerRange
         }
     }
 
+    public boolean isPositionWithinRange(BlockPos pos)
+    {
+        return this.isPositionWithinRange(pos.getX(), pos.getY(), pos.getZ());
+    }
+
     public boolean isPositionWithinRange(int x, int y, int z)
     {
         switch (this.layerMode)
