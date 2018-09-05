@@ -102,8 +102,8 @@ public class GuiRenderLayer extends GuiBase
             int w1 = GuiBase.getTextWidth(labelMin);
             int w2 = GuiBase.getTextWidth(labelMax);
 
-            this.addLabel(this.id++, x, y     , w1, 20, 0xFFFFFF, labelMax);
-            this.addLabel(this.id++, x, y + 23, w2, 20, 0xFFFFFF, labelMin);
+            this.addLabel(x, y     , w1, 20, 0xFFFFFF, labelMax);
+            this.addLabel(x, y + 23, w2, 20, 0xFFFFFF, labelMin);
 
             x += Math.max(w1, w2) + 10;
             yOffset = 45;
@@ -112,7 +112,7 @@ public class GuiRenderLayer extends GuiBase
         {
             String label = I18n.format("litematica.gui.label.render_layers.layer") + ":";
             int w = GuiBase.getTextWidth(label);
-            this.addLabel(this.id++, x, y, w, 20, 0xFFFFFF, label);
+            this.addLabel(x, y, w, 20, 0xFFFFFF, label);
 
             x += w + 10;
         }

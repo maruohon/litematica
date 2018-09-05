@@ -63,7 +63,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
 
         y += 20;
         String label = I18n.format("litematica.gui.label.schematic_placement.sub_regions");
-        this.addLabel(this.id++, x, y, -1, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y, -1, 20, 0xFFFFFFFF, label);
 
         width = 120;
         x = this.width - width - 10;
@@ -71,7 +71,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
         y += 32;
 
         label = I18n.format("litematica.gui.label.placement_settings.placement_origin");
-        this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
@@ -111,7 +111,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
     private void createCoordinateInput(int x, int y, int width, CoordinateType type)
     {
         String label = type.name() + ":";
-        this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
         int offset = this.mc.fontRenderer.getStringWidth(label) + 4;
 
         BlockPos pos = this.placement.getOrigin();

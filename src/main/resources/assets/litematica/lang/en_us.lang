@@ -124,6 +124,9 @@ litematica.gui.label.schematic_info.time_modified=Modified: §f%s§r
 litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
+litematica.gui.label.schematic_load.checkbox.create_placement=Create a placement
+litematica.gui.label.schematic_load.hoverinfo.create_placement=Immediately create a new placement and select that new placement
+
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.in_memory=IN-MEMORY ONLY
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:

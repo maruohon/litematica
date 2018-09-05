@@ -23,7 +23,9 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
     FILE_ICON_DIR_ROOT      (156,  24, 12, 12),
     SCHEMATIC_TYPE_FILE     (144,   0, 12, 12),
     SCHEMATIC_TYPE_MEMORY   (186,   0, 12, 12),
-    NOTICE_EXCLAMATION_11   (168,  29, 11, 11);
+    NOTICE_EXCLAMATION_11   (168,  29, 11, 11),
+    CHECKBOX_UNSELECTED     (198,   0, 11, 11),
+    CHECKBOX_SELECTED       (198,  11, 11, 11);
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 

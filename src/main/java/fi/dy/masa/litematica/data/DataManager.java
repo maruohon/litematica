@@ -46,6 +46,8 @@ public class DataManager implements IDirectoryCache
     private static boolean renderMismatches = true;
     private static boolean renderSchematics = true;
     private static boolean renderSelections = true;
+    private static boolean createPlacementOnLoad = true;
+
     private static boolean canSave;
 
     @Nullable
@@ -172,6 +174,11 @@ public class DataManager implements IDirectoryCache
         return renderSelections;
     }
 
+    public static boolean getCreatePlacementOnLoad()
+    {
+        return createPlacementOnLoad;
+    }
+
     public static OperationMode getOperationMode()
     {
         return operationMode;
@@ -195,6 +202,11 @@ public class DataManager implements IDirectoryCache
     public static LayerRange getRenderLayerRange()
     {
         return renderRange;
+    }
+
+    public static void setCreatePlacementOnLoad(boolean create)
+    {
+        createPlacementOnLoad = create;
     }
 
     @Override
@@ -281,6 +293,7 @@ public class DataManager implements IDirectoryCache
             renderMismatches = JsonUtils.getBoolean(root, "render_mismatched");
             renderSchematics = JsonUtils.getBoolean(root, "render_schematic");
             renderSelections = JsonUtils.getBoolean(root, "render_selections");
+            createPlacementOnLoad = JsonUtils.getBoolean(root, "create_placement_on_load");
         }
 
         canSave = true;
@@ -314,6 +327,7 @@ public class DataManager implements IDirectoryCache
         root.add("render_mismatched", new JsonPrimitive(renderMismatches));
         root.add("render_schematic", new JsonPrimitive(renderSchematics));
         root.add("render_selections", new JsonPrimitive(renderSelections));
+        root.add("create_placement_on_load", new JsonPrimitive(createPlacementOnLoad));
 
         root.add("operation_mode", new JsonPrimitive(operationMode.name()));
         root.add("config_gui_tab", new JsonPrimitive(configGuiTab.name()));

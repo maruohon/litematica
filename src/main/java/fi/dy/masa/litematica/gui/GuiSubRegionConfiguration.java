@@ -39,13 +39,13 @@ public class GuiSubRegionConfiguration extends GuiBase
         int y = 22;
 
         String label = I18n.format("litematica.gui.placement_sub_region.label.region_name", this.placement.getName());
-        this.addLabel(this.id++, 20, y, -1, 16, 0xFFFFFFFF, label);
+        this.addLabel(20, y, -1, 16, 0xFFFFFFFF, label);
 
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
         y += 32;
 
         label = I18n.format("litematica.gui.placement_sub_region.label.region_position");
-        this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
@@ -92,7 +92,7 @@ public class GuiSubRegionConfiguration extends GuiBase
     private void createCoordinateInput(int x, int y, int width, CoordinateType type)
     {
         String label = type.name() + ":";
-        this.addLabel(this.id++, x, y, width, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
         int offset = this.mc.fontRenderer.getStringWidth(label) + 4;
 
         // The sub-region placements are relative
