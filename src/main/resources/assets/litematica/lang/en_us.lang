@@ -134,6 +134,7 @@ litematica.gui.label.schematic_placement.schematic_file=File: %s
 litematica.gui.label.schematic_placement.schematic_name=Schematic: %s
 litematica.gui.label.schematic_placement.sub_regions=Sub-regions:
 
+litematica.gui.label.schematic_save.checkbox.ignore_entities=Ignore entities
 litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite=Hold shift to overwrite an existing file
 
 litematica.gui.label.schematic_verifier.count=Count

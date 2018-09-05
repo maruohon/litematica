@@ -103,12 +103,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
                     return;
                 }
 
-                boolean takeEntities = true; // TODO
+                boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
                 LitematicaSchematic schematic = this.gui.schematic;
 
                 if (schematic == null)
                 {
-                    schematic = this.createSchematicFromWorld(takeEntities);
+                    schematic = this.createSchematicFromWorld(ignoreEntities);
                 }
                 else
                 {
@@ -143,7 +143,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
         }
 
         @Nullable
-        private LitematicaSchematic createSchematicFromWorld(boolean takeEntities)
+        private LitematicaSchematic createSchematicFromWorld(boolean ignoreEntities)
         {
             AreaSelection area = this.selectionManager.getCurrentSelection();
 
@@ -154,7 +154,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
 
                 if (world != null)
                 {
-                    return LitematicaSchematic.createFromWorld(world, area, takeEntities, author, this.gui);
+                    return LitematicaSchematic.createFromWorld(world, area, ignoreEntities, author, this.gui);
                 }
             }
 

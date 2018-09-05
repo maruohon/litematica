@@ -14,6 +14,7 @@ import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryNavigator;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
@@ -27,11 +28,12 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     protected final GuiTextField textField;
     @Nullable
     protected final LitematicaSchematic schematic;
+    protected WidgetCheckBox checkboxIgnoreEntities;
     protected String defaultText = "";
 
     public GuiSchematicSaveBase(@Nullable LitematicaSchematic schematic)
     {
-        super(10, 60);
+        super(10, 70);
 
         this.schematic = schematic;
 
@@ -66,6 +68,10 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         int x = this.textField.x + this.textField.getWidth() + 12;
         int y = 32;
+
+        String str = I18n.format("litematica.gui.label.schematic_save.checkbox.ignore_entities");
+        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, str, this.mc);
+        this.addWidget(this.checkboxIgnoreEntities);
 
         x = this.createButton(1, x, y, ButtonType.SAVE);
         x = this.createButton(2, x, y, ButtonType.CREATE_DIRECTORY);

@@ -139,7 +139,7 @@ public class LitematicaSchematic
     }
 
     @Nullable
-    public static LitematicaSchematic createFromWorld(World world, AreaSelection area, boolean takeEntities, String author, IStringConsumer feedback)
+    public static LitematicaSchematic createFromWorld(World world, AreaSelection area, boolean ignoreEntities, String author, IStringConsumer feedback)
     {
         List<Box> boxes = PositionUtils.getValidBoxes(area);
 
@@ -159,7 +159,7 @@ public class LitematicaSchematic
 
         schematic.takeBlocksFromWorld(world, boxes, area.getOrigin());
 
-        if (takeEntities)
+        if (ignoreEntities == false)
         {
             schematic.takeEntitiesFromWorld(world, boxes, area.getOrigin());
         }

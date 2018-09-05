@@ -127,11 +127,11 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                 }
                 else if (fileType == FileType.SCHEMATICA_SCHEMATIC)
                 {
-                    schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(entry.getDirectory(), entry.getName(), this.gui);
+                    schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
                 }
                 else if (fileType == FileType.VANILLA_STRUCTURE)
                 {
-                    schematic = WorldUtils.convertStructureToLitematicaSchematic(entry.getDirectory(), entry.getName(), this.gui);
+                    schematic = WorldUtils.convertStructureToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
                 }
                 else
                 {

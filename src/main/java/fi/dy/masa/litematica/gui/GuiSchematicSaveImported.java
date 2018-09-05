@@ -84,11 +84,12 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
                     File inDir = this.gui.dirSource;
                     String inFile = this.gui.inputFileName;
                     boolean override = GuiScreen.isShiftKeyDown();
+                    boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
                     FileType fileType = FileType.fromFile(new File(inDir, inFile));
 
                     if (fileType == FileType.SCHEMATICA_SCHEMATIC)
                     {
-                        if (WorldUtils.convertSchematicaSchematicToLitematicaSchematic(inDir, inFile, dir, fileName, override, this.gui))
+                        if (WorldUtils.convertSchematicaSchematicToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
                         {
                             this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                             this.gui.widget.refreshEntries();
@@ -98,7 +99,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
                     }
                     else if (fileType == FileType.VANILLA_STRUCTURE)
                     {
-                        if (WorldUtils.convertStructureToLitematicaSchematic(inDir, inFile, dir, fileName, override, this.gui))
+                        if (WorldUtils.convertStructureToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
                         {
                             this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                             this.gui.widget.refreshEntries();

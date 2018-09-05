@@ -51,14 +51,15 @@ import net.minecraft.world.gen.structure.template.Template;
 public class WorldUtils
 {
     public static boolean convertSchematicaSchematicToLitematicaSchematic(
-            File inputDir, String inputFileName, File outputDir, String outputFileName, boolean override, IStringConsumer feedback)
+            File inputDir, String inputFileName, File outputDir, String outputFileName, boolean ignoreEntities, boolean override, IStringConsumer feedback)
     {
-        LitematicaSchematic litematicaSchematic = convertSchematicaSchematicToLitematicaSchematic(inputDir, inputFileName, feedback);
+        LitematicaSchematic litematicaSchematic = convertSchematicaSchematicToLitematicaSchematic(inputDir, inputFileName, ignoreEntities, feedback);
         return litematicaSchematic != null && litematicaSchematic.writeToFile(outputDir, outputFileName, override, feedback);
     }
 
     @Nullable
-    public static LitematicaSchematic convertSchematicaSchematicToLitematicaSchematic(File inputDir, String inputFileName, IStringConsumer feedback)
+    public static LitematicaSchematic convertSchematicaSchematicToLitematicaSchematic(File inputDir, String inputFileName,
+            boolean ignoreEntities, IStringConsumer feedback)
     {
         SchematicaSchematic schematic = SchematicaSchematic.createFromFile(new File(inputDir, inputFileName));
 
@@ -69,11 +70,11 @@ public class WorldUtils
         }
 
         WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
-        WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.PEACEFUL, Minecraft.getMinecraft().mcProfiler);
+        WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().mcProfiler);
 
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, schematic.getSize());
         PlacementSettings placementSettings = new PlacementSettings();
-        placementSettings.setIgnoreEntities(true);
+        placementSettings.setIgnoreEntities(ignoreEntities);
         schematic.placeSchematicDirectlyToChunks(world, BlockPos.ORIGIN, placementSettings);
 
         String subRegionName = FileUtils.getNameWithoutExtension(inputFileName) + " (Converted Schematic)";
@@ -85,7 +86,7 @@ public class WorldUtils
 
         LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);
 
-        if (litematicaSchematic != null)
+        if (litematicaSchematic != null && ignoreEntities == false)
         {
             litematicaSchematic.takeEntityDataFromSchematicaSchematic(schematic, subRegionName);
         }
@@ -97,15 +98,16 @@ public class WorldUtils
         return litematicaSchematic;
     }
 
-    public static boolean convertStructureToLitematicaSchematic(
-            File structureDir, String structureFileName, File outputDir, String outputFileName, boolean override, IStringConsumer feedback)
+    public static boolean convertStructureToLitematicaSchematic(File structureDir, String structureFileName,
+            File outputDir, String outputFileName, boolean ignoreEntities, boolean override, IStringConsumer feedback)
     {
-        LitematicaSchematic litematicaSchematic = convertStructureToLitematicaSchematic(structureDir, structureFileName, feedback);
+        LitematicaSchematic litematicaSchematic = convertStructureToLitematicaSchematic(structureDir, structureFileName, ignoreEntities, feedback);
         return litematicaSchematic != null && litematicaSchematic.writeToFile(outputDir, outputFileName, override, feedback);
     }
 
     @Nullable
-    public static LitematicaSchematic convertStructureToLitematicaSchematic(File structureDir, String structureFileName, IStringConsumer feedback)
+    public static LitematicaSchematic convertStructureToLitematicaSchematic(File structureDir, String structureFileName,
+            boolean ignoreEntities, IStringConsumer feedback)
     {
         DataFixer fixer = Minecraft.getMinecraft().getDataFixer();
         File file = new File(structureDir, structureFileName);
@@ -117,12 +119,12 @@ public class WorldUtils
             is.close();
 
             WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
-            WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.PEACEFUL, Minecraft.getMinecraft().mcProfiler);
+            WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().mcProfiler);
 
             loadChunksClientWorld(world, BlockPos.ORIGIN, template.getSize());
 
             PlacementSettings placementSettings = new PlacementSettings();
-            placementSettings.setIgnoreEntities(true);
+            placementSettings.setIgnoreEntities(ignoreEntities);
             template.addBlocksToWorld(world, BlockPos.ORIGIN, null, placementSettings, 0x12);
 
             String subRegionName = FileUtils.getNameWithoutExtension(structureFileName) + " (Converted Structure)";
@@ -132,7 +134,7 @@ public class WorldUtils
             area.setSelectedSubRegionBox(subRegionName);
             area.getSelectedSubRegionBox().setPos2(template.getSize().add(-1, -1, -1));
 
-            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);
+            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, ignoreEntities, template.getAuthor(), feedback);
 
             if (litematicaSchematic != null)
             {
