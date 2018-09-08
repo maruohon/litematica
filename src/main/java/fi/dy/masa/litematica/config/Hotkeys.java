@@ -15,10 +15,10 @@ public class Hotkeys
     public static final ConfigHotkey LAYER_NEXT                         = new ConfigHotkey("layerNext",                         "PRIOR", "Move the rendered layer selection up");
     public static final ConfigHotkey LAYER_PREVIOUS                     = new ConfigHotkey("layerPrevious",                     "NEXT",  "Move the rendered layer selection down");
     public static final ConfigHotkey MOVE_ENTIRE_SELECTION              = new ConfigHotkey("moveEntireSelection",               "M,H",  "Move the entire current selection here");
-    public static final ConfigHotkey OPEN_GUI_AREA_SETTINGS             = new ConfigHotkey("openGuiAreaSettings",               "M,Y",  "Open the Area Settings GUI for the currently selected area");
-    public static final ConfigHotkey OPEN_GUI_PLACEMENT_SETTINGS        = new ConfigHotkey("openGuiPlacementSettings",          "SUBTRACT",  "Open the Placement Settings GUI for the currently selected placement or sub-region");
-    public static final ConfigHotkey OPEN_GUI_MAIN_MENU                 = new ConfigHotkey("openGuiMainMenu",                   "M,N",  "Open the Litematica main menu");
-    public static final ConfigHotkey OPEN_GUI_SCHEMATIC_PLACEMENTS      = new ConfigHotkey("openGuiSchematicPlacements",        "M,P",  "Open the Schematic Placements GUI");
+    public static final ConfigHotkey OPEN_GUI_AREA_SETTINGS             = new ConfigHotkey("openGuiAreaSettings",               "SUBTRACT",  KeybindSettings.EXCLUSIVE, "Open the Area Settings GUI for the currently selected area");
+    public static final ConfigHotkey OPEN_GUI_PLACEMENT_SETTINGS        = new ConfigHotkey("openGuiPlacementSettings",          "SUBTRACT",  KeybindSettings.EXCLUSIVE, "Open the Placement Settings GUI for the currently selected placement or sub-region");
+    public static final ConfigHotkey OPEN_GUI_MAIN_MENU                 = new ConfigHotkey("openGuiMainMenu",                   "M",    KeybindSettings.RELEASE_EXCLUSIVE, "Open the Litematica main menu");
+    public static final ConfigHotkey OPEN_GUI_SCHEMATIC_PLACEMENTS      = new ConfigHotkey("openGuiSchematicPlacements",        "M,P",  KeybindSettings.EXCLUSIVE, "Open the Schematic Placements GUI");
     public static final ConfigHotkey OPEN_GUI_SCHEMATIC_VERIFIER        = new ConfigHotkey("openGuiSchematicVerifier",          "M,V",  "Open the Schematic Verifier GUI for the currently selected schematic placement");
     public static final ConfigHotkey OPEN_GUI_SELECTION_MANAGER         = new ConfigHotkey("openGuiSelectionManager",           "M,S",  "Open the Area Selection manager GUI");
     public static final ConfigHotkey OPEN_GUI_SETTINGS                  = new ConfigHotkey("openGuiSettings",                   "M,C",  "Open the Config GUI");
