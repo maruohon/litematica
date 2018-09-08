@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.config;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 
 public class Hotkeys
 {
@@ -14,18 +15,18 @@ public class Hotkeys
     public static final ConfigHotkey LAYER_NEXT                         = new ConfigHotkey("layerNext",                         "PRIOR", "Move the rendered layer selection up");
     public static final ConfigHotkey LAYER_PREVIOUS                     = new ConfigHotkey("layerPrevious",                     "NEXT",  "Move the rendered layer selection down");
     public static final ConfigHotkey MOVE_ENTIRE_SELECTION              = new ConfigHotkey("moveEntireSelection",               "M,H",  "Move the entire current selection here");
-    public static final ConfigHotkey OPEN_GUI_AREA_SETTINGS             = new ConfigHotkey("openGuiAreaSettings",               "M,P",  "Open the Area Settings GUI for the currently selected area");
+    public static final ConfigHotkey OPEN_GUI_AREA_SETTINGS             = new ConfigHotkey("openGuiAreaSettings",               "M,Y",  "Open the Area Settings GUI for the currently selected area");
     public static final ConfigHotkey OPEN_GUI_PLACEMENT_SETTINGS        = new ConfigHotkey("openGuiPlacementSettings",          "SUBTRACT",  "Open the Placement Settings GUI for the currently selected placement or sub-region");
     public static final ConfigHotkey OPEN_GUI_MAIN_MENU                 = new ConfigHotkey("openGuiMainMenu",                   "M,N",  "Open the Litematica main menu");
     public static final ConfigHotkey OPEN_GUI_SCHEMATIC_PLACEMENTS      = new ConfigHotkey("openGuiSchematicPlacements",        "M,P",  "Open the Schematic Placements GUI");
-    public static final ConfigHotkey OPEN_GUI_SCHEMATIC_VERIFIER        = new ConfigHotkey("openGuiSchematicVerifier",          "M,K",  "Open the Schematic Verifier GUI for the currently selected schematic placement");
+    public static final ConfigHotkey OPEN_GUI_SCHEMATIC_VERIFIER        = new ConfigHotkey("openGuiSchematicVerifier",          "M,V",  "Open the Schematic Verifier GUI for the currently selected schematic placement");
     public static final ConfigHotkey OPEN_GUI_SELECTION_MANAGER         = new ConfigHotkey("openGuiSelectionManager",           "M,S",  "Open the Area Selection manager GUI");
     public static final ConfigHotkey OPEN_GUI_SETTINGS                  = new ConfigHotkey("openGuiSettings",                   "M,C",  "Open the Config GUI");
-    public static final ConfigHotkey OPERATION_MODE_CHANGE_MODIFIER     = new ConfigHotkey("operationModeChangeModifier",       "LCONTROL", "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode.");
-    public static final ConfigHotkey PICK_BLOCK_FIRST                   = new ConfigHotkey("pickBlockFirst",                    "LSHIFT,BUTTON2", false, "A key to pick block the first schematic block ray traced to");
-    public static final ConfigHotkey PICK_BLOCK_LAST                    = new ConfigHotkey("pickBlockLast",                     "", false, "A key to pick block the last schematic block ray traced to,\nbefore the first (possible) client world block ray traced to.\nBasically this would get you the block you could place against an existing block.");
+    public static final ConfigHotkey OPERATION_MODE_CHANGE_MODIFIER     = new ConfigHotkey("operationModeChangeModifier",       "LCONTROL", KeybindSettings.PRESS_ALLOWEXTRA, "The modifier key to quickly change the operation mode.\nHold this and scroll while holding the \"tool item\" to quickly cycle the mode.");
+    public static final ConfigHotkey PICK_BLOCK_FIRST                   = new ConfigHotkey("pickBlockFirst",                    "LSHIFT,BUTTON2", KeybindSettings.PRESS_ALLOWEXTRA, "A key to pick block the first schematic block ray traced to");
+    public static final ConfigHotkey PICK_BLOCK_LAST                    = new ConfigHotkey("pickBlockLast",                     "BUTTON1", KeybindSettings.NOCANCEL, "A key to pick block the last schematic block ray traced to,\nbefore the first (possible) client world block ray traced to.\nBasically this would get you the block you could place against an existing block.");
     public static final ConfigHotkey PICK_BLOCK_TOGGLE                  = new ConfigHotkey("pickBlockToggle",                   "M,BUTTON2", "A hotkey to toggle the pick block toggle option in the Generic configs.\nThis is provided as a quick way to enable or disable\nthe pick block keys, if they interfere with something.");
-    public static final ConfigHotkey RENDER_INFO_OVERLAY                = new ConfigHotkey("renderInfoOverlay",                 "LMENU", false, "The key that enables rendering the block info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in Visuals to disable the overlay completely.");
+    public static final ConfigHotkey RENDER_INFO_OVERLAY                = new ConfigHotkey("renderInfoOverlay",                 "LMENU", KeybindSettings.PRESS_ALLOWEXTRA, "The key that enables rendering the block info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in Visuals to disable the overlay completely.");
     public static final ConfigHotkey SAVE_AREA_AS_IN_MEMORY_SCHEMATIC   = new ConfigHotkey("saveAreaAsInMemorySchematic",       "LCONTROL,S",  "Save the current Area Selection as an in-memory Schematic");
     public static final ConfigHotkey SAVE_AREA_AS_SCHEMATIC_TO_FILE     = new ConfigHotkey("saveAreaAsSchematicToFile",         "LCONTROL,LMENU,S",  "Save the current Area Selection as a Schematic to a file");
     public static final ConfigHotkey SELECTION_GRAB_MODIFIER            = new ConfigHotkey("selectionGrabModifier",             "LMENU", "The modifier key to be held while clicking\npick block to \"grab\" a selection box or corner.");
@@ -42,9 +43,9 @@ public class Hotkeys
     public static final ConfigHotkey TOGGLE_SELECTION_BOXES_RENDERING   = new ConfigHotkey("toggleSelectionBoxesRendering",     "M,X",  "Toggle selection boxes rendering on/off", "Selection Boxes Rendering");
     public static final ConfigHotkey TOGGLE_TRANSLUCENT_RENDERING       = new ConfigHotkey("toggleTranslucentRendering",        "M,U",  "Toggle translucent vs. opaque ghost block rendering", "Translucent Schematic Blocks Rendering");
     public static final ConfigHotkey TOOL_ENABLED_TOGGLE                = new ConfigHotkey("toolEnabledToggle",                 "M,T",  "The keybind to toggle the \"tool\" item functionality on/off");
-    public static final ConfigHotkey TOOL_PLACE_CORNER_1                = new ConfigHotkey("toolPlaceCorner1",                  "BUTTON0", false, "The button to use while holding the \"tool\" item\nto place the primary/first corner");
-    public static final ConfigHotkey TOOL_PLACE_CORNER_2                = new ConfigHotkey("toolPlaceCorner2",                  "BUTTON1", false, "The button to use while holding the \"tool\" item\nto place the second corner");
-    public static final ConfigHotkey TOOL_SELECT_ELEMENTS               = new ConfigHotkey("toolSelectElements",                "BUTTON2", false, "The button to use to select corners or boxes while holding the \"tool\" item");
+    public static final ConfigHotkey TOOL_PLACE_CORNER_1                = new ConfigHotkey("toolPlaceCorner1",                  "BUTTON0", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use while holding the \"tool\" item\nto place the primary/first corner");
+    public static final ConfigHotkey TOOL_PLACE_CORNER_2                = new ConfigHotkey("toolPlaceCorner2",                  "BUTTON1", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use while holding the \"tool\" item\nto place the second corner");
+    public static final ConfigHotkey TOOL_SELECT_ELEMENTS               = new ConfigHotkey("toolSelectElements",                "BUTTON2", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use to select corners or boxes while holding the \"tool\" item");
 
     public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
             ADD_SELECTION_BOX,
