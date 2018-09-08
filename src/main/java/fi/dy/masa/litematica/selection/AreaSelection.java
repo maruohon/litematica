@@ -12,9 +12,9 @@ import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.util.math.BlockPos;
 
 public class AreaSelection

@@ -8,7 +8,6 @@ import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.AreaSelectionMode;
-import fi.dy.masa.litematica.util.JsonUtils;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.config.IConfigHandler;
@@ -19,6 +18,7 @@ import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
+import fi.dy.masa.malilib.util.JsonUtils;
 
 public class Configs implements IConfigHandler
 {
