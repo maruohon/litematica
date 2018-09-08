@@ -12,7 +12,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import net.minecraft.client.resources.I18n;
 
-public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetListSchematicPlacements>  implements ISelectionListener<SchematicPlacement>
+public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetListSchematicPlacements> implements ISelectionListener<SchematicPlacement>
 {
     private final SchematicPlacementManager manager;
     private int id;
@@ -66,7 +66,7 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
     @Override
     public void onSelectionChange(@Nullable SchematicPlacement entry)
     {
-        this.manager.setSelectedSchematicPlacement(entry);
+        this.manager.setSelectedSchematicPlacement(entry != this.manager.getSelectedSchematicPlacement() ? entry : null);
     }
 
     @Override

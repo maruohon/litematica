@@ -129,6 +129,7 @@ litematica.gui.label.schematic_load.hoverinfo.create_placement=Immediately creat
 
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.in_memory=IN-MEMORY ONLY
+litematica.gui.label.schematic_placement.origin=Origin: %s
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:
 litematica.gui.label.schematic_placement.schematic_file=File: %s
 litematica.gui.label.schematic_placement.schematic_name=Schematic: %s

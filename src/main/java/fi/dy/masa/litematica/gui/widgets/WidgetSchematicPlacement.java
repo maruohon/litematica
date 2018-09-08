@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
 public class WidgetSchematicPlacement extends WidgetBase
@@ -180,6 +181,9 @@ public class WidgetSchematicPlacement extends WidgetBase
         List<String> text = new ArrayList<>();
         text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
         text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
+        BlockPos o = this.placement.getOrigin();
+        String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
+        text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
 
         int offset = 12 + 11 + 2; // this.x + modified icon + gap to buttons
 
