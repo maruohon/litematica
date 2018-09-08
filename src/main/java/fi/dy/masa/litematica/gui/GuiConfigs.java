@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.util.Collections;
 import java.util.List;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -18,7 +19,7 @@ public class GuiConfigs extends GuiConfigsBase
 
     public GuiConfigs()
     {
-        super(10, 50, null);
+        super(10, 50, Reference.MOD_ID, null);
 
         this.title = I18n.format("litematica.gui.title.configs");
     }

@@ -122,7 +122,7 @@ public class Configs implements IConfigHandler
                 ConfigUtils.readConfigBase(root, "Generic", Generic.OPTIONS);
                 ConfigUtils.readConfigBase(root, "Visuals", Visuals.OPTIONS);
                 ConfigUtils.readConfigBase(root, "Colors", Colors.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
+                ConfigUtils.readHotkeys(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
             }
         }
 
@@ -140,7 +140,7 @@ public class Configs implements IConfigHandler
             ConfigUtils.writeConfigBase(root, "Generic", Generic.OPTIONS);
             ConfigUtils.writeConfigBase(root, "Visuals", Visuals.OPTIONS);
             ConfigUtils.writeConfigBase(root, "Colors", Colors.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
+            ConfigUtils.writeHotkeys(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
 
             JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
         }
