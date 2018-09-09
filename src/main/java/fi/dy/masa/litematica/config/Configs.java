@@ -26,6 +26,7 @@ public class Configs implements IConfigHandler
 
     public static class Generic
     {
+        public static final ConfigBoolean       CHANGE_SELECTED_CORNER  = new ConfigBoolean(    "changeSelectedCornerOnMove", true, "If true, then the selected corner of an area selection is always set to the last moved corner, when using the set corner hotkeys");
         public static final ConfigBoolean       FIX_RAIL_ROTATION       = new ConfigBoolean(    "fixRailRotation", true, "If true, then a fix is applied for the vanilla bug in rails, where the 180 degree rotations of straight north-south and east-west rails are counterclockwise 90 instead >_>");
         public static final ConfigBoolean       LOAD_ENTIRE_SCHEMATICS  = new ConfigBoolean(    "loadEntireSchematics", true, "If true, then the entire schematic is always loaded at once.\nIf false, then only the part that is within the client's view distance is loaded.");
         public static final ConfigBoolean       PICK_BLOCK_ENABLED      = new ConfigBoolean(    "pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
@@ -36,6 +37,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       VERBOSE_LOGGING         = new ConfigBoolean(    "verboseLogging", false, "If enabled, a bunch of debug messages will be printed to the console");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                CHANGE_SELECTED_CORNER,
                 FIX_RAIL_ROTATION,
                 LOAD_ENTIRE_SCHEMATICS,
                 PICK_BLOCK_ENABLED,

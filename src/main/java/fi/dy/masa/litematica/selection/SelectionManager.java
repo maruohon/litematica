@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
@@ -373,6 +374,11 @@ public class SelectionManager
                     {
                         sel.getSelectedSubRegionBox().setPos2(pos);
                         cornerIndex = 2;
+                    }
+
+                    if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
+                    {
+                        sel.getSelectedSubRegionBox().setSelectedCorner(corner);
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
