@@ -10,6 +10,7 @@
         "IMixinRenderChunk",
         "IMixinViewFrustum",
         "IMixinWorldClient",
+        "MixinBlockRail",
         "MixinChunkProviderClient",
         "MixinEntityRenderer",
         "MixinMinecraft",
