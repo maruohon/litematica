@@ -25,16 +25,14 @@ import fi.dy.masa.litematica.util.LayerMode;
 import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
+import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 
 public class KeyCallbacks
 {
@@ -56,7 +54,7 @@ public class KeyCallbacks
         Hotkeys.OPEN_GUI_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_FIRST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_LAST.getKeybind().setCallback(callbackHotkeys);
-        Hotkeys.PICK_BLOCK_TOGGLE.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.PICK_BLOCK_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PICK_BLOCK_ENABLED));
         Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind().setCallback(callbackHotkeys);
@@ -71,15 +69,15 @@ public class KeyCallbacks
         Hotkeys.SET_AREA_ORIGIN.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(callbackMessage);
+        Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_RENDERING));
+        Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_GHOST_BLOCK_RENDERING));
+        Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_VERIFIER_OVERLAY_RENDERING));
+        Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED));
+        Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES));
+        Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES));
+        Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SELECTION_BOXES_RENDERING));
+        Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT));
+        Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.TOOL_ITEM_ENABLED));
     }
 
     private static class KeyCallbackHotkeys implements IHotkeyCallback
@@ -97,7 +95,7 @@ public class KeyCallbacks
             OperationMode mode = DataManager.getOperationMode();
             DataManager dataManager = DataManager.getInstance();
 
-            boolean toolEnabled = DataManager.isRenderingEnabled() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
+            boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
             boolean hasTool = EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem());
             boolean isToolPrimary = key == Hotkeys.TOOL_PLACE_CORNER_1.getKeybind();
             boolean isToolSecondary = key == Hotkeys.TOOL_PLACE_CORNER_2.getKeybind();
@@ -189,13 +187,6 @@ public class KeyCallbacks
                 else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
                 {
                     return WorldUtils.doSchematicWorldPickBlock(false, this.mc);
-                }
-                else if (key == Hotkeys.PICK_BLOCK_TOGGLE.getKeybind())
-                {
-                    ConfigBoolean config = Configs.Generic.PICK_BLOCK_ENABLED;
-                    config.setBooleanValue(! config.getBooleanValue());
-                    StringUtils.printBooleanConfigToggleMessage(config.getPrettyName(), config.getBooleanValue());
-                    return true;
                 }
                 else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
                 {
@@ -440,85 +431,8 @@ public class KeyCallbacks
                     return true;
                 }
             }
-            else if (key == Hotkeys.TOGGLE_ALL_RENDERING.getKeybind())
-            {
-                boolean enabled = DataManager.toggleAllRenderingEnabled();
-                String name = Hotkeys.TOGGLE_ALL_RENDERING.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
-            else if (key == Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind())
-            {
-                boolean enabled = DataManager.toggleRenderSelectionBoxes();
-                String name = Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
-            else if (key == Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind())
-            {
-                boolean enabled = DataManager.toggleRenderSchematics();
-                String name = Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
-            else if (key == Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind())
-            {
-                boolean enabled = DataManager.toggleRenderMismatches();
-                String name = Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
-            else if (key == Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind())
-            {
-                boolean enabled = ! Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
-                Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.setBooleanValue(enabled);
-                String name = Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
-            else if (key == Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind())
-            {
-                boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue();
-                Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.setBooleanValue(enabled);
-                String name = Hotkeys.TOGGLE_OVERLAY_RENDERING.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
-            else if (key == Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getKeybind())
-            {
-                boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue();
-                Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.setBooleanValue(enabled);
-                String name = Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
-            else if (key == Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getKeybind())
-            {
-                boolean enabled = ! Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue();
-                Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.setBooleanValue(enabled);
-                String name = Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
-            else if (key == Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind())
-            {
-                boolean enabled = ! Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
-                Configs.Generic.TOOL_ITEM_ENABLED.setBooleanValue(enabled);
-                String name = Configs.Generic.TOOL_ITEM_ENABLED.getPrettyName();
-                this.printToggleMessage(name, enabled);
-                return true;
-            }
 
             return false;
-        }
-
-        protected void printToggleMessage(String name, boolean enabled)
-        {
-            // FIXME
-            String pre = enabled ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-            String status = I18n.format("litematica.message.value." + (enabled ? "on" : "off"));
-            String message = I18n.format("litematica.message.toggled", name, pre + status + TextFormatting.RESET);
-            StringUtils.printActionbarMessage(message);
         }
     }
 }

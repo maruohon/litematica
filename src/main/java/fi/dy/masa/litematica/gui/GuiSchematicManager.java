@@ -64,7 +64,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         int x = 10;
         int y = this.height - 36;
 
-        DirectoryEntry selected = this.widget.getSelectedEntry();
+        DirectoryEntry selected = this.getListWidget().getSelectedEntry();
 
         if (selected != null)
         {
@@ -176,7 +176,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         @Override
         public void actionPerformed(ButtonBase control)
         {
-            DirectoryEntry entry = this.gui.widget.getSelectedEntry();
+            DirectoryEntry entry = this.gui.getListWidget().getSelectedEntry();
 
             if (entry == null)
             {
@@ -306,7 +306,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
                 if (schematic.writeToFile(this.dir, this.fileName, true, this.gui))
                 {
-                    this.gui.widget.clearSchematicMetadataCache();
+                    this.gui.getListWidget().clearSchematicMetadataCache();
                 }
             }
             else

@@ -5,6 +5,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 
 public class GuiMainMenu extends GuiBase
@@ -50,9 +51,9 @@ public class GuiMainMenu extends GuiBase
     {
         private final ButtonType type;
         @Nullable
-        private final GuiBase parent;
+        private final GuiScreen parent;
 
-        public ButtonListenerChangeMenu(ButtonType type, @Nullable GuiBase parent)
+        public ButtonListenerChangeMenu(ButtonType type, @Nullable GuiScreen parent)
         {
             this.type = type;
             this.parent = parent;

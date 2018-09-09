@@ -60,6 +60,23 @@ public class GuiConfigs extends GuiConfigsBase
     }
 
     @Override
+    protected int getConfigWidth()
+    {
+        ConfigGuiTab tab = DataManager.getConfigGuiTab();
+
+        if (tab == ConfigGuiTab.GENERIC || tab == ConfigGuiTab.VISUALS)
+        {
+            return 140;
+        }
+        if (tab == ConfigGuiTab.COLORS)
+        {
+            return 100;
+        }
+
+        return super.getConfigWidth();
+    }
+
+    @Override
     public List<? extends IConfigValue> getConfigs()
     {
         ConfigGuiTab tab = DataManager.getConfigGuiTab();
@@ -107,7 +124,8 @@ public class GuiConfigs extends GuiConfigsBase
 
             if (this.tab != ConfigGuiTab.RENDER_LAYERS)
             {
-                this.parent.widget.resetScrollbarPosition();
+                this.parent.reCreateListWidget(); // apply the new config width
+                this.parent.getListWidget().resetScrollbarPosition();
                 this.parent.initGui();
             }
             else

@@ -81,7 +81,7 @@ public class SchematicVerifier implements IStringListProvider
     @Override
     public boolean shouldRenderStrings()
     {
-        return DataManager.renderMismatches();
+        return Configs.Visuals.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
     }
 
     @Override

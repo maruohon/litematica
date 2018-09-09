@@ -101,7 +101,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         {
             if (this.type == Type.LOAD_SCHEMATIC)
             {
-                DirectoryEntry entry = this.gui.widget.getSelectedEntry();
+                DirectoryEntry entry = this.gui.getListWidget().getSelectedEntry();
 
                 if (entry == null)
                 {

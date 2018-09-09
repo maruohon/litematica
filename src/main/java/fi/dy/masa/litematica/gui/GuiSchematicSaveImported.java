@@ -64,7 +64,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
         {
             if (this.type == ButtonType.SAVE)
             {
-                File dir = this.gui.widget.getCurrentDirectory();
+                File dir = this.gui.getListWidget().getCurrentDirectory();
                 String fileName = this.gui.textField.getText();
 
                 if (dir.isDirectory() == false)
@@ -92,7 +92,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
                         if (WorldUtils.convertSchematicaSchematicToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
                         {
                             this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
-                            this.gui.widget.refreshEntries();
+                            this.gui.getListWidget().refreshEntries();
                         }
 
                         return;
@@ -102,7 +102,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
                         if (WorldUtils.convertStructureToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
                         {
                             this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
-                            this.gui.widget.refreshEntries();
+                            this.gui.getListWidget().refreshEntries();
                         }
 
                         return;
@@ -113,9 +113,9 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
             }
             else if (this.type == ButtonType.CREATE_DIRECTORY)
             {
-                File dir = this.gui.widget.getCurrentDirectory();
+                File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.widget)));
+                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
             }
         }
 

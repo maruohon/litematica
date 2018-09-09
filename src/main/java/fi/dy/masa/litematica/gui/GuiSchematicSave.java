@@ -88,7 +88,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
         {
             if (this.type == ButtonType.SAVE)
             {
-                File dir = this.gui.widget.getCurrentDirectory();
+                File dir = this.gui.getListWidget().getCurrentDirectory();
                 String fileName = this.gui.textField.getText();
 
                 if (dir.isDirectory() == false)
@@ -120,7 +120,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
                     if (schematic.writeToFile(dir, fileName, GuiScreen.isShiftKeyDown(), this.gui))
                     {
                         this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
-                        this.gui.widget.refreshEntries();
+                        this.gui.getListWidget().refreshEntries();
                     }
                 }
                 else
@@ -130,9 +130,9 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
             }
             else if (this.type == ButtonType.CREATE_DIRECTORY)
             {
-                File dir = this.gui.widget.getCurrentDirectory();
+                File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.widget)));
+                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
             }
         }
 

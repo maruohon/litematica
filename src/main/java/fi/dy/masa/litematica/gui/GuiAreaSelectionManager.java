@@ -136,13 +136,13 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         {
             if (this.type == ButtonType.CREATE_DIRECTORY)
             {
-                File dir = this.gui.widget.getCurrentDirectory();
+                File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.widget)));
+                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
             }
             else if (this.type == ButtonType.CREATE_SELECTION)
             {
-                File dir = this.gui.widget.getCurrentDirectory();
+                File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_area_selection";
                 this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new SelectionCreator(dir, this.gui)));
             }
@@ -204,7 +204,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         public void setString(String string)
         {
             this.gui.selectionManager.createNewSelection(this.dir, string);
-            this.gui.widget.refreshEntries();
+            this.gui.getListWidget().refreshEntries();
         }
     }
 }

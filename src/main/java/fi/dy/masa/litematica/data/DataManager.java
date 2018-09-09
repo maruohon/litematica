@@ -42,10 +42,6 @@ public class DataManager implements IDirectoryCache
     private static OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
     private static ConfigGuiTab configGuiTab = ConfigGuiTab.GENERIC;
     private static LayerRange renderRange = new LayerRange();
-    private static boolean enableRendering = true;
-    private static boolean renderMismatches = true;
-    private static boolean renderSchematics = true;
-    private static boolean renderSelections = true;
     private static boolean createPlacementOnLoad = true;
 
     private static boolean canSave;
@@ -123,55 +119,6 @@ public class DataManager implements IDirectoryCache
     public SchematicPlacementManager getSchematicPlacementManager()
     {
         return this.schematicPlacementManager;
-    }
-
-    public static void setAllRenderingEnabled(boolean enable)
-    {
-        enableRendering = enable;
-    }
-
-    public static boolean toggleAllRenderingEnabled()
-    {
-        enableRendering = ! enableRendering;
-        return enableRendering;
-    }
-
-    public static boolean toggleRenderMismatches()
-    {
-        renderMismatches = ! renderMismatches;
-        return renderMismatches;
-    }
-
-    public static boolean toggleRenderSelectionBoxes()
-    {
-        renderSelections = ! renderSelections;
-        return renderSelections;
-    }
-
-    public static boolean toggleRenderSchematics()
-    {
-        renderSchematics = ! renderSchematics;
-        return renderSchematics;
-    }
-
-    public static boolean isRenderingEnabled()
-    {
-        return enableRendering;
-    }
-
-    public static boolean renderSchematics()
-    {
-        return renderSchematics;
-    }
-
-    public static boolean renderMismatches()
-    {
-        return renderMismatches;
-    }
-
-    public static boolean renderSelections()
-    {
-        return renderSelections;
     }
 
     public static boolean getCreatePlacementOnLoad()
@@ -289,10 +236,6 @@ public class DataManager implements IDirectoryCache
                 renderRange = LayerRange.fromJson(JsonUtils.getNestedObject(root, "render_range", false));
             }
 
-            enableRendering = JsonUtils.getBoolean(root, "rendering_enabled");
-            renderMismatches = JsonUtils.getBoolean(root, "render_mismatched");
-            renderSchematics = JsonUtils.getBoolean(root, "render_schematic");
-            renderSelections = JsonUtils.getBoolean(root, "render_selections");
             createPlacementOnLoad = JsonUtils.getBoolean(root, "create_placement_on_load");
         }
 
@@ -323,12 +266,7 @@ public class DataManager implements IDirectoryCache
 
         root.add("last_directories", objDirs);
 
-        root.add("rendering_enabled", new JsonPrimitive(enableRendering));
-        root.add("render_mismatched", new JsonPrimitive(renderMismatches));
-        root.add("render_schematic", new JsonPrimitive(renderSchematics));
-        root.add("render_selections", new JsonPrimitive(renderSelections));
         root.add("create_placement_on_load", new JsonPrimitive(createPlacementOnLoad));
-
         root.add("operation_mode", new JsonPrimitive(operationMode.name()));
         root.add("config_gui_tab", new JsonPrimitive(configGuiTab.name()));
         root.add("render_range", renderRange.toJson());

@@ -219,7 +219,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             if (this.selectedDataEntry == entry)
             {
                 this.selectedDataEntry = null;
-                this.widget.clearSelection();
+                this.getListWidget().clearSelection();
                 this.placement.getSchematicVerifier().clearActiveMismatchRenderPositions();
             }
             // Main header - show the currently missing/unseen chunks

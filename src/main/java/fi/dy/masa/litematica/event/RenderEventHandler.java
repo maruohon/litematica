@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.event;
 
-import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
@@ -20,19 +20,19 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (DataManager.isRenderingEnabled() && mc.player != null)
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
-            if (DataManager.renderSchematics())
+            if (Configs.Visuals.ENABLE_GHOST_BLOCK_RENDERING.getBooleanValue())
             {
                 LitematicaRenderer.getInstance().renderSchematicWorld(partialTicks);
             }
 
-            if (DataManager.renderSelections())
+            if (Configs.Visuals.ENABLE_SELECTION_BOXES_RENDERING.getBooleanValue())
             {
                 OverlayRenderer.getInstance().renderSelectionAreas(partialTicks);
             }
 
-            if (DataManager.renderMismatches())
+            if (Configs.Visuals.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue())
             {
                 OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
             }
@@ -43,7 +43,8 @@ public class RenderEventHandler
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (DataManager.isRenderingEnabled() && mc.currentScreen == null && mc.gameSettings.showDebugInfo == false && mc.player != null)
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+            mc.currentScreen == null && mc.gameSettings.showDebugInfo == false && mc.player != null)
         {
             ToolHud.getInstance().renderHud();
             InfoHud.getInstance().renderHud();

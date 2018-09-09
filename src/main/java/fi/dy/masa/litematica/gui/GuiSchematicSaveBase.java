@@ -49,7 +49,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         super.initGui();
 
         ((IGuiTextField) this.textField).setInternalWidth(this.width - 273);
-        DirectoryEntry entry = this.widget.getSelectedEntry();
+        DirectoryEntry entry = this.getListWidget().getSelectedEntry();
 
         if (entry != null && entry.getType() != DirectoryEntryType.DIRECTORY)
         {
@@ -147,7 +147,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         if (this.textField.textboxKeyTyped(typedChar, keyCode))
         {
-            this.widget.clearSelection();
+            this.getListWidget().clearSelection();
             return true;
         }
         else if (keyCode == Keyboard.KEY_TAB)

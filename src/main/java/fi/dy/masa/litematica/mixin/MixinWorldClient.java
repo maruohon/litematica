@@ -4,6 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicVerifier;
 import fi.dy.masa.litematica.util.WorldUtils;
@@ -34,7 +35,7 @@ public abstract class MixinWorldClient extends World
             verifier.markBlockChanged(pos);
         }
 
-        if (DataManager.isRenderingEnabled() && DataManager.renderSchematics())
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Visuals.ENABLE_GHOST_BLOCK_RENDERING.getBooleanValue())
         {
             WorldUtils.markSchematicChunkForRenderUpdate(pos);
         }

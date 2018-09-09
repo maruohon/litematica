@@ -47,6 +47,10 @@ public class Configs implements IConfigHandler
 
     public static class Visuals
     {
+        public static final ConfigBoolean       ENABLE_RENDERING                    = new ConfigBoolean("enableRendering", true, "Main rendering toggle option. Enables/disables ALL mod rendering.");
+        public static final ConfigBoolean       ENABLE_GHOST_BLOCK_RENDERING        = new ConfigBoolean("enableGhostBlockRendering", true, "Enable rendering the schematic (ghost) blocks");
+        public static final ConfigBoolean       ENABLE_SELECTION_BOXES_RENDERING    = new ConfigBoolean("enableSelectionBoxesRendering", true, "Enable selection boxes rendering");
+        public static final ConfigBoolean       ENABLE_VERIFIER_OVERLAY_RENDERING   = new ConfigBoolean("enableVerifierOverlayRendering", true, "Enable Schematic Verifier overlay rendering");
         public static final ConfigDouble        ERROR_HILIGHT_ALPHA                 = new ConfigDouble( "errorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
         public static final ConfigInteger       ERROR_HILIGHT_MAX_POSITIONS         = new ConfigInteger("errorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render at once\nin the Schematic Verifier overlay.");
         public static final ConfigDouble        GHOST_BLOCK_ALPHA                   = new ConfigDouble( "ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks, when rendering them as translucent");
@@ -55,7 +59,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA            = new ConfigDouble( "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_AREA_SELECTION_BOX_SIDES     = new ConfigBoolean("renderAreaSelectionBoxSides", true, "If enabled, then the area selection boxes will have their side quads rendered");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT        = new ConfigBoolean("renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered using translucent \"ghost blocks\"");
-        public static final ConfigBoolean       RENDER_INFO_OVERLAY                 = new ConfigBoolean("renderInfoOverlay", true, "If enabled, then an info overlay is rendered while looking at schematic blocks\nor schematic verifier error markers, and holding the key for it");
+        public static final ConfigBoolean       RENDER_INFO_OVERLAY                 = new ConfigBoolean("renderInfoOverlay", true, "If enabled, then an info overlay is rendered while looking at schematic blocks\nor schematic verifier error markers, and holding the 'renderInfoOverlay' key");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES           = new ConfigBoolean("renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier will have\n(translucent) sides rendered instead of just the outline");
         public static final ConfigBoolean       RENDER_PLACEMENT_BOX_SIDES          = new ConfigBoolean("renderPlacementBoxSides", false, "If enabled, then the placed schematic sub-region boxes will have their side quads rendered");
         public static final ConfigBoolean       RENDER_TRANSLUCENT_INNER_SIDES      = new ConfigBoolean("renderTranslucentBlockInnerSides", false, "If enabled, then the model sides are also rendered for inner sides in the translucent mode");
@@ -68,6 +72,10 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       SCHEMATIC_OVERLAY_RENDER_THROUGH    = new ConfigBoolean("schematicOverlayRenderThroughBlocks", false, "If enabled, then the schematic overlay will be rendered through blocks\nThis is probably only useful once you are finished building\nand want to see any errors easier");
 
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                ENABLE_RENDERING,
+                ENABLE_GHOST_BLOCK_RENDERING,
+                ENABLE_SELECTION_BOXES_RENDERING,
+                ENABLE_VERIFIER_OVERLAY_RENDERING,
                 ERROR_HILIGHT_ALPHA,
                 ERROR_HILIGHT_MAX_POSITIONS,
                 GHOST_BLOCK_ALPHA,

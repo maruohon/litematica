@@ -371,10 +371,10 @@ public class OverlayRenderer
     {
         if (mc.world != null && mc.player != null)
         {
-            if (DataManager.renderMismatches() &&
+            if (Configs.Visuals.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue() &&
                 Configs.Visuals.RENDER_INFO_OVERLAY.getBooleanValue() &&
                 (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
-                Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld()))
+                 Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld()))
             {
                 SchematicPlacement placement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
 
