@@ -77,28 +77,33 @@ public class GuiConfigs extends GuiConfigsBase
     }
 
     @Override
-    public List<? extends IConfigValue> getConfigs()
+    public List<ConfigOptionWrapper> getConfigs()
     {
+        List<? extends IConfigValue> configs;
         ConfigGuiTab tab = DataManager.getConfigGuiTab();
 
         if (tab == ConfigGuiTab.GENERIC)
         {
-            return Configs.Generic.OPTIONS;
+            configs = Configs.Generic.OPTIONS;
         }
         else if (tab == ConfigGuiTab.VISUALS)
         {
-            return Configs.Visuals.OPTIONS;
+            configs = Configs.Visuals.OPTIONS;
         }
         else if (tab == ConfigGuiTab.COLORS)
         {
-            return Configs.Colors.OPTIONS;
+            configs = Configs.Colors.OPTIONS;
         }
         else if (tab == ConfigGuiTab.HOTKEYS)
         {
-            return Hotkeys.HOTKEY_LIST;
+            configs = Hotkeys.HOTKEY_LIST;
+        }
+        else
+        {
+            return Collections.emptyList();
         }
 
-        return Collections.emptyList();
+        return ConfigOptionWrapper.createFor(configs);
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
