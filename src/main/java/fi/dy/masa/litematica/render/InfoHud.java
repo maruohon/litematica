@@ -1,16 +1,10 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.config.HudAlignment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 
 public class InfoHud
 {
@@ -56,12 +50,12 @@ public class InfoHud
                 {
                     if (provider.shouldRenderStrings())
                     {
-                        y = renderTextLines(this.mc, 4, y, 0xFFFFFFFF, 0x80000000, true, true, this.getHudAlignment(), provider.getLines());
+                        y = fi.dy.masa.malilib.gui.RenderUtils.renderText(this.mc, 4, y, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, provider.getLines());
                     }
                 }
             }
 
-            renderTextLines(this.mc, 4, y, 0xFFFFFFFF, 0x80000000, true, true, this.getHudAlignment(), this.lineList);
+            fi.dy.masa.malilib.gui.RenderUtils.renderText(this.mc, 4, y, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
         }
     }
 
@@ -114,96 +108,5 @@ public class InfoHud
 
     protected void updateHudText()
     {
-    }
-
-    public static int renderTextLines(Minecraft mc, int xOff, int yOff, int fontColor, int bgColor,
-            boolean useBg, boolean useShadow, HudAlignment align, List<String> lines)
-    {
-        FontRenderer fontRenderer = mc.fontRenderer;
-        ScaledResolution res = new ScaledResolution(mc);
-        final int lineHeight = fontRenderer.FONT_HEIGHT + 2;
-        final int bgMargin = 2;
-        double posX = xOff + bgMargin;
-        double posY = yOff + bgMargin;
-
-        if (align == HudAlignment.TOP_RIGHT)
-        {
-            Collection<PotionEffect> effects = mc.player.getActivePotionEffects();
-
-            if (effects.isEmpty() == false)
-            {
-                int y1 = 0;
-                int y2 = 0;
-
-                for (PotionEffect effect : effects)
-                {
-                    Potion potion = effect.getPotion();
-
-                    if (effect.doesShowParticles() && potion.hasStatusIcon())
-                    {
-                        if (potion.isBeneficial())
-                        {
-                            y1 = 26;
-                        }
-                        else
-                        {
-                            y2 = 52;
-                            break;
-                        }
-                    }
-                }
-
-                posY += Math.max(y1, y2);
-            }
-        }
-
-        switch (align)
-        {
-            case BOTTOM_LEFT:
-            case BOTTOM_RIGHT:
-                posY = res.getScaledHeight() - (lines.size() * lineHeight) - yOff + 2;
-                break;
-            case CENTER:
-                posY = (res.getScaledHeight() / 2.0d) - (lines.size() * lineHeight / 2.0d) + yOff;
-                break;
-            default:
-        }
-
-        for (String line : lines)
-        {
-            final int width = fontRenderer.getStringWidth(line);
-
-            switch (align)
-            {
-                case TOP_RIGHT:
-                case BOTTOM_RIGHT:
-                    posX = res.getScaledWidth() - width - xOff - bgMargin;
-                    break;
-                case CENTER:
-                    posX = (res.getScaledWidth() / 2) - (width / 2) - xOff;
-                    break;
-                default:
-            }
-
-            final int x = (int) posX;
-            final int y = (int) posY;
-            posY += (double) lineHeight;
-
-            if (useBg)
-            {
-                Gui.drawRect(x - bgMargin, y - bgMargin, x + width + bgMargin, y + fontRenderer.FONT_HEIGHT, bgColor);
-            }
-
-            if (useShadow)
-            {
-                fontRenderer.drawStringWithShadow(line, x, y, fontColor);
-            }
-            else
-            {
-                fontRenderer.drawString(line, x, y, fontColor);
-            }
-        }
-
-        return (int) Math.ceil(posY);
     }
 }
