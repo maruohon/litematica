@@ -12,7 +12,6 @@
         "IMixinWorldClient",
         "MixinBlockRail",
         "MixinChunkProviderClient",
-        "MixinEntityRenderer",
         "MixinMinecraft",
         "MixinRegionRenderCacheBuilder",
         "MixinRenderGlobal",

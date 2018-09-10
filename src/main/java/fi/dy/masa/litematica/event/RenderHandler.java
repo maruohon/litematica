@@ -5,17 +5,12 @@ import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.ToolHud;
+import fi.dy.masa.malilib.interfaces.IRenderer;
 import net.minecraft.client.Minecraft;
 
-public class RenderEventHandler
+public class RenderHandler implements IRenderer
 {
-    private static final RenderEventHandler INSTANCE = new RenderEventHandler();
-
-    public static RenderEventHandler getInstance()
-    {
-        return INSTANCE;
-    }
-
+    @Override
     public void onRenderWorldLast(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();
@@ -39,6 +34,7 @@ public class RenderEventHandler
         }
     }
 
+    @Override
     public void onRenderGameOverlayPost(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();

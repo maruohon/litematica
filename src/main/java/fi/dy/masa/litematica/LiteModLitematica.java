@@ -13,9 +13,12 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.KeyCallbacks;
+import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.render.DebugScreenMessages;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
+import fi.dy.masa.malilib.event.RenderEventHandler;
+import fi.dy.masa.malilib.interfaces.IRenderer;
 import net.minecraft.client.Minecraft;
 
 public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, Tickable
@@ -45,9 +48,14 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     {
         Configs.loadFromFile();
         ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
+
         InputEventHandler.getInstance().registerKeybindProvider(InputHandler.getInstance());
         InputEventHandler.getInstance().registerKeyboardInputHandler(InputHandler.getInstance());
         InputEventHandler.getInstance().registerMouseInputHandler(InputHandler.getInstance());
+
+        IRenderer renderer = new RenderHandler();
+        RenderEventHandler.getInstance().registerGameOverlayRenderer(renderer);
+        RenderEventHandler.getInstance().registerWorldLastRenderer(renderer);
     }
 
     @Override
