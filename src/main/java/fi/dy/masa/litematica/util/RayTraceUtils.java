@@ -396,7 +396,7 @@ public class RayTraceUtils
             {
                 double dist = trace.hitVec.distanceTo(eyesPos);
 
-                if ((furthestDist < 0 || dist > furthestDist) && (dist <= closestVanilla || closestVanilla < 0))
+                if ((furthestDist < 0 || dist > furthestDist) && (dist < closestVanilla || closestVanilla < 0))
                 {
                     furthestDist = dist;
                     furthestTrace = trace;
