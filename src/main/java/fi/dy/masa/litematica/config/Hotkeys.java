@@ -8,7 +8,7 @@ import fi.dy.masa.malilib.hotkeys.KeybindSettings;
 public class Hotkeys
 {
     public static final ConfigHotkey ADD_SELECTION_BOX                  = new ConfigHotkey("addSelectionBox",                   "M,A",  "Add a new selection box (position 1) here");
-    public static final ConfigHotkey DELETE_SELECTION_BOX               = new ConfigHotkey("deleteSelectionBox",                "M,D",  "Delete the currently selected box");
+    public static final ConfigHotkey DELETE_SELECTION_BOX               = new ConfigHotkey("deleteSelectionBox",                "DELETE", "Delete the currently selected box");
     public static final ConfigHotkey EXECUTE_OPERATION                  = new ConfigHotkey("executeOperation",                  "LCONTROL,LMENU,R",  "Execute the currently selected tool operation with the\ncurrent selection or placement in the Fill, Replace,\nPaste Schematic etc. modes");
     public static final ConfigHotkey LAYER_MODE_NEXT                    = new ConfigHotkey("layerModeNext",                     "M,PRIOR", "Cycle the rendering mode (all, layers) forward");
     public static final ConfigHotkey LAYER_MODE_PREVIOUS                = new ConfigHotkey("layerModePrevious",                 "M,NEXT",  "Cycle the rendering mode (all, layers) backwards");
@@ -36,10 +36,11 @@ public class Hotkeys
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_2       = new ConfigHotkey("setSelectionBoxPosition2",          "M,2",  "Set the second position of the currently selected\nbox to the player's position");
     public static final ConfigHotkey TOGGLE_ALL_RENDERING               = new ConfigHotkey("toggleAllRendering",                "M,R",  "Toggle all rendering on/off", "All Rendering");
     public static final ConfigHotkey TOGGLE_GHOST_BLOCK_RENDERING       = new ConfigHotkey("toggleGhostBlockRendering",         "M,G",  "Toggle ghost block rendering on/off", "Ghost Block Rendering");
+    public static final ConfigHotkey TOGGLE_INFO_OVERLAY_RENDERING      = new ConfigHotkey("toggleInfoOverlayRendering",        "M,I",  "Toggle the info overlay rendering (for hovered block info)", "Info Overlay");
     public static final ConfigHotkey TOGGLE_MISMATCH_OVERLAY_RENDERING  = new ConfigHotkey("toggleMismatchOverlayRendering",    "M,E",  "Toggle the mismatch overlay rendering (for Schematic Verifier)", "Verifier Mismatch Overlay");
     public static final ConfigHotkey TOGGLE_OVERLAY_RENDERING           = new ConfigHotkey("toggleOverlayRendering",            "M,O",  "Toggle the block overlay rendering on/off", "All Block Overlay Rendering");
     public static final ConfigHotkey TOGGLE_OVERLAY_OUTLINE_RENDERING   = new ConfigHotkey("toggleOverlayOutlineRendering",     "M,B",  "Toggle the block overlay outline rendering on/off", "Block Overlay Outline Rendering");
-    public static final ConfigHotkey TOGGLE_OVERLAY_SIDE_RENDERING      = new ConfigHotkey("toggleOverlaySideRendering",        "M,I",  "Toggle the block overlay side rendering on/off", "Block Overlay Sides/Quads Rendering");
+    public static final ConfigHotkey TOGGLE_OVERLAY_SIDE_RENDERING      = new ConfigHotkey("toggleOverlaySideRendering",        "M,D",  "Toggle the block overlay side rendering on/off", "Block Overlay Sides/Quads Rendering");
     public static final ConfigHotkey TOGGLE_SELECTION_BOXES_RENDERING   = new ConfigHotkey("toggleSelectionBoxesRendering",     "M,X",  "Toggle selection boxes rendering on/off", "Selection Boxes Rendering");
     public static final ConfigHotkey TOGGLE_TRANSLUCENT_RENDERING       = new ConfigHotkey("toggleTranslucentRendering",        "M,U",  "Toggle translucent vs. opaque ghost block rendering", "Translucent Schematic Blocks Rendering");
     public static final ConfigHotkey TOOL_ENABLED_TOGGLE                = new ConfigHotkey("toolEnabledToggle",                 "M,T",  "The keybind to toggle the \"tool\" item functionality on/off");
@@ -77,6 +78,7 @@ public class Hotkeys
             SET_SELECTION_BOX_POSITION_2,
             TOGGLE_ALL_RENDERING,
             TOGGLE_GHOST_BLOCK_RENDERING,
+            TOGGLE_INFO_OVERLAY_RENDERING,
             TOGGLE_MISMATCH_OVERLAY_RENDERING,
             TOGGLE_OVERLAY_RENDERING,
             TOGGLE_OVERLAY_OUTLINE_RENDERING,

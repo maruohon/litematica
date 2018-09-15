@@ -53,6 +53,7 @@ public class Configs implements IConfigHandler
     {
         public static final ConfigBoolean       ENABLE_RENDERING                    = new ConfigBoolean("enableRendering", true, "Main rendering toggle option. Enables/disables ALL mod rendering.", "All Rendering");
         public static final ConfigBoolean       ENABLE_GHOST_BLOCK_RENDERING        = new ConfigBoolean("enableGhostBlockRendering", true, "Enable rendering the schematic (ghost) blocks", "Schematic (Ghost) Blocks Rendering");
+        public static final ConfigBoolean       ENABLE_INFO_OVERLAY_RENDERING       = new ConfigBoolean("enableInfoOverlayRendering", true, "Enable Info overlay rendering to show block info", "Info Overlay Rendering");
         public static final ConfigBoolean       ENABLE_SELECTION_BOXES_RENDERING    = new ConfigBoolean("enableSelectionBoxesRendering", true, "Enable selection boxes rendering", "Selection Boxes Rendering");
         public static final ConfigBoolean       ENABLE_VERIFIER_OVERLAY_RENDERING   = new ConfigBoolean("enableVerifierOverlayRendering", true, "Enable Schematic Verifier overlay rendering", "Verifier Overlay Rendering");
         public static final ConfigDouble        ERROR_HILIGHT_ALPHA                 = new ConfigDouble( "errorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
@@ -82,6 +83,7 @@ public class Configs implements IConfigHandler
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 ENABLE_RENDERING,
                 ENABLE_GHOST_BLOCK_RENDERING,
+                ENABLE_INFO_OVERLAY_RENDERING,
                 ENABLE_SELECTION_BOXES_RENDERING,
                 ENABLE_VERIFIER_OVERLAY_RENDERING,
                 ERROR_HILIGHT_ALPHA,
