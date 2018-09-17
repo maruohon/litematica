@@ -46,7 +46,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -113,9 +112,9 @@ public class RenderGlobalSchematic extends RenderGlobal
     @Override
     public String getDebugInfoRenders()
     {
-        int i = this.viewFrustum.renderChunks.length;
-        int j = this.getRenderedChunks();
-        return String.format("C: %d/%d %sD: %d, L: %d, %s", j, i, this.mc.renderChunksMany ? "(s) " : "", this.renderDistanceChunks, 0, this.renderDispatcher == null ? "null" : this.renderDispatcher.getDebugInfo());
+        int rcTotal = this.viewFrustum != null ? this.viewFrustum.renderChunks.length : 0;
+        int rcRendered = this.viewFrustum != null ? this.getRenderedChunks() : 0;
+        return String.format("C: %d/%d %sD: %d, L: %d, %s", rcRendered, rcTotal, this.mc.renderChunksMany ? "(s) " : "", this.renderDistanceChunks, 0, this.renderDispatcher == null ? "null" : this.renderDispatcher.getDebugInfo());
     }
 
     @Override
@@ -415,23 +414,6 @@ public class RenderGlobalSchematic extends RenderGlobal
                     break;
                 }
             }
-        }
-    }
-
-    @Nullable
-    private RenderChunk getRenderChunkOffset(BlockPos playerPos, RenderChunk renderChunkBase, EnumFacing facing)
-    {
-        BlockPos pos = renderChunkBase.getBlockPosOffset16(facing);
-
-        if (pos.getY() >= 0 && pos.getY() <= 255 &&
-            MathHelper.abs(playerPos.getX() - pos.getX()) <= this.renderDistanceChunks * 16 &&
-            MathHelper.abs(playerPos.getZ() - pos.getZ()) <= this.renderDistanceChunks * 16)
-        {
-            return ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(pos);
-        }
-        else
-        {
-            return null;
         }
     }
 
@@ -834,7 +816,10 @@ public class RenderGlobalSchematic extends RenderGlobal
 
     private void markBlocksForUpdate(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, boolean updateImmediately)
     {
-        this.viewFrustum.markBlocksForUpdate(minX, minY, minZ, maxX, maxY, maxZ, updateImmediately);
+        if (this.viewFrustum != null)
+        {
+            this.viewFrustum.markBlocksForUpdate(minX, minY, minZ, maxX, maxY, maxZ, updateImmediately);
+        }
     }
 
     @Override public void notifyLightSet(BlockPos pos) {}
