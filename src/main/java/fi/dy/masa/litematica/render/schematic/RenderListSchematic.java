@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.render.schematic;
 import java.util.EnumSet;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.chunk.ListedRenderChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.util.BlockRenderLayer;
 
@@ -16,7 +15,7 @@ public class RenderListSchematic extends ChunkRenderContainerSchematic
         {
             for (RenderChunk renderChunk : this.renderChunks)
             {
-                ListedRenderChunk listedrenderchunk = (ListedRenderChunk) renderChunk;
+                RenderChunkSchematicList listedrenderchunk = (RenderChunkSchematicList) renderChunk;
                 GlStateManager.pushMatrix();
                 this.preRenderChunk(renderChunk);
                 GlStateManager.callList(listedrenderchunk.getDisplayList(layer, listedrenderchunk.getCompiledChunk()));
