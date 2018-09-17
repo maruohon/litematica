@@ -12,14 +12,6 @@ import net.minecraft.util.BlockRenderLayer;
 public class VboRenderListSchematic extends ChunkRenderContainerSchematic
 {
     @Override
-    public void initialize(double viewEntityXIn, double viewEntityYIn, double viewEntityZIn)
-    {
-        super.initialize(viewEntityXIn, viewEntityYIn, viewEntityZIn);
-
-        this.overlayRenderChunks.clear();
-    }
-
-    @Override
     public void renderChunkLayer(BlockRenderLayer layer)
     {
         if (this.initialized)

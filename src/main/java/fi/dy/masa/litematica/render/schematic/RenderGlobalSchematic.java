@@ -103,6 +103,19 @@ public class RenderGlobalSchematic extends RenderGlobal
         this.mc = mc;
         this.renderManager = mc.getRenderManager();
 
+        this.vboEnabled = OpenGlHelper.useVbo();
+
+        if (this.vboEnabled)
+        {
+            this.renderContainer = new VboRenderListSchematic();
+            this.renderChunkFactory = new RenderChunkFactoryVbo();
+        }
+        else
+        {
+            this.renderContainer = new RenderListSchematic();
+            this.renderChunkFactory = new RenderChunkFactoryList();
+        }
+
         BlockRendererDispatcher dispatcher = mc.getBlockRendererDispatcher();
         this.blockModelShapes = dispatcher.getBlockModelShapes();
         this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColors());
@@ -201,13 +214,12 @@ public class RenderGlobalSchematic extends RenderGlobal
             boolean vboEnabledPrevious = this.vboEnabled;
             this.vboEnabled = OpenGlHelper.useVbo();
 
-            if (vboEnabledPrevious && this.vboEnabled == false)
+            if (this.vboEnabled == false && vboEnabledPrevious)
             {
                 this.renderContainer = new RenderListSchematic();
                 this.renderChunkFactory = new RenderChunkFactoryList();
             }
-            // Fall back to VBO mode
-            else if ((vboEnabledPrevious == false && this.vboEnabled) || this.renderChunkFactory == null)
+            else if (this.vboEnabled && vboEnabledPrevious == false)
             {
                 this.renderContainer = new VboRenderListSchematic();
                 this.renderChunkFactory = new RenderChunkFactoryVbo();

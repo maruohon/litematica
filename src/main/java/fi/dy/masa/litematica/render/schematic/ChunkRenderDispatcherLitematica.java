@@ -22,6 +22,7 @@ import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayTyp
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 import net.minecraft.client.renderer.VertexBufferUploader;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
@@ -264,7 +265,7 @@ public class ChunkRenderDispatcherLitematica
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
         {
             //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunk()\n");
-            if ((renderChunk instanceof RenderChunkSchematicList) == false)
+            if (OpenGlHelper.useVbo())
             {
                 this.uploadVertexBuffer(buffer, renderChunk.getVertexBufferByLayer(layer.ordinal()));
 
