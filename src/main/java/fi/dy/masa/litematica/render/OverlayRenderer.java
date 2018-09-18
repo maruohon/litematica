@@ -426,9 +426,9 @@ public class OverlayRenderer
                         BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
                         info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
 
-                        RenderUtils.renderInventoryOverlay(-90, worldSchematic, pos, mc);
+                        RenderUtils.renderInventoryOverlay(-1, worldSchematic, pos, mc);
                         World world = WorldUtils.getBestWorld(mc);
-                        RenderUtils.renderInventoryOverlay(90, world, pos, mc);
+                        RenderUtils.renderInventoryOverlay(1, world, pos, mc);
                     }
                     else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
                     {
