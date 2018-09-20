@@ -145,9 +145,17 @@ public class SchematicaSchematic
                                 teNBT.setInteger("x", pos.getX());
                                 teNBT.setInteger("y", pos.getY());
                                 teNBT.setInteger("z", pos.getZ());
-                                te.readFromNBT(teNBT);
-                                te.mirror(mirror);
-                                te.rotate(rotation);
+
+                                try
+                                {
+                                    te.readFromNBT(teNBT);
+                                    te.mirror(mirror);
+                                    te.rotate(rotation);
+                                }
+                                catch (Exception e)
+                                {
+                                    LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                }
                             }
                         }
                     }
@@ -272,9 +280,17 @@ public class SchematicaSchematic
                                         teNBT.setInteger("x", pos.getX());
                                         teNBT.setInteger("y", pos.getY());
                                         teNBT.setInteger("z", pos.getZ());
-                                        te.readFromNBT(teNBT);
-                                        te.mirror(mirror);
-                                        te.rotate(rotation);
+
+                                        try
+                                        {
+                                            te.readFromNBT(teNBT);
+                                            te.mirror(mirror);
+                                            te.rotate(rotation);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                        }
                                     }
                                 }
                             }

@@ -302,9 +302,17 @@ public class LitematicaSchematic
                                 teNBT.setInteger("x", pos.getX());
                                 teNBT.setInteger("y", pos.getY());
                                 teNBT.setInteger("z", pos.getZ());
-                                te.readFromNBT(teNBT);
-                                te.mirror(placement.getMirror());
-                                te.rotate(placement.getRotation());
+
+                                try
+                                {
+                                    te.readFromNBT(teNBT);
+                                    te.mirror(placement.getMirror());
+                                    te.rotate(placement.getRotation());
+                                }
+                                catch (Exception e)
+                                {
+                                    LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                }
                             }
                         }
                     }
@@ -531,9 +539,17 @@ public class LitematicaSchematic
                             teNBT.setInteger("x", pos.getX());
                             teNBT.setInteger("y", pos.getY());
                             teNBT.setInteger("z", pos.getZ());
-                            te.readFromNBT(teNBT);
-                            te.mirror(placement.getMirror());
-                            te.rotate(placement.getRotation());
+
+                            try
+                            {
+                                te.readFromNBT(teNBT);
+                                te.mirror(placement.getMirror());
+                                te.rotate(placement.getRotation());
+                            }
+                            catch (Exception e)
+                            {
+                                LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                            }
                         }
                     }
                 }
