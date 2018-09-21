@@ -96,6 +96,9 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
         y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.OPEN_VERIFIER_GUI);
+        y += 22;
+
+        this.createButton(x, y, width, ButtonListener.Type.OPEN_MATERIAL_LIST_GUI);
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
@@ -137,41 +140,31 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
 
         switch (type)
         {
-            case RENAME_PLACEMENT:
-                label = I18n.format("litematica.gui.button.rename");
+            case TOGGLE_ENABLED:
+            {
+                if (this.placement.isEnabled())
+                    label = I18n.format("litematica.gui.button.disable");
+                else
+                    label = I18n.format("litematica.gui.button.enable");
                 break;
+            }
 
             case ROTATE:
             {
                 String value = PositionUtils.getRotationNameShort(this.placement.getRotation());
-                label = I18n.format("litematica.gui.button.rotation_value", value);
+                label = type.getDisplayName(value);
                 break;
             }
 
             case MIRROR:
             {
                 String value = PositionUtils.getMirrorName(this.placement.getMirror());
-                label = I18n.format("litematica.gui.button.mirror_value", value);
+                label = type.getDisplayName(value);
                 break;
             }
 
-            case MOVE_HERE:
-                label = I18n.format("litematica.gui.button.move_here");
-                break;
-
-            case TOGGLE_ENABLED:
-                if (this.placement.isEnabled())
-                    label = I18n.format("litematica.gui.button.disable");
-                else
-                    label = I18n.format("litematica.gui.button.enable");
-                break;
-
-            case RESET_SUB_REGIONS:
-                break;
-
-            case OPEN_VERIFIER_GUI:
-                label = I18n.format("litematica.gui.button.schematic_verifier");
-                break;
+            default:
+                label = type.getDisplayName();
         }
 
         if (width == -1)
@@ -273,9 +266,11 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
                 }
 
                 case MOVE_HERE:
+                {
                     BlockPos pos = new BlockPos(mc.player.getPositionVector());
                     this.placement.setOrigin(pos);
                     break;
+                }
 
                 case TOGGLE_ENABLED:
                     this.placement.toggleEnabled();
@@ -286,10 +281,20 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
                     break;
 
                 case OPEN_VERIFIER_GUI:
+                {
                     GuiSchematicVerifier gui = new GuiSchematicVerifier(this.placement);
                     gui.setParent(this.parent);
                     mc.displayGuiScreen(gui);
                     break;
+                }
+
+                case OPEN_MATERIAL_LIST_GUI:
+                {
+                    GuiMaterialList gui = new GuiMaterialList(this.placement);
+                    gui.setParent(this.parent);
+                    mc.displayGuiScreen(gui);
+                    break;
+                }
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
@@ -297,13 +302,26 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
 
         public enum Type
         {
-            RENAME_PLACEMENT,
-            ROTATE,
-            MIRROR,
-            MOVE_HERE,
-            TOGGLE_ENABLED,
-            RESET_SUB_REGIONS,
-            OPEN_VERIFIER_GUI;
+            RENAME_PLACEMENT        ("litematica.gui.button.rename"),
+            ROTATE                  ("litematica.gui.button.rotation_value"),
+            MIRROR                  ("litematica.gui.button.mirror_value"),
+            MOVE_HERE               ("litematica.gui.button.move_here"),
+            TOGGLE_ENABLED          (""),
+            RESET_SUB_REGIONS       (""),
+            OPEN_VERIFIER_GUI       ("litematica.gui.button.schematic_verifier"),
+            OPEN_MATERIAL_LIST_GUI  ("litematica.gui.button.material_list");
+
+            private final String translationKey;
+
+            private Type(String translationKey)
+            {
+                this.translationKey = translationKey;
+            }
+
+            public String getDisplayName(Object... args)
+            {
+                return I18n.format(this.translationKey, args);
+            }
         }
     }
 

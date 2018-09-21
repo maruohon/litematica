@@ -779,6 +779,12 @@ public class LitematicaSchematic
         }
     }
 
+    @Nullable
+    public LitematicaBlockStateContainer getSubRegionContainer(String regionName)
+    {
+        return this.blockContainers.get(regionName);
+    }
+
     private NBTTagCompound writeToNBT()
     {
         NBTTagCompound nbt = new NBTTagCompound();
