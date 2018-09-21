@@ -465,7 +465,7 @@ public class LitematicaSchematic
         final int endZ = posMax.getZ();
 
         final int startY = 0;
-        final int endY = regionSize.getY() - 1;
+        final int endY = Math.abs(regionSize.getY()) - 1;
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
         //System.out.printf("sx: %d, sy: %d, sz: %d => ex: %d, ey: %d, ez: %d\n", startX, startY, startZ, endX, endY, endZ);
