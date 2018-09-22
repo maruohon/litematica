@@ -13,12 +13,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
 
 public class WidgetMaterialListEntry extends WidgetBase
 {
     private static int maxNameLength;
 
-    private final GuiMaterialList gui;
     @Nullable private final MaterialListEntry entry;
     @Nullable private final String header1;
     @Nullable private final String header2;
@@ -33,7 +33,6 @@ public class WidgetMaterialListEntry extends WidgetBase
 
         this.mc = Minecraft.getMinecraft();
         this.entry = entry;
-        this.gui = gui;
         this.isOdd = isOdd;
 
         if (this.entry != null)
@@ -47,7 +46,7 @@ public class WidgetMaterialListEntry extends WidgetBase
         }
         else
         {
-            this.header1 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.name");
+            this.header1 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.item");
             this.header2 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.required");
             this.header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.available");
         }
@@ -95,11 +94,14 @@ public class WidgetMaterialListEntry extends WidgetBase
             mc.fontRenderer.drawString(this.header2, x2, y, color);
             mc.fontRenderer.drawString(this.header3, x3, y, color);
         }
-        else if (this.entry != null) 
+        else if (this.entry != null)
         {
+            int countRequired = this.entry.getCountRequired();
+            int countAvailable = this.entry.getCountAvailable();
+            String pre = countAvailable >= countRequired ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
             mc.fontRenderer.drawString(this.entry.getStack().getDisplayName(), x1 + 20, y, color);
-            mc.fontRenderer.drawString(String.valueOf(this.entry.getCountRequired()), x2, y, color);
-            mc.fontRenderer.drawString(String.valueOf(this.entry.getCountAvailable()), x3, y, color);
+            mc.fontRenderer.drawString(String.valueOf(countRequired), x2, y, color);
+            mc.fontRenderer.drawString(pre + String.valueOf(countAvailable), x3, y, color);
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -109,7 +111,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             y = this.y + 3;
             Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
             mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.entry.getStack(), x1, y);
-            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
+            //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
             //mc.getRenderItem().zLevel += 110;
 
             GlStateManager.disableBlend();
@@ -193,7 +195,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             y += 16;
             Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
             mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, stack, x1, y);
-            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
+            //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
 
             //GlStateManager.disableBlend();
