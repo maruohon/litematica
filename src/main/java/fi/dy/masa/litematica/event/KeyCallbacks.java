@@ -113,14 +113,16 @@ public class KeyCallbacks
                     if (mode == OperationMode.AREA_SELECTION)
                     {
                         SelectionManager sm = dataManager.getSelectionManager();
+                        boolean moveEverything = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
 
                         if (Configs.Generic.SELECTION_MODE.getOptionListValue() == AreaSelectionMode.CORNERS)
                         {
-                            sm.setPositionOfCurrentSelectionToRayTrace(this.mc, isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2, maxDistance);
+                            Corner corner = isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2;
+                            sm.setPositionOfCurrentSelectionToRayTrace(this.mc, corner, moveEverything, maxDistance);
                         }
                         else if (Configs.Generic.SELECTION_MODE.getOptionListValue() == AreaSelectionMode.CUBOID)
                         {
-                            sm.handleCuboidModeMouseClick(mc, maxDistance, isToolSecondary);
+                            sm.handleCuboidModeMouseClick(this.mc, maxDistance, isToolSecondary, moveEverything);
                         }
                     }
                     else if (mode.getUsesSchematic())
@@ -391,11 +393,7 @@ public class KeyCallbacks
 
                     if (selection != null)
                     {
-                        BlockPos old = selection.getOrigin();
-                        selection.moveEntireSelectionTo(pos);
-                        String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
-                        String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                        StringUtils.printActionbarMessage("litematica.message.moved_selection", oldStr, posStr);
+                        selection.moveEntireSelectionTo(pos, true);
                         return true;
                     }
                 }

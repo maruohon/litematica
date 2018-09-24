@@ -4,6 +4,7 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager;
+import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
@@ -15,6 +16,7 @@ import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
 {
@@ -88,7 +90,22 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                             sm.changeGrabDistance(player, amount);
                             return true;
                         }
-                        else if (sm.hasSelectedElement() || (sm.getCurrentSelection() != null && sm.getCurrentSelection().isOriginSelected()))
+                        else if (sm.hasSelectedOrigin())
+                        {
+                            AreaSelection area = sm.getCurrentSelection();
+                            BlockPos old = area.getOrigin();
+                            area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(player), amount), false);
+                            return true;
+                        }
+                    }
+                }
+                else if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
+                {
+                    if (mode == OperationMode.AREA_SELECTION)
+                    {
+                        SelectionManager sm = DataManager.getInstance().getSelectionManager();
+
+                        if (sm.hasSelectedElement())
                         {
                             sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), amount);
                             return true;

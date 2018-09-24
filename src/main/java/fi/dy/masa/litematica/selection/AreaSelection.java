@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
 
 public class AreaSelection
@@ -222,8 +223,9 @@ public class AreaSelection
         return false;
     }
 
-    public void moveEntireSelectionTo(BlockPos newOrigin)
+    public void moveEntireSelectionTo(BlockPos newOrigin, boolean printMessage)
     {
+        BlockPos old = this.getOrigin();
         BlockPos diff = newOrigin.subtract(this.origin);
 
         for (Box box : this.subRegionBoxes.values())
@@ -240,6 +242,13 @@ public class AreaSelection
         }
 
         this.origin = newOrigin;
+
+        if (printMessage)
+        {
+            String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+            String newStr = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
+            StringUtils.printActionbarMessage("litematica.message.moved_selection", oldStr, newStr);
+        }
     }
 
     public static AreaSelection fromJson(JsonObject obj)

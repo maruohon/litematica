@@ -282,7 +282,13 @@ public class SelectionManager
     public boolean hasSelectedElement()
     {
         AreaSelection area = this.getCurrentSelection();
-        return area != null && area.getSelectedSubRegionBox() != null;
+        return area != null && (area.getSelectedSubRegionBox() != null || area.isOriginSelected());
+    }
+
+    public boolean hasSelectedOrigin()
+    {
+        AreaSelection area = this.getCurrentSelection();
+        return area != null && area.isOriginSelected();
     }
 
     public void moveSelectedElement(EnumFacing direction, int amount)
@@ -344,14 +350,14 @@ public class SelectionManager
         return false;
     }
 
-    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, Corner corner, double maxDistance)
+    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, Corner corner, boolean moveEntireSelection, double maxDistance)
     {
-        AreaSelection sel = this.getCurrentSelection();
+        AreaSelection area = this.getCurrentSelection();
 
-        if (sel != null)
+        if (area != null)
         {
-            boolean movingCorner = sel.getSelectedSubRegionBox() != null && corner != Corner.NONE;
-            boolean movingOrigin = sel.isOriginSelected();
+            boolean movingCorner = area.getSelectedSubRegionBox() != null && corner != Corner.NONE;
+            boolean movingOrigin = area.isOriginSelected();
 
             if (movingCorner || movingOrigin)
             {
@@ -368,17 +374,17 @@ public class SelectionManager
 
                     if (corner == Corner.CORNER_1)
                     {
-                        sel.getSelectedSubRegionBox().setPos1(pos);
+                        area.getSelectedSubRegionBox().setPos1(pos);
                     }
                     else if (corner == Corner.CORNER_2)
                     {
-                        sel.getSelectedSubRegionBox().setPos2(pos);
+                        area.getSelectedSubRegionBox().setPos2(pos);
                         cornerIndex = 2;
                     }
 
                     if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
                     {
-                        sel.getSelectedSubRegionBox().setSelectedCorner(corner);
+                        area.getSelectedSubRegionBox().setSelectedCorner(corner);
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
@@ -387,22 +393,30 @@ public class SelectionManager
                 // Moving the origin point
                 else
                 {
-                    this.moveSelectionOrigin(sel, pos);
+                    this.moveSelectionOrigin(area, pos, moveEntireSelection);
                 }
             }
         }
     }
 
-    public void moveSelectionOrigin(AreaSelection selection, BlockPos newOrigin)
+    public void moveSelectionOrigin(AreaSelection area, BlockPos newOrigin, boolean moveEntireSelection)
     {
-        BlockPos old = selection.getOrigin();
-        selection.setOrigin(newOrigin);
-        String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
-        String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-        StringUtils.printActionbarMessage("litematica.message.moved_area_origin", posStrOld, posStrNew);
+        if (moveEntireSelection)
+        {
+            area.moveEntireSelectionTo(newOrigin, true);
+        }
+        else
+        {
+            BlockPos old = area.getOrigin();
+            area.setOrigin(newOrigin);
+
+            String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+            String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
+            StringUtils.printActionbarMessage("litematica.message.moved_area_origin", posStrOld, posStrNew);
+        }
     }
 
-    public void handleCuboidModeMouseClick(Minecraft mc, double maxDistance, boolean isRightClick)
+    public void handleCuboidModeMouseClick(Minecraft mc, double maxDistance, boolean isRightClick, boolean moveEntireSelection)
     {
         AreaSelection selection = this.getCurrentSelection();
 
@@ -411,7 +425,7 @@ public class SelectionManager
             if (selection.isOriginSelected())
             {
                 BlockPos newOrigin = this.getTargetedPosition(mc.world, mc.player, maxDistance);
-                this.moveSelectionOrigin(selection, newOrigin);
+                this.moveSelectionOrigin(selection, newOrigin, moveEntireSelection);
             }
             // Right click in Cuboid mode: Reset the area to the clicked position
             else if (isRightClick)
