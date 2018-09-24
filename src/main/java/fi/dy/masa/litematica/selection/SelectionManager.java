@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.selection;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
@@ -142,6 +143,7 @@ public class SelectionManager
 
                 if (selection != null)
                 {
+                    String oldName = selection.getName();
                     String newId = newFile.getAbsolutePath();
                     selection.setName(newName);
                     this.selections.put(newId, selection);
@@ -151,12 +153,21 @@ public class SelectionManager
                         this.currentSelectionId = newId;
                     }
 
+                    List<Box> boxes = selection.getAllSubRegionBoxes();
+
+                    // If the selection had only one box with the exact same name as the area selection itself,
+                    // then also rename that box to the new name.
+                    if (boxes.size() == 1 && boxes.get(0).getName().equals(oldName))
+                    {
+                        selection.renameSubRegionBox(oldName, newName);
+                    }
+
                     return true;
                 }
             }
             else
             {
-                feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.already_exists", newName);
+                feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.already_exists", newFile.getName());
             }
         }
 

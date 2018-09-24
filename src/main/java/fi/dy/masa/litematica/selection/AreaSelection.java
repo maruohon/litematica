@@ -1,9 +1,10 @@
 package fi.dy.masa.litematica.selection;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -118,9 +119,9 @@ public class AreaSelection
         return this.currentBox != null ? this.subRegionBoxes.get(this.currentBox) : null;
     }
 
-    public Collection<Box> getAllSubRegionBoxes()
+    public List<Box> getAllSubRegionBoxes()
     {
-        return this.subRegionBoxes.values();
+        return ImmutableList.copyOf(this.subRegionBoxes.values());
     }
 
     public String createNewSubRegionBox(BlockPos pos1, final String nameIn)
