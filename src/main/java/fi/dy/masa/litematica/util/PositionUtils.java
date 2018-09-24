@@ -78,6 +78,19 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
+    public static BlockPos getAreaSizeFromRelativeEndPositionAbs(BlockPos posEndRelative)
+    {
+        int x = posEndRelative.getX();
+        int y = posEndRelative.getY();
+        int z = posEndRelative.getZ();
+
+        x = x >= 0 ? x + 1 : x - 1;
+        y = y >= 0 ? y + 1 : y - 1;
+        z = z >= 0 ? z + 1 : z - 1;
+
+        return new BlockPos(Math.abs(x), Math.abs(y), Math.abs(z));
+    }
+
     public static BlockPos getRelativeEndPositionFromAreaSize(Vec3i size)
     {
         int x = size.getX();

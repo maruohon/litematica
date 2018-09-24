@@ -194,12 +194,13 @@ litematica.gui.title.schematic_browser=Schematic Browser
 litematica.gui.title.schematic_manager=Schematic Manager
 litematica.gui.title.schematic_verifier=Schematic Verifier
 
-litematica.hud.area_selection.box_count=Boxes
+litematica.hud.area_selection.box_count=Boxes: %s
+litematica.hud.area_selection.dimensions_position=Dim: %s - p1: %s, p2: %s
 litematica.hud.area_selection.mode.corners=Corners
 litematica.hud.area_selection.mode.cuboid=Cuboid
-litematica.hud.area_selection.origin=Origin
-litematica.hud.area_selection.selected_area=Area
-litematica.hud.area_selection.selected_sub_region=Sub-region
+litematica.hud.area_selection.origin=Origin: %s
+litematica.hud.area_selection.selected_area=Area: %s
+litematica.hud.area_selection.selected_sub_region=Sub-region: %s
 litematica.hud.area_selection.selection_mode=Selection Mode: %s
 
 litematica.hud.schematic_placement.hover_info.placement_modified=This placement has been modified

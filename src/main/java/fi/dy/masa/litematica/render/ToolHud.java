@@ -6,9 +6,11 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import net.minecraft.client.resources.I18n;
@@ -48,8 +50,11 @@ public class ToolHud extends InfoHud
         List<String> lines = this.lineList;
         lines.clear();
         String str;
-        String strYes = GuiBase.TXT_GREEN + I18n.format("litematica.label.yes") + GuiBase.TXT_RST;
-        String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + GuiBase.TXT_RST;
+        String green = GuiBase.TXT_GREEN;
+        String white = GuiBase.TXT_WHITE;
+        String rst = GuiBase.TXT_RST;
+        String strYes = green + I18n.format("litematica.label.yes") + rst;
+        String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
 
         if (mode == OperationMode.AREA_SELECTION)
         {
@@ -58,31 +63,38 @@ public class ToolHud extends InfoHud
 
             if (selection != null)
             {
-                str = I18n.format("litematica.hud.area_selection.selected_area");
-                String strTmp = selection.getName();
-                lines.add(String.format("%s: %s%s%s", str, GuiBase.TXT_GREEN, strTmp, GuiBase.TXT_RST));
+                lines.add(I18n.format("litematica.hud.area_selection.selected_area", green + selection.getName() + rst));
 
-                str = I18n.format("litematica.hud.area_selection.box_count");
-                int count = selection.getAllSubRegionBoxes().size();
-                String strBoxes = String.format("%s: %s%d%s", str, GuiBase.TXT_GREEN, count, GuiBase.TXT_RST);
                 BlockPos or = selection.getOrigin();
-                str = I18n.format("litematica.hud.area_selection.origin");
-                String strOrigin = String.format("%s: %s%d%s, %s%d%s, %s%d%s", str,
-                        GuiBase.TXT_GREEN, or.getX(), GuiBase.TXT_WHITE,
-                        GuiBase.TXT_GREEN, or.getY(), GuiBase.TXT_WHITE,
-                        GuiBase.TXT_GREEN, or.getZ(), GuiBase.TXT_RST);
+                int count = selection.getAllSubRegionBoxes().size();
+
+                str = String.format("%d, %d, %d", or.getX(), or.getY(), or.getZ());
+                String strOrigin = I18n.format("litematica.hud.area_selection.origin", green + str + rst);
+                String strBoxes = I18n.format("litematica.hud.area_selection.box_count", green + count + rst);
+
                 lines.add(strOrigin + " - " + strBoxes);
 
                 String subRegionName = selection.getCurrentSubRegionBoxName();
+                Box box = selection.getSelectedSubRegionBox();
 
-                if (subRegionName != null)
+                if (subRegionName != null && box != null)
                 {
-                    str = I18n.format("litematica.hud.area_selection.selected_sub_region");
-                    lines.add(String.format("%s: %s%s%s", str, GuiBase.TXT_GREEN, subRegionName, GuiBase.TXT_RST));
+                    lines.add(I18n.format("litematica.hud.area_selection.selected_sub_region", green + subRegionName + rst));
+                    BlockPos p1 = box.getPos1();
+                    BlockPos p2 = box.getPos2();
+
+                    if (p1 != null && p2 != null)
+                    {
+                        BlockPos size = PositionUtils.getAreaSizeFromRelativeEndPositionAbs(p2.subtract(p1));
+                        String strDim = green + String.format("%dx%dx%d", size.getX(), size.getY(), size.getZ()) + rst;
+                        String strp1 = green + String.format("%d, %d, %d", p1.getX(), p1.getY(), p1.getZ()) + rst;
+                        String strp2 = green + String.format("%d, %d, %d", p2.getX(), p2.getY(), p2.getZ()) + rst;
+                        lines.add(I18n.format("litematica.hud.area_selection.dimensions_position", strDim, strp1, strp2));
+                    }
                 }
 
-                strTmp = GuiBase.TXT_GREEN + Configs.Generic.SELECTION_MODE.getOptionListValue().getDisplayName() + GuiBase.TXT_RST;
-                lines.add(I18n.format("litematica.hud.area_selection.selection_mode", strTmp));
+                str = green + Configs.Generic.SELECTION_MODE.getOptionListValue().getDisplayName() + rst;
+                lines.add(I18n.format("litematica.hud.area_selection.selection_mode", str));
             }
         }
         else if (mode.getUsesSchematic())
@@ -92,22 +104,20 @@ public class ToolHud extends InfoHud
             if (schematicPlacement != null)
             {
                 str = I18n.format("litematica.hud.schematic_placement.selected_placement");
-                lines.add(String.format("%s: %s%s%s", str, GuiBase.TXT_GREEN, schematicPlacement.getName(), GuiBase.TXT_RST));
+                lines.add(String.format("%s: %s%s%s", str, green, schematicPlacement.getName(), rst));
 
                 str = I18n.format("litematica.hud.schematic_placement.sub_region_count");
                 int count = schematicPlacement.getSubRegionCount();
-                String strCount = String.format("%s: %s%d%s", str, GuiBase.TXT_GREEN, count, GuiBase.TXT_RST);
+                String strCount = String.format("%s: %s%d%s", str, green, count, rst);
 
                 str = I18n.format("litematica.hud.schematic_placement.sub_regions_modified");
                 String strTmp = schematicPlacement.isRegionPlacementModified() ? strYes : strNo;
                 lines.add(strCount + String.format(" - %s: %s", str, strTmp));
 
-                str = I18n.format("litematica.hud.area_selection.origin");
                 BlockPos or = schematicPlacement.getOrigin();
-                lines.add(String.format("%s: %s%d%s, %s%d%s, %s%d%s", str,
-                        GuiBase.TXT_GREEN, or.getX(), GuiBase.TXT_WHITE,
-                        GuiBase.TXT_GREEN, or.getY(), GuiBase.TXT_WHITE,
-                        GuiBase.TXT_GREEN, or.getZ(), GuiBase.TXT_RST));
+                str = String.format("%d, %d, %d", or.getX(), or.getY(), or.getZ());
+
+                lines.add(I18n.format("litematica.hud.area_selection.origin", green + str + rst));
 
                 Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
@@ -115,7 +125,7 @@ public class ToolHud extends InfoHud
                 {
                     String areaName = placement.getName();
                     str = I18n.format("litematica.hud.schematic_placement.selected_sub_region");
-                    lines.add(String.format("%s: %s%s%s", str, GuiBase.TXT_GREEN, areaName, GuiBase.TXT_RST));
+                    lines.add(String.format("%s: %s%s%s", str, green, areaName, rst));
 
                     str = I18n.format("litematica.hud.schematic_placement.sub_region_modified");
                     strTmp = placement.isRegionPlacementModified(schematicPlacement.getSchematic().getSubRegionPosition(areaName)) ? strYes : strNo;
@@ -126,12 +136,12 @@ public class ToolHud extends InfoHud
             {
                 String strTmp = "<" + I18n.format("litematica.label.none_lower") + ">";
                 str = I18n.format("litematica.hud.schematic_placement.selected_placement");
-                lines.add(String.format("%s: %s%s%s", str, GuiBase.TXT_WHITE, strTmp, GuiBase.TXT_RST));
+                lines.add(String.format("%s: %s%s%s", str, white, strTmp, rst));
             }
         }
 
         str = I18n.format("litematica.hud.selected_mode");
-        lines.add(String.format("%s [%s%d%s/%s%d%s]: %s%s%s", str, GuiBase.TXT_GREEN, mode.ordinal() + 1, GuiBase.TXT_WHITE,
-                GuiBase.TXT_GREEN, OperationMode.values().length, GuiBase.TXT_WHITE, GuiBase.TXT_GREEN, mode.getName(), GuiBase.TXT_RST));
+        lines.add(String.format("%s [%s%d%s/%s%d%s]: %s%s%s", str, green, mode.ordinal() + 1, white,
+                green, OperationMode.values().length, white, green, mode.getName(), rst));
     }
 }
