@@ -14,10 +14,10 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class LayerRange
 {
-    private static final int WORLD_HORIZONTAL_SIZE_MAX =  30000000;
-    private static final int WORLD_HORIZONTAL_SIZE_MIN = -30000000;
-    private static final int WORLD_VERTICAL_SIZE_MAX = 255;
-    private static final int WORLD_VERTICAL_SIZE_MIN = 0;
+    public static final int WORLD_HORIZONTAL_SIZE_MAX =  30000000;
+    public static final int WORLD_HORIZONTAL_SIZE_MIN = -30000000;
+    public static final int WORLD_VERTICAL_SIZE_MAX = 255;
+    public static final int WORLD_VERTICAL_SIZE_MIN = 0;
 
     private LayerMode layerMode = LayerMode.ALL;
     private EnumFacing.Axis axis = EnumFacing.Axis.Y;
@@ -151,7 +151,7 @@ public class LayerRange
     {
         this.layerMode = mode;
 
-        WorldUtils.markSchematicChunksForRenderUpdateBetweenY(WORLD_VERTICAL_SIZE_MIN, WORLD_VERTICAL_SIZE_MAX);
+        WorldUtils.markAllSchematicChunksForRenderUpdate();
         String val = TextFormatting.GREEN.toString() + mode.getDisplayName();
         StringUtils.printActionbarMessage("litematica.message.set_layer_mode_to", val);
     }
@@ -160,7 +160,7 @@ public class LayerRange
     {
         this.axis = axis;
 
-        WorldUtils.markSchematicChunksForRenderUpdateBetweenY(WORLD_VERTICAL_SIZE_MIN, WORLD_VERTICAL_SIZE_MAX);
+        WorldUtils.markAllSchematicChunksForRenderUpdate();
         String val = TextFormatting.GREEN.toString() + axis.getName();
         StringUtils.printActionbarMessage("litematica.message.set_layer_axis_to", val);
     }
@@ -266,7 +266,7 @@ public class LayerRange
         switch (this.layerMode)
         {
             case ALL:
-                WorldUtils.markSchematicChunksForRenderUpdateBetweenY(WORLD_VERTICAL_SIZE_MIN, WORLD_VERTICAL_SIZE_MAX);
+                WorldUtils.markAllSchematicChunksForRenderUpdate();
                 return;
             case SINGLE_LAYER:
             {

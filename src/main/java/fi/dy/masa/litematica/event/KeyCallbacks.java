@@ -58,6 +58,7 @@ public class KeyCallbacks
         Hotkeys.PICK_BLOCK_FIRST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_LAST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PICK_BLOCK_ENABLED));
+        Hotkeys.RERENDER_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_1.getKeybind().setCallback(callbackHotkeys);
@@ -332,6 +333,12 @@ public class KeyCallbacks
                     WorldUtils.deleteSelectionVolumes(this.mc);
                     return true;
                 }
+            }
+            else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
+            {
+                WorldUtils.markAllSchematicChunksForRenderUpdate();
+                StringUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
+                return true;
             }
 
             return false;

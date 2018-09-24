@@ -248,6 +248,11 @@ public class WorldUtils
         }
     }
 
+    public static void markAllSchematicChunksForRenderUpdate()
+    {
+        markSchematicChunksForRenderUpdateBetweenY(LayerRange.WORLD_VERTICAL_SIZE_MIN, LayerRange.WORLD_VERTICAL_SIZE_MAX);
+    }
+
     public static void markSchematicChunksForRenderUpdateBetweenY(int y1, int y2)
     {
         World world = SchematicWorldHandler.getSchematicWorld();

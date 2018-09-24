@@ -236,6 +236,7 @@ litematica.message.scheduled_task_added=Scheduled task added...
 litematica.message.schematic_pasted=Schematic Pasted in world
 litematica.message.schematic_placement_created=Placement created for '%s'
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
+litematica.message.schematic_rendering_refreshed=Schematic rendering refreshed
 litematica.message.schematic_saved_as=Schematic saved as '%s'
 litematica.message.set_area_origin=Set the area origin point to %s
 litematica.message.set_layer_axis_to=Set layer axis to %s
