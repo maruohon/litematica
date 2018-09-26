@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.event;
 
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager;
@@ -61,12 +62,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
     {
         Minecraft mc = Minecraft.getMinecraft();
+        boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
-        // Not in a GUI
-        if (mc.currentScreen == null && mc.world != null && mc.player != null)
+        // Tool enabled, and not in a GUI
+        if (toolEnabled && mc.currentScreen == null && mc.world != null && mc.player != null)
         {
             EntityPlayer player = mc.player;
-            final boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.getToolItem());
+            boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.getToolItem());
 
             if (hasTool == false)
             {
