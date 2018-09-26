@@ -12,6 +12,7 @@ import com.google.gson.JsonPrimitive;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.LayerRange;
@@ -408,6 +409,8 @@ public class DataManager implements IDirectoryCache
         {
         }
 
+        // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
+        Configs.Generic.TOOL_ITEM.setValueFromString(Item.REGISTRY.getNameForObject(Items.STICK).toString());
     }
 }
