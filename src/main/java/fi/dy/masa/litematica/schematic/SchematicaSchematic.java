@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
@@ -39,7 +38,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 import net.minecraft.world.gen.structure.template.Template;
@@ -313,50 +311,30 @@ public class SchematicaSchematic
         BlockPos posEnd = posStart.add(PositionUtils.getRelativeEndPositionFromAreaSize(this.size));
         BlockPos pos1 = PositionUtils.getMinCorner(posStart, posEnd);
         BlockPos pos2 = PositionUtils.getMaxCorner(posStart, posEnd).add(1, 1, 1);
-        List<Entity> existingEntities = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos1, pos2));
+        List<Entity> existingEntitiesInArea = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos1, pos2), null);
 
         for (NBTTagCompound tag : this.entities)
         {
             Vec3d relativePos = NBTUtils.readEntityPositionFromTag(tag);
             Vec3d transformedRelativePos = PositionUtils.getTransformedPosition(relativePos, mirror, rotation);
             Vec3d realPos = transformedRelativePos.addVector(posStart.getX(), posStart.getY(), posStart.getZ());
-            NBTUtils.writeEntityPositionToTag(realPos, tag);
-
-            UUID uuidOriginal = tag.getUniqueId("UUID");
-            tag.setUniqueId("UUID", UUID.randomUUID());
-
-            Entity entity;
+            Entity entity = null;
 
             try
             {
                 entity = EntityList.createEntityFromNBT(tag, world);
             }
-            catch (Exception var15)
+            catch (Exception e)
             {
-                entity = null;
             }
 
             if (entity != null)
             {
+                EntityUtils.handleSchematicPlacementEntityUUIDCollision(world, entity, existingEntitiesInArea);
+
                 float rotationYaw = entity.getMirroredYaw(mirror);
                 rotationYaw = rotationYaw + (entity.rotationYaw - entity.getRotatedYaw(rotation));
                 entity.setLocationAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.rotationPitch);
-
-                // Use the original UUID if possible. If there is an entity with the same UUID within the pasted area,
-                // then the old one will be killed. Otherwise if there is no entity currently in the world with
-                // the same UUID, then the original UUID will be used.
-                Entity existing = EntityUtils.findEntityByUUID(existingEntities, uuidOriginal);
-
-                if (existing != null)
-                {
-                    world.removeEntityDangerously(existing);
-                    entity.setUniqueId(uuidOriginal);
-                }
-                else if (world instanceof WorldServer && ((WorldServer) world).getEntityFromUuid(uuidOriginal) == null)
-                {
-                    entity.setUniqueId(uuidOriginal);
-                }
-
                 world.spawnEntity(entity);
             }
         }
