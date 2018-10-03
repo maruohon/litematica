@@ -111,7 +111,7 @@ public class KeyCallbacks
 
                 if (isToolPrimary || isToolSecondary)
                 {
-                    if (mode == OperationMode.AREA_SELECTION)
+                    if (mode.getUsesAreaSelection())
                     {
                         SelectionManager sm = dataManager.getSelectionManager();
                         boolean moveEverything = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
@@ -139,7 +139,7 @@ public class KeyCallbacks
                     {
                         dataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
                     }
-                    else
+                    else if (mode.getUsesAreaSelection())
                     {
                         SelectionManager sm = dataManager.getSelectionManager();
 
@@ -249,7 +249,7 @@ public class KeyCallbacks
                     return true;
                 }
             }
-            else if (mode == OperationMode.AREA_SELECTION)
+            else if (mode.getUsesAreaSelection())
             {
                 if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind())
                 {
@@ -336,8 +336,11 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
             {
-                WorldUtils.markAllSchematicChunksForRenderUpdate();
-                StringUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
+                if (mode.getUsesSchematic())
+                {
+                    WorldUtils.markAllSchematicChunksForRenderUpdate();
+                    StringUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
+                }
                 return true;
             }
 
@@ -357,101 +360,118 @@ public class KeyCallbacks
         @Override
         public boolean onKeyAction(KeyAction action, IKeybind key)
         {
+            OperationMode mode = DataManager.getOperationMode();
+
             if (key == Hotkeys.ADD_SELECTION_BOX.getKeybind())
             {
-                SelectionManager sm = DataManager.getInstance().getSelectionManager();
-                AreaSelection selection = sm.getCurrentSelection();
-
-                if (selection != null)
-                {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                    selection.createNewSubRegionBox(pos, selection.getName());
-
-                    String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
-
-                    return true;
-                }
-            }
-            else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())
-            {
-                SelectionManager sm = DataManager.getInstance().getSelectionManager();
-                AreaSelection selection = sm.getCurrentSelection();
-
-                if (selection != null)
-                {
-                    String name = selection.getCurrentSubRegionBoxName();
-
-                    if (name != null && selection.removeSelectedSubRegionBox())
-                    {
-                        StringUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
-                        return true;
-                    }
-                }
-            }
-            else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())
-            {
-                BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-
-                if (DataManager.getOperationMode() == OperationMode.AREA_SELECTION)
+                if (mode.getUsesAreaSelection())
                 {
                     SelectionManager sm = DataManager.getInstance().getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
                     {
+                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        selection.createNewSubRegionBox(pos, selection.getName());
+
+                        String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                        StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
+
+                        return true;
+                    }
+                }
+            }
+            else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())
+            {
+                if (mode.getUsesAreaSelection())
+                {
+                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    AreaSelection selection = sm.getCurrentSelection();
+
+                    if (selection != null)
+                    {
+                        String name = selection.getCurrentSubRegionBoxName();
+
+                        if (name != null && selection.removeSelectedSubRegionBox())
+                        {
+                            StringUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
+                            return true;
+                        }
+                    }
+                }
+            }
+            else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())
+            {
+                if (mode.getUsesAreaSelection())
+                {
+                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    AreaSelection selection = sm.getCurrentSelection();
+
+                    if (selection != null)
+                    {
+                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                         selection.moveEntireSelectionTo(pos, true);
                         return true;
                     }
                 }
-                else if (DataManager.getOperationMode().getUsesSchematic())
+                else if (mode.getUsesSchematic())
                 {
+                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                     DataManager.getInstance().getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
                     return true;
                 }
             }
-            else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeybind() && DataManager.getOperationMode() == OperationMode.AREA_SELECTION)
+            else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeybind())
             {
-                Configs.Generic.SELECTION_MODE.setOptionListValue(Configs.Generic.SELECTION_MODE.getOptionListValue().cycle(false));
-                return true;
+                if (mode.getUsesAreaSelection())
+                {
+                    Configs.Generic.SELECTION_MODE.setOptionListValue(Configs.Generic.SELECTION_MODE.getOptionListValue().cycle(false));
+                    return true;
+                }
             }
             else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
             {
-                SelectionManager sm = DataManager.getInstance().getSelectionManager();
-                AreaSelection selection = sm.getCurrentSelection();
-
-                if (selection != null)
+                if (mode.getUsesAreaSelection())
                 {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                    selection.setOrigin(pos);
-                    String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    StringUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
-                    return true;
+                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    AreaSelection selection = sm.getCurrentSelection();
+
+                    if (selection != null)
+                    {
+                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        selection.setOrigin(pos);
+                        String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                        StringUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
+                        return true;
+                    }
                 }
             }
             else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ||
                      key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())
             {
-                SelectionManager sm = DataManager.getInstance().getSelectionManager();
-                AreaSelection selection = sm.getCurrentSelection();
-
-                if (selection != null && selection.getSelectedSubRegionBox() != null)
+                if (mode.getUsesAreaSelection())
                 {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                    int p = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? 1 : 2;
+                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    AreaSelection selection = sm.getCurrentSelection();
 
-                    if (p == 1)
+                    if (selection != null && selection.getSelectedSubRegionBox() != null)
                     {
-                        selection.getSelectedSubRegionBox().setPos1(pos);
-                    }
-                    else
-                    {
-                        selection.getSelectedSubRegionBox().setPos2(pos);
-                    }
+                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        int p = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? 1 : 2;
 
-                    String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", p, posStr);
-                    return true;
+                        if (p == 1)
+                        {
+                            selection.getSelectedSubRegionBox().setPos1(pos);
+                        }
+                        else
+                        {
+                            selection.getSelectedSubRegionBox().setPos2(pos);
+                        }
+
+                        String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                        StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", p, posStr);
+                        return true;
+                    }
                 }
             }
 

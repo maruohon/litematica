@@ -56,7 +56,7 @@ public class ToolHud extends InfoHud
         String strYes = green + I18n.format("litematica.label.yes") + rst;
         String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
 
-        if (mode == OperationMode.AREA_SELECTION)
+        if (mode.getUsesAreaSelection())
         {
             SelectionManager sm = DataManager.getInstance().getSelectionManager();
             AreaSelection selection = sm.getCurrentSelection();

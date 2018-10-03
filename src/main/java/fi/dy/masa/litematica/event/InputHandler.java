@@ -83,7 +83,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
                 {
-                    if (mode == OperationMode.AREA_SELECTION)
+                    if (mode.getUsesAreaSelection())
                     {
                         SelectionManager sm = DataManager.getInstance().getSelectionManager();
 
@@ -103,7 +103,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
                 else if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
                 {
-                    if (mode == OperationMode.AREA_SELECTION)
+                    if (mode.getUsesAreaSelection())
                     {
                         SelectionManager sm = DataManager.getInstance().getSelectionManager();
 
