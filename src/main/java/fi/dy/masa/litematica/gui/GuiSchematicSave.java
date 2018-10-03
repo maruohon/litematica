@@ -61,7 +61,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
     @Override
     public File getDefaultDirectory()
     {
-        return DataManager.ROOT_SCHEMATIC_DIRECTORY;
+        return DataManager.getSchematicsBaseDirectory();
     }
 
     @Override

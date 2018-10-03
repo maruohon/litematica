@@ -38,7 +38,7 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     @Override
     protected File getRootDirectory()
     {
-        return DataManager.ROOT_AREA_SELECTIONS_DIRECTORY;
+        return DataManager.getAreaSelectionsBaseDirectory();
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.litematica.event.RenderHandler;
@@ -61,6 +62,8 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     @Override
     public void onInitCompleted(Minecraft mc, LiteLoader loader)
     {
+        DataManager.getAreaSelectionsBaseDirectory();
+        DataManager.getSchematicsBaseDirectory();
         KeyCallbacks.init(mc);
     }
 

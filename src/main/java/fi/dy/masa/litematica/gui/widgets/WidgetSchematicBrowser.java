@@ -67,7 +67,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     @Override
     protected File getRootDirectory()
     {
-        return DataManager.ROOT_SCHEMATIC_DIRECTORY;
+        return DataManager.getSchematicsBaseDirectory();
     }
 
     @Override

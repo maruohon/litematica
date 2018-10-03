@@ -30,9 +30,6 @@ import net.minecraft.util.ResourceLocation;
 
 public class DataManager implements IDirectoryCache
 {
-    public static final File ROOT_AREA_SELECTIONS_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(getCurrentConfigDirectory(), "area_selections"));
-    public static final File ROOT_SCHEMATIC_DIRECTORY = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getMinecraft().mcDataDir, "schematics"));
-
     private static final DataManager INSTANCE = new DataManager();
 
     private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)(@(?<meta>[0-9]+))$");
@@ -327,6 +324,30 @@ public class DataManager implements IDirectoryCache
     public static File getCurrentConfigDirectory()
     {
         return new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+    }
+
+    public static File getSchematicsBaseDirectory()
+    {
+        File dir = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getMinecraft().mcDataDir, "schematics"));
+
+        if (dir.exists() == false && dir.mkdirs() == false)
+        {
+            LiteModLitematica.logger.warn("Failed to create the schematic directory '{}'", dir.getAbsolutePath());
+        }
+
+        return dir;
+    }
+
+    public static File getAreaSelectionsBaseDirectory()
+    {
+        File dir = FileUtils.getCanonicalFileIfPossible(new File(getCurrentConfigDirectory(), "area_selections"));
+
+        if (dir.exists() == false && dir.mkdirs() == false)
+        {
+            LiteModLitematica.logger.warn("Failed to create the area selections base directory '{}'", dir.getAbsolutePath());
+        }
+
+        return dir;
     }
 
     private static File getCurrentStorageFile(boolean globalData)

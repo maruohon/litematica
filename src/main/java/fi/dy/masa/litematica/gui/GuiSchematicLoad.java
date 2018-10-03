@@ -41,7 +41,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
     @Override
     public File getDefaultDirectory()
     {
-        return DataManager.ROOT_SCHEMATIC_DIRECTORY;
+        return DataManager.getSchematicsBaseDirectory();
     }
 
     @Override

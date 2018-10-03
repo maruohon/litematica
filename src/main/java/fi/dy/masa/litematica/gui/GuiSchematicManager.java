@@ -52,7 +52,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     @Override
     public File getDefaultDirectory()
     {
-        return DataManager.ROOT_SCHEMATIC_DIRECTORY;
+        return DataManager.getSchematicsBaseDirectory();
     }
 
     @Override

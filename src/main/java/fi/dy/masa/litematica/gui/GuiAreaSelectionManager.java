@@ -79,7 +79,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
 
     public File getDefaultDirectory()
     {
-        return DataManager.ROOT_AREA_SELECTIONS_DIRECTORY;
+        return DataManager.getAreaSelectionsBaseDirectory();
     }
 
     @Override
