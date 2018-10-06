@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.config.Configs;
@@ -15,6 +16,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
@@ -22,6 +24,9 @@ import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import net.minecraft.block.BlockRedstoneRepeater;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -33,10 +38,13 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
@@ -326,10 +334,73 @@ public class WorldUtils
             IBlockState state = world.getBlockState(pos);
             ItemStack stack = ItemUtils.getItemForBlock(world, pos, state, true);
 
-            // Don't pick-block and cancel further processing if the correct item is already in the player's hand
             if (stack.isEmpty() == false)
             {
+                // Don't pick-block and cancel further processing if the correct item is already in the player's hand
                 return InventoryUtils.swapItemToMainHand(stack, mc);
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean handleEasyPlace(Minecraft mc)
+    {
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+
+        if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
+        {
+            RayTraceResult trace = traceWrapper.getRayTraceResult();
+            BlockPos pos = trace.getBlockPos();
+            World world = SchematicWorldHandler.getSchematicWorld();
+            IBlockState state = world.getBlockState(pos);
+            ItemStack stack = ItemUtils.getItemForBlock(world, pos, state, true);
+
+            if (stack.isEmpty() == false)
+            {
+                if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
+                {
+                    InventoryUtils.swapItemToMainHand(stack, mc);
+                }
+
+                EnumHand hand = null;
+
+                if (InventoryUtils.areStacksEqual(mc.player.getHeldItemMainhand(), stack))
+                {
+                    hand = EnumHand.MAIN_HAND;
+                }
+
+                if (InventoryUtils.areStacksEqual(mc.player.getHeldItemOffhand(), stack))
+                {
+                    hand = EnumHand.OFF_HAND;
+                }
+
+                if (hand != null)
+                {
+                    Vec3d hitPos = trace.hitVec;
+
+                    if (mc.isSingleplayer() == false)
+                    {
+                        // Carpet Accurate Placement protocol support
+                        for (Map.Entry<IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
+                        {
+                            if (entry.getKey() instanceof PropertyDirection)
+                            {
+                                float x = state.getValue((PropertyDirection) entry.getKey()).ordinal() + 2 + pos.getX();
+
+                                if (state.getBlock() instanceof BlockRedstoneRepeater)
+                                {
+                                    x += ((state.getValue(BlockRedstoneRepeater.DELAY)) - 1) * 10;
+                                }
+
+                                hitPos = new Vec3d(x, hitPos.y, hitPos.z);
+                                break;
+                            }
+                        }
+                    }
+
+                    mc.playerController.processRightClickBlock(mc.player, mc.world, pos, trace.sideHit, hitPos, hand);
+                }
             }
         }
 

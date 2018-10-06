@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.OperationMode;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
@@ -50,9 +51,18 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     @Override
     public boolean onKeyInput(int eventKey, boolean eventKeyState)
     {
-        if (eventKeyState && Minecraft.getMinecraft().gameSettings.keyBindScreenshot.getKeyCode() == eventKey)
+        if (eventKeyState)
         {
-            return GuiSchematicManager.setPreviewImage();
+            Minecraft mc = Minecraft.getMinecraft();
+
+            if (eventKey == mc.gameSettings.keyBindUseItem.getKeyCode())
+            {
+                return this.handleEasyPlace(mc);
+            }
+            else if (eventKey == mc.gameSettings.keyBindScreenshot.getKeyCode())
+            {
+                return GuiSchematicManager.setPreviewImage();
+            }
         }
 
         return false;
@@ -65,12 +75,16 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
         // Tool enabled, and not in a GUI
-        if (toolEnabled && mc.currentScreen == null && mc.world != null && mc.player != null)
+        if (mc.currentScreen == null && mc.world != null && mc.player != null)
         {
-            EntityPlayer player = mc.player;
-            boolean hasTool = EntityUtils.isHoldingItem(player, DataManager.getToolItem());
+            if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode())
+            {
+                return this.handleEasyPlace(mc);
+            }
 
-            if (hasTool == false)
+            EntityPlayer player = mc.player;
+
+            if (toolEnabled == false || EntityUtils.isHoldingItem(player, DataManager.getToolItem()) == false)
             {
                 return false;
             }
@@ -126,6 +140,17 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     return true;
                 }
             }
+        }
+
+        return false;
+    }
+
+    private boolean handleEasyPlace(Minecraft mc)
+    {
+        if (mc.player != null &&
+            Configs.Generic.EASY_PLACE_ENABLED.getBooleanValue())
+        {
+            return WorldUtils.handleEasyPlace(mc);
         }
 
         return false;

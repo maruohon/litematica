@@ -186,13 +186,20 @@ public class KeyCallbacks
                     DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
                     return true;
                 }
-                else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
+                else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind() ||
+                         key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
                 {
-                    return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
-                }
-                else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
-                {
-                    return WorldUtils.doSchematicWorldPickBlock(false, this.mc);
+                    boolean first = key == Hotkeys.PICK_BLOCK_FIRST.getKeybind();
+                    boolean ret = WorldUtils.doSchematicWorldPickBlock(first, this.mc);
+
+                    // This needs to also happen in here in addition to the calls from the input handling,
+                    // as a successful pick-block will prevent the input handling from triggering.
+                    if (Configs.Generic.EASY_PLACE_ENABLED.getBooleanValue())
+                    {
+                        WorldUtils.handleEasyPlace(this.mc);
+                    }
+
+                    return ret;
                 }
                 else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
                 {
