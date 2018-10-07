@@ -38,6 +38,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
@@ -358,6 +359,12 @@ public class WorldUtils
 
             if (stack.isEmpty() == false)
             {
+                // Abort if there is already a block in the target position
+                if (mc.world.getBlockState(pos).getBlock().isReplaceable(mc.world, pos) == false)
+                {
+                    return false;
+                }
+
                 if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
                 {
                     InventoryUtils.swapItemToMainHand(stack, mc);
@@ -399,12 +406,22 @@ public class WorldUtils
                         }
                     }
 
-                    mc.playerController.processRightClickBlock(mc.player, mc.world, pos, trace.sideHit, hitPos, hand);
+                    EnumFacing side = trace.sideHit;
+
+                    // Get the targeted side for an existing client world block, if any
+                    trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, 6);
+
+                    if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
+                    {
+                        side = trace.sideHit;
+                    }
+
+                    mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand);
                 }
             }
         }
 
-        return false;
+        return true;
     }
 
     public static void deleteSelectionVolumes(Minecraft mc)

@@ -190,13 +190,17 @@ public class KeyCallbacks
                          key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
                 {
                     boolean first = key == Hotkeys.PICK_BLOCK_FIRST.getKeybind();
-                    boolean ret = WorldUtils.doSchematicWorldPickBlock(first, this.mc);
+                    // By default only cancel further processing for the "first" type pick block,
+                    // to allow the use action after a "last" type pick block
+                    boolean ret = WorldUtils.doSchematicWorldPickBlock(first, this.mc) && first;
 
                     // This needs to also happen in here in addition to the calls from the input handling,
                     // as a successful pick-block will prevent the input handling from triggering.
-                    if (Configs.Generic.EASY_PLACE_ENABLED.getBooleanValue())
+                    if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+                        Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
                     {
                         WorldUtils.handleEasyPlace(this.mc);
+                        return true;
                     }
 
                     return ret;

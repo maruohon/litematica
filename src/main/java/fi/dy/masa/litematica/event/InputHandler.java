@@ -148,9 +148,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     private boolean handleEasyPlace(Minecraft mc)
     {
         if (mc.player != null &&
-            Configs.Generic.EASY_PLACE_ENABLED.getBooleanValue())
+            Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
         {
-            return WorldUtils.handleEasyPlace(mc);
+            WorldUtils.handleEasyPlace(mc);
+            return true;
         }
 
         return false;
