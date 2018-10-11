@@ -59,6 +59,18 @@ import net.minecraft.world.gen.structure.template.Template;
 
 public class WorldUtils
 {
+    private static boolean preventOnBlockAdded;
+
+    public static boolean shouldPreventOnBlockAdded()
+    {
+        return preventOnBlockAdded;
+    }
+
+    public static void setShouldPreventOnBlockAdded(boolean prevent)
+    {
+        preventOnBlockAdded = prevent;
+    }
+
     public static boolean convertSchematicaSchematicToLitematicaSchematic(
             File inputDir, String inputFileName, File outputDir, String outputFileName, boolean ignoreEntities, boolean override, IStringConsumer feedback)
     {

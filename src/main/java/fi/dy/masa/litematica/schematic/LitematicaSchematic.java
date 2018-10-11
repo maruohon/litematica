@@ -20,6 +20,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -185,6 +186,8 @@ public class LitematicaSchematic
 
     public boolean placeToWorld(World world, SchematicPlacement schematicPlacement, boolean notifyNeighbors)
     {
+        WorldUtils.setShouldPreventOnBlockAdded(true);
+
         ImmutableMap<String, Placement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
         BlockPos origin = schematicPlacement.getOrigin();
 
@@ -216,6 +219,8 @@ public class LitematicaSchematic
                 }
             }
         }
+
+        WorldUtils.setShouldPreventOnBlockAdded(false);
 
         return true;
     }

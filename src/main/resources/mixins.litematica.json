@@ -11,6 +11,7 @@
         "IMixinViewFrustum",
         "IMixinWorldClient",
         "MixinBlockRail",
+        "MixinChunk",
         "MixinChunkProviderClient",
         "MixinMinecraft",
         "MixinRegionRenderCacheBuilder",
