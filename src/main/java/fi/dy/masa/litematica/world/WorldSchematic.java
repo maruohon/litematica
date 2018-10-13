@@ -4,8 +4,13 @@ import fi.dy.masa.litematica.mixin.IMixinWorldClient;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldSettings;
@@ -39,6 +44,44 @@ public class WorldSchematic extends WorldClient
         else
         {
             return this.getChunkFromBlockCoords(pos).setBlockState(pos, newState) != null;
+        }
+    }
+
+    // This override is just to get rid of the annoying Minecart sounds >_>
+    @Override
+    public boolean spawnEntity(Entity entityIn)
+    {
+        return this.spawnEntityBase(entityIn);
+    }
+
+    private boolean spawnEntityBase(Entity entityIn)
+    {
+        int i = MathHelper.floor(entityIn.posX / 16.0D);
+        int j = MathHelper.floor(entityIn.posZ / 16.0D);
+        boolean flag = entityIn.forceSpawn;
+
+        if (entityIn instanceof EntityPlayer)
+        {
+            flag = true;
+        }
+
+        if (!flag && !this.isChunkLoaded(i, j, false))
+        {
+            return false;
+        }
+        else
+        {
+            if (entityIn instanceof EntityPlayer)
+            {
+                EntityPlayer entityplayer = (EntityPlayer)entityIn;
+                this.playerEntities.add(entityplayer);
+                this.updateAllPlayersSleepingFlag();
+            }
+
+            this.getChunkFromChunkCoords(i, j).addEntity(entityIn);
+            this.loadedEntityList.add(entityIn);
+            this.onEntityAdded(entityIn);
+            return true;
         }
     }
 
@@ -88,5 +131,53 @@ public class WorldSchematic extends WorldClient
     public boolean checkLightFor(EnumSkyBlock lightType, BlockPos pos)
     {
         return false;
+    }
+
+    @Override
+    public void playBroadcastSound(int id, BlockPos pos, int data)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playRecord(BlockPos blockPositionIn, SoundEvent soundEventIn)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playSound(BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch, boolean distanceDelay)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playSound(double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch, boolean distanceDelay)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playSound(EntityPlayer player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playSound(EntityPlayer player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playEvent(EntityPlayer player, int type, BlockPos pos, int data)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playEvent(int type, BlockPos pos, int data)
+    {
+        // NO-OP
     }
 }
