@@ -225,6 +225,9 @@ litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.in_memory_schematic_created=Created an in-memory schematic as '%s'
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
+litematica.message.moved_layer_range_by=Moved layer range by %s on the %s axis
+litematica.message.moved_max_layer_to=Moved max layer to %s
+litematica.message.moved_min_layer_to=Moved min layer to %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
 litematica.message.no_area_selected=§cNo area selected§r
 litematica.message.no_placement_selected=§cNo placement selected§r

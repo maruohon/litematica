@@ -312,6 +312,8 @@ public class LayerRange
 
     public boolean moveLayer(int amount)
     {
+        String strTo = TextFormatting.GREEN.toString() + this.axis.getName().toLowerCase() + " = ";
+
         switch (this.layerMode)
         {
             case ALL:
@@ -320,24 +322,31 @@ public class LayerRange
             {
                 this.setLayerSingle(this.layerSingle + amount);
 
-                String val = TextFormatting.GREEN.toString() + String.valueOf(this.layerSingle);
+                String val = strTo + this.layerSingle;
                 StringUtils.printActionbarMessage("litematica.message.set_layer_to", val);
                 break;
             }
             case ALL_ABOVE:
             {
                 this.setLayerAbove(this.layerAbove + amount);
+                String val = strTo + this.layerAbove;
+                StringUtils.printActionbarMessage("litematica.message.moved_min_layer_to", val);
                 break;
             }
             case ALL_BELOW:
             {
                 this.setLayerBelow(this.layerBelow + amount);
+                String val = strTo + this.layerBelow;
+                StringUtils.printActionbarMessage("litematica.message.moved_max_layer_to", val);
                 break;
             }
             case LAYER_RANGE:
             {
                 this.setLayerRangeMin(this.layerRangeMin + amount);
                 this.setLayerRangeMax(this.layerRangeMax + amount);
+                String val1 = TextFormatting.GREEN.toString() + String.valueOf(amount);
+                String val2 = this.axis.getName().toLowerCase();
+                StringUtils.printActionbarMessage("litematica.message.moved_layer_range_by", val1, val2);
                 break;
             }
             default:
