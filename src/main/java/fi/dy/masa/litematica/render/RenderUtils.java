@@ -666,6 +666,8 @@ public class RenderUtils
                 y += (rows - 6) * 18;
             }
 
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
             fi.dy.masa.malilib.gui.RenderUtils.renderInventoryBackground(x, y, slotsPerRow, totalSlots, inv, mc);
             fi.dy.masa.malilib.gui.RenderUtils.renderInventoryStacks(inv, x + slotOffsetX, y + slotOffsetY, slotsPerRow, 0, -1, mc);
         }
