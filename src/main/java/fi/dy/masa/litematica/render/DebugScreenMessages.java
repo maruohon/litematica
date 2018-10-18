@@ -16,10 +16,11 @@ public class DebugScreenMessages
 
     public static void update(Minecraft mc)
     {
-        if (mc.gameSettings.showDebugInfo)
+        WorldClient world = SchematicWorldHandler.getSchematicWorld();
+
+        if (mc.gameSettings.showDebugInfo && world != null)
         {
             RenderGlobal render = LitematicaRenderer.getInstance().getRenderGlobal();
-            WorldClient world = SchematicWorldHandler.getSchematicWorld();
 
             String pre = TextFormatting.GOLD.toString();
             String rst = TextFormatting.RESET.toString();
