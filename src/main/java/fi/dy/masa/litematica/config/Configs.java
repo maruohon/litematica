@@ -66,6 +66,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA            = new ConfigDouble( "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_AREA_SELECTION_BOX_SIDES     = new ConfigBoolean("renderAreaSelectionBoxSides", true, "If enabled, then the area selection boxes will\nhave their side quads rendered");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT        = new ConfigBoolean("renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered\nusing translucent \"ghost blocks\"");
+        public static final ConfigBoolean       RENDER_COLLIDING_SCHEMATIC_BLOCKS   = new ConfigBoolean("renderCollidingSchematicBlocks", false, "If enabled, then blocks in the schematics are rendered\nalso when there is already a (wrong) block in the client world");
         public static final ConfigBoolean       RENDER_INFO_OVERLAY                 = new ConfigBoolean("renderInfoOverlay", true, "If enabled, then an info overlay is rendered\nwhile looking at schematic blocks or schematic verifier\nerror markers, and holding the 'renderInfoOverlay' key");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES           = new ConfigBoolean("renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier\nwill have (translucent) sides rendered instead of just the outline");
         public static final ConfigBoolean       RENDER_PLACEMENT_BOX_SIDES          = new ConfigBoolean("renderPlacementBoxSides", false, "If enabled, then the placed schematic sub-region boxes\nwill have their side quads rendered");
@@ -88,14 +89,9 @@ public class Configs implements IConfigHandler
                 ENABLE_INFO_OVERLAY_RENDERING,
                 ENABLE_SELECTION_BOXES_RENDERING,
                 ENABLE_VERIFIER_OVERLAY_RENDERING,
-                ERROR_HILIGHT_ALPHA,
-                ERROR_HILIGHT_MAX_POSITIONS,
-                GHOST_BLOCK_ALPHA,
-                INFO_HUD_ALIGNMENT,
-                INFO_HUD_MAX_LINES,
-                PLACEMENT_BOX_SIDE_ALPHA,
                 RENDER_AREA_SELECTION_BOX_SIDES,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
+                RENDER_COLLIDING_SCHEMATIC_BLOCKS,
                 RENDER_INFO_OVERLAY,
                 RENDER_ERROR_MARKER_SIDES,
                 RENDER_PLACEMENT_BOX_SIDES,
@@ -105,12 +101,19 @@ public class Configs implements IConfigHandler
                 SCHEMATIC_OVERLAY_ENABLE_SIDES,
                 SCHEMATIC_OVERLAY_MODEL_OUTLINE,
                 SCHEMATIC_OVERLAY_MODEL_SIDES,
-                SCHEMATIC_OVERLAY_OUTLINE_WIDTH,
                 SCHEMATIC_OVERLAY_RENDER_THROUGH,
                 SCHEMATIC_OVERLAY_TYPE_EXTRA,
                 SCHEMATIC_OVERLAY_TYPE_MISSING,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK,
-                SCHEMATIC_OVERLAY_TYPE_WRONG_STATE
+                SCHEMATIC_OVERLAY_TYPE_WRONG_STATE,
+
+                INFO_HUD_ALIGNMENT,
+                ERROR_HILIGHT_ALPHA,
+                ERROR_HILIGHT_MAX_POSITIONS,
+                GHOST_BLOCK_ALPHA,
+                INFO_HUD_MAX_LINES,
+                PLACEMENT_BOX_SIDE_ALPHA,
+                SCHEMATIC_OVERLAY_OUTLINE_WIDTH
         );
     }
 

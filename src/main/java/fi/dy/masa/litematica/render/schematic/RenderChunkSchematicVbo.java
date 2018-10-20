@@ -161,6 +161,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         Set<TileEntity> tileEntities = new HashSet<>();
         BlockPos posChunk = this.getPosition();
         LayerRange range = DataManager.getRenderLayerRange();
+        final boolean renderColliding = Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue();
 
         this.existingOverlays.clear();
 
@@ -200,25 +201,17 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     Block blockSchematic = stateSchematic.getBlock();
                     Block blockClient = stateClient.getBlock();
                     Color4f overlayColor = null;
+                    boolean clientHasAir = blockClient == Blocks.AIR;
                     boolean missing = false;
 
-                    if (blockClient == Blocks.AIR)
+                    if (clientHasAir && blockSchematic == Blocks.AIR)
                     {
-                        // Both are air
-                        if (blockSchematic == Blocks.AIR)
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        // Schematic has a block, client has air
-
-                        /*
-                        if (iblockstate.isOpaqueCube())
-                        {
-                            visGraph.setOpaqueCube(blockpos$mutableblockpos);
-                        }
-                        */
-
+                    // Schematic has a block, client has air
+                    if (clientHasAir || renderColliding)
+                    {
                         if (blockSchematic.hasTileEntity())
                         {
                             this.addTileEntity(posMutable, compiledChunk, tileEntities);
@@ -238,15 +231,20 @@ public class RenderChunkSchematicVbo extends RenderChunk
                             }
 
                             usedLayers[layerIndex] |= this.renderGlobal.renderBlock(stateSchematic, posMutable, this.schematicWorldView, bufferSchematic);
-                            missing = true;
 
-                            if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_MISSING.getBooleanValue())
+                            if (clientHasAir)
                             {
-                                overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
+                                if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_MISSING.getBooleanValue())
+                                {
+                                    overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
+                                }
+
+                                missing = true;
                             }
                         }
                     }
-                    else if (stateSchematic != stateClient)
+
+                    if (clientHasAir == false && stateSchematic != stateClient)
                     {
                         // Extra block
                         if (blockSchematic == Blocks.AIR)
