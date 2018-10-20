@@ -210,7 +210,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     }
 
                     // Schematic has a block, client has air
-                    if (clientHasAir || renderColliding)
+                    if (clientHasAir || (renderColliding && stateSchematic != stateClient))
                     {
                         if (blockSchematic.hasTileEntity())
                         {
