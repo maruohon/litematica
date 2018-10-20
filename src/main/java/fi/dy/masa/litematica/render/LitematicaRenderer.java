@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
 import fi.dy.masa.litematica.render.shader.ShaderProgram;
 import net.minecraft.client.Minecraft;
@@ -214,7 +215,8 @@ public class LitematicaRenderer
             GlStateManager.color(1f, 1f, 1f, 1f);
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
 
-            if (Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue())
+            if (Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue() ||
+                Hotkeys.RENDER_OVERLAY_THROUGH_BLOCKS.getKeybind().isKeybindHeld())
             {
                 GlStateManager.disableDepth();
             }
