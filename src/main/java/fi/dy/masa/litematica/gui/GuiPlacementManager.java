@@ -2,11 +2,11 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicPlacement;
-import fi.dy.masa.litematica.data.SchematicPlacementManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicPlacements;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;

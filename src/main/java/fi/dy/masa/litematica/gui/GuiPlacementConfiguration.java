@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListPlacementSubRegions;
 import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegion;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
@@ -18,8 +18,8 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
-                                        implements ISelectionListener<Placement>
+public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
+                                        implements ISelectionListener<SubRegionPlacement>
 {
     private final SchematicPlacement placement;
     private ButtonGeneric buttonResetPlacement;
@@ -205,13 +205,13 @@ public class GuiPlacementConfiguration  extends GuiListBase<Placement, WidgetPla
     }
 
     @Override
-    protected ISelectionListener<Placement> getSelectionListener()
+    protected ISelectionListener<SubRegionPlacement> getSelectionListener()
     {
         return this;
     }
 
     @Override
-    public void onSelectionChange(Placement entry)
+    public void onSelectionChange(SubRegionPlacement entry)
     {
         this.placement.setSelectedSubRegionName(entry != null && entry.getName().equals(this.placement.getSelectedSubRegionName()) == false ? entry.getName() : null);
     }

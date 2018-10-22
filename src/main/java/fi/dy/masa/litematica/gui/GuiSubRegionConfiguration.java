@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
@@ -17,11 +17,11 @@ import net.minecraft.util.math.BlockPos;
 public class GuiSubRegionConfiguration extends GuiBase
 {
     private final SchematicPlacement schematicPlacement;
-    private final Placement placement;
+    private final SubRegionPlacement placement;
     private ButtonGeneric buttonResetPlacement;
     private int id;
 
-    public GuiSubRegionConfiguration(SchematicPlacement schematicPlacement, Placement placement)
+    public GuiSubRegionConfiguration(SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
         this.schematicPlacement = schematicPlacement;
         this.placement = placement;
@@ -186,11 +186,11 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         private final GuiBase parent;
         private final SchematicPlacement schematicPlacement;
-        private final Placement placement;
+        private final SubRegionPlacement placement;
         private final Type type;
         private final String subRegionName;
 
-        public ButtonListener(Type type, SchematicPlacement schematicPlacement, Placement placement, GuiBase parent)
+        public ButtonListener(Type type, SchematicPlacement schematicPlacement, SubRegionPlacement placement, GuiBase parent)
         {
             this.type = type;
             this.schematicPlacement = schematicPlacement;
@@ -264,10 +264,10 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         private final GuiSubRegionConfiguration parent;
         private final SchematicPlacement schematicPlacement;
-        private final Placement placement;
+        private final SubRegionPlacement placement;
         private final CoordinateType type;
 
-        public TextFieldListener(CoordinateType type, SchematicPlacement schematicPlacement, Placement placement, GuiSubRegionConfiguration parent)
+        public TextFieldListener(CoordinateType type, SchematicPlacement schematicPlacement, SubRegionPlacement placement, GuiSubRegionConfiguration parent)
         {
             this.schematicPlacement = schematicPlacement;
             this.placement = placement;

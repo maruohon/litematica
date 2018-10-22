@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import net.minecraft.util.EnumFacing;
@@ -45,7 +45,7 @@ public class PositionUtils
                pos.getZ() >= posMin.getZ() && pos.getZ() <= posMax.getZ();
     }
 
-    public static BlockPos getTransformedPlacementPosition(BlockPos posWithinSub, SchematicPlacement schematicPlacement, Placement placement)
+    public static BlockPos getTransformedPlacementPosition(BlockPos posWithinSub, SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
         BlockPos pos = posWithinSub;
         pos = getTransformedBlockPos(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());

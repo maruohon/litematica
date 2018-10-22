@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.render;
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -119,7 +119,7 @@ public class ToolHud extends InfoHud
 
                 lines.add(I18n.format("litematica.hud.area_selection.origin", green + str + rst));
 
-                Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
+                SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
                 if (placement != null)
                 {

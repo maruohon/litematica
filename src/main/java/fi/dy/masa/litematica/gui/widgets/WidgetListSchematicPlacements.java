@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiPlacementManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
 public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>

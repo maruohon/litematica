@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.data;
+package fi.dy.masa.litematica.schematic.placement;
 
 import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
@@ -10,7 +10,7 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
-public class Placement
+public class SubRegionPlacement
 {
     private final String name;
     private final BlockPos defaultPos;
@@ -20,7 +20,7 @@ public class Placement
     private boolean enabled = true;
     private boolean renderingEnabled = true;
 
-    public Placement(BlockPos pos, String name)
+    public SubRegionPlacement(BlockPos pos, String name)
     {
         this.pos = pos;
         this.defaultPos = pos;
@@ -143,7 +143,7 @@ public class Placement
     }
 
     @Nullable
-    public static Placement fromJson(JsonObject obj)
+    public static SubRegionPlacement fromJson(JsonObject obj)
     {
         if (JsonUtils.hasArray(obj, "pos") &&
             JsonUtils.hasString(obj, "name") &&
@@ -159,7 +159,7 @@ public class Placement
             }
 
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
-            Placement placement = new Placement(pos, obj.get("name").getAsString());
+            SubRegionPlacement placement = new SubRegionPlacement(pos, obj.get("name").getAsString());
             placement.setEnabled(JsonUtils.getBoolean(obj, "enabled"));
             placement.setRenderingEnabled(JsonUtils.getBoolean(obj, "rendering_enabled"));
 

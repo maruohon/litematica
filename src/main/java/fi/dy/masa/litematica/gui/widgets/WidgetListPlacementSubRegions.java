@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import fi.dy.masa.litematica.data.Placement;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
-public class WidgetListPlacementSubRegions extends WidgetListBase<Placement, WidgetPlacementSubRegion>
+public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlacement, WidgetPlacementSubRegion>
 {
     private final GuiPlacementConfiguration parent;
 
@@ -31,7 +31,7 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<Placement, Wid
     }
 
     @Override
-    protected WidgetPlacementSubRegion createListEntryWidget(int x, int y, boolean isOdd, Placement entry)
+    protected WidgetPlacementSubRegion createListEntryWidget(int x, int y, boolean isOdd, SubRegionPlacement entry)
     {
         return new WidgetPlacementSubRegion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd,
                 this.parent.getSchematicPlacement(), entry, this, this.mc);

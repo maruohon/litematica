@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.data;
+package fi.dy.masa.litematica.schematic.placement;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,9 +15,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -499,7 +501,7 @@ public class SchematicPlacementManager
 
         if (schematicPlacement != null)
         {
-            Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
+            SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
             // Moving a sub-region
             if (placement != null)

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.ItemType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -31,7 +31,7 @@ public class SchematicUtils
         LitematicaSchematic schematic = placement.getSchematic();
         Object2IntOpenHashMap<IBlockState> counts = new Object2IntOpenHashMap<>();
 
-        for (Map.Entry<String, Placement> entry : placement.getEnabledRelativeSubRegionPlacements().entrySet())
+        for (Map.Entry<String, SubRegionPlacement> entry : placement.getEnabledRelativeSubRegionPlacements().entrySet())
         {
             LitematicaBlockStateContainer container = schematic.getSubRegionContainer(entry.getKey());
 

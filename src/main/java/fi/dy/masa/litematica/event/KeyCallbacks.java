@@ -3,8 +3,6 @@ package fi.dy.masa.litematica.event;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager.SelectedBoxRenamer;
 import fi.dy.masa.litematica.gui.GuiConfigs;
@@ -16,6 +14,8 @@ import fi.dy.masa.litematica.gui.GuiPlacementManager;
 import fi.dy.masa.litematica.gui.GuiRenderLayer;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -211,7 +211,7 @@ public class KeyCallbacks
 
                     if (schematicPlacement != null)
                     {
-                        Placement placement = schematicPlacement.getSelectedSubRegionPlacement();
+                        SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
                         if (placement != null)
                         {

@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.data;
+package fi.dy.masa.litematica.schematic.placement;
 
 import java.io.File;
 import java.util.Collection;
@@ -13,9 +13,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.data.Placement.RequiredEnabled;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.data.SchematicVerifier;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.Color4f;
@@ -34,7 +37,7 @@ public class SchematicPlacement
     private static final Set<Integer> USED_COLORS = new HashSet<>();
     private static int nextColorIndex;
 
-    private final Map<String, Placement> relativeSubRegionPlacements = new HashMap<>();
+    private final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
     private SchematicVerifier verifier;
     private LitematicaSchematic schematic;
     @Nullable
@@ -204,29 +207,29 @@ public class SchematicPlacement
     }
 
     @Nullable
-    public Placement getSelectedSubRegionPlacement()
+    public SubRegionPlacement getSelectedSubRegionPlacement()
     {
         return this.selectedSubRegionName != null ? this.relativeSubRegionPlacements.get(this.selectedSubRegionName) : null;
     }
 
     @Nullable
-    public Placement getRelativeSubRegionPlacement(String areaName)
+    public SubRegionPlacement getRelativeSubRegionPlacement(String areaName)
     {
         return this.relativeSubRegionPlacements.get(areaName);
     }
 
-    public Collection<Placement> getAllSubRegionsPlacements()
+    public Collection<SubRegionPlacement> getAllSubRegionsPlacements()
     {
         return this.relativeSubRegionPlacements.values();
     }
 
-    public ImmutableMap<String, Placement> getEnabledRelativeSubRegionPlacements()
+    public ImmutableMap<String, SubRegionPlacement> getEnabledRelativeSubRegionPlacements()
     {
-        ImmutableMap.Builder<String, Placement> builder = ImmutableMap.builder();
+        ImmutableMap.Builder<String, SubRegionPlacement> builder = ImmutableMap.builder();
 
-        for (Map.Entry<String, Placement> entry : this.relativeSubRegionPlacements.entrySet())
+        for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
         {
-            Placement placement = entry.getValue();
+            SubRegionPlacement placement = entry.getValue();
 
             if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
             {
@@ -249,10 +252,10 @@ public class SchematicPlacement
         ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
         Map<String, BlockPos> areaSizes = this.schematic.getAreaSizes();
 
-        for (Map.Entry<String, Placement> entry : this.relativeSubRegionPlacements.entrySet())
+        for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
         {
             String name = entry.getKey();
-            Placement placement = entry.getValue();
+            SubRegionPlacement placement = entry.getValue();
 
             if (placement.matchesRequirement(required))
             {
@@ -274,7 +277,7 @@ public class SchematicPlacement
         ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
         Map<String, BlockPos> areaSizes = this.schematic.getAreaSizes();
 
-        Placement placement = this.relativeSubRegionPlacements.get(regionName);
+        SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
 
         if (placement != null)
         {
@@ -392,7 +395,7 @@ public class SchematicPlacement
 
         for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
         {
-            Placement placement = this.relativeSubRegionPlacements.get(entry.getKey());
+            SubRegionPlacement placement = this.relativeSubRegionPlacements.get(entry.getKey());
 
             if (placement == null || placement.isRegionPlacementModified(entry.getValue()))
             {
@@ -483,7 +486,7 @@ public class SchematicPlacement
         for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
         {
             String name = entry.getKey();
-            this.relativeSubRegionPlacements.put(name, new Placement(entry.getValue(), name));
+            this.relativeSubRegionPlacements.put(name, new SubRegionPlacement(entry.getValue(), name));
         }
 
         this.onModified(manager);
@@ -492,7 +495,7 @@ public class SchematicPlacement
     public void resetSubRegionToSchematicValues(String regionName)
     {
         BlockPos pos = this.schematic.getSubRegionPosition(regionName);
-        Placement placement = this.relativeSubRegionPlacements.get(regionName);
+        SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
 
         if (pos != null && placement != null)
         {
@@ -539,7 +542,7 @@ public class SchematicPlacement
 
     public void toggleSubRegionRenderingEnabled(String regionName)
     {
-        Placement placement = this.relativeSubRegionPlacements.get(regionName);
+        SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
 
         if (placement != null)
         {
@@ -650,7 +653,7 @@ public class SchematicPlacement
             {
                 arr = new JsonArray();
 
-                for (Map.Entry<String, Placement> entry : this.relativeSubRegionPlacements.entrySet())
+                for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
                 {
                     JsonObject placementObj = new JsonObject();
                     placementObj.add("name", new JsonPrimitive(entry.getKey()));
@@ -735,7 +738,7 @@ public class SchematicPlacement
                     if (JsonUtils.hasString(placementObj, "name") &&
                         JsonUtils.hasObject(placementObj, "placement"))
                     {
-                        Placement placement = Placement.fromJson(placementObj.get("placement").getAsJsonObject());
+                        SubRegionPlacement placement = SubRegionPlacement.fromJson(placementObj.get("placement").getAsJsonObject());
 
                         if (placement != null)
                         {

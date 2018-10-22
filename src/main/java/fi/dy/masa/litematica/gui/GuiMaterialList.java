@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.gui;
 
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
 import fi.dy.masa.litematica.render.InfoHud;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.MaterialListEntry;
 import fi.dy.masa.litematica.util.MaterialListEntry.SortCriteria;
 import fi.dy.masa.malilib.gui.GuiListBase;

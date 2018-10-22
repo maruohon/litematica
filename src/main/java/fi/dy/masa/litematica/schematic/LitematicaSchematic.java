@@ -12,10 +12,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -188,12 +188,12 @@ public class LitematicaSchematic
     {
         WorldUtils.setShouldPreventOnBlockAdded(true);
 
-        ImmutableMap<String, Placement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
+        ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
         BlockPos origin = schematicPlacement.getOrigin();
 
         for (String regionName : relativePlacements.keySet())
         {
-            Placement placement = relativePlacements.get(regionName);
+            SubRegionPlacement placement = relativePlacements.get(regionName);
 
             if (placement.isEnabled())
             {
@@ -226,7 +226,7 @@ public class LitematicaSchematic
     }
 
     private void placeBlocksToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
-            SchematicPlacement schematicPlacement, Placement placement,
+            SchematicPlacement schematicPlacement, SubRegionPlacement placement,
             LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap,
             @Nullable Map<BlockPos, NextTickListEntry> scheduledTicks, boolean notifyNeighbors)
     {
@@ -355,7 +355,7 @@ public class LitematicaSchematic
         }
     }
 
-    private void placeEntitiesToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize, SchematicPlacement schematicPlacement, Placement placement, List<EntityInfo> entityList)
+    private void placeEntitiesToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize, SchematicPlacement schematicPlacement, SubRegionPlacement placement, List<EntityInfo> entityList)
     {
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         final int offX = regionPosRelTransformed.getX() + origin.getX();
@@ -403,7 +403,7 @@ public class LitematicaSchematic
 
         for (String regionName : regionsTouchingChunk)
         {
-            Placement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+            SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
 
             if (placement.isEnabled())
             {
@@ -434,7 +434,7 @@ public class LitematicaSchematic
 
     private void placeBlocksWithinChunk(World world, ChunkPos chunkPos, String regionName,
             BlockPos origin, BlockPos regionPos, BlockPos regionSize,
-            SchematicPlacement schematicPlacement, Placement placement,
+            SchematicPlacement schematicPlacement, SubRegionPlacement placement,
             LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
     {
         StructureBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
@@ -586,7 +586,7 @@ public class LitematicaSchematic
     }
 
     private void placeEntitiesToWorldWithinChunk(World world, ChunkPos chunkPos, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
-            SchematicPlacement schematicPlacement, Placement placement, List<EntityInfo> entityList)
+            SchematicPlacement schematicPlacement, SubRegionPlacement placement, List<EntityInfo> entityList)
     {
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         final int offX = regionPosRelTransformed.getX() + origin.getX();

@@ -3,10 +3,10 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -23,7 +23,7 @@ public class WidgetPlacementSubRegion extends WidgetBase
 {
     private final SchematicPlacement schematicPlacement;
     private final WidgetListPlacementSubRegions parent;
-    private final Placement placement;
+    private final SubRegionPlacement placement;
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private final boolean isOdd;
@@ -31,7 +31,7 @@ public class WidgetPlacementSubRegion extends WidgetBase
     private int buttonsStartX;
 
     public WidgetPlacementSubRegion(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            SchematicPlacement schematicPlacement, Placement placement, WidgetListPlacementSubRegions parent, Minecraft mc)
+            SchematicPlacement schematicPlacement, SubRegionPlacement placement, WidgetListPlacementSubRegions parent, Minecraft mc)
     {
         super(x, y, width, height, zLevel);
 

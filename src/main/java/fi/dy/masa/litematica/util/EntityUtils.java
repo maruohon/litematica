@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.util;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.data.Placement;
-import fi.dy.masa.litematica.data.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -89,7 +89,7 @@ public class EntityUtils
     }
 
     public static List<Entity> getEntitiesWithinSubRegion(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
-            SchematicPlacement schematicPlacement, Placement placement)
+            SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
         // These are the untransformed relative positions
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
