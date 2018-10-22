@@ -101,7 +101,11 @@ public class MaterialCache
     {
         Block block = state.getBlock();
 
-        if (block == Blocks.LAVA)
+        if (block == Blocks.PISTON_EXTENSION || block == Blocks.PORTAL || block == Blocks.END_PORTAL || block == Blocks.END_GATEWAY)
+        {
+            return ItemStack.EMPTY;
+        }
+        else if (block == Blocks.LAVA)
         {
             return new ItemStack(Items.LAVA_BUCKET);
         }
