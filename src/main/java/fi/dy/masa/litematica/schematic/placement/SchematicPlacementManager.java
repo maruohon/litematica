@@ -15,6 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.OverlayRenderer;
@@ -421,16 +422,14 @@ public class SchematicPlacementManager
                 placement.setSelectedSubRegionName(null);
             }
 
-            if (trace.getHitType() == HitType.PLACEMENT_SUBREGION)
+            if (trace.getHitType() == HitType.PLACEMENT_SUBREGION || trace.getHitType() == HitType.PLACEMENT_ORIGIN)
             {
                 this.setSelectedSchematicPlacement(trace.getHitSchematicPlacement());
-                this.getSelectedSchematicPlacement().setSelectedSubRegionName(trace.getHitSchematicPlacementRegionName());
-                return true;
-            }
-            else if (trace.getHitType() == HitType.PLACEMENT_ORIGIN)
-            {
-                this.setSelectedSchematicPlacement(trace.getHitSchematicPlacement());
-                this.getSelectedSchematicPlacement().setSelectedSubRegionName(null);
+
+                boolean selectSubRegion = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
+                String subRegionName = selectSubRegion ? trace.getHitSchematicPlacementRegionName() : null;
+                this.getSelectedSchematicPlacement().setSelectedSubRegionName(subRegionName);
+
                 return true;
             }
             else if (trace.getHitType() == HitType.MISS)
