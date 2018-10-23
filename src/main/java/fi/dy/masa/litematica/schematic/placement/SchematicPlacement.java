@@ -50,6 +50,7 @@ public class SchematicPlacement
     private boolean enableRender;
     private boolean renderEnclosingBox;
     private boolean regionPlacementsModified;
+    private boolean locked;
     private int boxesBBColor;
     private Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
     @Nullable
@@ -87,6 +88,11 @@ public class SchematicPlacement
     public boolean isRenderingEnabled()
     {
         return this.isEnabled() && this.enableRender;
+    }
+
+    public boolean isLocked()
+    {
+        return this.locked;
     }
 
     public boolean shouldRenderEnclosingBox()
@@ -130,6 +136,11 @@ public class SchematicPlacement
         {
             this.updateEnclosingBox();
         }
+    }
+
+    public void toggleLocked()
+    {
+        this.locked = ! this.locked;
     }
 
     public String getName()
@@ -706,6 +717,7 @@ public class SchematicPlacement
             obj.add("enabled", new JsonPrimitive(this.isEnabled()));
             obj.add("enable_render", new JsonPrimitive(this.enableRender));
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
+            obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
 
             if (this.selectedSubRegionName != null)
@@ -775,6 +787,7 @@ public class SchematicPlacement
             schematicPlacement.mirror = mirror;
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
             schematicPlacement.renderEnclosingBox = JsonUtils.getBoolean(obj, "render_enclosing_box");
+            schematicPlacement.locked = JsonUtils.getBoolean(obj, "locked");
 
             if (JsonUtils.hasInteger(obj, "bb_color"))
             {

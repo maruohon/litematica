@@ -163,7 +163,13 @@ public class WidgetSchematicPlacement extends WidgetBase
         if (this.placement.isRegionPlacementModified())
         {
             icon = Icons.NOTICE_EXCLAMATION_11;
-            icon.renderAt(this.buttonsStartX - icon.getWidth() - 2, this.y + 6, this.zLevel, false, false);
+            icon.renderAt(this.buttonsStartX - 13, this.y + 6, this.zLevel, false, false);
+        }
+
+        if (this.placement.isLocked())
+        {
+            icon = Icons.LOCK_LOCKED;
+            icon.renderAt(this.buttonsStartX - 26, this.y + 6, this.zLevel, false, false);
         }
 
         for (int i = 0; i < this.buttons.size(); ++i)

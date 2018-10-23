@@ -1,16 +1,20 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonIcon;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
@@ -42,23 +46,28 @@ public class GuiSubRegionConfiguration extends GuiBase
         this.addLabel(20, y, -1, 16, 0xFFFFFFFF, label);
 
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
-        y += 32;
+        y += 22;
 
         label = I18n.format("litematica.gui.placement_sub_region.label.region_position");
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
         y += 20;
+        x += 2;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
+        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_X, this.schematicPlacement, this.placement, this));
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Y);
+        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_Y, this.schematicPlacement, this.placement, this));
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Z);
+        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_Z, this.schematicPlacement, this.placement, this));
         y += 22;
+        x -= 2;
 
         this.createButton(x, y, width, ButtonListener.Type.MOVE_HERE);
-        y += 44;
+        y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.ROTATE);
         y += 22;
@@ -70,21 +79,22 @@ public class GuiSubRegionConfiguration extends GuiBase
         y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.SLICE_TYPE);
-        y += 22;
 
+        y = this.height - 36;
+        label = I18n.format("litematica.gui.placement_sub_region.button.placement_configuration");
+        int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
+        x = 10;
+        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        this.addButton(button, new ButtonListener<>(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
+
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
-        int buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        x = this.width - buttonWidth - 10;
-        y = this.height - 36;
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+        int menuButtonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        x = sr.getScaledHeight() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
 
-        label = I18n.format("litematica.gui.placement_sub_region.button.placement_configuration");
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
-        x = 20;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
+        button = new ButtonGeneric(this.id++, x, y, menuButtonWidth, 20, label);
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         this.updateElements();
     }
@@ -114,7 +124,7 @@ public class GuiSubRegionConfiguration extends GuiBase
 
     private void createButton(int x, int y, int width, ButtonListener.Type type)
     {
-        ButtonListener listener = new ButtonListener(type, this.schematicPlacement, this.placement, this);
+        ButtonListener<ButtonGeneric> listener = new ButtonListener<>(type, this.schematicPlacement, this.placement, this);
         String label = "";
 
         switch (type)
@@ -182,7 +192,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         this.buttonResetPlacement.enabled = enabled;
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener<T extends ButtonBase> implements IButtonActionListener<T>
     {
         private final GuiBase parent;
         private final SchematicPlacement schematicPlacement;
@@ -200,14 +210,23 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformed(T control)
         {
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(T control, int mouseButton)
         {
             Minecraft mc = Minecraft.getMinecraft();
+            int amount = mouseButton == 1 ? -1 : 1;
+            if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
+            if (GuiScreen.isAltKeyDown()) { amount *= 4; }
+
+            // The sub-region placements are relative (but the setter below uses the
+            // absolute position and subtracts the placement origin internally)
+            BlockPos posOld = this.placement.getPos();
+            posOld = PositionUtils.getTransformedBlockPos(posOld, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
+            posOld = posOld.add(this.schematicPlacement.getOrigin());
 
             switch (this.type)
             {
@@ -233,6 +252,18 @@ public class GuiSubRegionConfiguration extends GuiBase
                     this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(mc.player.getPositionVector()));
                     break;
 
+                case NUDGE_COORD_X:
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(amount, 0, 0));
+                    break;
+
+                case NUDGE_COORD_Y:
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(0, amount, 0));
+                    break;
+
+                case NUDGE_COORD_Z:
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(0, 0, amount));
+                    break;
+
                 case TOGGLE_ENABLED:
                     this.schematicPlacement.toggleSubRegionEnabled(this.subRegionName);
                     break;
@@ -253,6 +284,9 @@ public class GuiSubRegionConfiguration extends GuiBase
             PLACEMENT_CONFIGURATION,
             TOGGLE_ENABLED,
             MOVE_HERE,
+            NUDGE_COORD_X,
+            NUDGE_COORD_Y,
+            NUDGE_COORD_Z,
             ROTATE,
             MIRROR,
             RESET_PLACEMENT,

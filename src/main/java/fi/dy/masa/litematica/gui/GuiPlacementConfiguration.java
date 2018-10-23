@@ -3,20 +3,25 @@ package fi.dy.masa.litematica.gui;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListPlacementSubRegions;
 import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegion;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonIcon;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 
 public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
                                         implements ISelectionListener<SubRegionPlacement>
@@ -36,7 +41,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     @Override
     protected int getBrowserWidth()
     {
-        return this.width - 160;
+        return this.width - 150;
     }
 
     @Override
@@ -51,7 +56,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         super.initGui();
 
         this.id = 0;
-        int width = 300;
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        int width = Math.min(300, sr.getScaledWidth() - 200);
         int x = 10;
         int y = 28;
 
@@ -61,30 +67,38 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.addTextField(this.textFieldRename, null);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
 
-        y += 20;
         String label = I18n.format("litematica.gui.label.schematic_placement.sub_regions");
-        this.addLabel(x, y, -1, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y + 20, -1, 20, 0xFFFFFFFF, label);
 
         width = 120;
         x = this.width - width - 10;
+
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
-        y += 32;
+        y += 22;
+
+        this.createButton(x, y, width, ButtonListener.Type.TOGGLE_LOCKED);
+        y += 22;
+        x += 2;
 
         label = I18n.format("litematica.gui.label.placement_settings.placement_origin");
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
+        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_X, this.placement, this));
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Y);
+        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_Y, this.placement, this));
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Z);
+        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_Z, this.placement, this));
         y += 22;
+        x -= 2;
 
         this.createButton(x, y, width, ButtonListener.Type.MOVE_HERE);
-        y += 44;
+        y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.ROTATE);
         y += 22;
@@ -93,20 +107,37 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.RESET_SUB_REGIONS);
-        y += 22;
-
-        this.createButton(x, y, width, ButtonListener.Type.OPEN_VERIFIER_GUI);
-        y += 22;
-
-        this.createButton(x, y, width, ButtonListener.Type.OPEN_MATERIAL_LIST_GUI);
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
         int buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        x = this.width - buttonWidth - 10;
-        y = this.height - 36;
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+
+        // Move these buttons to the bottom (left) of the screen, if the height isn't enough for them
+        // to fit below the other buttons
+        if (sr.getScaledHeight() < 324)
+        {
+            x = 10;
+            y = this.height - 32;
+
+            x += this.createButton(x, y, -1, ButtonListener.Type.OPEN_MATERIAL_LIST_GUI) + 2;
+            x += this.createButton(x, y, -1, ButtonListener.Type.OPEN_VERIFIER_GUI) + 2;
+
+            ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+            this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+        }
+        else
+        {
+            y = this.height - 3 * 24 - 12;
+            this.createButton(x, y, width, ButtonListener.Type.OPEN_MATERIAL_LIST_GUI);
+            y += 22;
+
+            this.createButton(x, y, width, ButtonListener.Type.OPEN_VERIFIER_GUI);
+            y += 26;
+            x = this.width - buttonWidth - 10;
+
+            ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+            this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+        }
 
         this.updateElements();
     }
@@ -133,9 +164,9 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.addTextField(textField, listener);
     }
 
-    private void createButton(int x, int y, int width, ButtonListener.Type type)
+    private int createButton(int x, int y, int width, ButtonListener.Type type)
     {
-        ButtonListener listener = new ButtonListener(type, this.placement, this);
+        ButtonListener<ButtonGeneric> listener = new ButtonListener<>(type, this.placement, this);
         String label = "";
 
         switch (type)
@@ -146,6 +177,15 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     label = I18n.format("litematica.gui.button.disable");
                 else
                     label = I18n.format("litematica.gui.button.enable");
+                break;
+            }
+
+            case TOGGLE_LOCKED:
+            {
+                if (this.placement.isLocked())
+                    label = TextFormatting.GOLD + I18n.format("litematica.gui.button.locked");
+                else
+                    label = I18n.format("litematica.gui.button.unlocked");
                 break;
             }
 
@@ -179,6 +219,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         {
             this.buttonResetPlacement = button;
         }
+
+        return width;
     }
 
     private void updateElements()
@@ -222,7 +264,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener<T extends ButtonBase> implements IButtonActionListener<T>
     {
         private final GuiPlacementConfiguration parent;
         private final SchematicPlacement placement;
@@ -236,14 +278,18 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformed(T control)
         {
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(T control, int mouseButton)
         {
             Minecraft mc = Minecraft.getMinecraft();
+            int amount = mouseButton == 1 ? -1 : 1;
+            if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
+            if (GuiScreen.isAltKeyDown()) { amount *= 4; }
+            BlockPos oldOrigin = this.placement.getOrigin();
 
             switch (this.type)
             {
@@ -272,8 +318,24 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     break;
                 }
 
+                case NUDGE_COORD_X:
+                    this.placement.setOrigin(oldOrigin.add(amount, 0, 0));
+                    break;
+
+                case NUDGE_COORD_Y:
+                    this.placement.setOrigin(oldOrigin.add(0, amount, 0));
+                    break;
+
+                case NUDGE_COORD_Z:
+                    this.placement.setOrigin(oldOrigin.add(0, 0, amount));
+                    break;
+
                 case TOGGLE_ENABLED:
                     this.placement.toggleEnabled();
+                    break;
+
+                case TOGGLE_LOCKED:
+                    this.placement.toggleLocked();
                     break;
 
                 case RESET_SUB_REGIONS:
@@ -306,7 +368,11 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             ROTATE                  ("litematica.gui.button.rotation_value"),
             MIRROR                  ("litematica.gui.button.mirror_value"),
             MOVE_HERE               ("litematica.gui.button.move_here"),
+            NUDGE_COORD_X           (""),
+            NUDGE_COORD_Y           (""),
+            NUDGE_COORD_Z           (""),
             TOGGLE_ENABLED          (""),
+            TOGGLE_LOCKED           (""),
             RESET_SUB_REGIONS       (""),
             OPEN_VERIFIER_GUI       ("litematica.gui.button.schematic_verifier"),
             OPEN_MATERIAL_LIST_GUI  ("litematica.gui.button.material_list");

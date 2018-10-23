@@ -94,6 +94,7 @@ litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
 litematica.gui.button.import=Import
 litematica.gui.button.load_schematic_to_memory=Load Schematic to memory
+litematica.gui.button.locked=Locked
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_here=Move here
 litematica.gui.button.remove_placement=Remove placement
@@ -104,6 +105,7 @@ litematica.gui.button.save_to_file=Save to file
 litematica.gui.button.schematic_verifier=Schematic Verifier
 litematica.gui.button.set_preview=Set preview
 litematica.gui.button.unload=Unload
+litematica.gui.button.unlocked=Unlocked
 
 litematica.gui.label.area_selection_box_count=Boxes: %d
 litematica.gui.label.area_selection_origin=Origin: %s
