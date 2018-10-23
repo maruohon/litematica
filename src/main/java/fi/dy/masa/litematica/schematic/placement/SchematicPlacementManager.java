@@ -474,6 +474,12 @@ public class SchematicPlacementManager
 
         if (schematicPlacement != null)
         {
+            if (schematicPlacement.isLocked())
+            {
+                StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+                return;
+            }
+
             boolean movingBox = schematicPlacement.getSelectedSubRegionPlacement() != null;
 
             if (movingBox)
@@ -501,6 +507,12 @@ public class SchematicPlacementManager
 
         if (schematicPlacement != null)
         {
+            if (schematicPlacement.isLocked())
+            {
+                StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+                return;
+            }
+
             SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
             // Moving a sub-region

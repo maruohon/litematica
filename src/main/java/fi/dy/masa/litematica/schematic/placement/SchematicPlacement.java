@@ -24,6 +24,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -490,6 +491,12 @@ public class SchematicPlacement
      */
     public void moveSubRegionTo(String regionName, BlockPos newPos)
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
@@ -508,6 +515,12 @@ public class SchematicPlacement
 
     public void setSubRegionRotation(String regionName, Rotation rotation)
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
@@ -521,6 +534,12 @@ public class SchematicPlacement
 
     public void setSubRegionMirror(String regionName, Mirror mirror)
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
@@ -534,6 +553,12 @@ public class SchematicPlacement
 
     public void toggleSubRegionEnabled(String regionName)
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
@@ -547,6 +572,12 @@ public class SchematicPlacement
 
     public void resetAllSubRegionsToSchematicValues()
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
         // Marks the currently touched chunks before doing the modification
         SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
         manager.onPrePlacementChange(this);
@@ -566,6 +597,12 @@ public class SchematicPlacement
 
     public void resetSubRegionToSchematicValues(String regionName)
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
         BlockPos pos = this.schematic.getSubRegionPosition(regionName);
         SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
 
@@ -623,6 +660,12 @@ public class SchematicPlacement
 
     public SchematicPlacement setOrigin(BlockPos origin)
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return this;
+        }
+
         if (this.origin.equals(origin) == false)
         {
             // Marks the currently touched chunks before doing the modification
@@ -638,6 +681,12 @@ public class SchematicPlacement
 
     public SchematicPlacement setRotation(Rotation rotation)
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return this;
+        }
+
         if (this.rotation != rotation)
         {
             // Marks the currently touched chunks before doing the modification
@@ -653,6 +702,12 @@ public class SchematicPlacement
 
     public SchematicPlacement setMirror(Mirror mirror)
     {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return this;
+        }
+
         if (this.mirror != mirror)
         {
             // Marks the currently touched chunks before doing the modification

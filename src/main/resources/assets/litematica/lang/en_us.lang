@@ -234,6 +234,7 @@ litematica.message.moved_selection=Moved the current selection from %s => %s
 litematica.message.no_area_selected=§cNo area selected§r
 litematica.message.no_placement_selected=§cNo placement selected§r
 litematica.message.only_works_in_single_player=§cThis operation only works in single player§r
+litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
 litematica.message.removed_selection_box=Removed selection box %s
