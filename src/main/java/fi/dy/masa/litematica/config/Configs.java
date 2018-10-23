@@ -67,9 +67,11 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       RENDER_AREA_SELECTION_BOX_SIDES     = new ConfigBoolean("renderAreaSelectionBoxSides", true, "If enabled, then the area selection boxes will\nhave their side quads rendered");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT        = new ConfigBoolean("renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered\nusing translucent \"ghost blocks\"");
         public static final ConfigBoolean       RENDER_COLLIDING_SCHEMATIC_BLOCKS   = new ConfigBoolean("renderCollidingSchematicBlocks", false, "If enabled, then blocks in the schematics are rendered\nalso when there is already a (wrong) block in the client world");
-        public static final ConfigBoolean       RENDER_INFO_OVERLAY                 = new ConfigBoolean("renderInfoOverlay", true, "If enabled, then an info overlay is rendered\nwhile looking at schematic blocks or schematic verifier\nerror markers, and holding the 'renderInfoOverlay' key");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES           = new ConfigBoolean("renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier\nwill have (translucent) sides rendered instead of just the outline");
+        public static final ConfigBoolean       RENDER_INFO_OVERLAY                 = new ConfigBoolean("renderInfoOverlay", true, "If enabled, then an info overlay is rendered\nwhile looking at schematic blocks or schematic verifier\nerror markers, and holding the 'renderInfoOverlay' key");
         public static final ConfigBoolean       RENDER_PLACEMENT_BOX_SIDES          = new ConfigBoolean("renderPlacementBoxSides", false, "If enabled, then the placed schematic sub-region boxes\nwill have their side quads rendered");
+        public static final ConfigBoolean       RENDER_PLACEMENT_ENCLOSING_BOX      = new ConfigBoolean("renderPlacementEnclosingBox", true, "If enabled, then an enclosing box is rendered around\nall the sub-regions in a schematic (placement)");
+        public static final ConfigBoolean       RENDER_PLACEMENT_ENCLOSING_BOX_SIDES= new ConfigBoolean("renderPlacementEnclosingBoxSides", false, "If enabled, then the enclosing box around\na schematic placement will have its side quads rendered");
         public static final ConfigBoolean       RENDER_TRANSLUCENT_INNER_SIDES      = new ConfigBoolean("renderTranslucentBlockInnerSides", false, "If enabled, then the model sides are also rendered\nfor inner sides in the translucent mode");
         public static final ConfigBoolean       SCHEMATIC_OVERLAY_ENABLED           = new ConfigBoolean("schematicOverlayEnabled",  true, "The main toggle option for the schematic\nblock overlay rendering", "Schematic Overlay Rendering");
         public static final ConfigBoolean       SCHEMATIC_OVERLAY_ENABLE_OUTLINES   = new ConfigBoolean("schematicOverlayEnableOutlines",  true, "Enables rendering a wire frame outline for\nthe schematic block overlay", "Schematic Overlay Outlines");
@@ -92,9 +94,11 @@ public class Configs implements IConfigHandler
                 RENDER_AREA_SELECTION_BOX_SIDES,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
                 RENDER_COLLIDING_SCHEMATIC_BLOCKS,
-                RENDER_INFO_OVERLAY,
                 RENDER_ERROR_MARKER_SIDES,
+                RENDER_INFO_OVERLAY,
                 RENDER_PLACEMENT_BOX_SIDES,
+                RENDER_PLACEMENT_ENCLOSING_BOX,
+                RENDER_PLACEMENT_ENCLOSING_BOX_SIDES,
                 RENDER_TRANSLUCENT_INNER_SIDES,
                 SCHEMATIC_OVERLAY_ENABLED,
                 SCHEMATIC_OVERLAY_ENABLE_OUTLINES,

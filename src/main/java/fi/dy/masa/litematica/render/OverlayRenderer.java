@@ -161,7 +161,24 @@ public class OverlayRenderer
                 }
 
                 Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
-                RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, 2f, color, renderViewEntity, partialTicks);
+                RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+
+                if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX.getBooleanValue())
+                {
+                    Box box = schematicPlacement.getEclosingBox();
+
+                    if (schematicPlacement.shouldRenderEnclosingBox() && box != null)
+                    {
+                        RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
+
+                        if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
+                        {
+                            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
+                            color = new Color4f(color.r, color.g, color.b, alpha);
+                            RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, renderViewEntity, partialTicks);
+                        }
+                    }
+                }
             }
         }
 
@@ -249,7 +266,7 @@ public class OverlayRenderer
                 RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
                 RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
 
-                RenderUtils.renderAreaOutline(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
+                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
 
                 if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
                       Configs.Visuals.RENDER_AREA_SELECTION_BOX_SIDES.getBooleanValue())

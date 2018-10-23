@@ -126,9 +126,8 @@ public class RenderUtils
         tessellator.draw();
     }
 
-    /*
     public static void renderAreaOutline(BlockPos pos1, BlockPos pos2, float lineWidth,
-            Vec3f colorX, Vec3f colorY, Vec3f colorZ, Entity renderViewEntity, float partialTicks)
+            Color4f colorX, Color4f colorY, Color4f colorZ, Entity renderViewEntity, float partialTicks)
     {
         GlStateManager.glLineWidth(lineWidth);
 
@@ -136,12 +135,12 @@ public class RenderUtils
         drawBoundingBoxEdges(aabb, colorX, colorY, colorZ);
     }
 
-    private static void drawBoundingBoxEdges(AxisAlignedBB box, Vec3f colorX, Vec3f colorY, Vec3f colorZ)
+    private static void drawBoundingBoxEdges(AxisAlignedBB box, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
         drawBoundingBoxEdges(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, colorX, colorY, colorZ);
     }
 
-    private static void drawBoundingBoxEdges(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Vec3f colorX, Vec3f colorY, Vec3f colorZ)
+    private static void drawBoundingBoxEdges(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -154,51 +153,50 @@ public class RenderUtils
         tessellator.draw();
     }
 
-    private static void drawBoundingBoxLinesX(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Vec3f color)
+    private static void drawBoundingBoxLinesX(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f color)
     {
-        buffer.pos(minX, minY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(maxX, minY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(minX, maxY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(maxX, maxY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(minX, minY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(maxX, minY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(minX, maxY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
-    private static void drawBoundingBoxLinesY(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Vec3f color)
+    private static void drawBoundingBoxLinesY(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f color)
     {
-        buffer.pos(minX, minY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(minX, maxY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(maxX, minY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(maxX, maxY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(minX, minY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(minX, maxY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(maxX, minY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
-    private static void drawBoundingBoxLinesZ(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Vec3f color)
+    private static void drawBoundingBoxLinesZ(BufferBuilder buffer, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f color)
     {
-        buffer.pos(minX, minY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(minX, minY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(maxX, minY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(maxX, minY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(minX, maxY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(minX, maxY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
 
-        buffer.pos(maxX, maxY, minZ).color(color.x, color.y, color.z, 1.0F).endVertex();
-        buffer.pos(maxX, maxY, maxZ).color(color.x, color.y, color.z, 1.0F).endVertex();
+        buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
     }
-    */
 
     public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, Entity renderViewEntity, float partialTicks)
     {
@@ -382,7 +380,7 @@ public class RenderUtils
         buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
-    public static void renderAreaOutline(BlockPos pos1, BlockPos pos2,
+    public static void renderAreaOutlineNoCorners(BlockPos pos1, BlockPos pos2,
             float lineWidth, Color4f colorX, Color4f colorY, Color4f colorZ, Entity renderViewEntity, float partialTicks)
     {
         final int xMin = Math.min(pos1.getX(), pos2.getX());

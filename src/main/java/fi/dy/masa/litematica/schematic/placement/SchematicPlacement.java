@@ -38,10 +38,9 @@ public class SchematicPlacement
     private static int nextColorIndex;
 
     private final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
+    private final int subRegionCount;
     private SchematicVerifier verifier;
     private LitematicaSchematic schematic;
-    @Nullable
-    private File schematicFile;
     private BlockPos origin;
     private String name;
     private Rotation rotation = Rotation.NONE;
@@ -49,10 +48,14 @@ public class SchematicPlacement
     private boolean ignoreEntities;
     private boolean enabled;
     private boolean enableRender;
+    private boolean renderEnclosingBox;
     private boolean regionPlacementsModified;
     private int boxesBBColor;
-    private final int subRegionCount;
     private Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
+    @Nullable
+    private Box enclosingBox;
+    @Nullable
+    private File schematicFile;
     @Nullable
     private String selectedSubRegionName;
 
@@ -86,6 +89,11 @@ public class SchematicPlacement
         return this.isEnabled() && this.enableRender;
     }
 
+    public boolean shouldRenderEnclosingBox()
+    {
+        return this.renderEnclosingBox;
+    }
+
     public boolean matchesRequirement(RequiredEnabled required)
     {
         switch (required)
@@ -114,6 +122,16 @@ public class SchematicPlacement
         this.ignoreEntities = ignoreEntities;
     }
 
+    public void toggleRenderEnclosingBox()
+    {
+        this.renderEnclosingBox = ! this.renderEnclosingBox;
+
+        if (this.shouldRenderEnclosingBox())
+        {
+            this.updateEnclosingBox();
+        }
+    }
+
     public String getName()
     {
         return this.name;
@@ -130,6 +148,12 @@ public class SchematicPlacement
         return this.schematicFile;
     }
 
+    @Nullable
+    public Box getEclosingBox()
+    {
+        return this.enclosingBox;
+    }
+
     public void setName(String name)
     {
         this.name = name;
@@ -138,7 +162,7 @@ public class SchematicPlacement
     public SchematicPlacement setBoxesBBColor(int color)
     {
         this.boxesBBColor = color;
-        this.boxesBBColorVec = new Color4f(((color >> 16) & 0xFF) / 255f, ((color >> 8) & 0xFF) / 255f, (color & 0xFF) / 255f);
+        this.boxesBBColorVec = Color4f.fromColor(color, 1f);
         USED_COLORS.add(color);
         return this;
     }
@@ -246,6 +270,47 @@ public class SchematicPlacement
         return this.getSubRegionBoxes(RequiredEnabled.ANY);
     }
     */
+
+    private void updateEnclosingBox()
+    {
+        if (this.shouldRenderEnclosingBox())
+        {
+            ImmutableMap<String, Box> boxes = this.getSubRegionBoxes(RequiredEnabled.ANY);
+            BlockPos pos1 = null;
+            BlockPos pos2 = null;
+
+            for (Box box : boxes.values())
+            {
+                BlockPos tmp;
+                tmp = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+
+                if (pos1 == null)
+                {
+                    pos1 = tmp;
+                }
+                else if (tmp.getX() < pos1.getX() || tmp.getY() < pos1.getY() || tmp.getZ() < pos1.getZ())
+                {
+                    pos1 = PositionUtils.getMinCorner(tmp, pos1);
+                }
+
+                tmp = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+
+                if (pos2 == null)
+                {
+                    pos2 = tmp;
+                }
+                else if (tmp.getX() > pos2.getX() || tmp.getY() > pos2.getY() || tmp.getZ() > pos2.getZ())
+                {
+                    pos2 = PositionUtils.getMaxCorner(tmp, pos2);
+                }
+            }
+
+            if (pos1 != null && pos2 != null)
+            {
+                this.enclosingBox = new Box(pos1, pos2, "Enclosing Box");
+            }
+        }
+    }
 
     public ImmutableMap<String, Box> getSubRegionBoxes(RequiredEnabled required)
     {
@@ -426,7 +491,6 @@ public class SchematicPlacement
             newPos = PositionUtils.getReverseTransformedBlockPos(newPos, this.mirror, this.rotation);
 
             this.relativeSubRegionPlacements.get(regionName).setPos(newPos);
-            this.checkAreSubRegionsModified();
             this.onModified(regionName, manager);
         }
     }
@@ -440,7 +504,6 @@ public class SchematicPlacement
             manager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).setRotation(rotation);
-            this.checkAreSubRegionsModified();
             this.onModified(regionName, manager);
         }
     }
@@ -454,7 +517,6 @@ public class SchematicPlacement
             manager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
-            this.checkAreSubRegionsModified();
             this.onModified(regionName, manager);
         }
     }
@@ -468,7 +530,6 @@ public class SchematicPlacement
             manager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).toggleEnabled();
-            this.checkAreSubRegionsModified();
             this.onModified(regionName, manager);
         }
     }
@@ -504,7 +565,6 @@ public class SchematicPlacement
             manager.onPrePlacementChange(this);
 
             placement.resetToOriginalValues();
-            this.checkAreSubRegionsModified();
             this.onModified(regionName, manager);
         }
     }
@@ -602,12 +662,15 @@ public class SchematicPlacement
 
     private void onModified(SchematicPlacementManager manager)
     {
+        this.updateEnclosingBox();
         manager.onPostPlacementChange(this);
         OverlayRenderer.getInstance().updatePlacementCache();
     }
 
     private void onModified(String regionName, SchematicPlacementManager manager)
     {
+        this.checkAreSubRegionsModified();
+        this.updateEnclosingBox();
         manager.onPostPlacementChange(this);
         OverlayRenderer.getInstance().updatePlacementCache();
     }
@@ -639,9 +702,10 @@ public class SchematicPlacement
             obj.add("origin", arr);
             obj.add("rotation", new JsonPrimitive(this.rotation.name()));
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
-            obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities));
-            obj.add("enabled", new JsonPrimitive(this.enabled));
+            obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities()));
+            obj.add("enabled", new JsonPrimitive(this.isEnabled()));
             obj.add("enable_render", new JsonPrimitive(this.enableRender));
+            obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
 
             if (this.selectedSubRegionName != null)
@@ -710,6 +774,7 @@ public class SchematicPlacement
             schematicPlacement.rotation = rotation;
             schematicPlacement.mirror = mirror;
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
+            schematicPlacement.renderEnclosingBox = JsonUtils.getBoolean(obj, "render_enclosing_box");
 
             if (JsonUtils.hasInteger(obj, "bb_color"))
             {
@@ -750,6 +815,7 @@ public class SchematicPlacement
             }
 
             schematicPlacement.checkAreSubRegionsModified();
+            schematicPlacement.updateEnclosingBox();
 
             return schematicPlacement;
         }
