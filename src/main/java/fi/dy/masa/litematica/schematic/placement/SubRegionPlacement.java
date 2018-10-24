@@ -19,6 +19,7 @@ public class SubRegionPlacement
     private Mirror mirror = Mirror.NONE;
     private boolean enabled = true;
     private boolean renderingEnabled = true;
+    private boolean ignoreEntities;
 
     public SubRegionPlacement(BlockPos pos, String name)
     {
@@ -35,6 +36,11 @@ public class SubRegionPlacement
     public boolean isRenderingEnabled()
     {
         return this.renderingEnabled;
+    }
+
+    public boolean ignoreEntities()
+    {
+        return this.ignoreEntities;
     }
 
     public boolean matchesRequirement(RequiredEnabled required)
@@ -92,6 +98,11 @@ public class SubRegionPlacement
         this.setEnabled(! this.isEnabled());
     }
 
+    void toggleIgnoreEntities()
+    {
+        this.ignoreEntities = ! this.ignoreEntities;
+    }
+
     void setPos(BlockPos pos)
     {
         this.pos = pos;
@@ -113,11 +124,13 @@ public class SubRegionPlacement
         this.rotation = Rotation.NONE;
         this.mirror = Mirror.NONE;
         this.enabled = true;
+        this.ignoreEntities = false;
     }
 
     public boolean isRegionPlacementModified(BlockPos originalPosition)
     {
         return this.isEnabled() == false ||
+               this.ignoreEntities() ||
                this.getMirror() != Mirror.NONE ||
                this.getRotation() != Rotation.NONE ||
                this.getPos().equals(originalPosition) == false;
@@ -138,6 +151,7 @@ public class SubRegionPlacement
         obj.add("mirror", new JsonPrimitive(this.mirror.name()));
         obj.add("enabled", new JsonPrimitive(this.enabled));
         obj.add("rendering_enabled", new JsonPrimitive(this.renderingEnabled));
+        obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities));
 
         return obj;
     }
@@ -162,6 +176,7 @@ public class SubRegionPlacement
             SubRegionPlacement placement = new SubRegionPlacement(pos, obj.get("name").getAsString());
             placement.setEnabled(JsonUtils.getBoolean(obj, "enabled"));
             placement.setRenderingEnabled(JsonUtils.getBoolean(obj, "rendering_enabled"));
+            placement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
 
             try
             {

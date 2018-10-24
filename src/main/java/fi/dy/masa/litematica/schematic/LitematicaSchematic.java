@@ -14,8 +14,8 @@ import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -213,7 +213,7 @@ public class LitematicaSchematic
                     LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
                 }
 
-                if (schematicPlacement.ignoreEntities() == false && entityList != null)
+                if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
                 {
                     this.placeEntitiesToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, entityList);
                 }
@@ -422,7 +422,7 @@ public class LitematicaSchematic
                     LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
                 }
 
-                if (schematicPlacement.ignoreEntities() == false && entityList != null)
+                if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
                 {
                     this.placeEntitiesToWorldWithinChunk(world, chunkPos, origin, regionPos, regionSize, schematicPlacement, placement, entityList);
                 }

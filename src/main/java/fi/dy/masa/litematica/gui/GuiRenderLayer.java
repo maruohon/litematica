@@ -7,7 +7,6 @@ import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonIcon;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import net.minecraft.client.Minecraft;
@@ -159,7 +158,7 @@ public class GuiRenderLayer extends GuiBase
         LayerRange layerRange = DataManager.getRenderLayerRange();
         LayerMode layerMode = layerRange.getLayerMode();
         ButtonListenerChangeValue listener = new ButtonListenerChangeValue(layerMode, isSecondValue, this);
-        ButtonIcon button = new ButtonIcon(this.id++, x, y + 2, 16, 16, Icons.BUTTON_PLUS_MINUS_16);
+        ButtonGeneric button = new ButtonGeneric(this.id++, x, y + 2, Icons.BUTTON_PLUS_MINUS_16);
         this.addButton(button, listener);
     }
 
@@ -260,7 +259,7 @@ public class GuiRenderLayer extends GuiBase
         }
     }
 
-    private static class ButtonListenerChangeValue implements IButtonActionListener<ButtonIcon>
+    private static class ButtonListenerChangeValue implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiRenderLayer parent;
         private final LayerMode mode;
@@ -274,12 +273,12 @@ public class GuiRenderLayer extends GuiBase
         }
 
         @Override
-        public void actionPerformed(ButtonIcon control)
+        public void actionPerformed(ButtonGeneric control)
         {
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonIcon control, int mouseButton)
+        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             LayerRange layerRange = DataManager.getRenderLayerRange();
             int change = mouseButton == 1 ? -1 : 1;

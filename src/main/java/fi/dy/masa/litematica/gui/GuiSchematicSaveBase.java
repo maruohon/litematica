@@ -10,7 +10,6 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryNavigator;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -88,7 +87,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         if (type == ButtonType.SAVE)
         {
-            button = new ButtonHoverText(id, x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
+            button = new ButtonGeneric(id, x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
         }
         else
         {

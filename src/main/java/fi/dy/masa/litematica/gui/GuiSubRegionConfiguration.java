@@ -6,9 +6,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonIcon;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import net.minecraft.client.Minecraft;
@@ -42,27 +40,30 @@ public class GuiSubRegionConfiguration extends GuiBase
         int x = this.width - width - 10;
         int y = 22;
 
-        String label = I18n.format("litematica.gui.placement_sub_region.label.region_name", this.placement.getName());
+        String label = I18n.format("litematica.gui.label.placement_sub.region_name", this.placement.getName());
         this.addLabel(20, y, -1, 16, 0xFFFFFFFF, label);
 
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
         y += 22;
 
-        label = I18n.format("litematica.gui.placement_sub_region.label.region_position");
+        this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENTITIES);
+        y += 22;
+
+        label = I18n.format("litematica.gui.label.placement_sub.region_position");
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
         y += 20;
         x += 2;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
-        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_X, this.schematicPlacement, this.placement, this));
+        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_X, this.schematicPlacement, this.placement, this));
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Y);
-        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_Y, this.schematicPlacement, this.placement, this));
+        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_Y, this.schematicPlacement, this.placement, this));
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Z);
-        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_Z, this.schematicPlacement, this.placement, this));
+        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_Z, this.schematicPlacement, this.placement, this));
         y += 22;
         x -= 2;
 
@@ -81,11 +82,11 @@ public class GuiSubRegionConfiguration extends GuiBase
         this.createButton(x, y, width, ButtonListener.Type.SLICE_TYPE);
 
         y = this.height - 36;
-        label = I18n.format("litematica.gui.placement_sub_region.button.placement_configuration");
+        label = I18n.format("litematica.gui.button.placement_sub.placement_configuration");
         int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
         x = 10;
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListener<>(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
+        this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
 
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
@@ -124,7 +125,7 @@ public class GuiSubRegionConfiguration extends GuiBase
 
     private void createButton(int x, int y, int width, ButtonListener.Type type)
     {
-        ButtonListener<ButtonGeneric> listener = new ButtonListener<>(type, this.schematicPlacement, this.placement, this);
+        ButtonListener listener = new ButtonListener(type, this.schematicPlacement, this.placement, this);
         String label = "";
 
         switch (type)
@@ -154,13 +155,21 @@ public class GuiSubRegionConfiguration extends GuiBase
                     label = I18n.format("litematica.gui.button.enable");
                 break;
 
+            case TOGGLE_ENTITIES:
+            {
+                boolean enabled = this.placement.ignoreEntities();
+                String str = (enabled ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
+                label = I18n.format("litematica.gui.button.schematic_placement.ignore_entities", str);
+                break;
+            }
+
             case RESET_PLACEMENT:
                 break;
 
             case SLICE_TYPE:
             {
                 String value = "todo";
-                label = I18n.format("litematica.gui.placement_sub_region.button.slice_type", value);
+                label = I18n.format("litematica.gui.button.placement_sub.slice_type", value);
                 break;
             }
 
@@ -180,7 +189,7 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         String areaName = this.placement.getName();
         BlockPos posOriginal = this.schematicPlacement.getSchematic().getSubRegionPosition(areaName);
-        String label = I18n.format("litematica.gui.placement_sub_region.button.reset_sub_region_placement");
+        String label = I18n.format("litematica.gui.button.placement_sub.reset_sub_region_placement");
         boolean enabled = this.placement.isRegionPlacementModified(posOriginal);
 
         if (enabled)
@@ -192,7 +201,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         this.buttonResetPlacement.enabled = enabled;
     }
 
-    private static class ButtonListener<T extends ButtonBase> implements IButtonActionListener<T>
+    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiBase parent;
         private final SchematicPlacement schematicPlacement;
@@ -210,12 +219,12 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
 
         @Override
-        public void actionPerformed(T control)
+        public void actionPerformed(ButtonGeneric control)
         {
         }
 
         @Override
-        public void actionPerformedWithButton(T control, int mouseButton)
+        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             Minecraft mc = Minecraft.getMinecraft();
             int amount = mouseButton == 1 ? -1 : 1;
@@ -268,6 +277,10 @@ public class GuiSubRegionConfiguration extends GuiBase
                     this.schematicPlacement.toggleSubRegionEnabled(this.subRegionName);
                     break;
 
+                case TOGGLE_ENTITIES:
+                    this.schematicPlacement.toggleSubRegionIgnoreEntities(this.subRegionName);
+                    break;
+
                 case RESET_PLACEMENT:
                     this.schematicPlacement.resetSubRegionToSchematicValues(this.subRegionName);
                     break;
@@ -283,6 +296,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         {
             PLACEMENT_CONFIGURATION,
             TOGGLE_ENABLED,
+            TOGGLE_ENTITIES,
             MOVE_HERE,
             NUDGE_COORD_X,
             NUDGE_COORD_Y,

@@ -11,9 +11,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.RenderUtils;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
@@ -29,7 +27,7 @@ public class WidgetSchematicEntry extends WidgetBase
     private final WidgetListLoadedSchematics parent;
     private final LitematicaSchematic schematic;
     private final Minecraft mc;
-    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
+    private final List<ButtonWrapper<? extends ButtonGeneric>> buttons = new ArrayList<>();
     private final int typeIconX;
     private final int typeIconY;
     private final boolean isOdd;
@@ -68,14 +66,14 @@ public class WidgetSchematicEntry extends WidgetBase
         posX -= (len + 4);
         String tip = I18n.format("litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled");
         listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
-        this.addButton(new ButtonHoverText(0, posX, y, len, 20, text, tip), listener);
+        this.addButton(new ButtonGeneric(0, posX, y, len, 20, text, tip), listener);
 
         this.buttonsStartX = posX;
         this.typeIconX = this.x + 2;
         this.typeIconY = y + 4;
     }
 
-    protected <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
+    protected <T extends ButtonGeneric> void addButton(T button, IButtonActionListener<T> listener)
     {
         this.buttons.add(new ButtonWrapper<>(button, listener));
     }
@@ -150,13 +148,13 @@ public class WidgetSchematicEntry extends WidgetBase
             this.parent.drawHoveringText(text, mouseX, mouseY);
         }
 
-        for (ButtonWrapper<? extends ButtonBase> entry : this.buttons)
+        for (ButtonWrapper<? extends ButtonGeneric> entry : this.buttons)
         {
-            ButtonBase button = entry.getButton();
+            ButtonGeneric button = entry.getButton();
 
-            if ((button instanceof ButtonHoverText) && button.isMouseOver())
+            if (button.hasHoverText() && button.isMouseOver())
             {
-                RenderUtils.drawHoverText(mouseX, mouseY, ((ButtonHoverText) button).getHoverStrings());
+                RenderUtils.drawHoverText(mouseX, mouseY, button.getHoverStrings());
             }
         }
 

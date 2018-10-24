@@ -17,9 +17,7 @@ import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonHoverText;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -100,7 +98,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         String label = type.getLabel();
         String hover = type.getHoverText();
         int buttonWidth = this.mc.fontRenderer.getStringWidth(label) + 10;
-        ButtonBase button;
+        ButtonGeneric button;
 
         if (type == ButtonListener.Type.EXPORT_TYPE)
         {
@@ -111,7 +109,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
         else if (hover != null)
         {
-            button = new ButtonHoverText(id, x, y, buttonWidth, 20, label, hover);
+            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label, hover);
         }
         else
         {
@@ -162,7 +160,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonBase>
+    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final Type type;
         private final GuiSchematicManager gui;
@@ -174,7 +172,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
 
         @Override
-        public void actionPerformed(ButtonBase control)
+        public void actionPerformed(ButtonGeneric control)
         {
             DirectoryEntry entry = this.gui.getListWidget().getSelectedEntry();
 
@@ -233,7 +231,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase control, int mouseButton)
+        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             if (this.type == Type.SET_PREVIEW && mouseButton == 1)
             {

@@ -9,9 +9,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonIcon;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
@@ -73,10 +71,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         width = 120;
         x = this.width - width - 10;
 
-        this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
+        this.createButton(x, y, width - 18, ButtonListener.Type.TOGGLE_ENABLED);
+        this.createButton(x + width - 16, y + 2, 16, ButtonListener.Type.TOGGLE_ENCLOSING_BOX);
         y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.TOGGLE_LOCKED);
+        y += 22;
+
+        this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENTITIES);
         y += 22;
         x += 2;
 
@@ -85,15 +87,15 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
-        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_X, this.placement, this));
+        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_X, this.placement, this));
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Y);
-        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_Y, this.placement, this));
+        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_Y, this.placement, this));
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Z);
-        this.addButton(new ButtonIcon(this.id++, x + 85, y + 1, 16, 16, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener<ButtonIcon>(ButtonListener.Type.NUDGE_COORD_Z, this.placement, this));
+        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_Z, this.placement, this));
         y += 22;
         x -= 2;
 
@@ -166,8 +168,21 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
     private int createButton(int x, int y, int width, ButtonListener.Type type)
     {
-        ButtonListener<ButtonGeneric> listener = new ButtonListener<>(type, this.placement, this);
+        ButtonListener listener = new ButtonListener(type, this.placement, this);
         String label = "";
+        String hover = null;
+
+        if (type == ButtonListener.Type.TOGGLE_ENCLOSING_BOX)
+        {
+            Icons icon = this.placement.shouldRenderEnclosingBox() ? Icons.ENCLOSING_BOX_ENABLED : Icons.ENCLOSING_BOX_DISABLED;
+            boolean enabled = this.placement.shouldRenderEnclosingBox();
+            String str = (enabled ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
+            hover = I18n.format("litematica.gui.button.schematic_placement.hover.enclosing_box", str);
+
+            this.addButton(new ButtonGeneric(this.id++, x, y, icon, hover), listener);
+
+            return icon.getWidth();
+        }
 
         switch (type)
         {
@@ -186,6 +201,16 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     label = TextFormatting.GOLD + I18n.format("litematica.gui.button.locked");
                 else
                     label = I18n.format("litematica.gui.button.unlocked");
+
+                hover = I18n.format("litematica.gui.button.schematic_placement.hover.lock");
+                break;
+            }
+
+            case TOGGLE_ENTITIES:
+            {
+                boolean enabled = this.placement.ignoreEntities();
+                String str = (enabled ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
+                label = I18n.format("litematica.gui.button.schematic_placement.ignore_entities", str);
                 break;
             }
 
@@ -212,7 +237,17 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             width = this.fontRenderer.getStringWidth(label) + 10;
         }
 
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+        ButtonGeneric button;
+
+        if (hover != null)
+        {
+            button = new ButtonGeneric(this.id++, x, y, width, 20, label, hover);
+        }
+        else
+        {
+            button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+        }
+
         this.addButton(button, listener);
 
         if (type == ButtonListener.Type.RESET_SUB_REGIONS)
@@ -225,7 +260,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
     private void updateElements()
     {
-        String label = I18n.format("litematica.gui.schematic_placement.button.reset_sub_region_placements");;
+        String label = I18n.format("litematica.gui.button.schematic_placement.reset_sub_region_placements");;
         boolean enabled = true;
 
         if (this.placement.isRegionPlacementModified())
@@ -264,7 +299,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 
-    private static class ButtonListener<T extends ButtonBase> implements IButtonActionListener<T>
+    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final GuiPlacementConfiguration parent;
         private final SchematicPlacement placement;
@@ -278,12 +313,12 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         }
 
         @Override
-        public void actionPerformed(T control)
+        public void actionPerformed(ButtonGeneric control)
         {
         }
 
         @Override
-        public void actionPerformedWithButton(T control, int mouseButton)
+        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             Minecraft mc = Minecraft.getMinecraft();
             int amount = mouseButton == 1 ? -1 : 1;
@@ -338,6 +373,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     this.placement.toggleLocked();
                     break;
 
+                case TOGGLE_ENTITIES:
+                    this.placement.toggleIgnoreEntities();
+                    break;
+
+                case TOGGLE_ENCLOSING_BOX:
+                    this.placement.toggleRenderEnclosingBox();
+                    break;
+
                 case RESET_SUB_REGIONS:
                     this.placement.resetAllSubRegionsToSchematicValues();
                     break;
@@ -373,6 +416,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             NUDGE_COORD_Z           (""),
             TOGGLE_ENABLED          (""),
             TOGGLE_LOCKED           (""),
+            TOGGLE_ENTITIES         (""),
+            TOGGLE_ENCLOSING_BOX    (""),
             RESET_SUB_REGIONS       (""),
             OPEN_VERIFIER_GUI       ("litematica.gui.button.schematic_verifier"),
             OPEN_MATERIAL_LIST_GUI  ("litematica.gui.button.material_list");

@@ -124,9 +124,20 @@ public class SchematicPlacement
         return this.ignoreEntities;
     }
 
-    public void setIgnoreEntities(boolean ignoreEntities)
+    public void toggleIgnoreEntities()
     {
-        this.ignoreEntities = ignoreEntities;
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        // Marks the currently touched chunks before doing the modification
+        SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+        manager.onPrePlacementChange(this);
+
+        this.ignoreEntities = ! this.ignoreEntities;
+        this.onModified(manager);
     }
 
     public void toggleRenderEnclosingBox()
@@ -566,6 +577,25 @@ public class SchematicPlacement
             manager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).toggleEnabled();
+            this.onModified(regionName, manager);
+        }
+    }
+
+    public void toggleSubRegionIgnoreEntities(String regionName)
+    {
+        if (this.isLocked())
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        {
+            // Marks the currently touched chunks before doing the modification
+            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            manager.onPrePlacementChange(this);
+
+            this.relativeSubRegionPlacements.get(regionName).toggleIgnoreEntities();
             this.onModified(regionName, manager);
         }
     }

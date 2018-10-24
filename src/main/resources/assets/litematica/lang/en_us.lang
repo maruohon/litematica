@@ -65,11 +65,21 @@ litematica.gui.button.material_list.required=Required
 litematica.gui.button.material_list.toggle_info_hud=Info HUD: %s
 litematica.gui.button.material_list.write_to_file=Write to file
 
+litematica.gui.button.placement_sub.placement_configuration=Placement configuration
+litematica.gui.button.placement_sub.reset_sub_region_placement=Reset sub-region
+litematica.gui.button.placement_sub.slice_type=Slice: %s
+
 litematica.gui.button.render_layers_gui.axis=Axis: %s
 litematica.gui.button.render_layers_gui.layers=Layers: %s
 litematica.gui.button.render_layers_gui.set_here=Set Here
 
 litematica.gui.button.schematic_manager.export_as=Export as:
+
+litematica.gui.button.schematic_placement.ignore_entities=Ignore entities: %s
+litematica.gui.button.schematic_placement.reset_sub_region_placements=Reset all sub-regions
+
+litematica.gui.button.schematic_placement.hover.enclosing_box=Enclosing box rendering: %s
+litematica.gui.button.schematic_placement.hover.lock=Locking a placement prevents moving or\notherwise changing it (accidentally)
 
 litematica.gui.button.schematic_placements.configure=Configure
 litematica.gui.button.schematic_placements.remove=Remove
@@ -124,6 +134,11 @@ litematica.gui.label.material_list.item=Item
 litematica.gui.label.material_list.name=Name
 litematica.gui.label.material_list.required=Required
 
+litematica.gui.label.placement_sub.region_name=Region name: %s
+litematica.gui.label.placement_sub.region_position=Region position
+
+litematica.gui.label.placement_settings.placement_origin=Placement origin
+
 litematica.gui.label.render_layers.layer=Layer
 litematica.gui.label.render_layers.layer_max=Max layer
 litematica.gui.label.render_layers.layer_min=Min layer
@@ -162,16 +177,6 @@ litematica.gui.label.schematic_verifier_display_type.missing=Missing Blocks
 litematica.gui.label.schematic_verifier_display_type.wrong_blocks=Wrong Blocks
 litematica.gui.label.schematic_verifier_display_type.wrong_state=Wrong States
 litematica.gui.label.schematic_verifier.missing_chunks=Missing Chunks (%d)
-
-litematica.gui.placement_sub_region.button.placement_configuration=Placement configuration
-litematica.gui.placement_sub_region.label.region_name=Region name: %s
-litematica.gui.placement_sub_region.label.region_position=Region position
-litematica.gui.placement_sub_region.button.reset_sub_region_placement=Reset sub-region
-litematica.gui.placement_sub_region.button.slice_type=Slice: %s
-
-litematica.gui.schematic_placement.button.reset_sub_region_placements=Reset all sub-regions
-
-litematica.gui.label.placement_settings.placement_origin=Placement origin
 
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
