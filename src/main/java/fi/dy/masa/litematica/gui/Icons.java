@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import javax.annotation.Nullable;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.RenderUtils;
@@ -100,8 +101,14 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
     }
 
     @Override
+    @Nullable
     public IGuiIcon getIconForFile(File file)
     {
+        if (this == DUMMY)
+        {
+            return null;
+        }
+
         FileType fileType = FileType.fromFile(file);
 
         switch (fileType)
