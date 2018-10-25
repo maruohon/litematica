@@ -50,12 +50,12 @@ public class InfoHud
                 {
                     if (provider.shouldRenderStrings())
                     {
-                        y = fi.dy.masa.malilib.gui.RenderUtils.renderText(this.mc, 4, y, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, provider.getLines());
+                        y = fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, 4, y, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, provider.getLines());
                     }
                 }
             }
 
-            fi.dy.masa.malilib.gui.RenderUtils.renderText(this.mc, 4, y, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+            fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, 4, y, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
         }
     }
 

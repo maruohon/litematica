@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
+import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.util.ResourceLocation;
 
 public enum ButtonIcons implements IGuiIcon

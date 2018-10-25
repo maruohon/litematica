@@ -648,26 +648,22 @@ public class RenderUtils
             final int yCenter = res.getScaledHeight() / 2;
 
             final int totalSlots = inv.getSizeInventory();
-            final int slotConfig = fi.dy.masa.malilib.gui.RenderUtils.getInventorySlotConfiguration(inv, totalSlots);
-            final int slotsPerRow = (slotConfig >>> 16) & 0xFF;
-            final int slotOffsetX = (slotConfig >>> 8) & 0xFF;
-            final int slotOffsetY = slotConfig & 0xFF;
-            final int wh = fi.dy.masa.malilib.gui.RenderUtils.getInventoryBackgroundWidthHeight(inv, totalSlots, slotsPerRow);
-            final int rows = (int) Math.ceil(totalSlots / slotsPerRow);
-            final int width = (wh >>> 16) & 0xFFFF;
-            final int height = wh & 0xFFFF;
-            int x = xCenter - (width / 2) + (width / 2 + 4) * xOffsetMult;
-            int y = yCenter - 6 - height;
+            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
+            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
+            final int rows = (int) Math.ceil(totalSlots / props.slotsPerRow);
+
+            int xInv = xCenter - (props.width / 2) + (props.width / 2 + 4) * xOffsetMult;
+            int yInv = yCenter - 6 - props.height;
 
             if (rows > 6)
             {
-                y += (rows - 6) * 18;
+                yInv -= (rows - 6) * 18;
             }
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-            fi.dy.masa.malilib.gui.RenderUtils.renderInventoryBackground(x, y, slotsPerRow, totalSlots, inv, mc);
-            fi.dy.masa.malilib.gui.RenderUtils.renderInventoryStacks(inv, x + slotOffsetX, y + slotOffsetY, slotsPerRow, 0, -1, mc);
+            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
+            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);
         }
     }
 

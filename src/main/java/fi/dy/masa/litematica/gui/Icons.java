@@ -4,9 +4,9 @@ import java.io.File;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.FileType;
-import fi.dy.masa.malilib.gui.RenderUtils;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
+import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.util.ResourceLocation;
 
 public enum Icons implements IGuiIcon, IFileBrowserIconProvider

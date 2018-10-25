@@ -4,7 +4,7 @@ import java.util.List;
 import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.RenderUtils;
+import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
