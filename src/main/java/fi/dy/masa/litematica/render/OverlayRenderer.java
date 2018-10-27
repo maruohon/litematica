@@ -429,45 +429,47 @@ public class OverlayRenderer
                     BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
                     IBlockState stateClient = mc.world.getBlockState(pos);
                     stateClient = stateClient.getActualState(mc.world, pos);
+                    World worldClient = WorldUtils.getBestWorld(mc);
 
                     World worldSchematic = SchematicWorldHandler.getSchematicWorld();
                     IBlockState stateSchematic = worldSchematic.getBlockState(pos);
                     stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
                     IBlockState air = Blocks.AIR.getDefaultState();
 
+                    ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
+                    ItemUtils.setItemForBlock(mc.world, pos, stateClient);
+
                     // Not just a missing block
                     if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
                     {
-                        ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
-                        ItemUtils.setItemForBlock(mc.world, pos, stateClient);
                         BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
                         info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
 
                         RenderUtils.renderInventoryOverlay(-1, worldSchematic, pos, mc);
-                        World world = WorldUtils.getBestWorld(mc);
-                        RenderUtils.renderInventoryOverlay(1, world, pos, mc);
+                        RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
                     }
                     else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
                     {
-                        ItemUtils.setItemForBlock(mc.world, pos, stateClient);
                         BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
                         info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-                        World world = WorldUtils.getBestWorld(mc);
-                        RenderUtils.renderInventoryOverlay(0, world, pos, mc);
+                        RenderUtils.renderInventoryOverlay(0, worldClient, pos, mc);
                     }
                     else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
                     {
-                        ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
-                        BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
-                        info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-
                         int xOffset = 0;
                         TileEntity te = mc.world.getTileEntity(pos);
 
                         if (te instanceof IInventory)
                         {
-                            RenderUtils.renderInventoryOverlay(90, WorldUtils.getBestWorld(mc), pos, mc);
-                            xOffset = -90;
+                            BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
+                            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                            RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
+                            xOffset = -1;
+                        }
+                        else
+                        {
+                            BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
+                            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
                         }
 
                         RenderUtils.renderInventoryOverlay(xOffset, worldSchematic, pos, mc);
