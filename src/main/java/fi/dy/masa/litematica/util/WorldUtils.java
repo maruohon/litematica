@@ -29,8 +29,10 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -323,6 +325,12 @@ public class WorldUtils
         }
     }
 
+    /**
+     * Does a ray trace to the schematic world, and returns either the closest or the furthest hit block.
+     * @param closest
+     * @param mc
+     * @return true if the correct item was or is in the player's hand after the pick block
+     */
     public static boolean doSchematicWorldPickBlock(boolean closest, Minecraft mc)
     {
         if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() == false)
@@ -349,8 +357,45 @@ public class WorldUtils
 
             if (stack.isEmpty() == false)
             {
-                // Don't pick-block and cancel further processing if the correct item is already in the player's hand
-                return InventoryUtils.swapItemToMainHand(stack, mc);
+                InventoryPlayer inv = mc.player.inventory;
+
+                if (mc.player.capabilities.isCreativeMode)
+                {
+                    TileEntity te = world.getTileEntity(pos);
+
+                    // The creative mode pick block with NBT only works correctly
+                    // if the server world doesn't have a TileEntity in that position.
+                    // Otherwise it would try to write whatever that TE is into the picked ItemStack.
+                    if (GuiScreen.isCtrlKeyDown() && te != null && mc.world.isAirBlock(pos))
+                    {
+                        ItemUtils.storeTEInStack(stack, te);
+                    }
+
+                    inv.setPickedItemStack(stack);
+                    mc.playerController.sendSlotPacket(mc.player.getHeldItem(EnumHand.MAIN_HAND), 36 + inv.currentItem);
+
+                    return true;
+                }
+                else
+                {
+                    int slot = inv.getSlotFor(stack);
+                    boolean shouldPick = inv.currentItem != slot;
+                    boolean canPick = slot != -1;
+
+                    if (shouldPick && canPick)
+                    {
+                        if (InventoryPlayer.isHotbar(slot))
+                        {
+                            inv.currentItem = slot;
+                        }
+                        else
+                        {
+                            mc.playerController.pickItem(slot);
+                        }
+                    }
+
+                    return shouldPick == false || canPick;
+                }
             }
         }
 
@@ -371,16 +416,25 @@ public class WorldUtils
 
             if (stack.isEmpty() == false)
             {
+                IBlockState stateClient = mc.world.getBlockState(pos);
+
                 // Abort if there is already a block in the target position
-                if (mc.world.getBlockState(pos).getBlock().isReplaceable(mc.world, pos) == false)
+                if (stateClient.getBlock().isReplaceable(mc.world, pos) == false && stateClient.getMaterial().isLiquid() == false)
                 {
                     return false;
                 }
 
+                if (doSchematicWorldPickBlock(true, mc) == false)
+                {
+                    return false;
+                }
+
+                /*
                 if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
                 {
                     InventoryUtils.swapItemToMainHand(stack, mc);
                 }
+                */
 
                 EnumHand hand = null;
 
@@ -388,8 +442,7 @@ public class WorldUtils
                 {
                     hand = EnumHand.MAIN_HAND;
                 }
-
-                if (InventoryUtils.areStacksEqual(mc.player.getHeldItemOffhand(), stack))
+                else if (InventoryUtils.areStacksEqual(mc.player.getHeldItemOffhand(), stack))
                 {
                     hand = EnumHand.OFF_HAND;
                 }

@@ -6,7 +6,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -93,5 +99,48 @@ public class ItemUtils
         {
             stack.setCount(2);
         }
+    }
+
+    public static ItemStack storeTEInStack(ItemStack stack, TileEntity te)
+    {
+        NBTTagCompound nbt = te.writeToNBT(new NBTTagCompound());
+
+        if (stack.getItem() == Items.SKULL && nbt.hasKey("Owner"))
+        {
+            NBTTagCompound tagOwner = nbt.getCompoundTag("Owner");
+            NBTTagCompound tagSkull = new NBTTagCompound();
+
+            tagSkull.setTag("SkullOwner", tagOwner);
+            stack.setTagCompound(tagSkull);
+
+            return stack;
+        }
+        else
+        {
+            NBTTagCompound tagLore = new NBTTagCompound();
+            NBTTagList tagList = new NBTTagList();
+
+            tagList.appendTag(new NBTTagString("(+NBT)"));
+            tagLore.setTag("Lore", tagList);
+            stack.setTagInfo("display", tagLore);
+            stack.setTagInfo("BlockEntityTag", nbt);
+
+            return stack;
+        }
+    }
+
+    public static String getStackString(ItemStack stack)
+    {
+        if (stack.isEmpty() == false)
+        {
+            ResourceLocation rl = Item.REGISTRY.getNameForObject(stack.getItem());
+
+            return String.format("[%s @ %d - display: %s - NBT: %s] (%s)",
+                    rl != null ? rl.toString() : "null", stack.getMetadata(), stack.getDisplayName(),
+                    stack.getTagCompound() != null ? stack.getTagCompound().toString() : "<no NBT>",
+                    stack.toString());
+        }
+
+        return "<empty>";
     }
 }

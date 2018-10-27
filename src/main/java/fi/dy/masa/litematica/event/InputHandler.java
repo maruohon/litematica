@@ -77,7 +77,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         // Tool enabled, and not in a GUI
         if (mc.currentScreen == null && mc.world != null && mc.player != null)
         {
-            if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode())
+            if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode() + 100)
             {
                 return this.handleEasyPlace(mc);
             }

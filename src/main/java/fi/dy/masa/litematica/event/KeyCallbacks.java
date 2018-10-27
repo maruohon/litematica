@@ -14,10 +14,10 @@ import fi.dy.masa.litematica.gui.GuiPlacementManager;
 import fi.dy.masa.litematica.gui.GuiRenderLayer;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.AreaSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -189,21 +189,21 @@ public class KeyCallbacks
                 else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind() ||
                          key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
                 {
-                    boolean first = key == Hotkeys.PICK_BLOCK_FIRST.getKeybind();
-                    // By default only cancel further processing for the "first" type pick block,
-                    // to allow the use action after a "last" type pick block
-                    boolean ret = WorldUtils.doSchematicWorldPickBlock(first, this.mc) && first;
-
-                    // This needs to also happen in here in addition to the calls from the input handling,
-                    // as a successful pick-block will prevent the input handling from triggering.
-                    if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-                        Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
+                    if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() == false ||
+                        Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() == false ||
+                        mc.gameSettings.keyBindUseItem.isKeyDown() == false)
                     {
-                        WorldUtils.handleEasyPlace(this.mc);
-                        return true;
+                        boolean first = key == Hotkeys.PICK_BLOCK_FIRST.getKeybind();
+                        //boolean ret = WorldUtils.doSchematicWorldPickBlock(first, this.mc) && first;
+                        //WorldUtils.handleEasyPlace(this.mc);
+                        WorldUtils.doSchematicWorldPickBlock(first, this.mc);
+
+                        // Only cancel further processing for the "first" type pick block,
+                        // to allow the use action after a "last" type pick block
+                        return first;
                     }
 
-                    return ret;
+                    return false;
                 }
                 else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
                 {
