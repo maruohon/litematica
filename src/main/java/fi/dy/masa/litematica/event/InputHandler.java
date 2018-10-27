@@ -15,6 +15,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -57,7 +58,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
             if (eventKey == mc.gameSettings.keyBindUseItem.getKeyCode())
             {
-                return this.handleEasyPlace(mc);
+                return this.handleUseKey(mc);
             }
             else if (eventKey == mc.gameSettings.keyBindScreenshot.getKeyCode())
             {
@@ -79,7 +80,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode() + 100)
             {
-                return this.handleEasyPlace(mc);
+                return this.handleUseKey(mc);
             }
 
             EntityPlayer player = mc.player;
@@ -145,14 +146,31 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
-    private boolean handleEasyPlace(Minecraft mc)
+    private boolean handleUseKey(Minecraft mc)
     {
-        if (mc.player != null &&
-            Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
+        if (mc.player != null)
         {
-            WorldUtils.handleEasyPlace(mc);
-            return true;
+            if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+                Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
+            {
+                WorldUtils.handleEasyPlace(mc);
+                return true;
+            }
+            else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
+            {
+                String keyStrUse = KeybindMulti.getStorageStringForKeyCode(mc.gameSettings.keyBindUseItem.getKeyCode());
+                String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
+
+                if (keyStrUse.equals(keyStrPick))
+                {
+                    WorldUtils.doSchematicWorldPickBlock(false, mc);
+                }
+            }
+
+            if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
+            {
+                return WorldUtils.handlePlacementRestriction(mc);
+            }
         }
 
         return false;

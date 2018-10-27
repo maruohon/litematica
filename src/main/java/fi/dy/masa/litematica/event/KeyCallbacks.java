@@ -31,6 +31,7 @@ import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
@@ -186,21 +187,21 @@ public class KeyCallbacks
                     DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
                     return true;
                 }
-                else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind() ||
-                         key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
+                else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
                 {
-                    if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() == false ||
-                        Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() == false ||
-                        mc.gameSettings.keyBindUseItem.isKeyDown() == false)
-                    {
-                        boolean first = key == Hotkeys.PICK_BLOCK_FIRST.getKeybind();
-                        //boolean ret = WorldUtils.doSchematicWorldPickBlock(first, this.mc) && first;
-                        //WorldUtils.handleEasyPlace(this.mc);
-                        WorldUtils.doSchematicWorldPickBlock(first, this.mc);
+                    WorldUtils.doSchematicWorldPickBlock(true, this.mc);
+                    return true;
+                }
+                else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
+                {
+                    String keyStrUse = KeybindMulti.getStorageStringForKeyCode(this.mc.gameSettings.keyBindUseItem.getKeyCode());
+                    String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
 
-                        // Only cancel further processing for the "first" type pick block,
-                        // to allow the use action after a "last" type pick block
-                        return first;
+                    // Only do the pick block here, if it's not bound to the use button.
+                    // If it's bound to the use button, then it will be done from the input handling.
+                    if (keyStrUse.equals(keyStrPick) == false)
+                    {
+                        WorldUtils.doSchematicWorldPickBlock(false, this.mc);
                     }
 
                     return false;

@@ -3,12 +3,15 @@ package fi.dy.masa.litematica.util;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.malilib.util.InventoryUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -38,6 +41,31 @@ public class EntityUtils
         }
 
         return ItemStack.EMPTY;
+    }
+
+    /**
+     * Checks if the requested item is currently in the player's hand such that it would be used for using/placing.
+     * This means, that it must either be in the main hand, or the main hand must be empty and the item is in the offhand.
+     * @param player
+     * @param stack
+     * @return
+     */
+    @Nullable
+    public static EnumHand getUsedHandForItem(EntityPlayer player, ItemStack stack)
+    {
+        EnumHand hand = null;
+
+        if (InventoryUtils.areStacksEqual(player.getHeldItemMainhand(), stack))
+        {
+            hand = EnumHand.MAIN_HAND;
+        }
+        else if (player.getHeldItemMainhand().isEmpty() &&
+                 InventoryUtils.areStacksEqual(player.getHeldItemOffhand(), stack))
+        {
+            hand = EnumHand.OFF_HAND;
+        }
+
+        return hand;
     }
 
     public static boolean areStacksEqualIgnoreDurability(ItemStack stack1, ItemStack stack2)

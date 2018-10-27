@@ -21,7 +21,6 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.block.BlockRedstoneRepeater;
@@ -419,74 +418,129 @@ public class WorldUtils
                 IBlockState stateClient = mc.world.getBlockState(pos);
 
                 // Abort if there is already a block in the target position
-                if (stateClient.getBlock().isReplaceable(mc.world, pos) == false && stateClient.getMaterial().isLiquid() == false)
+                if (stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
+                    stateClient.getMaterial().isLiquid() == false)
                 {
-                    return false;
+                    return true;
                 }
 
+                // Abort if the required item was not able to be pick-block'd
                 if (doSchematicWorldPickBlock(true, mc) == false)
                 {
-                    return false;
+                    return true;
                 }
 
-                /*
-                if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
-                {
-                    InventoryUtils.swapItemToMainHand(stack, mc);
-                }
-                */
+                EnumHand hand = EntityUtils.getUsedHandForItem(mc.player, stack);
 
-                EnumHand hand = null;
-
-                if (InventoryUtils.areStacksEqual(mc.player.getHeldItemMainhand(), stack))
+                // Abort if the wrong item is in the player's hand
+                if (hand == null)
                 {
-                    hand = EnumHand.MAIN_HAND;
-                }
-                else if (InventoryUtils.areStacksEqual(mc.player.getHeldItemOffhand(), stack))
-                {
-                    hand = EnumHand.OFF_HAND;
+                    return true;
                 }
 
-                if (hand != null)
-                {
-                    Vec3d hitPos = trace.hitVec;
+                Vec3d hitPos = trace.hitVec;
 
-                    if (mc.isSingleplayer() == false)
+                if (mc.isSingleplayer() == false)
+                {
+                    // Carpet Accurate Placement protocol support
+                    for (Map.Entry<IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
                     {
-                        // Carpet Accurate Placement protocol support
-                        for (Map.Entry<IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
+                        if (entry.getKey() instanceof PropertyDirection)
                         {
-                            if (entry.getKey() instanceof PropertyDirection)
+                            float x = state.getValue((PropertyDirection) entry.getKey()).ordinal() + 2 + pos.getX();
+
+                            if (state.getBlock() instanceof BlockRedstoneRepeater)
                             {
-                                float x = state.getValue((PropertyDirection) entry.getKey()).ordinal() + 2 + pos.getX();
-
-                                if (state.getBlock() instanceof BlockRedstoneRepeater)
-                                {
-                                    x += ((state.getValue(BlockRedstoneRepeater.DELAY)) - 1) * 10;
-                                }
-
-                                hitPos = new Vec3d(x, hitPos.y, hitPos.z);
-                                break;
+                                x += ((state.getValue(BlockRedstoneRepeater.DELAY)) - 1) * 10;
                             }
+
+                            hitPos = new Vec3d(x, hitPos.y, hitPos.z);
+                            break;
                         }
                     }
-
-                    EnumFacing side = trace.sideHit;
-
-                    // Get the targeted side for an existing client world block, if any
-                    trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, 6);
-
-                    if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
-                    {
-                        side = trace.sideHit;
-                    }
-
-                    mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand);
                 }
+
+                EnumFacing side = trace.sideHit;
+
+                // Get the targeted side for an existing client world block, if any
+                trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, 6);
+
+                if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
+                {
+                    side = trace.sideHit;
+                }
+
+                // Fluid _blocks_ are not replaceable... >_>
+                if (stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
+                    stateClient.getMaterial().isLiquid())
+                {
+                    pos = pos.offset(side, -1);
+                }
+
+                mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand);
             }
         }
 
         return true;
+    }
+
+    /**
+     * Does placement restriction checks for the targeted position.
+     * If the targeted position is outside of the current layer range, or should be air
+     * in the schematic, or the player is holding the wrong item in hand, then true is returned
+     * to indicate that the use action should be cancelled.
+     * @param mc
+     * @param doEasyPlace
+     * @param restrictPlacement
+     * @return
+     */
+    public static boolean handlePlacementRestriction(Minecraft mc)
+    {
+        RayTraceResult trace = mc.objectMouseOver;
+
+        if (trace.typeOfHit == RayTraceResult.Type.BLOCK)
+        {
+            BlockPos pos = trace.getBlockPos();
+            IBlockState stateClient = mc.world.getBlockState(pos);
+
+            if (stateClient.getBlock().isReplaceable(mc.world, pos) == false)
+            {
+                pos = pos.offset(trace.sideHit);
+                stateClient = mc.world.getBlockState(pos);
+            }
+
+            // Placement position is already occupied
+            if (stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
+                stateClient.getMaterial().isLiquid() == false)
+            {
+                return true;
+            }
+
+            World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+            LayerRange range = DataManager.getRenderLayerRange();
+
+            // There should not be anything in the targeted position
+            if (range.isPositionWithinRange(pos) == false || worldSchematic.isAirBlock(pos))
+            {
+                return true;
+            }
+
+            IBlockState stateSchematic = worldSchematic.getBlockState(pos);
+            ItemStack stack = ItemUtils.getItemForBlock(worldSchematic, pos, stateSchematic, true);
+
+            if (stack.isEmpty() == false)
+            {
+                EnumHand hand = EntityUtils.getUsedHandForItem(mc.player, stack);
+
+                // The player is holding the wrong item for the targeted position
+                if (hand == null)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static void deleteSelectionVolumes(Minecraft mc)
