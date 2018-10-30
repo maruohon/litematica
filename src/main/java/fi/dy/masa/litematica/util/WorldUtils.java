@@ -21,6 +21,7 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.block.BlockRedstoneRepeater;
@@ -389,7 +390,7 @@ public class WorldUtils
                         }
                         else
                         {
-                            mc.playerController.pickItem(slot);
+                            InventoryUtils.swapItemToMainHand(stack, mc);
                         }
                     }
 
