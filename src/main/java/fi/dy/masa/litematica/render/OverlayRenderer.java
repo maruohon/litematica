@@ -96,7 +96,7 @@ public class OverlayRenderer
     public void updatePlacementCache()
     {
         this.placements.clear();
-        List<SchematicPlacement> list = DataManager.getInstance().getSchematicPlacementManager().getAllSchematicsPlacements();
+        List<SchematicPlacement> list = DataManager.getSchematicPlacementManager().getAllSchematicsPlacements();
 
         for (SchematicPlacement placement : list)
         {
@@ -114,8 +114,7 @@ public class OverlayRenderer
         float lineWidthBlockBox = 2f;
         float lineWidthArea = 1.5f;
 
-        DataManager dataManager = DataManager.getInstance();
-        SelectionManager sm = dataManager.getSelectionManager();
+        SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         final boolean hasWork = currentSelection != null || this.placements.isEmpty() == false;
 
@@ -143,7 +142,7 @@ public class OverlayRenderer
 
         if (this.placements.isEmpty() == false)
         {
-            SchematicPlacementManager spm = dataManager.getSchematicPlacementManager();
+            SchematicPlacementManager spm = DataManager.getSchematicPlacementManager();
             SchematicPlacement currentPlacement = spm.getSelectedSchematicPlacement();
 
             for (Map.Entry<SchematicPlacement, ImmutableMap<String, Box>> entry : this.placements.entrySet())
@@ -298,23 +297,18 @@ public class OverlayRenderer
 
     public void renderSchematicMismatches(float partialTicks)
     {
-        DataManager manager = DataManager.getInstance();
+        SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-        if (manager != null)
+        if (placement != null && placement.hasVerifier())
         {
-            SchematicPlacement placement = manager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+            SchematicVerifier verifier = placement.getSchematicVerifier();
 
-            if (placement != null && placement.hasVerifier())
+            if (verifier.getSelectedMismatchTypeForRender() != null)
             {
-                SchematicVerifier verifier = placement.getSchematicVerifier();
-
-                if (verifier.getSelectedMismatchTypeForRender() != null)
-                {
-                    List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
-                    RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 10);
-                    BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
-                    this.renderSchematicMismatches(verifier.getSelectedMismatchTypeForRender(), posList, posLook, partialTicks);
-                }
+                List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
+                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 10);
+                BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
+                this.renderSchematicMismatches(verifier.getSelectedMismatchTypeForRender(), posList, posLook, partialTicks);
             }
         }
     }
@@ -393,7 +387,7 @@ public class OverlayRenderer
                 (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
                  Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld()))
             {
-                SchematicPlacement placement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
+                SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
                 if (placement != null && placement.hasVerifier())
                 {

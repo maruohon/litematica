@@ -547,7 +547,7 @@ public class WorldUtils
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
-            final AreaSelection area = DataManager.getInstance().getSelectionManager().getCurrentSelection();
+            final AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
 
             if (area != null)
             {

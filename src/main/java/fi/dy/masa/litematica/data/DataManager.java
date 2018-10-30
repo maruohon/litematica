@@ -39,9 +39,7 @@ public class DataManager implements IDirectoryCache
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
-    private static OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
     private static ConfigGuiTab configGuiTab = ConfigGuiTab.GENERIC;
-    private static LayerRange renderRange = new LayerRange();
     private static boolean createPlacementOnLoad = true;
 
     private static boolean canSave;
@@ -52,12 +50,19 @@ public class DataManager implements IDirectoryCache
 
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
+    private LayerRange renderRange = new LayerRange();
+    private OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
 
     private DataManager()
     {
     }
 
-    public static DataManager getInstance()
+    private static DataManager getInstance()
+    {
+        return INSTANCE;
+    }
+
+    public static IDirectoryCache getDirectoryCache()
     {
         return INSTANCE;
     }
@@ -96,7 +101,7 @@ public class DataManager implements IDirectoryCache
 
     public static void runTasks()
     {
-        INSTANCE.schematicPlacementManager.processQueuedChunks();
+        getInstance().schematicPlacementManager.processQueuedChunks();
 
         if (placementToVerify != null)
         {
@@ -111,29 +116,14 @@ public class DataManager implements IDirectoryCache
         return toolItem;
     }
 
-    public SelectionManager getSelectionManager()
-    {
-        return this.selectionManager;
-    }
-
-    public SchematicPlacementManager getSchematicPlacementManager()
-    {
-        return this.schematicPlacementManager;
-    }
-
     public static boolean getCreatePlacementOnLoad()
     {
         return createPlacementOnLoad;
     }
 
-    public static OperationMode getOperationMode()
+    public static void setCreatePlacementOnLoad(boolean create)
     {
-        return operationMode;
-    }
-
-    public static void setOperationMode(OperationMode mode)
-    {
-        operationMode = mode;
+        createPlacementOnLoad = create;
     }
 
     public static ConfigGuiTab getConfigGuiTab()
@@ -146,14 +136,29 @@ public class DataManager implements IDirectoryCache
         configGuiTab = tab;
     }
 
-    public static LayerRange getRenderLayerRange()
+    public static SelectionManager getSelectionManager()
     {
-        return renderRange;
+        return getInstance().selectionManager;
     }
 
-    public static void setCreatePlacementOnLoad(boolean create)
+    public static SchematicPlacementManager getSchematicPlacementManager()
     {
-        createPlacementOnLoad = create;
+        return getInstance().schematicPlacementManager;
+    }
+
+    public static OperationMode getOperationMode()
+    {
+        return getInstance().operationMode;
+    }
+
+    public static void setOperationMode(OperationMode mode)
+    {
+        getInstance().operationMode = mode;
+    }
+
+    public static LayerRange getRenderLayerRange()
+    {
+        return getInstance().renderRange;
     }
 
     @Override
@@ -171,7 +176,7 @@ public class DataManager implements IDirectoryCache
 
     public static void load()
     {
-        INSTANCE.loadPerDimensionData();
+        getInstance().loadPerDimensionData();
 
         File file = getCurrentStorageFile(true);
         JsonElement element = JsonUtils.parseJsonFile(file);
@@ -203,20 +208,6 @@ public class DataManager implements IDirectoryCache
                 }
             }
 
-            if (JsonUtils.hasString(root, "operation_mode"))
-            {
-                try
-                {
-                    operationMode = OperationMode.valueOf(root.get("operation_mode").getAsString());
-                }
-                catch (Exception e) {}
-
-                if (operationMode == null)
-                {
-                    operationMode = OperationMode.SCHEMATIC_PLACEMENT;
-                }
-            }
-
             if (JsonUtils.hasString(root, "config_gui_tab"))
             {
                 try
@@ -231,12 +222,7 @@ public class DataManager implements IDirectoryCache
                 }
             }
 
-            if (JsonUtils.hasObject(root, "render_range"))
-            {
-                renderRange = LayerRange.fromJson(JsonUtils.getNestedObject(root, "render_range", false));
-            }
-
-            createPlacementOnLoad = JsonUtils.getBoolean(root, "create_placement_on_load");
+            createPlacementOnLoad = JsonUtils.getBooleanOrDefault(root, "create_placement_on_load", true);
         }
 
         canSave = true;
@@ -254,7 +240,7 @@ public class DataManager implements IDirectoryCache
             return;
         }
 
-        INSTANCE.savePerDimensionData();
+        getInstance().savePerDimensionData();
 
         JsonObject root = new JsonObject();
         JsonObject objDirs = new JsonObject();
@@ -267,9 +253,7 @@ public class DataManager implements IDirectoryCache
         root.add("last_directories", objDirs);
 
         root.add("create_placement_on_load", new JsonPrimitive(createPlacementOnLoad));
-        root.add("operation_mode", new JsonPrimitive(operationMode.name()));
         root.add("config_gui_tab", new JsonPrimitive(configGuiTab.name()));
-        root.add("render_range", renderRange.toJson());
 
         File file = getCurrentStorageFile(true);
         JsonUtils.writeJsonToFile(root, file);
@@ -311,6 +295,25 @@ public class DataManager implements IDirectoryCache
         {
             this.schematicPlacementManager.loadFromJson(obj.get("placements").getAsJsonObject());
         }
+
+        if (JsonUtils.hasObject(obj, "render_range"))
+        {
+            this.renderRange = LayerRange.fromJson(JsonUtils.getNestedObject(obj, "render_range", false));
+        }
+
+        if (JsonUtils.hasString(obj, "operation_mode"))
+        {
+            try
+            {
+                this.operationMode = OperationMode.valueOf(obj.get("operation_mode").getAsString());
+            }
+            catch (Exception e) {}
+
+            if (this.operationMode == null)
+            {
+                this.operationMode = OperationMode.AREA_SELECTION;
+            }
+        }
     }
 
     private JsonObject toJson()
@@ -319,6 +322,8 @@ public class DataManager implements IDirectoryCache
 
         obj.add("selections", this.selectionManager.toJson());
         obj.add("placements", this.schematicPlacementManager.toJson());
+        obj.add("operation_mode", new JsonPrimitive(this.operationMode.name()));
+        obj.add("render_range", this.renderRange.toJson());
 
         return obj;
     }

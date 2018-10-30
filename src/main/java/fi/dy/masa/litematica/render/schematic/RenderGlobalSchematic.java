@@ -314,7 +314,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             this.displayListEntitiesDirty = false;
             this.renderInfos = new ArrayList<>(256);
 
-            Set<SubChunkPos> set = DataManager.getInstance().getSchematicPlacementManager().getAllTouchedSubChunks();
+            Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
 
             Entity.setRenderDistanceWeight(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
             //List<SubChunkPos> positions = new ArrayList<>(256);

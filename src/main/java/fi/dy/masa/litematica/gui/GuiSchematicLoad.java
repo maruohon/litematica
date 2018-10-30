@@ -149,7 +149,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                         String name = schematic.getMetadata().getName();
                         boolean enabled = GuiScreen.isShiftKeyDown() == false;
 
-                        SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+                        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
                         SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, enabled, enabled);
                         manager.addSchematicPlacement(placement, this.gui);
                         manager.setSelectedSchematicPlacement(placement);

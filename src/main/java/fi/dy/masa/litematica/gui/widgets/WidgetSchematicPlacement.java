@@ -41,7 +41,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.placement = placement;
         this.isOdd = isOdd;
         this.mc = mc;
-        this.manager = DataManager.getInstance().getSchematicPlacementManager();
+        this.manager = DataManager.getSchematicPlacementManager();
 
         this.id = 0;
         int posX = x + width;

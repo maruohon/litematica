@@ -29,7 +29,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
 
         this.title = I18n.format("litematica.gui.title.area_selection_manager");
         this.mc = Minecraft.getMinecraft();
-        this.selectionManager = DataManager.getInstance().getSelectionManager();
+        this.selectionManager = DataManager.getSelectionManager();
     }
 
     @Override

@@ -18,7 +18,7 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     public WidgetAreaSelectionBrowser(int x, int y, int width, int height,
             GuiAreaSelectionManager parent, ISelectionListener<DirectoryEntry> selectionListener)
     {
-        super(x, y, width, height, DataManager.getInstance(), parent.getBrowserContext(),
+        super(x, y, width, height, DataManager.getDirectoryCache(), parent.getBrowserContext(),
                 parent.getDefaultDirectory(), selectionListener, Icons.DUMMY);
 
         this.browserEntryHeight = 22;

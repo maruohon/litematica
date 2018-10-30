@@ -42,7 +42,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
             this.title = I18n.format("litematica.gui.title.create_schematic_from_selection");
         }
 
-        this.selectionManager = DataManager.getInstance().getSelectionManager();
+        this.selectionManager = DataManager.getSelectionManager();
 
         AreaSelection area = this.selectionManager.getCurrentSelection();
 

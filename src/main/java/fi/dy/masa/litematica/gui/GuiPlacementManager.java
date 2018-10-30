@@ -22,7 +22,7 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
         super(10, 40);
 
         this.title = I18n.format("litematica.gui.title.manage_schematic_placements");
-        this.manager = DataManager.getInstance().getSchematicPlacementManager();
+        this.manager = DataManager.getSchematicPlacementManager();
     }
 
     @Override

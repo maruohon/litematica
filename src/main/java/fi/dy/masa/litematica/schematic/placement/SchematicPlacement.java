@@ -133,7 +133,7 @@ public class SchematicPlacement
         }
 
         // Marks the currently touched chunks before doing the modification
-        SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
         manager.onPrePlacementChange(this);
 
         this.ignoreEntities = ! this.ignoreEntities;
@@ -511,7 +511,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             // The input argument position is an absolute position, so need to convert to relative position here
@@ -535,7 +535,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).setRotation(rotation);
@@ -554,7 +554,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
@@ -573,7 +573,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).toggleEnabled();
@@ -592,7 +592,7 @@ public class SchematicPlacement
         if (this.relativeSubRegionPlacements.containsKey(regionName))
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.relativeSubRegionPlacements.get(regionName).toggleIgnoreEntities();
@@ -609,7 +609,7 @@ public class SchematicPlacement
         }
 
         // Marks the currently touched chunks before doing the modification
-        SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
         manager.onPrePlacementChange(this);
 
         Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
@@ -639,7 +639,7 @@ public class SchematicPlacement
         if (pos != null && placement != null)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             placement.resetToOriginalValues();
@@ -652,7 +652,7 @@ public class SchematicPlacement
         if (enabled != this.enabled)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.enabled = enabled;
@@ -670,7 +670,7 @@ public class SchematicPlacement
         if (render != this.enableRender)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.enableRender = render;
@@ -699,7 +699,7 @@ public class SchematicPlacement
         if (this.origin.equals(origin) == false)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.origin = origin;
@@ -720,7 +720,7 @@ public class SchematicPlacement
         if (this.rotation != rotation)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.rotation = rotation;
@@ -741,7 +741,7 @@ public class SchematicPlacement
         if (this.mirror != mirror)
         {
             // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getInstance().getSchematicPlacementManager();
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             manager.onPrePlacementChange(this);
 
             this.mirror = mirror;

@@ -26,7 +26,7 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
     public void refreshEntries()
     {
         this.listContents.clear();
-        this.listContents.addAll(DataManager.getInstance().getSchematicPlacementManager().getAllSchematicsPlacements());
+        this.listContents.addAll(DataManager.getSchematicPlacementManager().getAllSchematicsPlacements());
 
         this.reCreateListEntryWidgets();
     }

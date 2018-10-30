@@ -465,7 +465,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         this.boxes.clear();
         BlockPos pos = this.getPosition();
         SubChunkPos subChunk = new SubChunkPos(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
-        this.boxes.addAll(DataManager.getInstance().getSchematicPlacementManager().getTouchedBoxesInSubChunk(subChunk));
+        this.boxes.addAll(DataManager.getSchematicPlacementManager().getTouchedBoxesInSubChunk(subChunk));
     }
 
     public enum OverlayType

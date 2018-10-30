@@ -31,12 +31,7 @@ public class MixinChunkProviderClient implements IMixinChunkProviderClient
     {
         if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() == false)
         {
-            DataManager manager = DataManager.getInstance();
-
-            if (manager != null)
-            {
-                manager.getSchematicPlacementManager().onClientChunkUnload(x, z);
-            }
+            DataManager.getSchematicPlacementManager().onClientChunkUnload(x, z);
         }
     }
 }

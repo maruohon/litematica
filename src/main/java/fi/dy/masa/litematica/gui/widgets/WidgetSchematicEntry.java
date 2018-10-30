@@ -185,7 +185,7 @@ public class WidgetSchematicEntry extends WidgetBase
                 boolean enabled = GuiScreen.isShiftKeyDown() == false;
 
                 SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name, enabled, enabled);
-                DataManager.getInstance().getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
+                DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {

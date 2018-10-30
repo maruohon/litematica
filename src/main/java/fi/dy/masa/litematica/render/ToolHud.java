@@ -58,7 +58,7 @@ public class ToolHud extends InfoHud
 
         if (mode.getUsesAreaSelection())
         {
-            SelectionManager sm = DataManager.getInstance().getSelectionManager();
+            SelectionManager sm = DataManager.getSelectionManager();
             AreaSelection selection = sm.getCurrentSelection();
 
             if (selection != null)
@@ -99,7 +99,7 @@ public class ToolHud extends InfoHud
         }
         else if (mode.getUsesSchematic())
         {
-            SchematicPlacement schematicPlacement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
+            SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
             if (schematicPlacement != null)
             {

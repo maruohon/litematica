@@ -67,7 +67,7 @@ public class SchematicHolder
     {
         if (this.schematics.remove(schematic))
         {
-            DataManager.getInstance().getSchematicPlacementManager().removeAllPlacementsOfSchematic(schematic);
+            DataManager.getSchematicPlacementManager().removeAllPlacementsOfSchematic(schematic);
             return true;
         }
 

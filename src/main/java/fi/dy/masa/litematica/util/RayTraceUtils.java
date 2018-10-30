@@ -8,9 +8,9 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicVerifier;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
-import fi.dy.masa.litematica.data.SchematicVerifier;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -49,8 +49,7 @@ public class RayTraceUtils
         RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
         double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
 
-        DataManager dataManager = DataManager.getInstance();
-        AreaSelection area = dataManager.getSelectionManager().getCurrentSelection();
+        AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
         RayTraceWrapper wrapper = null;
 
         clearTraceVars();
@@ -74,7 +73,7 @@ public class RayTraceUtils
 
         if (DataManager.getOperationMode().getUsesSchematic())
         {
-            for (SchematicPlacement placement : dataManager.getSchematicPlacementManager().getAllSchematicsPlacements())
+            for (SchematicPlacement placement : DataManager.getSchematicPlacementManager().getAllSchematicsPlacements())
             {
                 traceToPlacementBox(placement, eyesPos, lookEndPos);
                 traceToOrigin(placement.getOrigin(), eyesPos, lookEndPos, HitType.PLACEMENT_ORIGIN, placement);
@@ -338,7 +337,7 @@ public class RayTraceUtils
             }
         }
 
-        SchematicPlacement placement = DataManager.getInstance().getSchematicPlacementManager().getSelectedSchematicPlacement();
+        SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
         if (placement != null && placement.hasVerifier())
         {

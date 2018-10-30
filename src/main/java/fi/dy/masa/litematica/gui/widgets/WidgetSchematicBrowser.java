@@ -33,7 +33,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
     public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
-        super(x, y, width, height, DataManager.getInstance(), parent.getBrowserContext(),
+        super(x, y, width, height, DataManager.getDirectoryCache(), parent.getBrowserContext(),
                 parent.getDefaultDirectory(), selectionListener, Icons.FILE_ICON_LITEMATIC);
 
         this.title = I18n.format("litematica.gui.title.schematic_browser");

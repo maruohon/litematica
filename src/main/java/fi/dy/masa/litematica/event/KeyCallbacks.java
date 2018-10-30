@@ -98,7 +98,6 @@ public class KeyCallbacks
         public boolean onKeyAction(KeyAction action, IKeybind key)
         {
             OperationMode mode = DataManager.getOperationMode();
-            DataManager dataManager = DataManager.getInstance();
 
             boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
             boolean hasTool = EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem());
@@ -114,7 +113,7 @@ public class KeyCallbacks
                 {
                     if (mode.getUsesAreaSelection())
                     {
-                        SelectionManager sm = dataManager.getSelectionManager();
+                        SelectionManager sm = DataManager.getSelectionManager();
                         boolean moveEverything = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
 
                         if (Configs.Generic.SELECTION_MODE.getOptionListValue() == AreaSelectionMode.CORNERS)
@@ -129,7 +128,7 @@ public class KeyCallbacks
                     }
                     else if (mode.getUsesSchematic())
                     {
-                        dataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionToRayTrace(this.mc, maxDistance);
+                        DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionToRayTrace(this.mc, maxDistance);
                     }
 
                     return true;
@@ -138,11 +137,11 @@ public class KeyCallbacks
                 {
                     if (mode.getUsesSchematic())
                     {
-                        dataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
+                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
                     }
                     else if (mode.getUsesAreaSelection())
                     {
-                        SelectionManager sm = dataManager.getSelectionManager();
+                        SelectionManager sm = DataManager.getSelectionManager();
 
                         if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
                         {
@@ -208,7 +207,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
                 {
-                    SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+                    SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
                     if (schematicPlacement != null)
                     {
@@ -232,7 +231,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind())
                 {
-                    SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+                    SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
                     if (schematicPlacement != null)
                     {
@@ -247,7 +246,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind())
                 {
-                    SchematicPlacement schematicPlacement = dataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+                    SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
                     if (schematicPlacement != null)
                     {
@@ -265,7 +264,7 @@ public class KeyCallbacks
             {
                 if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind())
                 {
-                    SelectionManager sm = dataManager.getSelectionManager();
+                    SelectionManager sm = DataManager.getSelectionManager();
                     AreaSelection sel = sm.getCurrentSelection();
 
                     if (sel != null)
@@ -282,7 +281,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
                 {
-                    SelectionManager sm = dataManager.getSelectionManager();
+                    SelectionManager sm = DataManager.getSelectionManager();
                     AreaSelection area = sm.getCurrentSelection();
 
                     if (area != null)
@@ -293,7 +292,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
                 {
-                    SelectionManager sm = dataManager.getSelectionManager();
+                    SelectionManager sm = DataManager.getSelectionManager();
                     AreaSelection area = sm.getCurrentSelection();
 
                     if (area != null)
@@ -337,7 +336,7 @@ public class KeyCallbacks
             {
                 if (mode == OperationMode.PASTE_SCHEMATIC)
                 {
-                    dataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
+                    DataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
                     return true;
                 }
                 else if (mode == OperationMode.DELETE)
@@ -378,7 +377,7 @@ public class KeyCallbacks
             {
                 if (mode.getUsesAreaSelection())
                 {
-                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    SelectionManager sm = DataManager.getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
@@ -397,7 +396,7 @@ public class KeyCallbacks
             {
                 if (mode.getUsesAreaSelection())
                 {
-                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    SelectionManager sm = DataManager.getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
@@ -416,7 +415,7 @@ public class KeyCallbacks
             {
                 if (mode.getUsesAreaSelection())
                 {
-                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    SelectionManager sm = DataManager.getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
@@ -429,7 +428,7 @@ public class KeyCallbacks
                 else if (mode.getUsesSchematic())
                 {
                     BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                    DataManager.getInstance().getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
+                    DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
                     return true;
                 }
             }
@@ -445,7 +444,7 @@ public class KeyCallbacks
             {
                 if (mode.getUsesAreaSelection())
                 {
-                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    SelectionManager sm = DataManager.getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null)
@@ -463,7 +462,7 @@ public class KeyCallbacks
             {
                 if (mode.getUsesAreaSelection())
                 {
-                    SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                    SelectionManager sm = DataManager.getSelectionManager();
                     AreaSelection selection = sm.getCurrentSelection();
 
                     if (selection != null && selection.getSelectedSubRegionBox() != null)

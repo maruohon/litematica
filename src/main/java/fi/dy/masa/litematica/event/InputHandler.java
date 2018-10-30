@@ -100,7 +100,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 {
                     if (mode.getUsesAreaSelection())
                     {
-                        SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                        SelectionManager sm = DataManager.getSelectionManager();
 
                         if (sm.hasGrabbedElement())
                         {
@@ -120,7 +120,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 {
                     if (mode.getUsesAreaSelection())
                     {
-                        SelectionManager sm = DataManager.getInstance().getSelectionManager();
+                        SelectionManager sm = DataManager.getSelectionManager();
 
                         if (sm.hasSelectedElement())
                         {
@@ -131,7 +131,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     else if (mode.getUsesSchematic())
                     {
                         EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
-                        DataManager.getInstance().getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
+                        DataManager.getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
                         return true;
                     }
                 }
@@ -182,7 +182,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (mc.world != null && mc.player != null)
         {
-            SelectionManager sm = DataManager.getInstance().getSelectionManager();
+            SelectionManager sm = DataManager.getSelectionManager();
 
             if (sm.hasGrabbedElement())
             {
