@@ -38,7 +38,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     {
         super(10, 60);
 
-        this.title = I18n.format("litematica.gui.title.schematic_verifier");
+        this.title = I18n.format("litematica.gui.title.schematic_verifier", placement.getName());
         this.placement = placement;
     }
 
