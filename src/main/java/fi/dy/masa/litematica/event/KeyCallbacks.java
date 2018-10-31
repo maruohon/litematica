@@ -68,6 +68,7 @@ public class KeyCallbacks
 
         Hotkeys.ADD_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
         Hotkeys.DELETE_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
+        Hotkeys.EASY_PLACE_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.EASY_PLACE_MODE));
         Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind().setCallback(callbackMessage);
         Hotkeys.SELECTION_MODE_CYCLE.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_AREA_ORIGIN.getKeybind().setCallback(callbackMessage);
