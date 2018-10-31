@@ -19,7 +19,9 @@ import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.render.IStringListProvider;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -34,6 +36,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.TextFormatting;
@@ -567,11 +570,22 @@ public class SchematicVerifier implements IStringListProvider
 
     private boolean verifyChunk(Chunk chunkClient, Chunk chunkSchematic, StructureBoundingBox box)
     {
-        for (int y = box.minY; y <= box.maxY; ++y)
+        LayerRange range = DataManager.getRenderLayerRange();
+        EnumFacing.Axis axis = range.getAxis();
+        boolean ranged = this.schematicPlacement.getSchematicVerifierType() == BlockInfoListType.RENDER_LAYERS;
+
+        final int startX = ranged && axis == EnumFacing.Axis.X ? Math.max(box.minX, range.getLayerMin()) : box.minX;
+        final int startY = ranged && axis == EnumFacing.Axis.Y ? Math.max(box.minY, range.getLayerMin()) : box.minY;
+        final int startZ = ranged && axis == EnumFacing.Axis.Z ? Math.max(box.minZ, range.getLayerMin()) : box.minZ;
+        final int endX = ranged && axis == EnumFacing.Axis.X ? Math.min(box.maxX, range.getLayerMax()) : box.maxX;
+        final int endY = ranged && axis == EnumFacing.Axis.Y ? Math.min(box.maxY, range.getLayerMax()) : box.maxY;
+        final int endZ = ranged && axis == EnumFacing.Axis.Z ? Math.min(box.maxZ, range.getLayerMax()) : box.maxZ;
+
+        for (int y = startY; y <= endY; ++y)
         {
-            for (int z = box.minZ; z <= box.maxZ; ++z)
+            for (int z = startZ; z <= endZ; ++z)
             {
-                for (int x = box.minX; x <= box.maxX; ++x)
+                for (int x = startX; x <= endX; ++x)
                 {
                     MUTABLE_POS.setPos(x, y, z);
                     IBlockState stateClient = chunkClient.getBlockState(x, y, z).getActualState(chunkClient.getWorld(), MUTABLE_POS);

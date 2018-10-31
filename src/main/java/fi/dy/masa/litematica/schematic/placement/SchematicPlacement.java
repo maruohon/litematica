@@ -52,6 +52,7 @@ public class SchematicPlacement
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
     private BlockInfoListType materialListType = BlockInfoListType.ALL;
+    private BlockInfoListType verifierType = BlockInfoListType.ALL;
     private boolean ignoreEntities;
     private boolean enabled;
     private boolean enableRender;
@@ -231,6 +232,16 @@ public class SchematicPlacement
     public void setMaterialListType(BlockInfoListType type)
     {
         this.materialListType = type;
+    }
+
+    public BlockInfoListType getSchematicVerifierType()
+    {
+        return this.verifierType;
+    }
+
+    public void setSchematicVerifierType(BlockInfoListType type)
+    {
+        this.verifierType = type;
     }
 
     public List<MaterialListEntry> getMaterialList()
@@ -840,6 +851,7 @@ public class SchematicPlacement
             obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
             obj.add("material_list_type", new JsonPrimitive(this.materialListType.getStringValue()));
+            obj.add("verifier_type", new JsonPrimitive(this.verifierType.getStringValue()));
 
             if (this.selectedSubRegionName != null)
             {
@@ -922,6 +934,11 @@ public class SchematicPlacement
             if (JsonUtils.hasString(obj, "material_list_type"))
             {
                 schematicPlacement.materialListType = BlockInfoListType.fromStringStatic(JsonUtils.getString(obj, "material_list_type"));
+            }
+
+            if (JsonUtils.hasString(obj, "verifier_type"))
+            {
+                schematicPlacement.verifierType = BlockInfoListType.fromStringStatic(JsonUtils.getString(obj, "verifier_type"));
             }
 
             if (JsonUtils.hasString(obj, "selected_region"))

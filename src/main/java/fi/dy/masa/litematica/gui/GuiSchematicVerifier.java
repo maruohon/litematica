@@ -13,6 +13,7 @@ import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVerificationResults;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiListBase;
@@ -70,6 +71,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         x += this.createButton(x, y, -1, ButtonListener.Type.START) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.STOP) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.RESET_VERIFIER) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.SET_LIST_TYPE) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.RESET_IGNORED) + 4;
         this.createButton(x, y, -1, ButtonListener.Type.TOGGLE_INFO_HUD);
         y += 22;
@@ -151,6 +153,13 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                 label = I18n.format("litematica.gui.button.schematic_verifier.reset_verifier");
                 SchematicVerifier verifier = this.placement.getSchematicVerifier();
                 enabled = verifier.isActive() || verifier.isPaused() || verifier.isFinished();
+                break;
+            }
+
+            case SET_LIST_TYPE:
+            {
+                String str = this.placement.getSchematicVerifierType().getDisplayName();
+                label = I18n.format("litematica.gui.button.schematic_verifier.range_type", str);
                 break;
             }
 
@@ -380,6 +389,14 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     DataManager.removeSchematicVerificationTask();
                     break;
 
+                case SET_LIST_TYPE:
+                    this.parent.placement.getSchematicVerifier().reset();
+                    DataManager.removeSchematicVerificationTask();
+                    SchematicPlacement placement = this.parent.placement;
+                    BlockInfoListType type = placement.getSchematicVerifierType();
+                    placement.setSchematicVerifierType((BlockInfoListType) type.cycle(mouseButton == 0));
+                    break;
+
                 case RESET_IGNORED:
                     this.parent.placement.getSchematicVerifier().setIgnoredStateMismatches(Collections.emptyList());
                     break;
@@ -403,6 +420,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             START,
             STOP,
             RESET_VERIFIER,
+            SET_LIST_TYPE,
             RESET_IGNORED,
             TOGGLE_INFO_HUD;
         }
