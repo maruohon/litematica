@@ -5,8 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
@@ -342,11 +346,31 @@ public class LayerRange
             }
             case LAYER_RANGE:
             {
-                this.setLayerRangeMin(this.layerRangeMin + amount);
-                this.setLayerRangeMax(this.layerRangeMax + amount);
-                String val1 = TextFormatting.GREEN.toString() + String.valueOf(amount);
-                String val2 = this.axis.getName().toLowerCase();
-                StringUtils.printActionbarMessage("litematica.message.moved_layer_range_by", val1, val2);
+                EntityPlayer player = Minecraft.getMinecraft().player;
+
+                if (player != null)
+                {
+                    double playerPos = this.axis == Axis.Y ? player.posY : (this.axis == Axis.X ? player.posX : player.posZ);
+                    double min = this.layerRangeMin + 0.5D;
+                    double max = this.layerRangeMax + 0.5D;
+                    String val1;
+
+                    if (Math.abs(playerPos - min) < Math.abs(playerPos - max) || playerPos < min)
+                    {
+                        this.setLayerRangeMin(this.layerRangeMin + amount);
+                        val1 = I18n.format("litematica.message.layer_range.range_min");
+                    }
+                    else
+                    {
+                        this.setLayerRangeMax(this.layerRangeMax + amount);
+                        val1 = I18n.format("litematica.message.layer_range.range_max");
+                    }
+
+                    String val2 = String.valueOf(amount);
+                    String val3 = this.axis.getName().toLowerCase();
+                    StringUtils.printActionbarMessage("litematica.message.moved_layer_range", val1, val2, val3);
+                }
+
                 break;
             }
             default:
