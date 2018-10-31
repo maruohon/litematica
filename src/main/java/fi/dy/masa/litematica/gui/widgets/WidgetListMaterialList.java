@@ -1,16 +1,13 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.Collections;
-import java.util.List;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.util.MaterialListEntry;
-import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
 public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
 {
     private final GuiMaterialList gui;
-    private final List<MaterialListEntry> cachedList;
 
     public WidgetListMaterialList(int x, int y, int width, int height, GuiMaterialList parent)
     {
@@ -19,9 +16,6 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
         this.browserEntryHeight = 22;
         this.gui = parent;
         this.setParent(parent);
-
-        this.cachedList = SchematicUtils.createMaterialListFor(parent.getSchematicPlacement());
-        this.listContents.addAll(this.cachedList);
     }
 
     @Override
@@ -29,7 +23,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     {
         this.listContents.clear();
 
-        this.listContents.addAll(this.cachedList);
+        this.listContents.addAll(this.gui.getSchematicPlacement().getMaterialList());
         Collections.sort(this.listContents);
 
         this.listContents.add(0, null); // title row

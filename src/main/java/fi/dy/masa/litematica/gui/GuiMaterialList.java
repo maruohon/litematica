@@ -5,6 +5,7 @@ import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.MaterialListEntry;
 import fi.dy.masa.litematica.util.MaterialListEntry.SortCriteria;
 import fi.dy.masa.malilib.gui.GuiListBase;
@@ -52,6 +53,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         String label;
         ButtonGeneric button;
 
+        x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_NAME) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_REQUIRED) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_AVAILABLE) + 4;
@@ -78,6 +81,10 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             boolean val = InfoHud.getInstance().isEnabled();
             String str = (val ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (val ? "on" : "off")) + TXT_RST;
             label = type.getDisplayName(str);
+        }
+        else if (type == ButtonListener.Type.LIST_TYPE)
+        {
+            label = type.getDisplayName(this.placement.getMaterialListType().getDisplayName());
         }
         else
         {
@@ -144,6 +151,17 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
                 case TOGGLE_INFO_HUD:
                     break;
+
+                case LIST_TYPE:
+                    SchematicPlacement placement = this.parent.getSchematicPlacement();
+                    BlockInfoListType type = placement.getMaterialListType();
+                    placement.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
+                    placement.refreshMaterialList();
+                    break;
+
+                case REFRESH_LIST:
+                    this.parent.getSchematicPlacement().refreshMaterialList();
+                    break;
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
@@ -155,7 +173,9 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             SORT_BY_REQUIRED    ("litematica.gui.button.material_list.required"),
             SORT_BY_AVAILABLE   ("litematica.gui.button.material_list.available"),
             WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
-            TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud");
+            TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
+            LIST_TYPE           ("litematica.gui.button.material_list.list_type"),
+            REFRESH_LIST        ("litematica.gui.button.material_list.refresh_list");
 
             private final String translationKey;
 

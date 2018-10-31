@@ -60,7 +60,9 @@ litematica.gui.button.config_gui.visuals=Visuals
 
 litematica.gui.button.material_list=Material List
 litematica.gui.button.material_list.available=Available
+litematica.gui.button.material_list.list_type=Show: %s
 litematica.gui.button.material_list.name=Name
+litematica.gui.button.material_list.refresh_list=Refresh
 litematica.gui.button.material_list.required=Required
 litematica.gui.button.material_list.toggle_info_hud=Info HUD: %s
 litematica.gui.button.material_list.write_to_file=Write to file
@@ -122,6 +124,9 @@ litematica.gui.label.area_selection_origin=Origin: %s
 
 litematica.gui.label.block_info.state_client=Client World Block State
 litematica.gui.label.block_info.state_schematic=Schematic World Block State
+
+litematica.gui.label.block_info_list_type.all=All
+litematica.gui.label.block_info_list_type.render_layers=Render Layers
 
 litematica.gui.label.layer_mode.all=All
 litematica.gui.label.layer_mode.all_above=All above
