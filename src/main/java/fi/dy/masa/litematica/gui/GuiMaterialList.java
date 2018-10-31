@@ -56,7 +56,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_NAME) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_REQUIRED) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_TOTAL) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_MISSING) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_AVAILABLE) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.TOGGLE_INFO_HUD) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + 4;
@@ -138,8 +139,12 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                     MaterialListEntry.setSortCriteria(SortCriteria.NAME);
                     break;
 
-                case SORT_BY_REQUIRED:
-                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_REQUIRED);
+                case SORT_BY_TOTAL:
+                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_TOTAL);
+                    break;
+
+                case SORT_BY_MISSING:
+                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_MISSING);
                     break;
 
                 case SORT_BY_AVAILABLE:
@@ -170,7 +175,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         public enum Type
         {
             SORT_BY_NAME        ("litematica.gui.button.material_list.name"),
-            SORT_BY_REQUIRED    ("litematica.gui.button.material_list.required"),
+            SORT_BY_TOTAL       ("litematica.gui.button.material_list.total"),
+            SORT_BY_MISSING     ("litematica.gui.button.material_list.missing"),
             SORT_BY_AVAILABLE   ("litematica.gui.button.material_list.available"),
             WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
             TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),

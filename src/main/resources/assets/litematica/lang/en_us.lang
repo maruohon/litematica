@@ -61,9 +61,10 @@ litematica.gui.button.config_gui.visuals=Visuals
 litematica.gui.button.material_list=Material List
 litematica.gui.button.material_list.available=Available
 litematica.gui.button.material_list.list_type=Show: %s
+litematica.gui.button.material_list.missing=Missing
 litematica.gui.button.material_list.name=Name
 litematica.gui.button.material_list.refresh_list=Refresh
-litematica.gui.button.material_list.required=Required
+litematica.gui.button.material_list.total=Total
 litematica.gui.button.material_list.toggle_info_hud=Info HUD: %s
 litematica.gui.button.material_list.write_to_file=Write to file
 
@@ -136,8 +137,9 @@ litematica.gui.label.layer_mode.single_layer=Single Layer
 
 litematica.gui.label.material_list.available=Available
 litematica.gui.label.material_list.item=Item
+litematica.gui.label.material_list.missing=Missing
 litematica.gui.label.material_list.name=Name
-litematica.gui.label.material_list.required=Required
+litematica.gui.label.material_list.total=Total
 
 litematica.gui.label.placement_sub.region_name=Region name: %s
 litematica.gui.label.placement_sub.region_position=Region position

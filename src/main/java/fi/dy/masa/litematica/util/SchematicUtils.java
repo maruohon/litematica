@@ -6,10 +6,7 @@ import java.util.List;
 import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -21,7 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class SchematicUtils
@@ -29,19 +25,22 @@ public class SchematicUtils
     public static List<MaterialListEntry> createMaterialListFor(SchematicPlacement placement)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        World world = SchematicWorldHandler.getSchematicWorld();
+        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+        World worldClient = mc.world;
 
-        if (mc.player == null || world == null)
+        if (mc.player == null || worldSchematic == null || worldClient == null)
         {
             return Collections.emptyList();
         }
 
         List<MaterialListEntry> list = new ArrayList<>();
-        LitematicaSchematic schematic = placement.getSchematic();
-        Object2IntOpenHashMap<IBlockState> counts = new Object2IntOpenHashMap<>();
+        Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
+        Object2IntOpenHashMap<IBlockState> countsMissing = new Object2IntOpenHashMap<>();
 
-        if (placement.getMaterialListType() == BlockInfoListType.ALL)
+        /*if (placement.getMaterialListType() == BlockInfoListType.ALL)
         {
+            LitematicaSchematic schematic = placement.getSchematic();
+
             for (Map.Entry<String, SubRegionPlacement> entry : placement.getEnabledRelativeSubRegionPlacements().entrySet())
             {
                 LitematicaBlockStateContainer container = schematic.getSubRegionContainer(entry.getKey());
@@ -59,16 +58,23 @@ public class SchematicUtils
                         {
                             for (int x = 0; x < sizeX; ++x)
                             {
-                                counts.addTo(container.get(x, y, z), 1);
+                                countsTotal.addTo(container.get(x, y, z), 1);
                             }
                         }
                     }
                 }
             }
         }
-        else if (placement.getMaterialListType() == BlockInfoListType.RENDER_LAYERS)
+        else if (placement.getMaterialListType() == BlockInfoListType.RENDER_LAYERS)*/
         {
             LayerRange range = DataManager.getRenderLayerRange();
+
+            if (placement.getMaterialListType() == BlockInfoListType.ALL)
+            {
+                range = new LayerRange();
+                range.setLayerMode(LayerMode.ALL);
+            }
+
             EnumFacing.Axis axis = range.getAxis();
             ImmutableMap<String, Box> subRegionBoxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
             BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
@@ -92,36 +98,56 @@ public class SchematicUtils
                         for (int x = startX; x <= endX; ++x)
                         {
                             posMutable.setPos(x, y, z);
-                            counts.addTo(world.getBlockState(posMutable), 1);
+                            IBlockState stateSchematic = worldSchematic.getBlockState(posMutable);
+                            IBlockState stateClient = worldClient.getBlockState(posMutable);
+                            countsTotal.addTo(stateSchematic, 1);
+
+                            if (stateClient != stateSchematic)
+                            {
+                                countsMissing.addTo(stateSchematic, 1);
+                            }
                         }
                     }
                 }
             }
         }
 
-        if (counts.isEmpty() == false)
+        if (countsTotal.isEmpty() == false)
         {
             MaterialCache cache = MaterialCache.getInstance();
-            Object2IntOpenHashMap<ItemType> itemTypes = new Object2IntOpenHashMap<>();
+            Object2IntOpenHashMap<ItemType> itemTypesTotal = new Object2IntOpenHashMap<>();
+            Object2IntOpenHashMap<ItemType> itemTypesMissing = new Object2IntOpenHashMap<>();
 
             // Convert from counts per IBlockState to counts per different stacks
-            for (IBlockState state : counts.keySet())
+            for (IBlockState state : countsTotal.keySet())
             {
                 ItemStack stack = cache.getItemForState(state);
 
                 if (stack.isEmpty() == false)
                 {
                     ItemType type = new ItemType(stack, false, true);
-                    itemTypes.addTo(type, counts.getInt(state) * stack.getCount());
+                    itemTypesTotal.addTo(type, countsTotal.getInt(state) * stack.getCount());
+                }
+            }
+
+            // Convert from counts per IBlockState to counts per different stacks
+            for (IBlockState state : countsMissing.keySet())
+            {
+                ItemStack stack = cache.getItemForState(state);
+
+                if (stack.isEmpty() == false)
+                {
+                    ItemType type = new ItemType(stack, false, true);
+                    itemTypesMissing.addTo(type, countsMissing.getInt(state) * stack.getCount());
                 }
             }
 
             Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(mc.player.inventory);
 
-            for (ItemType type : itemTypes.keySet())
+            for (ItemType type : itemTypesTotal.keySet())
             {
                 int countAvailable = playerInvItems.getInt(type);
-                list.add(new MaterialListEntry(type.getStack(), itemTypes.getInt(type), countAvailable));
+                list.add(new MaterialListEntry(type.getStack(), itemTypesTotal.getInt(type), itemTypesMissing.getInt(type), countAvailable));
             }
         }
 

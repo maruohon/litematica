@@ -4,17 +4,19 @@ import net.minecraft.item.ItemStack;
 
 public class MaterialListEntry implements Comparable<MaterialListEntry>
 {
-    private static SortCriteria sortCriteria = SortCriteria.COUNT_REQUIRED;
+    private static SortCriteria sortCriteria = SortCriteria.COUNT_TOTAL;
     private static boolean reverse;
 
     private final ItemStack stack;
-    private int countRequired;
-    private int countAvailable;
+    private final int countTotal;
+    private final int countMissing;
+    private final int countAvailable;
 
-    public MaterialListEntry(ItemStack stack, int countRequired, int countAvailable)
+    public MaterialListEntry(ItemStack stack, int countTotal, int countMissing, int countAvailable)
     {
         this.stack = stack;
-        this.countRequired = countRequired;
+        this.countTotal = countTotal;
+        this.countMissing = countMissing;
         this.countAvailable = countAvailable;
     }
 
@@ -23,9 +25,23 @@ public class MaterialListEntry implements Comparable<MaterialListEntry>
         return this.stack;
     }
 
-    public int getCountRequired()
+    /**
+     * Returns the total number of required items of this type in the counted area.
+     * @return
+     */
+    public int getCountTotal()
     {
-        return this.countRequired;
+        return this.countTotal;
+    }
+
+    /**
+     * Returns the number of items still missing (or having the wrong block state)
+     * in the counted area for this item type.
+     * @return
+     */
+    public int getCountMissing()
+    {
+        return this.countMissing;
     }
 
     public int getCountAvailable()
@@ -36,9 +52,13 @@ public class MaterialListEntry implements Comparable<MaterialListEntry>
     @Override
     public int compareTo(MaterialListEntry other)
     {
-        if (sortCriteria == SortCriteria.COUNT_REQUIRED)
+        if (sortCriteria == SortCriteria.COUNT_TOTAL)
         {
-            return this.countRequired == other.countRequired ? 0 : ((this.countRequired > other.countRequired) != reverse ? -1 : 1);
+            return this.countTotal == other.countTotal ? 0 : ((this.countTotal > other.countTotal) != reverse ? -1 : 1);
+        }
+        else if (sortCriteria == SortCriteria.COUNT_MISSING)
+        {
+            return this.countMissing == other.countMissing ? 0 : ((this.countMissing > other.countMissing) != reverse ? -1 : 1);
         }
         else if (sortCriteria == SortCriteria.COUNT_AVAILABLE)
         {
@@ -65,7 +85,8 @@ public class MaterialListEntry implements Comparable<MaterialListEntry>
     public enum SortCriteria
     {
         NAME,
-        COUNT_REQUIRED,
+        COUNT_TOTAL,
+        COUNT_MISSING,
         COUNT_AVAILABLE;
     }
 }

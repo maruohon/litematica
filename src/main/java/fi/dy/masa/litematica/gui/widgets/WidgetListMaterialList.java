@@ -16,10 +16,10 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
         this.browserEntryHeight = 22;
         this.gui = parent;
         this.setParent(parent);
+        this.refreshData();
     }
 
-    @Override
-    public void refreshEntries()
+    public void refreshData()
     {
         this.listContents.clear();
 
@@ -27,7 +27,12 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
         Collections.sort(this.listContents);
 
         this.listContents.add(0, null); // title row
+    }
 
+    @Override
+    public void refreshEntries()
+    {
+        this.refreshData();
         this.reCreateListEntryWidgets();
     }
 

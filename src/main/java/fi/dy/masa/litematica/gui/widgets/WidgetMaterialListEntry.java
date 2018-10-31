@@ -23,6 +23,7 @@ public class WidgetMaterialListEntry extends WidgetBase
     @Nullable private final String header1;
     @Nullable private final String header2;
     @Nullable private final String header3;
+    @Nullable private final String header4;
     private final Minecraft mc;
     private final boolean isOdd;
 
@@ -40,6 +41,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             this.header1 = null;
             this.header2 = null;
             this.header3 = null;
+            this.header4 = null;
 
             FontRenderer font = Minecraft.getMinecraft().fontRenderer;
             maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName()));
@@ -47,8 +49,9 @@ public class WidgetMaterialListEntry extends WidgetBase
         else
         {
             this.header1 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.item");
-            this.header2 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.required");
-            this.header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.available");
+            this.header2 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.total");
+            this.header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.missing");
+            this.header4 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.available");
         }
     }
 
@@ -85,6 +88,7 @@ public class WidgetMaterialListEntry extends WidgetBase
         int x1 = this.x + 4;
         int x2 = this.x + maxNameLength + 50;
         int x3 = x2 + 80;
+        int x4 = x3 + 80;
         int y = this.y + 7;
         int color = 0xFFFFFFFF;
 
@@ -93,15 +97,18 @@ public class WidgetMaterialListEntry extends WidgetBase
             mc.fontRenderer.drawString(this.header1, x1, y, color);
             mc.fontRenderer.drawString(this.header2, x2, y, color);
             mc.fontRenderer.drawString(this.header3, x3, y, color);
+            mc.fontRenderer.drawString(this.header4, x4, y, color);
         }
         else if (this.entry != null)
         {
-            int countRequired = this.entry.getCountRequired();
+            int countTotal = this.entry.getCountTotal();
+            int countMissing = this.entry.getCountMissing();
             int countAvailable = this.entry.getCountAvailable();
-            String pre = countAvailable >= countRequired ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+            String pre = countAvailable >= countMissing ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
             mc.fontRenderer.drawString(this.entry.getStack().getDisplayName(), x1 + 20, y, color);
-            mc.fontRenderer.drawString(String.valueOf(countRequired), x2, y, color);
-            mc.fontRenderer.drawString(pre + String.valueOf(countAvailable), x3, y, color);
+            mc.fontRenderer.drawString(String.valueOf(countTotal), x2, y, color);
+            mc.fontRenderer.drawString(String.valueOf(countMissing), x3, y, color);
+            mc.fontRenderer.drawString(pre + String.valueOf(countAvailable), x4, y, color);
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -130,77 +137,94 @@ public class WidgetMaterialListEntry extends WidgetBase
 
             Minecraft mc = this.mc;
             String header1 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.item");
-            String header2 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.required");
+            String header2 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.total");
+            String header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.missing");
+
             ItemStack stack = this.entry.getStack();
             String stackName = stack.getDisplayName();
+            int total = this.entry.getCountTotal();
+            int missing = this.entry.getCountMissing();
+            String strCountTotal = this.getFormattedCountString(total, stack.getMaxStackSize());
+            String strCountMissing = this.getFormattedCountString(missing, stack.getMaxStackSize());
 
-            int total = this.entry.getCountRequired();
-            int maxStack = stack.getMaxStackSize();
-            int stacks = total / maxStack;
-            int rem = total % maxStack;
-            double boxCount = (double) total / (27D * maxStack);
-            String strCount;
-
-            if (total > maxStack)
-            {
-                if (maxStack > 1)
-                {
-                    if (rem > 0)
-                    {
-                        strCount = String.format("%d = %d x %d + %d = %.2f SB", total, stacks, maxStack, rem, boxCount);
-                    }
-                    else
-                    {
-                        strCount = String.format("%d = %d x %d = %.2f SB", total, stacks, maxStack, boxCount);
-                    }
-                }
-                else
-                {
-                    strCount = String.format("%d = %.2f SB", total, boxCount);
-                }
-            }
-            else
-            {
-                strCount = String.format("%d", total);
-            }
-
-            int w1 = Math.max(mc.fontRenderer.getStringWidth(stackName), mc.fontRenderer.getStringWidth(header1));
-            int w2 = Math.max(mc.fontRenderer.getStringWidth(strCount), mc.fontRenderer.getStringWidth(header2));
-            int width = w1 + w2 + 60;
+            FontRenderer fr = mc.fontRenderer;
+            int w1 = Math.max(fr.getStringWidth(header1), Math.max(fr.getStringWidth(header2), fr.getStringWidth(header3)));
+            int w2 = Math.max(fr.getStringWidth(stackName) + 20, Math.max(fr.getStringWidth(strCountTotal), fr.getStringWidth(strCountMissing)));
+            int totalWidth = w1 + w2 + 60;
 
             int x = mouseX + 10;
             int y = mouseY - 10;
 
-            if (x + width - 20 >= this.width)
+            if (x + totalWidth - 20 >= this.width)
             {
-                x -= width + 20;
+                x -= totalWidth + 20;
             }
 
             int x1 = x + 10;
-            int x2 = x1 + w1 + 40;
+            int x2 = x1 + w1 + 20;
 
-            RenderUtils.drawOutlinedBox(x, y, width, 50, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
+            RenderUtils.drawOutlinedBox(x, y, totalWidth, 60, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
             y += 6;
+            int y1 = y;
+            y += 4;
 
-            mc.fontRenderer.drawString(header1, x1, y, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(header2, x2, y, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(header1,         x1     , y, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(stackName,       x2 + 20, y, 0xFFFFFFFF);
+            y += 16;
 
-            mc.fontRenderer.drawString(stackName, x1 + 20, y + 20, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(strCount, x2, y + 20, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(header2,         x1, y, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(strCountTotal,   x2, y, 0xFFFFFFFF);
+            y += 16;
+
+            mc.fontRenderer.drawString(header3,         x1, y, 0xFFFFFFFF);
+            mc.fontRenderer.drawString(strCountMissing, x2, y, 0xFFFFFFFF);
+
+            Gui.drawRect(x2, y1, x2 + 16, y1 + 16, 0x20FFFFFF); // light background for the item
 
             GlStateManager.disableLighting();
             RenderHelper.enableGUIStandardItemLighting();
 
             //mc.getRenderItem().zLevel += 100;
-            y += 16;
-            Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, stack, x1, y);
+            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, stack, x2, y1);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
-
             //GlStateManager.disableBlend();
+
             RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
         }
+    }
+
+    private String getFormattedCountString(int total, int maxStackSize)
+    {
+        int stacks = total / maxStackSize;
+        int remainder = total % maxStackSize;
+        double boxCount = (double) total / (27D * maxStackSize);
+        String strCount;
+
+        if (total > maxStackSize)
+        {
+            if (maxStackSize > 1)
+            {
+                if (remainder > 0)
+                {
+                    strCount = String.format("%d = %d x %d + %d = %.2f SB", total, stacks, maxStackSize, remainder, boxCount);
+                }
+                else
+                {
+                    strCount = String.format("%d = %d x %d = %.2f SB", total, stacks, maxStackSize, boxCount);
+                }
+            }
+            else
+            {
+                strCount = String.format("%d = %.2f SB", total, boxCount);
+            }
+        }
+        else
+        {
+            strCount = String.format("%d", total);
+        }
+
+        return strCount;
     }
 }
