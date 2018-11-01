@@ -16,6 +16,7 @@ import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.render.DebugScreenMessages;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
 import fi.dy.masa.malilib.event.RenderEventHandler;
@@ -76,6 +77,7 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
     {
         InputHandler.onTick();
+        WorldUtils.easyPlaceOnUseTick(mc);
         DebugScreenMessages.update(mc);
     }
 

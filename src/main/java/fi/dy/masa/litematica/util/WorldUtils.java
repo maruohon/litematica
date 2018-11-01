@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
@@ -19,6 +20,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InventoryUtils;
@@ -400,6 +402,19 @@ public class WorldUtils
         }
 
         return false;
+    }
+
+    public static void easyPlaceOnUseTick(Minecraft mc)
+    {
+        if (Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
+            Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+            mc.player != null &&
+            (Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() ||
+             Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isValid() == false) &&
+            KeybindMulti.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
+        {
+            WorldUtils.handleEasyPlace(mc);
+        }
     }
 
     public static boolean handleEasyPlace(Minecraft mc)
