@@ -189,19 +189,26 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
                 {
-                    WorldUtils.doSchematicWorldPickBlock(true, this.mc);
-                    return true;
+                    if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
+                    {
+                        return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
+                    }
+
+                    return false;
                 }
                 else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
                 {
-                    String keyStrUse = KeybindMulti.getStorageStringForKeyCode(this.mc.gameSettings.keyBindUseItem.getKeyCode());
-                    String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
-
-                    // Only do the pick block here, if it's not bound to the use button.
-                    // If it's bound to the use button, then it will be done from the input handling.
-                    if (keyStrUse.equals(keyStrPick) == false)
+                    if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
                     {
-                        WorldUtils.doSchematicWorldPickBlock(false, this.mc);
+                        String keyStrUse = KeybindMulti.getStorageStringForKeyCode(this.mc.gameSettings.keyBindUseItem.getKeyCode());
+                        String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
+
+                        // Only do the pick block here, if it's not bound to the use button.
+                        // If it's bound to the use button, then it will be done from the input handling.
+                        if (keyStrUse.equals(keyStrPick) == false)
+                        {
+                            WorldUtils.doSchematicWorldPickBlock(false, this.mc);
+                        }
                     }
 
                     return false;

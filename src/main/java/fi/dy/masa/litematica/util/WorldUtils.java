@@ -338,11 +338,6 @@ public class WorldUtils
      */
     public static boolean doSchematicWorldPickBlock(boolean closest, Minecraft mc)
     {
-        if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() == false)
-        {
-            return false;
-        }
-
         BlockPos pos = null;
 
         if (closest)
