@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
@@ -63,6 +65,7 @@ import net.minecraft.world.gen.structure.template.Template;
 
 public class WorldUtils
 {
+    private static final List<PositionCache> EASY_PLACE_POSITIONS = new ArrayList<>();
     private static boolean preventOnBlockAdded;
 
     public static boolean shouldPreventOnBlockAdded()
@@ -429,6 +432,12 @@ public class WorldUtils
             IBlockState state = world.getBlockState(pos);
             ItemStack stack = ItemUtils.getItemForBlock(world, pos, state, true);
 
+            // Already placed to that position, possible server sync delay
+            if (easyPlaceIsPositionCached(pos))
+            {
+                return true;
+            }
+
             if (stack.isEmpty() == false)
             {
                 IBlockState stateClient = mc.world.getBlockState(pos);
@@ -485,6 +494,9 @@ public class WorldUtils
                 {
                     side = trace.sideHit;
                 }
+
+                // Mark that this position has been handled (use the non-offset position that is checked above)
+                cacheEasyPlacePosition(pos);
 
                 // Fluid _blocks_ are not replaceable... >_>
                 if (stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
@@ -645,5 +657,64 @@ public class WorldUtils
         }
 
         return true;
+    }
+
+    public static boolean easyPlaceIsPositionCached(BlockPos pos)
+    {
+        long currentTime = System.nanoTime();
+        boolean cached = false;
+
+        for (int i = 0; i < EASY_PLACE_POSITIONS.size(); ++i)
+        {
+            PositionCache val = EASY_PLACE_POSITIONS.get(i);
+            boolean expired = val.hasExpired(currentTime);
+
+            if (expired)
+            {
+                EASY_PLACE_POSITIONS.remove(i);
+                --i;
+            }
+            else if (val.getPos().equals(pos))
+            {
+                cached = true;
+
+                // Keep checking and removing old entries if there are a fair amount
+                if (EASY_PLACE_POSITIONS.size() < 16)
+                {
+                    break;
+                }
+            }
+        }
+
+        return cached;
+    }
+
+    private static void cacheEasyPlacePosition(BlockPos pos)
+    {
+        EASY_PLACE_POSITIONS.add(new PositionCache(pos, System.nanoTime(), 2000));
+    }
+
+    public static class PositionCache
+    {
+        private final BlockPos pos;
+        private final long time;
+        private final long timeout;
+
+        private PositionCache(BlockPos pos, long time, long timeout)
+        {
+            this.pos = pos;
+            this.time = time;
+            this.timeout = timeout;
+        }
+
+        public BlockPos getPos()
+        {
+            return this.pos;
+        }
+
+        public boolean hasExpired(long currentTime)
+        {
+            return currentTime - this.time > this.timeout;
+        }
     }
 }
