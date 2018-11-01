@@ -25,7 +25,6 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.block.BlockRedstoneRepeater;
@@ -371,7 +370,7 @@ public class WorldUtils
                         ItemUtils.storeTEInStack(stack, te);
                     }
 
-                    inv.setPickedItemStack(stack);
+                    InventoryUtils.setPickedItemToHand(stack, mc);
                     mc.playerController.sendSlotPacket(mc.player.getHeldItem(EnumHand.MAIN_HAND), 36 + inv.currentItem);
 
                     return true;
@@ -384,14 +383,7 @@ public class WorldUtils
 
                     if (shouldPick && canPick)
                     {
-                        if (InventoryPlayer.isHotbar(slot))
-                        {
-                            inv.currentItem = slot;
-                        }
-                        else
-                        {
-                            InventoryUtils.swapItemToMainHand(stack, mc);
-                        }
+                        InventoryUtils.setPickedItemToHand(stack, mc);
                     }
 
                     return shouldPick == false || canPick;

@@ -51,14 +51,7 @@ public class ItemUtils
             return ItemStack.EMPTY;
         }
 
-        ItemStack stack = ITEMS_FOR_STATES.get(state);
-
-        if (stack != null)
-        {
-            return stack;
-        }
-
-        stack = getStateToItemOverride(state);
+        ItemStack stack = getStateToItemOverride(state);
 
         if (stack.isEmpty())
         {
