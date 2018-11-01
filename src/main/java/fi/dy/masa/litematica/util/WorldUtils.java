@@ -27,7 +27,12 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
@@ -416,8 +421,8 @@ public class WorldUtils
             RayTraceResult trace = traceWrapper.getRayTraceResult();
             BlockPos pos = trace.getBlockPos();
             World world = SchematicWorldHandler.getSchematicWorld();
-            IBlockState state = world.getBlockState(pos);
-            ItemStack stack = ItemUtils.getItemForBlock(world, pos, state, true);
+            IBlockState stateSchematic = world.getBlockState(pos);
+            ItemStack stack = ItemUtils.getItemForBlock(world, pos, stateSchematic, true);
 
             // Already placed to that position, possible server sync delay
             if (easyPlaceIsPositionCached(pos))
@@ -427,11 +432,15 @@ public class WorldUtils
 
             if (stack.isEmpty() == false)
             {
-                IBlockState stateClient = mc.world.getBlockState(pos);
+                IBlockState stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
+
+                if (stateSchematic == stateClient)
+                {
+                    return true;
+                }
 
                 // Abort if there is already a block in the target position
-                if (stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
-                    stateClient.getMaterial().isLiquid() == false)
+                if (easyPlaceBlockChecksCancel(stateSchematic, stateClient, mc.world, pos))
                 {
                     return true;
                 }
@@ -451,36 +460,11 @@ public class WorldUtils
                 }
 
                 Vec3d hitPos = trace.hitVec;
+                EnumFacing sideOrig = trace.sideHit;
+                EnumFacing side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
 
-                if (mc.isSingleplayer() == false)
-                {
-                    // Carpet Accurate Placement protocol support
-                    for (Map.Entry<IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
-                    {
-                        if (entry.getKey() instanceof PropertyDirection)
-                        {
-                            float x = state.getValue((PropertyDirection) entry.getKey()).ordinal() + 2 + pos.getX();
-
-                            if (state.getBlock() instanceof BlockRedstoneRepeater)
-                            {
-                                x += ((state.getValue(BlockRedstoneRepeater.DELAY)) - 1) * 10;
-                            }
-
-                            hitPos = new Vec3d(x, hitPos.y, hitPos.z);
-                            break;
-                        }
-                    }
-                }
-
-                EnumFacing side = trace.sideHit;
-
-                // Get the targeted side for an existing client world block, if any
-                trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, 6);
-
-                if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
-                {
-                    side = trace.sideHit;
-                }
+                // Carpet Accurate Placement protocol support, plus BlockSlab support
+                hitPos = applyCarpetProtocolHitVec(pos, stateSchematic, hitPos);
 
                 // Mark that this position has been handled (use the non-offset position that is checked above)
                 cacheEasyPlacePosition(pos);
@@ -492,11 +476,127 @@ public class WorldUtils
                     pos = pos.offset(side, -1);
                 }
 
+                //System.out.printf("pos: %s side: %s, hit: %s\n", pos, side, hitPos);
                 mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand);
+
+                if (stateSchematic.getBlock() instanceof BlockSlab && ((BlockSlab) stateSchematic.getBlock()).isDouble())
+                {
+                    stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
+
+                    if (stateClient.getBlock() instanceof BlockSlab && ((BlockSlab) stateClient.getBlock()).isDouble() == false)
+                    {
+                        side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
+                        mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand);
+                    }
+                }
             }
         }
 
         return true;
+    }
+
+    private static boolean easyPlaceBlockChecksCancel(IBlockState stateSchematic, IBlockState stateClient, World worldClient, BlockPos pos)
+    {
+        Block blockSchematic = stateSchematic.getBlock();
+
+        if (blockSchematic instanceof BlockSlab && ((BlockSlab) blockSchematic).isDouble())
+        {
+            if (stateClient.getBlock() instanceof BlockSlab && ((BlockSlab) stateClient.getBlock()).isDouble() == false)
+            {
+                IProperty<?> propSchematic = ((BlockSlab) stateSchematic.getBlock()).getVariantProperty();
+                IProperty<?> propClient = ((BlockSlab) stateClient.getBlock()).getVariantProperty();
+
+                return propSchematic != propClient || stateSchematic.getValue(propSchematic) != stateClient.getValue(propClient);
+            }
+        }
+
+        if (stateClient.getBlock().isReplaceable(worldClient, pos) == false &&
+            stateClient.getMaterial().isLiquid() == false)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Vec3d applyCarpetProtocolHitVec(BlockPos pos, IBlockState state, Vec3d hitVecIn)
+    {
+        double x = hitVecIn.x;
+        double y = hitVecIn.y;
+        double z = hitVecIn.z;
+        Block block = state.getBlock();
+
+        for (Map.Entry<IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
+        {
+            if (entry.getKey() instanceof PropertyDirection)
+            {
+                x = state.getValue((PropertyDirection) entry.getKey()).ordinal() + 2 + pos.getX();
+                break;
+            }
+        }
+
+        if (block instanceof BlockRedstoneRepeater)
+        {
+            x += ((state.getValue(BlockRedstoneRepeater.DELAY)) - 1) * 10;
+        }
+        else if (block instanceof BlockTrapDoor && state.getValue(BlockTrapDoor.HALF) == BlockTrapDoor.DoorHalf.TOP)
+        {
+            x += 10;
+        }
+        else if (block instanceof BlockRedstoneComparator && state.getValue(BlockRedstoneComparator.MODE) == BlockRedstoneComparator.Mode.SUBTRACT)
+        {
+            x += 10;
+        }
+        else if (block instanceof BlockStairs && state.getValue(BlockStairs.HALF) == BlockStairs.EnumHalf.TOP)
+        {
+            x += 10;
+        }
+        else if (block instanceof BlockSlab && ((BlockSlab) block).isDouble() == false)
+        {
+            //x += 10; // Doesn't actually exist (yet?)
+
+            // Do it via vanilla
+            if (state.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP)
+            {
+                y = pos.getY() + 0.9;
+            }
+            else
+            {
+                y = pos.getY();
+            }
+        }
+
+        return new Vec3d(x, y, z);
+    }
+
+    private static EnumFacing applyPlacementFacing(IBlockState stateSchematic, EnumFacing side, IBlockState stateClient)
+    {
+        Block blockSchematic = stateSchematic.getBlock();
+        Block blockClient = stateClient.getBlock();
+
+        if (blockSchematic instanceof BlockSlab)
+        {
+            if (((BlockSlab) blockSchematic).isDouble() &&
+                blockClient instanceof BlockSlab &&
+                ((BlockSlab) blockClient).isDouble() == false)
+            {
+                if (stateClient.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP)
+                {
+                    return EnumFacing.DOWN;
+                }
+                else
+                {
+                    return EnumFacing.UP;
+                }
+            }
+            // Single slab
+            else
+            {
+                return EnumFacing.NORTH;
+            }
+        }
+
+        return side;
     }
 
     /**
@@ -678,7 +778,7 @@ public class WorldUtils
 
     private static void cacheEasyPlacePosition(BlockPos pos)
     {
-        EASY_PLACE_POSITIONS.add(new PositionCache(pos, System.nanoTime(), 2000));
+        EASY_PLACE_POSITIONS.add(new PositionCache(pos, System.nanoTime(), 2000000000));
     }
 
     public static class PositionCache
