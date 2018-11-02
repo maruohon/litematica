@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.config.Configs;
@@ -34,7 +33,6 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -525,14 +523,11 @@ public class WorldUtils
         double y = hitVecIn.y;
         double z = hitVecIn.z;
         Block block = state.getBlock();
+        EnumFacing facing = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
 
-        for (Map.Entry<IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
+        if (facing != null)
         {
-            if (entry.getKey() instanceof PropertyDirection)
-            {
-                x = state.getValue((PropertyDirection) entry.getKey()).ordinal() + 2 + pos.getX();
-                break;
-            }
+            x = facing.ordinal() + 2 + pos.getX();
         }
 
         if (block instanceof BlockRedstoneRepeater)
