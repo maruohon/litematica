@@ -112,7 +112,8 @@ public class WorldUtils
         area.setName(subRegionName);
         subRegionName = area.createNewSubRegionBox(BlockPos.ORIGIN, subRegionName);
         area.setSelectedSubRegionBox(subRegionName);
-        area.getSelectedSubRegionBox().setPos2(new BlockPos(schematic.getSize()));
+        area.getSelectedSubRegionBox().setPos1(BlockPos.ORIGIN); // createNewSubRegionBox() offsets the default position by one when creating the first box...
+        area.getSelectedSubRegionBox().setPos2((new BlockPos(schematic.getSize())).add(-1, -1, -1));
 
         LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);
 
@@ -162,6 +163,7 @@ public class WorldUtils
             area.setName(subRegionName);
             subRegionName = area.createNewSubRegionBox(BlockPos.ORIGIN, subRegionName);
             area.setSelectedSubRegionBox(subRegionName);
+            area.getSelectedSubRegionBox().setPos1(BlockPos.ORIGIN); // createNewSubRegionBox() offsets the default position by one when creating the first box...
             area.getSelectedSubRegionBox().setPos2(template.getSize().add(-1, -1, -1));
 
             LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, ignoreEntities, template.getAuthor(), feedback);
