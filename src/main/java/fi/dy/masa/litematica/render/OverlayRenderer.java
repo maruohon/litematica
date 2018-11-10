@@ -1,8 +1,10 @@
 package fi.dy.masa.litematica.render;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
@@ -24,8 +26,12 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.WorldUtils;
+import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -39,6 +45,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 public class OverlayRenderer
@@ -82,6 +89,9 @@ public class OverlayRenderer
     private Color4f colorBoxPlacementSelected = new Color4f(0x16 / 255f, 1f, 1f);
     private Color4f colorSelectedCorner = new Color4f(0f, 1f, 1f);
     private Color4f colorAreaOrigin = new Color4f(1f, 0x90 / 255f, 0x10 / 255f);
+
+    private long infoUpdateTime;
+    private List<String> blockInfoLines = new ArrayList<>();
 
     private OverlayRenderer()
     {
@@ -361,7 +371,7 @@ public class OverlayRenderer
             for (BlockPos pos : posList)
             {
                 Color4f color = type.getColor();
-                Color4f colorSides = new Color4f(color.r, color.g, color.b, (float) Configs.Visuals.ERROR_HILIGHT_ALPHA.getDoubleValue());
+                Color4f colorSides = new Color4f(color.r, color.g, color.b, (float) Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_ALPHA.getDoubleValue());
                 RenderUtils.renderAreaSidesBatched(pos, pos, colorSides, 0.002, this.mc.player, partialTicks, buffer);
             }
 
@@ -378,98 +388,205 @@ public class OverlayRenderer
         GlStateManager.enableDepth();
     }
 
-    public static void renderHoverInfo(Minecraft mc)
+    public void renderHoverInfo(Minecraft mc)
     {
         if (mc.world != null && mc.player != null)
         {
-            if (Configs.Visuals.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue() &&
-                Configs.Visuals.RENDER_INFO_OVERLAY.getBooleanValue() &&
+            if (Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue() &&
+                Configs.InfoOverlays.RENDER_BLOCK_INFO_OVERLAY.getBooleanValue() &&
                 (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
                  Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld()))
             {
-                SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
-
-                if (placement != null && placement.hasVerifier())
-                {
-                    SchematicVerifier verifier = placement.getSchematicVerifier();
-                    List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
-                    RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 10);
-
-                    if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
-                    {
-                        BlockMismatch mismatch = verifier.getMismatchForPosition(trace.getBlockPos());
-
-                        if (mismatch != null)
-                        {
-                            BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                            ScaledResolution sr = new ScaledResolution(mc);
-                            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-                            return;
-                        }
-                    }
-                }
+                this.renderVerifierOverlay(mc);
             }
 
-            if (Configs.Visuals.ENABLE_INFO_OVERLAY_RENDERING.getBooleanValue() &&
-                (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
-                 Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld()))
-            {
-                RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+            boolean renderBlockInfoLines = Configs.InfoOverlays.RENDER_BLOCK_INFO_LINES.getBooleanValue();
+            boolean renderInfoOverlay = Configs.InfoOverlays.ENABLE_INFO_OVERLAY_RENDERING.getBooleanValue() &&
+                                        (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
+                                        Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld());
+            RayTraceWrapper traceWrapper = null;
 
-                if (traceWrapper != null)
+            if (renderBlockInfoLines || renderInfoOverlay)
+            {
+                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+            }
+
+            if (traceWrapper != null)
+            {
+                if (renderBlockInfoLines)
                 {
+                    this.renderBlockInfoLines(traceWrapper, mc);
+                }
+
+                if (renderInfoOverlay)
+                {
+                    this.renderBlockInfoOverlay(traceWrapper, mc);
+                }
+            }
+        }
+    }
+
+    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, Minecraft mc)
+    {
+        long currentTime = System.currentTimeMillis();
+
+        // Only update the text once per game tick
+        if (currentTime - this.infoUpdateTime >= 50)
+        {
+            this.updateBlockInfoLines(traceWrapper, mc);
+            this.infoUpdateTime = currentTime;
+        }
+
+        int x = Configs.InfoOverlays.BLOCK_INFO_OFFSET_X.getIntegerValue();
+        int y = Configs.InfoOverlays.BLOCK_INFO_OFFSET_Y.getIntegerValue();
+        double fontScale = Configs.InfoOverlays.BLOCK_INFO_FONT_SCALE.getDoubleValue();
+        int textColor = 0xFFFFFFFF;
+        int bgColor = 0xA0505050;
+        HudAlignment alignment = (HudAlignment) Configs.InfoOverlays.BLOCK_INFO_LINES_ALIGNMENT.getOptionListValue();
+        boolean useBackground = true;
+        boolean useShadow = false;
+
+        fi.dy.masa.malilib.render.RenderUtils.renderText(mc, x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
+    }
+
+    private void renderVerifierOverlay(Minecraft mc)
+    {
+        SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+        if (placement != null && placement.hasVerifier())
+        {
+            SchematicVerifier verifier = placement.getSchematicVerifier();
+            List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
+            RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 10);
+
+            if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
+            {
+                BlockMismatch mismatch = verifier.getMismatchForPosition(trace.getBlockPos());
+
+                if (mismatch != null)
+                {
+                    BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
                     ScaledResolution sr = new ScaledResolution(mc);
-
-                    BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
-                    IBlockState stateClient = mc.world.getBlockState(pos);
-                    stateClient = stateClient.getActualState(mc.world, pos);
-                    World worldClient = WorldUtils.getBestWorld(mc);
-
-                    World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-                    IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-                    stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
-                    IBlockState air = Blocks.AIR.getDefaultState();
-
-                    ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
-                    ItemUtils.setItemForBlock(mc.world, pos, stateClient);
-
-                    // Not just a missing block
-                    if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
-                    {
-                        BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
-                        info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-
-                        RenderUtils.renderInventoryOverlay(-1, worldSchematic, pos, mc);
-                        RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
-                    }
-                    else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
-                    {
-                        BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-                        info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-                        RenderUtils.renderInventoryOverlay(0, worldClient, pos, mc);
-                    }
-                    else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
-                    {
-                        int xOffset = 0;
-                        TileEntity te = mc.world.getTileEntity(pos);
-
-                        if (te instanceof IInventory)
-                        {
-                            BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-                            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-                            RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
-                            xOffset = -1;
-                        }
-                        else
-                        {
-                            BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
-                            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-                        }
-
-                        RenderUtils.renderInventoryOverlay(xOffset, worldSchematic, pos, mc);
-                    }
+                    info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                    return;
                 }
             }
+        }
+    }
+
+    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, Minecraft mc)
+    {
+        ScaledResolution sr = new ScaledResolution(mc);
+
+        BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
+        IBlockState stateClient = mc.world.getBlockState(pos);
+        stateClient = stateClient.getActualState(mc.world, pos);
+        World worldClient = WorldUtils.getBestWorld(mc);
+
+        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+        IBlockState stateSchematic = worldSchematic.getBlockState(pos);
+        stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
+        IBlockState air = Blocks.AIR.getDefaultState();
+
+        ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
+        ItemUtils.setItemForBlock(mc.world, pos, stateClient);
+
+        // Not just a missing block
+        if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
+        {
+            BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
+            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+
+            RenderUtils.renderInventoryOverlay(-1, worldSchematic, pos, mc);
+            RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
+        }
+        else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
+        {
+            BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
+            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+            RenderUtils.renderInventoryOverlay(0, worldClient, pos, mc);
+        }
+        else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
+        {
+            int xOffset = 0;
+            TileEntity te = mc.world.getTileEntity(pos);
+
+            if (te instanceof IInventory)
+            {
+                BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
+                info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
+                xOffset = -1;
+            }
+            else
+            {
+                BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
+                info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+            }
+
+            RenderUtils.renderInventoryOverlay(xOffset, worldSchematic, pos, mc);
+        }
+    }
+
+    private void updateBlockInfoLines(RayTraceWrapper traceWrapper, Minecraft mc)
+    {
+        this.blockInfoLines.clear();
+
+        BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
+        IBlockState stateClient = mc.world.getBlockState(pos);
+        stateClient = stateClient.getActualState(mc.world, pos);
+
+        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+        IBlockState stateSchematic = worldSchematic.getBlockState(pos);
+        stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
+        IBlockState air = Blocks.AIR.getDefaultState();
+        String ul = TextFormatting.UNDERLINE.toString();
+
+        if (stateSchematic != stateClient && stateSchematic != air && stateClient != air)
+        {
+            this.blockInfoLines.add(ul + "Schematic:");
+            this.addBlockInfoLines(stateSchematic);
+
+            this.blockInfoLines.add("");
+            this.blockInfoLines.add(ul + "Client:");
+            this.addBlockInfoLines(stateClient);
+        }
+        else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
+        {
+            this.blockInfoLines.add(ul + "Schematic:");
+            this.addBlockInfoLines(stateSchematic);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Comparable<T>> void addBlockInfoLines(IBlockState state)
+    {
+        this.blockInfoLines.add(String.valueOf(Block.REGISTRY.getNameForObject(state.getBlock())));
+
+        for (Entry <IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
+        {
+            IProperty<T> property = (IProperty<T>) entry.getKey();
+            T value = (T) entry.getValue();
+            String valueName = property.getName(value);
+
+            if (property instanceof PropertyDirection)
+            {
+                valueName = TextFormatting.GOLD + valueName;
+            }
+            else if (Boolean.TRUE.equals(value))
+            {
+                valueName = TextFormatting.GREEN + valueName;
+            }
+            else if (Boolean.FALSE.equals(value))
+            {
+                valueName = TextFormatting.RED + valueName;
+            }
+            else if (Integer.class.equals(property.getValueClass()))
+            {
+                valueName = TextFormatting.GREEN + valueName;
+            }
+
+            this.blockInfoLines.add(property.getName() + ": " + valueName);
         }
     }
 

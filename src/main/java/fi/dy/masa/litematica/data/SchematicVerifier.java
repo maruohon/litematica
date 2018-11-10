@@ -85,7 +85,7 @@ public class SchematicVerifier implements IStringListProvider
     @Override
     public boolean shouldRenderStrings()
     {
-        return Configs.Visuals.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
+        return Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
     }
 
     @Override
@@ -339,7 +339,7 @@ public class SchematicVerifier implements IStringListProvider
 
         if (mc.player != null)
         {
-            this.maxEntries = Configs.Visuals.ERROR_HILIGHT_MAX_POSITIONS.getIntegerValue();
+            this.maxEntries = Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_MAX_POSITIONS.getIntegerValue();
 
             // This needs to happen first
             BlockPos centerPos = new BlockPos(mc.player.getPositionVector());
@@ -716,7 +716,7 @@ public class SchematicVerifier implements IStringListProvider
         {
             this.infoLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), TextFormatting.RESET.toString()));
 
-            final int count = Math.min(positionList.size(), Configs.Visuals.INFO_HUD_MAX_LINES.getIntegerValue());
+            final int count = Math.min(positionList.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
 
             for (int i = 0; i < count; ++i)
             {
@@ -745,7 +745,7 @@ public class SchematicVerifier implements IStringListProvider
             PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
             Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
 
-            final int count = Math.min(list.size(), Configs.Visuals.INFO_HUD_MAX_LINES.getIntegerValue());
+            final int count = Math.min(list.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
 
             for (int i = 0; i < count; ++i)
             {

@@ -19,6 +19,7 @@ public class LitematicaConfigPanel extends ConfigPanelBase
     {
         String modId = Reference.MOD_ID;
         this.addSubPanel((new GuiModConfigs(modId, "Generic", Configs.Generic.OPTIONS)).setConfigWidth(160));
+        this.addSubPanel((new GuiModConfigs(modId, "Info Overlays", Configs.InfoOverlays.OPTIONS)).setConfigWidth(160));
         this.addSubPanel((new GuiModConfigs(modId, "Visuals", Configs.Visuals.OPTIONS)).setConfigWidth(120));
         this.addSubPanel((new GuiModConfigs(modId, "Colors", Configs.Colors.OPTIONS)).setConfigWidth(100));
         this.addSubPanel((new GuiModConfigs(modId, "Generic Hotkeys", Hotkeys.HOTKEY_LIST)).setConfigWidth(210));

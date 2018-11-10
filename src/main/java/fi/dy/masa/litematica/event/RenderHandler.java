@@ -27,7 +27,7 @@ public class RenderHandler implements IRenderer
                 OverlayRenderer.getInstance().renderSelectionAreas(partialTicks);
             }
 
-            if (Configs.Visuals.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue())
+            if (Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue())
             {
                 OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
             }
@@ -44,7 +44,7 @@ public class RenderHandler implements IRenderer
         {
             ToolHud.getInstance().renderHud();
             InfoHud.getInstance().renderHud();
-            OverlayRenderer.renderHoverInfo(mc);
+            OverlayRenderer.getInstance().renderHoverInfo(mc);
         }
     }
 }

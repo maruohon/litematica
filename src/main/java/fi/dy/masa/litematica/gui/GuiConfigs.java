@@ -35,6 +35,7 @@ public class GuiConfigs extends GuiConfigsBase
         int y = 26;
 
         x += this.createButton(x, y, -1, ConfigGuiTab.GENERIC) + 4;
+        x += this.createButton(x, y, -1, ConfigGuiTab.INFO_OVERLAYS) + 4;
         x += this.createButton(x, y, -1, ConfigGuiTab.VISUALS) + 4;
         x += this.createButton(x, y, -1, ConfigGuiTab.COLORS) + 4;
         x += this.createButton(x, y, -1, ConfigGuiTab.HOTKEYS) + 4;
@@ -64,7 +65,7 @@ public class GuiConfigs extends GuiConfigsBase
     {
         ConfigGuiTab tab = DataManager.getConfigGuiTab();
 
-        if (tab == ConfigGuiTab.GENERIC || tab == ConfigGuiTab.VISUALS)
+        if (tab == ConfigGuiTab.GENERIC || tab == ConfigGuiTab.INFO_OVERLAYS || tab == ConfigGuiTab.VISUALS)
         {
             return 140;
         }
@@ -85,6 +86,10 @@ public class GuiConfigs extends GuiConfigsBase
         if (tab == ConfigGuiTab.GENERIC)
         {
             configs = Configs.Generic.OPTIONS;
+        }
+        else if (tab == ConfigGuiTab.INFO_OVERLAYS)
+        {
+            configs = Configs.InfoOverlays.OPTIONS;
         }
         else if (tab == ConfigGuiTab.VISUALS)
         {
@@ -143,6 +148,7 @@ public class GuiConfigs extends GuiConfigsBase
     public enum ConfigGuiTab
     {
         GENERIC         ("litematica.gui.button.config_gui.generic"),
+        INFO_OVERLAYS   ("litematica.gui.button.config_gui.info_overlays"),
         VISUALS         ("litematica.gui.button.config_gui.visuals"),
         COLORS          ("litematica.gui.button.config_gui.colors"),
         HOTKEYS         ("litematica.gui.button.config_gui.hotkeys"),

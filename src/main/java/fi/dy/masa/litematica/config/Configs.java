@@ -62,20 +62,13 @@ public class Configs implements IConfigHandler
     {
         public static final ConfigBoolean       ENABLE_RENDERING                    = new ConfigBoolean("enableRendering", true, "Main rendering toggle option. Enables/disables ALL mod rendering.", "All Rendering");
         public static final ConfigBoolean       ENABLE_GHOST_BLOCK_RENDERING        = new ConfigBoolean("enableGhostBlockRendering", true, "Enable rendering the schematic (ghost) blocks", "Schematic (Ghost) Blocks Rendering");
-        public static final ConfigBoolean       ENABLE_INFO_OVERLAY_RENDERING       = new ConfigBoolean("enableInfoOverlayRendering", true, "Enable Info overlay rendering to show block info", "Info Overlay Rendering");
         public static final ConfigBoolean       ENABLE_SELECTION_BOXES_RENDERING    = new ConfigBoolean("enableSelectionBoxesRendering", true, "Enable selection boxes rendering", "Selection Boxes Rendering");
-        public static final ConfigBoolean       ENABLE_VERIFIER_OVERLAY_RENDERING   = new ConfigBoolean("enableVerifierOverlayRendering", true, "Enable Schematic Verifier overlay rendering", "Verifier Overlay Rendering");
-        public static final ConfigDouble        ERROR_HILIGHT_ALPHA                 = new ConfigDouble( "errorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
-        public static final ConfigInteger       ERROR_HILIGHT_MAX_POSITIONS         = new ConfigInteger("errorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render\nat once in the Schematic Verifier overlay.");
         public static final ConfigDouble        GHOST_BLOCK_ALPHA                   = new ConfigDouble( "ghostBlockAlpha", 0.5, 0, 1, "The alpha value of the ghost blocks,\nwhen rendering them as translucent");
-        public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\",\nused for schematic verifier mismatch positions etc.");
-        public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger("infoHudMaxLines", 10, 1, 32, "The maximum number of info lines to show on the HUD at once");
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA            = new ConfigDouble( "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_AREA_SELECTION_BOX_SIDES     = new ConfigBoolean("renderAreaSelectionBoxSides", true, "If enabled, then the area selection boxes will\nhave their side quads rendered");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT        = new ConfigBoolean("renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered\nusing translucent \"ghost blocks\"");
         public static final ConfigBoolean       RENDER_COLLIDING_SCHEMATIC_BLOCKS   = new ConfigBoolean("renderCollidingSchematicBlocks", true, "If enabled, then blocks in the schematics are rendered\nalso when there is already a (wrong) block in the client world");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES           = new ConfigBoolean("renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier\nwill have (translucent) sides rendered instead of just the outline");
-        public static final ConfigBoolean       RENDER_INFO_OVERLAY                 = new ConfigBoolean("renderInfoOverlay", true, "If enabled, then an info overlay is rendered\nwhile looking at schematic blocks or schematic verifier\nerror markers, and holding the 'renderInfoOverlay' key");
         public static final ConfigBoolean       RENDER_PLACEMENT_BOX_SIDES          = new ConfigBoolean("renderPlacementBoxSides", false, "If enabled, then the placed schematic sub-region boxes\nwill have their side quads rendered");
         public static final ConfigBoolean       RENDER_PLACEMENT_ENCLOSING_BOX      = new ConfigBoolean("renderPlacementEnclosingBox", true, "If enabled, then an enclosing box is rendered around\nall the sub-regions in a schematic (placement)");
         public static final ConfigBoolean       RENDER_PLACEMENT_ENCLOSING_BOX_SIDES= new ConfigBoolean("renderPlacementEnclosingBoxSides", false, "If enabled, then the enclosing box around\na schematic placement will have its side quads rendered");
@@ -95,14 +88,11 @@ public class Configs implements IConfigHandler
         public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
                 ENABLE_RENDERING,
                 ENABLE_GHOST_BLOCK_RENDERING,
-                ENABLE_INFO_OVERLAY_RENDERING,
                 ENABLE_SELECTION_BOXES_RENDERING,
-                ENABLE_VERIFIER_OVERLAY_RENDERING,
                 RENDER_AREA_SELECTION_BOX_SIDES,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
                 RENDER_COLLIDING_SCHEMATIC_BLOCKS,
                 RENDER_ERROR_MARKER_SIDES,
-                RENDER_INFO_OVERLAY,
                 RENDER_PLACEMENT_BOX_SIDES,
                 RENDER_PLACEMENT_ENCLOSING_BOX,
                 RENDER_PLACEMENT_ENCLOSING_BOX_SIDES,
@@ -118,13 +108,41 @@ public class Configs implements IConfigHandler
                 SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK,
                 SCHEMATIC_OVERLAY_TYPE_WRONG_STATE,
 
-                INFO_HUD_ALIGNMENT,
-                ERROR_HILIGHT_ALPHA,
-                ERROR_HILIGHT_MAX_POSITIONS,
                 GHOST_BLOCK_ALPHA,
-                INFO_HUD_MAX_LINES,
                 PLACEMENT_BOX_SIDE_ALPHA,
                 SCHEMATIC_OVERLAY_OUTLINE_WIDTH
+        );
+    }
+
+    public static class InfoOverlays
+    {
+        public static final ConfigInteger       BLOCK_INFO_OFFSET_X                 = new ConfigInteger("blockInfoLinesOffsetX", 4, 0, 2000, "The x offset of the block info lines from the selected edge");
+        public static final ConfigInteger       BLOCK_INFO_OFFSET_Y                 = new ConfigInteger("blockInfoLinesOffsetY", 4, 0, 2000, "The y offset of the block info lines from the selected edge");
+        public static final ConfigDouble        BLOCK_INFO_FONT_SCALE               = new ConfigDouble( "blockInfoFontScale", 0.5, 0, 10, "The font scale for the block info lines");
+        public static final ConfigOptionList    BLOCK_INFO_LINES_ALIGNMENT          = new ConfigOptionList("blockInfoLinesAlignment", HudAlignment.TOP_RIGHT, "The alignment of the block info lines overlay");
+        public static final ConfigBoolean       ENABLE_INFO_OVERLAY_RENDERING       = new ConfigBoolean("enableInfoOverlayRendering", true, "Enable Info Overlay rendering to show block info\nabout the looked-at block or verifier error marker", "Info Overlay Rendering");
+        public static final ConfigBoolean       ENABLE_VERIFIER_OVERLAY_RENDERING   = new ConfigBoolean("enableVerifierOverlayRendering", true, "Enable Schematic Verifier marker overlay rendering", "Verifier Overlay Rendering");
+        public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList("infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\",\nused for schematic verifier mismatch positions etc.");
+        public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger("infoHudMaxLines", 10, 1, 32, "The maximum number of info lines to show on the HUD at once");
+        public static final ConfigBoolean       RENDER_BLOCK_INFO_LINES             = new ConfigBoolean("renderBlockInfoLines", true, "If enabled, then MiniHUD-style block info overlay\nis rendered for the looked-at block");
+        public static final ConfigBoolean       RENDER_BLOCK_INFO_OVERLAY           = new ConfigBoolean("renderBlockInfoOverlay", true, "If enabled, then an info overlay is rendered\nwhile looking at schematic blocks or schematic verifier\nerror markers, and holding the 'renderInfoOverlay' key");
+        public static final ConfigDouble        VERIFIER_ERROR_HILIGHT_ALPHA        = new ConfigDouble( "verifierErrorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
+        public static final ConfigInteger       VERIFIER_ERROR_HILIGHT_MAX_POSITIONS = new ConfigInteger("verifierErrorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render\nat once in the Schematic Verifier overlay.");
+
+        public static final ImmutableList<IConfigValue> OPTIONS = ImmutableList.of(
+                ENABLE_INFO_OVERLAY_RENDERING,
+                ENABLE_VERIFIER_OVERLAY_RENDERING,
+                RENDER_BLOCK_INFO_LINES,
+                RENDER_BLOCK_INFO_OVERLAY,
+
+                BLOCK_INFO_LINES_ALIGNMENT,
+                INFO_HUD_ALIGNMENT,
+                BLOCK_INFO_OFFSET_X,
+                BLOCK_INFO_OFFSET_Y,
+                BLOCK_INFO_FONT_SCALE,
+                INFO_HUD_MAX_LINES,
+                VERIFIER_ERROR_HILIGHT_ALPHA,
+                VERIFIER_ERROR_HILIGHT_MAX_POSITIONS
         );
     }
 

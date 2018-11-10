@@ -55,6 +55,7 @@ litematica.gui.button.change_menu.to_main_menu=Litematica menu
 litematica.gui.button.config_gui.colors=Colors
 litematica.gui.button.config_gui.generic=Generic
 litematica.gui.button.config_gui.hotkeys=Hotkeys
+litematica.gui.button.config_gui.info_overlays=Info Overlays
 litematica.gui.button.config_gui.render_layers=Render Layers
 litematica.gui.button.config_gui.visuals=Visuals
 
