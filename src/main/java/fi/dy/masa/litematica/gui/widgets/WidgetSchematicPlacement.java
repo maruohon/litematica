@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -16,6 +17,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetBase;
 import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -226,8 +228,15 @@ public class WidgetSchematicPlacement extends WidgetBase
             }
             else if (this.type == ButtonType.REMOVE)
             {
-                this.widget.manager.removeSchematicPlacement(this.widget.placement);
-                this.widget.parent.refreshEntries();
+                if (this.widget.placement.isLocked() && GuiScreen.isShiftKeyDown() == false)
+                {
+                    this.widget.parent.getParentGui().addMessage(MessageType.ERROR, "litematica.error.schematic_placements.remove_fail_locked");
+                }
+                else
+                {
+                    this.widget.manager.removeSchematicPlacement(this.widget.placement);
+                    this.widget.parent.refreshEntries();
+                }
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {
