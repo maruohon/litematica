@@ -54,6 +54,7 @@ public class KeyCallbacks
         Hotkeys.LAYER_MODE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_NEXT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.LAYER_SET_HERE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind().setCallback(callbackHotkeys);
@@ -193,6 +194,11 @@ public class KeyCallbacks
                 else if (key == Hotkeys.LAYER_PREVIOUS.getKeybind())
                 {
                     DataManager.getRenderLayerRange().moveLayer(-1);
+                    return true;
+                }
+                else if (key == Hotkeys.LAYER_SET_HERE.getKeybind())
+                {
+                    DataManager.getRenderLayerRange().setToPosition(this.mc.player);
                     return true;
                 }
                 else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())
