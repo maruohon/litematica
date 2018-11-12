@@ -31,6 +31,7 @@ public class GuiRenderLayer extends GuiBase
         int y = 26;
 
         x += this.createTabButton(x, y, -1, ConfigGuiTab.GENERIC) + 4;
+        x += this.createTabButton(x, y, -1, ConfigGuiTab.INFO_OVERLAYS) + 4;
         x += this.createTabButton(x, y, -1, ConfigGuiTab.VISUALS) + 4;
         x += this.createTabButton(x, y, -1, ConfigGuiTab.COLORS) + 4;
         x += this.createTabButton(x, y, -1, ConfigGuiTab.HOTKEYS) + 4;
