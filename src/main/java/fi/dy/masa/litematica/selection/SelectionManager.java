@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
@@ -245,6 +246,27 @@ public class SelectionManager
         JsonUtils.writeJsonToFile(selection.toJson(), file);
 
         return this.currentSelectionId;
+    }
+
+    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement)
+    {
+        File file = new File(dir, FileUtils.generateSafeFileName(placement.getName()) + ".json");
+        String name = file.getAbsolutePath();
+        AreaSelection selection = this.getSelection(name);
+
+        if (selection == null)
+        {
+            selection = AreaSelection.fromPlacement(placement);
+
+            this.selections.put(name, selection);
+            this.currentSelectionId = name;
+
+            JsonUtils.writeJsonToFile(selection.toJson(), file);
+
+            return true;
+        }
+
+        return false;
     }
 
     public boolean changeSelection(World world, Entity entity, int maxDistance)

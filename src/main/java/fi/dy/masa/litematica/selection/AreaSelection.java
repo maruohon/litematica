@@ -10,10 +10,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -28,28 +26,9 @@ public class AreaSelection
     private String currentBox;
     private boolean originSelected;
 
-    public static AreaSelection fromSchematic(LitematicaSchematic schematic, SchematicPlacement placement)
-    {
-        Map<String, Box> boxes = schematic.getAreas();
-        BlockPos origin = placement.getOrigin();
-        AreaSelection selection = new AreaSelection();
-        selection.name = placement.getName();
-
-        for (Map.Entry<String, Box> entry : boxes.entrySet())
-        {
-            Box box = entry.getValue();
-            BlockPos pos1 = PositionUtils.getTransformedBlockPos(box.getPos1(), placement.getMirror(), placement.getRotation()).add(origin);
-            BlockPos pos2 = PositionUtils.getTransformedBlockPos(box.getPos2(), placement.getMirror(), placement.getRotation()).add(origin);
-            box = new Box(pos1, pos2, entry.getKey());
-            selection.subRegionBoxes.put(box.getName(), box);
-        }
-
-        return selection;
-    }
-
     public static AreaSelection fromPlacement(SchematicPlacement placement)
     {
-        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
+        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.ANY);
         BlockPos origin = placement.getOrigin();
 
         AreaSelection selection = new AreaSelection();

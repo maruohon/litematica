@@ -4,10 +4,12 @@ import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicSaveBase.DirectoryCreator;
 import fi.dy.masa.litematica.gui.widgets.WidgetAreaSelectionBrowser;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -53,8 +55,10 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         int x = this.mc.currentScreen.width - 13;
         int y = 24;
 
+        // These are placed from right to left
         x = this.createButton(x, y, ButtonListener.ButtonType.CREATE_DIRECTORY);
-        x = this.createButton(x, y, ButtonListener.ButtonType.CREATE_SELECTION);
+        x = this.createButton(x, y, ButtonListener.ButtonType.FROM_PLACEMENT);
+        x = this.createButton(x, y, ButtonListener.ButtonType.NEW_SELECTION);
     }
 
     private int createButton(int x, int y, ButtonListener.ButtonType type)
@@ -140,11 +144,33 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
                 String title = "litematica.gui.title.create_directory";
                 this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
             }
-            else if (this.type == ButtonType.CREATE_SELECTION)
+            else if (this.type == ButtonType.NEW_SELECTION)
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_area_selection";
                 this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new SelectionCreator(dir, this.gui)));
+            }
+            else if (this.type == ButtonType.FROM_PLACEMENT)
+            {
+                File dir = this.gui.getListWidget().getCurrentDirectory();
+                SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                if (placement != null)
+                {
+                    if (this.gui.getSelectionManager().createSelectionFromPlacement(dir, placement) == false)
+                    {
+                        this.gui.addMessage(MessageType.ERROR, "litematica.error.area_selection.from_placement_failed", placement.getName());
+                    }
+                    else
+                    {
+                        this.gui.addMessage(MessageType.SUCCESS, "litematica.message.area_selections.selection_created_from_placement", placement.getName());
+                        this.gui.getListWidget().refreshEntries();
+                    }
+                }
+                else
+                {
+                    this.gui.addMessage(MessageType.ERROR, "litematica.error.area_selection.no_placement_selected");
+                }
             }
         }
 
@@ -157,7 +183,8 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         public enum ButtonType
         {
             CREATE_DIRECTORY    ("litematica.gui.button.area_selections.create_directory"),
-            CREATE_SELECTION    ("litematica.gui.button.area_selections.create_selection");
+            NEW_SELECTION       ("litematica.gui.button.area_selections.create_new_selection"),
+            FROM_PLACEMENT      ("litematica.gui.button.area_selections.create_selection_from_placement");
 
             private final String labelKey;
 

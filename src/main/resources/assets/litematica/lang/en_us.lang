@@ -2,6 +2,9 @@ language.name=English
 language.region=US
 language.code=en_US
 
+
+litematica.error.area_selection.from_placement_failed=Failed to create a new selection from the placement '%s'
+litematica.error.area_selection.no_placement_selected=No Schematic Placement selected!
 litematica.error.area_selection.rename.already_exists=Error: An area already exists with the file name '%s'
 
 litematica.error.duplicate_schematic_load=Error: Tried to load a duplicate schematic + placement
@@ -44,7 +47,8 @@ litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot=Use
 litematica.info.schematic_manager.preview.success=Preview image successfully set
 
 litematica.gui.button.area_selections.create_directory=Create directory
-litematica.gui.button.area_selections.create_selection=Create selection
+litematica.gui.button.area_selections.create_new_selection=New selection
+litematica.gui.button.area_selections.create_selection_from_placement=From Placement
 
 litematica.gui.button.change_menu.create_schematic_from_area=Create schematic from selection
 litematica.gui.button.change_menu.load_schematics_to_memory=Load schematics to memory
@@ -238,6 +242,7 @@ litematica.label.yes=yes
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.area_clear_fail=§cFailed to clear the area(s)§r
 litematica.message.area_cleared=Area cleared
+litematica.message.area_selections.selection_created_from_placement=Created a new selection from placement '%s'
 litematica.message.directory_created=Directory '%s' created
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
