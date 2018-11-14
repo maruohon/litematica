@@ -138,6 +138,10 @@ public class OverlayRenderer
 
         if (currentSelection != null)
         {
+            GlStateManager.enablePolygonOffset();
+            GlStateManager.doPolygonOffset(-1.2f, -0.2f);
+            GlStateManager.depthMask(false);
+
             Box currentBox = currentSelection.getSelectedSubRegionBox();
 
             for (Box box : currentSelection.getAllSubRegionBoxes())
@@ -148,6 +152,10 @@ public class OverlayRenderer
 
             Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
             RenderUtils.renderBlockOutline(currentSelection.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+
+            GlStateManager.depthMask(true);
+            GlStateManager.doPolygonOffset(0f, 0f);
+            GlStateManager.disablePolygonOffset();
         }
 
         if (this.placements.isEmpty() == false)
