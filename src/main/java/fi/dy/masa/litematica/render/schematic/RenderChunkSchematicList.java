@@ -11,11 +11,15 @@ public class RenderChunkSchematicList extends RenderChunkSchematicVbo
     private static final int BLOCK_LAYERS = BlockRenderLayer.values().length;
     private static final int LIST_SIZE = BLOCK_LAYERS + OverlayType.values().length;
 
-    private final int baseDisplayList = GLAllocation.generateDisplayLists(LIST_SIZE);
+    private final int baseDisplayList;
+    private final int baseOverlay;
 
     public RenderChunkSchematicList(World worldIn, RenderGlobal renderGlobalIn, int index)
     {
         super(worldIn, renderGlobalIn, index);
+
+        this.baseDisplayList = GLAllocation.generateDisplayLists(LIST_SIZE);
+        this.baseOverlay = this.baseDisplayList + BLOCK_LAYERS;
     }
 
     public int getDisplayList(BlockRenderLayer layer, CompiledChunk compiledChunk)
@@ -23,14 +27,9 @@ public class RenderChunkSchematicList extends RenderChunkSchematicVbo
         return compiledChunk.isLayerEmpty(layer) == false ? this.baseDisplayList + layer.ordinal() : -1;
     }
 
-    public int getOverlayDisplayList(OverlayType type)
+    public int getOverlayDisplayList(OverlayType type, CompiledChunkSchematic compiledChunk)
     {
-        if (this.hasOverlay() == false)
-        {
-            return -1;
-        }
-
-        return this.baseDisplayList + BLOCK_LAYERS + type.ordinal();
+        return compiledChunk.isOverlayTypeEmpty(type) == false ? this.baseOverlay + type.ordinal() : -1;
     }
 
     public void deleteGlResources()

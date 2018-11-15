@@ -27,7 +27,6 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
-import net.minecraft.client.renderer.chunk.VisGraph;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -47,10 +46,10 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
     private final RenderGlobalSchematic renderGlobal;
     private final VertexBuffer[] vertexBufferOverlay = new VertexBuffer[OverlayType.values().length];
-    private final BufferBuilder.State bufferStates[] = new BufferBuilder.State[OverlayType.values().length];
-    private final EnumSet<OverlayType> existingOverlays = EnumSet.noneOf(OverlayType.class);
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private final List<StructureBoundingBox> boxes = new ArrayList<>();
+    private final EnumSet<OverlayType> existingOverlays = EnumSet.noneOf(OverlayType.class);
+    private boolean hasOverlay = false;
 
     private ChunkCacheSchematic schematicWorldView;
     private ChunkCacheSchematic clientWorldView;
@@ -72,7 +71,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
     public boolean hasOverlay()
     {
-        return this.existingOverlays.isEmpty() == false;
+        return this.hasOverlay;
     }
 
     public EnumSet<OverlayType> getOverlayTypes()
@@ -103,35 +102,48 @@ public class RenderChunkSchematicVbo extends RenderChunk
     @Override
     public void resortTransparency(float x, float y, float z, ChunkCompileTaskGenerator generator)
     {
-        CompiledChunk compiledChunk = generator.getCompiledChunk();
+        CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) generator.getCompiledChunk();
+        RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
+        BufferBuilder.State bufferState = compiledChunk.getBlockBufferState(BlockRenderLayer.TRANSLUCENT);
 
-        if (compiledChunk.getState() != null)
+        if (bufferState != null)
         {
-            if (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue())
+            /*if (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue())
             {
+                RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
+
                 for (BlockRenderLayer layer : BlockRenderLayer.values())
                 {
-                    BufferBuilder buffer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(layer);
+                    BufferBuilder buffer = buffers.getWorldRendererByLayer(layer);
 
                     this.preRenderBlocks(buffer, this.getPosition());
                     buffer.setVertexState(compiledChunk.getState());
                     this.postRenderBlocks(layer, x, y, z, buffer, compiledChunk);
                 }
             }
-            else if (compiledChunk.isLayerEmpty(BlockRenderLayer.TRANSLUCENT) == false)
+            else */if (compiledChunk.isLayerEmpty(BlockRenderLayer.TRANSLUCENT) == false)
             {
-                BufferBuilder buffer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
+                BufferBuilder buffer = buffers.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
 
                 this.preRenderBlocks(buffer, this.getPosition());
-                buffer.setVertexState(compiledChunk.getState());
+                buffer.setVertexState(bufferState);
                 this.postRenderBlocks(BlockRenderLayer.TRANSLUCENT, x, y, z, buffer, compiledChunk);
             }
+        }
 
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparency\n");
-            if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
+        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparency\n");
+        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
+        {
+            OverlayType type = OverlayType.QUAD;
+            bufferState = compiledChunk.getOverlayBufferState(type);
+
+            if (bufferState != null && compiledChunk.isOverlayTypeEmpty(type) == false)
             {
-                this.resortTransparencyPreRenderOverlays(generator);
-                this.postRenderOverlays(x, y, z, generator);
+                BufferBuilder buffer = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(type);
+
+                this.preRenderOverlay(buffer, type.getGlMode());
+                buffer.setVertexState(bufferState);
+                this.postRenderOverlay(type, x, y, z, buffer, compiledChunk);
             }
         }
     }
@@ -139,7 +151,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     @Override
     public void rebuildChunk(float x, float y, float z, ChunkCompileTaskGenerator generator)
     {
-        CompiledChunk compiledChunk = new CompiledChunk();
+        CompiledChunkSchematic compiledChunk = new CompiledChunkSchematic();
         generator.getLock().lock();
 
         try
@@ -157,13 +169,27 @@ public class RenderChunkSchematicVbo extends RenderChunk
         }
 
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("rebuildChunk pos: %s gen: %s\n", this.getPosition(), generator);
-        VisGraph visGraph = new VisGraph();
         Set<TileEntity> tileEntities = new HashSet<>();
         BlockPos posChunk = this.getPosition();
         LayerRange range = DataManager.getRenderLayerRange();
         final boolean renderColliding = Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue();
+        final boolean translucent = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
+        final boolean overlayEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue();
+        final boolean overlayOutlinesEnabled = overlayEnabled && Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue();
+        final boolean overlaySidesEnabled = overlayEnabled && Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue();
+        final boolean overlayOutlinesModel = Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue();
+        final boolean overlaySidesModel = Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.getBooleanValue();
+        final boolean overlayTypeMissing = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_MISSING.getBooleanValue();
+        final boolean overlayTypeExtra = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_EXTRA.getBooleanValue();
+        final boolean overlayTypeWrongBlock = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK.getBooleanValue();
+        final boolean overlayTypeWrongState = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_STATE.getBooleanValue();
+        final Color4f colorMissing = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
+        final Color4f colorExtra = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_EXTRA.getColor();
+        final Color4f colorWrongBlock = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK.getColor();
+        final Color4f colorWrongState = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_STATE.getColor();
 
         this.existingOverlays.clear();
+        this.hasOverlay = false;
 
         if (this.schematicWorldView.isEmpty() == false && this.boxes.isEmpty() == false &&
             range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
@@ -174,10 +200,6 @@ public class RenderChunkSchematicVbo extends RenderChunk
             RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
             BufferBuilder bufferOverlayOutlines = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.OUTLINE);
             BufferBuilder bufferOverlayQuads    = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.QUAD);
-
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("rebuildChunk OL start pos: %s gen: %s\n", this.getPosition(), generator);
-            this.preRenderOverlayIfNotStarted(bufferOverlayOutlines, OverlayType.OUTLINE);
-            this.preRenderOverlayIfNotStarted(bufferOverlayQuads, OverlayType.QUAD);
 
             for (StructureBoundingBox box : this.boxes)
             {
@@ -217,7 +239,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                             this.addTileEntity(posMutable, compiledChunk, tileEntities);
                         }
 
-                        BlockRenderLayer layer = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() ? BlockRenderLayer.TRANSLUCENT : blockSchematic.getBlockLayer();
+                        BlockRenderLayer layer = translucent ? BlockRenderLayer.TRANSLUCENT : blockSchematic.getBlockLayer();
                         int layerIndex = layer.ordinal();
 
                         if (stateSchematic.getRenderType() != EnumBlockRenderType.INVISIBLE)
@@ -234,9 +256,9 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
                             if (clientHasAir)
                             {
-                                if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_MISSING.getBooleanValue())
+                                if (overlayTypeMissing)
                                 {
-                                    overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
+                                    overlayColor = colorMissing;
                                 }
 
                                 missing = true;
@@ -249,35 +271,41 @@ public class RenderChunkSchematicVbo extends RenderChunk
                         // Extra block
                         if (blockSchematic == Blocks.AIR)
                         {
-                            if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_EXTRA.getBooleanValue())
+                            if (overlayTypeExtra)
                             {
-                                overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_EXTRA.getColor();
+                                overlayColor = colorExtra;
                             }
                         }
                         // Wrong block
                         else if (blockClient != blockSchematic)
                         {
-                            if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK.getBooleanValue())
+                            if (overlayTypeWrongBlock)
                             {
-                                overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK.getColor();
+                                overlayColor = colorWrongBlock;
                             }
                         }
                         // Wrong state
                         else
                         {
-                            if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_STATE.getBooleanValue())
+                            if (overlayTypeWrongState)
                             {
-                                overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_STATE.getColor();
+                                overlayColor = colorWrongState;
                             }
                         }
                     }
 
-                    if (overlayColor != null && Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
+                    if (overlayColor != null)
                     {
-                        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue())
+                        if (overlaySidesEnabled)
                         {
+                            if (compiledChunk.isOverlayTypeStarted(OverlayType.QUAD) == false)
+                            {
+                                compiledChunk.setOverlayTypeStarted(OverlayType.QUAD);
+                                this.preRenderOverlay(bufferOverlayQuads, OverlayType.QUAD);
+                            }
+
                             // Only render the model-based outlines or sides for missing blocks
-                            if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.getBooleanValue())
+                            if (missing && overlaySidesModel)
                             {
                                 IBakedModel bakedModel = this.renderGlobal.getModelForState(stateSchematic);
                                 RenderUtils.drawBlockModelQuadOverlayBatched(bakedModel, stateSchematic, posMutable, overlayColor, 0, bufferOverlayQuads);
@@ -288,12 +316,18 @@ public class RenderChunkSchematicVbo extends RenderChunk
                             }
                         }
 
-                        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue())
+                        if (overlayOutlinesEnabled)
                         {
+                            if (compiledChunk.isOverlayTypeStarted(OverlayType.OUTLINE) == false)
+                            {
+                                compiledChunk.setOverlayTypeStarted(OverlayType.OUTLINE);
+                                this.preRenderOverlay(bufferOverlayOutlines, OverlayType.OUTLINE);
+                            }
+
                             overlayColor = new Color4f(overlayColor.r, overlayColor.g, overlayColor.b, 1f);
 
                             // Only render the model-based outlines or sides for missing blocks
-                            if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue())
+                            if (missing && overlayOutlinesModel)
                             {
                                 IBakedModel bakedModel = this.renderGlobal.getModelForState(stateSchematic);
                                 RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, posMutable, overlayColor, 0, bufferOverlayOutlines);
@@ -316,14 +350,24 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
                 if (compiledChunk.isLayerStarted(layerTmp))
                 {
-                    this.postRenderBlocks(layerTmp, x, y, z, generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(layerTmp), compiledChunk);
+                    this.postRenderBlocks(layerTmp, x, y, z, buffers.getWorldRendererByLayer(layerTmp), compiledChunk);
                 }
             }
 
-            this.postRenderOverlays(x, y, z, generator);
+            if (this.hasOverlay)
+            {
+                //if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
+                for (OverlayType type : this.existingOverlays)
+                {
+                    if (compiledChunk.isOverlayTypeStarted(type))
+                    {
+                        compiledChunk.setOverlayTypeUsed(type);
+                        this.postRenderOverlay(type, x, y, z, ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(type), compiledChunk);
+                    }
+                }
+            }
         }
 
-        compiledChunk.setVisibility(visGraph.computeVisibility());
         this.getLockCompileTask().lock();
 
         try
@@ -368,71 +412,43 @@ public class RenderChunkSchematicVbo extends RenderChunk
         buffer.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
 
-    private void postRenderBlocks(BlockRenderLayer layer, float x, float y, float z, BufferBuilder bufferBuilderIn, CompiledChunk compiledChunkIn)
+    private void postRenderBlocks(BlockRenderLayer layer, float x, float y, float z, BufferBuilder buffer, CompiledChunkSchematic compiledChunk)
     {
-        if (layer == BlockRenderLayer.TRANSLUCENT && compiledChunkIn.isLayerEmpty(layer) == false)
+        if (layer == BlockRenderLayer.TRANSLUCENT && compiledChunk.isLayerEmpty(layer) == false)
         {
-            bufferBuilderIn.sortVertexData(x, y, z);
-            compiledChunkIn.setState(bufferBuilderIn.getVertexState());
+            buffer.sortVertexData(x, y, z);
+            compiledChunk.setBlockBufferState(layer, buffer.getVertexState());
         }
 
-        bufferBuilderIn.finishDrawing();
-    }
-
-    private void preRenderOverlayIfNotStarted(BufferBuilder buffer, OverlayType type)
-    {
-        if (this.existingOverlays.contains(type) == false)
-        {
-            this.preRenderOverlay(buffer, type);
-        }
+        buffer.finishDrawing();
     }
 
     private void preRenderOverlay(BufferBuilder buffer, OverlayType type)
     {
         this.existingOverlays.add(type);
+        this.hasOverlay = true;
 
         BlockPos pos = this.getPosition();
         buffer.begin(type.getGlMode(), DefaultVertexFormats.POSITION_COLOR);
         buffer.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
 
-    private void resortTransparencyPreRenderOverlays(ChunkCompileTaskGenerator generator)
+    private void preRenderOverlay(BufferBuilder buffer, int glMode)
     {
-        if (this.hasOverlay())
-        {
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparencyPreRenderOverlays\n");
-            RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
-
-            for (OverlayType type : this.existingOverlays)
-            {
-                BufferBuilder.State state = this.bufferStates[type.ordinal()];
-
-                if (state != null)
-                {
-                    BufferBuilder buffer = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(type);
-                    this.preRenderOverlay(buffer, type);
-                    buffer.setVertexState(state);
-                }
-            }
-        }
+        BlockPos pos = this.getPosition();
+        buffer.begin(glMode, DefaultVertexFormats.POSITION_COLOR);
+        buffer.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
 
-    private void postRenderOverlays(float x, float y, float z, ChunkCompileTaskGenerator generator)
+    private void postRenderOverlay(OverlayType type, float x, float y, float z, BufferBuilder buffer, CompiledChunkSchematic compiledChunk)
     {
-        if (this.hasOverlay())
+        if (type == OverlayType.QUAD && compiledChunk.isOverlayTypeEmpty(type) == false)
         {
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
-            RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
-
-            for (OverlayType type : this.existingOverlays)
-            {
-                BufferBuilder buffer = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(type);
-
-                buffer.sortVertexData(x, y, z);
-                this.bufferStates[type.ordinal()] = buffer.getVertexState();
-                buffer.finishDrawing();
-            }
+            buffer.sortVertexData(x, y, z);
+            compiledChunk.setOverlayBufferState(type, buffer.getVertexState());
         }
+
+        buffer.finishDrawing();
     }
 
     @Override

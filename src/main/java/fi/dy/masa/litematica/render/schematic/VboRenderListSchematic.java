@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import java.util.EnumSet;
 import org.lwjgl.opengl.GL11;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.renderer.GlStateManager;
@@ -29,21 +28,13 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
     }
 
     @Override
-    public void renderBlockOverlays()
+    public void renderBlockOverlays(OverlayType type)
     {
         if (this.initialized)
         {
             for (RenderChunkSchematicVbo renderChunk : this.overlayRenderChunks)
             {
-                EnumSet<OverlayType> types = renderChunk.getOverlayTypes();
-
-                if (types.isEmpty() == false)
-                {
-                    for (OverlayType type : types)
-                    {
-                        this.renderOverlay(renderChunk.getOverlayVertexBuffer(type), renderChunk, type.getGlMode());
-                    }
-                }
+                this.renderOverlay(renderChunk.getOverlayVertexBuffer(type), renderChunk, type.getGlMode());
             }
 
             OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);

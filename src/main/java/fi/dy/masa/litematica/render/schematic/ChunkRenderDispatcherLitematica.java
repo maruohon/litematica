@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -17,7 +16,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -259,42 +257,19 @@ public class ChunkRenderDispatcherLitematica
         return flag;
     }
 
-    public ListenableFuture<Object> uploadChunk(final ChunkCompileTaskGenerator generator, final BlockRenderLayer layer, final BufferBuilder buffer,
+    public ListenableFuture<Object> uploadChunkBlocks(final BlockRenderLayer layer, final BufferBuilder buffer,
             final RenderChunkSchematicVbo renderChunk, final CompiledChunk compiledChunk, final double distanceSq)
     {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
         {
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunk()\n");
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunkBlocks()\n");
             if (OpenGlHelper.useVbo())
             {
                 this.uploadVertexBuffer(buffer, renderChunk.getVertexBufferByLayer(layer.ordinal()));
-
-                EnumSet<OverlayType> types = renderChunk.getOverlayTypes();
-
-                if (layer != BlockRenderLayer.TRANSLUCENT && types.isEmpty() == false)
-                {
-                    for (OverlayType type : types)
-                    {
-                        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunk() overlay: %s\n", type);
-                        BufferBuilder overlayBuffer = ((IRegionRenderCacheBuilder) generator.getRegionRenderCacheBuilder()).getOverlayBuffer(type);
-                        this.uploadVertexBuffer(overlayBuffer, renderChunk.getOverlayVertexBuffer(type));
-                    }
-                }
             }
             else
             {
                 this.uploadDisplayList(buffer, ((RenderChunkSchematicList) renderChunk).getDisplayList(layer, compiledChunk), renderChunk);
-
-                EnumSet<OverlayType> types = renderChunk.getOverlayTypes();
-
-                if (types.isEmpty() == false)
-                {
-                    for (OverlayType type : types)
-                    {
-                        BufferBuilder overlayBuffer = ((IRegionRenderCacheBuilder) generator.getRegionRenderCacheBuilder()).getOverlayBuffer(type);
-                        this.uploadDisplayList(overlayBuffer, ((RenderChunkSchematicList) renderChunk).getOverlayDisplayList(type), renderChunk);
-                    }
-                }
             }
 
             buffer.setTranslation(0.0D, 0.0D, 0.0D);
@@ -308,7 +283,45 @@ public class ChunkRenderDispatcherLitematica
                 @Override
                 public void run()
                 {
-                    ChunkRenderDispatcherLitematica.this.uploadChunk(generator, layer, buffer, renderChunk, compiledChunk, distanceSq);
+                    ChunkRenderDispatcherLitematica.this.uploadChunkBlocks(layer, buffer, renderChunk, compiledChunk, distanceSq);
+                }
+            }, null);
+
+            synchronized (this.queueChunkUploads)
+            {
+                this.queueChunkUploads.add(new ChunkRenderDispatcherLitematica.PendingUpload(futureTask, distanceSq));
+                return futureTask;
+            }
+        }
+    }
+
+    public ListenableFuture<Object> uploadChunkOverlay(final OverlayType type, final BufferBuilder buffer,
+            final RenderChunkSchematicVbo renderChunk, final CompiledChunkSchematic compiledChunk, final double distanceSq)
+    {
+        if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
+        {
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunkOverlay()\n");
+            if (OpenGlHelper.useVbo())
+            {
+                this.uploadVertexBuffer(buffer, renderChunk.getOverlayVertexBuffer(type));
+            }
+            else
+            {
+                this.uploadDisplayList(buffer, ((RenderChunkSchematicList) renderChunk).getOverlayDisplayList(type, compiledChunk), renderChunk);
+            }
+
+            buffer.setTranslation(0.0D, 0.0D, 0.0D);
+
+            return Futures.<Object>immediateFuture(null);
+        }
+        else
+        {
+            ListenableFutureTask<Object> futureTask = ListenableFutureTask.<Object>create(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    ChunkRenderDispatcherLitematica.this.uploadChunkOverlay(type, buffer, renderChunk, compiledChunk, distanceSq);
                 }
             }, null);
 

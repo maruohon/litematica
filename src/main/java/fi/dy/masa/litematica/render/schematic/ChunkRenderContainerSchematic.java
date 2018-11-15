@@ -2,11 +2,12 @@ package fi.dy.masa.litematica.render.schematic;
 
 import java.util.ArrayList;
 import java.util.List;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.renderer.ChunkRenderContainer;
 
 public abstract class ChunkRenderContainerSchematic extends ChunkRenderContainer
 {
-    protected List<RenderChunkSchematicVbo> overlayRenderChunks = new ArrayList<>(17424);
+    protected List<RenderChunkSchematicVbo> overlayRenderChunks = new ArrayList<>(128);
 
     @Override
     public void initialize(double viewEntityXIn, double viewEntityYIn, double viewEntityZIn)
@@ -21,5 +22,5 @@ public abstract class ChunkRenderContainerSchematic extends ChunkRenderContainer
         this.overlayRenderChunks.add(renderChunk);
     }
 
-    public abstract void renderBlockOverlays();
+    public abstract void renderBlockOverlays(OverlayType type);
 }

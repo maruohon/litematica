@@ -10,11 +10,12 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
-import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
@@ -131,8 +132,9 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 generator.getLock().unlock();
             }
 
-            final CompiledChunk compiledChunk = generator.getCompiledChunk();
+            final CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) generator.getCompiledChunk();
             ArrayList<ListenableFuture<Object>> futuresList = Lists.newArrayList();
+            RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
             RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) generator.getRenderChunk();
 
             if (generatorType == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK)
@@ -140,17 +142,36 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 //if (GuiScreen.isCtrlKeyDown()) System.out.printf("pre uploadChunk()\n");
                 for (BlockRenderLayer layer : BlockRenderLayer.values())
                 {
-                    if (compiledChunk.isLayerStarted(layer) || renderChunk.hasOverlay())
+                    if (compiledChunk.isLayerEmpty(layer) == false)
                     {
-                        BufferBuilder buffer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(layer);
-                        futuresList.add(this.chunkRenderDispatcher.uploadChunk(generator, layer, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
+                        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkBlocks()\n");
+                        BufferBuilder buffer = buffers.getWorldRendererByLayer(layer);
+                        futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(layer, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
+                    }
+                }
+
+                for (OverlayType type : OverlayType.values())
+                {
+                    if (compiledChunk.isOverlayTypeEmpty(type) == false)
+                    {
+                        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkOverlay()\n");
+                        BufferBuilder buffer = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(type);
+                        futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(type, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                     }
                 }
             }
             else if (generatorType == ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY)
             {
-                BufferBuilder buffer = generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
-                futuresList.add(this.chunkRenderDispatcher.uploadChunk(generator, BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
+                BufferBuilder buffer = buffers.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
+                futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
+
+                // FIXME this breaks the overlay for some reason...
+                if (compiledChunk.isOverlayTypeEmpty(OverlayType.QUAD) == false)
+                {
+                    //if (GuiScreen.isCtrlKeyDown()) System.out.printf("RESORT_TRANSPARENCY pre uploadChunkOverlay()\n");
+                    buffer = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.QUAD);
+                    futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(OverlayType.QUAD, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
+                }
             }
 
             final ListenableFuture<List<Object>> listenablefuture = Futures.allAsList(futuresList);

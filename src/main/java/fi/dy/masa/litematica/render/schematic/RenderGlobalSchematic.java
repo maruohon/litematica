@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.litematica.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
@@ -63,9 +64,9 @@ public class RenderGlobalSchematic extends RenderGlobal
     private final BlockModelRendererSchematic blockModelRenderer;
     private final BlockFluidRenderer fluidRenderer;
     private final Set<TileEntity> setTileEntities = new HashSet<>();
-    private WorldClient world;
+    private final List<RenderChunkSchematicVbo> renderInfos = new ArrayList<>(1024);
     private Set<RenderChunk> chunksToUpdate = new LinkedHashSet<>();
-    private List<RenderChunkSchematicVbo> renderInfos = new ArrayList<>(69696);
+    private WorldClient world;
     private ViewFrustum viewFrustum;
     private double frustumUpdatePosX = Double.MIN_VALUE;
     private double frustumUpdatePosY = Double.MIN_VALUE;
@@ -300,7 +301,12 @@ public class RenderGlobalSchematic extends RenderGlobal
         SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ);
         BlockPos viewPosSubChunk = new BlockPos(viewSubChunk.getX() << 4, viewSubChunk.getY() << 4, viewSubChunk.getZ() << 4);
 
-        this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false || viewEntity.posX != this.lastViewEntityX || viewEntity.posY != this.lastViewEntityY || viewEntity.posZ != this.lastViewEntityZ || viewEntity.rotationPitch != this.lastViewEntityPitch || viewEntity.rotationYaw != this.lastViewEntityYaw;
+        this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false ||
+                viewEntity.posX != this.lastViewEntityX ||
+                viewEntity.posY != this.lastViewEntityY ||
+                viewEntity.posZ != this.lastViewEntityZ ||
+                viewEntity.rotationPitch != this.lastViewEntityPitch ||
+                viewEntity.rotationYaw != this.lastViewEntityYaw;
         this.lastViewEntityX = viewEntity.posX;
         this.lastViewEntityY = viewEntity.posY;
         this.lastViewEntityZ = viewEntity.posZ;
@@ -312,11 +318,11 @@ public class RenderGlobalSchematic extends RenderGlobal
         if (this.displayListEntitiesDirty)
         {
             this.displayListEntitiesDirty = false;
-            this.renderInfos = new ArrayList<>(256);
-
-            Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
+            this.renderInfos.clear();
 
             Entity.setRenderDistanceWeight(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
+
+            Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
             //List<SubChunkPos> positions = new ArrayList<>(256);
             //positions.addAll(set);
 
@@ -332,19 +338,19 @@ public class RenderGlobalSchematic extends RenderGlobal
             {
                 SubChunkPos subChunk = queuePositions.poll();
                 //SubChunkPos subChunk = positions.get(i);
-                BlockPos pos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
 
-                if (Math.abs(subChunk.getX() - centerChunkX) < renderDistance &&
-                    Math.abs(subChunk.getZ() - centerChunkZ) < renderDistance)
+                if (Math.abs(subChunk.getX() - centerChunkX) <= renderDistance &&
+                    Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance)
                 {
-                    RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(pos);
+                    BlockPos subChunkCornerPos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
+                    RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(subChunkCornerPos);
 
                     if (renderChunk != null)
                     {
                         if (renderChunk.setFrameIndex(frameCount) && camera.isBoundingBoxInFrustum(renderChunk.boundingBox))
                         {
                             //if (GuiScreen.isCtrlKeyDown()) System.out.printf("add @ %s\n", subChunk);
-                            if (pos.equals(viewPosSubChunk) && renderChunk.needsUpdate())
+                            if (renderChunk.needsUpdate() && subChunkCornerPos.equals(viewPosSubChunk))
                             {
                                 renderChunk.setNeedsUpdate(true);
                             }
@@ -533,6 +539,12 @@ public class RenderGlobalSchematic extends RenderGlobal
 
     public void renderBlockOverlays()
     {
+        this.renderBlockOverlay(OverlayType.OUTLINE);
+        this.renderBlockOverlay(OverlayType.QUAD);
+    }
+
+    private void renderBlockOverlay(OverlayType type)
+    {
         this.mc.mcProfiler.startSection("litematica_overlay_filter_empty");
 
         for (int i = this.renderInfos.size() - 1; i >= 0; --i)
@@ -541,18 +553,23 @@ public class RenderGlobalSchematic extends RenderGlobal
 
             if (renderChunk.getCompiledChunk() != CompiledChunk.DUMMY && renderChunk.hasOverlay())
             {
-                this.renderContainer.addOverlayChunk(renderChunk);
+                CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) renderChunk.getCompiledChunk();
+
+                if (compiledChunk.isOverlayTypeEmpty(type) == false)
+                {
+                    this.renderContainer.addOverlayChunk(renderChunk);
+                }
             }
         }
 
         this.mc.mcProfiler.endStartSection("litematica_overlay_render");
 
-        this.renderBlockOverlayBuffers();
+        this.renderBlockOverlayBuffers(type);
 
         this.mc.mcProfiler.endSection();
     }
 
-    private void renderBlockOverlayBuffers()
+    private void renderBlockOverlayBuffers(OverlayType type)
     {
         this.mc.entityRenderer.enableLightmap();
 
@@ -562,7 +579,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
         }
 
-        this.renderContainer.renderBlockOverlays();
+        this.renderContainer.renderBlockOverlays(type);
 
         if (OpenGlHelper.useVbo())
         {

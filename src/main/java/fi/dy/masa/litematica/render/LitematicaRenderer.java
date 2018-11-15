@@ -120,10 +120,10 @@ public class LitematicaRenderer
         icamera.setPosition(x, y, z);
 
         boolean translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && OpenGlHelper.shadersSupported;
-        float alpha = (float) Configs.Visuals.GHOST_BLOCK_ALPHA.getDoubleValue();
 
         if (translucentSchematic)
         {
+            float alpha = (float) Configs.Visuals.GHOST_BLOCK_ALPHA.getDoubleValue();
             GL20.glUseProgram(SHADER_ALPHA.getProgram());
             GL20.glUniform1f(GL20.glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), alpha);
         }
