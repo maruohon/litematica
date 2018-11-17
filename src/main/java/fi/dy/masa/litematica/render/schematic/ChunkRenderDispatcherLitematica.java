@@ -333,12 +333,14 @@ public class ChunkRenderDispatcherLitematica
         }
     }
 
-    private void uploadDisplayList(BufferBuilder bufferBuilderIn, int list, RenderChunk chunkRenderer)
+    private void uploadDisplayList(BufferBuilder bufferBuilderIn, int list, RenderChunk renderChunk)
     {
         GlStateManager.glNewList(list, GL11.GL_COMPILE);
         GlStateManager.pushMatrix();
-        chunkRenderer.multModelviewMatrix();
+
+        //chunkRenderer.multModelviewMatrix();
         this.worldVertexUploader.draw(bufferBuilderIn);
+
         GlStateManager.popMatrix();
         GlStateManager.glEndList();
     }

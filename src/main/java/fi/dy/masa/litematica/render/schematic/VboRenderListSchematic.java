@@ -47,22 +47,26 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
     private void renderBlocks(VertexBuffer vertexBuffer, RenderChunk renderChunk)
     {
         GlStateManager.pushMatrix();
+
         this.preRenderChunk(renderChunk);
-        renderChunk.multModelviewMatrix();
+        //renderChunk.multModelviewMatrix();
         vertexBuffer.bindBuffer();
         this.setupArrayPointersBlocks();
         vertexBuffer.drawArrays(GL11.GL_QUADS);
+
         GlStateManager.popMatrix();
     }
 
     private void renderOverlay(VertexBuffer vertexBuffer, RenderChunk renderChunk, int glMode)
     {
         GlStateManager.pushMatrix();
+
         this.preRenderChunk(renderChunk);
-        renderChunk.multModelviewMatrix();
+        //renderChunk.multModelviewMatrix();
         vertexBuffer.bindBuffer();
         this.setupArrayPointersOverlay();
         vertexBuffer.drawArrays(glMode);
+
         GlStateManager.popMatrix();
     }
 

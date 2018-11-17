@@ -165,7 +165,6 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 BufferBuilder buffer = buffers.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
                 futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
 
-                // FIXME this breaks the overlay for some reason...
                 if (compiledChunk.isOverlayTypeEmpty(OverlayType.QUAD) == false)
                 {
                     //if (GuiScreen.isCtrlKeyDown()) System.out.printf("RESORT_TRANSPARENCY pre uploadChunkOverlay()\n");
