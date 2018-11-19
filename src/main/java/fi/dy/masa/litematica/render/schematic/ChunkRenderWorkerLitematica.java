@@ -10,12 +10,9 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.RegionRenderCacheBuilder;
-import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
@@ -25,7 +22,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
     private static final Logger LOGGER = LiteModLitematica.logger;
 
     private final ChunkRenderDispatcherLitematica chunkRenderDispatcher;
-    private final RegionRenderCacheBuilder regionRenderCacheBuilder;
+    private final BufferBuilderCache bufferCache;
     private boolean shouldRun;
 
     public ChunkRenderWorkerLitematica(ChunkRenderDispatcherLitematica chunkRenderDispatcherIn)
@@ -33,11 +30,11 @@ public class ChunkRenderWorkerLitematica implements Runnable
         this(chunkRenderDispatcherIn, null);
     }
 
-    public ChunkRenderWorkerLitematica(ChunkRenderDispatcherLitematica chunkRenderDispatcherIn, @Nullable RegionRenderCacheBuilder regionRenderCacheBuilderIn)
+    public ChunkRenderWorkerLitematica(ChunkRenderDispatcherLitematica chunkRenderDispatcherIn, @Nullable BufferBuilderCache bufferCache)
     {
         this.shouldRun = true;
         this.chunkRenderDispatcher = chunkRenderDispatcherIn;
-        this.regionRenderCacheBuilder = regionRenderCacheBuilderIn;
+        this.bufferCache = bufferCache;
     }
 
     @Override
@@ -63,13 +60,13 @@ public class ChunkRenderWorkerLitematica implements Runnable
         }
     }
 
-    protected void processTask(final ChunkCompileTaskGenerator generator) throws InterruptedException
+    protected void processTask(final ChunkCompileTaskGeneratorSchematic generator) throws InterruptedException
     {
         generator.getLock().lock();
 
         try
         {
-            if (generator.getStatus() != ChunkCompileTaskGenerator.Status.PENDING)
+            if (generator.getStatus() != ChunkCompileTaskGeneratorSchematic.Status.PENDING)
             {
                 if (generator.isFinished() == false)
                 {
@@ -79,7 +76,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 return;
             }
 
-            generator.setStatus(ChunkCompileTaskGenerator.Status.COMPILING);
+            generator.setStatus(ChunkCompileTaskGeneratorSchematic.Status.COMPILING);
         }
         finally
         {
@@ -96,16 +93,16 @@ public class ChunkRenderWorkerLitematica implements Runnable
         {
             generator.setRegionRenderCacheBuilder(this.getRegionRenderCacheBuilder());
 
-            ChunkCompileTaskGenerator.Type generatorType = generator.getType();
+            ChunkCompileTaskGeneratorSchematic.Type generatorType = generator.getType();
             float x = (float) entity.posX;
             float y = (float) entity.posY + entity.getEyeHeight();
             float z = (float) entity.posZ;
 
-            if (generatorType == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK)
+            if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK)
             {
                 generator.getRenderChunk().rebuildChunk(x, y, z, generator);
             }
-            else if (generatorType == ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY)
+            else if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.RESORT_TRANSPARENCY)
             {
                 generator.getRenderChunk().resortTransparency(x, y, z, generator);
             }
@@ -114,7 +111,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
             try
             {
-                if (generator.getStatus() != ChunkCompileTaskGenerator.Status.COMPILING)
+                if (generator.getStatus() != ChunkCompileTaskGeneratorSchematic.Status.COMPILING)
                 {
                     if (generator.isFinished() == false)
                     {
@@ -125,7 +122,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     return;
                 }
 
-                generator.setStatus(ChunkCompileTaskGenerator.Status.UPLOADING);
+                generator.setStatus(ChunkCompileTaskGeneratorSchematic.Status.UPLOADING);
             }
             finally
             {
@@ -134,10 +131,10 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
             final CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) generator.getCompiledChunk();
             ArrayList<ListenableFuture<Object>> futuresList = Lists.newArrayList();
-            RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
+            BufferBuilderCache buffers = generator.getBufferCache();
             RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) generator.getRenderChunk();
 
-            if (generatorType == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK)
+            if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK)
             {
                 //if (GuiScreen.isCtrlKeyDown()) System.out.printf("pre uploadChunk()\n");
                 for (BlockRenderLayer layer : BlockRenderLayer.values())
@@ -155,12 +152,12 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     if (compiledChunk.isOverlayTypeEmpty(type) == false)
                     {
                         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkOverlay()\n");
-                        BufferBuilder buffer = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(type);
+                        BufferBuilder buffer = buffers.getOverlayBuffer(type);
                         futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(type, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                     }
                 }
             }
-            else if (generatorType == ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY)
+            else if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.RESORT_TRANSPARENCY)
             {
                 BufferBuilder buffer = buffers.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
                 futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
@@ -168,7 +165,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 if (compiledChunk.isOverlayTypeEmpty(OverlayType.QUAD) == false)
                 {
                     //if (GuiScreen.isCtrlKeyDown()) System.out.printf("RESORT_TRANSPARENCY pre uploadChunkOverlay()\n");
-                    buffer = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.QUAD);
+                    buffer = buffers.getOverlayBuffer(OverlayType.QUAD);
                     futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(OverlayType.QUAD, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                 }
             }
@@ -197,9 +194,9 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     {
                         try
                         {
-                            if (generator.getStatus() == ChunkCompileTaskGenerator.Status.UPLOADING)
+                            if (generator.getStatus() == ChunkCompileTaskGeneratorSchematic.Status.UPLOADING)
                             {
-                                generator.setStatus(ChunkCompileTaskGenerator.Status.DONE);
+                                generator.setStatus(ChunkCompileTaskGeneratorSchematic.Status.DONE);
                                 break label49;
                             }
 
@@ -233,16 +230,16 @@ public class ChunkRenderWorkerLitematica implements Runnable
         }
     }
 
-    private RegionRenderCacheBuilder getRegionRenderCacheBuilder() throws InterruptedException
+    private BufferBuilderCache getRegionRenderCacheBuilder() throws InterruptedException
     {
-        return this.regionRenderCacheBuilder != null ? this.regionRenderCacheBuilder : this.chunkRenderDispatcher.allocateRenderBuilder();
+        return this.bufferCache != null ? this.bufferCache : this.chunkRenderDispatcher.allocateRenderBuilder();
     }
 
-    private void freeRenderBuilder(ChunkCompileTaskGenerator generator)
+    private void freeRenderBuilder(ChunkCompileTaskGeneratorSchematic generator)
     {
-        if (this.regionRenderCacheBuilder == null)
+        if (this.bufferCache == null)
         {
-            this.chunkRenderDispatcher.freeRenderBuilder(generator.getRegionRenderCacheBuilder());
+            this.chunkRenderDispatcher.freeRenderBuilder(generator.getBufferCache());
         }
     }
 

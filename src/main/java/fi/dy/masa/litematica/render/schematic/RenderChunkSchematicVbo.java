@@ -5,11 +5,11 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.interfaces.IRegionRenderCacheBuilder;
 import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
 import fi.dy.masa.litematica.mixin.IMixinRenderChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
@@ -21,10 +21,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -45,11 +43,12 @@ public class RenderChunkSchematicVbo extends RenderChunk
     public static int schematicRenderChunksUpdated;
 
     private final RenderGlobalSchematic renderGlobal;
-    private final VertexBuffer[] vertexBufferOverlay = new VertexBuffer[OverlayType.values().length];
+    private final VertexBufferSchematic[] vertexBufferOverlay = new VertexBufferSchematic[OverlayType.values().length];
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private final List<StructureBoundingBox> boxes = new ArrayList<>();
     private final EnumSet<OverlayType> existingOverlays = EnumSet.noneOf(OverlayType.class);
     private boolean hasOverlay = false;
+    private ChunkCompileTaskGeneratorSchematic compileTask;
 
     private ChunkCacheSchematic schematicWorldView;
     private ChunkCacheSchematic clientWorldView;
@@ -62,9 +61,22 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
         if (OpenGlHelper.useVbo())
         {
+            // Delete the vanilla buffers and re-create them using our overridden class
+            VertexBuffer[] buffers = ((IMixinRenderChunk) this).getVertexBuffers();
+
+            for (int i = 0; i < buffers.length; ++i)
+            {
+                if (buffers[i] != null)
+                {
+                    buffers[i].deleteGlBuffers();
+                }
+
+                buffers[i] = new VertexBufferSchematic(DefaultVertexFormats.BLOCK);
+            }
+
             for (int i = 0; i < OverlayType.values().length; ++i)
             {
-                this.vertexBufferOverlay[i] = new VertexBuffer(DefaultVertexFormats.POSITION_COLOR);
+                this.vertexBufferOverlay[i] = new VertexBufferSchematic(DefaultVertexFormats.POSITION_COLOR);
             }
         }
     }
@@ -79,7 +91,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         return this.existingOverlays;
     }
 
-    public VertexBuffer getOverlayVertexBuffer(OverlayType type)
+    public VertexBufferSchematic getOverlayVertexBuffer(OverlayType type)
     {
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("getOverlayVertexBuffer: type: %s, buf: %s\n", type, this.vertexBufferOverlay[type.ordinal()]);
         return this.vertexBufferOverlay[type.ordinal()];
@@ -99,11 +111,10 @@ public class RenderChunkSchematicVbo extends RenderChunk
         }
     }
 
-    @Override
-    public void resortTransparency(float x, float y, float z, ChunkCompileTaskGenerator generator)
+    public void resortTransparency(float x, float y, float z, ChunkCompileTaskGeneratorSchematic generator)
     {
         CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) generator.getCompiledChunk();
-        RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
+        BufferBuilderCache buffers = generator.getBufferCache();
         BufferBuilder.State bufferState = compiledChunk.getBlockBufferState(BlockRenderLayer.TRANSLUCENT);
 
         if (bufferState != null)
@@ -139,7 +150,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
             if (bufferState != null && compiledChunk.isOverlayTypeEmpty(type) == false)
             {
-                BufferBuilder buffer = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(type);
+                BufferBuilder buffer = buffers.getOverlayBuffer(type);
 
                 this.preRenderOverlay(buffer, type.getGlMode());
                 buffer.setVertexState(bufferState);
@@ -148,15 +159,14 @@ public class RenderChunkSchematicVbo extends RenderChunk
         }
     }
 
-    @Override
-    public void rebuildChunk(float x, float y, float z, ChunkCompileTaskGenerator generator)
+    public void rebuildChunk(float x, float y, float z, ChunkCompileTaskGeneratorSchematic generator)
     {
         CompiledChunkSchematic compiledChunk = new CompiledChunkSchematic();
         generator.getLock().lock();
 
         try
         {
-            if (generator.getStatus() != ChunkCompileTaskGenerator.Status.COMPILING)
+            if (generator.getStatus() != ChunkCompileTaskGeneratorSchematic.Status.COMPILING)
             {
                 return;
             }
@@ -197,9 +207,9 @@ public class RenderChunkSchematicVbo extends RenderChunk
             ++schematicRenderChunksUpdated;
 
             boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
-            RegionRenderCacheBuilder buffers = generator.getRegionRenderCacheBuilder();
-            BufferBuilder bufferOverlayOutlines = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.OUTLINE);
-            BufferBuilder bufferOverlayQuads    = ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(OverlayType.QUAD);
+            BufferBuilderCache buffers = generator.getBufferCache();
+            BufferBuilder bufferOverlayOutlines = buffers.getOverlayBuffer(OverlayType.OUTLINE);
+            BufferBuilder bufferOverlayQuads    = buffers.getOverlayBuffer(OverlayType.QUAD);
 
             for (StructureBoundingBox box : this.boxes)
             {
@@ -362,7 +372,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     if (compiledChunk.isOverlayTypeStarted(type))
                     {
                         compiledChunk.setOverlayTypeUsed(type);
-                        this.postRenderOverlay(type, x, y, z, ((IRegionRenderCacheBuilder) buffers).getOverlayBuffer(type), compiledChunk);
+                        this.postRenderOverlay(type, x, y, z, buffers.getOverlayBuffer(type), compiledChunk);
                     }
                 }
             }
@@ -451,26 +461,71 @@ public class RenderChunkSchematicVbo extends RenderChunk
         buffer.finishDrawing();
     }
 
-    @Override
-    public ChunkCompileTaskGenerator makeCompileTaskChunk()
+    public ChunkCompileTaskGeneratorSchematic makeCompileTaskChunkSchematic()
     {
         this.getLockCompileTask().lock();
-        ChunkCompileTaskGenerator chunkcompiletaskgenerator;
+        ChunkCompileTaskGeneratorSchematic generator = null;
 
         try
         {
             //if (GuiScreen.isCtrlKeyDown()) System.out.printf("makeCompileTaskChunk()\n");
             this.finishCompileTask();
-            ((IMixinRenderChunk) this).setCompileTask(new ChunkCompileTaskGenerator(this, ChunkCompileTaskGenerator.Type.REBUILD_CHUNK, this.getDistanceSq()));
+            this.compileTask = new ChunkCompileTaskGeneratorSchematic(this, ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK, this.getDistanceSq());
             this.rebuildWorldView();
-            chunkcompiletaskgenerator = ((IMixinRenderChunk) this).getCompileTask();
+            generator = this.compileTask;
         }
         finally
         {
             this.getLockCompileTask().unlock();
         }
 
-        return chunkcompiletaskgenerator;
+        return generator;
+    }
+
+    @Nullable
+    public ChunkCompileTaskGeneratorSchematic makeCompileTaskTransparencySchematic()
+    {
+        this.getLockCompileTask().lock();
+
+        try
+        {
+            if (this.compileTask == null || this.compileTask.getStatus() != ChunkCompileTaskGeneratorSchematic.Status.PENDING)
+            {
+                if (this.compileTask != null && this.compileTask.getStatus() != ChunkCompileTaskGeneratorSchematic.Status.DONE)
+                {
+                    this.compileTask.finish();
+                }
+
+                this.compileTask = new ChunkCompileTaskGeneratorSchematic(this, ChunkCompileTaskGeneratorSchematic.Type.RESORT_TRANSPARENCY, this.getDistanceSq());
+                this.compileTask.setCompiledChunk(this.compiledChunk);
+
+                return this.compileTask;
+            }
+        }
+        finally
+        {
+            this.getLockCompileTask().unlock();
+        }
+
+        return null;
+    }
+
+    protected void finishCompileTask()
+    {
+        this.getLockCompileTask().lock();
+
+        try
+        {
+            if (this.compileTask != null && this.compileTask.getStatus() != ChunkCompileTaskGeneratorSchematic.Status.DONE)
+            {
+                this.compileTask.finish();
+                this.compileTask = null;
+            }
+        }
+        finally
+        {
+            this.getLockCompileTask().unlock();
+        }
     }
 
     private void rebuildWorldView()

@@ -65,7 +65,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     private final BlockFluidRenderer fluidRenderer;
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private final List<RenderChunkSchematicVbo> renderInfos = new ArrayList<>(1024);
-    private Set<RenderChunk> chunksToUpdate = new LinkedHashSet<>();
+    private Set<RenderChunkSchematicVbo> chunksToUpdate = new LinkedHashSet<>();
     private WorldClient world;
     private ViewFrustum viewFrustum;
     private double frustumUpdatePosX = Double.MIN_VALUE;
@@ -365,10 +365,10 @@ public class RenderGlobalSchematic extends RenderGlobal
         }
 
         this.mc.mcProfiler.endStartSection("litematica_rebuild_near");
-        Set<RenderChunk> set = this.chunksToUpdate;
+        Set<RenderChunkSchematicVbo> set = this.chunksToUpdate;
         this.chunksToUpdate = new LinkedHashSet<>();
 
-        for (RenderChunk renderChunkTmp : this.renderInfos)
+        for (RenderChunkSchematicVbo renderChunkTmp : this.renderInfos)
         {
             if (renderChunkTmp.needsUpdate() || set.contains(renderChunkTmp))
             {
@@ -402,20 +402,20 @@ public class RenderGlobalSchematic extends RenderGlobal
 
         if (this.chunksToUpdate.isEmpty() == false)
         {
-            Iterator<RenderChunk> iterator = this.chunksToUpdate.iterator();
+            Iterator<RenderChunkSchematicVbo> iterator = this.chunksToUpdate.iterator();
 
             while (iterator.hasNext())
             {
-                RenderChunk renderchunk = iterator.next();
+                RenderChunkSchematicVbo renderChunk = iterator.next();
                 boolean flag;
 
-                if (renderchunk.needsImmediateUpdate())
+                if (renderChunk.needsImmediateUpdate())
                 {
-                    flag = this.renderDispatcher.updateChunkNow(renderchunk);
+                    flag = this.renderDispatcher.updateChunkNow(renderChunk);
                 }
                 else
                 {
-                    flag = this.renderDispatcher.updateChunkLater(renderchunk);
+                    flag = this.renderDispatcher.updateChunkLater(renderChunk);
                 }
 
                 if (!flag)
@@ -423,7 +423,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                     break;
                 }
 
-                renderchunk.clearNeedsUpdate();
+                renderChunk.clearNeedsUpdate();
                 iterator.remove();
                 long i = finishTimeNano - System.nanoTime();
 

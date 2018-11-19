@@ -21,10 +21,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RegionRenderCacheBuilder;
-import net.minecraft.client.renderer.VertexBufferUploader;
-import net.minecraft.client.renderer.WorldVertexBufferUploader;
-import net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
@@ -38,10 +34,10 @@ public class ChunkRenderDispatcherLitematica
 
     private final List<Thread> listWorkerThreads = Lists.<Thread>newArrayList();
     private final List<ChunkRenderWorkerLitematica> listThreadedWorkers = new ArrayList<>();
-    private final PriorityBlockingQueue<ChunkCompileTaskGenerator> queueChunkUpdates = Queues.newPriorityBlockingQueue();
-    private final BlockingQueue<RegionRenderCacheBuilder> queueFreeRenderBuilders;
-    private final WorldVertexBufferUploader worldVertexUploader = new WorldVertexBufferUploader();
-    private final VertexBufferUploader vertexUploader = new VertexBufferUploader();
+    private final PriorityBlockingQueue<ChunkCompileTaskGeneratorSchematic> queueChunkUpdates = Queues.newPriorityBlockingQueue();
+    private final BlockingQueue<BufferBuilderCache> queueFreeRenderBuilders;
+    private final DisplayListUploaderSchematic displayListUploader = new DisplayListUploaderSchematic();
+    private final VertexBufferUploaderSchematic vertexBufferUploader = new VertexBufferUploaderSchematic();
     private final Queue<ChunkRenderDispatcherLitematica.PendingUpload> queueChunkUploads = Queues.newPriorityQueue();
     private final ChunkRenderWorkerLitematica renderWorker;
     private final int countRenderBuilders;
@@ -68,10 +64,10 @@ public class ChunkRenderDispatcherLitematica
 
         for (int i = 0; i < this.countRenderBuilders; ++i)
         {
-            this.queueFreeRenderBuilders.add(new RegionRenderCacheBuilder());
+            this.queueFreeRenderBuilders.add(new BufferBuilderCache());
         }
 
-        this.renderWorker = new ChunkRenderWorkerLitematica(this, new RegionRenderCacheBuilder());
+        this.renderWorker = new ChunkRenderWorkerLitematica(this, new BufferBuilderCache());
     }
 
     public String getDebugInfo()
@@ -89,7 +85,7 @@ public class ChunkRenderDispatcherLitematica
 
             if (this.listWorkerThreads.isEmpty())
             {
-                ChunkCompileTaskGenerator generator = this.queueChunkUpdates.poll();
+                ChunkCompileTaskGeneratorSchematic generator = this.queueChunkUpdates.poll();
 
                 if (generator != null)
                 {
@@ -124,15 +120,15 @@ public class ChunkRenderDispatcherLitematica
         return ranTasks;
     }
 
-    public boolean updateChunkLater(RenderChunk chunkRenderer)
+    public boolean updateChunkLater(RenderChunkSchematicVbo renderChunk)
     {
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateChunkLater()\n");
-        chunkRenderer.getLockCompileTask().lock();
+        renderChunk.getLockCompileTask().lock();
         boolean flag1;
 
         try
         {
-            final ChunkCompileTaskGenerator generator = chunkRenderer.makeCompileTaskChunk();
+            final ChunkCompileTaskGeneratorSchematic generator = renderChunk.makeCompileTaskChunkSchematic();
 
             generator.addFinishRunnable(new Runnable()
             {
@@ -153,13 +149,13 @@ public class ChunkRenderDispatcherLitematica
         }
         finally
         {
-            chunkRenderer.getLockCompileTask().unlock();
+            renderChunk.getLockCompileTask().unlock();
         }
 
         return flag1;
     }
 
-    public boolean updateChunkNow(RenderChunk chunkRenderer)
+    public boolean updateChunkNow(RenderChunkSchematicVbo chunkRenderer)
     {
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateChunkNow()\n");
         chunkRenderer.getLockCompileTask().lock();
@@ -167,7 +163,7 @@ public class ChunkRenderDispatcherLitematica
 
         try
         {
-            ChunkCompileTaskGenerator generator = chunkRenderer.makeCompileTaskChunk();
+            ChunkCompileTaskGeneratorSchematic generator = chunkRenderer.makeCompileTaskChunkSchematic();
 
             try
             {
@@ -190,7 +186,7 @@ public class ChunkRenderDispatcherLitematica
     public void stopChunkUpdates()
     {
         this.clearChunkUpdates();
-        List<RegionRenderCacheBuilder> list = Lists.<RegionRenderCacheBuilder>newArrayList();
+        List<BufferBuilderCache> list = new ArrayList<>();
 
         while (list.size() != this.countRenderBuilders)
         {
@@ -208,22 +204,22 @@ public class ChunkRenderDispatcherLitematica
         this.queueFreeRenderBuilders.addAll(list);
     }
 
-    public void freeRenderBuilder(RegionRenderCacheBuilder builderCache)
+    public void freeRenderBuilder(BufferBuilderCache builderCache)
     {
         this.queueFreeRenderBuilders.add(builderCache);
     }
 
-    public RegionRenderCacheBuilder allocateRenderBuilder() throws InterruptedException
+    public BufferBuilderCache allocateRenderBuilder() throws InterruptedException
     {
         return this.queueFreeRenderBuilders.take();
     }
 
-    public ChunkCompileTaskGenerator getNextChunkUpdate() throws InterruptedException
+    public ChunkCompileTaskGeneratorSchematic getNextChunkUpdate() throws InterruptedException
     {
         return this.queueChunkUpdates.take();
     }
 
-    public boolean updateTransparencyLater(RenderChunk renderChunk)
+    public boolean updateTransparencyLater(RenderChunkSchematicVbo renderChunk)
     {
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateTransparencyLater()\n");
         renderChunk.getLockCompileTask().lock();
@@ -231,23 +227,23 @@ public class ChunkRenderDispatcherLitematica
 
         try
         {
-            final ChunkCompileTaskGenerator chunkcompiletaskgenerator = renderChunk.makeCompileTaskTransparency();
+            final ChunkCompileTaskGeneratorSchematic generator = renderChunk.makeCompileTaskTransparencySchematic();
 
-            if (chunkcompiletaskgenerator == null)
+            if (generator == null)
             {
                 flag = true;
                 return flag;
             }
 
-            chunkcompiletaskgenerator.addFinishRunnable(new Runnable()
+            generator.addFinishRunnable(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    ChunkRenderDispatcherLitematica.this.queueChunkUpdates.remove(chunkcompiletaskgenerator);
+                    ChunkRenderDispatcherLitematica.this.queueChunkUpdates.remove(generator);
                 }
             });
-            flag = this.queueChunkUpdates.offer(chunkcompiletaskgenerator);
+            flag = this.queueChunkUpdates.offer(generator);
         }
         finally
         {
@@ -339,7 +335,7 @@ public class ChunkRenderDispatcherLitematica
         GlStateManager.pushMatrix();
 
         //chunkRenderer.multModelviewMatrix();
-        this.worldVertexUploader.draw(bufferBuilderIn);
+        this.displayListUploader.draw(bufferBuilderIn);
 
         GlStateManager.popMatrix();
         GlStateManager.glEndList();
@@ -347,15 +343,15 @@ public class ChunkRenderDispatcherLitematica
 
     private void uploadVertexBuffer(BufferBuilder bufferBuilder, VertexBuffer vertexBufferIn)
     {
-        this.vertexUploader.setVertexBuffer(vertexBufferIn);
-        this.vertexUploader.draw(bufferBuilder);
+        this.vertexBufferUploader.setVertexBuffer(vertexBufferIn);
+        this.vertexBufferUploader.draw(bufferBuilder);
     }
 
     public void clearChunkUpdates()
     {
         while (this.queueChunkUpdates.isEmpty() == false)
         {
-            ChunkCompileTaskGenerator generator = this.queueChunkUpdates.poll();
+            ChunkCompileTaskGeneratorSchematic generator = this.queueChunkUpdates.poll();
 
             if (generator != null)
             {

@@ -14,7 +14,6 @@
         "MixinChunk",
         "MixinChunkProviderClient",
         "MixinMinecraft",
-        "MixinRegionRenderCacheBuilder",
         "MixinRenderGlobal",
         "MixinWorldClient"
     ],
