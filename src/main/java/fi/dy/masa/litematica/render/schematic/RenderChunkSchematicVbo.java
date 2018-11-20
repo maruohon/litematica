@@ -322,7 +322,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                             }
                             else
                             {
-                                RenderUtils.drawBlockBoundingBoxSidesBatched(posMutable, overlayColor, 0, bufferOverlayQuads);
+                                fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(posMutable, overlayColor, 0, bufferOverlayQuads);
                             }
                         }
 
@@ -344,7 +344,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                             }
                             else
                             {
-                                RenderUtils.drawBlockBoundingBoxOutlinesBatched(posMutable, overlayColor, 0, bufferOverlayOutlines);
+                                fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, overlayColor, 0, bufferOverlayOutlines);
                             }
                         }
                     }
