@@ -28,7 +28,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
@@ -377,7 +376,7 @@ public class LitematicaSchematic
 
         for (EntityInfo info : entityList)
         {
-            Entity entity = EntityList.createEntityFromNBT(info.nbt, world);
+            Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
 
             if (entity != null)
             {
@@ -391,7 +390,7 @@ public class LitematicaSchematic
                 double z = pos.z + offZ;
 
                 this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
-                world.spawnEntity(entity);
+                EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
             }
         }
     }
@@ -612,7 +611,7 @@ public class LitematicaSchematic
 
         for (EntityInfo info : entityList)
         {
-            Entity entity = EntityList.createEntityFromNBT(info.nbt, world);
+            Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
 
             if (entity != null)
             {
@@ -629,7 +628,7 @@ public class LitematicaSchematic
                 {
                     this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
                     //System.out.printf("post: %.1f - rot: %s, mm: %s, ms: %s\n", rotationYaw, rotationCombined, mirrorMain, mirrorSub);
-                    world.spawnEntity(entity);
+                    EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
                 }
             }
         }

@@ -22,7 +22,6 @@ import fi.dy.masa.malilib.util.NBTUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -318,15 +317,7 @@ public class SchematicaSchematic
             Vec3d relativePos = NBTUtils.readEntityPositionFromTag(tag);
             Vec3d transformedRelativePos = PositionUtils.getTransformedPosition(relativePos, mirror, rotation);
             Vec3d realPos = transformedRelativePos.addVector(posStart.getX(), posStart.getY(), posStart.getZ());
-            Entity entity = null;
-
-            try
-            {
-                entity = EntityList.createEntityFromNBT(tag, world);
-            }
-            catch (Exception e)
-            {
-            }
+            Entity entity = EntityUtils.createEntityAndPassengersFromNBT(tag, world);
 
             if (entity != null)
             {
@@ -335,7 +326,7 @@ public class SchematicaSchematic
                 float rotationYaw = entity.getMirroredYaw(mirror);
                 rotationYaw = rotationYaw + (entity.rotationYaw - entity.getRotatedYaw(rotation));
                 entity.setLocationAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.rotationPitch);
-                world.spawnEntity(entity);
+                EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
             }
         }
     }
