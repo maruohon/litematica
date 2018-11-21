@@ -134,9 +134,7 @@ public class WidgetSchematicPlacement extends WidgetBase
 
         if (placementSelected)
         {
-            GlStateManager.translate(0, 0, 1);
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
-            GlStateManager.translate(0, 0, -1);
         }
 
         String name = this.placement.getName();
