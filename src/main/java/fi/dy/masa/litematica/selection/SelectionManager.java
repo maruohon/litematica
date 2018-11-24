@@ -458,7 +458,11 @@ public class SelectionManager
             if (selection.isOriginSelected())
             {
                 BlockPos newOrigin = this.getTargetedPosition(mc.world, mc.player, maxDistance);
-                this.moveSelectionOrigin(selection, newOrigin, moveEntireSelection);
+
+                if (newOrigin != null)
+                {
+                    this.moveSelectionOrigin(selection, newOrigin, moveEntireSelection);
+                }
             }
             // Right click in Cuboid mode: Reset the area to the clicked position
             else if (isRightClick)
@@ -525,7 +529,7 @@ public class SelectionManager
     @Nullable
     private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance)
     {
-        return getTargetedPosition(world, player, maxDistance, true);
+        return this.getTargetedPosition(world, player, maxDistance, true);
     }
 
     @Nullable
