@@ -181,13 +181,13 @@ public class SelectionManager
 
         if (selectionId != null)
         {
-            return this.renameSubRegionBox(selectionId, newName);
+            return this.renameSelectedSubRegionBox(selectionId, newName);
         }
 
         return false;
     }
 
-    public boolean renameSubRegionBox(String selectionId, String newName)
+    public boolean renameSelectedSubRegionBox(String selectionId, String newName)
     {
         AreaSelection selection = this.getSelection(selectionId);
 

@@ -185,10 +185,11 @@ public class AreaSelection
 
     public boolean renameSubRegionBox(String oldName, String newName)
     {
-        Box box = this.subRegionBoxes.remove(oldName);
+        Box box = this.subRegionBoxes.get(oldName);
 
-        if (box != null)
+        if (box != null && this.subRegionBoxes.containsKey(newName) == false)
         {
+            this.subRegionBoxes.remove(oldName);
             box.setName(newName);
             this.subRegionBoxes.put(newName, box);
 
