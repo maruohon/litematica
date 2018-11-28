@@ -62,11 +62,11 @@ public class LitematicaRenderer
             int fpsLimit = this.mc.gameSettings.limitFramerate;
             int fpsMin = Math.min(Minecraft.getDebugFPS(), fpsLimit);
             fpsMin = Math.max(fpsMin, 60);
-            long finishTimeNano = Math.max((long)(1000000000 / fpsMin / 4), 0L);
+            long finishTimeNano = Math.max((long)(1000000000 / fpsMin / 8), 0L);
 
             GlStateManager.pushMatrix();
 
-            this.renderWorld(partialTicks, finishTimeNano);
+            this.renderWorld(partialTicks, System.nanoTime() + finishTimeNano);
 
             GlStateManager.popMatrix();
 
