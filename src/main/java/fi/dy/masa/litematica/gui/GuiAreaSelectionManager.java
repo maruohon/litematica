@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -17,6 +18,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -142,7 +144,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
+                this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
             }
             else if (this.type == ButtonType.NEW_SELECTION)
             {
@@ -200,7 +202,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         }
     }
 
-    public static class SelectedBoxRenamer implements IStringConsumer
+    public static class SelectedBoxRenamer implements IStringConsumerFeedback
     {
         private final SelectionManager selectionManager;
 
@@ -210,9 +212,9 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         }
 
         @Override
-        public void setString(String string)
+        public boolean setString(String string)
         {
-            this.selectionManager.renameSelectedSubRegionBox(string);
+            return this.selectionManager.renameSelectedSubRegionBox(string);
         }
     }
 

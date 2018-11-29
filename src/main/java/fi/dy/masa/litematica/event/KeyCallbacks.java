@@ -29,6 +29,7 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.IConfigValue;
 import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -306,7 +307,7 @@ public class KeyCallbacks
                         if (name != null)
                         {
                             String title = "litematica.gui.title.rename_area_sub_region";
-                            this.mc.displayGuiScreen(new GuiTextInput(128, title, name, null, new SelectedBoxRenamer(sm)));
+                            this.mc.displayGuiScreen(new GuiTextInputFeedback(128, title, name, null, new SelectedBoxRenamer(sm)));
                             return true;
                         }
                     }

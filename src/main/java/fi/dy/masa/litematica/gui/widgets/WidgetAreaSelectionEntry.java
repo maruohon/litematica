@@ -6,7 +6,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -169,7 +169,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 AreaSelection selection = this.selectionManager.getSelection(selectionId);
                 String name = selection != null ? selection.getName() : "<error>";
                 SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget);
-                this.widget.mc.displayGuiScreen(new GuiTextInput(160, title, name, this.widget.parent.getSelectionManagerGui(), renamer));
+                this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, name, this.widget.parent.getSelectionManagerGui(), renamer));
             }
             else if (this.type == ButtonType.REMOVE)
             {
@@ -208,7 +208,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         }
     }
 
-    private static class SelectionRenamer implements IStringConsumer
+    private static class SelectionRenamer implements IStringConsumerFeedback
     {
         private final WidgetAreaSelectionEntry widget;
         private final SelectionManager selectionManager;
@@ -220,10 +220,10 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         }
 
         @Override
-        public void setString(String string)
+        public boolean setString(String string)
         {
             String oldName = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
-            this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), oldName, string, this.widget.parent.getSelectionManagerGui());
+            return this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), oldName, string, this.widget.parent.getSelectionManagerGui());
         }
     }
 }

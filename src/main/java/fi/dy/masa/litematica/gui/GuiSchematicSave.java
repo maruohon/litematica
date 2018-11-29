@@ -8,7 +8,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -132,7 +132,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
+                this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
             }
         }
 

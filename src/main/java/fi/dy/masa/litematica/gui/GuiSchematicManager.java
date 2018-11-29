@@ -15,14 +15,14 @@ import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.config.IConfigOptionList;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
@@ -220,7 +220,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             {
                 LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
                 String oldName = schematic != null ? schematic.getMetadata().getName() : "";
-                this.gui.mc.displayGuiScreen(new GuiTextInput(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), this.gui)));
+                this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), this.gui)));
             }
             else if (this.type == Type.SET_PREVIEW)
             {
@@ -279,7 +279,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
     }
 
-    private static class SchematicRenamer implements IStringConsumer
+    private static class SchematicRenamer implements IStringConsumerFeedback
     {
         private final File dir;
         private final String fileName;
@@ -293,7 +293,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
 
         @Override
-        public void setString(String string)
+        public boolean setString(String string)
         {
             LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName, this.gui);
 
@@ -305,12 +305,15 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 if (schematic.writeToFile(this.dir, this.fileName, true, this.gui))
                 {
                     this.gui.getListWidget().clearSchematicMetadataCache();
+                    return true;
                 }
             }
             else
             {
                 this.gui.setString(I18n.format("litematica.error.schematic_rename.read_failed"));
             }
+
+            return false;
         }
     }
 

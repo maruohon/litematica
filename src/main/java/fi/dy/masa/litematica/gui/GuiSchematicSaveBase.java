@@ -16,7 +16,7 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
@@ -158,7 +158,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         return super.onKeyTyped(typedChar, keyCode);
     }
 
-    public static class DirectoryCreator implements IStringConsumer
+    public static class DirectoryCreator implements IStringConsumerFeedback
     {
         private final File dir;
         private final GuiBase parent;
@@ -172,12 +172,12 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         }
 
         @Override
-        public void setString(String string)
+        public boolean setString(String string)
         {
             if (string.isEmpty())
             {
                 this.parent.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", string);
-                return;
+                return false;
             }
 
             File file = new File(this.dir, string);
@@ -185,17 +185,19 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
             if (file.exists())
             {
                 this.parent.addMessage(MessageType.ERROR, "litematica.error.schematic_save.file_or_directory_already_exists", file.getAbsolutePath());
-                return;
+                return false;
             }
 
             if (file.mkdirs() == false)
             {
                 this.parent.addMessage(MessageType.ERROR, "litematica.error.schematic_save.failed_to_create_directory", file.getAbsolutePath());
-                return;
+                return false;
             }
 
             this.navigator.switchToDirectory(file);
             this.parent.addMessage(MessageType.SUCCESS, "litematica.message.directory_created", string);
+
+            return true;
         }
     }
 
