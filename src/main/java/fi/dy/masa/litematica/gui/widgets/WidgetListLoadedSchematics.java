@@ -37,7 +37,7 @@ public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchemat
     }
 
     @Override
-    protected WidgetSchematicEntry createListEntryWidget(int x, int y, boolean isOdd, LitematicaSchematic entry)
+    protected WidgetSchematicEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, LitematicaSchematic entry)
     {
         return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this, this.mc);
     }

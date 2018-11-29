@@ -6,7 +6,7 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.malilib.config.IConfigValue;
+import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -80,7 +80,7 @@ public class GuiConfigs extends GuiConfigsBase
     @Override
     public List<ConfigOptionWrapper> getConfigs()
     {
-        List<? extends IConfigValue> configs;
+        List<? extends IConfigBase> configs;
         ConfigGuiTab tab = DataManager.getConfigGuiTab();
 
         if (tab == ConfigGuiTab.GENERIC)

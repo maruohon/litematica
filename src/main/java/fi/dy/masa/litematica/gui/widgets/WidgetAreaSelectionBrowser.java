@@ -53,7 +53,7 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected WidgetAreaSelectionEntry createListEntryWidget(int x, int y, boolean isOdd, DirectoryEntry entry)
+    protected WidgetAreaSelectionEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, DirectoryEntry entry)
     {
         return new WidgetAreaSelectionEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd,
                 entry, this.guiAreaSelectionManager.getSelectionManager(), this.mc, this, this.iconProvider);

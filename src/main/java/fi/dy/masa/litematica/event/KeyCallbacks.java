@@ -27,7 +27,7 @@ import fi.dy.masa.litematica.util.LayerMode;
 import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.config.IConfigValue;
+import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
@@ -97,7 +97,7 @@ public class KeyCallbacks
     private static class ValueChangeCallback implements IValueChangeCallback
     {
         @Override
-        public void onValueChanged(IConfigValue config)
+        public void onValueChanged(IConfigBase config)
         {
             if (config == Configs.Generic.PICK_BLOCKABLE_SLOTS)
             {
