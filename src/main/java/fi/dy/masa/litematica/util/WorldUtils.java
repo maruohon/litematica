@@ -100,7 +100,7 @@ public class WorldUtils
         }
 
         WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
-        WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().mcProfiler);
+        WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().profiler);
 
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, schematic.getSize());
         PlacementSettings placementSettings = new PlacementSettings();
@@ -150,7 +150,7 @@ public class WorldUtils
             is.close();
 
             WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
-            WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().mcProfiler);
+            WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().profiler);
 
             loadChunksClientWorld(world, BlockPos.ORIGIN, template.getSize());
 

@@ -74,7 +74,7 @@ public class SchematicaSchematic
             NBTTagCompound entityData = this.entities.get(i);
             Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
 
-            if (posVec != null && entityData.hasNoTags() == false)
+            if (posVec != null && entityData.isEmpty() == false)
             {
                 entityList.add(new EntityInfo(posVec, entityData));
             }
@@ -225,7 +225,7 @@ public class SchematicaSchematic
                     final int zMinChunk = Math.max(cz << 4, posMin.getZ());
                     final int xMaxChunk = Math.min((cx << 4) + 15, posMax.getX());
                     final int zMaxChunk = Math.min((cz << 4) + 15, posMax.getZ());
-                    Chunk chunk = world.getChunkFromChunkCoords(cx, cz);
+                    Chunk chunk = world.getChunk(cx, cz);
 
                     for (int y = posMin.getY(), ySrc = 0; ySrc < height; ++y, ++ySrc)
                     {
@@ -316,7 +316,7 @@ public class SchematicaSchematic
         {
             Vec3d relativePos = NBTUtils.readEntityPositionFromTag(tag);
             Vec3d transformedRelativePos = PositionUtils.getTransformedPosition(relativePos, mirror, rotation);
-            Vec3d realPos = transformedRelativePos.addVector(posStart.getX(), posStart.getY(), posStart.getZ());
+            Vec3d realPos = transformedRelativePos.add(posStart.getX(), posStart.getY(), posStart.getZ());
             Entity entity = EntityUtils.createEntityAndPassengersFromNBT(tag, world);
 
             if (entity != null)

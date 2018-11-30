@@ -37,7 +37,7 @@ public class ChunkCacheSchematic implements IBlockAccess
         {
             for (int cz = this.chunkStartZ; cz <= chunkEndZ; ++cz)
             {
-                this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = worldIn.getChunkFromChunkCoords(cx, cz);
+                this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = worldIn.getChunk(cx, cz);
             }
         }
 

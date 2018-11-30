@@ -251,7 +251,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                                     this.addTileEntity(posMutable, compiledChunk, tileEntities);
                                 }
 
-                                BlockRenderLayer layer = translucent ? BlockRenderLayer.TRANSLUCENT : blockSchematic.getBlockLayer();
+                                BlockRenderLayer layer = translucent ? BlockRenderLayer.TRANSLUCENT : blockSchematic.getRenderLayer();
                                 int layerIndex = layer.ordinal();
 
                                 if (stateSchematic.getRenderType() != EnumBlockRenderType.INVISIBLE)

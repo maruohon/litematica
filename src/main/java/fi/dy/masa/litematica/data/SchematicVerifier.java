@@ -388,8 +388,8 @@ public class SchematicVerifier implements IStringListProvider
                 if (this.worldClient.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z) &&
                     this.worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
                 {
-                    Chunk chunkClient = this.worldClient.getChunkFromChunkCoords(pos.x, pos.z);
-                    Chunk chunkSchematic = this.worldSchematic.getChunkFromChunkCoords(pos.x, pos.z);
+                    Chunk chunkClient = this.worldClient.getChunk(pos.x, pos.z);
+                    Chunk chunkSchematic = this.worldSchematic.getChunk(pos.x, pos.z);
                     Map<String, StructureBoundingBox> boxes = this.schematicPlacement.getBoxesWithinChunk(pos.x, pos.z);
 
                     for (StructureBoundingBox box : boxes.values())

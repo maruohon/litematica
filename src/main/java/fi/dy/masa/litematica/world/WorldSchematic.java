@@ -43,7 +43,7 @@ public class WorldSchematic extends WorldClient
         }
         else
         {
-            return this.getChunkFromBlockCoords(pos).setBlockState(pos, newState) != null;
+            return this.getChunk(pos).setBlockState(pos, newState) != null;
         }
     }
 
@@ -56,16 +56,16 @@ public class WorldSchematic extends WorldClient
 
     private boolean spawnEntityBase(Entity entityIn)
     {
-        int i = MathHelper.floor(entityIn.posX / 16.0D);
-        int j = MathHelper.floor(entityIn.posZ / 16.0D);
-        boolean flag = entityIn.forceSpawn;
+        int cx = MathHelper.floor(entityIn.posX / 16.0D);
+        int cy = MathHelper.floor(entityIn.posZ / 16.0D);
+        boolean forceSpawn = entityIn.forceSpawn;
 
         if (entityIn instanceof EntityPlayer)
         {
-            flag = true;
+            forceSpawn = true;
         }
 
-        if (!flag && !this.isChunkLoaded(i, j, false))
+        if (forceSpawn == false && this.isChunkLoaded(cx, cy, false) == false)
         {
             return false;
         }
@@ -78,7 +78,7 @@ public class WorldSchematic extends WorldClient
                 this.updateAllPlayersSleepingFlag();
             }
 
-            this.getChunkFromChunkCoords(i, j).addEntity(entityIn);
+            this.getChunk(cx, cy).addEntity(entityIn);
             this.loadedEntityList.add(entityIn);
             this.onEntityAdded(entityIn);
             return true;

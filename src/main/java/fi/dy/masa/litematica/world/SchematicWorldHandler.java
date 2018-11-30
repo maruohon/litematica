@@ -30,7 +30,7 @@ public class SchematicWorldHandler
         else
         {
             // Note: The dimension used here must have no skylight, because the custom Chunks don't have those arrays
-            world = new WorldSchematic(null, SETTINGS, -1, EnumDifficulty.PEACEFUL, MC.mcProfiler);
+            world = new WorldSchematic(null, SETTINGS, -1, EnumDifficulty.PEACEFUL, MC.profiler);
             //this.world.addEventListener(LitematicaRenderer.getInstance().getRenderGlobal());
         }
 

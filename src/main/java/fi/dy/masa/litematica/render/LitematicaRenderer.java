@@ -57,8 +57,8 @@ public class LitematicaRenderer
     {
         if (this.mc.skipRenderWorld == false)
         {
-            this.mc.mcProfiler.startSection("litematica_schematic_world_render");
-            this.mc.mcProfiler.startSection("litematica_level");
+            this.mc.profiler.startSection("litematica_schematic_world_render");
+            this.mc.profiler.startSection("litematica_level");
             int fpsLimit = this.mc.gameSettings.limitFramerate;
             int fpsMin = Math.min(Minecraft.getDebugFPS(), fpsLimit);
             fpsMin = Math.max(fpsMin, 60);
@@ -70,8 +70,8 @@ public class LitematicaRenderer
 
             GlStateManager.popMatrix();
 
-            this.mc.mcProfiler.endSection();
-            this.mc.mcProfiler.endSection();
+            this.mc.profiler.endSection();
+            this.mc.profiler.endSection();
         }
     }
 
@@ -85,7 +85,7 @@ public class LitematicaRenderer
         GlStateManager.enableDepth();
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.5F);
-        this.mc.mcProfiler.startSection("litematica_center");
+        this.mc.profiler.startSection("litematica_center");
 
         if (this.mc.gameSettings.anaglyph)
         {
@@ -104,14 +104,14 @@ public class LitematicaRenderer
             this.renderWorldPass(2, partialTicks, finishTimeNano);
         }
 
-        this.mc.mcProfiler.endSection();
+        this.mc.profiler.endSection();
     }
 
     private void renderWorldPass(int pass, float partialTicks, long finishTimeNano)
     {
         RenderGlobalSchematic renderGlobal = this.getRenderGlobal();
 
-        this.mc.mcProfiler.endStartSection("litematica_culling");
+        this.mc.profiler.endStartSection("litematica_culling");
         ICamera icamera = new Frustum();
         Entity entity = this.mc.getRenderViewEntity();
         double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double) partialTicks;
@@ -130,20 +130,20 @@ public class LitematicaRenderer
 
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        this.mc.mcProfiler.endStartSection("litematica_prepare_terrain");
+        this.mc.profiler.endStartSection("litematica_prepare_terrain");
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         RenderHelper.disableStandardItemLighting();
 
-        this.mc.mcProfiler.endStartSection("litematica_terrain_setup");
+        this.mc.profiler.endStartSection("litematica_terrain_setup");
         renderGlobal.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
 
         if (pass == 0 || pass == 2)
         {
-            this.mc.mcProfiler.endStartSection("litematica_update_chunks");
+            this.mc.profiler.endStartSection("litematica_update_chunks");
             renderGlobal.updateChunks(finishTimeNano);
         }
 
-        this.mc.mcProfiler.endStartSection("litematica_terrain");
+        this.mc.profiler.endStartSection("litematica_terrain");
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.pushMatrix();
         GlStateManager.disableAlpha();
@@ -166,7 +166,7 @@ public class LitematicaRenderer
         GlStateManager.popMatrix();
 
         GlStateManager.pushMatrix();
-        this.mc.mcProfiler.endStartSection("litematica_entities");
+        this.mc.profiler.endStartSection("litematica_entities");
         RenderHelper.enableStandardItemLighting();
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
@@ -184,7 +184,7 @@ public class LitematicaRenderer
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        this.mc.mcProfiler.endStartSection("litematica_translucent");
+        this.mc.profiler.endStartSection("litematica_translucent");
         GlStateManager.depthMask(false);
 
         GlStateManager.pushMatrix();
@@ -204,7 +204,7 @@ public class LitematicaRenderer
         {
             GlStateManager.pushMatrix();
 
-            this.mc.mcProfiler.endStartSection("litematica_overlay");
+            this.mc.profiler.endStartSection("litematica_overlay");
             GlStateManager.disableTexture2D();
             GlStateManager.disableCull();
             GlStateManager.enablePolygonOffset();

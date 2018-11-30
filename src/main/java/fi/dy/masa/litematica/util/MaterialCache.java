@@ -44,7 +44,7 @@ public class MaterialCache
     {
         WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
 
-        this.tempWorld = new WorldSchematic(null, settings, -1, EnumDifficulty.PEACEFUL, Minecraft.getMinecraft().mcProfiler);
+        this.tempWorld = new WorldSchematic(null, settings, -1, EnumDifficulty.PEACEFUL, Minecraft.getMinecraft().profiler);
         this.checkPos = new BlockPos(8, 0, 8);
 
         WorldUtils.loadChunksClientWorld(this.tempWorld, this.checkPos, new Vec3i(1, 1, 1));
