@@ -95,9 +95,8 @@ litematica.gui.button.schematic_placements.configure=Configure
 litematica.gui.button.schematic_placements.remove=Remove
 litematica.gui.button.schematic_placements.select=Select
 litematica.gui.button.schematic_placements.disable=Disable
-litematica.gui.button.schematic_placements.enable=Enable
-litematica.gui.button.schematic_placements.render_enable=Enable rendering
-litematica.gui.button.schematic_placements.render_disable=Disable rendering
+litematica.gui.button.schematic_placements.placement_enabled=Placement: %s
+litematica.gui.button.schematic_placements.rendering_enabled=Rendering: %s
 
 litematica.gui.button.schematic_verifier.ignore=Ignore
 litematica.gui.button.schematic_verifier.range_type=Range: %s
@@ -192,6 +191,9 @@ litematica.gui.label.schematic_verifier_display_type.missing=Missing Blocks
 litematica.gui.label.schematic_verifier_display_type.wrong_blocks=Wrong Blocks
 litematica.gui.label.schematic_verifier_display_type.wrong_state=Wrong States
 litematica.gui.label.schematic_verifier.missing_chunks=Missing Chunks (%d)
+
+litematica.gui.label_colored.off=§cOFF§r
+litematica.gui.label_colored.on=§aON§r
 
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
