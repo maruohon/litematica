@@ -5,5 +5,5 @@ import net.minecraft.world.chunk.Chunk;
 
 public interface IMixinChunkProviderClient
 {
-    Long2ObjectMap<Chunk> getChunkMapping();
+    Long2ObjectMap<Chunk> getLoadedChunks();
 }

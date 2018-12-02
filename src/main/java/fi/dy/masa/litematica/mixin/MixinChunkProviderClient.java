@@ -18,12 +18,12 @@ public class MixinChunkProviderClient implements IMixinChunkProviderClient
 {
     @Shadow
     @Final
-    private Long2ObjectMap<Chunk> chunkMapping;
+    private Long2ObjectMap<Chunk> loadedChunks;
 
     @Override
-    public Long2ObjectMap<Chunk> getChunkMapping()
+    public Long2ObjectMap<Chunk> getLoadedChunks()
     {
-        return this.chunkMapping;
+        return this.loadedChunks;
     }
 
     @Inject(method = "unloadChunk", at = @At("RETURN"))

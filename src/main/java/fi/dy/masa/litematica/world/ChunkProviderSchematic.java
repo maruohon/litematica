@@ -22,7 +22,7 @@ public class ChunkProviderSchematic extends ChunkProviderClient
     {
         Chunk chunk = new ChunkSchematic(this.world, chunkX, chunkZ);
 
-        ((IMixinChunkProviderClient) (Object) this).getChunkMapping().put(ChunkPos.asLong(chunkX, chunkZ), chunk);
+        ((IMixinChunkProviderClient) (Object) this).getLoadedChunks().put(ChunkPos.asLong(chunkX, chunkZ), chunk);
         chunk.markLoaded(true);
 
         return chunk;
