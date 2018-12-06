@@ -1,27 +1,29 @@
 package fi.dy.masa.litematica.world;
 
+import java.util.Arrays;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.init.Biomes;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.EnumLightType;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.chunk.ChunkSection;
 
 public class ChunkSchematic extends Chunk
 {
     public ChunkSchematic(World worldIn, int x, int z)
     {
-        super(worldIn, x, z);
+        super(worldIn, x, z, new Biome[256]);
 
-        this.setLightPopulated(true);
+        Arrays.fill(this.getBiomes(), Biomes.PLAINS);
     }
 
     @Override
-    public IBlockState setBlockState(BlockPos pos, IBlockState state)
+    public IBlockState setBlockState(BlockPos pos, IBlockState state, boolean isMoving)
     {
         int x = pos.getX() & 15;
         int y = pos.getY();
@@ -37,27 +39,27 @@ public class ChunkSchematic extends Chunk
         {
             Block blockNew = state.getBlock();
             Block blockOld = stateOld.getBlock();
-            ExtendedBlockStorage storage = this.getBlockStorageArray()[y >> 4];
+            ChunkSection section = this.getSections()[y >> 4];
 
-            if (storage == NULL_BLOCK_STORAGE)
+            if (section == EMPTY_SECTION)
             {
-                if (blockNew == Blocks.AIR)
+                if (state.isAir())
                 {
                     return null;
                 }
 
-                storage = new ExtendedBlockStorage(y >> 4 << 4, false);
-                this.getBlockStorageArray()[y >> 4] = storage;
+                section = new ChunkSection(y >> 4 << 4, false);
+                this.getSections()[y >> 4] = section;
             }
 
-            storage.set(x, y & 15, z, state);
+            section.set(x, y & 15, z, state);
 
             if (blockOld != blockNew)
             {
                 this.getWorld().removeTileEntity(pos);
             }
 
-            if (storage.get(x, y & 0xF, z).getBlock() != blockNew)
+            if (section.get(x, y & 0xF, z).getBlock() != blockNew)
             {
                 return null;
             }
@@ -86,7 +88,7 @@ public class ChunkSchematic extends Chunk
 
                     if (te == null)
                     {
-                        te = ((ITileEntityProvider) blockNew).createNewTileEntity(this.getWorld(), blockNew.getMetaFromState(state));
+                        te = ((ITileEntityProvider) blockNew).createNewTileEntity(this.getWorld());
                         this.getWorld().setTileEntity(pos, te);
                     }
 
@@ -104,7 +106,7 @@ public class ChunkSchematic extends Chunk
     }
 
     @Override
-    public int getLightFor(EnumSkyBlock type, BlockPos pos)
+    public int getLightFor(EnumLightType type, BlockPos pos)
     {
         return 15;
     }
@@ -116,19 +118,13 @@ public class ChunkSchematic extends Chunk
     }
 
     @Override
-    public void setLightFor(EnumSkyBlock type, BlockPos pos, int value)
+    public void setLightFor(EnumLightType type, BlockPos pos, int value)
     {
         // NO-OP
     }
 
     @Override
-    public void onTick(boolean skipRecheckGaps)
-    {
-        super.onTick(true);
-    }
-
-    @Override
-    public void checkLight()
+    public void tick(boolean skipRecheckGaps)
     {
         // NO-OP
     }

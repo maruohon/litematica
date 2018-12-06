@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.world.World;
@@ -14,9 +14,9 @@ public class RenderChunkSchematicList extends RenderChunkSchematicVbo
     private final int baseDisplayList;
     private final int baseOverlay;
 
-    public RenderChunkSchematicList(World worldIn, RenderGlobal renderGlobalIn, int index)
+    public RenderChunkSchematicList(World worldIn, WorldRenderer worldRenderer)
     {
-        super(worldIn, renderGlobalIn, index);
+        super(worldIn, worldRenderer);
 
         this.baseDisplayList = GLAllocation.generateDisplayLists(LIST_SIZE);
         this.baseOverlay = this.baseDisplayList + BLOCK_LAYERS;

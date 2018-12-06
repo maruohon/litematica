@@ -1,19 +1,26 @@
 package fi.dy.masa.litematica.render.schematic;
 
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.EnumLightType;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.gen.Heightmap.Type;
 
-public class ChunkCacheSchematic implements IBlockAccess
+public class ChunkCacheSchematic implements IWorldReader
 {
     private static final IBlockState AIR = Blocks.AIR.getDefaultState();
 
@@ -90,7 +97,7 @@ public class ChunkCacheSchematic implements IBlockAccess
         int cx = (pos.getX() >> 4) - this.chunkStartX;
         int cz = (pos.getZ() >> 4) - this.chunkStartZ;
 
-        return this.chunkArray[cx][cz].getBiome(pos, this.world.getBiomeProvider());
+        return this.chunkArray[cx][cz].getBiome(pos);
     }
 
     @Override
@@ -111,7 +118,7 @@ public class ChunkCacheSchematic implements IBlockAccess
     @Override
     public boolean isAirBlock(BlockPos pos)
     {
-        return this.getBlockState(pos).getMaterial() == Material.AIR;
+        return this.getBlockState(pos).isAir();
     }
 
     @Override
@@ -135,8 +142,83 @@ public class ChunkCacheSchematic implements IBlockAccess
     }
 
     @Override
-    public WorldType getWorldType()
+    public int getLightFor(EnumLightType type, BlockPos pos)
     {
-        return this.world.getWorldType();
+        return 15;
+    }
+
+    @Override
+    public int getLightSubtracted(BlockPos pos, int amount)
+    {
+        return 15;
+    }
+
+    @Override
+    public boolean isChunkLoaded(int cx, int cz, boolean allowEmpty)
+    {
+        int x = cx - this.chunkStartX;
+        int z = cz - this.chunkStartZ;
+        return x >= 0 && x < this.chunkArray.length && z >= 0 && z < this.chunkArray[x].length;
+    }
+
+    @Override
+    public boolean canSeeSky(BlockPos pos)
+    {
+        return false;
+    }
+
+    @Override
+    public int getHeight(Type heightmapType, int x, int z)
+    {
+        return 0;
+    }
+
+    @Override
+    public EntityPlayer getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate)
+    {
+        return null;
+    }
+
+    @Override
+    public int getSkylightSubtracted()
+    {
+        return 0;
+    }
+
+    @Override
+    public WorldBorder getWorldBorder()
+    {
+        return this.world.getWorldBorder();
+    }
+
+    @Override
+    public boolean checkNoEntityCollision(Entity entityIn, VoxelShape shape)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isRemote()
+    {
+        return false;
+    }
+
+    @Override
+    public int getSeaLevel()
+    {
+        return 0;
+    }
+
+    @Override
+    public Dimension getDimension()
+    {
+        return this.world.getDimension();
+    }
+
+    @Override
+    public IFluidState getFluidState(BlockPos pos)
+    {
+        // TODO change when fluids become separate
+        return this.getBlockState(pos).getFluidState();
     }
 }

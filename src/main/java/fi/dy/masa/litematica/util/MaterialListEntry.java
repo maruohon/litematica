@@ -65,7 +65,7 @@ public class MaterialListEntry implements Comparable<MaterialListEntry>
             return this.countAvailable == other.countAvailable ? 0 : ((this.countAvailable > other.countAvailable) != reverse ? -1 : 1);
         }
 
-        int val = this.stack.getDisplayName().compareTo(other.stack.getDisplayName());
+        int val = this.stack.getDisplayName().getString().compareTo(other.stack.getDisplayName().getString());
         return reverse ? val * -1 : val;
     }
 

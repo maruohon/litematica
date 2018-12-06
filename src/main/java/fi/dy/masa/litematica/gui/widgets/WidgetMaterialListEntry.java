@@ -32,7 +32,7 @@ public class WidgetMaterialListEntry extends WidgetBase
     {
         super(x, y, width, height, zLevel);
 
-        this.mc = Minecraft.getMinecraft();
+        this.mc = Minecraft.getInstance();
         this.entry = entry;
         this.isOdd = isOdd;
 
@@ -43,8 +43,8 @@ public class WidgetMaterialListEntry extends WidgetBase
             this.header3 = null;
             this.header4 = null;
 
-            FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-            maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName()));
+            FontRenderer font = this.mc.fontRenderer;
+            maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName().getString()));
         }
         else
         {
@@ -105,7 +105,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             int countMissing = this.entry.getCountMissing();
             int countAvailable = this.entry.getCountAvailable();
             String pre = countAvailable >= countMissing ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-            mc.fontRenderer.drawString(this.entry.getStack().getDisplayName(), x1 + 20, y, color);
+            mc.fontRenderer.drawString(this.entry.getStack().getDisplayName().getString(), x1 + 20, y, color);
             mc.fontRenderer.drawString(String.valueOf(countTotal), x2, y, color);
             mc.fontRenderer.drawString(String.valueOf(countMissing), x3, y, color);
             mc.fontRenderer.drawString(pre + String.valueOf(countAvailable), x4, y, color);
@@ -117,7 +117,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             //mc.getRenderItem().zLevel -= 110;
             y = this.y + 3;
             Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.entry.getStack(), x1, y);
+            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.entry.getStack(), x1, y);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
             //mc.getRenderItem().zLevel += 110;
 
@@ -133,7 +133,7 @@ public class WidgetMaterialListEntry extends WidgetBase
         if (this.entry != null)
         {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0, 0, 200);
+            GlStateManager.translatef(0, 0, 200);
 
             Minecraft mc = this.mc;
             String header1 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.item");
@@ -141,7 +141,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             String header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.missing");
 
             ItemStack stack = this.entry.getStack();
-            String stackName = stack.getDisplayName();
+            String stackName = stack.getDisplayName().getString();
             int total = this.entry.getCountTotal();
             int missing = this.entry.getCountMissing();
             String strCountTotal = this.getFormattedCountString(total, stack.getMaxStackSize());
@@ -185,7 +185,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             RenderHelper.enableGUIStandardItemLighting();
 
             //mc.getRenderItem().zLevel += 100;
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, stack, x2, y1);
+            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, stack, x2, y1);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
             //GlStateManager.disableBlend();

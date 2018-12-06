@@ -94,7 +94,7 @@ public class GuiMainMenu extends GuiBase
                 gui.setParent(this.parent);
             }
 
-            Minecraft.getMinecraft().displayGuiScreen(gui);
+            Minecraft.getInstance().displayGuiScreen(gui);
         }
 
         @Override

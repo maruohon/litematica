@@ -1,12 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
@@ -26,6 +22,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ScreenShotHelper;
 
@@ -336,25 +333,18 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             {
                 try
                 {
-                    Minecraft mc = Minecraft.getMinecraft();
-                    BufferedImage screenshot = ScreenShotHelper.createScreenshot(mc.displayWidth, mc.displayHeight, mc.getFramebuffer());
+                    Minecraft mc = Minecraft.getInstance();
+                    NativeImage screenshot = ScreenShotHelper.createScreenshot(mc.mainWindow.getWidth(), mc.mainWindow.getHeight(), mc.getFramebuffer());
 
                     int x = screenshot.getWidth() >= screenshot.getHeight() ? (screenshot.getWidth() - screenshot.getHeight()) / 2 : 0;
                     int y = screenshot.getHeight() >= screenshot.getWidth() ? (screenshot.getHeight() - screenshot.getWidth()) / 2 : 0;
                     int longerSide = Math.min(screenshot.getWidth(), screenshot.getHeight());
                     //System.out.printf("w: %d, h: %d, x: %d, y: %d\n", screenshot.getWidth(), screenshot.getHeight(), x, y);
-
                     int previewDimensions = 140;
-                    double scaleFactor = (double) previewDimensions / longerSide;
-                    BufferedImage scaled = new BufferedImage(previewDimensions, previewDimensions, BufferedImage.TYPE_INT_ARGB);
-                    AffineTransform at = new AffineTransform();
-                    at.scale(scaleFactor, scaleFactor);
-                    AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
-
-                    Graphics2D graphics = scaled.createGraphics();
-                    graphics.drawImage(screenshot.getSubimage(x, y, longerSide, longerSide), scaleOp, 0, 0);
-
-                    int[] pixels = scaled.getRGB(0, 0, previewDimensions, previewDimensions, null, 0, scaled.getWidth());
+                    NativeImage scaled = new NativeImage(previewDimensions, previewDimensions, false);
+                    screenshot.resizeSubRectTo(x, y, longerSide, longerSide, scaled);
+                    @SuppressWarnings("deprecation")
+                    int[] pixels = scaled.makePixelArray();
 
                     schematic.getMetadata().setPreviewImagePixelData(pixels);
                     schematic.getMetadata().setTimeModified(System.currentTimeMillis());
@@ -365,7 +355,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 }
                 catch (Exception e)
                 {
-                    LiteModLitematica.logger.warn("Exception while creating preview image", e);
+                    Litematica.logger.warn("Exception while creating preview image", e);
                 }
             }
             else

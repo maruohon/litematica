@@ -5,7 +5,6 @@ import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -14,6 +13,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.IRegistry;
 
 public class BlockInfo
 {
@@ -34,11 +34,11 @@ public class BlockInfo
         this.state = state;
         this.stack = ItemUtils.getItemForState(this.state);
 
-        ResourceLocation rl = Block.REGISTRY.getNameForObject(this.state.getBlock());
+        ResourceLocation rl = IRegistry.BLOCK.getKey(this.state.getBlock());
         this.blockRegistryname = rl != null ? rl.toString() : "<null>";
 
-        Minecraft mc = Minecraft.getMinecraft();
-        this.stackName = this.stack.getDisplayName();
+        Minecraft mc = Minecraft.getInstance();
+        this.stackName = this.stack.getDisplayName().getString();
 
         int w = mc.fontRenderer.getStringWidth(this.stackName) + 20;
         w = Math.max(w, mc.fontRenderer.getStringWidth(this.blockRegistryname));
@@ -80,8 +80,8 @@ public class BlockInfo
 
             //mc.getRenderItem().zLevel += 100;
             Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stack, x1, y);
-            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stack, x1, y, null);
+            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.stack, x1, y);
+            mc.getItemRenderer().renderItemOverlayIntoGUI(mc.fontRenderer, this.stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
 
             //GlStateManager.disableBlend();

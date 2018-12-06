@@ -72,17 +72,17 @@ public class VboRenderListSchematic extends ChunkRenderContainerSchematic
 
     private void setupArrayPointersBlocks()
     {
-        GlStateManager.glVertexPointer(3, GL11.GL_FLOAT, 28, 0);
-        GlStateManager.glColorPointer(4, GL11.GL_UNSIGNED_BYTE, 28, 12);
-        GlStateManager.glTexCoordPointer(2, GL11.GL_FLOAT, 28, 16);
-        OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapTexUnit);
-        GlStateManager.glTexCoordPointer(2, GL11.GL_SHORT, 28, 24);
-        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+        GlStateManager.vertexPointer(3, GL11.GL_FLOAT, 28, 0);
+        GlStateManager.colorPointer(4, GL11.GL_UNSIGNED_BYTE, 28, 12);
+        GlStateManager.texCoordPointer(2, GL11.GL_FLOAT, 28, 16);
+        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE1);
+        GlStateManager.texCoordPointer(2, GL11.GL_SHORT, 28, 24);
+        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0);
     }
 
     private void setupArrayPointersOverlay()
     {
-        GlStateManager.glVertexPointer(3, GL11.GL_FLOAT, 16, 0);
-        GlStateManager.glColorPointer(4, GL11.GL_UNSIGNED_BYTE, 16, 12);
+        GlStateManager.vertexPointer(3, GL11.GL_FLOAT, 16, 0);
+        GlStateManager.colorPointer(4, GL11.GL_UNSIGNED_BYTE, 16, 12);
     }
 }

@@ -129,19 +129,19 @@ public class SchematicMetadata
     {
         NBTTagCompound nbt = new NBTTagCompound();
 
-        nbt.setString("Name", this.name);
-        nbt.setString("Author", this.author);
-        nbt.setString("Description", this.description);
-        nbt.setInteger("RegionCount", this.regionCount);
-        nbt.setInteger("TotalVolume", this.totalVolume);
-        nbt.setInteger("TotalBlocks", this.totalBlocks);
-        nbt.setLong("TimeCreated", this.timeCreated);
-        nbt.setLong("TimeModified", this.timeModified);
-        nbt.setTag("EnclosingSize", NBTUtils.createBlockPosTag(this.enclosingSize));
+        nbt.putString("Name", this.name);
+        nbt.putString("Author", this.author);
+        nbt.putString("Description", this.description);
+        nbt.putInt("RegionCount", this.regionCount);
+        nbt.putInt("TotalVolume", this.totalVolume);
+        nbt.putInt("TotalBlocks", this.totalBlocks);
+        nbt.putLong("TimeCreated", this.timeCreated);
+        nbt.putLong("TimeModified", this.timeModified);
+        nbt.put("EnclosingSize", NBTUtils.createBlockPosTag(this.enclosingSize));
 
         if (this.thumbnailPixelData != null)
         {
-            nbt.setIntArray("PreviewImageData", this.thumbnailPixelData);
+            nbt.putIntArray("PreviewImageData", this.thumbnailPixelData);
         }
 
         return nbt;
@@ -152,20 +152,20 @@ public class SchematicMetadata
         this.name = nbt.getString("Name");
         this.author = nbt.getString("Author");
         this.description = nbt.getString("Description");
-        this.regionCount = nbt.getInteger("RegionCount");
-        this.totalVolume = nbt.getInteger("TotalVolume");
-        this.totalBlocks = nbt.getInteger("TotalBlocks");
+        this.regionCount = nbt.getInt("RegionCount");
+        this.totalVolume = nbt.getInt("TotalVolume");
+        this.totalBlocks = nbt.getInt("TotalBlocks");
         this.timeCreated = nbt.getLong("TimeCreated");
         this.timeModified = nbt.getLong("TimeModified");
 
-        Vec3i size = NBTUtils.readBlockPos(nbt.getCompoundTag("EnclosingSize"));
+        Vec3i size = NBTUtils.readBlockPos(nbt.getCompound("EnclosingSize"));
 
         if (size != null)
         {
             this.enclosingSize = size;
         }
 
-        if (nbt.hasKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
+        if (nbt.contains("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
         {
             this.thumbnailPixelData = nbt.getIntArray("PreviewImageData");
         }

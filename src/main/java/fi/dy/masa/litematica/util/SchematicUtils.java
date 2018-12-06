@@ -24,7 +24,7 @@ public class SchematicUtils
 {
     public static List<MaterialListEntry> createMaterialListFor(SchematicPlacement placement)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         World worldClient = mc.world;
 

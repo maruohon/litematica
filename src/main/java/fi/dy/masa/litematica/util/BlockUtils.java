@@ -3,52 +3,44 @@ package fi.dy.masa.litematica.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import com.google.common.collect.UnmodifiableIterator;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.properties.PropertyInteger;
+import java.util.Map.Entry;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.IProperty;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.util.text.TextFormatting;
 
 public class BlockUtils
 {
-    private static final String AQUA = TextFormatting.AQUA.toString();
-    private static final String GOLD = TextFormatting.GOLD.toString();
-    private static final String GREEN = TextFormatting.GREEN.toString();
-    private static final String RED = TextFormatting.RED.toString();
-
-    public static List<String> getFormattedBlockStateProperties(IBlockState state)
+    @SuppressWarnings("unchecked")
+    public static <T extends Comparable<T>> List<String> getFormattedBlockStateProperties(IBlockState state)
     {
         if (state.getProperties().size() > 0)
         {
             List<String> lines = new ArrayList<>();
-            UnmodifiableIterator<Map.Entry<IProperty<?>, Comparable<?>>> iter = state.getProperties().entrySet().iterator();
 
-            while (iter.hasNext())
+            for (Entry <IProperty<?>, Comparable<?>> entry : state.getValues().entrySet())
             {
-                Map.Entry<IProperty<?>, Comparable<?>> entry = iter.next();
-                IProperty<?> key = entry.getKey();
-                Comparable<?> val = entry.getValue();
+                IProperty<T> property = (IProperty<T>) entry.getKey();
+                T value = (T) entry.getValue();
+                String valueName = property.getName(value);
 
-                if (key instanceof PropertyBool)
+                if (property instanceof DirectionProperty)
                 {
-                    String pre = val.equals(Boolean.TRUE) ? GREEN : RED;
-                    lines.add(key.getName() + " = " + pre + val.toString());
+                    valueName = TextFormatting.GOLD + valueName;
                 }
-                else if (key instanceof PropertyDirection)
+                else if (property instanceof BooleanProperty)
                 {
-                    lines.add(key.getName() + " = " + GOLD + val.toString());
+                    String pre = value.equals(Boolean.TRUE) ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+                    valueName = pre + valueName;
                 }
-                else if (key instanceof PropertyInteger)
+                else if (property instanceof IntegerProperty)
                 {
-                    lines.add(key.getName() + " = " + AQUA + val.toString());
+                    valueName = TextFormatting.AQUA + valueName;
                 }
-                else
-                {
-                    lines.add(key.getName() + " = " + val.toString());
-                }
+
+                lines.add(property.getName() + " = " + valueName);
             }
 
             return lines;

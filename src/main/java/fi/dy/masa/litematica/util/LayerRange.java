@@ -13,8 +13,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class LayerRange
 {
@@ -346,7 +346,7 @@ public class LayerRange
             }
             case LAYER_RANGE:
             {
-                EntityPlayer player = Minecraft.getMinecraft().player;
+                EntityPlayer player = Minecraft.getInstance().player;
 
                 if (player != null)
                 {
@@ -509,7 +509,7 @@ public class LayerRange
         }
     }
 
-    public boolean intersects(StructureBoundingBox box)
+    public boolean intersects(MutableBoundingBox box)
     {
         switch (this.axis)
         {
@@ -531,7 +531,7 @@ public class LayerRange
     }
 
     @Nullable
-    public StructureBoundingBox getClampedRenderBoundingBox(StructureBoundingBox box)
+    public MutableBoundingBox getClampedRenderBoundingBox(MutableBoundingBox box)
     {
         if (this.intersects(box) == false)
         {
@@ -544,19 +544,19 @@ public class LayerRange
             {
                 final int xMin = Math.max(box.minX, this.getLayerMin());
                 final int xMax = Math.min(box.maxX, this.getLayerMax());
-                return StructureBoundingBox.createProper(xMin, box.minY, box.minZ, xMax, box.maxY, box.maxZ);
+                return MutableBoundingBox.createProper(xMin, box.minY, box.minZ, xMax, box.maxY, box.maxZ);
             }
             case Y:
             {
                 final int yMin = Math.max(box.minY, this.getLayerMin());
                 final int yMax = Math.min(box.maxY, this.getLayerMax());
-                return StructureBoundingBox.createProper(box.minX, yMin, box.minZ, box.maxX, yMax, box.maxZ);
+                return MutableBoundingBox.createProper(box.minX, yMin, box.minZ, box.maxX, yMax, box.maxZ);
             }
             case Z:
             {
                 final int zMin = Math.max(box.minZ, this.getLayerMin());
                 final int zMax = Math.min(box.maxZ, this.getLayerMax());
-                return StructureBoundingBox.createProper(box.minX, box.minY, zMin, box.maxX, box.maxY, zMax);
+                return MutableBoundingBox.createProper(box.minX, box.minY, zMin, box.maxX, box.maxY, zMax);
             }
             default:
                 return null;

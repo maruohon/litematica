@@ -13,10 +13,10 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -54,8 +54,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         super.initGui();
 
         this.id = 0;
-        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-        int width = Math.min(300, sr.getScaledWidth() - 200);
+        MainWindow window = Minecraft.getInstance().mainWindow;
+        int width = Math.min(300, window.getScaledWidth() - 200);
         int x = 10;
         int y = 28;
 
@@ -116,7 +116,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
         // Move these buttons to the bottom (left) of the screen, if the height isn't enough for them
         // to fit below the other buttons
-        if (sr.getScaledHeight() < 324)
+        if (window.getScaledHeight() < 324)
         {
             x = 10;
             y = this.height - 32;
@@ -320,7 +320,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         @Override
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
             int amount = mouseButton == 1 ? -1 : 1;
             if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
             if (GuiScreen.isAltKeyDown()) { amount *= 4; }

@@ -2,8 +2,6 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import javax.annotation.Nullable;
-import org.lwjgl.input.Keyboard;
-import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -18,15 +16,16 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.KeyCodes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
-    protected final GuiTextField textField;
     @Nullable
     protected final LitematicaSchematic schematic;
+    protected GuiTextField textField;
     protected WidgetCheckBox checkboxIgnoreEntities;
     protected String defaultText = "";
 
@@ -36,7 +35,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         this.schematic = schematic;
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         this.textField = new GuiTextFieldGeneric(0, mc.fontRenderer, 10, 32, 90, 20);
         this.textField.setMaxStringLength(256);
         this.textField.setFocused(true);
@@ -47,7 +46,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         super.initGui();
 
-        ((IGuiTextField) this.textField).setInternalWidth(this.width - 273);
+        boolean focused = this.textField.isFocused();
+        this.textField = new GuiTextFieldGeneric(0, mc.fontRenderer, 10, 32, this.width - 273, 20);
+        this.textField.setMaxStringLength(256);
+        this.textField.setFocused(focused);
+
         DirectoryEntry entry = this.getListWidget().getSelectedEntry();
 
         if (entry != null && entry.getType() != DirectoryEntryType.DIRECTORY)
@@ -111,7 +114,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         super.drawContents(mouseX, mouseY, partialTicks);
 
-        this.textField.drawTextBox();
+        this.textField.drawTextField(mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -142,20 +145,20 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public boolean onKeyTyped(char typedChar, int keyCode)
+    public boolean onKeyTyped(int keyCode, int scanCode, int modifiers)
     {
-        if (this.textField.textboxKeyTyped(typedChar, keyCode))
+        if (this.textField.keyPressed(keyCode, scanCode, modifiers))
         {
             this.getListWidget().clearSelection();
             return true;
         }
-        else if (keyCode == Keyboard.KEY_TAB)
+        else if (keyCode == KeyCodes.KEY_TAB)
         {
             this.textField.setFocused(! this.textField.isFocused());
             return true;
         }
 
-        return super.onKeyTyped(typedChar, keyCode);
+        return super.onKeyTyped(keyCode, scanCode, modifiers);
     }
 
     public static class DirectoryCreator implements IStringConsumerFeedback

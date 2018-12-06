@@ -22,7 +22,7 @@ public class InfoHud
 
     protected InfoHud()
     {
-        this.mc = Minecraft.getMinecraft();
+        this.mc = Minecraft.getInstance();
     }
 
     public boolean isEnabled()

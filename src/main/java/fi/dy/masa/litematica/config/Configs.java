@@ -4,7 +4,6 @@ import java.io.File;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.AreaSelectionMode;
@@ -19,6 +18,7 @@ import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 
 public class Configs implements IConfigHandler
@@ -165,7 +165,7 @@ public class Configs implements IConfigHandler
 
     public static void loadFromFile()
     {
-        File configFile = new File(LiteLoader.getCommonConfigFolder(), CONFIG_FILE_NAME);
+        File configFile = new File(FileUtils.getConfigDirectory(), CONFIG_FILE_NAME);
 
         if (configFile.exists() && configFile.isFile() && configFile.canRead())
         {
@@ -189,9 +189,9 @@ public class Configs implements IConfigHandler
 
     public static void saveToFile()
     {
-        File dir = LiteLoader.getCommonConfigFolder();
+        File dir = FileUtils.getConfigDirectory();
 
-        if (dir.exists() && dir.isDirectory())
+        if ((dir.exists() && dir.isDirectory()) || dir.mkdirs())
         {
             JsonObject root = new JsonObject();
 
@@ -209,6 +209,12 @@ public class Configs implements IConfigHandler
     public void onConfigsChanged()
     {
         saveToFile();
+        loadFromFile();
+    }
+
+    @Override
+    public void load()
+    {
         loadFromFile();
     }
 

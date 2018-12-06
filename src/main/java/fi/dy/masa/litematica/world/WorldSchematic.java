@@ -12,16 +12,17 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.EnumLightType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.dimension.DimensionType;
 
 public class WorldSchematic extends WorldClient
 {
-    public WorldSchematic(NetHandlerPlayClient netHandler, WorldSettings settings, int dimension,
+    public WorldSchematic(NetHandlerPlayClient netHandler, WorldSettings settings, DimensionType dimType,
             EnumDifficulty difficulty, Profiler profilerIn)
     {
-        super(netHandler, settings, dimension, difficulty, profilerIn);
+        super(netHandler, settings, dimType, difficulty, profilerIn);
     }
 
     @Override
@@ -35,6 +36,12 @@ public class WorldSchematic extends WorldClient
     }
 
     @Override
+    public ChunkProviderSchematic getChunkProvider()
+    {
+        return (ChunkProviderSchematic) super.getChunkProvider();
+    }
+
+    @Override
     public boolean setBlockState(BlockPos pos, IBlockState newState, int flags)
     {
         if (pos.getY() < 0 || pos.getY() >= 256)
@@ -43,7 +50,7 @@ public class WorldSchematic extends WorldClient
         }
         else
         {
-            return this.getChunk(pos).setBlockState(pos, newState) != null;
+            return this.getChunk(pos).setBlockState(pos, newState, false) != null;
         }
     }
 
@@ -92,31 +99,13 @@ public class WorldSchematic extends WorldClient
     }
 
     @Override
-    public int getLight(BlockPos pos, boolean checkNeighbors)
+    public int getLightFor(EnumLightType type, BlockPos pos)
     {
         return 15;
     }
 
     @Override
-    public float getLightBrightness(BlockPos pos)
-    {
-        return 1f;
-    }
-
-    @Override
-    public int getLightFor(EnumSkyBlock type, BlockPos pos)
-    {
-        return 15;
-    }
-
-    @Override
-    public int getLightFromNeighbors(BlockPos pos)
-    {
-        return 15;
-    }
-
-    @Override
-    public int getLightFromNeighborsFor(EnumSkyBlock type, BlockPos pos)
+    public int getLightFromNeighborsFor(EnumLightType type, BlockPos pos)
     {
         return 15;
     }
@@ -128,7 +117,7 @@ public class WorldSchematic extends WorldClient
     }
 
     @Override
-    public boolean checkLightFor(EnumSkyBlock lightType, BlockPos pos)
+    public boolean checkLightFor(EnumLightType lightType, BlockPos pos)
     {
         return false;
     }

@@ -1,18 +1,19 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
+import java.util.Random;
 import org.lwjgl.opengl.GL11;
 import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
@@ -26,13 +27,15 @@ import net.minecraft.world.World;
 
 public class RenderUtils
 {
+    private static final Random RAND = new Random();
+
     public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth,
             Color4f color, Entity renderViewEntity, float partialTicks)
     {
-        GlStateManager.glLineWidth(lineWidth);
+        GlStateManager.lineWidth(lineWidth);
 
         AxisAlignedBB aabb = createAABB(pos.getX(), pos.getY(), pos.getZ(), expand, partialTicks, renderViewEntity);
-        RenderGlobal.drawSelectionBoundingBox(aabb, color.r, color.g, color.b, color.a);
+        WorldRenderer.drawSelectionBoundingBox(aabb, color.r, color.g, color.b, color.a);
     }
 
     public static void renderBlockOutlineBatched(BlockPos pos, double expand,
@@ -42,7 +45,7 @@ public class RenderUtils
         double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
         double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
 
-        RenderGlobal.drawBoundingBox(buffer,
+        WorldRenderer.drawBoundingBox(buffer,
                 pos.getX() - dx - expand,
                 pos.getY() - dy - expand,
                 pos.getZ() - dz - expand,
@@ -54,7 +57,7 @@ public class RenderUtils
 
     public static void renderBlockOverlay(BlockPos pos, double expand, Color4f color, BufferBuilder buffer)
     {
-        RenderGlobal.drawBoundingBox(buffer,
+        WorldRenderer.drawBoundingBox(buffer,
                 pos.getX() - expand,
                 pos.getY() - expand,
                 pos.getZ() - expand,
@@ -78,7 +81,7 @@ public class RenderUtils
         final double maxY = pos.getY() - dy + expand + 1;
         final double maxZ = pos.getZ() - dz + expand + 1;
 
-        GlStateManager.glLineWidth(lineWidth);
+        GlStateManager.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -129,7 +132,7 @@ public class RenderUtils
     public static void renderAreaOutline(BlockPos pos1, BlockPos pos2, float lineWidth,
             Color4f colorX, Color4f colorY, Color4f colorZ, Entity renderViewEntity, float partialTicks)
     {
-        GlStateManager.glLineWidth(lineWidth);
+        GlStateManager.lineWidth(lineWidth);
 
         AxisAlignedBB aabb = createEnclosingAABB(pos1, pos2, renderViewEntity, partialTicks);
         drawBoundingBoxEdges(aabb, colorX, colorY, colorZ);
@@ -265,7 +268,7 @@ public class RenderUtils
 
         int start, end;
 
-        GlStateManager.glLineWidth(lineWidth);
+        GlStateManager.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -392,10 +395,10 @@ public class RenderUtils
     {
         for (final EnumFacing side : EnumFacing.values())
         {
-            renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, 0));
+            renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, RAND));
         }
 
-        renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, null, 0));
+        renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, null, RAND));
     }
 
     private static void renderModelQuadOutlines(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
@@ -441,10 +444,10 @@ public class RenderUtils
     {
         for (final EnumFacing side : EnumFacing.values())
         {
-            renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, 0));
+            renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, RAND));
         }
 
-        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, 0));
+        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, RAND));
     }
 
     private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
@@ -486,7 +489,7 @@ public class RenderUtils
 
             if (state.getBlock() instanceof BlockChest)
             {
-                ILockableContainer cont = ((BlockChest) state.getBlock()).getLockableContainer(world, pos);
+                ILockableContainer cont = ((BlockChest) state.getBlock()).getContainer(state, world, pos, true);
 
                 if (cont instanceof InventoryLargeChest)
                 {
@@ -497,9 +500,9 @@ public class RenderUtils
 
         if (inv != null)
         {
-            ScaledResolution res = new ScaledResolution(mc);
-            final int xCenter = res.getScaledWidth() / 2;
-            final int yCenter = res.getScaledHeight() / 2;
+            MainWindow window = mc.mainWindow;
+            final int xCenter = window.getScaledWidth() / 2;
+            final int yCenter = window.getScaledHeight() / 2;
 
             final int totalSlots = inv.getSizeInventory();
             final fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
@@ -514,7 +517,7 @@ public class RenderUtils
                 yInv -= (rows - 6) * 18;
             }
 
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color4f(1f, 1f, 1f, 1f);
 
             fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
             fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);

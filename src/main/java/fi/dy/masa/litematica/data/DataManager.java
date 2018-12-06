@@ -9,8 +9,7 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mumfrey.liteloader.core.LiteLoader;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
@@ -29,12 +28,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.IRegistry;
 
 public class DataManager implements IDirectoryCache
 {
     private static final DataManager INSTANCE = new DataManager();
 
-    private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)(@(?<meta>[0-9]+))$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
 
@@ -330,16 +329,16 @@ public class DataManager implements IDirectoryCache
 
     public static File getCurrentConfigDirectory()
     {
-        return new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+        return new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
     }
 
     public static File getSchematicsBaseDirectory()
     {
-        File dir = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getMinecraft().gameDir, "schematics"));
+        File dir = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getInstance().gameDir, "schematics"));
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            LiteModLitematica.logger.warn("Failed to create the schematic directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the schematic directory '{}'", dir.getAbsolutePath());
         }
 
         return dir;
@@ -351,7 +350,7 @@ public class DataManager implements IDirectoryCache
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            LiteModLitematica.logger.warn("Failed to create the area selections base directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the area selections base directory '{}'", dir.getAbsolutePath());
         }
 
         return dir;
@@ -363,7 +362,7 @@ public class DataManager implements IDirectoryCache
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            LiteModLitematica.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
         }
 
         return new File(dir, getStorageFileName(globalData));
@@ -371,12 +370,12 @@ public class DataManager implements IDirectoryCache
 
     private static String getStorageFileName(boolean globalData)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         if (mc.world != null)
         {
             // TODO How to fix this for Forge custom dimensions compatibility (if the type ID is not unique)?
-            final int dimension = mc.world.provider.getDimensionType().getId();
+            final int dimension = mc.world.dimension.getType().getId();
 
             if (mc.isSingleplayer())
             {
@@ -407,24 +406,11 @@ public class DataManager implements IDirectoryCache
     {
         try
         {
-            Matcher matcher = PATTERN_ITEM_META.matcher(itemName);
+            Matcher matcher = PATTERN_ITEM_BASE.matcher(itemName);
 
             if (matcher.matches())
             {
-                Item item = Item.REGISTRY.getObject(new ResourceLocation(matcher.group("name")));
-
-                if (item != null && item != Items.AIR)
-                {
-                    toolItem = new ItemStack(item, 1, Integer.parseInt(matcher.group("meta")));
-                    return;
-                }
-            }
-
-            matcher = PATTERN_ITEM_BASE.matcher(itemName);
-
-            if (matcher.matches())
-            {
-                Item item = Item.REGISTRY.getObject(new ResourceLocation(matcher.group("name")));
+                Item item = IRegistry.ITEM.get(new ResourceLocation(matcher.group("name")));
 
                 if (item != null && item != Items.AIR)
                 {
@@ -439,6 +425,6 @@ public class DataManager implements IDirectoryCache
 
         // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
-        Configs.Generic.TOOL_ITEM.setValueFromString(Item.REGISTRY.getNameForObject(Items.STICK).toString());
+        Configs.Generic.TOOL_ITEM.setValueFromString(IRegistry.ITEM.getKey(Items.STICK).toString());
     }
 }

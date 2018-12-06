@@ -2,30 +2,30 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = 'sponge'
-            url = 'http://repo.spongepowered.org/maven'
-        }
+        maven { url 'http://files.minecraftforge.net/maven' }
+        maven { url 'http://repo.spongepowered.org/maven' }
+        maven { url 'https://www.jitpack.io' }
     }
 
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath 'com.github.Chocohead:ForgeGradle:moderniser-SNAPSHOT'
         classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
 
-repositories {
-    maven {
-        url 'https://masa.dy.fi/maven'
-    }
-}
-
-apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'net.minecraftforge.gradle.tweaker-client'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url 'https://www.jitpack.io' }
+    maven { url 'http://repo.strezz.org/artifactory/list/Strezz-Central' }
+}
 
 ext.configFile = file "build.properties"
 
@@ -40,6 +40,7 @@ minecraft {
     mappings = config.mappings_version
     runDir = 'minecraft'
     makeObfSourceJar = false
+    tweakClass = 'org.dimdev.riftloader.launch.RiftLoaderClientTweaker'
 
     ext.mod_version = config.mod_version
 
@@ -52,22 +53,26 @@ minecraft {
 }
 
 dependencies {
+    implementation 'com.github.Chocohead:Rift:jitpack-SNAPSHOT:dev'
     deobfCompile "fi.dy.masa.malilib:malilib-" + config.minecraft_version_out + ":" + config.malilib_version + ":deobf"
 }
 
+/*
 sourceSets {
     main {
         ext.refMap = 'mixins.' + config.mod_id + '.refmap.json'
     }
 }
+*/
 
-group = config.group + "." + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = config.group + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = config.mod_id + '-' + config.minecraft_version_out
 version = project.minecraft.mod_version
 
 /**
  * This section allows you to customise the generated litemod.json file
  */
+ /*
 litemod {
     json {
         name = config.mod_id
@@ -83,6 +88,7 @@ litemod {
         mixinConfigs = [ 'mixins.' + config.mod_id + '.json' ]
     }
 }
+*/
 
 /**
  * This section allows you to customise your generated jar (litemod) file. By
@@ -91,11 +97,11 @@ litemod {
  */
 jar {
     // Remove the "-mc1.12" suffix from the file name
-    classifier = ""
+    //classifier = ""
     // Don't append a 'mod-' filename prefix >_>
     baseName = archivesBaseName
 
-    from litemod.outputs
+    //from litemod.outputs
 
     /*
     manifest.mainAttributes (
@@ -109,6 +115,7 @@ jar {
 
 mixin {
     defaultObfuscationEnv notch
+    add sourceSets.main, 'mixins.' + config.mod_id + '.refmap.json'
 }
 
 //tasks.withType(Jar)*.baseName = archivesBaseName

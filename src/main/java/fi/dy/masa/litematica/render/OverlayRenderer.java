@@ -29,12 +29,9 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -42,9 +39,12 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
@@ -95,7 +95,7 @@ public class OverlayRenderer
 
     private OverlayRenderer()
     {
-        this.mc = Minecraft.getMinecraft();
+        this.mc = Minecraft.getInstance();
     }
 
     public static OverlayRenderer getInstance()
@@ -139,7 +139,7 @@ public class OverlayRenderer
         if (currentSelection != null)
         {
             GlStateManager.enablePolygonOffset();
-            GlStateManager.doPolygonOffset(-1.2f, -0.2f);
+            GlStateManager.polygonOffset(-1.2f, -0.2f);
             GlStateManager.depthMask(false);
 
             Box currentBox = currentSelection.getSelectedSubRegionBox();
@@ -154,7 +154,7 @@ public class OverlayRenderer
             RenderUtils.renderBlockOutline(currentSelection.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
 
             GlStateManager.depthMask(true);
-            GlStateManager.doPolygonOffset(0f, 0f);
+            GlStateManager.polygonOffset(0f, 0f);
             GlStateManager.disablePolygonOffset();
         }
 
@@ -325,7 +325,7 @@ public class OverlayRenderer
             {
                 List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
                 RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 10);
-                BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
+                BlockPos posLook = trace != null && trace.type == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
                 this.renderSchematicMismatches(verifier.getSelectedMismatchTypeForRender(), posList, posLook, partialTicks);
             }
         }
@@ -333,7 +333,7 @@ public class OverlayRenderer
 
     private void renderSchematicMismatches(MismatchType type, List<BlockPos> posList, @Nullable BlockPos lookPos, float partialTicks)
     {
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
         GlStateManager.depthMask(false);
         GlStateManager.disableLighting();
         GlStateManager.disableTexture2D();
@@ -341,7 +341,7 @@ public class OverlayRenderer
 
         if (posList.isEmpty() == false)
         {
-            GlStateManager.glLineWidth(2f);
+            GlStateManager.lineWidth(2f);
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
@@ -360,7 +360,7 @@ public class OverlayRenderer
                 tessellator.draw();
                 buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
 
-                GlStateManager.glLineWidth(6f);
+                GlStateManager.lineWidth(6f);
                 RenderUtils.renderBlockOutlineBatched(lookPos, 0.002, type.getColor(), this.mc.player, buffer, partialTicks);
             }
 
@@ -393,7 +393,7 @@ public class OverlayRenderer
         GlStateManager.enableCull();
         GlStateManager.enableLighting();
         GlStateManager.depthMask(true);
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
     }
 
     public void renderHoverInfo(Minecraft mc)
@@ -467,15 +467,15 @@ public class OverlayRenderer
             List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
             RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 10);
 
-            if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
+            if (trace != null && trace.type == RayTraceResult.Type.BLOCK)
             {
                 BlockMismatch mismatch = verifier.getMismatchForPosition(trace.getBlockPos());
 
                 if (mismatch != null)
                 {
                     BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                    ScaledResolution sr = new ScaledResolution(mc);
-                    info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                    MainWindow window = mc.mainWindow;
+                    info.render(window.getScaledWidth() / 2 - info.getTotalWidth() / 2, window.getScaledHeight() / 2 + 10, mc);
                     return;
                 }
             }
@@ -484,16 +484,14 @@ public class OverlayRenderer
 
     private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, Minecraft mc)
     {
-        ScaledResolution sr = new ScaledResolution(mc);
+        MainWindow window = mc.mainWindow;
 
         BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
         IBlockState stateClient = mc.world.getBlockState(pos);
-        stateClient = stateClient.getActualState(mc.world, pos);
         World worldClient = WorldUtils.getBestWorld(mc);
 
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-        stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
         IBlockState air = Blocks.AIR.getDefaultState();
 
         ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
@@ -503,7 +501,7 @@ public class OverlayRenderer
         if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
         {
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
-            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+            info.render(window.getScaledWidth() / 2 - info.getTotalWidth() / 2, window.getScaledHeight() / 2 + 10, mc);
 
             RenderUtils.renderInventoryOverlay(-1, worldSchematic, pos, mc);
             RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
@@ -511,7 +509,7 @@ public class OverlayRenderer
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+            info.render(window.getScaledWidth() / 2 - info.getTotalWidth() / 2, window.getScaledHeight() / 2 + 10, mc);
             RenderUtils.renderInventoryOverlay(0, worldClient, pos, mc);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
@@ -522,14 +520,14 @@ public class OverlayRenderer
             if (te instanceof IInventory)
             {
                 BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-                info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                info.render(window.getScaledWidth() / 2 - info.getTotalWidth() / 2, window.getScaledHeight() / 2 + 10, mc);
                 RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
                 xOffset = -1;
             }
             else
             {
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
-                info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+                info.render(window.getScaledWidth() / 2 - info.getTotalWidth() / 2, window.getScaledHeight() / 2 + 10, mc);
             }
 
             RenderUtils.renderInventoryOverlay(xOffset, worldSchematic, pos, mc);
@@ -542,11 +540,9 @@ public class OverlayRenderer
 
         BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
         IBlockState stateClient = mc.world.getBlockState(pos);
-        stateClient = stateClient.getActualState(mc.world, pos);
 
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-        stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
         IBlockState air = Blocks.AIR.getDefaultState();
         String ul = TextFormatting.UNDERLINE.toString();
 
@@ -569,15 +565,15 @@ public class OverlayRenderer
     @SuppressWarnings("unchecked")
     private <T extends Comparable<T>> void addBlockInfoLines(IBlockState state)
     {
-        this.blockInfoLines.add(String.valueOf(Block.REGISTRY.getNameForObject(state.getBlock())));
+        this.blockInfoLines.add(String.valueOf(IRegistry.BLOCK.getKey(state.getBlock())));
 
-        for (Entry <IProperty<?>, Comparable<?>> entry : state.getProperties().entrySet())
+        for (Entry <IProperty<?>, Comparable<?>> entry : state.getValues().entrySet())
         {
             IProperty<T> property = (IProperty<T>) entry.getKey();
             T value = (T) entry.getValue();
             String valueName = property.getName(value);
 
-            if (property instanceof PropertyDirection)
+            if (property instanceof DirectionProperty)
             {
                 valueName = TextFormatting.GOLD + valueName;
             }

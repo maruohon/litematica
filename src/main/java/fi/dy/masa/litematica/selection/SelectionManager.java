@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -374,7 +374,7 @@ public class SelectionManager
                         trace.getHitSelectionBox(),
                         trace.getHitCorner(),
                         trace.getHitVec(),
-                        entity.getPositionEyes(1f).distanceTo(trace.getHitVec()));
+                        entity.getEyePosition(1f).distanceTo(trace.getHitVec()));
                 StringUtils.printActionbarMessage("litematica.message.grabbed_element_for_moving");
                 return true;
             }
@@ -537,7 +537,7 @@ public class SelectionManager
     {
         RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(world, player, false, maxDistance);
 
-        if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+        if (trace.type != RayTraceResult.Type.BLOCK)
         {
             return null;
         }
@@ -613,7 +613,7 @@ public class SelectionManager
         }
         catch (Exception e)
         {
-            LiteModLitematica.logger.warn("Exception while writing area selections to disk", e);
+            Litematica.logger.warn("Exception while writing area selections to disk", e);
         }
 
         AreaSelection current = this.currentSelectionId != null ? this.selections.get(this.currentSelectionId) : null;
@@ -657,7 +657,7 @@ public class SelectionManager
 
         public void moveElement(Entity entity)
         {
-            Vec3d newLookPos = entity.getPositionEyes(1f).add(entity.getLook(1f).scale(this.grabDistance));
+            Vec3d newLookPos = entity.getEyePosition(1f).add(entity.getLook(1f).scale(this.grabDistance));
             Vec3d change = newLookPos.subtract(this.grabPosition);
 
             if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_1) && this.grabbedBox.getPos1() != null)

@@ -17,13 +17,12 @@ public class ChunkProviderSchematic extends ChunkProviderClient
         this.world = world;
     }
 
-    @Override
     public Chunk loadChunk(int chunkX, int chunkZ)
     {
         Chunk chunk = new ChunkSchematic(this.world, chunkX, chunkZ);
 
-        ((IMixinChunkProviderClient) (Object) this).getChunkMapping().put(ChunkPos.asLong(chunkX, chunkZ), chunk);
-        chunk.markLoaded(true);
+        ((IMixinChunkProviderClient) (Object) this).getLoadedChunks().put(ChunkPos.asLong(chunkX, chunkZ), chunk);
+        chunk.setLoaded(true);
 
         return chunk;
     }

@@ -2,30 +2,30 @@ package fi.dy.masa.litematica.render.schematic;
 
 import java.util.BitSet;
 import java.util.List;
+import java.util.Random;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.crash.ReportedException;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ReportedException;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IWorldReader;
 
 public class BlockModelRendererSchematic extends BlockModelRenderer
 {
     private final BlockColors blockColors;
+    private final Random random = new Random();
 
     public BlockModelRendererSchematic(BlockColors blockColorsIn)
     {
@@ -34,20 +34,19 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         this.blockColors = blockColorsIn;
     }
 
-    public boolean renderModel(IBlockAccess worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer)
+    public boolean renderModel(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
     {
         boolean ao = Minecraft.isAmbientOcclusionEnabled() && stateIn.getLightValue() == 0 && modelIn.isAmbientOcclusion();
-        long rand = MathHelper.getPositionRandom(posIn);
 
         try
         {
             if (ao)
             {
-                return this.renderModelSmooth(worldIn, modelIn, stateIn, posIn, buffer, rand);
+                return this.renderModelSmooth(worldIn, modelIn, stateIn, posIn, buffer, this.random, rand);
             }
             else
             {
-                return this.renderModelFlat(worldIn, modelIn, stateIn, posIn, buffer, rand);
+                return this.renderModelFlat(worldIn, modelIn, stateIn, posIn, buffer, this.random, rand);
             }
         }
         catch (Throwable throwable)
@@ -55,12 +54,12 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block model");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Block model being tesselated");
             CrashReportCategory.addBlockInfo(crashreportcategory, posIn, stateIn);
-            crashreportcategory.addCrashSection("Using AO", Boolean.valueOf(ao));
+            crashreportcategory.addDetail("Using AO", Boolean.valueOf(ao));
             throw new ReportedException(crashreport);
         }
     }
 
-    public boolean renderModelSmooth(IBlockAccess worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
+    public boolean renderModelSmooth(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long rand)
     {
         boolean renderedSomething = false;
         float[] quadBounds = new float[EnumFacing.values().length * 2];
@@ -69,7 +68,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
         for (EnumFacing side : EnumFacing.values())
         {
-            List<BakedQuad> quads = modelIn.getQuads(stateIn, side, rand);
+            List<BakedQuad> quads = modelIn.getQuads(stateIn, side, random);
 
             if (quads.isEmpty() == false)
             {
@@ -81,7 +80,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             }
         }
 
-        List<BakedQuad> quads = modelIn.getQuads(stateIn, (EnumFacing)null, rand);
+        List<BakedQuad> quads = modelIn.getQuads(stateIn, (EnumFacing)null, random);
 
         if (quads.isEmpty() == false)
         {
@@ -92,14 +91,14 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         return renderedSomething;
     }
 
-    public boolean renderModelFlat(IBlockAccess worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
+    public boolean renderModelFlat(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long rand)
     {
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
 
         for (EnumFacing side : EnumFacing.values())
         {
-            List<BakedQuad> quads = modelIn.getQuads(stateIn, side, rand);
+            List<BakedQuad> quads = modelIn.getQuads(stateIn, side, random);
 
             if (quads.isEmpty() == false)
             {
@@ -112,7 +111,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             }
         }
 
-        List<BakedQuad> quads = modelIn.getQuads(stateIn, null, rand);
+        List<BakedQuad> quads = modelIn.getQuads(stateIn, null, random);
 
         if (quads.isEmpty() == false)
         {
@@ -123,16 +122,17 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         return renderedSomething;
     }
 
-    private boolean shouldRenderModelSide(IBlockAccess worldIn, IBlockState stateIn, BlockPos posIn, EnumFacing side)
+    @SuppressWarnings("deprecation")
+    private boolean shouldRenderModelSide(IWorldReader worldIn, IBlockState stateIn, BlockPos posIn, EnumFacing side)
     {
         return DataManager.getRenderLayerRange().isPositionAtRenderEdgeOnSide(posIn, side) ||
                (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.getBooleanValue()) ||
-               stateIn.shouldSideBeRendered(worldIn, posIn, side);
+               Block.shouldSideBeRendered(stateIn, worldIn, posIn, side);
     }
 
-    private void renderQuadsSmooth(IBlockAccess blockAccessIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, List<BakedQuad> list, float[] quadBounds, BitSet bitSet, AmbientOcclusionFace aoFace)
+    private void renderQuadsSmooth(IWorldReader world, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, List<BakedQuad> list, float[] quadBounds, BitSet bitSet, AmbientOcclusionFace aoFace)
     {
-        Vec3d vec3d = stateIn.getOffset(blockAccessIn, posIn);
+        Vec3d vec3d = stateIn.getOffset(world, posIn);
         double x = (double)posIn.getX() + vec3d.x;
         double y = (double)posIn.getY() + vec3d.y;
         double z = (double)posIn.getZ() + vec3d.z;
@@ -142,19 +142,13 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         {
             BakedQuad bakedquad = list.get(i);
             this.fillQuadBounds(stateIn, bakedquad.getVertexData(), bakedquad.getFace(), quadBounds, bitSet);
-            aoFace.updateVertexBrightness(blockAccessIn, stateIn, posIn, bakedquad.getFace(), quadBounds, bitSet);
+            aoFace.updateVertexBrightness(world, stateIn, posIn, bakedquad.getFace(), quadBounds, bitSet);
             buffer.addVertexData(bakedquad.getVertexData());
             buffer.putBrightness4(aoFace.vertexBrightness[0], aoFace.vertexBrightness[1], aoFace.vertexBrightness[2], aoFace.vertexBrightness[3]);
 
             if (bakedquad.hasTintIndex())
             {
-                int k = this.blockColors.colorMultiplier(stateIn, blockAccessIn, posIn, bakedquad.getTintIndex());
-
-                if (EntityRenderer.anaglyphEnable)
-                {
-                    k = TextureUtil.anaglyphColor(k);
-                }
-
+                int k = this.blockColors.getColor(stateIn, world, posIn, bakedquad.getTintIndex());
                 float f = (float)(k >> 16 & 255) / 255.0F;
                 float f1 = (float)(k >> 8 & 255) / 255.0F;
                 float f2 = (float)(k & 255) / 255.0F;
@@ -175,9 +169,9 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
     }
 
-    private void renderQuadsFlat(IBlockAccess blockAccessIn, IBlockState stateIn, BlockPos posIn, int brightnessIn, boolean ownBrightness, BufferBuilder buffer, List<BakedQuad> list, BitSet bitSet)
+    private void renderQuadsFlat(IWorldReader world, IBlockState stateIn, BlockPos posIn, int brightnessIn, boolean ownBrightness, BufferBuilder buffer, List<BakedQuad> list, BitSet bitSet)
     {
-        Vec3d vec3d = stateIn.getOffset(blockAccessIn, posIn);
+        Vec3d vec3d = stateIn.getOffset(world, posIn);
         double d0 = (double)posIn.getX() + vec3d.x;
         double d1 = (double)posIn.getY() + vec3d.y;
         double d2 = (double)posIn.getZ() + vec3d.z;
@@ -191,7 +185,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             {
                 this.fillQuadBounds(stateIn, bakedquad.getVertexData(), bakedquad.getFace(), (float[])null, bitSet);
                 BlockPos blockpos = bitSet.get(0) ? posIn.offset(bakedquad.getFace()) : posIn;
-                brightnessIn = stateIn.getPackedLightmapCoords(blockAccessIn, blockpos);
+                brightnessIn = stateIn.getPackedLightmapCoords(world, blockpos);
             }
 
             buffer.addVertexData(bakedquad.getVertexData());
@@ -199,13 +193,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
             if (bakedquad.hasTintIndex())
             {
-                int k = this.blockColors.colorMultiplier(stateIn, blockAccessIn, posIn, bakedquad.getTintIndex());
-
-                if (EntityRenderer.anaglyphEnable)
-                {
-                    k = TextureUtil.anaglyphColor(k);
-                }
-
+                int k = this.blockColors.getColor(stateIn, world, posIn, bakedquad.getTintIndex());
                 float f = (float)(k >> 16 & 255) / 255.0F;
                 float f1 = (float)(k >> 8 & 255) / 255.0F;
                 float f2 = (float)(k & 255) / 255.0F;
@@ -291,7 +279,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         private final float[] vertexColorMultiplier = new float[4];
         private final int[] vertexBrightness = new int[4];
 
-        public void updateVertexBrightness(IBlockAccess worldIn, IBlockState state, BlockPos centerPos, EnumFacing direction, float[] faceShape, BitSet shapeState)
+        public void updateVertexBrightness(IWorldReader worldIn, IBlockState state, BlockPos centerPos, EnumFacing direction, float[] faceShape, BitSet shapeState)
         {
             /*
             BlockPos blockpos = shapeState.get(0) ? centerPos.offset(direction) : centerPos;

@@ -9,7 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -19,7 +19,7 @@ import net.minecraft.util.BlockRenderLayer;
 
 public class ChunkRenderWorkerLitematica implements Runnable
 {
-    private static final Logger LOGGER = LiteModLitematica.logger;
+    private static final Logger LOGGER = Litematica.logger;
 
     private final ChunkRenderDispatcherLitematica chunkRenderDispatcher;
     private final BufferBuilderCache bufferCache;
@@ -54,19 +54,19 @@ public class ChunkRenderWorkerLitematica implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Batching chunks");
-                Minecraft.getMinecraft().crashed(Minecraft.getMinecraft().addGraphicsAndWorldToCrashReport(crashreport));
+                Minecraft.getInstance().crashed(Minecraft.getInstance().addGraphicsAndWorldToCrashReport(crashreport));
                 return;
             }
         }
     }
 
-    protected void processTask(final ChunkCompileTaskGeneratorSchematic generator) throws InterruptedException
+    protected void processTask(final ChunkRenderTaskSchematic generator) throws InterruptedException
     {
         generator.getLock().lock();
 
         try
         {
-            if (generator.getStatus() != ChunkCompileTaskGeneratorSchematic.Status.PENDING)
+            if (generator.getStatus() != ChunkRenderTaskSchematic.Status.PENDING)
             {
                 if (generator.isFinished() == false)
                 {
@@ -76,14 +76,14 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 return;
             }
 
-            generator.setStatus(ChunkCompileTaskGeneratorSchematic.Status.COMPILING);
+            generator.setStatus(ChunkRenderTaskSchematic.Status.COMPILING);
         }
         finally
         {
             generator.getLock().unlock();
         }
 
-        Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
+        Entity entity = Minecraft.getInstance().getRenderViewEntity();
 
         if (entity == null)
         {
@@ -93,16 +93,16 @@ public class ChunkRenderWorkerLitematica implements Runnable
         {
             generator.setRegionRenderCacheBuilder(this.getRegionRenderCacheBuilder());
 
-            ChunkCompileTaskGeneratorSchematic.Type generatorType = generator.getType();
+            ChunkRenderTaskSchematic.Type generatorType = generator.getType();
             float x = (float) entity.posX;
             float y = (float) entity.posY + entity.getEyeHeight();
             float z = (float) entity.posZ;
 
-            if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK)
+            if (generatorType == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK)
             {
                 generator.getRenderChunk().rebuildChunk(x, y, z, generator);
             }
-            else if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.RESORT_TRANSPARENCY)
+            else if (generatorType == ChunkRenderTaskSchematic.Type.RESORT_TRANSPARENCY)
             {
                 generator.getRenderChunk().resortTransparency(x, y, z, generator);
             }
@@ -111,7 +111,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
             try
             {
-                if (generator.getStatus() != ChunkCompileTaskGeneratorSchematic.Status.COMPILING)
+                if (generator.getStatus() != ChunkRenderTaskSchematic.Status.COMPILING)
                 {
                     if (generator.isFinished() == false)
                     {
@@ -122,7 +122,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     return;
                 }
 
-                generator.setStatus(ChunkCompileTaskGeneratorSchematic.Status.UPLOADING);
+                generator.setStatus(ChunkRenderTaskSchematic.Status.UPLOADING);
             }
             finally
             {
@@ -134,7 +134,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             BufferBuilderCache buffers = generator.getBufferCache();
             RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) generator.getRenderChunk();
 
-            if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK)
+            if (generatorType == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK)
             {
                 //if (GuiScreen.isCtrlKeyDown()) System.out.printf("pre uploadChunk()\n");
                 for (BlockRenderLayer layer : BlockRenderLayer.values())
@@ -157,7 +157,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     }
                 }
             }
-            else if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.RESORT_TRANSPARENCY)
+            else if (generatorType == ChunkRenderTaskSchematic.Type.RESORT_TRANSPARENCY)
             {
                 BufferBuilder buffer = buffers.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
                 futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
@@ -194,9 +194,9 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     {
                         try
                         {
-                            if (generator.getStatus() == ChunkCompileTaskGeneratorSchematic.Status.UPLOADING)
+                            if (generator.getStatus() == ChunkRenderTaskSchematic.Status.UPLOADING)
                             {
-                                generator.setStatus(ChunkCompileTaskGeneratorSchematic.Status.DONE);
+                                generator.setStatus(ChunkRenderTaskSchematic.Status.DONE);
                                 break label49;
                             }
 
@@ -223,7 +223,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
                     if ((throwable instanceof CancellationException) == false && (throwable instanceof InterruptedException) == false)
                     {
-                        Minecraft.getMinecraft().crashed(CrashReport.makeCrashReport(throwable, "Rendering Litematica chunk"));
+                        Minecraft.getInstance().crashed(CrashReport.makeCrashReport(throwable, "Rendering Litematica chunk"));
                     }
                 }
             });
@@ -235,7 +235,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
         return this.bufferCache != null ? this.bufferCache : this.chunkRenderDispatcher.allocateRenderBuilder();
     }
 
-    private void freeRenderBuilder(ChunkCompileTaskGeneratorSchematic generator)
+    private void freeRenderBuilder(ChunkRenderTaskSchematic generator)
     {
         if (this.bufferCache == null)
         {

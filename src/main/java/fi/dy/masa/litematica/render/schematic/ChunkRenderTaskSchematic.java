@@ -6,26 +6,26 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 
-public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompileTaskGeneratorSchematic>
+public class ChunkRenderTaskSchematic implements Comparable<ChunkRenderTaskSchematic>
 {
     private final RenderChunkSchematicVbo renderChunk;
     private final ReentrantLock lock = new ReentrantLock();
     private final List<Runnable> listFinishRunnables = Lists.<Runnable>newArrayList();
-    private final ChunkCompileTaskGeneratorSchematic.Type type;
+    private final ChunkRenderTaskSchematic.Type type;
     private final double distanceSq;
     private BufferBuilderCache bufferBuilderCache;
     private CompiledChunk compiledChunk;
-    private ChunkCompileTaskGeneratorSchematic.Status status = ChunkCompileTaskGeneratorSchematic.Status.PENDING;
+    private ChunkRenderTaskSchematic.Status status = ChunkRenderTaskSchematic.Status.PENDING;
     private boolean finished;
 
-    public ChunkCompileTaskGeneratorSchematic(RenderChunkSchematicVbo renderChunkIn, ChunkCompileTaskGeneratorSchematic.Type typeIn, double distanceSqIn)
+    public ChunkRenderTaskSchematic(RenderChunkSchematicVbo renderChunkIn, ChunkRenderTaskSchematic.Type typeIn, double distanceSqIn)
     {
         this.renderChunk = renderChunkIn;
         this.type = typeIn;
         this.distanceSq = distanceSqIn;
     }
 
-    public ChunkCompileTaskGeneratorSchematic.Status getStatus()
+    public ChunkRenderTaskSchematic.Status getStatus()
     {
         return this.status;
     }
@@ -55,7 +55,7 @@ public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompi
         this.bufferBuilderCache = cache;
     }
 
-    public void setStatus(ChunkCompileTaskGeneratorSchematic.Status statusIn)
+    public void setStatus(ChunkRenderTaskSchematic.Status statusIn)
     {
         this.lock.lock();
 
@@ -75,13 +75,13 @@ public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompi
 
         try
         {
-            if (this.type == ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK && this.status != ChunkCompileTaskGeneratorSchematic.Status.DONE)
+            if (this.type == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK && this.status != ChunkRenderTaskSchematic.Status.DONE)
             {
                 this.renderChunk.setNeedsUpdate(false);
             }
 
             this.finished = true;
-            this.status = ChunkCompileTaskGeneratorSchematic.Status.DONE;
+            this.status = ChunkRenderTaskSchematic.Status.DONE;
 
             for (Runnable runnable : this.listFinishRunnables)
             {
@@ -118,7 +118,7 @@ public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompi
         return this.lock;
     }
 
-    public ChunkCompileTaskGeneratorSchematic.Type getType()
+    public ChunkRenderTaskSchematic.Type getType()
     {
         return this.type;
     }
@@ -128,7 +128,7 @@ public class ChunkCompileTaskGeneratorSchematic implements Comparable<ChunkCompi
         return this.finished;
     }
 
-    public int compareTo(ChunkCompileTaskGeneratorSchematic other)
+    public int compareTo(ChunkRenderTaskSchematic other)
     {
         return Doubles.compare(this.distanceSq, other.distanceSq);
     }

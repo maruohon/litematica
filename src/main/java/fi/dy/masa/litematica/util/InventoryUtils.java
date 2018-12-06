@@ -64,7 +64,7 @@ public class InventoryUtils
             {
                 inventory.currentItem = slotNum;
 
-                if (player.capabilities.isCreativeMode)
+                if (player.abilities.isCreativeMode)
                 {
                     inventory.mainInventory.set(slotNum, stack.copy());
                 }

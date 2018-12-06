@@ -14,16 +14,16 @@ import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.world.chunk.Chunk;
 
 @Mixin(ChunkProviderClient.class)
-public class MixinChunkProviderClient implements IMixinChunkProviderClient
+public abstract class MixinChunkProviderClient implements IMixinChunkProviderClient
 {
     @Shadow
     @Final
-    private Long2ObjectMap<Chunk> chunkMapping;
+    private Long2ObjectMap<Chunk> loadedChunks;
 
     @Override
-    public Long2ObjectMap<Chunk> getChunkMapping()
+    public Long2ObjectMap<Chunk> getLoadedChunks()
     {
-        return this.chunkMapping;
+        return this.loadedChunks;
     }
 
     @Inject(method = "unloadChunk", at = @At("RETURN"))

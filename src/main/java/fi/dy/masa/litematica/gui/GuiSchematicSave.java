@@ -149,7 +149,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
 
             if (area != null)
             {
-                String author = this.gui.mc.player.getName();
+                String author = this.gui.mc.player.getName().getString();
                 World world = WorldUtils.getBestWorld(this.gui.mc);
 
                 if (world != null)
@@ -170,14 +170,14 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
         public InMemorySchematicCreator(AreaSelection area)
         {
             this.area = area;
-            this.mc = Minecraft.getMinecraft();
+            this.mc = Minecraft.getInstance();
         }
 
         @Override
         public void setString(String string)
         {
             boolean takeEntities = true; // TODO
-            String author = this.mc.player.getName();
+            String author = this.mc.player.getName().getString();
             LitematicaSchematic schematic = LitematicaSchematic.createFromWorld(this.mc.world, this.area, takeEntities, author, InfoUtils.INFO_MESSAGE_CONSUMER);
 
             if (schematic != null)

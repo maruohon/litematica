@@ -61,11 +61,11 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
     @Override
     public void readFromNBT(NBTTagList tagList)
     {
-        final int size = tagList.tagCount();
+        final int size = tagList.size();
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = tagList.getCompoundTagAt(i);
+            NBTTagCompound tag = tagList.getCompound(i);
             this.idFor(NBTUtil.readBlockState(tag));
         }
     }
@@ -77,9 +77,8 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
 
         for (int id = 0; id < this.currentSize; ++id)
         {
-            NBTTagCompound tag = new NBTTagCompound();
-            NBTUtil.writeBlockState(tag, this.states[id]);
-            tagList.appendTag(tag);
+            NBTTagCompound tag = NBTUtil.writeBlockState(this.states[id]);
+            tagList.add(tag);
         }
 
         return tagList;

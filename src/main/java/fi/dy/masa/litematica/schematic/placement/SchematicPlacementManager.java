@@ -39,16 +39,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class SchematicPlacementManager
 {
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
     private final HashMultimap<ChunkPos, SchematicPlacement> schematicsTouchingChunk = HashMultimap.create();
-    private final ArrayListMultimap<SubChunkPos, StructureBoundingBox> touchedVolumesInSubChunk = ArrayListMultimap.create();
+    private final ArrayListMultimap<SubChunkPos, MutableBoundingBox> touchedVolumesInSubChunk = ArrayListMultimap.create();
     private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
     private final Set<ChunkPos> chunksToUnload = new HashSet<>();
     private final Set<ChunkPos> chunksPreChange = new HashSet<>();
@@ -73,7 +73,7 @@ public class SchematicPlacementManager
         //System.out.printf("processQueuedChunks, size: %d\n", this.chunksToRebuild.size());
         if (this.chunksToRebuild.isEmpty() == false)
         {
-            WorldClient worldClient = Minecraft.getMinecraft().world;
+            WorldClient worldClient = Minecraft.getInstance().world;
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             Iterator<ChunkPos> iter = this.chunksToRebuild.iterator();
 
@@ -93,10 +93,10 @@ public class SchematicPlacementManager
                 }
 
                 if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() ||
-                    worldClient.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                    worldClient.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
                 {
                     // Wipe the old chunk if it exists
-                    if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                    if (worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
                     {
                         //System.out.printf("wiping chunk at %s\n", pos);
                         this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
@@ -106,7 +106,7 @@ public class SchematicPlacementManager
                     worldSchematic.getChunkProvider().loadChunk(pos.x, pos.z);
                 }
 
-                if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                if (worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
                 {
                     //System.out.printf("placing at %s\n", pos);
                     Collection<SchematicPlacement> placements = this.schematicsTouchingChunk.get(pos);
@@ -153,7 +153,7 @@ public class SchematicPlacementManager
 
     private void unloadSchematicChunk(WorldSchematic worldSchematic, int chunkX, int chunkZ)
     {
-        if (worldSchematic.getChunkProvider().isChunkGeneratedAt(chunkX, chunkZ))
+        if (worldSchematic.getChunkProvider().getChunk(chunkX, chunkZ, false, false) != null)
         {
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
             worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4) - 1, 0, (chunkZ << 4) - 1, (chunkX << 4) + 16, 256, (chunkZ << 4) + 16);
@@ -166,7 +166,7 @@ public class SchematicPlacementManager
         return this.schematicPlacements;
     }
 
-    public List<StructureBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
+    public List<MutableBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
     {
         return this.touchedVolumesInSubChunk.get(subChunk);
     }
@@ -365,9 +365,9 @@ public class SchematicPlacementManager
             {
                 if (placement.matchesRequirement(RequiredEnabled.RENDERING_ENABLED))
                 {
-                    Map<String, StructureBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
+                    Map<String, MutableBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
 
-                    for (StructureBoundingBox bbOrig : boxMap.values())
+                    for (MutableBoundingBox bbOrig : boxMap.values())
                     {
                         final int startCY = (bbOrig.minY >> 4);
                         final int endCY = (bbOrig.maxY >> 4);
@@ -377,7 +377,7 @@ public class SchematicPlacementManager
                             int y1 = Math.max((cy << 4)     , bbOrig.minY);
                             int y2 = Math.min((cy << 4) + 15, bbOrig.maxY);
 
-                            StructureBoundingBox bbSub = new StructureBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
+                            MutableBoundingBox bbSub = new MutableBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
                             this.touchedVolumesInSubChunk.put(new SubChunkPos(pos.x, cy, pos.z), bbSub);
                             //System.out.printf("updateTouchedBoxesInChunk box at %d, %d, %d: %s\n", pos.x, cy, pos.z, bbSub);
                         }
@@ -450,7 +450,7 @@ public class SchematicPlacementManager
         {
             RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
 
-            if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+            if (trace.type != RayTraceResult.Type.BLOCK)
             {
                 return;
             }
@@ -534,7 +534,7 @@ public class SchematicPlacementManager
 
     public void pasteCurrentPlacementToWorld(Minecraft mc)
     {
-        if (mc.player != null && mc.player.capabilities.isCreativeMode)
+        if (mc.player != null && mc.player.abilities.isCreativeMode)
         {
             final SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
@@ -542,7 +542,7 @@ public class SchematicPlacementManager
             {
                 if (mc.isSingleplayer())
                 {
-                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
+                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().dimension.getType());
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
 
                     world.addScheduledTask(new Runnable()

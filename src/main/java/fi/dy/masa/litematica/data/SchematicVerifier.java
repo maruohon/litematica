@@ -29,7 +29,6 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.Color4f;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -39,9 +38,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class SchematicVerifier implements IStringListProvider
 {
@@ -283,7 +283,7 @@ public class SchematicVerifier implements IStringListProvider
                     {
                         this.blockMismatches.remove(pos);
 
-                        IBlockState stateFound = this.worldClient.getBlockState(pos).getActualState(this.worldClient, pos);
+                        IBlockState stateFound = this.worldClient.getBlockState(pos);
                         MUTABLE_PAIR.setLeft(mismatch.stateExpected);
                         MUTABLE_PAIR.setRight(mismatch.stateFound);
 
@@ -298,7 +298,7 @@ public class SchematicVerifier implements IStringListProvider
                     else
                     {
                         IBlockState stateExpected = this.worldSchematic.getBlockState(pos);
-                        IBlockState stateFound = this.worldClient.getBlockState(pos).getActualState(this.worldClient, pos);
+                        IBlockState stateFound = this.worldClient.getBlockState(pos);
                         this.checkBlockStates(pos.getX(), pos.getY(), pos.getZ(), stateExpected, stateFound);
                     }
 
@@ -335,7 +335,7 @@ public class SchematicVerifier implements IStringListProvider
 
     private void updateMismatchOverlaysForType(MismatchType mismatchType, @Nullable Pair<IBlockState, IBlockState> pair)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         if (mc.player != null)
         {
@@ -385,14 +385,14 @@ public class SchematicVerifier implements IStringListProvider
 
                 ChunkPos pos = iter.next();
 
-                if (this.worldClient.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z) &&
-                    this.worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                if (this.worldClient.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null &&
+                    this.worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
                 {
                     Chunk chunkClient = this.worldClient.getChunk(pos.x, pos.z);
                     Chunk chunkSchematic = this.worldSchematic.getChunk(pos.x, pos.z);
-                    Map<String, StructureBoundingBox> boxes = this.schematicPlacement.getBoxesWithinChunk(pos.x, pos.z);
+                    Map<String, MutableBoundingBox> boxes = this.schematicPlacement.getBoxesWithinChunk(pos.x, pos.z);
 
-                    for (StructureBoundingBox box : boxes.values())
+                    for (MutableBoundingBox box : boxes.values())
                     {
                         this.verifyChunk(chunkClient, chunkSchematic, box);
                     }
@@ -537,8 +537,8 @@ public class SchematicVerifier implements IStringListProvider
                 @Override
                 public int compare(Pair<IBlockState, IBlockState> o1, Pair<IBlockState, IBlockState> o2)
                 {
-                    String name1 = Block.REGISTRY.getNameForObject(o1.getLeft().getBlock()).toString();
-                    String name2 = Block.REGISTRY.getNameForObject(o2.getLeft().getBlock()).toString();
+                    String name1 = IRegistry.BLOCK.getKey(o1.getLeft().getBlock()).toString();
+                    String name2 = IRegistry.BLOCK.getKey(o2.getLeft().getBlock()).toString();
 
                     int val = name1.compareTo(name2);
 
@@ -552,8 +552,8 @@ public class SchematicVerifier implements IStringListProvider
                     }
                     else
                     {
-                        name1 = Block.REGISTRY.getNameForObject(o1.getRight().getBlock()).toString();
-                        name2 = Block.REGISTRY.getNameForObject(o2.getRight().getBlock()).toString();
+                        name1 = IRegistry.BLOCK.getKey(o1.getRight().getBlock()).toString();
+                        name2 = IRegistry.BLOCK.getKey(o2.getRight().getBlock()).toString();
 
                         return name1.compareTo(name2);
                     }
@@ -568,7 +568,7 @@ public class SchematicVerifier implements IStringListProvider
         return list;
     }
 
-    private boolean verifyChunk(Chunk chunkClient, Chunk chunkSchematic, StructureBoundingBox box)
+    private boolean verifyChunk(Chunk chunkClient, Chunk chunkSchematic, MutableBoundingBox box)
     {
         LayerRange range = DataManager.getRenderLayerRange();
         EnumFacing.Axis axis = range.getAxis();
@@ -588,7 +588,7 @@ public class SchematicVerifier implements IStringListProvider
                 for (int x = startX; x <= endX; ++x)
                 {
                     MUTABLE_POS.setPos(x, y, z);
-                    IBlockState stateClient = chunkClient.getBlockState(x, y, z).getActualState(chunkClient.getWorld(), MUTABLE_POS);
+                    IBlockState stateClient = chunkClient.getBlockState(x, y, z);
                     IBlockState stateSchematic = chunkSchematic.getBlockState(x, y, z);
 
                     this.checkBlockStates(x, y, z, stateSchematic, stateClient);
@@ -730,7 +730,7 @@ public class SchematicVerifier implements IStringListProvider
     {
         this.infoLines.clear();
 
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        EntityPlayer player = Minecraft.getInstance().player;
 
         if (this.requiredChunks.isEmpty() == false && player != null)
         {

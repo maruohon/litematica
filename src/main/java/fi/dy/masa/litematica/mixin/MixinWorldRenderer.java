@@ -8,10 +8,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.renderer.WorldRenderer;
 
-@Mixin(RenderGlobal.class)
-public class MixinRenderGlobal
+@Mixin(WorldRenderer.class)
+public abstract class MixinWorldRenderer
 {
     @Shadow
     private WorldClient world;
@@ -20,7 +20,7 @@ public class MixinRenderGlobal
     private void onLoadRenderers(CallbackInfo ci)
     {
         // Also (re-)load our renderer when the vanilla renderer gets reloaded
-        if (this.world != null && this.world == Minecraft.getMinecraft().world)
+        if (this.world != null && this.world == Minecraft.getInstance().world)
         {
             LitematicaRenderer.getInstance().loadRenderers();
         }

@@ -15,7 +15,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -29,12 +29,12 @@ import net.minecraft.util.math.MathHelper;
 
 public class ChunkRenderDispatcherLitematica
 {
-    private static final Logger LOGGER = LiteModLitematica.logger;
+    private static final Logger LOGGER = Litematica.logger;
     private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setNameFormat("Litematica Chunk Batcher %d").setDaemon(true).build();
 
     private final List<Thread> listWorkerThreads = Lists.<Thread>newArrayList();
     private final List<ChunkRenderWorkerLitematica> listThreadedWorkers = new ArrayList<>();
-    private final PriorityBlockingQueue<ChunkCompileTaskGeneratorSchematic> queueChunkUpdates = Queues.newPriorityBlockingQueue();
+    private final PriorityBlockingQueue<ChunkRenderTaskSchematic> queueChunkUpdates = Queues.newPriorityBlockingQueue();
     private final BlockingQueue<BufferBuilderCache> queueFreeRenderBuilders;
     private final DisplayListUploaderSchematic displayListUploader = new DisplayListUploaderSchematic();
     private final VertexBufferUploaderSchematic vertexBufferUploader = new VertexBufferUploaderSchematic();
@@ -85,7 +85,7 @@ public class ChunkRenderDispatcherLitematica
 
             if (this.listWorkerThreads.isEmpty())
             {
-                ChunkCompileTaskGeneratorSchematic generator = this.queueChunkUpdates.poll();
+                ChunkRenderTaskSchematic generator = this.queueChunkUpdates.poll();
 
                 if (generator != null)
                 {
@@ -128,7 +128,7 @@ public class ChunkRenderDispatcherLitematica
 
         try
         {
-            final ChunkCompileTaskGeneratorSchematic generator = renderChunk.makeCompileTaskChunkSchematic();
+            final ChunkRenderTaskSchematic generator = renderChunk.makeCompileTaskChunkSchematic();
 
             generator.addFinishRunnable(new Runnable()
             {
@@ -163,7 +163,7 @@ public class ChunkRenderDispatcherLitematica
 
         try
         {
-            ChunkCompileTaskGeneratorSchematic generator = chunkRenderer.makeCompileTaskChunkSchematic();
+            ChunkRenderTaskSchematic generator = chunkRenderer.makeCompileTaskChunkSchematic();
 
             try
             {
@@ -214,7 +214,7 @@ public class ChunkRenderDispatcherLitematica
         return this.queueFreeRenderBuilders.take();
     }
 
-    public ChunkCompileTaskGeneratorSchematic getNextChunkUpdate() throws InterruptedException
+    public ChunkRenderTaskSchematic getNextChunkUpdate() throws InterruptedException
     {
         return this.queueChunkUpdates.take();
     }
@@ -227,7 +227,7 @@ public class ChunkRenderDispatcherLitematica
 
         try
         {
-            final ChunkCompileTaskGeneratorSchematic generator = renderChunk.makeCompileTaskTransparencySchematic();
+            final ChunkRenderTaskSchematic generator = renderChunk.makeCompileTaskTransparencySchematic();
 
             if (generator == null)
             {
@@ -256,7 +256,7 @@ public class ChunkRenderDispatcherLitematica
     public ListenableFuture<Object> uploadChunkBlocks(final BlockRenderLayer layer, final BufferBuilder buffer,
             final RenderChunkSchematicVbo renderChunk, final CompiledChunk compiledChunk, final double distanceSq)
     {
-        if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
+        if (Minecraft.getInstance().isCallingFromMinecraftThread())
         {
             //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunkBlocks()\n");
             if (OpenGlHelper.useVbo())
@@ -294,7 +294,7 @@ public class ChunkRenderDispatcherLitematica
     public ListenableFuture<Object> uploadChunkOverlay(final OverlayType type, final BufferBuilder buffer,
             final RenderChunkSchematicVbo renderChunk, final CompiledChunkSchematic compiledChunk, final double distanceSq)
     {
-        if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
+        if (Minecraft.getInstance().isCallingFromMinecraftThread())
         {
             //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunkOverlay()\n");
             if (OpenGlHelper.useVbo())
@@ -331,14 +331,14 @@ public class ChunkRenderDispatcherLitematica
 
     private void uploadDisplayList(BufferBuilder bufferBuilderIn, int list, RenderChunk renderChunk)
     {
-        GlStateManager.glNewList(list, GL11.GL_COMPILE);
+        GlStateManager.newList(list, GL11.GL_COMPILE);
         GlStateManager.pushMatrix();
 
         //chunkRenderer.multModelviewMatrix();
         this.displayListUploader.draw(bufferBuilderIn);
 
         GlStateManager.popMatrix();
-        GlStateManager.glEndList();
+        GlStateManager.endList();
     }
 
     private void uploadVertexBuffer(BufferBuilder bufferBuilder, VertexBuffer vertexBufferIn)
@@ -351,7 +351,7 @@ public class ChunkRenderDispatcherLitematica
     {
         while (this.queueChunkUpdates.isEmpty() == false)
         {
-            ChunkCompileTaskGeneratorSchematic generator = this.queueChunkUpdates.poll();
+            ChunkRenderTaskSchematic generator = this.queueChunkUpdates.poll();
 
             if (generator != null)
             {

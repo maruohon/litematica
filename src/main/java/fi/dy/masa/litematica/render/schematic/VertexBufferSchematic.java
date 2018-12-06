@@ -38,7 +38,7 @@ public class VertexBufferSchematic extends VertexBuffer
     @Override
     public void drawArrays(int mode)
     {
-        GlStateManager.glDrawArrays(mode, 0, this.count);
+        GlStateManager.drawArrays(mode, 0, this.count);
     }
 
     @Override

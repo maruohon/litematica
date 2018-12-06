@@ -14,7 +14,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.data.SchematicVerifier;
@@ -35,8 +35,8 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
-import net.minecraft.world.gen.structure.template.PlacementSettings;
+import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.world.gen.feature.template.PlacementSettings;
 
 public class SchematicPlacement
 {
@@ -458,15 +458,15 @@ public class SchematicPlacement
         return set;
     }
 
-    public Map<String, StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
+    public Map<String, MutableBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
     {
         ImmutableMap<String, Box> map = this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
-        Map<String, StructureBoundingBox> mapOut = new HashMap<>();
+        Map<String, MutableBoundingBox> mapOut = new HashMap<>();
 
         for (Map.Entry<String, Box> entry : map.entrySet())
         {
             Box box = entry.getValue();
-            StructureBoundingBox bb = box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
+            MutableBoundingBox bb = box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
 
             if (bb != null)
             {
@@ -478,7 +478,7 @@ public class SchematicPlacement
     }
 
     @Nullable
-    public StructureBoundingBox getBoxWithinChunkForRegion(String regionName, int chunkX, int chunkZ)
+    public MutableBoundingBox getBoxWithinChunkForRegion(String regionName, int chunkX, int chunkZ)
     {
         Box box = this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED).get(regionName);
         return box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
@@ -896,7 +896,7 @@ public class SchematicPlacement
 
             if (schematic == null)
             {
-                LiteModLitematica.logger.warn("Failed to load schematic '{}'", file.getAbsolutePath());
+                Litematica.logger.warn("Failed to load schematic '{}'", file.getAbsolutePath());
                 return null;
             }
 
@@ -904,7 +904,7 @@ public class SchematicPlacement
 
             if (posArr.size() != 3)
             {
-                LiteModLitematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", file.getAbsolutePath());
+                Litematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", file.getAbsolutePath());
                 return null;
             }
 

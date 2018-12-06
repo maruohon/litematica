@@ -6,6 +6,7 @@
     "client": [
         "IMixinBlockRendererDispatcher",
         "IMixinCompiledChunk",
+        "IMixinKeyBinding",
         "IMixinNBTTagLongArray",
         "IMixinRenderChunk",
         "IMixinViewFrustum",
@@ -13,9 +14,10 @@
         "MixinBlockRail",
         "MixinChunk",
         "MixinChunkProviderClient",
+        "MixinGuiOverlayDebug",
         "MixinMinecraft",
-        "MixinRenderGlobal",
-        "MixinWorldClient"
+        "MixinWorldClient",
+        "MixinWorldRenderer"
     ],
     "injectors": {
         "defaultRequire": 1

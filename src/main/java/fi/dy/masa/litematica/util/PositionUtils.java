@@ -17,11 +17,11 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class PositionUtils
 {
@@ -199,7 +199,7 @@ public class PositionUtils
     }
 
     @Nullable
-    public static StructureBoundingBox getBoundsWithinChunkForBox(Box box, int chunkX, int chunkZ)
+    public static MutableBoundingBox getBoundsWithinChunkForBox(Box box, int chunkX, int chunkZ)
     {
         final int chunkXMin = chunkX << 4;
         final int chunkZMin = chunkZ << 4;
@@ -222,7 +222,7 @@ public class PositionUtils
             final int yMax = Math.max(box.getPos1().getY(), box.getPos2().getY());
             final int zMax = Math.min(chunkZMax, boxZMax);
 
-            return new StructureBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax);
+            return new MutableBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax);
         }
 
         return null;

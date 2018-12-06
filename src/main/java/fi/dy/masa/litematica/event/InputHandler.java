@@ -5,6 +5,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager;
+import fi.dy.masa.litematica.mixin.IMixinKeyBinding;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -54,13 +55,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         if (eventKeyState)
         {
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
 
-            if (eventKey == mc.gameSettings.keyBindUseItem.getKeyCode())
+            if (mc.gameSettings.keyBindUseItem.func_197984_a(eventKey))
             {
                 return this.handleUseKey(mc);
             }
-            else if (eventKey == mc.gameSettings.keyBindScreenshot.getKeyCode())
+            else if (mc.gameSettings.keyBindScreenshot.func_197984_a(eventKey))
             {
                 return GuiSchematicManager.setPreviewImage();
             }
@@ -70,19 +71,28 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
+    public boolean onMouseClick(int mouseX, int mouseY, int eventButton, boolean eventButtonState)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-        boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
+        Minecraft mc = Minecraft.getInstance();
 
-        // Tool enabled, and not in a GUI
+        if (mc.currentScreen == null && mc.world != null && mc.player != null &&
+            eventButtonState && mc.gameSettings.keyBindUseItem.func_197984_a(eventButton))
+        {
+            return this.handleUseKey(mc);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean onMouseScroll(int mouseX, int mouseY, double scrollAmount)
+    {
+        Minecraft mc = Minecraft.getInstance();
+
+        // Not in a GUI
         if (mc.currentScreen == null && mc.world != null && mc.player != null)
         {
-            if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode() + 100)
-            {
-                return this.handleUseKey(mc);
-            }
-
+            boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
             EntityPlayer player = mc.player;
 
             if (toolEnabled == false || EntityUtils.isHoldingItem(player, DataManager.getToolItem()) == false)
@@ -90,6 +100,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 return false;
             }
 
+            int dWheel = (int) scrollAmount;
             OperationMode mode = DataManager.getOperationMode();
 
             if (dWheel != 0)
@@ -159,7 +170,8 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
             else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
             {
-                String keyStrUse = KeybindMulti.getStorageStringForKeyCode(mc.gameSettings.keyBindUseItem.getKeyCode());
+                int keyCode = ((IMixinKeyBinding) mc.gameSettings.keyBindUseItem).getInput().getKeyCode();
+                String keyStrUse = KeybindMulti.getStorageStringForKeyCode(keyCode);
                 String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
 
                 if (keyStrUse.equals(keyStrPick))
@@ -179,7 +191,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
     public static void onTick()
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         if (mc.world != null && mc.player != null)
         {

@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -168,7 +168,7 @@ public class SubRegionPlacement
 
             if (posArr.size() != 3)
             {
-                LiteModLitematica.logger.warn("Placement.fromJson(): Failed to load a placement from JSON, invalid position data");
+                Litematica.logger.warn("Placement.fromJson(): Failed to load a placement from JSON, invalid position data");
                 return null;
             }
 
@@ -188,7 +188,7 @@ public class SubRegionPlacement
             }
             catch (Exception e)
             {
-                LiteModLitematica.logger.warn("Placement.fromJson(): Invalid rotation or mirror value for a placement");
+                Litematica.logger.warn("Placement.fromJson(): Invalid rotation or mirror value for a placement");
             }
 
             return placement;

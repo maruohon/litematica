@@ -113,7 +113,7 @@ public class WidgetSchematicPlacement extends WidgetBase
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
 
         boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
 
@@ -155,7 +155,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         //GlStateManager.disableRescaleNormal();
         //RenderHelper.disableStandardItemLighting();
         //GlStateManager.disableLighting();
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
 
         this.parent.bindTexture(Icons.TEXTURE);
         icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
@@ -222,7 +222,7 @@ public class WidgetSchematicPlacement extends WidgetBase
             {
                 GuiPlacementConfiguration gui = new GuiPlacementConfiguration(this.widget.placement);
                 gui.setParent(this.widget.parent.getParentGui());
-                Minecraft.getMinecraft().displayGuiScreen(gui);
+                Minecraft.getInstance().displayGuiScreen(gui);
             }
             else if (this.type == ButtonType.REMOVE)
             {

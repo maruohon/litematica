@@ -96,7 +96,7 @@ public class WidgetSchematicEntry extends WidgetBase
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
@@ -116,7 +116,7 @@ public class WidgetSchematicEntry extends WidgetBase
         String schematicName = this.schematic.getMetadata().getName();
         this.mc.fontRenderer.drawString(schematicName, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();
         File schematicFile = this.schematic.getFile();
         String fileName = schematicFile != null ? schematicFile.getName() : null;
@@ -178,7 +178,7 @@ public class WidgetSchematicEntry extends WidgetBase
         {
             if (this.type == Type.CREATE_PLACEMENT)
             {
-                Minecraft mc = Minecraft.getMinecraft();
+                Minecraft mc = Minecraft.getInstance();
                 BlockPos pos = new BlockPos(mc.player.getPositionVector());
                 LitematicaSchematic entry = this.widget.schematic;
                 String name = entry.getMetadata().getName();
@@ -189,7 +189,7 @@ public class WidgetSchematicEntry extends WidgetBase
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {
-                Minecraft mc = Minecraft.getMinecraft();
+                Minecraft mc = Minecraft.getInstance();
                 LitematicaSchematic entry = this.widget.schematic;
                 GuiSchematicSave gui = new GuiSchematicSave(entry);
 

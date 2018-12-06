@@ -163,10 +163,10 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
             if (pair != null)
             {
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                GlStateManager.color4f(1f, 1f, 1f, 1f);
                 this.bindTexture(pair.getLeft());
 
-                int iconSize = (int) Math.sqrt(pair.getRight().getTextureData().length);
+                int iconSize = (int) Math.sqrt(pair.getRight().getTextureData().getWidth());
                 Gui.drawModalRectWithCustomSizedTexture(x + 10, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
@@ -215,7 +215,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                     //BufferedImage buf = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
                     //buf.setRGB(0, 0, size, size, previewImageData, 0, size);
 
-                    DynamicTexture tex = new DynamicTexture(size, size);
+                    DynamicTexture tex = new DynamicTexture(size, size, true);
                     ResourceLocation rl = new ResourceLocation("litematica", file.getAbsolutePath());
                     this.mc.getTextureManager().loadTexture(rl, tex);
 

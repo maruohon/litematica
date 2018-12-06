@@ -107,7 +107,7 @@ public class WidgetPlacementSubRegion extends WidgetBase
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
 
         boolean placementSelected = this.schematicPlacement.getSelectedSubRegionPlacement() == this.placement;
 
@@ -128,9 +128,9 @@ public class WidgetPlacementSubRegion extends WidgetBase
 
         if (placementSelected)
         {
-            GlStateManager.translate(0, 0, 1);
+            GlStateManager.translatef(0, 0, 1);
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
-            GlStateManager.translate(0, 0, -1);
+            GlStateManager.translatef(0, 0, -1);
         }
 
         String name = this.placement.getName();
@@ -151,7 +151,7 @@ public class WidgetPlacementSubRegion extends WidgetBase
         //GlStateManager.disableRescaleNormal();
         //RenderHelper.disableStandardItemLighting();
         //GlStateManager.disableLighting();
-        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
 
         this.parent.bindTexture(Icons.TEXTURE);
         icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
@@ -209,7 +209,7 @@ public class WidgetPlacementSubRegion extends WidgetBase
             {
                 GuiSubRegionConfiguration gui = new GuiSubRegionConfiguration(this.widget.schematicPlacement, this.widget.placement);
                 gui.setParent(this.widget.parent.getParentGui());
-                Minecraft.getMinecraft().displayGuiScreen(gui);
+                Minecraft.getInstance().displayGuiScreen(gui);
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {

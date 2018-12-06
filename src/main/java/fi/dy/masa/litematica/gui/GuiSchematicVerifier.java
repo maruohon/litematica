@@ -329,7 +329,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         @Override
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
 
             switch (this.type)
             {

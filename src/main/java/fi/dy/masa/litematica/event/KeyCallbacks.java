@@ -16,6 +16,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
+import fi.dy.masa.litematica.mixin.IMixinKeyBinding;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -42,8 +43,9 @@ import net.minecraft.util.math.BlockPos;
 
 public class KeyCallbacks
 {
-    public static void init(Minecraft mc)
+    public static void init()
     {
+        Minecraft mc = Minecraft.getInstance();
         IHotkeyCallback callbackHotkeys = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
         ValueChangeCallback valueChangeCallback = new ValueChangeCallback();
@@ -225,7 +227,8 @@ public class KeyCallbacks
                 {
                     if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
                     {
-                        String keyStrUse = KeybindMulti.getStorageStringForKeyCode(this.mc.gameSettings.keyBindUseItem.getKeyCode());
+                        int keyCode = ((IMixinKeyBinding) mc.gameSettings.keyBindUseItem).getInput().getKeyCode();
+                        String keyStrUse = KeybindMulti.getStorageStringForKeyCode(keyCode);
                         String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
 
                         // Only do the pick block here, if it's not bound to the use button.

@@ -186,7 +186,7 @@ public class GuiRenderLayer extends GuiBase
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             DataManager.setConfigGuiTab(this.tab);
-            Minecraft.getMinecraft().displayGuiScreen(new GuiConfigs());
+            Minecraft.getInstance().displayGuiScreen(new GuiConfigs());
         }
     }
 

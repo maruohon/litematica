@@ -40,7 +40,7 @@ public enum OperationMode
     public OperationMode cycle(EntityPlayer player, boolean forward)
     {
         int id = this.ordinal();
-        int numModes = player.capabilities.isCreativeMode ? values().length : 2;
+        int numModes = player.abilities.isCreativeMode ? values().length : 2;
 
         if (forward)
         {

@@ -30,28 +30,28 @@ public class DisplayListUploaderSchematic
                 switch (usage)
                 {
                     case POSITION:
-                        GlStateManager.glVertexPointer(format.getElementCount(), glConstant, size, bytebuffer);
-                        GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+                        GlStateManager.vertexPointer(format.getElementCount(), glConstant, size, bytebuffer);
+                        GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
                         break;
                     case UV:
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + format.getIndex());
-                        GlStateManager.glTexCoordPointer(format.getElementCount(), glConstant, size, bytebuffer);
-                        GlStateManager.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0 + format.getIndex());
+                        GlStateManager.texCoordPointer(format.getElementCount(), glConstant, size, bytebuffer);
+                        GlStateManager.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0);
                         break;
                     case COLOR:
-                        GlStateManager.glColorPointer(format.getElementCount(), glConstant, size, bytebuffer);
-                        GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
+                        GlStateManager.colorPointer(format.getElementCount(), glConstant, size, bytebuffer);
+                        GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
                         break;
                     case NORMAL:
-                        GlStateManager.glNormalPointer(glConstant, size, bytebuffer);
-                        GlStateManager.glEnableClientState(GL11.GL_NORMAL_ARRAY);
+                        GlStateManager.normalPointer(glConstant, size, bytebuffer);
+                        GlStateManager.enableClientState(GL11.GL_NORMAL_ARRAY);
                         break;
                     default:
                 }
             }
 
-            GlStateManager.glDrawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
+            GlStateManager.drawArrays(bufferBuilder.getDrawMode(), 0, bufferBuilder.getVertexCount());
             final int count = elements.size();
 
             for (int i = 0; i < count; ++i)
@@ -62,19 +62,19 @@ public class DisplayListUploaderSchematic
                 switch (usage)
                 {
                     case POSITION:
-                        GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                        GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
                         break;
                     case UV:
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + format.getIndex());
-                        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0 + format.getIndex());
+                        GlStateManager.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0);
                         break;
                     case COLOR:
-                        GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
+                        GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
                         GlStateManager.resetColor();
                         break;
                     case NORMAL:
-                        GlStateManager.glDisableClientState(GL11.GL_NORMAL_ARRAY);
+                        GlStateManager.disableClientState(GL11.GL_NORMAL_ARRAY);
                         break;
                     default:
                 }

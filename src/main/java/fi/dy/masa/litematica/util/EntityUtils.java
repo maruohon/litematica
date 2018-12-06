@@ -8,8 +8,8 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -125,7 +125,7 @@ public class EntityUtils
     {
         try
         {
-            return EntityList.createEntityFromNBT(nbt, world);
+            return EntityType.create(nbt, world);
         }
         catch (Exception e)
         {
@@ -150,13 +150,13 @@ public class EntityUtils
         }
         else
         {
-            if (nbt.hasKey("Passengers", Constants.NBT.TAG_LIST))
+            if (nbt.contains("Passengers", Constants.NBT.TAG_LIST))
             {
-                NBTTagList taglist = nbt.getTagList("Passengers", Constants.NBT.TAG_COMPOUND);
+                NBTTagList taglist = nbt.getList("Passengers", Constants.NBT.TAG_COMPOUND);
 
-                for (int i = 0; i < taglist.tagCount(); ++i)
+                for (int i = 0; i < taglist.size(); ++i)
                 {
-                    Entity passenger = createEntityAndPassengersFromNBT(taglist.getCompoundTagAt(i), world);
+                    Entity passenger = createEntityAndPassengersFromNBT(taglist.getCompound(i), world);
 
                     if (passenger != null)
                     {

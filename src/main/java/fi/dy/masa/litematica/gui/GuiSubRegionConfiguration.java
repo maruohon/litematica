@@ -9,10 +9,10 @@ import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
@@ -88,11 +88,11 @@ public class GuiSubRegionConfiguration extends GuiBase
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
 
-        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        MainWindow window = Minecraft.getInstance().mainWindow;
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
         int menuButtonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        x = sr.getScaledHeight() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
+        x = window.getScaledHeight() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
 
         button = new ButtonGeneric(this.id++, x, y, menuButtonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
@@ -226,7 +226,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         @Override
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
             int amount = mouseButton == 1 ? -1 : 1;
             if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
             if (GuiScreen.isAltKeyDown()) { amount *= 4; }

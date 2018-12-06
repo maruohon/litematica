@@ -9,11 +9,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 @Mixin(Chunk.class)
-public class MixinChunk
+public abstract class MixinChunk
 {
     @Redirect(method = "setBlockState",
                 slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/Chunk;generateSkylightMap()V")),
-                at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;isRemote:Z"))
+                at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;isRemote:Z", ordinal = 0))
     private boolean redirectIsRemote(World world)
     {
         return WorldUtils.shouldPreventOnBlockAdded() ? true : world.isRemote;

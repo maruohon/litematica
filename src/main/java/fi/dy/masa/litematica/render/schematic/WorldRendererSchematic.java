@@ -26,37 +26,40 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.ViewFrustum;
-import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.IRenderChunkFactory;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.crash.ReportedException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.fluid.IFluidState;
+import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.ReportedException;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-public class RenderGlobalSchematic extends RenderGlobal
+public class WorldRendererSchematic extends WorldRenderer
 {
     private final Minecraft mc;
     private final RenderManager renderManager;
@@ -97,7 +100,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     private double prevRenderSortZ;
     private boolean displayListEntitiesDirty = true;
 
-    public RenderGlobalSchematic(Minecraft mc)
+    public WorldRendererSchematic(Minecraft mc)
     {
         super(mc);
 
@@ -259,7 +262,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     }
 
     @Override
-    public void setupTerrain(Entity viewEntity, double partialTicks, ICamera camera, int frameCount, boolean playerSpectator)
+    public void setupTerrain(Entity viewEntity, float partialTicks, ICamera camera, int frameCount, boolean playerSpectator)
     {
         if (this.viewFrustum == null || this.mc.gameSettings.renderDistanceChunks != this.renderDistanceChunks)
         {
@@ -436,7 +439,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     }
 
     @Override
-    public int renderBlockLayer(BlockRenderLayer blockLayerIn, double partialTicks, int pass, Entity entityIn)
+    public int renderBlockLayer(BlockRenderLayer blockLayerIn, double partialTicks, Entity entityIn)
     {
         RenderHelper.disableStandardItemLighting();
 
@@ -494,17 +497,17 @@ public class RenderGlobalSchematic extends RenderGlobal
 
     private void renderBlockLayer(BlockRenderLayer layer)
     {
-        this.mc.entityRenderer.enableLightmap();
+        this.mc.gameRenderer.enableLightmap();
 
         if (OpenGlHelper.useVbo())
         {
-            GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-            OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
-            GlStateManager.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-            OpenGlHelper.setClientActiveTexture(OpenGlHelper.lightmapTexUnit);
-            GlStateManager.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-            OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
-            GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
+            GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
+            OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0);
+            GlStateManager.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+            OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE1);
+            GlStateManager.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+            OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0);
+            GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
         }
 
         this.renderContainer.renderChunkLayer(layer);
@@ -519,22 +522,22 @@ public class RenderGlobalSchematic extends RenderGlobal
                 switch (vertexformatelement$enumusage)
                 {
                     case POSITION:
-                        GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                        GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
                         break;
                     case UV:
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + index);
-                        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0 + index);
+                        GlStateManager.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0);
                         break;
                     case COLOR:
-                        GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
+                        GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
                         GlStateManager.resetColor();
                     default:
                 }
             }
         }
 
-        this.mc.entityRenderer.disableLightmap();
+        this.mc.gameRenderer.disableLightmap();
     }
 
     public void renderBlockOverlays()
@@ -571,12 +574,12 @@ public class RenderGlobalSchematic extends RenderGlobal
 
     private void renderBlockOverlayBuffers(OverlayType type)
     {
-        this.mc.entityRenderer.enableLightmap();
+        this.mc.gameRenderer.enableLightmap();
 
         if (OpenGlHelper.useVbo())
         {
-            GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-            GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
+            GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
+            GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
         }
 
         this.renderContainer.renderBlockOverlays(type);
@@ -590,25 +593,25 @@ public class RenderGlobalSchematic extends RenderGlobal
                 switch (usage)
                 {
                     case POSITION:
-                        GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+                        GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
                         break;
                     case UV:
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit + element.getIndex());
-                        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
+                        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0 + element.getIndex());
+                        GlStateManager.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                        OpenGlHelper.glClientActiveTexture(OpenGlHelper.GL_TEXTURE0);
                         break;
                     case COLOR:
-                        GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
+                        GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
                         GlStateManager.resetColor();
                     default:
                 }
             }
         }
 
-        this.mc.entityRenderer.disableLightmap();
+        this.mc.gameRenderer.disableLightmap();
     }
 
-    public boolean renderBlock(IBlockState state, BlockPos pos, IBlockAccess blockAccess, BufferBuilder bufferBuilderIn)
+    public boolean renderBlock(IBlockState state, BlockPos pos, IWorldReader world, BufferBuilder bufferBuilderIn)
     {
         try
         {
@@ -623,11 +626,9 @@ public class RenderGlobalSchematic extends RenderGlobal
                 switch (renderType)
                 {
                     case MODEL:
-                        return this.blockModelRenderer.renderModel(blockAccess, this.getModelForState(state), state, pos, bufferBuilderIn);
+                        return this.blockModelRenderer.renderModel(world, this.getModelForState(state), state, pos, bufferBuilderIn, state.getPositionRandom(pos));
                     case ENTITYBLOCK_ANIMATED:
                         return false;
-                    case LIQUID:
-                        return this.fluidRenderer.renderFluid(blockAccess, state, pos, bufferBuilderIn);
                     default:
                         return false;
                 }
@@ -637,14 +638,29 @@ public class RenderGlobalSchematic extends RenderGlobal
         {
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block in world");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being tesselated");
-            CrashReportCategory.addBlockInfo(crashreportcategory, pos, state.getBlock(), state.getBlock().getMetaFromState(state));
+            CrashReportCategory.addBlockInfo(crashreportcategory, pos, state);
+            throw new ReportedException(crashreport);
+        }
+    }
+
+    public boolean renderFluid(IFluidState state, BlockPos pos, IWorldReader world, BufferBuilder bufferBuilderIn)
+    {
+        try
+        {
+            return this.fluidRenderer.render(world, pos, bufferBuilderIn, state);
+        }
+        catch (Throwable throwable)
+        {
+            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating liquid in world");
+            CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being tesselated");
+            CrashReportCategory.addBlockInfo(crashreportcategory, pos, null);
             throw new ReportedException(crashreport);
         }
     }
 
     public IBakedModel getModelForState(IBlockState state)
     {
-        return this.blockModelShapes.getModelForState(state);
+        return this.blockModelShapes.getModel(state);
     }
 
     @Override
@@ -674,10 +690,9 @@ public class RenderGlobalSchematic extends RenderGlobal
             TileEntityRendererDispatcher.staticPlayerY = entityY;
             TileEntityRendererDispatcher.staticPlayerZ = entityZ;
             this.renderManager.setRenderPosition(entityX, entityY, entityZ);
-            this.mc.entityRenderer.enableLightmap();
+            this.mc.gameRenderer.enableLightmap();
             this.world.profiler.endStartSection("litematica_global");
-            List<Entity> entities = this.world.getLoadedEntityList();
-            this.countEntitiesTotal = entities.size();
+            this.countEntitiesTotal = this.world.func_212419_R();
 
             this.world.profiler.endStartSection("litematica_entities");
             List<Entity> entitiesOutlined = Lists.<Entity>newArrayList();
@@ -726,7 +741,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                 }
             }
 
-            posMutable.release();
+            posMutable.close();
 
             if (entitiesMultipass.isEmpty() == false)
             {
@@ -800,7 +815,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                 }
             }
 
-            this.mc.entityRenderer.disableLightmap();
+            this.mc.gameRenderer.disableLightmap();
             this.mc.profiler.endSection();
         }
     }
@@ -819,7 +834,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         }
         else if (this.mc.player.isSpectator() && this.mc.gameSettings.keyBindSpectatorOutlines.isKeyDown() && entityIn instanceof EntityPlayer)
         {
-            return entityIn.ignoreFrustumCheck || camera.isBoundingBoxInFrustum(entityIn.getEntityBoundingBox()) || entityIn.isRidingOrBeingRiddenBy(this.mc.player);
+            return entityIn.ignoreFrustumCheck || camera.isBoundingBoxInFrustum(entityIn.getBoundingBox()) || entityIn.isRidingOrBeingRiddenBy(this.mc.player);
         }
         else
         {
@@ -828,7 +843,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     }
 
     @Override
-    public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags)
+    public void notifyBlockUpdate(IBlockReader worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -854,8 +869,8 @@ public class RenderGlobalSchematic extends RenderGlobal
     @Override public void notifyLightSet(BlockPos pos) {}
     @Override public void playSoundToAllNearExcept(@Nullable EntityPlayer player, SoundEvent soundIn, SoundCategory category, double x, double y, double z, float volume, float pitch) {}
     @Override public void playRecord(SoundEvent soundIn, BlockPos pos) {}
-    @Override public void spawnParticle(int particleID, boolean ignoreRange, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, int... parameters) {}
-    @Override public void spawnParticle(int id, boolean ignoreRange, boolean p_190570_3_, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, int... parameters) {}
+    @Override public void addParticle(IParticleData particle, boolean ignoreRange, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {}
+    @Override public void addParticle(IParticleData particle, boolean ignoreRange, boolean minimizeLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {}
     @Override public void onEntityAdded(Entity entityIn) {}
     @Override public void onEntityRemoved(Entity entityIn) {}
     @Override public void broadcastSound(int soundID, BlockPos pos, int data) {}
