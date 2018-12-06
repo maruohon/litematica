@@ -161,6 +161,18 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         return super.onKeyTyped(keyCode, scanCode, modifiers);
     }
 
+    @Override
+    public boolean onCharTyped(char charIn, int modifiers)
+    {
+        if (this.textField.charTyped(charIn, modifiers))
+        {
+            this.getListWidget().clearSelection();
+            return true;
+        }
+
+        return super.onCharTyped(charIn, modifiers);
+    }
+
     public static class DirectoryCreator implements IStringConsumerFeedback
     {
         private final File dir;
