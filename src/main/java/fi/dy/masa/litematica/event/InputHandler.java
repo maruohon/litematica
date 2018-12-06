@@ -171,10 +171,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
             {
                 int keyCode = ((IMixinKeyBinding) mc.gameSettings.keyBindUseItem).getInput().getKeyCode();
+                // FIXME 1.13
                 String keyStrUse = KeybindMulti.getStorageStringForKeyCode(keyCode);
                 String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
 
-                if (keyStrUse.equals(keyStrPick))
+                if (keyStrPick.equals(keyStrUse))
                 {
                     WorldUtils.doSchematicWorldPickBlock(false, mc);
                 }
