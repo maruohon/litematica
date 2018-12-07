@@ -30,6 +30,7 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
@@ -483,7 +484,7 @@ public class SchematicPlacementManager
 
             if (movingBox)
             {
-                schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), pos);
+                schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), pos, InfoUtils.INFO_MESSAGE_CONSUMER);
 
                 String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                 StringUtils.printActionbarMessage("litematica.message.placement.moved_subregion_to", posStr);
@@ -492,7 +493,7 @@ public class SchematicPlacementManager
             else
             {
                 BlockPos old = schematicPlacement.getOrigin();
-                schematicPlacement.setOrigin(pos);
+                schematicPlacement.setOrigin(pos, InfoUtils.INFO_MESSAGE_CONSUMER);
                 String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
                 String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                 StringUtils.printActionbarMessage("litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
@@ -521,13 +522,13 @@ public class SchematicPlacementManager
                 BlockPos old = PositionUtils.getTransformedBlockPos(placement.getPos(), schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 old = old.add(schematicPlacement.getOrigin());
 
-                schematicPlacement.moveSubRegionTo(placement.getName(), old.offset(direction, amount));
+                schematicPlacement.moveSubRegionTo(placement.getName(), old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
             }
             // Moving the origin point
             else
             {
                 BlockPos old = schematicPlacement.getOrigin();
-                schematicPlacement.setOrigin(old.offset(direction, amount));
+                schematicPlacement.setOrigin(old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
             }
         }
     }

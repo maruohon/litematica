@@ -26,10 +26,12 @@ import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.MaterialListEntry;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.SchematicUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -85,7 +87,7 @@ public class SchematicPlacement
     {
         SchematicPlacement placement = new SchematicPlacement(schematic, origin, name, enabled, enableRender);
         placement.setBoxesBBColorNext();
-        placement.resetAllSubRegionsToSchematicValues();
+        placement.resetAllSubRegionsToSchematicValues(InfoUtils.INFO_MESSAGE_CONSUMER);
 
         return placement;
     }
@@ -133,11 +135,11 @@ public class SchematicPlacement
         return this.ignoreEntities;
     }
 
-    public void toggleIgnoreEntities()
+    public void toggleIgnoreEntities(IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -546,11 +548,11 @@ public class SchematicPlacement
      * @param regionName
      * @param newPos
      */
-    public void moveSubRegionTo(String regionName, BlockPos newPos)
+    public void moveSubRegionTo(String regionName, BlockPos newPos, IStringConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -570,11 +572,11 @@ public class SchematicPlacement
         }
     }
 
-    public void setSubRegionRotation(String regionName, Rotation rotation)
+    public void setSubRegionRotation(String regionName, Rotation rotation, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -589,11 +591,11 @@ public class SchematicPlacement
         }
     }
 
-    public void setSubRegionMirror(String regionName, Mirror mirror)
+    public void setSubRegionMirror(String regionName, Mirror mirror, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -608,11 +610,11 @@ public class SchematicPlacement
         }
     }
 
-    public void toggleSubRegionEnabled(String regionName)
+    public void toggleSubRegionEnabled(String regionName, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -627,11 +629,11 @@ public class SchematicPlacement
         }
     }
 
-    public void toggleSubRegionIgnoreEntities(String regionName)
+    public void toggleSubRegionIgnoreEntities(String regionName, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -646,11 +648,11 @@ public class SchematicPlacement
         }
     }
 
-    public void resetAllSubRegionsToSchematicValues()
+    public void resetAllSubRegionsToSchematicValues(IStringConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -671,11 +673,11 @@ public class SchematicPlacement
         this.onModified(manager);
     }
 
-    public void resetSubRegionToSchematicValues(String regionName)
+    public void resetSubRegionToSchematicValues(String regionName, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -734,11 +736,11 @@ public class SchematicPlacement
         }
     }
 
-    public SchematicPlacement setOrigin(BlockPos origin)
+    public SchematicPlacement setOrigin(BlockPos origin, IStringConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
             return this;
         }
 
@@ -755,11 +757,11 @@ public class SchematicPlacement
         return this;
     }
 
-    public SchematicPlacement setRotation(Rotation rotation)
+    public SchematicPlacement setRotation(Rotation rotation, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return this;
         }
 
@@ -776,11 +778,11 @@ public class SchematicPlacement
         return this;
     }
 
-    public SchematicPlacement setMirror(Mirror mirror)
+    public SchematicPlacement setMirror(Mirror mirror, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return this;
         }
 

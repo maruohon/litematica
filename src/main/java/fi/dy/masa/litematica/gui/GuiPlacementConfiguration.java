@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -18,6 +19,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
@@ -325,6 +328,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
             if (GuiScreen.isAltKeyDown()) { amount *= 4; }
             BlockPos oldOrigin = this.placement.getOrigin();
+            this.parent.setNextMessageType(MessageType.ERROR);
 
             switch (this.type)
             {
@@ -335,34 +339,36 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
-                    this.placement.setRotation(PositionUtils.cycleRotation(this.placement.getRotation(), reverse));
+                    Rotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
+                    this.placement.setRotation(rotation, this.parent);
                     break;
                 }
 
                 case MIRROR:
                 {
                     boolean reverse = mouseButton == 1;
-                    this.placement.setMirror(PositionUtils.cycleMirror(this.placement.getMirror(), reverse));
+                    Mirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
+                    this.placement.setMirror(mirror, this.parent);
                     break;
                 }
 
                 case MOVE_HERE:
                 {
                     BlockPos pos = new BlockPos(mc.player.getPositionVector());
-                    this.placement.setOrigin(pos);
+                    this.placement.setOrigin(pos, this.parent);
                     break;
                 }
 
                 case NUDGE_COORD_X:
-                    this.placement.setOrigin(oldOrigin.add(amount, 0, 0));
+                    this.placement.setOrigin(oldOrigin.add(amount, 0, 0), this.parent);
                     break;
 
                 case NUDGE_COORD_Y:
-                    this.placement.setOrigin(oldOrigin.add(0, amount, 0));
+                    this.placement.setOrigin(oldOrigin.add(0, amount, 0), this.parent);
                     break;
 
                 case NUDGE_COORD_Z:
-                    this.placement.setOrigin(oldOrigin.add(0, 0, amount));
+                    this.placement.setOrigin(oldOrigin.add(0, 0, amount), this.parent);
                     break;
 
                 case TOGGLE_ENABLED:
@@ -374,7 +380,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     break;
 
                 case TOGGLE_ENTITIES:
-                    this.placement.toggleIgnoreEntities();
+                    this.placement.toggleIgnoreEntities(this.parent);
                     break;
 
                 case TOGGLE_ENCLOSING_BOX:
@@ -382,7 +388,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     break;
 
                 case RESET_SUB_REGIONS:
-                    this.placement.resetAllSubRegionsToSchematicValues();
+                    this.placement.resetAllSubRegionsToSchematicValues(this.parent);
                     break;
 
                 case OPEN_VERIFIER_GUI:
@@ -462,12 +468,13 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             {
                 int value = Integer.parseInt(textField.getText());
                 BlockPos posOld = this.placement.getOrigin();
+                this.parent.setNextMessageType(MessageType.ERROR);
 
                 switch (this.type)
                 {
-                    case X: this.placement.setOrigin(new BlockPos(value, posOld.getY(), posOld.getZ())); break;
-                    case Y: this.placement.setOrigin(new BlockPos(posOld.getX(), value, posOld.getZ())); break;
-                    case Z: this.placement.setOrigin(new BlockPos(posOld.getX(), posOld.getY(), value)); break;
+                    case X: this.placement.setOrigin(new BlockPos(value, posOld.getY(), posOld.getZ()), this.parent); break;
+                    case Y: this.placement.setOrigin(new BlockPos(posOld.getX(), value, posOld.getZ()), this.parent); break;
+                    case Z: this.placement.setOrigin(new BlockPos(posOld.getX(), posOld.getY(), value), this.parent); break;
                 }
 
                 this.parent.updateElements();

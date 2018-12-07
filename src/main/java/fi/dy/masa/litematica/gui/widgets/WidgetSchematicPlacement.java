@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
@@ -184,16 +185,21 @@ public class WidgetSchematicPlacement extends WidgetBase
         String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
         text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
 
-        int offset = 12 + 11 + 2; // this.x + modified icon + gap to buttons
-
-        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
+        if (this.placement.isLocked() &&
+                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 37, this.y + 6, 11, 11))
         {
-            this.parent.drawHoveringText(text, mouseX, mouseY);
+            String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_locked");
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
         }
-        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - offset, this.y + 6, 11, 11))
+        else if (this.placement.isRegionPlacementModified() &&
+                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 26, this.y + 6, 11, 11))
         {
             String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_modified");
-            this.parent.drawHoveringText(str, mouseX, mouseY);
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
+        }
+        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 18, this.height))
+        {
+            RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
     }
 

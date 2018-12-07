@@ -227,6 +227,7 @@ litematica.hud.area_selection.selected_area=Area: %s
 litematica.hud.area_selection.selected_sub_region=Sub-region: %s
 litematica.hud.area_selection.selection_mode=Selection Mode: %s
 
+litematica.hud.schematic_placement.hover_info.placement_locked=This placement has been locked and can't\nbe modified without unlocking it first
 litematica.hud.schematic_placement.hover_info.placement_modified=This placement has been modified
 litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=This sub-region has been modified
 litematica.hud.schematic_placement.selected_placement=Placement

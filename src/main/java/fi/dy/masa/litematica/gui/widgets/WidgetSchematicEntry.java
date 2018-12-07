@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
@@ -145,7 +146,7 @@ public class WidgetSchematicEntry extends WidgetBase
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
         {
-            this.parent.drawHoveringText(text, mouseX, mouseY);
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(text));
         }
 
         for (ButtonWrapper<? extends ButtonGeneric> entry : this.buttons)

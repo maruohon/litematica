@@ -6,6 +6,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
@@ -14,6 +15,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiSubRegionConfiguration extends GuiBase
@@ -187,10 +190,8 @@ public class GuiSubRegionConfiguration extends GuiBase
 
     private void updateElements()
     {
-        String areaName = this.placement.getName();
-        BlockPos posOriginal = this.schematicPlacement.getSchematic().getSubRegionPosition(areaName);
         String label = I18n.format("litematica.gui.button.placement_sub.reset_sub_region_placement");
-        boolean enabled = this.placement.isRegionPlacementModified(posOriginal);
+        boolean enabled = this.placement.isRegionPlacementModifiedFromDefault();
 
         if (enabled)
         {
@@ -236,6 +237,7 @@ public class GuiSubRegionConfiguration extends GuiBase
             BlockPos posOld = this.placement.getPos();
             posOld = PositionUtils.getTransformedBlockPos(posOld, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
             posOld = posOld.add(this.schematicPlacement.getOrigin());
+            this.parent.setNextMessageType(MessageType.ERROR);
 
             switch (this.type)
             {
@@ -246,43 +248,45 @@ public class GuiSubRegionConfiguration extends GuiBase
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
-                    this.schematicPlacement.setSubRegionRotation(this.subRegionName, PositionUtils.cycleRotation(this.placement.getRotation(), reverse));
+                    Rotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
+                    this.schematicPlacement.setSubRegionRotation(this.subRegionName, rotation, this.parent);
                     break;
                 }
 
                 case MIRROR:
                 {
                     boolean reverse = mouseButton == 1;
-                    this.schematicPlacement.setSubRegionMirror(this.subRegionName, PositionUtils.cycleMirror(this.placement.getMirror(), reverse));
+                    Mirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
+                    this.schematicPlacement.setSubRegionMirror(this.subRegionName, mirror, this.parent);
                     break;
                 }
 
                 case MOVE_HERE:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(mc.player.getPositionVector()));
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(mc.player.getPositionVector()), this.parent);
                     break;
 
                 case NUDGE_COORD_X:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(amount, 0, 0));
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(amount, 0, 0), this.parent);
                     break;
 
                 case NUDGE_COORD_Y:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(0, amount, 0));
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(0, amount, 0), this.parent);
                     break;
 
                 case NUDGE_COORD_Z:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(0, 0, amount));
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(0, 0, amount), this.parent);
                     break;
 
                 case TOGGLE_ENABLED:
-                    this.schematicPlacement.toggleSubRegionEnabled(this.subRegionName);
+                    this.schematicPlacement.toggleSubRegionEnabled(this.subRegionName, this.parent);
                     break;
 
                 case TOGGLE_ENTITIES:
-                    this.schematicPlacement.toggleSubRegionIgnoreEntities(this.subRegionName);
+                    this.schematicPlacement.toggleSubRegionIgnoreEntities(this.subRegionName, this.parent);
                     break;
 
                 case RESET_PLACEMENT:
-                    this.schematicPlacement.resetSubRegionToSchematicValues(this.subRegionName);
+                    this.schematicPlacement.resetSubRegionToSchematicValues(this.subRegionName, this.parent);
                     break;
 
                 case SLICE_TYPE:
@@ -349,7 +353,8 @@ public class GuiSubRegionConfiguration extends GuiBase
                     case Z: pos = new BlockPos(posOld.getX(), posOld.getY(), value        ); break;
                 }
 
-                this.schematicPlacement.moveSubRegionTo(this.placement.getName(), pos);
+                this.parent.setNextMessageType(MessageType.ERROR);
+                this.schematicPlacement.moveSubRegionTo(this.placement.getName(), pos, this.parent);
                 this.parent.updateElements();
             }
             catch (NumberFormatException e)
