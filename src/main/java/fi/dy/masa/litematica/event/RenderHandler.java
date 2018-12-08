@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.event;
 
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
@@ -17,7 +18,9 @@ public class RenderHandler implements IRenderer
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
-            if (Configs.Visuals.ENABLE_GHOST_BLOCK_RENDERING.getBooleanValue())
+            boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isValid() && Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
+
+            if (Configs.Visuals.ENABLE_GHOST_BLOCK_RENDERING.getBooleanValue() != invert)
             {
                 LitematicaRenderer.getInstance().renderSchematicWorld(partialTicks);
             }

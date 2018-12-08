@@ -12,6 +12,7 @@ public class Hotkeys
     public static final ConfigHotkey EASY_PLACE_ACTIVATION              = new ConfigHotkey("easyPlaceActivation",               "LCONTROL",  "When the easyPlaceMode is enabled, this key must\nbe held to enable placing the blocks when\nusing the vanilla Use key");
     public static final ConfigHotkey EASY_PLACE_TOGGLE                  = new ConfigHotkey("easyPlaceToggle",                   "",        "Allows quickly toggling on/off the Easy Place mode");
     public static final ConfigHotkey EXECUTE_OPERATION                  = new ConfigHotkey("executeOperation",                  "LCONTROL,LMENU,R",  "Execute the currently selected tool operation with the\ncurrent selection or placement in the Fill, Replace,\nPaste Schematic etc. modes");
+    public static final ConfigHotkey INVERT_GHOST_BLOCK_RENDER_STATE    = new ConfigHotkey("invertGhostBlockRenderState",       "", "Inverts the Ghost Block Rendering status\nwhile this keybind is held down");
     public static final ConfigHotkey LAYER_MODE_NEXT                    = new ConfigHotkey("layerModeNext",                     "M,PRIOR", "Cycle the rendering mode (all, layers) forward");
     public static final ConfigHotkey LAYER_MODE_PREVIOUS                = new ConfigHotkey("layerModePrevious",                 "M,NEXT",  "Cycle the rendering mode (all, layers) backwards");
     public static final ConfigHotkey LAYER_NEXT                         = new ConfigHotkey("layerNext",                         "PRIOR", "Move the rendered layer selection up");
@@ -62,6 +63,7 @@ public class Hotkeys
             EASY_PLACE_ACTIVATION,
             EASY_PLACE_TOGGLE,
             EXECUTE_OPERATION,
+            INVERT_GHOST_BLOCK_RENDER_STATE,
             LAYER_MODE_NEXT,
             LAYER_MODE_PREVIOUS,
             LAYER_NEXT,
