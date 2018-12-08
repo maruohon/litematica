@@ -279,11 +279,15 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             Minecraft mc = Minecraft.getMinecraft();
             this.stackNameExpected = this.stackExpected.getDisplayName();
             this.stackNameFound = this.stackFound.getDisplayName();
-            this.columnWidthExpected = Math.max(mc.fontRenderer.getStringWidth(this.stackNameExpected) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
-            int w2 = Math.max(mc.fontRenderer.getStringWidth(this.stackNameFound) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
-
             List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
             List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
+
+            int w1 = Math.max(mc.fontRenderer.getStringWidth(this.stackNameExpected) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
+            int w2 = Math.max(mc.fontRenderer.getStringWidth(this.stackNameFound) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
+            w1 = Math.max(w1, fi.dy.masa.litematica.render.RenderUtils.getMaxStringRenderLength(propsExpected, mc));
+            w2 = Math.max(w2, fi.dy.masa.litematica.render.RenderUtils.getMaxStringRenderLength(propsFound, mc));
+
+            this.columnWidthExpected = w1;
             this.totalWidth = this.columnWidthExpected + w2 + 40;
             this.totalHeight = Math.max(propsExpected.size(), propsFound.size()) * (mc.fontRenderer.FONT_HEIGHT + 2) + 60;
         }

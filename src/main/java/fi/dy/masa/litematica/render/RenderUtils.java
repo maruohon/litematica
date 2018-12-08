@@ -26,6 +26,18 @@ import net.minecraft.world.World;
 
 public class RenderUtils
 {
+    public static int getMaxStringRenderLength(List<String> list, Minecraft mc)
+    {
+        int length = 0;
+
+        for (String str : list)
+        {
+            length = Math.max(length, mc.fontRenderer.getStringWidth(str));
+        }
+
+        return length;
+    }
+
     public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth,
             Color4f color, Entity renderViewEntity, float partialTicks)
     {
