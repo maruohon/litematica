@@ -75,6 +75,13 @@ public class SchematicPlacementManager
         if (this.chunksToRebuild.isEmpty() == false)
         {
             WorldClient worldClient = Minecraft.getMinecraft().world;
+
+            if (worldClient == null)
+            {
+                this.chunksToRebuild.clear();
+                return true;
+            }
+
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             Iterator<ChunkPos> iter = this.chunksToRebuild.iterator();
 
