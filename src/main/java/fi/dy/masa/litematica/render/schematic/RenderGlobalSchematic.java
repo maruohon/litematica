@@ -339,8 +339,11 @@ public class RenderGlobalSchematic extends RenderGlobal
                 SubChunkPos subChunk = queuePositions.poll();
                 //SubChunkPos subChunk = positions.get(i);
 
+                // Only render sub-chunks that are within the client's render distance, and that
+                // have been already properly loaded on the client
                 if (Math.abs(subChunk.getX() - centerChunkX) <= renderDistance &&
-                    Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance)
+                    Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance &&
+                    world.getChunkProvider().isChunkGeneratedAt(subChunk.getX(), subChunk.getZ()))
                 {
                     BlockPos subChunkCornerPos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
                     RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(subChunkCornerPos);
