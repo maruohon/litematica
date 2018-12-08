@@ -52,7 +52,6 @@ public class WidgetSchematicPlacement extends WidgetBase
         // Note: These are placed from right to left
 
         posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.REMOVE);
-        posX = this.createButtonOnOff(posX, posY, this.placement.isRenderingEnabled(), ButtonListener.ButtonType.TOGGLE_RENDER);
         posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
         posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.CONFIGURE);
 
@@ -71,7 +70,7 @@ public class WidgetSchematicPlacement extends WidgetBase
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
-        ButtonOnOff button = ButtonOnOff.create(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = ButtonOnOff.create(xRight + 1, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         xRight -= button.getButtonWidth();
         this.addButton(button, new ButtonListener(type, this));
 
@@ -186,13 +185,13 @@ public class WidgetSchematicPlacement extends WidgetBase
         text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
 
         if (this.placement.isLocked() &&
-                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 37, this.y + 6, 11, 11))
+                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 38, this.y + 6, 11, 11))
         {
             String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_locked");
             RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
         }
         else if (this.placement.isRegionPlacementModified() &&
-                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 26, this.y + 6, 11, 11))
+                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 25, this.y + 6, 11, 11))
         {
             String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_modified");
             RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
@@ -240,11 +239,6 @@ public class WidgetSchematicPlacement extends WidgetBase
                 this.widget.placement.setEnabled(! this.widget.placement.isEnabled());
                 this.widget.parent.refreshEntries();
             }
-            else if (this.type == ButtonType.TOGGLE_RENDER)
-            {
-                this.widget.placement.setRenderSchematic(! this.widget.placement.isRenderingEnabled());
-                this.widget.parent.refreshEntries();
-            }
         }
 
         @Override
@@ -257,8 +251,7 @@ public class WidgetSchematicPlacement extends WidgetBase
         {
             CONFIGURE       ("litematica.gui.button.schematic_placements.configure"),
             REMOVE          ("litematica.gui.button.schematic_placements.remove"),
-            TOGGLE_ENABLED  ("litematica.gui.button.schematic_placements.placement_enabled"),
-            TOGGLE_RENDER   ("litematica.gui.button.schematic_placements.rendering_enabled");
+            TOGGLE_ENABLED  ("litematica.gui.button.schematic_placements.placement_enabled");
 
             private final String translationKey;
 

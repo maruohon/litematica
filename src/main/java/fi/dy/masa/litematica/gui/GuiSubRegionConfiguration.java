@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
+import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
+import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -24,7 +26,6 @@ public class GuiSubRegionConfiguration extends GuiBase
     private final SchematicPlacement schematicPlacement;
     private final SubRegionPlacement placement;
     private ButtonGeneric buttonResetPlacement;
-    private int id;
 
     public GuiSubRegionConfiguration(SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
@@ -38,18 +39,19 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         super.initGui();
 
-        this.id = 0;
-        int width = 140;
+        int id = 0;
+        int width = 120;
         int x = this.width - width - 10;
         int y = 22;
 
         String label = I18n.format("litematica.gui.label.placement_sub.region_name", this.placement.getName());
         this.addLabel(20, y, -1, 16, 0xFFFFFFFF, label);
 
-        this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENABLED);
+        this.createButtonOnOff(x, y, width - 22, this.placement.isEnabled(), ButtonListener.Type.TOGGLE_ENABLED);
+        this.createButton(x + width - 20, y, 20, ButtonListener.Type.TOGGLE_RENDERING);
         y += 22;
 
-        this.createButton(x, y, width, ButtonListener.Type.TOGGLE_ENTITIES);
+        this.createButtonOnOff(x, y, width, this.placement.ignoreEntities(), ButtonListener.Type.TOGGLE_ENTITIES);
         y += 22;
 
         label = I18n.format("litematica.gui.label.placement_sub.region_position");
@@ -58,19 +60,19 @@ public class GuiSubRegionConfiguration extends GuiBase
         x += 2;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
-        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_X, this.schematicPlacement, this.placement, this));
+        this.createButton(x + 85, y + 1, -1, ButtonListener.Type.NUDGE_COORD_X);
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Y);
-        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_Y, this.schematicPlacement, this.placement, this));
+        this.createButton(x + 85, y + 1, -1, ButtonListener.Type.NUDGE_COORD_Y);
         y += 20;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Z);
-        this.addButton(new ButtonGeneric(this.id++, x + 85, y + 1, Icons.BUTTON_PLUS_MINUS_16), new ButtonListener(ButtonListener.Type.NUDGE_COORD_Z, this.schematicPlacement, this.placement, this));
+        this.createButton(x + 85, y + 1, -1, ButtonListener.Type.NUDGE_COORD_Z);
         y += 22;
         x -= 2;
 
-        this.createButton(x, y, width, ButtonListener.Type.MOVE_HERE);
+        this.createButton(x, y, width, ButtonListener.Type.MOVE_TO_PLAYER);
         y += 22;
 
         this.createButton(x, y, width, ButtonListener.Type.ROTATE);
@@ -88,7 +90,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         label = I18n.format("litematica.gui.button.placement_sub.placement_configuration");
         int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
         x = 10;
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        ButtonGeneric button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
 
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
@@ -97,7 +99,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         int menuButtonWidth = this.fontRenderer.getStringWidth(label) + 20;
         x = sr.getScaledHeight() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
 
-        button = new ButtonGeneric(this.id++, x, y, menuButtonWidth, 20, label);
+        button = new ButtonGeneric(id, x, y, menuButtonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         this.updateElements();
@@ -120,66 +122,66 @@ public class GuiSubRegionConfiguration extends GuiBase
             case Z: text = String.valueOf(pos.getZ()); break;
         }
 
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(this.id++, x + offset, y + 1, width, 16, this.mc.fontRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(0, x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
         this.addTextField(textField, listener);
     }
 
+    private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
+    {
+        ButtonOnOff button = ButtonOnOff.create(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        this.addButton(button, new ButtonListener(type, this.schematicPlacement, this.placement, this));
+        return button.getButtonWidth();
+    }
+
     private void createButton(int x, int y, int width, ButtonListener.Type type)
     {
         ButtonListener listener = new ButtonListener(type, this.schematicPlacement, this.placement, this);
-        String label = "";
+        String label;
 
         switch (type)
         {
-            case ROTATE:
+            case TOGGLE_RENDERING:
             {
-                String value = PositionUtils.getRotationNameShort(this.placement.getRotation());
-                label = I18n.format("litematica.gui.button.rotation_value", value);
+                boolean enabled = this.placement.isRenderingEnabled();
+                String pre = enabled ? TXT_GREEN : TXT_RED;
+                label = pre + type.getDisplayName() + TXT_RST;
+                String str = pre + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
+                String hover = I18n.format("litematica.gui.button.schematic_placement.hover.rendering", str);
+
+                this.addButton(new ButtonGeneric(0, x, y, width, 20, label, hover), listener);
                 break;
             }
+
+            case NUDGE_COORD_X:
+            case NUDGE_COORD_Y:
+            case NUDGE_COORD_Z:
+            {
+                String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
+                ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
+                this.addButton(button, listener);
+                return;
+            }
+
+            case ROTATE:
+                label = type.getDisplayName(PositionUtils.getRotationNameShort(this.placement.getRotation()));
+                break;
 
             case MIRROR:
-            {
-                String value = PositionUtils.getMirrorName(this.placement.getMirror());
-                label = I18n.format("litematica.gui.button.mirror_value", value);
-                break;
-            }
-
-            case MOVE_HERE:
-                label = I18n.format("litematica.gui.button.move_here");
-                break;
-
-            case TOGGLE_ENABLED:
-                if (this.placement.isEnabled())
-                    label = I18n.format("litematica.gui.button.disable");
-                else
-                    label = I18n.format("litematica.gui.button.enable");
-                break;
-
-            case TOGGLE_ENTITIES:
-            {
-                boolean enabled = this.placement.ignoreEntities();
-                String str = (enabled ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
-                label = I18n.format("litematica.gui.button.schematic_placement.ignore_entities", str);
-                break;
-            }
-
-            case RESET_PLACEMENT:
+                label = type.getDisplayName(PositionUtils.getMirrorName(this.placement.getMirror()));
                 break;
 
             case SLICE_TYPE:
-            {
-                String value = "todo";
-                label = I18n.format("litematica.gui.button.placement_sub.slice_type", value);
+                label = type.getDisplayName("todo");
                 break;
-            }
 
             default:
+                label = type.getDisplayName();
+                break;
         }
 
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
         this.addButton(button, listener);
 
         if (type == ButtonListener.Type.RESET_PLACEMENT)
@@ -261,7 +263,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                     break;
                 }
 
-                case MOVE_HERE:
+                case MOVE_TO_PLAYER:
                     this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(mc.player.getPositionVector()), this.parent);
                     break;
 
@@ -281,6 +283,10 @@ public class GuiSubRegionConfiguration extends GuiBase
                     this.schematicPlacement.toggleSubRegionEnabled(this.subRegionName, this.parent);
                     break;
 
+                case TOGGLE_RENDERING:
+                    this.schematicPlacement.toggleSubRegionRenderingEnabled(this.subRegionName);
+                    break;
+
                 case TOGGLE_ENTITIES:
                     this.schematicPlacement.toggleSubRegionIgnoreEntities(this.subRegionName, this.parent);
                     break;
@@ -298,17 +304,42 @@ public class GuiSubRegionConfiguration extends GuiBase
 
         public enum Type
         {
-            PLACEMENT_CONFIGURATION,
-            TOGGLE_ENABLED,
-            TOGGLE_ENTITIES,
-            MOVE_HERE,
-            NUDGE_COORD_X,
-            NUDGE_COORD_Y,
-            NUDGE_COORD_Z,
-            ROTATE,
-            MIRROR,
-            RESET_PLACEMENT,
-            SLICE_TYPE;
+            PLACEMENT_CONFIGURATION (""),
+            TOGGLE_ENABLED          ("litematica.gui.button.schematic_placement.region_enabled"),
+            TOGGLE_RENDERING        ("litematica.gui.button.schematic_placement.abbr.rendering"),
+            TOGGLE_ENTITIES         ("litematica.gui.button.schematic_placement.ignore_entities"),
+            MOVE_TO_PLAYER          ("litematica.gui.button.move_to_player"),
+            NUDGE_COORD_X           (""),
+            NUDGE_COORD_Y           (""),
+            NUDGE_COORD_Z           (""),
+            ROTATE                  ("litematica.gui.button.rotation_value"),
+            MIRROR                  ("litematica.gui.button.mirror_value"),
+            RESET_PLACEMENT         (""),
+            SLICE_TYPE              ("litematica.gui.button.placement_sub.slice_type");
+
+            private final String translationKey;
+            @Nullable private final String hoverText;
+
+            private Type(String translationKey)
+            {
+                this(translationKey, null);
+            }
+
+            private Type(String translationKey, @Nullable String hoverText)
+            {
+                this.translationKey = translationKey;
+                this.hoverText = hoverText;
+            }
+
+            public String getTranslationKey()
+            {
+                return this.translationKey;
+            }
+
+            public String getDisplayName(Object... args)
+            {
+                return I18n.format(this.translationKey, args);
+            }
         }
     }
 

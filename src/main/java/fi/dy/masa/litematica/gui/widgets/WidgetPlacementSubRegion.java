@@ -47,7 +47,6 @@ public class WidgetPlacementSubRegion extends WidgetBase
 
         // Note: These are placed from right to left
 
-        posX = this.createButtonOnOff(posX, posY, this.placement.isRenderingEnabled(), WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_RENDER);
         posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED);
         posX = this.createButtonGeneric(posX, posY, WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE);
 
@@ -66,7 +65,7 @@ public class WidgetPlacementSubRegion extends WidgetBase
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, WidgetSchematicPlacement.ButtonListener.ButtonType type)
     {
-        ButtonOnOff button = ButtonOnOff.create(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = ButtonOnOff.create(xRight + 1, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         xRight -= button.getButtonWidth();
         this.addButton(button, new ButtonListener(type, this));
 
@@ -207,11 +206,6 @@ public class WidgetPlacementSubRegion extends WidgetBase
             else if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED)
             {
                 this.widget.schematicPlacement.toggleSubRegionEnabled(this.widget.placement.getName(), this.widget.parent.getParentGui());
-                this.widget.parent.refreshEntries();
-            }
-            else if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_RENDER)
-            {
-                this.widget.schematicPlacement.toggleSubRegionRenderingEnabled(this.widget.placement.getName());
                 this.widget.parent.refreshEntries();
             }
         }

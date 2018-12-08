@@ -65,6 +65,8 @@ litematica.gui.button.config_gui.info_overlays=Info Overlays
 litematica.gui.button.config_gui.render_layers=Render Layers
 litematica.gui.button.config_gui.visuals=Visuals
 
+litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
+
 litematica.gui.button.material_list=Material List
 litematica.gui.button.material_list.available=Available
 litematica.gui.button.material_list.list_type=Show: %s
@@ -85,18 +87,23 @@ litematica.gui.button.render_layers_gui.set_here=Set Here
 
 litematica.gui.button.schematic_manager.export_as=Export as:
 
+litematica.gui.button.schematic_placement.abbr.rendering=R
+
 litematica.gui.button.schematic_placement.ignore_entities=Ignore entities: %s
+litematica.gui.button.schematic_placement.region_enabled=Region: %s
 litematica.gui.button.schematic_placement.reset_sub_region_placements=Reset all sub-regions
 
 litematica.gui.button.schematic_placement.hover.enclosing_box=Enclosing box rendering: %s
 litematica.gui.button.schematic_placement.hover.lock=Locking a placement prevents moving or\notherwise changing it (accidentally)
+litematica.gui.button.schematic_placement.hover.rendering=Rendering: %s\nNote that this works a bit funky\nand doesn't prevent entity rendering.\nUsually you should just disable\nthe placement entirely
 
 litematica.gui.button.schematic_placements.configure=Configure
-litematica.gui.button.schematic_placements.remove=Remove
-litematica.gui.button.schematic_placements.select=Select
 litematica.gui.button.schematic_placements.disable=Disable
+litematica.gui.button.schematic_placements.locked=Locked: %s
 litematica.gui.button.schematic_placements.placement_enabled=Placement: %s
+litematica.gui.button.schematic_placements.remove=Remove
 litematica.gui.button.schematic_placements.rendering_enabled=Rendering: %s
+litematica.gui.button.schematic_placements.select=Select
 
 litematica.gui.button.schematic_verifier.ignore=Ignore
 litematica.gui.button.schematic_verifier.range_type=Range: %s
@@ -114,9 +121,8 @@ litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
 litematica.gui.button.import=Import
 litematica.gui.button.load_schematic_to_memory=Load Schematic to memory
-litematica.gui.button.locked=Locked
 litematica.gui.button.mirror_value=Mirror: %s
-litematica.gui.button.move_here=Move here
+litematica.gui.button.move_to_player=Move to player
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
 litematica.gui.button.rotation_value=Rotation: %s
@@ -168,7 +174,7 @@ litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 
 litematica.gui.label.schematic_load.checkbox.create_placement=Create a placement
-litematica.gui.label.schematic_load.hoverinfo.create_placement=Immediately create a new placement and select that new placement
+litematica.gui.label.schematic_load.hoverinfo.create_placement=Immediately create a new placement\nand select that placement
 
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.in_memory=IN-MEMORY ONLY
