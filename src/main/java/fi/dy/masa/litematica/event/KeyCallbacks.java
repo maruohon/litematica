@@ -56,6 +56,8 @@ public class KeyCallbacks
         Hotkeys.LAYER_NEXT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_SET_HERE.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind().setCallback(callbackHotkeys);
@@ -385,6 +387,13 @@ public class KeyCallbacks
                     WorldUtils.markAllSchematicChunksForRenderUpdate();
                     StringUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
                 }
+                return true;
+            }
+            else if (key == Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeybind() ||
+                     key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind())
+            {
+                int amount = key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind() ? 1 : -1;
+                InputHandler.nudgeSelection(amount, mode, this.mc.player);
                 return true;
             }
 

@@ -18,6 +18,8 @@ public class Hotkeys
     public static final ConfigHotkey LAYER_NEXT                         = new ConfigHotkey("layerNext",                         "PRIOR", "Move the rendered layer selection up");
     public static final ConfigHotkey LAYER_PREVIOUS                     = new ConfigHotkey("layerPrevious",                     "NEXT",  "Move the rendered layer selection down");
     public static final ConfigHotkey LAYER_SET_HERE                     = new ConfigHotkey("layerSetHere",                      "",  "Set the Render Layer to the player's current position");
+    public static final ConfigHotkey NUDGE_SELECTION_NEGATIVE           = new ConfigHotkey("nudgeSelectionNegative",            "",  "Nudge the current selection in the \"negative\" direction\nThis is basically the same as mouse wheel down\nwith the Nudge modifier pressed");
+    public static final ConfigHotkey NUDGE_SELECTION_POSITIVE           = new ConfigHotkey("nudgeSelectionPositive",            "",  "Nudge the current selection in the \"positive\" direction\nThis is basically the same as mouse wheel up\nwith the Nudge modifier pressed");
     public static final ConfigHotkey MOVE_ENTIRE_SELECTION              = new ConfigHotkey("moveEntireSelection",               "M,H",  "Move the entire current selection here");
     public static final ConfigHotkey OPEN_GUI_AREA_SETTINGS             = new ConfigHotkey("openGuiAreaSettings",               "SUBTRACT",  KeybindSettings.EXCLUSIVE, "Open the Area Settings GUI for the currently selected area");
     public static final ConfigHotkey OPEN_GUI_PLACEMENT_SETTINGS        = new ConfigHotkey("openGuiPlacementSettings",          "SUBTRACT",  KeybindSettings.EXCLUSIVE, "Open the Placement Settings GUI for the currently\nselected placement or sub-region");
@@ -69,6 +71,8 @@ public class Hotkeys
             LAYER_NEXT,
             LAYER_PREVIOUS,
             LAYER_SET_HERE,
+            NUDGE_SELECTION_NEGATIVE,
+            NUDGE_SELECTION_POSITIVE,
             MOVE_ENTIRE_SELECTION,
             OPEN_GUI_AREA_SETTINGS,
             OPEN_GUI_PLACEMENT_SETTINGS,

@@ -118,22 +118,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
                 else if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
                 {
-                    if (mode.getUsesAreaSelection())
-                    {
-                        SelectionManager sm = DataManager.getSelectionManager();
-
-                        if (sm.hasSelectedElement())
-                        {
-                            sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), amount);
-                            return true;
-                        }
-                    }
-                    else if (mode.getUsesSchematic())
-                    {
-                        EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
-                        DataManager.getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
-                        return true;
-                    }
+                    return nudgeSelection(amount, mode, player);
                 }
                 else if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
                 {
@@ -141,6 +126,28 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     return true;
                 }
             }
+        }
+
+        return false;
+    }
+
+    public static boolean nudgeSelection(int amount, OperationMode mode, EntityPlayer player)
+    {
+        if (mode.getUsesAreaSelection())
+        {
+            SelectionManager sm = DataManager.getSelectionManager();
+
+            if (sm.hasSelectedElement())
+            {
+                sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), amount);
+                return true;
+            }
+        }
+        else if (mode.getUsesSchematic())
+        {
+            EnumFacing direction = EntityUtils.getClosestLookingDirection(player);
+            DataManager.getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
+            return true;
         }
 
         return false;
