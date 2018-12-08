@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -58,6 +59,27 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
         return this.currentSize;
     }
 
+    private void requestNewId(IBlockState state)
+    {
+        final int size = this.currentSize;
+
+        if (size < this.states.length)
+        {
+            this.states[size] = state;
+            ++this.currentSize;
+        }
+        else
+        {
+            int newId = this.resizeHandler.onResize(this.bits + 1, Blocks.AIR.getDefaultState());
+
+            if (newId <= size)
+            {
+                this.states[size] = state;
+                ++this.currentSize;
+            }
+        }
+    }
+
     @Override
     public void readFromNBT(NBTTagList tagList)
     {
@@ -66,7 +88,12 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound tag = tagList.getCompound(i);
-            this.idFor(NBTUtil.readBlockState(tag));
+            IBlockState state = NBTUtil.readBlockState(tag);
+
+            if (i > 0 || state != LitematicaBlockStateContainer.AIR_BLOCK_STATE)
+            {
+                this.requestNewId(state);
+            }
         }
     }
 

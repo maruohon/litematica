@@ -8,7 +8,7 @@ import net.minecraft.util.math.Vec3i;
 
 public class LitematicaBlockStateContainer implements ILitematicaBlockStatePaletteResizer
 {
-    protected static final IBlockState AIR_BLOCK_STATE = Blocks.AIR.getDefaultState();
+    public static final IBlockState AIR_BLOCK_STATE = Blocks.AIR.getDefaultState();
     protected LitematicaBitArray storage;
     protected ILitematicaBlockStatePalette palette;
     protected final int sizeX;
