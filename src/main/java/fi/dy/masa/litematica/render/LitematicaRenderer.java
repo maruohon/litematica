@@ -149,6 +149,12 @@ public class LitematicaRenderer
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
 
+        if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+        {
+            GlStateManager.enablePolygonOffset();
+            GlStateManager.doPolygonOffset(-0.2f, -0.4f);
+        }
+
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         renderGlobal.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, pass, entity);
 
@@ -157,6 +163,12 @@ public class LitematicaRenderer
         this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
         renderGlobal.renderBlockLayer(BlockRenderLayer.CUTOUT, partialTicks, pass, entity);
         this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+
+        if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+        {
+            GlStateManager.doPolygonOffset(0f, 0f);
+            GlStateManager.disablePolygonOffset();
+        }
 
         GlStateManager.disableBlend();
         GlStateManager.shadeModel(GL11.GL_FLAT);
@@ -208,7 +220,7 @@ public class LitematicaRenderer
             GlStateManager.disableTexture2D();
             GlStateManager.disableCull();
             GlStateManager.enablePolygonOffset();
-            GlStateManager.doPolygonOffset(-0.1f, -0.8f);
+            GlStateManager.doPolygonOffset(-0.4f, -0.8f);
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.glLineWidth((float) Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
