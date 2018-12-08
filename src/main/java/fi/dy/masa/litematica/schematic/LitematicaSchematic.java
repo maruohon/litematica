@@ -311,8 +311,10 @@ public class LitematicaSchematic
                                 try
                                 {
                                     te.readFromNBT(teNBT);
-                                    te.mirror(placement.getMirror());
-                                    te.rotate(placement.getRotation());
+
+                                    if (mirrorMain != Mirror.NONE) { te.mirror(mirrorMain); }
+                                    if (mirrorSub != Mirror.NONE)  { te.mirror(mirrorSub); }
+                                    if (rotationCombined != Rotation.NONE) { te.rotate(rotationCombined); }
                                 }
                                 catch (Exception e)
                                 {
@@ -552,8 +554,10 @@ public class LitematicaSchematic
                             try
                             {
                                 te.readFromNBT(teNBT);
-                                te.mirror(placement.getMirror());
-                                te.rotate(placement.getRotation());
+
+                                if (mirrorMain != Mirror.NONE) { te.mirror(mirrorMain); }
+                                if (mirrorSub != Mirror.NONE)  { te.mirror(mirrorSub); }
+                                if (rotationCombined != Rotation.NONE) { te.rotate(rotationCombined); }
                             }
                             catch (Exception e)
                             {
