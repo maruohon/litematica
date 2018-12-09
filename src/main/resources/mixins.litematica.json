@@ -14,6 +14,7 @@
         "MixinChunk",
         "MixinChunkProviderClient",
         "MixinMinecraft",
+        "MixinNetHandlerPlayClient",
         "MixinRenderGlobal",
         "MixinWorldClient"
     ],
