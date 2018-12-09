@@ -20,7 +20,7 @@ public class RenderHandler implements IRenderer
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isValid() && Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
 
-            if (Configs.Visuals.ENABLE_GHOST_BLOCK_RENDERING.getBooleanValue() != invert)
+            if (Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert)
             {
                 LitematicaRenderer.getInstance().renderSchematicWorld(partialTicks);
             }

@@ -35,7 +35,7 @@ public abstract class MixinWorldClient extends World
             verifier.markBlockChanged(pos);
         }
 
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Visuals.ENABLE_GHOST_BLOCK_RENDERING.getBooleanValue())
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue())
         {
             WorldUtils.markSchematicChunkForRenderUpdate(pos);
         }
