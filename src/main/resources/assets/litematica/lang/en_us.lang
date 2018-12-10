@@ -92,6 +92,8 @@ litematica.gui.button.schematic_placement.abbr.rendering=R
 litematica.gui.button.schematic_placement.ignore_entities=Ignore entities: %s
 litematica.gui.button.schematic_placement.region_enabled=Region: %s
 litematica.gui.button.schematic_placement.reset_sub_region_placements=Reset all sub-regions
+litematica.gui.button.schematic_placement.toggle_all_off=All §cOFF§r
+litematica.gui.button.schematic_placement.toggle_all_on=All §aON§r
 
 litematica.gui.button.schematic_placement.hover.enclosing_box=Enclosing box rendering: %s
 litematica.gui.button.schematic_placement.hover.lock=Locking a placement prevents moving or\notherwise changing it (accidentally)
@@ -182,7 +184,7 @@ litematica.gui.label.schematic_placement.origin=Origin: %s
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:
 litematica.gui.label.schematic_placement.schematic_file=File: %s
 litematica.gui.label.schematic_placement.schematic_name=Schematic: %s
-litematica.gui.label.schematic_placement.sub_regions=Sub-regions:
+litematica.gui.label.schematic_placement.sub_regions=Sub-regions (%s):
 
 litematica.gui.label.schematic_save.checkbox.ignore_entities=Ignore entities
 litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite=Hold shift to overwrite an existing file

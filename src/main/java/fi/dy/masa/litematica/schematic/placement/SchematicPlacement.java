@@ -610,6 +610,32 @@ public class SchematicPlacement
         }
     }
 
+    public void setAllSubRegionsEnabledState(boolean state, IMessageConsumer feedback)
+    {
+        if (this.isLocked())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+        // Marks the currently touched chunks before doing the modification
+        manager.onPrePlacementChange(this);
+
+        for (String regionName : this.relativeSubRegionPlacements.keySet())
+        {
+            SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
+
+            if (placement.isEnabled() != state)
+            {
+                this.relativeSubRegionPlacements.get(regionName).setEnabled(state);
+            }
+        }
+
+        this.checkAreSubRegionsModified();
+        this.onModified(manager);
+    }
+
     public void toggleSubRegionEnabled(String regionName, IMessageConsumer feedback)
     {
         if (this.isLocked())

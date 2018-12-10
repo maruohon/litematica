@@ -34,7 +34,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
     {
-        super(10, 60);
+        super(10, 68);
         this.placement = placement;
         this.title = I18n.format("litematica.gui.title.configure_schematic_placement");
     }
@@ -68,8 +68,12 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.addTextField(this.textFieldRename, null);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
 
-        String label = I18n.format("litematica.gui.label.schematic_placement.sub_regions");
+        String label = I18n.format("litematica.gui.label.schematic_placement.sub_regions", this.placement.getAllSubRegionsPlacements().size());
         this.addLabel(x, y + 20, -1, 20, 0xFFFFFFFF, label);
+
+        x = sr.getScaledWidth() - 154;
+        x -= this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_OFF) + 2;
+        this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_ON);
 
         width = 120;
         x = this.width - width - 10;
@@ -249,6 +253,12 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             width = this.fontRenderer.getStringWidth(label) + 10;
         }
 
+        // These are right-aligned
+        if (type == ButtonListener.Type.TOGGLE_ALL_REGIONS_OFF || type == ButtonListener.Type.TOGGLE_ALL_REGIONS_ON)
+        {
+            x -= width;
+        }
+
         ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
 
         this.addButton(button, listener);
@@ -395,6 +405,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     this.placement.resetAllSubRegionsToSchematicValues(this.parent);
                     break;
 
+                case TOGGLE_ALL_REGIONS_ON:
+                case TOGGLE_ALL_REGIONS_OFF:
+                {
+                    boolean state = this.type == Type.TOGGLE_ALL_REGIONS_ON;
+                    this.placement.setAllSubRegionsEnabledState(state, this.parent);
+                    break;
+                }
+
                 case OPEN_VERIFIER_GUI:
                 {
                     GuiSchematicVerifier gui = new GuiSchematicVerifier(this.placement);
@@ -429,6 +447,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             TOGGLE_LOCKED           ("litematica.gui.button.schematic_placements.locked", "litematica.gui.button.schematic_placement.hover.lock"),
             TOGGLE_ENTITIES         ("litematica.gui.button.schematic_placement.ignore_entities"),
             TOGGLE_ENCLOSING_BOX    (""),
+            TOGGLE_ALL_REGIONS_ON   ("litematica.gui.button.schematic_placement.toggle_all_on"),
+            TOGGLE_ALL_REGIONS_OFF  ("litematica.gui.button.schematic_placement.toggle_all_off"),
             RESET_SUB_REGIONS       (""),
             OPEN_VERIFIER_GUI       ("litematica.gui.button.schematic_verifier"),
             OPEN_MATERIAL_LIST_GUI  ("litematica.gui.button.material_list");
