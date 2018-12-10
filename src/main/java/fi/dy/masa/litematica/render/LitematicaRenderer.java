@@ -158,7 +158,7 @@ public class LitematicaRenderer
                 GlStateManager.doPolygonOffset(-0.2f, -0.4f);
             }
 
-            GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+            GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
             renderGlobal.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, pass, entity);
 
             renderGlobal.renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, partialTicks, pass, entity);
@@ -175,7 +175,7 @@ public class LitematicaRenderer
 
             GlStateManager.disableBlend();
             GlStateManager.shadeModel(GL11.GL_FLAT);
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
 
             GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.popMatrix();
@@ -184,7 +184,7 @@ public class LitematicaRenderer
             this.mc.profiler.endStartSection("litematica_entities");
             RenderHelper.enableStandardItemLighting();
             GlStateManager.enableBlend();
-            GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+            GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
             renderGlobal.renderEntities(entity, icamera, partialTicks);
 
