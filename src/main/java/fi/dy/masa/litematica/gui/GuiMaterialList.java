@@ -1,5 +1,9 @@
 package fi.dy.masa.litematica.gui;
 
+import java.io.File;
+import java.util.List;
+import com.mumfrey.liteloader.core.LiteLoader;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.button.ButtonOnOff;
@@ -10,10 +14,13 @@ import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
+import fi.dy.masa.malilib.data.DataDump;
 import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -172,10 +179,34 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                     break;
 
                 case WRITE_TO_FILE:
+                    File dir = new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+                    DataDump dump = new DataDump(2, DataDump.Format.ASCII);
+                    this.addLinesToDump(dump, this.parent.materialList.getMaterialsAll());
+                    File file = DataDump.dumpDataToFile(dir, "material_list", dump.getLines());
+
+                    if (file != null)
+                    {
+                        String key = "litematica.message.material_list_written_to_file";
+                        this.parent.addMessage(MessageType.SUCCESS, key, file.getName());
+                        StringUtils.sendOpenFileChatMessage(this.parent.mc.player, key, file);
+                    }
                     break;
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
+        }
+
+        private void addLinesToDump(DataDump dump, List<MaterialListEntry> materials)
+        {
+            for (MaterialListEntry entry : materials)
+            {
+                dump.addData(entry.getStack().getDisplayName(), String.valueOf(entry.getCountTotal()));
+            }
+
+            dump.addTitle("Item", "Total");
+            dump.setColumnProperties(1, DataDump.Alignment.RIGHT, true); // total
+            dump.setSort(true);
+            dump.setUseColumnSeparator(true);
         }
 
         public enum Type
