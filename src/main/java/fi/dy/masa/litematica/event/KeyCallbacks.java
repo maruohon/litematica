@@ -286,7 +286,7 @@ public class KeyCallbacks
 
                     if (schematicPlacement != null)
                     {
-                        this.mc.displayGuiScreen(new GuiMaterialList(schematicPlacement));
+                        this.mc.displayGuiScreen(new GuiMaterialList(schematicPlacement.getMaterialList()));
                     }
                     else
                     {

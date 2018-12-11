@@ -1,11 +1,9 @@
 package fi.dy.masa.litematica.schematic.placement;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -18,14 +16,14 @@ import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.data.SchematicVerifier;
+import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.litematica.materials.MaterialListPlacement;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.litematica.util.MaterialListEntry;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
@@ -53,7 +51,6 @@ public class SchematicPlacement
     private String name;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
-    private BlockInfoListType materialListType = BlockInfoListType.ALL;
     private BlockInfoListType verifierType = BlockInfoListType.ALL;
     private boolean ignoreEntities;
     private boolean enabled;
@@ -69,8 +66,8 @@ public class SchematicPlacement
     private File schematicFile;
     @Nullable
     private String selectedSubRegionName;
-    private final List<MaterialListEntry> materialList = new ArrayList<>();
-    private boolean materialListPopulated;
+    @Nullable
+    private MaterialListBase materialList;
 
     private SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
     {
@@ -226,16 +223,6 @@ public class SchematicPlacement
         return this.subRegionCount;
     }
 
-    public BlockInfoListType getMaterialListType()
-    {
-        return this.materialListType;
-    }
-
-    public void setMaterialListType(BlockInfoListType type)
-    {
-        this.materialListType = type;
-    }
-
     public BlockInfoListType getSchematicVerifierType()
     {
         return this.verifierType;
@@ -246,21 +233,15 @@ public class SchematicPlacement
         this.verifierType = type;
     }
 
-    public List<MaterialListEntry> getMaterialList()
+    public MaterialListBase getMaterialList()
     {
-        if (this.materialListPopulated == false)
+        if (this.materialList == null)
         {
-            this.refreshMaterialList();
+            this.materialList = new MaterialListPlacement(this);
+            this.materialList.refreshMaterialList();
         }
 
         return this.materialList;
-    }
-
-    public void refreshMaterialList()
-    {
-        this.materialList.clear();
-        this.materialList.addAll(SchematicUtils.createMaterialListFor(this));
-        this.materialListPopulated = true;
     }
 
     public boolean hasVerifier()
@@ -878,12 +859,16 @@ public class SchematicPlacement
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
             obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
-            obj.add("material_list_type", new JsonPrimitive(this.materialListType.getStringValue()));
             obj.add("verifier_type", new JsonPrimitive(this.verifierType.getStringValue()));
 
             if (this.selectedSubRegionName != null)
             {
                 obj.add("selected_region", new JsonPrimitive(this.selectedSubRegionName));
+            }
+
+            if (this.materialList != null)
+            {
+                obj.add("material_list", this.materialList.toJson());
             }
 
             if (this.relativeSubRegionPlacements.isEmpty() == false)
@@ -959,9 +944,10 @@ public class SchematicPlacement
                 schematicPlacement.setBoxesBBColorNext();
             }
 
-            if (JsonUtils.hasString(obj, "material_list_type"))
+            if (JsonUtils.hasObject(obj, "material_list"))
             {
-                schematicPlacement.materialListType = BlockInfoListType.fromStringStatic(JsonUtils.getString(obj, "material_list_type"));
+                schematicPlacement.materialList = new MaterialListPlacement(schematicPlacement);
+                schematicPlacement.materialList.fromJson(JsonUtils.getNestedObject(obj, "material_list", false));
             }
 
             if (JsonUtils.hasString(obj, "verifier_type"))

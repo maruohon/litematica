@@ -3,28 +3,33 @@ package fi.dy.masa.litematica.gui;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
+import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.render.InfoHud;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.litematica.util.MaterialListEntry;
-import fi.dy.masa.litematica.util.MaterialListEntry.SortCriteria;
+import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
 {
-    private final SchematicPlacement placement;
+    private final MaterialListBase materialList;
     private int id;
 
-    public GuiMaterialList(SchematicPlacement placement)
+    public GuiMaterialList(MaterialListBase materialList)
     {
         super(10, 60);
 
-        String schematicName = placement.getName();
-        this.title = I18n.format("litematica.gui.title.material_list", schematicName);
-        this.placement = placement;
+        this.materialList = materialList;
+        this.title = this.materialList.getDisplayName();
+
+        Minecraft mc = Minecraft.getMinecraft();
+
+        SchematicUtils.updateAvailableCounts(this.materialList.getMaterials(), mc.player);
+        WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterials(), mc);
     }
 
     @Override
@@ -42,8 +47,6 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     @Override
     public void initGui()
     {
-        WidgetMaterialListEntry.resetNameLengths();
-
         super.initGui();
 
         int x = 12;
@@ -55,10 +58,6 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_NAME) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_TOTAL) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_MISSING) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_AVAILABLE) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.TOGGLE_INFO_HUD) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + 4;
         y += 22;
@@ -74,7 +73,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
     private int createButton(int x, int y, int width, ButtonListener.Type type)
     {
-        ButtonListener listener = new ButtonListener(type, this.placement, this);
+        ButtonListener listener = new ButtonListener(type, this);
         String label = "";
 
         if (type == ButtonListener.Type.TOGGLE_INFO_HUD)
@@ -85,7 +84,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         }
         else if (type == ButtonListener.Type.LIST_TYPE)
         {
-            label = type.getDisplayName(this.placement.getMaterialListType().getDisplayName());
+            label = type.getDisplayName(this.materialList.getMaterialListType().getDisplayName());
         }
         else
         {
@@ -103,9 +102,9 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         return width;
     }
 
-    public SchematicPlacement getSchematicPlacement()
+    public MaterialListBase getMaterialList()
     {
-        return this.placement;
+        return this.materialList;
     }
 
     @Override
@@ -119,7 +118,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         private final GuiMaterialList parent;
         private final Type type;
 
-        public ButtonListener(Type type, SchematicPlacement placement, GuiMaterialList parent)
+        public ButtonListener(Type type, GuiMaterialList parent)
         {
             this.parent = parent;
             this.type = type;
@@ -135,37 +134,20 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         {
             switch (this.type)
             {
-                case SORT_BY_NAME:
-                    MaterialListEntry.setSortCriteria(SortCriteria.NAME);
+                case REFRESH_LIST:
+                    this.parent.materialList.refreshMaterialList();
                     break;
 
-                case SORT_BY_TOTAL:
-                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_TOTAL);
-                    break;
-
-                case SORT_BY_MISSING:
-                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_MISSING);
-                    break;
-
-                case SORT_BY_AVAILABLE:
-                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_AVAILABLE);
-                    break;
-
-                case WRITE_TO_FILE:
+                case LIST_TYPE:
+                    BlockInfoListType type = this.parent.materialList.getMaterialListType();
+                    this.parent.materialList.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
+                    this.parent.materialList.refreshMaterialList();
                     break;
 
                 case TOGGLE_INFO_HUD:
                     break;
 
-                case LIST_TYPE:
-                    SchematicPlacement placement = this.parent.getSchematicPlacement();
-                    BlockInfoListType type = placement.getMaterialListType();
-                    placement.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
-                    placement.refreshMaterialList();
-                    break;
-
-                case REFRESH_LIST:
-                    this.parent.getSchematicPlacement().refreshMaterialList();
+                case WRITE_TO_FILE:
                     break;
             }
 
@@ -174,10 +156,6 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         public enum Type
         {
-            SORT_BY_NAME        ("litematica.gui.button.material_list.name"),
-            SORT_BY_TOTAL       ("litematica.gui.button.material_list.total"),
-            SORT_BY_MISSING     ("litematica.gui.button.material_list.missing"),
-            SORT_BY_AVAILABLE   ("litematica.gui.button.material_list.available"),
             WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
             TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
             LIST_TYPE           ("litematica.gui.button.material_list.list_type"),

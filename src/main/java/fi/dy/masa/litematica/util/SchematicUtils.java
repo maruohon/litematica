@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.materials.MaterialListEntry;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
@@ -15,13 +18,49 @@ import fi.dy.masa.malilib.util.ItemType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class SchematicUtils
 {
+    public static List<MaterialListEntry> createMaterialListFor(LitematicaSchematic schematic)
+    {
+        Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
+        Object2IntOpenHashMap<IBlockState> countsMissing = new Object2IntOpenHashMap<>();
+
+        for (String regionName : schematic.getAreas().keySet())
+        {
+            LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
+
+            if (container != null)
+            {
+                Vec3i size = container.getSize();
+                final int sizeX = size.getX();
+                final int sizeY = size.getY();
+                final int sizeZ = size.getZ();
+
+                for (int y = 0; y < sizeY; ++y)
+                {
+                    for (int z = 0; z < sizeZ; ++z)
+                    {
+                        for (int x = 0; x < sizeX; ++x)
+                        {
+                            countsTotal.addTo(container.get(x, y, z), 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        Minecraft mc = Minecraft.getMinecraft();
+
+        return getMaterialList(countsTotal, countsMissing, mc.player);
+    }
+
     public static List<MaterialListEntry> createMaterialListFor(SchematicPlacement placement)
     {
         Minecraft mc = Minecraft.getMinecraft();
@@ -33,43 +72,14 @@ public class SchematicUtils
             return Collections.emptyList();
         }
 
-        List<MaterialListEntry> list = new ArrayList<>();
         Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
         Object2IntOpenHashMap<IBlockState> countsMissing = new Object2IntOpenHashMap<>();
 
-        /*if (placement.getMaterialListType() == BlockInfoListType.ALL)
-        {
-            LitematicaSchematic schematic = placement.getSchematic();
-
-            for (Map.Entry<String, SubRegionPlacement> entry : placement.getEnabledRelativeSubRegionPlacements().entrySet())
-            {
-                LitematicaBlockStateContainer container = schematic.getSubRegionContainer(entry.getKey());
-
-                if (container != null)
-                {
-                    Vec3i size = container.getSize();
-                    final int sizeX = size.getX();
-                    final int sizeY = size.getY();
-                    final int sizeZ = size.getZ();
-
-                    for (int y = 0; y < sizeY; ++y)
-                    {
-                        for (int z = 0; z < sizeZ; ++z)
-                        {
-                            for (int x = 0; x < sizeX; ++x)
-                            {
-                                countsTotal.addTo(container.get(x, y, z), 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if (placement.getMaterialListType() == BlockInfoListType.RENDER_LAYERS)*/
+        //if (placement.getMaterialListType() == BlockInfoListType.RENDER_LAYERS)
         {
             LayerRange range = DataManager.getRenderLayerRange();
 
-            if (placement.getMaterialListType() == BlockInfoListType.ALL)
+            if (placement.getMaterialList().getMaterialListType() == BlockInfoListType.ALL)
             {
                 range = new LayerRange();
                 range.setLayerMode(LayerMode.ALL);
@@ -99,7 +109,7 @@ public class SchematicUtils
                         {
                             posMutable.setPos(x, y, z);
                             IBlockState stateSchematic = worldSchematic.getBlockState(posMutable);
-                            IBlockState stateClient = worldClient.getBlockState(posMutable);
+                            IBlockState stateClient = worldClient.getBlockState(posMutable).getActualState(worldClient, posMutable);
                             countsTotal.addTo(stateSchematic, 1);
 
                             if (stateClient != stateSchematic)
@@ -112,37 +122,26 @@ public class SchematicUtils
             }
         }
 
+        return getMaterialList(countsTotal, countsMissing, mc.player);
+    }
+
+    private static List<MaterialListEntry> getMaterialList(
+            Object2IntOpenHashMap<IBlockState> countsTotal,
+            Object2IntOpenHashMap<IBlockState> countsMissing,
+            EntityPlayer player)
+    {
+        List<MaterialListEntry> list = new ArrayList<>();
+
         if (countsTotal.isEmpty() == false)
         {
             MaterialCache cache = MaterialCache.getInstance();
             Object2IntOpenHashMap<ItemType> itemTypesTotal = new Object2IntOpenHashMap<>();
             Object2IntOpenHashMap<ItemType> itemTypesMissing = new Object2IntOpenHashMap<>();
 
-            // Convert from counts per IBlockState to counts per different stacks
-            for (IBlockState state : countsTotal.keySet())
-            {
-                ItemStack stack = cache.getItemForState(state);
+            convertStatesToStacks(countsTotal, itemTypesTotal, cache);
+            convertStatesToStacks(countsMissing, itemTypesMissing, cache);
 
-                if (stack.isEmpty() == false)
-                {
-                    ItemType type = new ItemType(stack, false, true);
-                    itemTypesTotal.addTo(type, countsTotal.getInt(state) * stack.getCount());
-                }
-            }
-
-            // Convert from counts per IBlockState to counts per different stacks
-            for (IBlockState state : countsMissing.keySet())
-            {
-                ItemStack stack = cache.getItemForState(state);
-
-                if (stack.isEmpty() == false)
-                {
-                    ItemType type = new ItemType(stack, false, true);
-                    itemTypesMissing.addTo(type, countsMissing.getInt(state) * stack.getCount());
-                }
-            }
-
-            Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(mc.player.inventory);
+            Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.inventory);
 
             for (ItemType type : itemTypesTotal.keySet())
             {
@@ -152,5 +151,35 @@ public class SchematicUtils
         }
 
         return list;
+    }
+
+    private static void convertStatesToStacks(
+            Object2IntOpenHashMap<IBlockState> blockStatesIn,
+            Object2IntOpenHashMap<ItemType> itemTypesOut,
+            MaterialCache cache)
+    {
+        // Convert from counts per IBlockState to counts per different stacks
+        for (IBlockState state : blockStatesIn.keySet())
+        {
+            ItemStack stack = cache.getItemForState(state);
+
+            if (stack.isEmpty() == false)
+            {
+                ItemType type = new ItemType(stack, false, true);
+                itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
+            }
+        }
+    }
+
+    public static void updateAvailableCounts(List<MaterialListEntry> list, EntityPlayer player)
+    {
+        Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.inventory);
+
+        for (MaterialListEntry entry : list)
+        {
+            ItemType type = new ItemType(entry.getStack(), false, true);
+            int countAvailable = playerInvItems.getInt(type);
+            entry.setCountAvailable(countAvailable);
+        }
     }
 }

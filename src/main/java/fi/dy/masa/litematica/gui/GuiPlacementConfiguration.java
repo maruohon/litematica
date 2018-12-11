@@ -423,7 +423,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
                 case OPEN_MATERIAL_LIST_GUI:
                 {
-                    GuiMaterialList gui = new GuiMaterialList(this.placement);
+                    GuiMaterialList gui = new GuiMaterialList(this.placement.getMaterialList());
                     gui.setParent(this.parent);
                     mc.displayGuiScreen(gui);
                     break;
