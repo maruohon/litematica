@@ -44,7 +44,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     public void refreshData()
     {
         this.listContents.clear();
-        this.listContents.addAll(this.gui.getMaterialList().getMaterials());
+        this.listContents.addAll(this.gui.getMaterialList().getMaterialsFiltered());
         Collections.sort(this.listContents, this.sorter);
     }
 

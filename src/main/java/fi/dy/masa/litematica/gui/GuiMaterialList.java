@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
+import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListBase;
@@ -30,8 +31,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         Minecraft mc = Minecraft.getMinecraft();
 
-        MaterialListUtils.updateAvailableCounts(this.materialList.getMaterials(), mc.player);
-        WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterials(), mc);
+        MaterialListUtils.updateAvailableCounts(this.materialList.getMaterialsAll(), mc.player);
+        WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), mc);
 
         // Remember the last opened material list, for the hotkey
         if (DataManager.getMaterialList() == null)
@@ -68,6 +69,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + 4;
+        x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.TOGGLE_INFO_HUD) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + 4;
         y += 22;
@@ -112,6 +114,13 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         return width;
     }
 
+    private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
+    {
+        ButtonOnOff button = ButtonOnOff.create(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        this.addButton(button, new ButtonListener(type, this));
+        return button.getButtonWidth();
+    }
+
     public MaterialListBase getMaterialList()
     {
         return this.materialList;
@@ -154,6 +163,11 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                     this.parent.materialList.refreshMaterialList();
                     break;
 
+                case HIDE_AVAILABLE:
+                    this.parent.materialList.setHideAvailable(! this.parent.materialList.getHideAvailable());
+                    this.parent.materialList.refreshMaterialList();
+                    break;
+
                 case TOGGLE_INFO_HUD:
                     break;
 
@@ -166,16 +180,22 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         public enum Type
         {
-            WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
-            TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
+            REFRESH_LIST        ("litematica.gui.button.material_list.refresh_list"),
             LIST_TYPE           ("litematica.gui.button.material_list.list_type"),
-            REFRESH_LIST        ("litematica.gui.button.material_list.refresh_list");
+            HIDE_AVAILABLE      ("litematica.gui.button.material_list.hide_available"),
+            TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
+            WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file");
 
             private final String translationKey;
 
             private Type(String translationKey)
             {
                 this.translationKey = translationKey;
+            }
+
+            public String getTranslationKey()
+            {
+                return this.translationKey;
             }
 
             public String getDisplayName(Object... args)
