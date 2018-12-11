@@ -1,10 +1,12 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.gui.widgets.WidgetListPlacementSubRegions;
 import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegion;
+import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -423,7 +425,9 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
                 case OPEN_MATERIAL_LIST_GUI:
                 {
-                    GuiMaterialList gui = new GuiMaterialList(this.placement.getMaterialList());
+                    MaterialListBase materialList = this.placement.getMaterialList();
+                    GuiMaterialList gui = new GuiMaterialList(materialList);
+                    DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
                     gui.setParent(this.parent);
                     mc.displayGuiScreen(gui);
                     break;

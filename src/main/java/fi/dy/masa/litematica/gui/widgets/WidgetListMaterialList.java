@@ -8,8 +8,11 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
 public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
 {
+    private static int lastScrollbarPosition;
+
     private final GuiMaterialList gui;
     private final MaterialListSorter sorter;
+    private boolean scrollbarRestored;
 
     public WidgetListMaterialList(int x, int y, int width, int height, GuiMaterialList parent)
     {
@@ -21,6 +24,20 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
 
         this.setParent(parent);
         this.refreshData();
+    }
+
+    @Override
+    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    {
+        super.drawContents(mouseX, mouseY, partialTicks);
+        lastScrollbarPosition = this.scrollBar.getValue();
+    }
+
+    @Override
+    protected void offsetSelectionOrScrollbar(int amount, boolean changeSelection)
+    {
+        super.offsetSelectionOrScrollbar(amount, changeSelection);
+        lastScrollbarPosition = this.scrollBar.getValue();
     }
 
     public void refreshData()
@@ -38,6 +55,14 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     {
         this.refreshData();
         this.reCreateListEntryWidgets();
+
+        if (this.scrollbarRestored == false && lastScrollbarPosition <= this.scrollBar.getMaxValue())
+        {
+            // This needs to happen after the setMaxValue() has been called in reCreateListEntryWidgets()
+            this.scrollBar.setValue(lastScrollbarPosition);
+            this.scrollbarRestored = true;
+            this.reCreateListEntryWidgets();
+        }
     }
 
     @Override

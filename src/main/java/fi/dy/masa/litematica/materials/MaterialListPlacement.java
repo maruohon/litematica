@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.materials;
 
 import java.util.List;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.util.SchematicUtils;
 import net.minecraft.client.resources.I18n;
 
 public class MaterialListPlacement extends MaterialListBase
@@ -25,6 +24,6 @@ public class MaterialListPlacement extends MaterialListBase
     @Override
     protected List<MaterialListEntry> createMaterialListEntries()
     {
-        return SchematicUtils.createMaterialListFor(this.placement);
+        return MaterialListUtils.createMaterialListFor(this.placement);
     }
 }

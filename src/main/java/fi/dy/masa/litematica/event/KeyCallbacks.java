@@ -16,6 +16,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
+import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -282,15 +283,27 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind())
                 {
-                    SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+                    MaterialListBase materialList = DataManager.getMaterialList();
 
-                    if (schematicPlacement != null)
+                    // No last-viewed material list currently stored, try to get one for the currently selected placement, if any
+                    if (materialList == null)
                     {
-                        this.mc.displayGuiScreen(new GuiMaterialList(schematicPlacement.getMaterialList()));
+                        SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                        if (schematicPlacement != null)
+                        {
+                            materialList = schematicPlacement.getMaterialList();
+                            materialList.refreshMaterialList();
+                        }
+                        else
+                        {
+                            StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                        }
                     }
-                    else
+
+                    if (materialList != null)
                     {
-                        StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                        this.mc.displayGuiScreen(new GuiMaterialList(materialList));
                     }
 
                     return true;

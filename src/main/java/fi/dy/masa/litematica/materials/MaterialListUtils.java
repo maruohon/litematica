@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.util;
+package fi.dy.masa.litematica.materials;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,12 +6,16 @@ import java.util.List;
 import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.BlockInfoListType;
+import fi.dy.masa.litematica.util.LayerMode;
+import fi.dy.masa.litematica.util.LayerRange;
+import fi.dy.masa.litematica.util.MaterialCache;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.ItemType;
@@ -25,7 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
-public class SchematicUtils
+public class MaterialListUtils
 {
     public static List<MaterialListEntry> createMaterialListFor(LitematicaSchematic schematic)
     {
@@ -108,7 +112,7 @@ public class SchematicUtils
                         for (int x = startX; x <= endX; ++x)
                         {
                             posMutable.setPos(x, y, z);
-                            IBlockState stateSchematic = worldSchematic.getBlockState(posMutable);
+                            IBlockState stateSchematic = worldSchematic.getBlockState(posMutable).getActualState(worldSchematic, posMutable);
                             IBlockState stateClient = worldClient.getBlockState(posMutable).getActualState(worldClient, posMutable);
                             countsTotal.addTo(stateSchematic, 1);
 

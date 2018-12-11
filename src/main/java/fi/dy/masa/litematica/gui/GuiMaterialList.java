@@ -1,16 +1,18 @@
 package fi.dy.masa.litematica.gui;
 
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
+import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -21,15 +23,21 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
     public GuiMaterialList(MaterialListBase materialList)
     {
-        super(10, 60);
+        super(10, 44);
 
         this.materialList = materialList;
         this.title = this.materialList.getDisplayName();
 
         Minecraft mc = Minecraft.getMinecraft();
 
-        SchematicUtils.updateAvailableCounts(this.materialList.getMaterials(), mc.player);
+        MaterialListUtils.updateAvailableCounts(this.materialList.getMaterials(), mc.player);
         WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterials(), mc);
+
+        // Remember the last opened material list, for the hotkey
+        if (DataManager.getMaterialList() == null)
+        {
+            DataManager.setMaterialList(materialList);
+        }
     }
 
     @Override
@@ -41,7 +49,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 94;
+        return this.height - 80;
     }
 
     @Override
@@ -50,11 +58,13 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         super.initGui();
 
         int x = 12;
-        int y = 40;
+        int y = 24;
         int buttonWidth;
         this.id = 0;
         String label;
         ButtonGeneric button;
+
+        this.addWidget(new WidgetInfoIcon(this.width - 23, 12, this.zLevel, Icons.INFO_11, "litematica.info.material_list"));
 
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + 4;

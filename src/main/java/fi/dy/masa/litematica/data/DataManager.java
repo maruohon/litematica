@@ -14,6 +14,7 @@ import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
+import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -52,6 +53,8 @@ public class DataManager implements IDirectoryCache
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
     private LayerRange renderRange = new LayerRange();
     private OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
+    @Nullable
+    private MaterialListBase materialList;
 
     private DataManager()
     {
@@ -144,6 +147,17 @@ public class DataManager implements IDirectoryCache
     public static SchematicPlacementManager getSchematicPlacementManager()
     {
         return getInstance().schematicPlacementManager;
+    }
+
+    @Nullable
+    public static MaterialListBase getMaterialList()
+    {
+        return getInstance().materialList;
+    }
+
+    public static void setMaterialList(MaterialListBase materialList)
+    {
+        getInstance().materialList = materialList;
     }
 
     public static OperationMode getOperationMode()
@@ -273,6 +287,7 @@ public class DataManager implements IDirectoryCache
     {
         this.selectionManager.clear();
         this.schematicPlacementManager.clear();
+        this.materialList = null;
 
         File file = getCurrentStorageFile(false);
         JsonElement element = JsonUtils.parseJsonFile(file);

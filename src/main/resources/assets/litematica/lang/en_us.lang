@@ -243,6 +243,8 @@ litematica.hud.schematic_placement.sub_regions_modified=Regions modified
 
 litematica.hud.selected_mode=Mode
 
+litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
+
 litematica.label.none_lower=none
 litematica.label.no=no
 litematica.label.yes=yes
