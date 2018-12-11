@@ -5,6 +5,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
+import fi.dy.masa.litematica.materials.MaterialListSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
@@ -23,7 +24,6 @@ import net.minecraft.util.math.BlockPos;
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
 {
     private WidgetCheckBox checkboxCreatePlacementOnLoad;
-    private int id;
 
     public GuiSchematicLoad()
     {
@@ -52,7 +52,6 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         int x = 10;
         int y = this.height - 40;
         int buttonWidth;
-        this.id = 0;
         String label;
         String str;
         ButtonGeneric button;
@@ -65,24 +64,38 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         this.addWidget(this.checkboxCreatePlacementOnLoad);
         y += 14;
 
-        label = I18n.format("litematica.gui.button.load_schematic_to_memory");
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListener(ButtonListener.Type.LOAD_SCHEMATIC, this));
-        x += buttonWidth + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.LOAD_SCHEMATIC) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.MATERIAL_LIST) + 4;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.SHOW_LOADED;
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label, type.getIcon());
+        button = new ButtonGeneric(0, x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        button = new ButtonGeneric(0, x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+    }
+
+    private int createButton(int x, int y, int width, ButtonListener.Type type)
+    {
+        ButtonListener listener = new ButtonListener(type, this);
+        String label = I18n.format(type.getTranslationKey());
+
+        if (width == -1)
+        {
+            width = this.fontRenderer.getStringWidth(label) + 10;
+        }
+
+        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+
+        this.addButton(button, listener);
+
+        return width;
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
@@ -99,46 +112,46 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            if (this.type == Type.LOAD_SCHEMATIC)
+            DirectoryEntry entry = this.gui.getListWidget().getSelectedEntry();
+
+            if (entry == null)
             {
-                DirectoryEntry entry = this.gui.getListWidget().getSelectedEntry();
+                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
+                return;
+            }
 
-                if (entry == null)
-                {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
-                    return;
-                }
+            File file = entry.getFullPath();
 
-                File file = entry.getFullPath();
+            if (file.exists() == false || file.isFile() == false || file.canRead() == false)
+            {
+                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
+                return;
+            }
 
-                if (file.exists() == false || file.isFile() == false || file.canRead() == false)
-                {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
-                    return;
-                }
+            this.gui.setNextMessageType(MessageType.ERROR);
+            LitematicaSchematic schematic = null;
+            FileType fileType = FileType.fromFile(entry.getFullPath());
 
-                this.gui.setNextMessageType(MessageType.ERROR);
-                LitematicaSchematic schematic = null;
-                FileType fileType = FileType.fromFile(entry.getFullPath());
+            if (fileType == FileType.LITEMATICA_SCHEMATIC)
+            {
+                schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
+            }
+            else if (fileType == FileType.SCHEMATICA_SCHEMATIC)
+            {
+                schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
+            }
+            else if (fileType == FileType.VANILLA_STRUCTURE)
+            {
+                schematic = WorldUtils.convertStructureToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
+            }
+            else
+            {
+                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", file.getName());
+            }
 
-                if (fileType == FileType.LITEMATICA_SCHEMATIC)
-                {
-                    schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
-                }
-                else if (fileType == FileType.SCHEMATICA_SCHEMATIC)
-                {
-                    schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
-                }
-                else if (fileType == FileType.VANILLA_STRUCTURE)
-                {
-                    schematic = WorldUtils.convertStructureToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
-                }
-                else
-                {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", file.getName());
-                }
-
-                if (schematic != null)
+            if (schematic != null)
+            {
+                if (this.type == Type.LOAD_SCHEMATIC)
                 {
                     SchematicHolder.getInstance().addSchematic(schematic, true);
                     this.gui.addMessage(MessageType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
@@ -155,6 +168,12 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                         manager.setSelectedSchematicPlacement(placement);
                     }
                 }
+                else if (this.type == Type.MATERIAL_LIST)
+                {
+                    MaterialListSchematic materialList = new MaterialListSchematic(schematic);
+                    materialList.refreshMaterialList();
+                    this.gui.mc.displayGuiScreen(new GuiMaterialList(materialList));
+                }
             }
         }
 
@@ -166,7 +185,20 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         public enum Type
         {
-            LOAD_SCHEMATIC
+            LOAD_SCHEMATIC  ("litematica.gui.button.load_schematic_to_memory"),
+            MATERIAL_LIST   ("litematica.gui.button.material_list");
+
+            private final String translationKey;
+
+            private Type(String translationKey)
+            {
+                this.translationKey = translationKey;
+            }
+
+            public String getTranslationKey()
+            {
+                return this.translationKey;
+            }
         }
     }
 
