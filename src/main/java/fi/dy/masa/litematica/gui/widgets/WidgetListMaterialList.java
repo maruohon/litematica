@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.Collections;
+import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListSorter;
@@ -43,11 +44,26 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     public void refreshData()
     {
         this.listContents.clear();
-
         this.listContents.addAll(this.gui.getMaterialList().getMaterials());
         Collections.sort(this.listContents, this.sorter);
+    }
 
-        this.listContents.add(0, null); // title row
+    @Override
+    protected int createAndAddHeaderWidget(int x, int y, int listIndexStart, int usableHeight, int usedHeight)
+    {
+        listIndexStart++;
+        WidgetMaterialListEntry widget = this.createListEntryWidget(x, y, listIndexStart, true, null);
+        int height = widget.getHeight();
+
+        if ((usedHeight + height) > usableHeight)
+        {
+            return -1;
+        }
+
+        this.listWidgets.add(widget);
+        this.maxVisibleBrowserEntries++;
+
+        return height;
     }
 
     @Override
@@ -66,7 +82,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     }
 
     @Override
-    protected WidgetMaterialListEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, MaterialListEntry entry)
+    protected WidgetMaterialListEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, @Nullable MaterialListEntry entry)
     {
         return new WidgetMaterialListEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
                 this.zLevel, isOdd, this.gui.getMaterialList(), entry, this);

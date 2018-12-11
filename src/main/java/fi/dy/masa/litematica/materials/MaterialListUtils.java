@@ -34,7 +34,6 @@ public class MaterialListUtils
     public static List<MaterialListEntry> createMaterialListFor(LitematicaSchematic schematic)
     {
         Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
-        Object2IntOpenHashMap<IBlockState> countsMissing = new Object2IntOpenHashMap<>();
 
         for (String regionName : schematic.getAreas().keySet())
         {
@@ -53,7 +52,8 @@ public class MaterialListUtils
                     {
                         for (int x = 0; x < sizeX; ++x)
                         {
-                            countsTotal.addTo(container.get(x, y, z), 1);
+                            IBlockState state = container.get(x, y, z);
+                            countsTotal.addTo(state, 1);
                         }
                     }
                 }
@@ -62,7 +62,7 @@ public class MaterialListUtils
 
         Minecraft mc = Minecraft.getMinecraft();
 
-        return getMaterialList(countsTotal, countsMissing, mc.player);
+        return getMaterialList(countsTotal, countsTotal, mc.player);
     }
 
     public static List<MaterialListEntry> createMaterialListFor(SchematicPlacement placement)
