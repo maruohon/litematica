@@ -67,8 +67,9 @@ public abstract class MaterialListBase
         for (int i = 0; i < this.materialListPreFiltered.size(); ++i)
         {
             MaterialListEntry entry = this.materialListPreFiltered.get(i);
+            int countMissing = this.multiplier == 1 ? entry.getCountMissing() : this.multiplier * entry.getCountTotal();
 
-            if (entry.getCountAvailable() < entry.getCountMissing())
+            if (entry.getCountAvailable() < countMissing)
             {
                 this.materialListFiltered.add(entry);
             }

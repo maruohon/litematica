@@ -72,19 +72,19 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         ScaledResolution res = new ScaledResolution(mc);
         FontRenderer font = mc.fontRenderer;
         double scale = 1;
+        int bgMargin = 2;
         int lineHeight = 16;
         int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
-        int contentHeight = (Math.min(list.size(), maxLines) + 1) * lineHeight;
+        int contentHeight = (Math.min(list.size(), maxLines) * lineHeight) + bgMargin + 10;
         int maxTextLength = 0;
         int maxCountLength = 0;
-        int bgMargin = 2;
-        int posX = 4 + bgMargin;
+        int posX = xOffset + bgMargin;
         int posY = yOffset + bgMargin;
         int bgColor = 0xA0000000;
         int textColor = 0xFFFFFFFF;
         boolean useBackground = true;
         boolean useShadow = false;
-        int count = 0;
+        int lineCount = 0;
 
         // Only Chuck Norris can divide by zero
         if (scale == 0d)
@@ -95,9 +95,13 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         for (MaterialListEntry entry : list)
         {
             maxTextLength = Math.max(maxTextLength, font.getStringWidth(entry.getStack().getDisplayName()));
-            maxCountLength = Math.max(maxCountLength, font.getStringWidth(String.valueOf(entry.getCountMissing())));
+            int multiplier = this.materialList.getMultiplier();
+            int count = multiplier == 1 ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
+            count *= multiplier;
+            String strCount = GuiBase.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + GuiBase.TXT_RST;
+            maxCountLength = Math.max(maxCountLength, font.getStringWidth(strCount));
 
-            if (++count >= maxLines)
+            if (++lineCount >= maxLines)
             {
                 break;
             }
@@ -123,37 +127,41 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             GlStateManager.scale(scale, scale, 0);
         }
 
-        posY += RenderUtils.getHudOffsetForPotions(alignment, scale, mc.player);
         posY = RenderUtils.getHudPosY((int) posY, yOffset, contentHeight, scale, alignment);
-
-        int textX = posX + 18;
-        int textY = posY + 3;
-        count = 0;
+        posY += RenderUtils.getHudOffsetForPotions(alignment, scale, mc.player);
 
         if (useBackground)
         {
             Gui.drawRect(posX - bgMargin, posY - bgMargin,
-                         posX + maxLineLength + bgMargin, posY + contentHeight + bgMargin, bgColor);
+                         posX + maxLineLength + bgMargin, posY + contentHeight, bgColor);
         }
 
         String title = GuiBase.TXT_BOLD + I18n.format("litematica.gui.button.material_list") + GuiBase.TXT_RST;
 
+        int textX = posX + 2;
+        int textY = posY + 2;
+
         if (useShadow)
         {
-            font.drawStringWithShadow(title, posX + 2, textY, textColor);
+            font.drawStringWithShadow(title, textX, textY, textColor);
         }
         else
         {
-            font.drawString(title, posX + 2, textY, textColor);
+            font.drawString(title, textX, textY, textColor);
         }
 
-        posY += lineHeight;
+        textX = posX + 18;
+        posY += 10;
+        lineCount = 0;
 
         for (MaterialListEntry entry : list)
         {
             textY = posY + 4;
             String text = entry.getStack().getDisplayName();
-            String strCount = GuiBase.TXT_RED + String.valueOf(entry.getCountMissing() - entry.getCountAvailable()) + GuiBase.TXT_RST;
+            int multiplier = this.materialList.getMultiplier();
+            int count = multiplier == 1 ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
+            count *= multiplier;
+            String strCount = GuiBase.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + GuiBase.TXT_RST;
             int cntLen = font.getStringWidth(strCount);
             int cntPosX = posX + maxLineLength - cntLen - 2;
 
@@ -180,7 +188,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
             posY += lineHeight;
 
-            if (++count >= maxLines)
+            if (++lineCount >= maxLines)
             {
                 break;
             }
@@ -191,6 +199,12 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             GlStateManager.popMatrix();
         }
 
-        return contentHeight;
+        return contentHeight + 4;
+    }
+
+    protected String getFormattedCountString(int count, int maxStackSize)
+    {
+        double boxCount = (double) count / (27D * maxStackSize);
+        return String.format("%d (%.2f SB)", count, boxCount);
     }
 }

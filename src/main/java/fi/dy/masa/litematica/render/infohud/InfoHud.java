@@ -12,7 +12,7 @@ public class InfoHud
 
     protected final Minecraft mc;
     protected final List<String> lineList = new ArrayList<>();
-    protected final List<IInfoHudRenderer> providers = new ArrayList<>();
+    protected final List<IInfoHudRenderer> renderers = new ArrayList<>();
     protected boolean enabled;
 
     public static InfoHud getInstance()
@@ -50,17 +50,17 @@ public class InfoHud
             this.updateHudText();
 
             final int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
-            int xOffset = 4;
-            int yOffset = 4;
+            int xOffset = 2;
+            int yOffset = 2;
             int lineIndex = 0;
 
-            if (this.providers.isEmpty() == false)
+            if (this.renderers.isEmpty() == false)
             {
-                for (IInfoHudRenderer provider : this.providers)
+                for (IInfoHudRenderer renderer : this.renderers)
                 {
-                    if (provider.getShouldRender())
+                    if (renderer.getShouldRender())
                     {
-                        List<String> lines = provider.getText();
+                        List<String> lines = renderer.getText();
 
                         for (int i = 0; i < lines.size() && lineIndex < maxLines; ++i, ++lineIndex)
                         {
@@ -77,37 +77,37 @@ public class InfoHud
 
             if (this.lineList.isEmpty() == false)
             {
-                yOffset += fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, 4, yOffset, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                yOffset += fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, xOffset, yOffset, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
             }
 
-            if (this.providers.isEmpty() == false)
+            if (this.renderers.isEmpty() == false)
             {
-                for (IInfoHudRenderer provider : this.providers)
+                for (IInfoHudRenderer renderer : this.renderers)
                 {
-                    if (provider.getShouldRender())
+                    if (renderer.getShouldRender())
                     {
-                        yOffset += provider.render(xOffset, yOffset, this.getHudAlignment());
+                        yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment());
                     }
                 }
             }
         }
     }
 
-    public void addInfoHudRenderer(IInfoHudRenderer provider, boolean enable)
+    public void addInfoHudRenderer(IInfoHudRenderer renderer, boolean enable)
     {
-        if (this.providers.contains(provider) == false)
+        if (this.renderers.contains(renderer) == false)
         {
-            this.providers.add(provider);
+            this.renderers.add(renderer);
         }
 
         this.enabled |= enable;
     }
 
-    public void removeInfoHudRenderer(IInfoHudRenderer provider, boolean disableIfEmpty)
+    public void removeInfoHudRenderer(IInfoHudRenderer renderer, boolean disableIfEmpty)
     {
-        this.providers.remove(provider);
+        this.renderers.remove(renderer);
 
-        if (disableIfEmpty && this.providers.isEmpty())
+        if (disableIfEmpty && this.renderers.isEmpty())
         {
             this.enabled = false;
         }
@@ -115,16 +115,16 @@ public class InfoHud
 
     public void removeInfoHudRenderersOfType(Class<? extends IInfoHudRenderer> clazz, boolean disableIfEmpty)
     {
-        for (int i = 0; i < this.providers.size(); ++i)
+        for (int i = 0; i < this.renderers.size(); ++i)
         {
-            if (this.providers.get(i).getClass().isAssignableFrom(clazz))
+            if (this.renderers.get(i).getClass().isAssignableFrom(clazz))
             {
-                this.providers.remove(i);
+                this.renderers.remove(i);
                 i--;
             }
         }
 
-        if (disableIfEmpty && this.providers.isEmpty())
+        if (disableIfEmpty && this.renderers.isEmpty())
         {
             this.enabled = false;
         }
@@ -132,7 +132,7 @@ public class InfoHud
 
     public void reset()
     {
-        this.providers.clear();
+        this.renderers.clear();
         this.lineList.clear();
     }
 
