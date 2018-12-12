@@ -24,7 +24,9 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
+    maven { url 'https://www.dimdev.org/maven/' }
     maven { url 'http://repo.strezz.org/artifactory/list/Strezz-Central' }
+    maven { url 'https://masa.dy.fi/maven' }
 }
 
 ext.configFile = file "build.properties"
@@ -53,8 +55,8 @@ minecraft {
 }
 
 dependencies {
+    implementation 'fi.dy.masa.malilib:malilib-rift-' + config.minecraft_version_out + ':' + config.malilib_version + ':deobf'
     implementation 'com.github.Chocohead:Rift:jitpack-SNAPSHOT:dev'
-    deobfCompile "fi.dy.masa.malilib:malilib-" + config.minecraft_version_out + ":" + config.malilib_version + ":deobf"
 }
 
 /*
@@ -66,7 +68,7 @@ sourceSets {
 */
 
 group = config.group + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = config.mod_id + '-' + config.minecraft_version_out
+archivesBaseName = config.mod_file_name + '-' + config.minecraft_version_out
 version = project.minecraft.mod_version
 
 /**
