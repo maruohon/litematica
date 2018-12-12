@@ -1,10 +1,10 @@
-package fi.dy.masa.litematica.render;
+package fi.dy.masa.litematica.render.infohud;
 
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -128,7 +128,7 @@ public class ToolHud extends InfoHud
                     lines.add(String.format("%s: %s%s%s", str, green, areaName, rst));
 
                     str = I18n.format("litematica.hud.schematic_placement.sub_region_modified");
-                    strTmp = placement.isRegionPlacementModified(schematicPlacement.getSchematic().getSubRegionPosition(areaName)) ? strYes : strNo;
+                    strTmp = placement.isRegionPlacementModifiedFromDefault() ? strYes : strNo;
                     lines.add(String.format("%s: %s", str, strTmp));
                 }
             }

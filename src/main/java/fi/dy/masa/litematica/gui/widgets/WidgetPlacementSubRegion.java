@@ -3,10 +3,12 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -27,7 +29,6 @@ public class WidgetPlacementSubRegion extends WidgetBase
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private final boolean isOdd;
-    private int id;
     private int buttonsStartX;
 
     public WidgetPlacementSubRegion(int x, int y, int width, int height, float zLevel, boolean isOdd,
@@ -41,41 +42,34 @@ public class WidgetPlacementSubRegion extends WidgetBase
         this.isOdd = isOdd;
         this.mc = mc;
 
-        this.id = 0;
         int posX = x + width;
         int posY = y + 1;
 
         // Note: These are placed from right to left
 
-        String labelEn = I18n.format("litematica.gui.button.schematic_placements.render_enable");
-        String labelDis = I18n.format("litematica.gui.button.schematic_placements.render_disable");
-        String label = this.placement.isRenderingEnabled() ? labelDis : labelEn;
-        int len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
-        posX -= (len + 2);
-        ButtonListener listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_RENDER, this);
-        this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
-
-        labelEn = I18n.format("litematica.gui.button.schematic_placements.enable");
-        labelDis = I18n.format("litematica.gui.button.schematic_placements.disable");
-        label = this.placement.isEnabled() ? labelDis : labelEn;
-        len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
-        posX -= (len + 2);
-        listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_ENABLED, this);
-        this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
-
-        posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
+        posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED);
+        posX = this.createButtonGeneric(posX, posY, WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE);
 
         this.buttonsStartX = posX;
     }
 
-    private int createButton(int x, int y, ButtonListener.ButtonType type)
+    private int createButtonGeneric(int xRight, int y, WidgetSchematicPlacement.ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getLabelKey());
-        int len = mc.fontRenderer.getStringWidth(label) + 10;
-        x -= (len + 2);
-        this.addButton(new ButtonGeneric(this.id++, x, y, len, 20, label), new ButtonListener(type, this));
+        String label = I18n.format(type.getTranslationKey());
+        int len = this.mc.fontRenderer.getStringWidth(label) + 10;
+        xRight -= (len + 2);
+        this.addButton(new ButtonGeneric(0, xRight, y, len, 20, label), new ButtonListener(type, this));
 
-        return x;
+        return xRight;
+    }
+
+    private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, WidgetSchematicPlacement.ButtonListener.ButtonType type)
+    {
+        ButtonOnOff button = ButtonOnOff.create(xRight + 1, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        xRight -= button.getWidth();
+        this.addButton(button, new ButtonListener(type, this));
+
+        return xRight;
     }
 
     private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
@@ -156,7 +150,7 @@ public class WidgetPlacementSubRegion extends WidgetBase
         this.parent.bindTexture(Icons.TEXTURE);
         icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
 
-        if (this.placement.isRegionPlacementModified(this.schematicPlacement.getSchematic().getAreaPositions().get(name)))
+        if (this.placement.isRegionPlacementModifiedFromDefault())
         {
             icon = Icons.NOTICE_EXCLAMATION_11;
             icon.renderAt(this.buttonsStartX - icon.getWidth() - 2, this.y + 6, this.zLevel, false, false);
@@ -174,29 +168,27 @@ public class WidgetPlacementSubRegion extends WidgetBase
         File schematicFile = this.schematicPlacement.getSchematic().getFile();
         String fileName = schematicFile != null ? schematicFile.getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
 
-        List<String> text = new ArrayList<>();
-        text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.schematicPlacement.getSchematic().getMetadata().getName()));
-        text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
-
-        int offset = 12 + 11 + 2; // this.x + modified icon + gap to buttons
-
-        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
-        {
-            this.parent.drawHoveringText(text, mouseX, mouseY);
-        }
-        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - offset, this.y + 6, 11, 11))
+        if (this.placement.isRegionPlacementModifiedFromDefault() &&
+            GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 25, this.y + 6, 11, 11))
         {
             String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_sub_region_modified");
-            this.parent.drawHoveringText(str, mouseX, mouseY);
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
+        }
+        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 14, this.height))
+        {
+            List<String> text = new ArrayList<>();
+            text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.schematicPlacement.getSchematic().getMetadata().getName()));
+            text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
+            RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
-        private final ButtonType type;
+        private final WidgetSchematicPlacement.ButtonListener.ButtonType type;
         private final WidgetPlacementSubRegion widget;
 
-        public ButtonListener(ButtonType type, WidgetPlacementSubRegion widget)
+        public ButtonListener(WidgetSchematicPlacement.ButtonListener.ButtonType type, WidgetPlacementSubRegion widget)
         {
             this.type = type;
             this.widget = widget;
@@ -205,20 +197,15 @@ public class WidgetPlacementSubRegion extends WidgetBase
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            if (this.type == ButtonType.CONFIGURE)
+            if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE)
             {
                 GuiSubRegionConfiguration gui = new GuiSubRegionConfiguration(this.widget.schematicPlacement, this.widget.placement);
                 gui.setParent(this.widget.parent.getParentGui());
                 Minecraft.getInstance().displayGuiScreen(gui);
             }
-            else if (this.type == ButtonType.TOGGLE_ENABLED)
+            else if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED)
             {
-                this.widget.schematicPlacement.toggleSubRegionEnabled(this.widget.placement.getName());
-                this.widget.parent.refreshEntries();
-            }
-            else if (this.type == ButtonType.TOGGLE_RENDER)
-            {
-                this.widget.schematicPlacement.toggleSubRegionRenderingEnabled(this.widget.placement.getName());
+                this.widget.schematicPlacement.toggleSubRegionEnabled(this.widget.placement.getName(), this.widget.parent.getParentGui());
                 this.widget.parent.refreshEntries();
             }
         }
@@ -227,25 +214,6 @@ public class WidgetPlacementSubRegion extends WidgetBase
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             this.actionPerformed(control);
-        }
-
-        public enum ButtonType
-        {
-            CONFIGURE       ("litematica.gui.button.schematic_placements.configure"),
-            TOGGLE_ENABLED  (""),
-            TOGGLE_RENDER   ("");
-
-            private final String labelKey;
-
-            private ButtonType(String labelKey)
-            {
-                this.labelKey = labelKey;
-            }
-
-            public String getLabelKey()
-            {
-                return this.labelKey;
-            }
         }
     }
 }

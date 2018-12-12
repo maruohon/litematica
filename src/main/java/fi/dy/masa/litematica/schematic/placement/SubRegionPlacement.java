@@ -127,6 +127,11 @@ public class SubRegionPlacement
         this.ignoreEntities = false;
     }
 
+    public boolean isRegionPlacementModifiedFromDefault()
+    {
+        return this.isRegionPlacementModified(this.defaultPos);
+    }
+
     public boolean isRegionPlacementModified(BlockPos originalPosition)
     {
         return this.isEnabled() == false ||

@@ -1,30 +1,53 @@
 package fi.dy.masa.litematica.gui;
 
+import java.io.File;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
+import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
-import fi.dy.masa.litematica.render.InfoHud;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.litematica.materials.MaterialListEntry;
+import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
+import fi.dy.masa.litematica.materials.MaterialListUtils;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.litematica.util.MaterialListEntry;
-import fi.dy.masa.litematica.util.MaterialListEntry.SortCriteria;
+import fi.dy.masa.malilib.data.DataDump;
 import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
 {
-    private final SchematicPlacement placement;
+    private final MaterialListBase materialList;
     private int id;
 
-    public GuiMaterialList(SchematicPlacement placement)
+    public GuiMaterialList(MaterialListBase materialList)
     {
-        super(10, 60);
+        super(10, 44);
 
-        String schematicName = placement.getName();
-        this.title = I18n.format("litematica.gui.title.material_list", schematicName);
-        this.placement = placement;
+        this.materialList = materialList;
+        this.title = this.materialList.getTitle();
+        this.useTitleHierarchy = false;
+
+        Minecraft mc = Minecraft.getInstance();
+
+        MaterialListUtils.updateAvailableCounts(this.materialList.getMaterialsAll(), mc.player);
+        WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), mc);
+
+        // Remember the last opened material list, for the hotkey
+        if (DataManager.getMaterialList() == null)
+        {
+            DataManager.setMaterialList(materialList);
+        }
     }
 
     @Override
@@ -36,31 +59,35 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 94;
+        return this.height - 80;
     }
 
     @Override
     public void initGui()
     {
-        WidgetMaterialListEntry.resetNameLengths();
-
         super.initGui();
 
         int x = 12;
-        int y = 40;
+        int y = 24;
         int buttonWidth;
         this.id = 0;
         String label;
         ButtonGeneric button;
 
-        x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_NAME) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_TOTAL) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_MISSING) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.SORT_BY_AVAILABLE) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.TOGGLE_INFO_HUD) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + 4;
+        String str = I18n.format("litematica.gui.label.material_list.multiplier", this.materialList.getMultiplier());
+        int w = this.fontRenderer.getStringWidth(str) + 6;
+        this.addLabel(this.width - w - 6, y + 4, w, 12, 0xFFFFFFFF, str);
+        this.createButton(this.width - w - 26, y + 2, -1, ButtonListener.Type.CHANGE_MULTIPLIER);
+
+        this.addWidget(new WidgetInfoIcon(this.width - 23, 12, this.zLevel, Icons.INFO_11, "litematica.info.material_list"));
+
+        int gap = 2;
+        x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + gap;
+        x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + gap;
+        x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + gap;
+        x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRender(), ButtonListener.Type.TOGGLE_INFO_HUD) + gap;
+        x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_IGNORED) + gap;
+        x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + gap;
         y += 22;
 
         y = this.height - 36;
@@ -74,18 +101,19 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
     private int createButton(int x, int y, int width, ButtonListener.Type type)
     {
-        ButtonListener listener = new ButtonListener(type, this.placement, this);
+        ButtonListener listener = new ButtonListener(type, this);
         String label = "";
 
-        if (type == ButtonListener.Type.TOGGLE_INFO_HUD)
+        if (type == ButtonListener.Type.LIST_TYPE)
         {
-            boolean val = InfoHud.getInstance().isEnabled();
-            String str = (val ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (val ? "on" : "off")) + TXT_RST;
-            label = type.getDisplayName(str);
+            label = type.getDisplayName(this.materialList.getMaterialListType().getDisplayName());
         }
-        else if (type == ButtonListener.Type.LIST_TYPE)
+        else if (type == ButtonListener.Type.CHANGE_MULTIPLIER)
         {
-            label = type.getDisplayName(this.placement.getMaterialListType().getDisplayName());
+            String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
+            ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
+            this.addButton(button, listener);
+            return button.getWidth();
         }
         else
         {
@@ -103,9 +131,16 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         return width;
     }
 
-    public SchematicPlacement getSchematicPlacement()
+    private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        return this.placement;
+        ButtonOnOff button = ButtonOnOff.create(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        this.addButton(button, new ButtonListener(type, this));
+        return button.getWidth();
+    }
+
+    public MaterialListBase getMaterialList()
+    {
+        return this.materialList;
     }
 
     @Override
@@ -119,7 +154,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         private final GuiMaterialList parent;
         private final Type type;
 
-        public ButtonListener(Type type, SchematicPlacement placement, GuiMaterialList parent)
+        public ButtonListener(Type type, GuiMaterialList parent)
         {
             this.parent = parent;
             this.type = type;
@@ -133,61 +168,110 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         @Override
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
+            MaterialListBase materialList = this.parent.materialList;
+
             switch (this.type)
             {
-                case SORT_BY_NAME:
-                    MaterialListEntry.setSortCriteria(SortCriteria.NAME);
-                    break;
-
-                case SORT_BY_TOTAL:
-                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_TOTAL);
-                    break;
-
-                case SORT_BY_MISSING:
-                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_MISSING);
-                    break;
-
-                case SORT_BY_AVAILABLE:
-                    MaterialListEntry.setSortCriteria(SortCriteria.COUNT_AVAILABLE);
-                    break;
-
-                case WRITE_TO_FILE:
-                    break;
-
-                case TOGGLE_INFO_HUD:
+                case REFRESH_LIST:
+                    materialList.recreateMaterialList();
                     break;
 
                 case LIST_TYPE:
-                    SchematicPlacement placement = this.parent.getSchematicPlacement();
-                    BlockInfoListType type = placement.getMaterialListType();
-                    placement.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
-                    placement.refreshMaterialList();
+                    BlockInfoListType type = materialList.getMaterialListType();
+                    materialList.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
+                    materialList.recreateMaterialList();
                     break;
 
-                case REFRESH_LIST:
-                    this.parent.getSchematicPlacement().refreshMaterialList();
+                case HIDE_AVAILABLE:
+                    materialList.setHideAvailable(! materialList.getHideAvailable());
+                    materialList.refreshPreFilteredList();
+                    materialList.recreateFilteredList();
                     break;
+
+                case TOGGLE_INFO_HUD:
+                    MaterialListHudRenderer renderer = materialList.getHudRenderer();
+                    renderer.toggleShouldRender();
+
+                    if (materialList.getHudRenderer().getShouldRender())
+                    {
+                        InfoHud.getInstance().addInfoHudRenderer(renderer, true);
+                    }
+                    else
+                    {
+                        InfoHud.getInstance().removeInfoHudRenderersOfType(renderer.getClass(), true);
+                    }
+
+                    break;
+
+                case CLEAR_IGNORED:
+                    materialList.clearIgnored();
+                    break;
+
+                case WRITE_TO_FILE:
+                    File dir = new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
+                    DataDump dump = new DataDump(2, DataDump.Format.ASCII);
+                    this.addLinesToDump(dump, materialList);
+                    File file = DataDump.dumpDataToFile(dir, "material_list", dump.getLines());
+
+                    if (file != null)
+                    {
+                        String key = "litematica.message.material_list_written_to_file";
+                        this.parent.addMessage(MessageType.SUCCESS, key, file.getName());
+                        StringUtils.sendOpenFileChatMessage(this.parent.mc.player, key, file);
+                    }
+                    break;
+
+                case CHANGE_MULTIPLIER:
+                {
+                    int amount = mouseButton == 1 ? -1 : 1;
+                    if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
+                    if (GuiScreen.isAltKeyDown()) { amount *= 4; }
+                    materialList.setMultiplier(materialList.getMultiplier() + amount);
+                    break;
+                }
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
         }
 
+        private void addLinesToDump(DataDump dump, MaterialListBase materialList)
+        {
+            int multiplier = materialList.getMultiplier();
+
+            for (MaterialListEntry entry : materialList.getMaterialsAll())
+            {
+                int count = entry.getCountTotal() * multiplier;
+                dump.addData(entry.getStack().getDisplayName().getString(), String.valueOf(count));
+            }
+
+            String titleTotal = multiplier > 1 ? String.format("Total (x%d)", multiplier) : "Total";
+            dump.addTitle("Item", titleTotal);
+            dump.addHeader(materialList.getTitle());
+            dump.setColumnProperties(1, DataDump.Alignment.RIGHT, true); // total
+            dump.setSort(true);
+            dump.setUseColumnSeparator(true);
+        }
+
         public enum Type
         {
-            SORT_BY_NAME        ("litematica.gui.button.material_list.name"),
-            SORT_BY_TOTAL       ("litematica.gui.button.material_list.total"),
-            SORT_BY_MISSING     ("litematica.gui.button.material_list.missing"),
-            SORT_BY_AVAILABLE   ("litematica.gui.button.material_list.available"),
-            WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
-            TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
+            REFRESH_LIST        ("litematica.gui.button.material_list.refresh_list"),
             LIST_TYPE           ("litematica.gui.button.material_list.list_type"),
-            REFRESH_LIST        ("litematica.gui.button.material_list.refresh_list");
+            HIDE_AVAILABLE      ("litematica.gui.button.material_list.hide_available"),
+            TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
+            CLEAR_IGNORED       ("litematica.gui.button.material_list.clear_ignored"),
+            WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
+            CHANGE_MULTIPLIER   ("");
 
             private final String translationKey;
 
             private Type(String translationKey)
             {
                 this.translationKey = translationKey;
+            }
+
+            public String getTranslationKey()
+            {
+                return this.translationKey;
             }
 
             public String getDisplayName(Object... args)

@@ -3,9 +3,11 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -31,7 +33,6 @@ public class WidgetSchematicPlacement extends WidgetBase
     private final Minecraft mc;
     private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private final boolean isOdd;
-    private int id;
     private int buttonsStartX;
 
     public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel, boolean isOdd,
@@ -45,43 +46,35 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.mc = mc;
         this.manager = DataManager.getSchematicPlacementManager();
 
-        this.id = 0;
         int posX = x + width;
         int posY = y + 1;
 
         // Note: These are placed from right to left
 
-        posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
-
-        String labelEn = I18n.format("litematica.gui.button.schematic_placements.render_enable");
-        String labelDis = I18n.format("litematica.gui.button.schematic_placements.render_disable");
-        String label = this.placement.isRenderingEnabled() ? labelDis : labelEn;
-        int len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
-        posX -= (len + 2);
-        ButtonListener listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_RENDER, this);
-        this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
-
-        labelEn = I18n.format("litematica.gui.button.schematic_placements.enable");
-        labelDis = I18n.format("litematica.gui.button.schematic_placements.disable");
-        label = this.placement.isEnabled() ? labelDis : labelEn;
-        len = Math.max(mc.fontRenderer.getStringWidth(labelEn), mc.fontRenderer.getStringWidth(labelEn)) + 10;
-        posX -= (len + 2);
-        listener = new ButtonListener(ButtonListener.ButtonType.TOGGLE_ENABLED, this);
-        this.addButton(new ButtonGeneric(this.id++, posX, posY, len, 20, label), listener);
-
-        posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
+        posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.REMOVE);
+        posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
+        posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.CONFIGURE);
 
         this.buttonsStartX = posX;
     }
 
-    private int createButton(int x, int y, ButtonListener.ButtonType type)
+    private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getLabelKey());
-        int len = mc.fontRenderer.getStringWidth(label) + 10;
-        x -= (len + 2);
-        this.addButton(new ButtonGeneric(this.id++, x, y, len, 20, label), new ButtonListener(type, this));
+        String label = I18n.format(type.getTranslationKey());
+        int len = this.mc.fontRenderer.getStringWidth(label) + 10;
+        xRight -= (len + 2);
+        this.addButton(new ButtonGeneric(0, xRight, y, len, 20, label), new ButtonListener(type, this));
 
-        return x;
+        return xRight;
+    }
+
+    private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
+    {
+        ButtonOnOff button = ButtonOnOff.create(xRight + 1, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        xRight -= button.getWidth();
+        this.addButton(button, new ButtonListener(type, this));
+
+        return xRight;
     }
 
     private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
@@ -191,20 +184,25 @@ public class WidgetSchematicPlacement extends WidgetBase
         String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
         text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
 
-        int offset = 12 + 11 + 2; // this.x + modified icon + gap to buttons
-
-        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
+        if (this.placement.isLocked() &&
+                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 38, this.y + 6, 11, 11))
         {
-            this.parent.drawHoveringText(text, mouseX, mouseY);
+            String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_locked");
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
         }
-        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - offset, this.y + 6, 11, 11))
+        else if (this.placement.isRegionPlacementModified() &&
+                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 25, this.y + 6, 11, 11))
         {
             String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_modified");
-            this.parent.drawHoveringText(str, mouseX, mouseY);
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
+        }
+        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 18, this.height))
+        {
+            RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final ButtonType type;
         private final WidgetSchematicPlacement widget;
@@ -241,11 +239,6 @@ public class WidgetSchematicPlacement extends WidgetBase
                 this.widget.placement.setEnabled(! this.widget.placement.isEnabled());
                 this.widget.parent.refreshEntries();
             }
-            else if (this.type == ButtonType.TOGGLE_RENDER)
-            {
-                this.widget.placement.setRenderSchematic(! this.widget.placement.isRenderingEnabled());
-                this.widget.parent.refreshEntries();
-            }
         }
 
         @Override
@@ -258,19 +251,18 @@ public class WidgetSchematicPlacement extends WidgetBase
         {
             CONFIGURE       ("litematica.gui.button.schematic_placements.configure"),
             REMOVE          ("litematica.gui.button.schematic_placements.remove"),
-            TOGGLE_ENABLED  (""),
-            TOGGLE_RENDER   ("");
+            TOGGLE_ENABLED  ("litematica.gui.button.schematic_placements.placement_enabled");
 
-            private final String labelKey;
+            private final String translationKey;
 
-            private ButtonType(String labelKey)
+            private ButtonType(String translationKey)
             {
-                this.labelKey = labelKey;
+                this.translationKey = translationKey;
             }
 
-            public String getLabelKey()
+            public String getTranslationKey()
             {
-                return this.labelKey;
+                return this.translationKey;
             }
         }
     }

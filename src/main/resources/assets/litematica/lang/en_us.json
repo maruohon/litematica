@@ -61,13 +61,14 @@
     "litematica.gui.button.config_gui.render_layers": "Render Layers",
     "litematica.gui.button.config_gui.visuals": "Visuals",
 
+    "litematica.gui.button.hover.plus_minus_tip": "Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size",
+
     "litematica.gui.button.material_list": "Material List",
-    "litematica.gui.button.material_list.available": "Available",
+    "litematica.gui.button.material_list.clear_ignored": "Clear ignored",
+    "litematica.gui.button.material_list.hide_available": "Hide available: %s",
+    "litematica.gui.button.material_list.ignore": "Ignore",
     "litematica.gui.button.material_list.list_type": "Show: %s",
-    "litematica.gui.button.material_list.missing": "Missing",
-    "litematica.gui.button.material_list.name": "Name",
     "litematica.gui.button.material_list.refresh_list": "Refresh",
-    "litematica.gui.button.material_list.total": "Total",
     "litematica.gui.button.material_list.toggle_info_hud": "Info HUD: %s",
     "litematica.gui.button.material_list.write_to_file": "Write to file",
 
@@ -81,19 +82,25 @@
 
     "litematica.gui.button.schematic_manager.export_as": "Export as:",
 
+    "litematica.gui.button.schematic_placement.abbr.rendering": "R",
+
     "litematica.gui.button.schematic_placement.ignore_entities": "Ignore entities: %s",
+    "litematica.gui.button.schematic_placement.region_enabled": "Region: %s",
     "litematica.gui.button.schematic_placement.reset_sub_region_placements": "Reset all sub-regions",
+    "litematica.gui.button.schematic_placement.toggle_all_off": "All §cOFF§r",
+    "litematica.gui.button.schematic_placement.toggle_all_on": "All §aON§r",
 
     "litematica.gui.button.schematic_placement.hover.enclosing_box": "Enclosing box rendering: %s",
     "litematica.gui.button.schematic_placement.hover.lock": "Locking a placement prevents moving or\notherwise changing it (accidentally)",
+    "litematica.gui.button.schematic_placement.hover.rendering": "Rendering: %s\nNote that this works a bit funky\nand doesn't prevent entity rendering.\nUsually you should just disable\nthe placement entirely",
 
     "litematica.gui.button.schematic_placements.configure": "Configure",
-    "litematica.gui.button.schematic_placements.remove": "Remove",
-    "litematica.gui.button.schematic_placements.select": "Select",
     "litematica.gui.button.schematic_placements.disable": "Disable",
-    "litematica.gui.button.schematic_placements.enable": "Enable",
-    "litematica.gui.button.schematic_placements.render_enable": "Enable rendering",
-    "litematica.gui.button.schematic_placements.render_disable": "Disable rendering",
+    "litematica.gui.button.schematic_placements.locked": "Locked: %s",
+    "litematica.gui.button.schematic_placements.placement_enabled": "Placement: %s",
+    "litematica.gui.button.schematic_placements.remove": "Remove",
+    "litematica.gui.button.schematic_placements.rendering_enabled": "Rendering: %s",
+    "litematica.gui.button.schematic_placements.select": "Select",
 
     "litematica.gui.button.schematic_verifier.ignore": "Ignore",
     "litematica.gui.button.schematic_verifier.range_type": "Range: %s",
@@ -111,9 +118,8 @@
     "litematica.gui.button.enable": "Enable",
     "litematica.gui.button.import": "Import",
     "litematica.gui.button.load_schematic_to_memory": "Load Schematic to memory",
-    "litematica.gui.button.locked": "Locked",
     "litematica.gui.button.mirror_value": "Mirror: %s",
-    "litematica.gui.button.move_here": "Move here",
+    "litematica.gui.button.move_to_player": "Move to player",
     "litematica.gui.button.remove_placement": "Remove placement",
     "litematica.gui.button.rename": "Rename",
     "litematica.gui.button.rotation_value": "Rotation: %s",
@@ -142,6 +148,7 @@
     "litematica.gui.label.material_list.available": "Available",
     "litematica.gui.label.material_list.item": "Item",
     "litematica.gui.label.material_list.missing": "Missing",
+    "litematica.gui.label.material_list.multiplier": "Multiplier: %s",
     "litematica.gui.label.material_list.name": "Name",
     "litematica.gui.label.material_list.total": "Total",
 
@@ -165,7 +172,7 @@
     "litematica.gui.label.schematic_info.total_blocks": "Total blocks: §f%d§r",
 
     "litematica.gui.label.schematic_load.checkbox.create_placement": "Create a placement",
-    "litematica.gui.label.schematic_load.hoverinfo.create_placement": "Immediately create a new placement and select that new placement",
+    "litematica.gui.label.schematic_load.hoverinfo.create_placement": "Immediately create a new placement\nand select that placement",
 
     "litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled": "Hold shift to disable the placement when created",
     "litematica.gui.label.schematic_placement.in_memory": "IN-MEMORY ONLY",
@@ -173,7 +180,7 @@
     "litematica.gui.label.schematic_placement.rename_placement": "Rename placement:",
     "litematica.gui.label.schematic_placement.schematic_file": "File: %s",
     "litematica.gui.label.schematic_placement.schematic_name": "Schematic: %s",
-    "litematica.gui.label.schematic_placement.sub_regions": "Sub-regions:",
+    "litematica.gui.label.schematic_placement.sub_regions": "Sub-regions (%s):",
 
     "litematica.gui.label.schematic_save.checkbox.ignore_entities": "Ignore entities",
     "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite": "Hold shift to overwrite an existing file",
@@ -189,6 +196,9 @@
     "litematica.gui.label.schematic_verifier_display_type.wrong_state": "Wrong States",
     "litematica.gui.label.schematic_verifier.missing_chunks": "Missing Chunks (%d)",
 
+    "litematica.gui.label_colored.off": "§cOFF§r",
+    "litematica.gui.label_colored.on": "§aON§r",
+
     "litematica.gui.title.area_selection_manager": "Area Selection Manager",
     "litematica.gui.title.configure_schematic_placement": "Configure Schematic placement",
     "litematica.gui.title.configure_schematic_sub_region": "Configure Placement Sub-Region",
@@ -200,7 +210,8 @@
     "litematica.gui.title.load_schematic": "Load Schematic",
     "litematica.gui.title.manage_loaded_schematics": "Manage loaded Schematics",
     "litematica.gui.title.manage_schematic_placements": "Manage Schematic Placements",
-    "litematica.gui.title.material_list": "Material List for '%s'",
+    "litematica.gui.title.material_list.placement": "Material List for placement '%s'",
+    "litematica.gui.title.material_list.schematic": "Material List for schematic '%s'",
     "litematica.gui.title.rename_area_selection": "Rename Area Selection",
     "litematica.gui.title.rename_area_sub_region": "Rename Sub Region",
     "litematica.gui.title.rename_schematic": "Rename Schematic",
@@ -221,6 +232,7 @@
     "litematica.hud.area_selection.selected_sub_region": "Sub-region: %s",
     "litematica.hud.area_selection.selection_mode": "Selection Mode: %s",
 
+    "litematica.hud.schematic_placement.hover_info.placement_locked": "This placement has been locked and can't\nbe modified without unlocking it first",
     "litematica.hud.schematic_placement.hover_info.placement_modified": "This placement has been modified",
     "litematica.hud.schematic_placement.hover_info.placement_sub_region_modified": "This sub-region has been modified",
     "litematica.hud.schematic_placement.selected_placement": "Placement",
@@ -230,6 +242,8 @@
     "litematica.hud.schematic_placement.sub_regions_modified": "Regions modified",
 
     "litematica.hud.selected_mode": "Mode",
+
+    "litematica.info.material_list": "- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one",
 
     "litematica.label.none_lower": "none",
     "litematica.label.no": "no",
@@ -245,6 +259,7 @@
     "litematica.message.in_memory_schematic_created": "Created an in-memory schematic as '%s'",
     "litematica.message.layer_range.range_max": "max",
     "litematica.message.layer_range.range_min": "min",
+    "litematica.message.material_list_written_to_file": "Material list written to file '%s'",
     "litematica.message.moved_area_origin": "Moved the area origin point from %s => %s",
     "litematica.message.moved_layer_range": "Moved layer range §a%s§r by §a%s§r on the §a%s§r axis",
     "litematica.message.moved_max_layer_to": "Moved max layer to %s",

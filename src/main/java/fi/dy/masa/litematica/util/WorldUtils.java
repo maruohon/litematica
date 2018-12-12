@@ -239,6 +239,25 @@ public class WorldUtils
         }
     }
 
+    public static void markSchematicChunkForRenderUpdate(SubChunkPos chunkPos)
+    {
+        World world = SchematicWorldHandler.getSchematicWorld();
+
+        if (world != null)
+        {
+            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
+            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getInstance().world.getChunkProvider()).getLoadedChunks();
+            long key = ChunkPos.asLong(chunkPos.getX(), chunkPos.getZ());
+
+            if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
+            {
+                WorldRenderer renderer = LitematicaRenderer.getInstance().getWorldRenderer();
+                renderer.markBlockRangeForRenderUpdate((chunkPos.getX() << 4) - 1, (chunkPos.getY() << 4) - 1, (chunkPos.getZ() << 4) - 1,
+                                                       (chunkPos.getX() << 4) + 1, (chunkPos.getY() << 4) + 1, (chunkPos.getZ() << 4) + 1);
+            }
+        }
+    }
+
     public static void markSchematicChunkForRenderUpdate(BlockPos pos)
     {
         World world = SchematicWorldHandler.getSchematicWorld();

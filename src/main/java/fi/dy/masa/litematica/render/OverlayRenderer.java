@@ -133,6 +133,8 @@ public class OverlayRenderer
             GlStateManager.depthMask(true);
             GlStateManager.disableLighting();
             GlStateManager.disableTexture2D();
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
+            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
             GlStateManager.pushMatrix();
         }
 

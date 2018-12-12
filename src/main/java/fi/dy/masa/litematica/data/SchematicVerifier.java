@@ -16,8 +16,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.interfaces.ICompletionListener;
-import fi.dy.masa.litematica.render.IStringListProvider;
-import fi.dy.masa.litematica.render.InfoHud;
+import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.ItemUtils;
@@ -43,7 +43,7 @@ import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.chunk.Chunk;
 
-public class SchematicVerifier implements IStringListProvider
+public class SchematicVerifier implements IInfoHudRenderer
 {
     private static final MutablePair<IBlockState, IBlockState> MUTABLE_PAIR = new MutablePair<>();
     private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
@@ -83,13 +83,13 @@ public class SchematicVerifier implements IStringListProvider
     private int maxEntries;
 
     @Override
-    public boolean shouldRenderStrings()
+    public boolean getShouldRender()
     {
         return Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
     }
 
     @Override
-    public List<String> getLines()
+    public List<String> getText()
     {
         return this.infoLines;
     }
@@ -165,7 +165,7 @@ public class SchematicVerifier implements IStringListProvider
     public void clearActiveMismatchRenderPositions()
     {
         this.selectedMismatchPositions.clear();
-        InfoHud.getInstance().removeLineProvidersOfType(SchematicVerifier.class);
+        InfoHud.getInstance().removeInfoHudRenderersOfType(SchematicVerifier.class, true);
     }
 
     @Nullable
@@ -195,7 +195,7 @@ public class SchematicVerifier implements IStringListProvider
             this.completionListener = completionListener;
             this.verificationStarted = true;
 
-            InfoHud.getInstance().addLineProvider(this);
+            InfoHud.getInstance().addInfoHudRenderer(this, true);
             DataManager.addSchematicVerificationTask(this.schematicPlacement);
         }
 
@@ -247,7 +247,7 @@ public class SchematicVerifier implements IStringListProvider
         this.blockMismatches.clear();
         this.correctStateCounts.clear();
 
-        InfoHud.getInstance().removeLineProvider(this);
+        InfoHud.getInstance().removeInfoHudRenderer(this, true);
         this.clearActiveMismatchRenderPositions();
     }
 
@@ -384,12 +384,11 @@ public class SchematicVerifier implements IStringListProvider
                 }
 
                 ChunkPos pos = iter.next();
+                Chunk chunkClient = this.worldClient.getChunkProvider().getChunk(pos.x, pos.z, false, false);
+                Chunk chunkSchematic = this.worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false);
 
-                if (this.worldClient.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null &&
-                    this.worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
+                if (chunkClient != null && chunkSchematic != null)
                 {
-                    Chunk chunkClient = this.worldClient.getChunk(pos.x, pos.z);
-                    Chunk chunkSchematic = this.worldSchematic.getChunk(pos.x, pos.z);
                     Map<String, MutableBoundingBox> boxes = this.schematicPlacement.getBoxesWithinChunk(pos.x, pos.z);
 
                     for (MutableBoundingBox box : boxes.values())
@@ -780,10 +779,12 @@ public class SchematicVerifier implements IStringListProvider
      * @param type
      * @return
      */
-    public IStringListProvider getClosestMismatchedPositionListProviderFor(MismatchType type)
+    /*
+    public IInfoHudRenderer getClosestMismatchedPositionListProviderFor(MismatchType type)
     {
         return this;
     }
+    */
 
     public static class BlockMismatch implements Comparable<BlockMismatch>
     {

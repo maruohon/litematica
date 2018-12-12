@@ -120,59 +120,75 @@ public class LitematicaRenderer
 
         this.mc.profiler.endStartSection("litematica_terrain");
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-        GlStateManager.pushMatrix();
         GlStateManager.disableAlphaTest();
         GlStateManager.enableBlend();
 
-        GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        worldRenderer.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, entity);
-
-        worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, partialTicks, entity);
-
-        this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-        worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT, partialTicks, entity);
-        this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
-
-        GlStateManager.disableBlend();
-        GlStateManager.shadeModel(GL11.GL_FLAT);
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-        GlStateManager.popMatrix();
-
-        GlStateManager.pushMatrix();
-        this.mc.profiler.endStartSection("litematica_entities");
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-
-        worldRenderer.renderEntities(entity, icamera, partialTicks);
-
-        GlStateManager.disableBlend();
-        RenderHelper.disableStandardItemLighting();
-
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-        GlStateManager.popMatrix();
-
-        GlStateManager.enableCull();
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-        this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        GlStateManager.shadeModel(GL11.GL_SMOOTH);
-
-        this.mc.profiler.endStartSection("litematica_translucent");
-        GlStateManager.depthMask(false);
-
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-
-        worldRenderer.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, entity);
-
-        GlStateManager.popMatrix();
-
-        if (translucentSchematic)
+        if (Configs.Visuals.SCHEMATIC_BLOCKS_ENABLED.getBooleanValue())
         {
-            GL20.glUseProgram(0);
+            GlStateManager.pushMatrix();
+
+            if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+            {
+                GlStateManager.enablePolygonOffset();
+                GlStateManager.polygonOffset(-0.2f, -0.4f);
+            }
+
+            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+            worldRenderer.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, entity);
+
+            worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, partialTicks, entity);
+
+            this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+            worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT, partialTicks, entity);
+            this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+
+            if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+            {
+                GlStateManager.polygonOffset(0f, 0f);
+                GlStateManager.disablePolygonOffset();
+            }
+
+            GlStateManager.disableBlend();
+            GlStateManager.shadeModel(GL11.GL_FLAT);
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
+
+            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+            GlStateManager.popMatrix();
+
+            GlStateManager.pushMatrix();
+            this.mc.profiler.endStartSection("litematica_entities");
+            RenderHelper.enableStandardItemLighting();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+
+            worldRenderer.renderEntities(entity, icamera, partialTicks);
+
+            GlStateManager.disableBlend();
+            RenderHelper.disableStandardItemLighting();
+
+            GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+            GlStateManager.popMatrix();
+
+            GlStateManager.enableCull();
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+            this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            GlStateManager.shadeModel(GL11.GL_SMOOTH);
+
+            this.mc.profiler.endStartSection("litematica_translucent");
+            GlStateManager.depthMask(false);
+
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+
+            worldRenderer.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, entity);
+
+            GlStateManager.popMatrix();
+
+            if (translucentSchematic)
+            {
+                GL20.glUseProgram(0);
+            }
         }
 
         if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
@@ -183,7 +199,7 @@ public class LitematicaRenderer
             GlStateManager.disableTexture2D();
             GlStateManager.disableCull();
             GlStateManager.enablePolygonOffset();
-            GlStateManager.polygonOffset(-0.1f, -0.8f);
+            GlStateManager.polygonOffset(-0.4f, -0.8f);
             GlStateManager.enableBlend();
             GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.lineWidth((float) Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());

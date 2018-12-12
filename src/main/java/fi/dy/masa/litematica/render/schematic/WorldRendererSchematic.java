@@ -269,8 +269,8 @@ public class WorldRendererSchematic extends WorldRenderer
             this.loadRenderers();
         }
 
-        World world = this.world;
-        world.profiler.startSection("litematica_camera");
+        World worldClient = this.world;
+        worldClient.profiler.startSection("litematica_camera");
 
         double diffX = viewEntity.posX - this.frustumUpdatePosX;
         double diffY = viewEntity.posY - this.frustumUpdatePosY;
@@ -290,7 +290,7 @@ public class WorldRendererSchematic extends WorldRenderer
             this.viewFrustum.updateChunkPositions(viewEntity.posX, viewEntity.posZ);
         }
 
-        world.profiler.endStartSection("litematica_renderlist_camera");
+        worldClient.profiler.endStartSection("litematica_renderlist_camera");
         double x = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks;
         double y = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks;
         double z = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks;
@@ -342,8 +342,11 @@ public class WorldRendererSchematic extends WorldRenderer
                 SubChunkPos subChunk = queuePositions.poll();
                 //SubChunkPos subChunk = positions.get(i);
 
+                // Only render sub-chunks that are within the client's render distance, and that
+                // have been already properly loaded on the client
                 if (Math.abs(subChunk.getX() - centerChunkX) <= renderDistance &&
-                    Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance)
+                    Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance &&
+                    worldClient.getChunkProvider().getChunk(subChunk.getX(), subChunk.getZ(), false, false) != null)
                 {
                     BlockPos subChunkCornerPos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
                     RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(subChunkCornerPos);

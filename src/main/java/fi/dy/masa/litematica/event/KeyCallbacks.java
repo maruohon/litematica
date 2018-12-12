@@ -16,6 +16,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
+import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.mixin.IMixinKeyBinding;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -58,6 +59,8 @@ public class KeyCallbacks
         Hotkeys.LAYER_NEXT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_SET_HERE.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind().setCallback(callbackHotkeys);
@@ -85,12 +88,13 @@ public class KeyCallbacks
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_RENDERING));
-        Hotkeys.TOGGLE_GHOST_BLOCK_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_GHOST_BLOCK_RENDERING));
+        Hotkeys.TOGGLE_SCHEMATIC_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SCHEMATIC_RENDERING));
         Hotkeys.TOGGLE_INFO_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.ENABLE_INFO_OVERLAY_RENDERING));
         Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING));
         Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED));
         Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES));
         Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES));
+        Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_BLOCKS_ENABLED));
         Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SELECTION_BOXES_RENDERING));
         Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT));
         Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.TOOL_ITEM_ENABLED));
@@ -282,15 +286,27 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind())
                 {
-                    SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+                    MaterialListBase materialList = DataManager.getMaterialList();
 
-                    if (schematicPlacement != null)
+                    // No last-viewed material list currently stored, try to get one for the currently selected placement, if any
+                    if (materialList == null)
                     {
-                        this.mc.displayGuiScreen(new GuiMaterialList(schematicPlacement));
+                        SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                        if (schematicPlacement != null)
+                        {
+                            materialList = schematicPlacement.getMaterialList();
+                            materialList.recreateMaterialList();
+                        }
+                        else
+                        {
+                            StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                        }
                     }
-                    else
+
+                    if (materialList != null)
                     {
-                        StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                        this.mc.displayGuiScreen(new GuiMaterialList(materialList));
                     }
 
                     return true;
@@ -388,6 +404,13 @@ public class KeyCallbacks
                     WorldUtils.markAllSchematicChunksForRenderUpdate();
                     StringUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
                 }
+                return true;
+            }
+            else if (key == Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeybind() ||
+                     key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind())
+            {
+                int amount = key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind() ? 1 : -1;
+                InputHandler.nudgeSelection(amount, mode, this.mc.player);
                 return true;
             }
 

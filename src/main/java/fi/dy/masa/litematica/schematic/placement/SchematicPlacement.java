@@ -1,11 +1,9 @@
 package fi.dy.masa.litematica.schematic.placement;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -18,18 +16,20 @@ import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.data.SchematicVerifier;
+import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.litematica.materials.MaterialListPlacement;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.litematica.util.MaterialListEntry;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.util.SchematicUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -51,7 +51,6 @@ public class SchematicPlacement
     private String name;
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
-    private BlockInfoListType materialListType = BlockInfoListType.ALL;
     private BlockInfoListType verifierType = BlockInfoListType.ALL;
     private boolean ignoreEntities;
     private boolean enabled;
@@ -67,8 +66,8 @@ public class SchematicPlacement
     private File schematicFile;
     @Nullable
     private String selectedSubRegionName;
-    private final List<MaterialListEntry> materialList = new ArrayList<>();
-    private boolean materialListPopulated;
+    @Nullable
+    private MaterialListBase materialList;
 
     private SchematicPlacement(LitematicaSchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
     {
@@ -85,7 +84,7 @@ public class SchematicPlacement
     {
         SchematicPlacement placement = new SchematicPlacement(schematic, origin, name, enabled, enableRender);
         placement.setBoxesBBColorNext();
-        placement.resetAllSubRegionsToSchematicValues();
+        placement.resetAllSubRegionsToSchematicValues(InfoUtils.INFO_MESSAGE_CONSUMER);
 
         return placement;
     }
@@ -133,11 +132,11 @@ public class SchematicPlacement
         return this.ignoreEntities;
     }
 
-    public void toggleIgnoreEntities()
+    public void toggleIgnoreEntities(IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -224,16 +223,6 @@ public class SchematicPlacement
         return this.subRegionCount;
     }
 
-    public BlockInfoListType getMaterialListType()
-    {
-        return this.materialListType;
-    }
-
-    public void setMaterialListType(BlockInfoListType type)
-    {
-        this.materialListType = type;
-    }
-
     public BlockInfoListType getSchematicVerifierType()
     {
         return this.verifierType;
@@ -244,21 +233,15 @@ public class SchematicPlacement
         this.verifierType = type;
     }
 
-    public List<MaterialListEntry> getMaterialList()
+    public MaterialListBase getMaterialList()
     {
-        if (this.materialListPopulated == false)
+        if (this.materialList == null)
         {
-            this.refreshMaterialList();
+            this.materialList = new MaterialListPlacement(this);
+            this.materialList.recreateMaterialList();
         }
 
         return this.materialList;
-    }
-
-    public void refreshMaterialList()
-    {
-        this.materialList.clear();
-        this.materialList.addAll(SchematicUtils.createMaterialListFor(this));
-        this.materialListPopulated = true;
     }
 
     public boolean hasVerifier()
@@ -546,11 +529,11 @@ public class SchematicPlacement
      * @param regionName
      * @param newPos
      */
-    public void moveSubRegionTo(String regionName, BlockPos newPos)
+    public void moveSubRegionTo(String regionName, BlockPos newPos, IStringConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -570,11 +553,11 @@ public class SchematicPlacement
         }
     }
 
-    public void setSubRegionRotation(String regionName, Rotation rotation)
+    public void setSubRegionRotation(String regionName, Rotation rotation, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -589,11 +572,11 @@ public class SchematicPlacement
         }
     }
 
-    public void setSubRegionMirror(String regionName, Mirror mirror)
+    public void setSubRegionMirror(String regionName, Mirror mirror, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -608,11 +591,37 @@ public class SchematicPlacement
         }
     }
 
-    public void toggleSubRegionEnabled(String regionName)
+    public void setAllSubRegionsEnabledState(boolean state, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+        // Marks the currently touched chunks before doing the modification
+        manager.onPrePlacementChange(this);
+
+        for (String regionName : this.relativeSubRegionPlacements.keySet())
+        {
+            SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
+
+            if (placement.isEnabled() != state)
+            {
+                this.relativeSubRegionPlacements.get(regionName).setEnabled(state);
+            }
+        }
+
+        this.checkAreSubRegionsModified();
+        this.onModified(manager);
+    }
+
+    public void toggleSubRegionEnabled(String regionName, IMessageConsumer feedback)
+    {
+        if (this.isLocked())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -627,11 +636,11 @@ public class SchematicPlacement
         }
     }
 
-    public void toggleSubRegionIgnoreEntities(String regionName)
+    public void toggleSubRegionIgnoreEntities(String regionName, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -646,11 +655,11 @@ public class SchematicPlacement
         }
     }
 
-    public void resetAllSubRegionsToSchematicValues()
+    public void resetAllSubRegionsToSchematicValues(IStringConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -671,11 +680,11 @@ public class SchematicPlacement
         this.onModified(manager);
     }
 
-    public void resetSubRegionToSchematicValues(String regionName)
+    public void resetSubRegionToSchematicValues(String regionName, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -734,11 +743,11 @@ public class SchematicPlacement
         }
     }
 
-    public SchematicPlacement setOrigin(BlockPos origin)
+    public SchematicPlacement setOrigin(BlockPos origin, IStringConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
             return this;
         }
 
@@ -755,11 +764,11 @@ public class SchematicPlacement
         return this;
     }
 
-    public SchematicPlacement setRotation(Rotation rotation)
+    public SchematicPlacement setRotation(Rotation rotation, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return this;
         }
 
@@ -776,11 +785,11 @@ public class SchematicPlacement
         return this;
     }
 
-    public SchematicPlacement setMirror(Mirror mirror)
+    public SchematicPlacement setMirror(Mirror mirror, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
-            StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
             return this;
         }
 
@@ -850,12 +859,16 @@ public class SchematicPlacement
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
             obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
-            obj.add("material_list_type", new JsonPrimitive(this.materialListType.getStringValue()));
             obj.add("verifier_type", new JsonPrimitive(this.verifierType.getStringValue()));
 
             if (this.selectedSubRegionName != null)
             {
                 obj.add("selected_region", new JsonPrimitive(this.selectedSubRegionName));
+            }
+
+            if (this.materialList != null)
+            {
+                obj.add("material_list", this.materialList.toJson());
             }
 
             if (this.relativeSubRegionPlacements.isEmpty() == false)
@@ -931,9 +944,10 @@ public class SchematicPlacement
                 schematicPlacement.setBoxesBBColorNext();
             }
 
-            if (JsonUtils.hasString(obj, "material_list_type"))
+            if (JsonUtils.hasObject(obj, "material_list"))
             {
-                schematicPlacement.materialListType = BlockInfoListType.fromStringStatic(JsonUtils.getString(obj, "material_list_type"));
+                schematicPlacement.materialList = new MaterialListPlacement(schematicPlacement);
+                schematicPlacement.materialList.fromJson(JsonUtils.getNestedObject(obj, "material_list", false));
             }
 
             if (JsonUtils.hasString(obj, "verifier_type"))

@@ -16,6 +16,7 @@
         "MixinChunkProviderClient",
         "MixinGuiOverlayDebug",
         "MixinMinecraft",
+        "MixinNetHandlerPlayClient",
         "MixinWorldClient",
         "MixinWorldRenderer"
     ],
