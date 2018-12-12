@@ -45,9 +45,10 @@ public class InfoHud
     {
         if (this.mc.player != null && this.shouldRender())
         {
+            this.lineList.clear();
+
             this.updateHudText();
 
-            this.lineList.clear();
             final int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
             int xOffset = 4;
             int yOffset = 4;
@@ -72,9 +73,15 @@ public class InfoHud
                         }
                     }
                 }
+            }
 
+            if (this.lineList.isEmpty() == false)
+            {
                 yOffset += fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, 4, yOffset, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+            }
 
+            if (this.providers.isEmpty() == false)
+            {
                 for (IInfoHudRenderer provider : this.providers)
                 {
                     if (provider.getShouldRender())
