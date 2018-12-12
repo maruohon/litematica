@@ -11,8 +11,9 @@ import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
+import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.materials.MaterialListUtils;
-import fi.dy.masa.litematica.render.InfoHud;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.data.DataDump;
 import fi.dy.masa.malilib.gui.GuiListBase;
@@ -77,7 +78,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + 4;
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.TOGGLE_INFO_HUD) + 4;
+        x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRender(), ButtonListener.Type.TOGGLE_INFO_HUD) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_IGNORED) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + 4;
         y += 22;
 
@@ -95,13 +97,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         ButtonListener listener = new ButtonListener(type, this);
         String label = "";
 
-        if (type == ButtonListener.Type.TOGGLE_INFO_HUD)
-        {
-            boolean val = InfoHud.getInstance().isEnabled();
-            String str = (val ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (val ? "on" : "off")) + TXT_RST;
-            label = type.getDisplayName(str);
-        }
-        else if (type == ButtonListener.Type.LIST_TYPE)
+        if (type == ButtonListener.Type.LIST_TYPE)
         {
             label = type.getDisplayName(this.materialList.getMaterialListType().getDisplayName());
         }
@@ -158,30 +154,49 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         @Override
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
+            MaterialListBase materialList = this.parent.materialList;
+
             switch (this.type)
             {
                 case REFRESH_LIST:
-                    this.parent.materialList.refreshMaterialList();
+                    materialList.recreateMaterialList();
                     break;
 
                 case LIST_TYPE:
-                    BlockInfoListType type = this.parent.materialList.getMaterialListType();
-                    this.parent.materialList.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
-                    this.parent.materialList.refreshMaterialList();
+                    BlockInfoListType type = materialList.getMaterialListType();
+                    materialList.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
+                    materialList.recreateMaterialList();
                     break;
 
                 case HIDE_AVAILABLE:
-                    this.parent.materialList.setHideAvailable(! this.parent.materialList.getHideAvailable());
-                    this.parent.materialList.refreshMaterialList();
+                    materialList.setHideAvailable(! materialList.getHideAvailable());
+                    materialList.refreshPreFilteredList();
+                    materialList.recreateFilteredList();
                     break;
 
                 case TOGGLE_INFO_HUD:
+                    MaterialListHudRenderer renderer = materialList.getHudRenderer();
+                    renderer.toggleShouldRender();
+
+                    if (materialList.getHudRenderer().getShouldRender())
+                    {
+                        InfoHud.getInstance().addInfoHudRenderer(renderer, true);
+                    }
+                    else
+                    {
+                        InfoHud.getInstance().removeInfoHudRenderersOfType(renderer.getClass(), true);
+                    }
+
+                    break;
+
+                case CLEAR_IGNORED:
+                    materialList.clearIgnored();
                     break;
 
                 case WRITE_TO_FILE:
                     File dir = new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
                     DataDump dump = new DataDump(2, DataDump.Format.ASCII);
-                    this.addLinesToDump(dump, this.parent.materialList.getMaterialsAll());
+                    this.addLinesToDump(dump, materialList.getMaterialsAll());
                     File file = DataDump.dumpDataToFile(dir, "material_list", dump.getLines());
 
                     if (file != null)
@@ -215,6 +230,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             LIST_TYPE           ("litematica.gui.button.material_list.list_type"),
             HIDE_AVAILABLE      ("litematica.gui.button.material_list.hide_available"),
             TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
+            CLEAR_IGNORED       ("litematica.gui.button.material_list.clear_ignored"),
             WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file");
 
             private final String translationKey;

@@ -68,7 +68,9 @@ litematica.gui.button.config_gui.visuals=Visuals
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 
 litematica.gui.button.material_list=Material List
+litematica.gui.button.material_list.clear_ignored=Clear ignored
 litematica.gui.button.material_list.hide_available=Hide available: %s
+litematica.gui.button.material_list.ignore=Ignore
 litematica.gui.button.material_list.list_type=Show: %s
 litematica.gui.button.material_list.refresh_list=Refresh
 litematica.gui.button.material_list.toggle_info_hud=Info HUD: %s

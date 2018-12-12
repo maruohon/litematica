@@ -86,7 +86,7 @@ public class MaterialListUtils
             if (placement.getMaterialList().getMaterialListType() == BlockInfoListType.ALL)
             {
                 range = new LayerRange();
-                range.setLayerMode(LayerMode.ALL);
+                range.setLayerMode(LayerMode.ALL, false);
             }
 
             EnumFacing.Axis axis = range.getAxis();

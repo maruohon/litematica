@@ -238,7 +238,7 @@ public class SchematicPlacement
         if (this.materialList == null)
         {
             this.materialList = new MaterialListPlacement(this);
-            this.materialList.refreshMaterialList();
+            this.materialList.recreateMaterialList();
         }
 
         return this.materialList;

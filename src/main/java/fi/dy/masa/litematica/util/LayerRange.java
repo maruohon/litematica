@@ -153,11 +153,20 @@ public class LayerRange
 
     public void setLayerMode(LayerMode mode)
     {
+        this.setLayerMode(mode, true);
+    }
+
+    public void setLayerMode(LayerMode mode, boolean printMessage)
+    {
         this.layerMode = mode;
 
         WorldUtils.markAllSchematicChunksForRenderUpdate();
-        String val = TextFormatting.GREEN.toString() + mode.getDisplayName();
-        StringUtils.printActionbarMessage("litematica.message.set_layer_mode_to", val);
+
+        if (printMessage)
+        {
+            String val = TextFormatting.GREEN.toString() + mode.getDisplayName();
+            StringUtils.printActionbarMessage("litematica.message.set_layer_mode_to", val);
+        }
     }
 
     public void setAxis(EnumFacing.Axis axis)

@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.Icons;
@@ -7,8 +8,12 @@ import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListBase.SortCriteria;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
+import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.widgets.WidgetBase;
+import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -31,6 +36,7 @@ public class WidgetMaterialListEntry extends WidgetBase
 
     private final MaterialListBase materialList;
     private final WidgetListMaterialList listWidget;
+    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     @Nullable private final MaterialListEntry entry;
     @Nullable private final String header1;
     @Nullable private final String header2;
@@ -67,6 +73,28 @@ public class WidgetMaterialListEntry extends WidgetBase
             this.header3 = GuiBase.TXT_BOLD + I18n.format(HEADERS[2]) + GuiBase.TXT_RST;
             this.header4 = GuiBase.TXT_BOLD + I18n.format(HEADERS[3]) + GuiBase.TXT_RST;
         }
+
+        int posX = x + width;
+        int posY = y + 1;
+
+        // Note: These are placed from right to left
+
+        posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.IGNORE);
+    }
+
+    private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
+    {
+        String label = I18n.format(type.getTranslationKey());
+        int len = this.mc.fontRenderer.getStringWidth(label) + 10;
+        xRight -= (len + 2);
+        this.addButton(new ButtonGeneric(0, xRight, y, len, 20, label), new ButtonListener(type, this.materialList, this.entry, this.listWidget));
+
+        return xRight;
+    }
+
+    private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
+    {
+        this.buttons.add(new ButtonWrapper<>(button, listener));
     }
 
     public static void setMaxNameLength(List<MaterialListEntry> materials, Minecraft mc)
@@ -132,6 +160,20 @@ public class WidgetMaterialListEntry extends WidgetBase
     @Override
     protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
     {
+        for (ButtonWrapper<?> entry : this.buttons)
+        {
+            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
+            {
+                // Don't call super if the button press got handled
+                return true;
+            }
+        }
+
+        if (this.entry != null)
+        {
+            return false;
+        }
+
         int column = this.getMouseOverColumn(mouseX, mouseY);
 
         switch (column)
@@ -234,6 +276,11 @@ public class WidgetMaterialListEntry extends WidgetBase
             GlStateManager.disableBlend();
             RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
+
+            for (int i = 0; i < this.buttons.size(); ++i)
+            {
+                this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
+            }
         }
     }
 
@@ -341,5 +388,54 @@ public class WidgetMaterialListEntry extends WidgetBase
         }
 
         return strCount;
+    }
+
+    static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    {
+        private final ButtonType type;
+        private final MaterialListBase materialList;
+        private final WidgetListMaterialList listWidget;
+        private final MaterialListEntry entry;
+
+        public ButtonListener(ButtonType type, MaterialListBase materialList, MaterialListEntry entry, WidgetListMaterialList listWidget)
+        {
+            this.type = type;
+            this.materialList = materialList;
+            this.listWidget = listWidget;
+            this.entry = entry;
+        }
+
+        @Override
+        public void actionPerformed(ButtonGeneric control)
+        {
+            if (this.type == ButtonType.IGNORE)
+            {
+                this.materialList.ignoreEntry(this.entry);
+                this.listWidget.refreshEntries();
+            }
+        }
+
+        @Override
+        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        {
+            this.actionPerformed(control);
+        }
+
+        public enum ButtonType
+        {
+            IGNORE  ("litematica.gui.button.material_list.ignore");
+
+            private final String translationKey;
+
+            private ButtonType(String translationKey)
+            {
+                this.translationKey = translationKey;
+            }
+
+            public String getTranslationKey()
+            {
+                return this.translationKey;
+            }
+        }
     }
 }

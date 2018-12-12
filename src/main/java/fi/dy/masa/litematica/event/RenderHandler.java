@@ -2,10 +2,10 @@ package fi.dy.masa.litematica.event;
 
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.render.InfoHud;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
-import fi.dy.masa.litematica.render.ToolHud;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import net.minecraft.client.Minecraft;
 

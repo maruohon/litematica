@@ -1,7 +1,9 @@
 package fi.dy.masa.litematica.materials;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -10,7 +12,11 @@ import fi.dy.masa.malilib.util.JsonUtils;
 
 public abstract class MaterialListBase
 {
-    protected ImmutableList<MaterialListEntry> materialList = ImmutableList.of();
+    protected final MaterialListHudRenderer hudRenderer = new MaterialListHudRenderer(this);
+    protected final Set<MaterialListEntry> ignored = new HashSet<>();
+    protected final List<MaterialListEntry> materialListPreFiltered = new ArrayList<>();
+    protected final List<MaterialListEntry> materialListFiltered = new ArrayList<>();
+    protected ImmutableList<MaterialListEntry> materialListAll = ImmutableList.of();
     protected SortCriteria sortCriteria = SortCriteria.COUNT_TOTAL;
     protected BlockInfoListType materialListType = BlockInfoListType.ALL;
     protected boolean reverse;
@@ -20,34 +26,89 @@ public abstract class MaterialListBase
 
     public abstract String getDisplayName();
 
-    public ImmutableList<MaterialListEntry> getMaterialsAll()
+    public MaterialListHudRenderer getHudRenderer()
     {
-        return this.materialList;
+        return this.hudRenderer;
     }
 
-    public List<MaterialListEntry> getMaterialsFiltered()
+    public ImmutableList<MaterialListEntry> getMaterialsAll()
+    {
+        return this.materialListAll;
+    }
+
+    public List<MaterialListEntry> getMaterialsFiltered(boolean refresh)
     {
         if (this.hideAvailable)
         {
-            ArrayList<MaterialListEntry> list = new ArrayList<>();
-
-            for (MaterialListEntry entry : this.materialList)
-            {
-                if (entry.getCountAvailable() < entry.getCountMissing())
-                {
-                    list.add(entry);
-                }
-            }
-
-            return list;
+            return this.getMaterialsMissingOnly(refresh);
         }
 
-        return this.materialList;
+        return this.materialListPreFiltered;
     }
 
-    public void refreshMaterialList()
+    public List<MaterialListEntry> getMaterialsMissingOnly(boolean refresh)
     {
-        this.materialList = ImmutableList.copyOf(this.createMaterialListEntries());
+        if (refresh)
+        {
+            this.recreateFilteredList();
+        }
+
+        return this.materialListFiltered;
+    }
+
+    public void recreateFilteredList()
+    {
+        this.materialListFiltered.clear();
+
+        for (int i = 0; i < this.materialListPreFiltered.size(); ++i)
+        {
+            MaterialListEntry entry = this.materialListPreFiltered.get(i);
+
+            if (entry.getCountAvailable() < entry.getCountMissing())
+            {
+                this.materialListFiltered.add(entry);
+            }
+            // Remove entries that have been seen as available at least at one point
+            // (for example when gathering resources to a staging area)
+            else if (this.hideAvailable)
+            {
+                this.materialListPreFiltered.remove(i);
+                --i;
+            }
+        }
+    }
+
+    public void ignoreEntry(MaterialListEntry entry)
+    {
+        this.ignored.add(entry);
+        this.materialListPreFiltered.remove(entry);
+        this.recreateFilteredList();
+    }
+
+    public void clearIgnored()
+    {
+        this.ignored.clear();
+        this.refreshPreFilteredList();
+        this.recreateFilteredList();
+    }
+
+    /**
+     * Re-creates the all materials list from the schematic or placement
+     */
+    public void recreateMaterialList()
+    {
+        this.materialListAll = ImmutableList.copyOf(this.createMaterialListEntries());
+        this.refreshPreFilteredList();
+    }
+
+    /**
+     * Resets the pre-filtered materials list to the all materials list
+     */
+    public void refreshPreFilteredList()
+    {
+        this.materialListPreFiltered.clear();
+        this.materialListPreFiltered.addAll(this.materialListAll);
+        this.materialListPreFiltered.removeAll(this.ignored);
     }
 
     public SortCriteria getSortCriteria()

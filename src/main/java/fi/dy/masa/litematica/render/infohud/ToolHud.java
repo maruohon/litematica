@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.render;
+package fi.dy.masa.litematica.render.infohud;
 
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;

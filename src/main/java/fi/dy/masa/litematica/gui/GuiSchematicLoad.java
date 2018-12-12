@@ -171,7 +171,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                 else if (this.type == Type.MATERIAL_LIST)
                 {
                     MaterialListSchematic materialList = new MaterialListSchematic(schematic);
-                    materialList.refreshMaterialList();
+                    materialList.recreateMaterialList();
                     DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
                     this.gui.mc.displayGuiScreen(new GuiMaterialList(materialList));
                 }
