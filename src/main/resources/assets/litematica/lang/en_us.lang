@@ -152,6 +152,7 @@ litematica.gui.label.layer_mode.single_layer=Single Layer
 litematica.gui.label.material_list.available=Available
 litematica.gui.label.material_list.item=Item
 litematica.gui.label.material_list.missing=Missing
+litematica.gui.label.material_list.multiplier=Multiplier: %s
 litematica.gui.label.material_list.name=Name
 litematica.gui.label.material_list.total=Total
 

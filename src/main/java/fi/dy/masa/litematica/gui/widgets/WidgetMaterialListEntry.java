@@ -253,8 +253,9 @@ public class WidgetMaterialListEntry extends WidgetBase
         }
         else if (this.entry != null)
         {
-            int countTotal = this.entry.getCountTotal();
-            int countMissing = this.entry.getCountMissing();
+            int multiplier = this.materialList.getMultiplier();
+            int countTotal = this.entry.getCountTotal() * multiplier;
+            int countMissing = multiplier == 1 ? this.entry.getCountMissing() : countTotal;
             int countAvailable = this.entry.getCountAvailable();
             String pre = countAvailable >= countMissing ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
             mc.fontRenderer.drawString(this.entry.getStack().getDisplayName(), x1 + 20, y, color);
@@ -304,8 +305,9 @@ public class WidgetMaterialListEntry extends WidgetBase
 
             ItemStack stack = this.entry.getStack();
             String stackName = stack.getDisplayName();
-            int total = this.entry.getCountTotal();
-            int missing = this.entry.getCountMissing();
+            int multiplier = this.materialList.getMultiplier();
+            int total = this.entry.getCountTotal() * multiplier;
+            int missing = multiplier == 1 ? this.entry.getCountMissing() : total;
             String strCountTotal = this.getFormattedCountString(total, stack.getMaxStackSize());
             String strCountMissing = this.getFormattedCountString(missing, stack.getMaxStackSize());
 

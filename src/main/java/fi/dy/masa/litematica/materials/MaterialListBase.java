@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.util.JsonUtils;
+import net.minecraft.util.math.MathHelper;
 
 public abstract class MaterialListBase
 {
@@ -21,10 +22,13 @@ public abstract class MaterialListBase
     protected BlockInfoListType materialListType = BlockInfoListType.ALL;
     protected boolean reverse;
     protected boolean hideAvailable;
+    protected int multiplier = 1;
 
     protected abstract List<MaterialListEntry> createMaterialListEntries();
 
-    public abstract String getDisplayName();
+    public abstract String getName();
+
+    public abstract String getTitle();
 
     public MaterialListHudRenderer getHudRenderer()
     {
@@ -126,6 +130,11 @@ public abstract class MaterialListBase
         return this.hideAvailable;
     }
 
+    public int getMultiplier()
+    {
+        return this.multiplier;
+    }
+
     public void setSortCriteria(SortCriteria criteria)
     {
         if (this.sortCriteria == criteria)
@@ -142,6 +151,11 @@ public abstract class MaterialListBase
     public void setHideAvailable(boolean hideAvailable)
     {
         this.hideAvailable = hideAvailable;
+    }
+
+    public void setMultiplier(int multiplier)
+    {
+        this.multiplier = MathHelper.clamp(multiplier, 1, Integer.MAX_VALUE);
     }
 
     public BlockInfoListType getMaterialListType()
@@ -162,6 +176,7 @@ public abstract class MaterialListBase
         obj.add("sort_criteria", new JsonPrimitive(this.sortCriteria.name()));
         obj.add("sort_reverse", new JsonPrimitive(this.reverse));
         obj.add("hide_available", new JsonPrimitive(this.hideAvailable));
+        obj.add("multiplier", new JsonPrimitive(this.multiplier));
 
         return obj;
     }
@@ -180,6 +195,7 @@ public abstract class MaterialListBase
 
         this.reverse = JsonUtils.getBooleanOrDefault(obj, "sort_reverse", false);
         this.hideAvailable = JsonUtils.getBooleanOrDefault(obj, "hide_available", false);
+        this.multiplier = JsonUtils.getIntegerOrDefault(obj, "multiplier", 1);
     }
 
     public enum SortCriteria

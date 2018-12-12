@@ -16,9 +16,15 @@ public class MaterialListSchematic extends MaterialListBase
     }
 
     @Override
-    public String getDisplayName()
+    public String getName()
     {
-        return I18n.format("litematica.gui.title.material_list.schematic", this.schematic.getMetadata().getName());
+        return this.schematic.getMetadata().getName();
+    }
+
+    @Override
+    public String getTitle()
+    {
+        return I18n.format("litematica.gui.title.material_list.schematic", this.getName());
     }
 
     @Override

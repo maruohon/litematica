@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import java.util.List;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
@@ -23,6 +22,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
@@ -35,7 +35,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         super(10, 44);
 
         this.materialList = materialList;
-        this.title = this.materialList.getDisplayName();
+        this.title = this.materialList.getTitle();
+        this.useTitleHierarchy = false;
 
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -73,14 +74,20 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         String label;
         ButtonGeneric button;
 
+        String str = I18n.format("litematica.gui.label.material_list.multiplier", this.materialList.getMultiplier());
+        int w = this.fontRenderer.getStringWidth(str) + 6;
+        this.addLabel(this.width - w - 6, y + 4, w, 12, 0xFFFFFFFF, str);
+        this.createButton(this.width - w - 26, y + 2, -1, ButtonListener.Type.CHANGE_MULTIPLIER);
+
         this.addWidget(new WidgetInfoIcon(this.width - 23, 12, this.zLevel, Icons.INFO_11, "litematica.info.material_list"));
 
-        x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + 4;
-        x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + 4;
-        x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRender(), ButtonListener.Type.TOGGLE_INFO_HUD) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_IGNORED) + 4;
-        x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + 4;
+        int gap = 2;
+        x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + gap;
+        x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + gap;
+        x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + gap;
+        x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRender(), ButtonListener.Type.TOGGLE_INFO_HUD) + gap;
+        x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_IGNORED) + gap;
+        x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + gap;
         y += 22;
 
         y = this.height - 36;
@@ -100,6 +107,13 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         if (type == ButtonListener.Type.LIST_TYPE)
         {
             label = type.getDisplayName(this.materialList.getMaterialListType().getDisplayName());
+        }
+        else if (type == ButtonListener.Type.CHANGE_MULTIPLIER)
+        {
+            String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
+            ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
+            this.addButton(button, listener);
+            return button.getButtonWidth();
         }
         else
         {
@@ -196,7 +210,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                 case WRITE_TO_FILE:
                     File dir = new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
                     DataDump dump = new DataDump(2, DataDump.Format.ASCII);
-                    this.addLinesToDump(dump, materialList.getMaterialsAll());
+                    this.addLinesToDump(dump, materialList);
                     File file = DataDump.dumpDataToFile(dir, "material_list", dump.getLines());
 
                     if (file != null)
@@ -206,19 +220,33 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                         StringUtils.sendOpenFileChatMessage(this.parent.mc.player, key, file);
                     }
                     break;
+
+                case CHANGE_MULTIPLIER:
+                {
+                    int amount = mouseButton == 1 ? -1 : 1;
+                    if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
+                    if (GuiScreen.isAltKeyDown()) { amount *= 4; }
+                    materialList.setMultiplier(materialList.getMultiplier() + amount);
+                    break;
+                }
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
         }
 
-        private void addLinesToDump(DataDump dump, List<MaterialListEntry> materials)
+        private void addLinesToDump(DataDump dump, MaterialListBase materialList)
         {
-            for (MaterialListEntry entry : materials)
+            int multiplier = materialList.getMultiplier();
+
+            for (MaterialListEntry entry : materialList.getMaterialsAll())
             {
-                dump.addData(entry.getStack().getDisplayName(), String.valueOf(entry.getCountTotal()));
+                int count = entry.getCountTotal() * multiplier;
+                dump.addData(entry.getStack().getDisplayName(), String.valueOf(count));
             }
 
-            dump.addTitle("Item", "Total");
+            String titleTotal = multiplier > 1 ? String.format("Total (x%d)", multiplier) : "Total";
+            dump.addTitle("Item", titleTotal);
+            dump.addHeader(materialList.getTitle());
             dump.setColumnProperties(1, DataDump.Alignment.RIGHT, true); // total
             dump.setSort(true);
             dump.setUseColumnSeparator(true);
@@ -231,7 +259,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             HIDE_AVAILABLE      ("litematica.gui.button.material_list.hide_available"),
             TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
             CLEAR_IGNORED       ("litematica.gui.button.material_list.clear_ignored"),
-            WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file");
+            WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
+            CHANGE_MULTIPLIER   ("");
 
             private final String translationKey;
 

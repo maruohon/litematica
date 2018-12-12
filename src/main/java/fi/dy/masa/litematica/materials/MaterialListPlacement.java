@@ -16,9 +16,15 @@ public class MaterialListPlacement extends MaterialListBase
     }
 
     @Override
-    public String getDisplayName()
+    public String getName()
     {
-        return I18n.format("litematica.gui.title.material_list.placement", this.placement.getName());
+        return this.placement.getName();
+    }
+
+    @Override
+    public String getTitle()
+    {
+        return I18n.format("litematica.gui.title.material_list.placement", this.getName());
     }
 
     @Override
