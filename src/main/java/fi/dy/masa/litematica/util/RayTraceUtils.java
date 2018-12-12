@@ -530,12 +530,12 @@ public class RayTraceUtils
 
                 if (blockCollidable)
                 {
-                    trace = Block.collisionRayTrace(blockState, world, data.blockPos, data.currentPos, data.end);
+                    trace = Block.collisionRayTrace(blockState, world, data.blockPos, data.start, data.end);
                 }
 
                 if (trace == null && fluidCollidable)
                 {
-                    trace = VoxelShapes.create(0.0D, 0.0D, 0.0D, 1.0D, fluidState.getHeight(), 1.0D).func_212433_a(data.currentPos, data.end, data.blockPos);
+                    trace = VoxelShapes.create(0.0D, 0.0D, 0.0D, 1.0D, fluidState.getHeight(), 1.0D).func_212433_a(data.start, data.end, data.blockPos);
                 }
 
                 if (trace != null)
@@ -564,7 +564,8 @@ public class RayTraceUtils
 
             if (blockCollidable == false && fluidCollidable == false)
             {
-                data.trace = new RayTraceResult(RayTraceResult.Type.MISS, data.currentPos, data.facing, data.blockPos);
+                Vec3d pos = new Vec3d(data.currentX, data.currentY, data.currentZ);
+                data.trace = new RayTraceResult(RayTraceResult.Type.MISS, pos, data.facing, data.blockPos);
             }
             else
             {
@@ -572,12 +573,12 @@ public class RayTraceUtils
 
                 if (blockCollidable)
                 {
-                    traceTmp = Block.collisionRayTrace(blockState, world, data.blockPos, data.currentPos, data.end);
+                    traceTmp = Block.collisionRayTrace(blockState, world, data.blockPos, data.start, data.end);
                 }
 
                 if (traceTmp == null && fluidCollidable)
                 {
-                    traceTmp = VoxelShapes.create(0.0D, 0.0D, 0.0D, 1.0D, fluidState.getHeight(), 1.0D).func_212433_a(data.currentPos, data.end, data.blockPos);
+                    traceTmp = VoxelShapes.create(0.0D, 0.0D, 0.0D, 1.0D, fluidState.getHeight(), 1.0D).func_212433_a(data.start, data.end, data.blockPos);
                 }
 
                 if (traceTmp != null)
@@ -648,7 +649,7 @@ public class RayTraceUtils
         double nextY = 999.0D;
         double nextZ = 999.0D;
 
-        if (Double.isNaN(data.currentPos.x) || Double.isNaN(data.currentPos.y) || Double.isNaN(data.currentPos.z))
+        if (Double.isNaN(data.currentX) || Double.isNaN(data.currentY) || Double.isNaN(data.currentZ))
         {
             data.trace = null;
             return true;
@@ -703,62 +704,68 @@ public class RayTraceUtils
             zDiffers = false;
         }
 
-        double d3 = 999.0D;
-        double d4 = 999.0D;
-        double d5 = 999.0D;
-        double d6 = data.end.x - data.currentPos.x;
-        double d7 = data.end.y - data.currentPos.y;
-        double d8 = data.end.z - data.currentPos.z;
+        double relStepX = 999.0D;
+        double relStepY = 999.0D;
+        double relStepZ = 999.0D;
+        double distToEndX = data.end.x - data.currentX;
+        double distToEndY = data.end.y - data.currentY;
+        double distToEndZ = data.end.z - data.currentZ;
 
         if (xDiffers)
         {
-            d3 = (nextX - data.currentPos.x) / d6;
+            relStepX = (nextX - data.currentX) / distToEndX;
         }
 
         if (yDiffers)
         {
-            d4 = (nextY - data.currentPos.y) / d7;
+            relStepY = (nextY - data.currentY) / distToEndY;
         }
 
         if (zDiffers)
         {
-            d5 = (nextZ - data.currentPos.z) / d8;
+            relStepZ = (nextZ - data.currentZ) / distToEndZ;
         }
 
-        if (d3 == -0.0D)
+        if (relStepX == -0.0D)
         {
-            d3 = -1.0E-4D;
+            relStepX = -1.0E-4D;
         }
 
-        if (d4 == -0.0D)
+        if (relStepY == -0.0D)
         {
-            d4 = -1.0E-4D;
+            relStepY = -1.0E-4D;
         }
 
-        if (d5 == -0.0D)
+        if (relStepZ == -0.0D)
         {
-            d5 = -1.0E-4D;
+            relStepZ = -1.0E-4D;
         }
 
-        if (d3 < d4 && d3 < d5)
+        if (relStepX < relStepY && relStepX < relStepZ)
         {
             data.facing = data.xEnd > data.x ? EnumFacing.WEST : EnumFacing.EAST;
-            data.currentPos = new Vec3d(nextX, data.currentPos.y + d7 * d3, data.currentPos.z + d8 * d3);
+            data.currentX = nextX;
+            data.currentY += distToEndY * relStepX;
+            data.currentZ += distToEndZ * relStepX;
         }
-        else if (d4 < d5)
+        else if (relStepY < relStepZ)
         {
             data.facing = data.yEnd > data.y ? EnumFacing.DOWN : EnumFacing.UP;
-            data.currentPos = new Vec3d(data.currentPos.x + d6 * d4, nextY, data.currentPos.z + d8 * d4);
+            data.currentX += distToEndX * relStepY;
+            data.currentY = nextY;
+            data.currentZ += distToEndZ * relStepY;
         }
         else
         {
             data.facing = data.zEnd > data.z ? EnumFacing.NORTH : EnumFacing.SOUTH;
-            data.currentPos = new Vec3d(data.currentPos.x + d6 * d5, data.currentPos.y + d7 * d5, nextZ);
+            data.currentX += distToEndX * relStepZ;
+            data.currentY += distToEndY * relStepZ;
+            data.currentZ = nextZ;
         }
 
-        data.x = MathHelper.floor(data.currentPos.x) - (data.facing == EnumFacing.EAST ?  1 : 0);
-        data.y = MathHelper.floor(data.currentPos.y) - (data.facing == EnumFacing.UP ?    1 : 0);
-        data.z = MathHelper.floor(data.currentPos.z) - (data.facing == EnumFacing.SOUTH ? 1 : 0);
+        data.x = MathHelper.floor(data.currentX) - (data.facing == EnumFacing.EAST ?  1 : 0);
+        data.y = MathHelper.floor(data.currentY) - (data.facing == EnumFacing.UP ?    1 : 0);
+        data.z = MathHelper.floor(data.currentZ) - (data.facing == EnumFacing.SOUTH ? 1 : 0);
         data.blockPos = new BlockPos(data.x, data.y, data.z);
 
         return false;
@@ -768,6 +775,7 @@ public class RayTraceUtils
     {
         public final LayerRange range;
         public final RayTraceFluidMode fluidMode;
+        public final Vec3d start;
         public final Vec3d end;
         public final int xEnd;
         public final int yEnd;
@@ -775,17 +783,22 @@ public class RayTraceUtils
         public int x;
         public int y;
         public int z;
-        public Vec3d currentPos;
+        public double currentX;
+        public double currentY;
+        public double currentZ;
         public BlockPos blockPos;
         public EnumFacing facing;
         public RayTraceResult trace;
 
         public RayTraceCalcsData(Vec3d start, Vec3d end, LayerRange range, RayTraceFluidMode fluidMode)
         {
+            this.start = start;
+            this.end = end;
             this.range = range;
             this.fluidMode = fluidMode;
-            this.currentPos = start;
-            this.end = end;
+            this.currentX = start.x;
+            this.currentY = start.y;
+            this.currentZ = start.z;
             this.xEnd = MathHelper.floor(end.x);
             this.yEnd = MathHelper.floor(end.y);
             this.zEnd = MathHelper.floor(end.z);
