@@ -3,32 +3,42 @@ package fi.dy.masa.litematica.mixin;
 import java.util.List;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
 import net.minecraft.client.gui.GuiOverlayDebug;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.text.TextFormatting;
 
 @Mixin(GuiOverlayDebug.class)
-public class MixinGuiOverlayDebug
+public abstract class MixinGuiOverlayDebug
 {
-    @Inject(method = "renderDebugInfoLeft()V",
-            at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/String;)Z",
-                     shift = Shift.AFTER, ordinal = 2, remap = false),
-            locals = LocalCapture.CAPTURE_FAILSOFT, require = 0)
-    private void onRenderDebugInfoLeft(CallbackInfo ci, List<String> list)
+    private boolean captureNextCall = false;
+
+    @Inject(method = "renderDebugInfoLeft()V", at = @At(value = "HEAD"))
+    private void onRenderDebugInfoLeft(CallbackInfo ci)
     {
-        this.addInfoLines(list);
+        this.captureNextCall = true;
+    }
+
+    @Redirect(method = "renderDebugInfoLeft()V", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/List;size()I"), require = 0)
+    private int getSize(List<String> list)
+    {
+        if (this.captureNextCall)
+        {
+            this.captureNextCall = false;
+            this.addInfoLines(list);
+        }
+
+        return list.size();
     }
 
     private void addInfoLines(List<String> list)
     {
-        WorldClient world = SchematicWorldHandler.getSchematicWorld();
+        WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
 
         if (world != null)
         {
