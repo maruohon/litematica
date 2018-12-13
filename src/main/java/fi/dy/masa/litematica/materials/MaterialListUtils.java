@@ -14,7 +14,6 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.LayerMode;
 import fi.dy.masa.litematica.util.LayerRange;
-import fi.dy.masa.litematica.util.MaterialCache;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.InventoryUtils;
