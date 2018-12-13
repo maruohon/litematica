@@ -3,16 +3,16 @@ package fi.dy.masa.litematica.gui;
 import java.util.Collections;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicVerifier;
-import fi.dy.masa.litematica.data.SchematicVerifier.BlockMismatch;
-import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
+import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVerificationResults;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult;
 import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVerificationResults;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
@@ -27,6 +27,8 @@ import net.minecraft.client.resources.I18n;
 public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetListSchematicVerificationResults>
                                     implements ISelectionListener<BlockMismatchEntry>, ICompletionListener
 {
+    private static SchematicVerifier verifierLast;
+
     private final SchematicPlacement placement;
     @Nullable
     private BlockMismatchEntry selectedDataEntry;
@@ -40,6 +42,15 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
         this.title = I18n.format("litematica.gui.title.schematic_verifier", placement.getName());
         this.placement = placement;
+
+        SchematicVerifier verifier = placement.getSchematicVerifier();
+
+        if (verifier != verifierLast)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+            WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined(), mc);
+            verifierLast = verifier;
+        }
     }
 
     @Override
@@ -57,8 +68,6 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     @Override
     public void initGui()
     {
-        WidgetSchematicVerificationResult.resetNameLengths();
-
         super.initGui();
 
         int x = 12;
@@ -213,6 +222,9 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     {
         if (this.mc.currentScreen == this)
         {
+            Minecraft mc = Minecraft.getMinecraft();
+            SchematicVerifier verifier = this.placement.getSchematicVerifier();
+            WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined(), mc);
             this.initGui();
         }
     }
@@ -377,6 +389,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     {
                         this.parent.addMessage(MessageType.ERROR, "litematica.error.generic.schematic_world_not_loaded");
                     }
+                    verifierLast = null; // force re-calculating the column lengths
                     break;
 
                 case STOP:

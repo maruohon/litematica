@@ -2,12 +2,12 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import fi.dy.masa.litematica.data.SchematicVerifier.BlockMismatch;
-import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
+import fi.dy.masa.litematica.schematic.verifier.VerifierResultSorter;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.util.ItemType;
@@ -20,7 +20,11 @@ import net.minecraft.item.ItemStack;
 
 public class WidgetListSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
 {
+    private static int lastScrollbarPosition;
+
     private final GuiSchematicVerifier guiSchematicVerifier;
+    private final VerifierResultSorter sorter;
+    private boolean scrollbarRestored;
 
     public WidgetListSchematicVerificationResults(int x, int y, int width, int height, GuiSchematicVerifier parent)
     {
@@ -28,7 +32,49 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
 
         this.browserEntryHeight = 22;
         this.guiSchematicVerifier = parent;
+        this.sorter = new VerifierResultSorter(parent.getPlacement().getSchematicVerifier());
         this.setParent(parent);
+    }
+
+    @Override
+    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    {
+        super.drawContents(mouseX, mouseY, partialTicks);
+        lastScrollbarPosition = this.scrollBar.getValue();
+    }
+
+    @Override
+    protected void offsetSelectionOrScrollbar(int amount, boolean changeSelection)
+    {
+        super.offsetSelectionOrScrollbar(amount, changeSelection);
+        lastScrollbarPosition = this.scrollBar.getValue();
+    }
+
+    @Override
+    protected WidgetSchematicVerificationResult createHeaderWidget(int x, int y, int listIndexStart, int usableHeight, int usedHeight)
+    {
+        int height = this.browserEntryHeight;
+
+        if ((usedHeight + height) > usableHeight)
+        {
+            return null;
+        }
+
+        MismatchType type = this.guiSchematicVerifier.getResultMode();
+        String strExpected = TXT_BOLD + I18n.format(WidgetSchematicVerificationResult.HEADER_EXPECTED) + TXT_RST;
+        BlockMismatchEntry entry;
+
+        if (type != MismatchType.CORRECT_STATE)
+        {
+            String strFound = TXT_WHITE + TXT_BOLD + I18n.format(WidgetSchematicVerificationResult.HEADER_FOUND) + TXT_RST;
+            entry = new BlockMismatchEntry(strExpected, strFound);
+        }
+        else
+        {
+            entry = new BlockMismatchEntry(strExpected, "");
+        }
+
+        return this.createListEntryWidget(x, y, listIndexStart, true, entry);
     }
 
     @Override
@@ -37,18 +83,6 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
         this.listContents.clear();
 
         MismatchType type = this.guiSchematicVerifier.getResultMode();
-
-        if (type != MismatchType.CORRECT_STATE)
-        {
-            String strExpected = TXT_WHITE + TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.expected") + TXT_RST;
-            String strFound = TXT_WHITE + TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.found") + TXT_RST;
-            this.listContents.add(new BlockMismatchEntry(strExpected, strFound));
-        }
-        else
-        {
-            String strExpected = TXT_WHITE + TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.expected") + TXT_RST;
-            this.listContents.add(new BlockMismatchEntry(strExpected, ""));
-        }
 
         if (type == MismatchType.ALL)
         {
@@ -63,12 +97,21 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
         }
 
         this.reCreateListEntryWidgets();
+
+        if (this.scrollbarRestored == false && lastScrollbarPosition <= this.scrollBar.getMaxValue())
+        {
+            // This needs to happen after the setMaxValue() has been called in reCreateListEntryWidgets()
+            this.scrollBar.setValue(lastScrollbarPosition);
+            this.scrollbarRestored = true;
+            this.reCreateListEntryWidgets();
+        }
     }
 
     private void addEntriesForType(MismatchType type)
     {
         String title = type.getFormattingCode() + type.getDisplayname() + TXT_RST;
         this.listContents.add(new BlockMismatchEntry(type, title));
+        List<BlockMismatch> list;
 
         if (type == MismatchType.CORRECT_STATE)
         {
@@ -94,40 +137,32 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
                 itemCounts.addTo(itemType, counts.getInt(state));
             }
 
-            List<BlockMismatchEntry> list = new ArrayList<>();
+            list = new ArrayList<>();
 
             for (ItemType itemType : itemCounts.keySet())
             {
                 IBlockState state = states.get(itemType);
                 BlockMismatch mismatch = new BlockMismatch(MismatchType.CORRECT_STATE, state, state, itemCounts.getInt(itemType));
-                list.add(new BlockMismatchEntry(type, mismatch));
+                list.add(mismatch);
             }
-
-            Collections.sort(list, new Comparator<BlockMismatchEntry>()
-            {
-                @Override
-                public int compare(BlockMismatchEntry o1, BlockMismatchEntry o2)
-                {
-                    return o1.blockMismatch.count > o2.blockMismatch.count ? -1 : (o1.blockMismatch.count < o2.blockMismatch.count ? 1 : 0);
-                }
-            });
-
-            this.listContents.addAll(list);
         }
         else
         {
-            List<BlockMismatch> list = this.guiSchematicVerifier.getPlacement().getSchematicVerifier().getMismatchOverviewFor(type);
+            list = this.guiSchematicVerifier.getPlacement().getSchematicVerifier().getMismatchOverviewFor(type);
+        }
 
-            for (BlockMismatch entry : list)
-            {
-                this.listContents.add(new BlockMismatchEntry(type, entry));
-            }
+        Collections.sort(list, this.sorter);
+
+        for (BlockMismatch mismatch : list)
+        {
+            this.listContents.add(new BlockMismatchEntry(type, mismatch));
         }
     }
 
     @Override
     protected WidgetSchematicVerificationResult createListEntryWidget(int x, int y, int listIndex, boolean isOdd, BlockMismatchEntry entry)
     {
-        return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this.guiSchematicVerifier);
+        return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
+                this.zLevel, isOdd, this, this.guiSchematicVerifier, entry);
     }
 }

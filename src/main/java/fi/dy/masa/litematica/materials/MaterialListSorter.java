@@ -32,6 +32,6 @@ public class MaterialListSorter implements Comparator<MaterialListEntry>
             return entry1.getCountAvailable() == entry2.getCountAvailable() ? nameCompare : ((entry1.getCountAvailable() > entry2.getCountAvailable()) != reverse ? -1 : 1);
         }
 
-        return reverse ? nameCompare * -1 : nameCompare;
+        return reverse == false ? nameCompare * -1 : nameCompare;
     }
 }

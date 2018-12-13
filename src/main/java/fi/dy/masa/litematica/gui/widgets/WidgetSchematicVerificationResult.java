@@ -1,19 +1,20 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
+import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.SortCriteria;
 import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetBase;
-import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
+import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -27,12 +28,19 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class WidgetSchematicVerificationResult extends WidgetBase
+public class WidgetSchematicVerificationResult extends WidgetListEntrySortable
 {
+    public static final String HEADER_EXPECTED = "litematica.gui.label.schematic_verifier.expected";
+    public static final String HEADER_FOUND = "litematica.gui.label.schematic_verifier.found";
+    public static final String HEADER_COUNT = "litematica.gui.label.schematic_verifier.count";
+
     private static int maxNameLengthExpected;
     private static int maxNameLengthFound;
+    private static int maxCountLength;
 
     private final GuiSchematicVerifier guiSchematicVerifier;
+    private final WidgetListSchematicVerificationResults listWidget;
+    private final SchematicVerifier verifier;
     private final BlockMismatchEntry mismatchEntry;
     @Nullable private final String header1;
     @Nullable private final String header2;
@@ -41,25 +49,27 @@ public class WidgetSchematicVerificationResult extends WidgetBase
     private final Minecraft mc;
     private final int count;
     private final boolean isOdd;
-    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     @Nullable private final ButtonGeneric buttonIgnore;
     private int id;
 
     public WidgetSchematicVerificationResult(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            BlockMismatchEntry entry, GuiSchematicVerifier guiSchematicVerifier)
+            WidgetListSchematicVerificationResults listWidget, GuiSchematicVerifier guiSchematicVerifier, BlockMismatchEntry entry)
     {
         super(x, y, width, height, zLevel);
 
+        this.columnCount = 3;
         this.mc = Minecraft.getMinecraft();
         this.mismatchEntry = entry;
         this.guiSchematicVerifier = guiSchematicVerifier;
+        this.listWidget = listWidget;
+        this.verifier = guiSchematicVerifier.getPlacement().getSchematicVerifier();
         this.isOdd = isOdd;
 
         if (entry.header1 != null && entry.header2 != null)
         {
             this.header1 = entry.header1;
             this.header2 = entry.header2;
-            this.header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.count");
+            this.header3 = GuiBase.TXT_BOLD + I18n.format(HEADER_COUNT) + GuiBase.TXT_RST;
             this.mismatchInfo = null;
             this.count = 0;
             this.buttonIgnore = null;
@@ -81,8 +91,6 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.mismatchInfo = new BlockMismatchInfo(entry.blockMismatch.stateExpected, entry.blockMismatch.stateFound);
             this.count = entry.blockMismatch.count;
 
-            FontRenderer font = Minecraft.getMinecraft().fontRenderer;
-
             if (entry.mismatchType != MismatchType.CORRECT_STATE)
             {
                 this.buttonIgnore = this.createButton(this.x + this.width, y + 1, ButtonListener.ButtonType.IGNORE_MISMATCH);
@@ -91,16 +99,26 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             {
                 this.buttonIgnore = null;
             }
-
-            maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(this.mismatchInfo.stackExpected.getDisplayName()));
-            maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(this.mismatchInfo.stackFound.getDisplayName()));
         }
     }
 
-    public static void resetNameLengths()
+    public static void setMaxNameLengths(List<BlockMismatch> mismatches, Minecraft mc)
     {
-        maxNameLengthExpected = 60;
-        maxNameLengthFound = 60;
+        FontRenderer font = mc.fontRenderer;
+        maxNameLengthExpected = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADER_EXPECTED) + GuiBase.TXT_RST);
+        maxNameLengthFound = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADER_FOUND) + GuiBase.TXT_RST);
+        maxCountLength = 7 * font.getStringWidth("8");
+
+        for (BlockMismatch entry : mismatches)
+        {
+            ItemStack stack = ItemUtils.getItemForState(entry.stateExpected);
+            maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(stack.getDisplayName()));
+
+            stack = ItemUtils.getItemForState(entry.stateFound);
+            maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(stack.getDisplayName()));
+        }
+
+        maxCountLength = Math.max(maxCountLength, font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADER_COUNT) + GuiBase.TXT_RST));
     }
 
     private ButtonGeneric createButton(int x, int y, ButtonListener.ButtonType type)
@@ -114,9 +132,69 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         return button;
     }
 
-    private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
+    @Override
+    protected int getCurrentSortColumn()
     {
-        this.buttons.add(new ButtonWrapper<>(button, listener));
+        return this.verifier.getSortCriteria().ordinal();
+    }
+
+    @Override
+    protected boolean getSortInReverse()
+    {
+        return this.verifier.getSortInReverse();
+    }
+
+    @Override
+    protected int getColumnPosX(int column)
+    {
+        int x1 = this.x + 4;
+        int x2 = x1 + maxNameLengthExpected + 40; // including item icon
+        int x3 = x2 + maxNameLengthFound + 40;
+
+        switch (column)
+        {
+            case 0: return x1;
+            case 1: return x2;
+            case 2: return x3;
+            case 3: return x3 + maxCountLength + 20;
+            default: return x1;
+        }
+    }
+
+    @Override
+    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
+    {
+        if (super.onMouseClickedImpl(mouseX, mouseY, mouseButton))
+        {
+            return true;
+        }
+
+        if (this.mismatchEntry.type != BlockMismatchEntry.Type.HEADER)
+        {
+            return false;
+        }
+
+        int column = this.getMouseOverColumn(mouseX, mouseY);
+
+        switch (column)
+        {
+            case 0:
+                this.verifier.setSortCriteria(SortCriteria.NAME_EXPECTED);
+                break;
+            case 1:
+                this.verifier.setSortCriteria(SortCriteria.NAME_FOUND);
+                break;
+            case 2:
+                this.verifier.setSortCriteria(SortCriteria.COUNT);
+                break;
+            default:
+                return false;
+        }
+
+        // Re-create the widgets
+        this.listWidget.refreshEntries();
+
+        return true;
     }
 
     @Override
@@ -126,25 +204,10 @@ public class WidgetSchematicVerificationResult extends WidgetBase
     }
 
     @Override
-    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
-    {
-        for (ButtonWrapper<?> entry : this.buttons)
-        {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return true;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
         // Draw a lighter background for the hovered and the selected entry
-        if (selected || this.isMouseOver(mouseX, mouseY))
+        if (this.header1 == null && this.header2 == null && (selected || this.isMouseOver(mouseX, mouseY)))
         {
             GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
         }
@@ -159,9 +222,9 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         }
 
         Minecraft mc = Minecraft.getMinecraft();
-        int x1 = this.x + 4;
-        int x2 = this.x + maxNameLengthExpected + 50;
-        int x3 = x2 + maxNameLengthFound + 50;
+        int x1 = this.getColumnPosX(0);
+        int x2 = this.getColumnPosX(1);
+        int x3 = this.getColumnPosX(2);
         int y = this.y + 7;
         int color = 0xFFFFFFFF;
 
@@ -170,6 +233,8 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             mc.fontRenderer.drawString(this.header1, x1, y, color);
             mc.fontRenderer.drawString(this.header2, x2, y, color);
             mc.fontRenderer.drawString(this.header3, x3, y, color);
+
+            this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
         }
         else if (this.header1 != null)
         {
@@ -212,10 +277,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             GlStateManager.popMatrix();
         }
 
-        for (int i = 0; i < this.buttons.size(); ++i)
-        {
-            this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-        }
+        super.render(mouseX, mouseY, selected);
     }
 
     @Override

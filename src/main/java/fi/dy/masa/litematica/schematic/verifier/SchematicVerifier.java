@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.data;
+package fi.dy.masa.litematica.schematic.verifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -73,6 +74,8 @@ public class SchematicVerifier implements IInfoHudRenderer
     private MismatchType selectedMismatchType = null;
     @Nullable
     private Pair<IBlockState, IBlockState> selectedMismatchPair = null;
+    private SortCriteria sortCriteria = SortCriteria.NAME_EXPECTED;
+    private boolean sortReverse;
     private boolean verificationStarted;
     private boolean verificationActive;
     private boolean finished;
@@ -152,6 +155,29 @@ public class SchematicVerifier implements IInfoHudRenderer
     public long getMismatchedStates()
     {
         return this.wrongStatesPositions.size();
+    }
+
+    public SortCriteria getSortCriteria()
+    {
+        return this.sortCriteria;
+    }
+
+    public boolean getSortInReverse()
+    {
+        return this.sortReverse;
+    }
+
+    public void setSortCriteria(SortCriteria criteria)
+    {
+        if (this.sortCriteria == criteria)
+        {
+            this.sortReverse = ! this.sortReverse;
+        }
+        else
+        {
+            this.sortCriteria = criteria;
+            this.sortReverse = criteria != SortCriteria.COUNT;
+        }
     }
 
     public void setActiveMismatchPositionsForRender(MismatchType type, @Nullable Pair<IBlockState, IBlockState> pair, List<BlockPos> list)
@@ -505,7 +531,7 @@ public class SchematicVerifier implements IInfoHudRenderer
         return list;
     }
 
-    private List<BlockMismatch> getMismatchOverviewCombined()
+    public List<BlockMismatch> getMismatchOverviewCombined()
     {
         List<BlockMismatch> list = new ArrayList<>();
 
@@ -883,5 +909,12 @@ public class SchematicVerifier implements IInfoHudRenderer
         {
             return this.formattingCode;
         }
+    }
+
+    public enum SortCriteria
+    {
+        NAME_EXPECTED,
+        NAME_FOUND,
+        COUNT;
     }
 }

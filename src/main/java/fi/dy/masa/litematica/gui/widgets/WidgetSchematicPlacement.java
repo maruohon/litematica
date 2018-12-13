@@ -12,11 +12,9 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetBase;
-import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -31,7 +29,6 @@ public class WidgetSchematicPlacement extends WidgetBase
     private final WidgetListSchematicPlacements parent;
     private final SchematicPlacement placement;
     private final Minecraft mc;
-    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private final boolean isOdd;
     private int buttonsStartX;
 
@@ -75,26 +72,6 @@ public class WidgetSchematicPlacement extends WidgetBase
         this.addButton(button, new ButtonListener(type, this));
 
         return xRight;
-    }
-
-    private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
-    {
-        this.buttons.add(new ButtonWrapper<>(button, listener));
-    }
-
-    @Override
-    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
-    {
-        for (ButtonWrapper<?> entry : this.buttons)
-        {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return true;
-            }
-        }
-
-        return true;
     }
 
     @Override
@@ -165,10 +142,7 @@ public class WidgetSchematicPlacement extends WidgetBase
             icon.renderAt(this.buttonsStartX - 26, this.y + 6, this.zLevel, false, false);
         }
 
-        for (int i = 0; i < this.buttons.size(); ++i)
-        {
-            this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-        }
+        super.render(mouseX, mouseY, placementSelected);
     }
 
     @Override

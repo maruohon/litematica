@@ -49,21 +49,16 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     }
 
     @Override
-    protected int createAndAddHeaderWidget(int x, int y, int listIndexStart, int usableHeight, int usedHeight)
+    protected WidgetMaterialListEntry createHeaderWidget(int x, int y, int listIndexStart, int usableHeight, int usedHeight)
     {
-        listIndexStart++;
-        WidgetMaterialListEntry widget = this.createListEntryWidget(x, y, listIndexStart, true, null);
-        int height = widget.getHeight();
+        int height = this.browserEntryHeight;
 
         if ((usedHeight + height) > usableHeight)
         {
-            return -1;
+            return null;
         }
 
-        this.listWidgets.add(widget);
-        this.maxVisibleBrowserEntries++;
-
-        return height;
+        return this.createListEntryWidget(x, y, listIndexStart, true, null);
     }
 
     @Override

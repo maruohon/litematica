@@ -174,6 +174,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             {
                 case REFRESH_LIST:
                     materialList.recreateMaterialList();
+                    WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), this.parent.mc);
                     break;
 
                 case LIST_TYPE:

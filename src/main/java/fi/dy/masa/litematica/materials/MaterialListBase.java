@@ -145,7 +145,7 @@ public abstract class MaterialListBase
         else
         {
             this.sortCriteria = criteria;
-            this.reverse = false;
+            this.reverse = criteria == SortCriteria.NAME;
         }
     }
 

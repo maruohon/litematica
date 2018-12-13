@@ -16,6 +16,8 @@ litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_s
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
 litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the Structure to a Litematica Schematic
 
+litematica.error.schematic.create.no_selections=No valid selection regions!
+
 litematica.error.schematic_load.cant_read_file=Can't read the schematic file '%s' (doesn't exist or permission issue)
 litematica.error.schematic_load.no_schematic_selected=No Schematic file selected!
 litematica.error.schematic_load.unsupported_type=Unknown or unsupported file type for '%s'

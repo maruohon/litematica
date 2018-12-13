@@ -7,14 +7,12 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -25,7 +23,6 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 {
     private final SelectionManager selectionManager;
     private final WidgetAreaSelectionBrowser parent;
-    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     private int id;
     private int buttonsStartX;
 
@@ -64,26 +61,6 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         return x;
     }
 
-    private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
-    {
-        this.buttons.add(new ButtonWrapper<>(button, listener));
-    }
-
-    @Override
-    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
-    {
-        for (ButtonWrapper<?> entry : this.buttons)
-        {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return true;
-            }
-        }
-
-        return super.onMouseClickedImpl(mouseX, mouseY, mouseButton);
-    }
-
     @Override
     public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
     {
@@ -97,11 +74,6 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         {
             selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentSelectionId());
             super.render(mouseX, mouseY, selected);
-
-            for (int i = 0; i < this.buttons.size(); ++i)
-            {
-                this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-            }
         }
         else
         {
