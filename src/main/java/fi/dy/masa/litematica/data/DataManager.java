@@ -19,6 +19,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.LayerRange;
+import fi.dy.masa.litematica.util.MaterialCache;
 import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -245,6 +246,7 @@ public class DataManager implements IDirectoryCache
     public static void save()
     {
         save(false);
+        MaterialCache.getInstance().writeToFile();
     }
 
     public static void save(boolean forceSave)

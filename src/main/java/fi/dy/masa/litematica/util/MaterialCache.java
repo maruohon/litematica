@@ -39,6 +39,7 @@ public class MaterialCache
     protected final WorldSchematic tempWorld;
     protected final BlockPos checkPos;
     protected boolean hasReadFromFile;
+    protected boolean dirty;
 
     private MaterialCache()
     {
@@ -92,6 +93,7 @@ public class MaterialCache
         }
 
         this.itemsForStates.put(state, stack);
+        this.dirty = true;
 
         return stack;
     }
@@ -199,6 +201,11 @@ public class MaterialCache
 
     public boolean writeToFile()
     {
+        if (this.dirty == false)
+        {
+            return false;
+        }
+
         File dir = this.getCacheDir();
         File file = this.getCacheFile();
 
@@ -213,6 +220,7 @@ public class MaterialCache
             FileOutputStream os = new FileOutputStream(file);
             CompressedStreamTools.writeCompressed(this.writeToNBT(), os);
             os.close();
+            this.dirty = false;
 
             return true;
         }
@@ -243,6 +251,7 @@ public class MaterialCache
             {
                 this.readFromNBT(nbt);
                 this.hasReadFromFile = true;
+                this.dirty = false;
             }
         }
         catch (Exception e)
