@@ -16,6 +16,8 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
@@ -157,8 +159,21 @@ public class DataManager implements IDirectoryCache
         return getInstance().materialList;
     }
 
-    public static void setMaterialList(MaterialListBase materialList)
+    public static void setMaterialList(@Nullable MaterialListBase materialList)
     {
+        MaterialListBase old = getInstance().materialList;
+
+        if (old != null)
+        {
+            MaterialListHudRenderer renderer = old.getHudRenderer();
+
+            if (renderer.getShouldRender())
+            {
+                renderer.toggleShouldRender();
+                InfoHud.getInstance().removeInfoHudRenderer(renderer, true);
+            }
+        }
+
         getInstance().materialList = materialList;
     }
 

@@ -263,6 +263,8 @@ public class SchematicPlacementManager
         {
             this.selectedPlacement = placement;
             OverlayRenderer.getInstance().updatePlacementCache();
+            // Forget the last viewed material list when changing the placement selection
+            DataManager.setMaterialList(null);
         }
     }
 
