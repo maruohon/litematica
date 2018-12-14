@@ -163,6 +163,6 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
     protected WidgetSchematicVerificationResult createListEntryWidget(int x, int y, int listIndex, boolean isOdd, BlockMismatchEntry entry)
     {
         return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                this.zLevel, isOdd, this, this.guiSchematicVerifier, entry);
+                this.zLevel, isOdd, this, this.guiSchematicVerifier, entry, listIndex);
     }
 }

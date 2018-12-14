@@ -14,7 +14,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -23,7 +23,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
-public class WidgetSchematicPlacement extends WidgetBase
+public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlacement>
 {
     private final SchematicPlacementManager manager;
     private final WidgetListSchematicPlacements parent;
@@ -33,9 +33,9 @@ public class WidgetSchematicPlacement extends WidgetBase
     private int buttonsStartX;
 
     public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            SchematicPlacement placement, WidgetListSchematicPlacements parent, Minecraft mc)
+            SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent, Minecraft mc)
     {
-        super(x, y, width, height, zLevel);
+        super(x, y, width, height, zLevel, placement, listIndex);
 
         this.parent = parent;
         this.placement = placement;

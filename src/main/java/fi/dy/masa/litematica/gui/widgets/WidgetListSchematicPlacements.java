@@ -34,6 +34,7 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
     @Override
     protected WidgetSchematicPlacement createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SchematicPlacement entry)
     {
-        return new WidgetSchematicPlacement(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this, this.mc);
+        return new WidgetSchematicPlacement(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
+                this.zLevel, isOdd, entry, listIndex, this, this.mc);
     }
 }

@@ -20,7 +20,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 
-public class WidgetMaterialListEntry extends WidgetListEntrySortable
+public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialListEntry>
 {
     private static final String[] HEADERS = new String[] {
             "litematica.gui.label.material_list.item",
@@ -40,9 +40,9 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable
     private final boolean isOdd;
 
     public WidgetMaterialListEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            MaterialListBase materialList, @Nullable MaterialListEntry entry, WidgetListMaterialList listWidget)
+            MaterialListBase materialList, @Nullable MaterialListEntry entry, int listIndex, WidgetListMaterialList listWidget)
     {
-        super(x, y, width, height, zLevel);
+        super(x, y, width, height, zLevel, entry, listIndex);
 
         this.columnCount = 4;
         this.entry = entry;

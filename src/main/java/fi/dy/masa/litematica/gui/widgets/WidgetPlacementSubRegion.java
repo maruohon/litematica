@@ -12,14 +12,14 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.text.TextFormatting;
 
-public class WidgetPlacementSubRegion extends WidgetBase
+public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlacement>
 {
     private final SchematicPlacement schematicPlacement;
     private final WidgetListPlacementSubRegions parent;
@@ -29,9 +29,10 @@ public class WidgetPlacementSubRegion extends WidgetBase
     private int buttonsStartX;
 
     public WidgetPlacementSubRegion(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement, WidgetListPlacementSubRegions parent, Minecraft mc)
+            SchematicPlacement schematicPlacement, SubRegionPlacement placement, int listIndex,
+            WidgetListPlacementSubRegions parent, Minecraft mc)
     {
-        super(x, y, width, height, zLevel);
+        super(x, y, width, height, zLevel, placement, listIndex);
 
         this.parent = parent;
         this.schematicPlacement = schematicPlacement;

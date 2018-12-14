@@ -36,8 +36,8 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
     @Override
     protected WidgetPlacementSubRegion createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SubRegionPlacement entry)
     {
-        return new WidgetPlacementSubRegion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd,
-                this.parent.getSchematicPlacement(), entry, this, this.mc);
+        return new WidgetPlacementSubRegion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
+                this.zLevel, isOdd, this.parent.getSchematicPlacement(), entry, listIndex, this, this.mc);
     }
 
     /*

@@ -80,6 +80,6 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     protected WidgetMaterialListEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, @Nullable MaterialListEntry entry)
     {
         return new WidgetMaterialListEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                this.zLevel, isOdd, this.gui.getMaterialList(), entry, this);
+                this.zLevel, isOdd, this.gui.getMaterialList(), entry, listIndex, this);
     }
 }

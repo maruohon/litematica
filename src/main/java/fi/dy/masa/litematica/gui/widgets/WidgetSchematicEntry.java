@@ -13,7 +13,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class WidgetSchematicEntry extends WidgetBase
+public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchematic>
 {
     private final WidgetListLoadedSchematics parent;
     private final LitematicaSchematic schematic;
@@ -35,9 +35,9 @@ public class WidgetSchematicEntry extends WidgetBase
     private final int buttonsStartX;
 
     public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            LitematicaSchematic schematic, WidgetListLoadedSchematics parent, Minecraft mc)
+            LitematicaSchematic schematic, int listIndex, WidgetListLoadedSchematics parent, Minecraft mc)
     {
-        super(x, y, width, height, zLevel);
+        super(x, y, width, height, zLevel, schematic, listIndex);
 
         this.parent = parent;
         this.schematic = schematic;

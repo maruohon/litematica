@@ -56,7 +56,7 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     protected WidgetAreaSelectionEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, DirectoryEntry entry)
     {
         return new WidgetAreaSelectionEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd,
-                entry, this.guiAreaSelectionManager.getSelectionManager(), this.mc, this, this.iconProvider);
+                entry, listIndex, this.guiAreaSelectionManager.getSelectionManager(), this.mc, this, this.iconProvider);
     }
 
     public static class FileFilterJson implements FileFilter

@@ -28,7 +28,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class WidgetSchematicVerificationResult extends WidgetListEntrySortable
+public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<BlockMismatchEntry>
 {
     public static final String HEADER_EXPECTED = "litematica.gui.label.schematic_verifier.expected";
     public static final String HEADER_FOUND = "litematica.gui.label.schematic_verifier.found";
@@ -53,9 +53,10 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable
     private int id;
 
     public WidgetSchematicVerificationResult(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            WidgetListSchematicVerificationResults listWidget, GuiSchematicVerifier guiSchematicVerifier, BlockMismatchEntry entry)
+            WidgetListSchematicVerificationResults listWidget, GuiSchematicVerifier guiSchematicVerifier,
+            BlockMismatchEntry entry, int listIndex)
     {
-        super(x, y, width, height, zLevel);
+        super(x, y, width, height, zLevel, entry, listIndex);
 
         this.columnCount = 3;
         this.mc = Minecraft.getMinecraft();

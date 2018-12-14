@@ -27,10 +27,10 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     private int buttonsStartX;
 
     public WidgetAreaSelectionEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            DirectoryEntry entry, SelectionManager selectionManager, Minecraft mc,
+            DirectoryEntry entry, int listIndex, SelectionManager selectionManager, Minecraft mc,
             WidgetAreaSelectionBrowser parent, IFileBrowserIconProvider iconProvider)
     {
-        super(x, y, width, height, zLevel, isOdd, entry, mc, parent, iconProvider);
+        super(x, y, width, height, zLevel, isOdd, entry, listIndex, mc, parent, iconProvider);
 
         this.selectionManager = selectionManager;
         this.parent = parent;
