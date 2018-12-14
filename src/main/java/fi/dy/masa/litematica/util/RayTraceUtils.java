@@ -75,8 +75,11 @@ public class RayTraceUtils
         {
             for (SchematicPlacement placement : DataManager.getSchematicPlacementManager().getAllSchematicsPlacements())
             {
-                traceToPlacementBox(placement, eyesPos, lookEndPos);
-                traceToOrigin(placement.getOrigin(), eyesPos, lookEndPos, HitType.PLACEMENT_ORIGIN, placement);
+                if (placement.isEnabled())
+                {
+                    traceToPlacementBox(placement, eyesPos, lookEndPos);
+                    traceToOrigin(placement.getOrigin(), eyesPos, lookEndPos, HitType.PLACEMENT_ORIGIN, placement);
+                }
             }
         }
 
