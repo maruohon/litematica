@@ -152,8 +152,13 @@ public class OverlayRenderer
                 this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
             }
 
-            Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
-            RenderUtils.renderBlockOutline(currentSelection.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+            BlockPos origin = currentSelection.getExplicitOrigin();
+
+            if (origin != null)
+            {
+                Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
+                RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+            }
 
             GlStateManager.depthMask(true);
             GlStateManager.doPolygonOffset(0f, 0f);

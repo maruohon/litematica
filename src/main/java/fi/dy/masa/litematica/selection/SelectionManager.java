@@ -239,6 +239,8 @@ public class SelectionManager
 
         AreaSelection selection = new AreaSelection();
         selection.setName(name);
+        BlockPos pos = new BlockPos(Minecraft.getMinecraft().player);
+        selection.createNewSubRegionBox(pos, name);
 
         this.selections.put(selectionId, selection);
         this.currentSelectionId = selectionId;
@@ -330,25 +332,7 @@ public class SelectionManager
 
         if (area != null)
         {
-            if (area.getSelectedSubRegionBox() != null)
-            {
-                Box box = area.getSelectedSubRegionBox();
-                Corner selectedCorner = box.getSelectedCorner();
-
-                if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_1) && box.getPos1() != null)
-                {
-                    box.setPos1(box.getPos1().offset(direction, amount));
-                }
-
-                if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_2) && box.getPos2() != null)
-                {
-                    box.setPos2(box.getPos2().offset(direction, amount));
-                }
-            }
-            else if (area.isOriginSelected())
-            {
-                area.setOrigin(area.getOrigin().offset(direction, amount));
-            }
+            area.moveSelectedElement(direction, amount);
         }
     }
 
@@ -371,6 +355,7 @@ public class SelectionManager
             {
                 this.changeSelection(area, trace);
                 this.grabbedElement = new GrabbedElement(
+                        area,
                         trace.getHitSelectionBox(),
                         trace.getHitCorner(),
                         trace.getHitVec(),
@@ -403,16 +388,11 @@ public class SelectionManager
 
                 if (movingCorner)
                 {
-                    int cornerIndex = 1;
+                    int cornerIndex = corner.ordinal();
 
-                    if (corner == Corner.CORNER_1)
+                    if (corner == Corner.CORNER_1 || corner == Corner.CORNER_2)
                     {
-                        area.getSelectedSubRegionBox().setPos1(pos);
-                    }
-                    else if (corner == Corner.CORNER_2)
-                    {
-                        area.getSelectedSubRegionBox().setPos2(pos);
-                        cornerIndex = 2;
+                        area.setSelectedSubRegionCornerPos(pos, corner);
                     }
 
                     if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
@@ -440,8 +420,8 @@ public class SelectionManager
         }
         else
         {
-            BlockPos old = area.getOrigin();
-            area.setOrigin(newOrigin);
+            BlockPos old = area.getEffectiveOrigin();
+            area.setExplicitOrigin(newOrigin);
 
             String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
@@ -479,16 +459,16 @@ public class SelectionManager
 
     private void resetSelectionToClickedPosition(Minecraft mc, double maxDistance)
     {
-        AreaSelection sel = this.getCurrentSelection();
+        AreaSelection area = this.getCurrentSelection();
 
-        if (sel != null && sel.getSelectedSubRegionBox() != null)
+        if (area != null && area.getSelectedSubRegionBox() != null)
         {
             BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance);
 
             if (pos != null)
             {
-                sel.getSelectedSubRegionBox().setPos1(pos);
-                sel.getSelectedSubRegionBox().setPos2(pos);
+                area.setSelectedSubRegionCornerPos(pos, Corner.CORNER_1);
+                area.setSelectedSubRegionCornerPos(pos, Corner.CORNER_2);
             }
         }
     }
@@ -520,8 +500,8 @@ public class SelectionManager
                 BlockPos posMin = PositionUtils.getMinCorner(PositionUtils.getMinCorner(pos1, pos2), pos);
                 BlockPos posMax = PositionUtils.getMaxCorner(PositionUtils.getMaxCorner(pos1, pos2), pos);
 
-                box.setPos1(posMin);
-                box.setPos2(posMax);
+                sel.setSelectedSubRegionCornerPos(posMin, Corner.CORNER_1);
+                sel.setSelectedSubRegionCornerPos(posMax, Corner.CORNER_2);
             }
         }
     }
@@ -633,21 +613,21 @@ public class SelectionManager
 
     private static class GrabbedElement
     {
+        private final AreaSelection area;
         public final Box grabbedBox;
         public final Box originalBox;
         public final Vec3d grabPosition;
         public final Corner grabbedCorner;
         public double grabDistance;
 
-        private GrabbedElement(Box box, Corner corner, Vec3d grabPosition, double grabDistance)
+        private GrabbedElement(AreaSelection area, Box box, Corner corner, Vec3d grabPosition, double grabDistance)
         {
+            this.area = area;
             this.grabbedBox = box;
             this.grabbedCorner = corner;
             this.grabPosition = grabPosition;
             this.grabDistance = grabDistance;
-            this.originalBox = new Box();
-            this.originalBox.setPos1(box.getPos1());
-            this.originalBox.setPos2(box.getPos2());
+            this.originalBox = new Box(box.getPos1(), box.getPos2(), "");
         }
 
         public void changeGrabDistance(double amount)
@@ -662,12 +642,14 @@ public class SelectionManager
 
             if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_1) && this.grabbedBox.getPos1() != null)
             {
-                this.grabbedBox.setPos1(this.originalBox.getPos1().add(change.x, change.y, change.z));
+                BlockPos pos = this.originalBox.getPos1().add(change.x, change.y, change.z);
+                this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_1, pos);
             }
 
             if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_2) && this.grabbedBox.getPos2() != null)
             {
-                this.grabbedBox.setPos2(this.originalBox.getPos2().add(change.x, change.y, change.z));
+                BlockPos pos = this.originalBox.getPos2().add(change.x, change.y, change.z);
+                this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_2, pos);
             }
         }
     }

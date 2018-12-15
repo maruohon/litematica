@@ -501,12 +501,12 @@ public class KeyCallbacks
                 if (mode.getUsesAreaSelection())
                 {
                     SelectionManager sm = DataManager.getSelectionManager();
-                    AreaSelection selection = sm.getCurrentSelection();
+                    AreaSelection area = sm.getCurrentSelection();
 
-                    if (selection != null)
+                    if (area != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        selection.setOrigin(pos);
+                        area.setExplicitOrigin(pos);
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         StringUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
                         return true;
@@ -519,24 +519,16 @@ public class KeyCallbacks
                 if (mode.getUsesAreaSelection())
                 {
                     SelectionManager sm = DataManager.getSelectionManager();
-                    AreaSelection selection = sm.getCurrentSelection();
+                    AreaSelection area = sm.getCurrentSelection();
 
-                    if (selection != null && selection.getSelectedSubRegionBox() != null)
+                    if (area != null && area.getSelectedSubRegionBox() != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        int p = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? 1 : 2;
-
-                        if (p == 1)
-                        {
-                            selection.getSelectedSubRegionBox().setPos1(pos);
-                        }
-                        else
-                        {
-                            selection.getSelectedSubRegionBox().setPos2(pos);
-                        }
+                        Corner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? Corner.CORNER_1 : Corner.CORNER_2;
+                        area.setSelectedSubRegionCornerPos(pos, corner);
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                        StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", p, posStr);
+                        StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", corner.ordinal(), posStr);
                         return true;
                     }
                 }

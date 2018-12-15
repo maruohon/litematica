@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
@@ -12,19 +13,22 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 public class AreaSelection
 {
     private final Map<String, Box> subRegionBoxes = new HashMap<>();
-    private BlockPos origin = BlockPos.ORIGIN;
     private String name = "Unnamed";
-    @Nullable
-    private String currentBox;
     private boolean originSelected;
+    private BlockPos calculatedOrigin = BlockPos.ORIGIN;
+    private boolean calculatedOriginDirty = true;
+    @Nullable private BlockPos explicitOrigin = null;
+    @Nullable private String currentBox;
 
     public static AreaSelection fromPlacement(SchematicPlacement placement)
     {
@@ -32,7 +36,7 @@ public class AreaSelection
         BlockPos origin = placement.getOrigin();
 
         AreaSelection selection = new AreaSelection();
-        selection.origin = origin;
+        selection.setExplicitOrigin(origin);
         selection.name = placement.getName();
         selection.subRegionBoxes.putAll(boxes);
 
@@ -76,14 +80,49 @@ public class AreaSelection
         this.originSelected = selected;
     }
 
-    public BlockPos getOrigin()
+    /**
+     * Returns the effective origin point. This is the explicit origin point, if one has been set,
+     * otherwise it's an automatically calculated origin point, located at the minimum corner
+     * of all the boxes.
+     * @return
+     */
+    public BlockPos getEffectiveOrigin()
     {
-        return this.origin;
+        if (this.explicitOrigin != null)
+        {
+            return this.explicitOrigin;
+        }
+        else
+        {
+            if (this.calculatedOriginDirty)
+            {
+                this.updateCalculatedOrigin();
+            }
+
+            return this.calculatedOrigin;
+        }
     }
 
-    public void setOrigin(BlockPos origin)
+    /**
+     * Get the explicitly defined origin point, if any.
+     * @return
+     */
+    @Nullable
+    public BlockPos getExplicitOrigin()
     {
-        this.origin = origin;
+        return this.explicitOrigin;
+    }
+
+    public void setExplicitOrigin(@Nullable BlockPos origin)
+    {
+        this.explicitOrigin = origin;
+    }
+
+    private void updateCalculatedOrigin()
+    {
+        Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(this.subRegionBoxes.values());
+        this.calculatedOrigin = pair.getLeft();
+        this.calculatedOriginDirty = false;
     }
 
     @Nullable
@@ -117,24 +156,10 @@ public class AreaSelection
 
         Box box = new Box();
         box.setName(name);
-
-        // When creating the first sub-region box, select the origin by default, and offset the position by one
-        // block, so that it can be selected without having to move the overlapping origin box first
-        if (this.origin.equals(BlockPos.ORIGIN) && this.subRegionBoxes.isEmpty())
-        {
-            this.origin = pos1;
-            this.originSelected = true;
-            pos1 = pos1.add(0, 1, 0);
-        }
-        else
-        {
-            box.setSelectedCorner(Corner.CORNER_1);
-            this.currentBox = name;
-        }
-
-        box.setPos1(pos1);
-
+        box.setSelectedCorner(Corner.CORNER_1);
+        this.currentBox = name;
         this.subRegionBoxes.put(name, box);
+        this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
 
         return name;
     }
@@ -206,23 +231,26 @@ public class AreaSelection
 
     public void moveEntireSelectionTo(BlockPos newOrigin, boolean printMessage)
     {
-        BlockPos old = this.getOrigin();
-        BlockPos diff = newOrigin.subtract(this.origin);
+        BlockPos old = this.getEffectiveOrigin();
+        BlockPos diff = newOrigin.subtract(old);
 
         for (Box box : this.subRegionBoxes.values())
         {
             if (box.getPos1() != null)
             {
-                box.setPos1(box.getPos1().add(diff));
+                this.setSubRegionCornerPos(box, Corner.CORNER_1, box.getPos1().add(diff));
             }
 
             if (box.getPos2() != null)
             {
-                box.setPos2(box.getPos2().add(diff));
+                this.setSubRegionCornerPos(box, Corner.CORNER_2, box.getPos2().add(diff));
             }
         }
 
-        this.origin = newOrigin;
+        if (this.getExplicitOrigin() != null)
+        {
+            this.setExplicitOrigin(newOrigin);
+        }
 
         if (printMessage)
         {
@@ -230,6 +258,61 @@ public class AreaSelection
             String newStr = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
             StringUtils.printActionbarMessage("litematica.message.moved_selection", oldStr, newStr);
         }
+    }
+
+    public void moveSelectedElement(EnumFacing direction, int amount)
+    {
+        Box box = this.getSelectedSubRegionBox();
+
+        if (box != null)
+        {
+            Corner corner = box.getSelectedCorner();
+
+            if ((corner == Corner.NONE || corner == Corner.CORNER_1) && box.getPos1() != null)
+            {
+                BlockPos pos = this.getSubRegionCornerPos(box, Corner.CORNER_1).offset(direction, amount);
+                this.setSubRegionCornerPos(box, Corner.CORNER_1, pos);
+            }
+
+            if ((corner == Corner.NONE || corner == Corner.CORNER_2) && box.getPos2() != null)
+            {
+                BlockPos pos = this.getSubRegionCornerPos(box, Corner.CORNER_2).offset(direction, amount);
+                this.setSubRegionCornerPos(box, Corner.CORNER_2, pos);
+            }
+        }
+        else if (this.isOriginSelected() && this.getExplicitOrigin() != null)
+        {
+            this.setExplicitOrigin(this.getExplicitOrigin().offset(direction, amount));
+        }
+    }
+
+    public void setSelectedSubRegionCornerPos(BlockPos pos, Corner corner)
+    {
+        Box box = this.getSelectedSubRegionBox();
+
+        if (box != null)
+        {
+            this.setSubRegionCornerPos(box, corner, pos);
+        }
+    }
+
+    public void setSubRegionCornerPos(Box box, Corner corner, BlockPos pos)
+    {
+        if (corner == Corner.CORNER_1)
+        {
+            box.setPos1(pos);
+            this.calculatedOriginDirty = true;
+        }
+        else if (corner == Corner.CORNER_2)
+        {
+            box.setPos2(pos);
+            this.calculatedOriginDirty = true;
+        }
+    }
+
+    public BlockPos getSubRegionCornerPos(Box box, Corner corner)
+    {
+        return corner == Corner.CORNER_2 ? box.getPos2() : box.getPos1();
     }
 
     public static AreaSelection fromJson(JsonObject obj)
@@ -271,7 +354,11 @@ public class AreaSelection
 
         if (pos != null)
         {
-            area.origin = pos;
+            area.setExplicitOrigin(pos);
+        }
+        else
+        {
+            area.updateCalculatedOrigin();
         }
 
         return area;
@@ -304,7 +391,10 @@ public class AreaSelection
             obj.add("boxes", arr);
         }
 
-        obj.add("origin", JsonUtils.blockPosToJson(this.origin));
+        if (this.getExplicitOrigin() != null)
+        {
+            obj.add("origin", JsonUtils.blockPosToJson(this.getExplicitOrigin()));
+        }
 
         return obj;
     }

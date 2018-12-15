@@ -65,10 +65,21 @@ public class ToolHud extends InfoHud
             {
                 lines.add(I18n.format("litematica.hud.area_selection.selected_area", green + selection.getName() + rst));
 
-                BlockPos or = selection.getOrigin();
+                String strOr;
+                BlockPos o = selection.getExplicitOrigin();
+
+                if (o == null)
+                {
+                    o = selection.getEffectiveOrigin();
+                    strOr = I18n.format("litematica.gui.label.origin.auto");
+                }
+                else
+                {
+                    strOr = I18n.format("litematica.gui.label.origin.manual");
+                }
                 int count = selection.getAllSubRegionBoxes().size();
 
-                str = String.format("%d, %d, %d", or.getX(), or.getY(), or.getZ());
+                str = String.format("%d, %d, %d [%s]", o.getX(), o.getY(), o.getZ(), strOr);
                 String strOrigin = I18n.format("litematica.hud.area_selection.origin", green + str + rst);
                 String strBoxes = I18n.format("litematica.hud.area_selection.box_count", green + count + rst);
 

@@ -6,14 +6,12 @@ import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class Box
 {
-    private BlockPos pos1;
-    private BlockPos pos2;
+    @Nullable private BlockPos pos1;
+    @Nullable private BlockPos pos2;
     private BlockPos size = BlockPos.ORIGIN;
     private String name = "Unnamed";
     private Corner selectedCorner = Corner.NONE;
@@ -22,7 +20,7 @@ public class Box
     {
     }
 
-    public Box(BlockPos pos1, BlockPos pos2, String name)
+    public Box(@Nullable BlockPos pos1, @Nullable BlockPos pos2, String name)
     {
         this.pos1 = pos1;
         this.pos2 = pos2;
@@ -80,6 +78,7 @@ public class Box
         this.selectedCorner = corner;
     }
 
+    /*
     public void rotate(Rotation rotation)
     {
         BlockPos pos = PositionUtils.getTransformedBlockPos(this.getSize(), Mirror.NONE, rotation);
@@ -91,6 +90,7 @@ public class Box
         BlockPos pos = PositionUtils.getTransformedBlockPos(this.getSize(), mirror, Rotation.NONE);
         this.setPos2(this.getPos1().add(pos).add(-1, -1, -1));
     }
+    */
 
     private void updateSize()
     {

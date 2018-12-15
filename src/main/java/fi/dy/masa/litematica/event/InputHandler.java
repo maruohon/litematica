@@ -110,7 +110,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                         else if (sm.hasSelectedOrigin())
                         {
                             AreaSelection area = sm.getCurrentSelection();
-                            BlockPos old = area.getOrigin();
+                            BlockPos old = area.getEffectiveOrigin();
                             area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(player), amount), false);
                             return true;
                         }

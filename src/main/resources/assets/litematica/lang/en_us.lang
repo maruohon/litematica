@@ -158,6 +158,9 @@ litematica.gui.label.material_list.multiplier=Multiplier: %s
 litematica.gui.label.material_list.name=Name
 litematica.gui.label.material_list.total=Total
 
+litematica.gui.label.origin.auto=Auto
+litematica.gui.label.origin.manual=Manual
+
 litematica.gui.label.placement_sub.region_name=Region name: %s
 litematica.gui.label.placement_sub.region_position=Region position
 

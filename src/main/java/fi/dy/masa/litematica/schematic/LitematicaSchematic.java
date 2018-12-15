@@ -155,14 +155,15 @@ public class LitematicaSchematic
 
         schematic.totalSize = PositionUtils.getEnclosingAreaSize(area);
 
-        schematic.setSubRegionPositions(boxes, area.getOrigin());
+        BlockPos origin = area.getEffectiveOrigin();
+        schematic.setSubRegionPositions(boxes, origin);
         schematic.setSubRegionSizes(boxes);
 
-        schematic.takeBlocksFromWorld(world, boxes, area.getOrigin());
+        schematic.takeBlocksFromWorld(world, boxes, origin);
 
         if (ignoreEntities == false)
         {
-            schematic.takeEntitiesFromWorld(world, boxes, area.getOrigin());
+            schematic.takeEntitiesFromWorld(world, boxes, origin);
         }
 
         schematic.metadata.setAuthor(author);

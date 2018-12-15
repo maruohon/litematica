@@ -68,7 +68,12 @@ public class RayTraceUtils
                 }
             }
 
-            traceToOrigin(area.getOrigin(), eyesPos, lookEndPos, HitType.SELECTION_ORIGIN, null);
+            BlockPos origin = area.getExplicitOrigin();
+
+            if (origin != null)
+            {
+                traceToOrigin(origin, eyesPos, lookEndPos, HitType.SELECTION_ORIGIN, null);
+            }
         }
 
         if (DataManager.getOperationMode().getUsesSchematic())

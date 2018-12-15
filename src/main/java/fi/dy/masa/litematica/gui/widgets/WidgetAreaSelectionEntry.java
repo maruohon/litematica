@@ -101,8 +101,20 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
         if (selection != null)
         {
-            BlockPos o = selection.getOrigin();
-            String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
+            String str;
+            BlockPos o = selection.getExplicitOrigin();
+
+            if (o == null)
+            {
+                o = selection.getEffectiveOrigin();
+                str = I18n.format("litematica.gui.label.origin.auto");
+            }
+            else
+            {
+                str = I18n.format("litematica.gui.label.origin.manual");
+            }
+
+            String strOrigin = String.format("x: %d, y: %d, z: %d (%s)", o.getX(), o.getY(), o.getZ(), str);
             text.add(I18n.format("litematica.gui.label.area_selection_origin", strOrigin));
 
             int count = selection.getAllSubRegionBoxes().size();
