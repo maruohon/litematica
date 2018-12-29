@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.materials;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +33,14 @@ public class MaterialListUtils
 {
     public static List<MaterialListEntry> createMaterialListFor(LitematicaSchematic schematic)
     {
+        return createMaterialListFor(schematic, schematic.getAreas().keySet());
+    }
+
+    public static List<MaterialListEntry> createMaterialListFor(LitematicaSchematic schematic, Collection<String> subRegions)
+    {
         Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
 
-        for (String regionName : schematic.getAreas().keySet())
+        for (String regionName : subRegions)
         {
             LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
 

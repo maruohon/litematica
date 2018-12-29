@@ -62,7 +62,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         int x = 10;
         int y = this.height - 36;
 
-        DirectoryEntry selected = this.getListWidget().getSelectedEntry();
+        DirectoryEntry selected = this.getListWidget().getLastSelectedEntry();
 
         if (selected != null)
         {
@@ -174,7 +174,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            DirectoryEntry entry = this.gui.getListWidget().getSelectedEntry();
+            DirectoryEntry entry = this.gui.getListWidget().getLastSelectedEntry();
 
             if (entry == null)
             {

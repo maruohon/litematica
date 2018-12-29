@@ -67,6 +67,7 @@ litematica.gui.button.config_gui.info_overlays=Info Overlays
 litematica.gui.button.config_gui.render_layers=Render Layers
 litematica.gui.button.config_gui.visuals=Visuals
 
+litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift to select the sub regions used for the Material List
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 
 litematica.gui.button.material_list=Material List
@@ -117,6 +118,7 @@ litematica.gui.button.schematic_verifier.start=Start verification
 litematica.gui.button.schematic_verifier.stop=Stop verification
 litematica.gui.button.schematic_verifier.toggle_info_hud=Info HUD: %s
 
+litematica.gui.button.cancel=Cancel
 litematica.gui.button.configure=Configure
 litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.create_placement=Create placement
@@ -126,6 +128,7 @@ litematica.gui.button.import=Import
 litematica.gui.button.load_schematic_to_memory=Load Schematic to memory
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
+litematica.gui.button.ok=Ok
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
 litematica.gui.button.rotation_value=Rotation: %s
@@ -220,7 +223,8 @@ litematica.gui.title.load_schematic=Load Schematic
 litematica.gui.title.manage_loaded_schematics=Manage loaded Schematics
 litematica.gui.title.manage_schematic_placements=Manage Schematic Placements
 litematica.gui.title.material_list.placement=Material List for placement '%s'
-litematica.gui.title.material_list.schematic=Material List for schematic '%s'
+litematica.gui.title.material_list.schematic=Material List for schematic '%s' (%s of %s regions)
+litematica.gui.title.material_list.select_schematic_regions=Select the sub-regions for the Material List for '%s'
 litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.rename_area_sub_region=Rename Sub Region
 litematica.gui.title.rename_schematic=Rename Schematic
@@ -252,7 +256,7 @@ litematica.hud.schematic_placement.sub_regions_modified=Regions modified
 
 litematica.hud.selected_mode=Mode
 
-litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
+litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
 
 litematica.label.none_lower=none
 litematica.label.no=no

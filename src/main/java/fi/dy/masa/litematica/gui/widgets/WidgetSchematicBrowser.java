@@ -84,7 +84,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     @Override
     protected void drawAdditionalContents(int mouseX, int mouseY)
     {
-        this.drawSelectedSchematicInfo(this.getSelectedEntry());
+        this.drawSelectedSchematicInfo(this.getLastSelectedEntry());
     }
 
     protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry)

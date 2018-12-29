@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import java.util.Collection;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
@@ -11,12 +12,15 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.GuiStringListSelection;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.interfaces.IStringListConsumer;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -93,6 +97,11 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
 
+        if (type == ButtonListener.Type.MATERIAL_LIST)
+        {
+            button.setHoverStrings(I18n.format("litematica.gui.button.hover.material_list_shift_to_select_sub_regions"));
+        }
+
         this.addButton(button, listener);
 
         return width;
@@ -112,7 +121,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            DirectoryEntry entry = this.gui.getListWidget().getSelectedEntry();
+            DirectoryEntry entry = this.gui.getListWidget().getLastSelectedEntry();
 
             if (entry == null)
             {
@@ -170,10 +179,21 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                 }
                 else if (this.type == Type.MATERIAL_LIST)
                 {
-                    MaterialListSchematic materialList = new MaterialListSchematic(schematic);
-                    materialList.recreateMaterialList();
-                    DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-                    this.gui.mc.displayGuiScreen(new GuiMaterialList(materialList));
+                    if (isShiftKeyDown())
+                    {
+                        MaterialListCreator creator = new MaterialListCreator(schematic);
+                        GuiStringListSelection gui = new GuiStringListSelection(schematic.getAreas().keySet(), creator);
+                        gui.setTitle(I18n.format("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
+                        gui.setParent(this.gui.mc.currentScreen);
+                        this.gui.mc.displayGuiScreen(gui);
+                    }
+                    else
+                    {
+                        MaterialListSchematic materialList = new MaterialListSchematic(schematic);
+                        materialList.recreateMaterialList();
+                        DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
+                        this.gui.mc.displayGuiScreen(new GuiMaterialList(materialList));
+                    }
                 }
             }
         }
@@ -209,6 +229,27 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         public void onSelectionChange(WidgetCheckBox entry)
         {
             DataManager.setCreatePlacementOnLoad(entry.isChecked());
+        }
+    }
+
+    private static class MaterialListCreator implements IStringListConsumer
+    {
+        private final LitematicaSchematic schematic;
+
+        public MaterialListCreator(LitematicaSchematic schematic)
+        {
+            this.schematic = schematic;
+        }
+
+        @Override
+        public boolean consume(Collection<String> strings)
+        {
+            MaterialListSchematic materialList = new MaterialListSchematic(this.schematic, strings);
+            materialList.recreateMaterialList();
+            DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
+            Minecraft.getMinecraft().displayGuiScreen(new GuiMaterialList(materialList));
+
+            return true;
         }
     }
 }
