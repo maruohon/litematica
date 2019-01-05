@@ -15,7 +15,6 @@ import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -166,10 +165,9 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
             else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
             {
-                String keyStrUse = KeybindMulti.getStorageStringForKeyCode(mc.gameSettings.keyBindUseItem.getKeyCode());
-                String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
+                int keyCodeUse = mc.gameSettings.keyBindUseItem.getKeyCode();
 
-                if (keyStrUse.equals(keyStrPick))
+                if (Hotkeys.PICK_BLOCK_LAST.getKeybind().matches(keyCodeUse))
                 {
                     WorldUtils.doSchematicWorldPickBlock(false, mc);
                 }

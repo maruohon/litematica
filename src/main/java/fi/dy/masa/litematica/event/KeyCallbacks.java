@@ -35,7 +35,6 @@ import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
@@ -229,12 +228,11 @@ public class KeyCallbacks
                 {
                     if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
                     {
-                        String keyStrUse = KeybindMulti.getStorageStringForKeyCode(this.mc.gameSettings.keyBindUseItem.getKeyCode());
-                        String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
+                        int keyCodeUse = this.mc.gameSettings.keyBindUseItem.getKeyCode();
 
                         // Only do the pick block here, if it's not bound to the use button.
                         // If it's bound to the use button, then it will be done from the input handling.
-                        if (keyStrUse.equals(keyStrPick) == false)
+                        if (Hotkeys.PICK_BLOCK_LAST.getKeybind().matches(keyCodeUse) == false)
                         {
                             WorldUtils.doSchematicWorldPickBlock(false, this.mc);
                         }
