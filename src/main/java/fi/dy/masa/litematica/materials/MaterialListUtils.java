@@ -155,7 +155,7 @@ public class MaterialListUtils
             for (ItemType type : itemTypesTotal.keySet())
             {
                 int countAvailable = playerInvItems.getInt(type);
-                list.add(new MaterialListEntry(type.getStack(), itemTypesTotal.getInt(type), itemTypesMissing.getInt(type), countAvailable));
+                list.add(new MaterialListEntry(type.getStack().copy(), itemTypesTotal.getInt(type), itemTypesMissing.getInt(type), countAvailable));
             }
         }
 
