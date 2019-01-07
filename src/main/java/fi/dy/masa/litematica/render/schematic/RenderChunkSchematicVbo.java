@@ -30,7 +30,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.fluid.IFluidState;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -234,10 +233,11 @@ public class RenderChunkSchematicVbo extends RenderChunk
                             Block blockSchematic = stateSchematic.getBlock();
                             Block blockClient = stateClient.getBlock();
                             Color4f overlayColor = null;
-                            boolean clientHasAir = blockClient == Blocks.AIR;
+                            boolean clientHasAir = stateClient.isAir();
+                            boolean schematicHasAir = stateSchematic.isAir();
                             boolean missing = false;
 
-                            if (clientHasAir && blockSchematic == Blocks.AIR)
+                            if (clientHasAir && schematicHasAir)
                             {
                                 continue;
                             }
@@ -297,7 +297,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                             if (clientHasAir == false && stateSchematic != stateClient)
                             {
                                 // Extra block
-                                if (blockSchematic == Blocks.AIR)
+                                if (schematicHasAir)
                                 {
                                     if (overlayTypeExtra)
                                     {

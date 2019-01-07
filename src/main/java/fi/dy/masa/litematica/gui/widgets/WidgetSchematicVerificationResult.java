@@ -22,7 +22,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.IRegistry;
@@ -177,7 +176,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         }
         else if (this.mismatchInfo != null &&
                 (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE ||
-                 this.mismatchEntry.blockMismatch.stateExpected.getBlock() != Blocks.AIR)) 
+                 this.mismatchEntry.blockMismatch.stateExpected.isAir() == false)) 
         {
             mc.fontRenderer.drawString(this.mismatchInfo.stackExpected.getDisplayName().getString(), x1 + 20, y, color);
 

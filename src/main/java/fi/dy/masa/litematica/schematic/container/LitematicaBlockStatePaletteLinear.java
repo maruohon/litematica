@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -70,7 +69,7 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
         }
         else
         {
-            int newId = this.resizeHandler.onResize(this.bits + 1, Blocks.AIR.getDefaultState());
+            int newId = this.resizeHandler.onResize(this.bits + 1, LitematicaBlockStateContainer.AIR_BLOCK_STATE);
 
             if (newId <= size)
             {

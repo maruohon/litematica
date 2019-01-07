@@ -37,7 +37,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.IProperty;
@@ -494,13 +493,12 @@ public class OverlayRenderer
 
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-        IBlockState air = Blocks.AIR.getDefaultState();
 
         ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
         ItemUtils.setItemForBlock(mc.world, pos, stateClient);
 
         // Not just a missing block
-        if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
+        if (stateSchematic != stateClient && stateClient.isAir() == false && stateSchematic.isAir() == false)
         {
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
             info.render(window.getScaledWidth() / 2 - info.getTotalWidth() / 2, window.getScaledHeight() / 2 + 10, mc);
@@ -545,10 +543,9 @@ public class OverlayRenderer
 
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-        IBlockState air = Blocks.AIR.getDefaultState();
         String ul = TextFormatting.UNDERLINE.toString();
 
-        if (stateSchematic != stateClient && stateSchematic != air && stateClient != air)
+        if (stateSchematic != stateClient && stateClient.isAir() == false && stateSchematic.isAir() == false)
         {
             this.blockInfoLines.add(ul + "Schematic:");
             this.addBlockInfoLines(stateSchematic);

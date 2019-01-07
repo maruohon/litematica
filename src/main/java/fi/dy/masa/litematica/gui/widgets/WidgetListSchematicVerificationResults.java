@@ -15,7 +15,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
 public class WidgetListSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
@@ -78,7 +77,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
 
             for (IBlockState state : counts.keySet())
             {
-                if (state == Blocks.AIR.getDefaultState())
+                if (state.isAir())
                 {
                     continue;
                 }

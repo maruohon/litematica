@@ -34,7 +34,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -47,7 +46,6 @@ public class SchematicVerifier implements IInfoHudRenderer
 {
     private static final MutablePair<IBlockState, IBlockState> MUTABLE_PAIR = new MutablePair<>();
     private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
-    private static final IBlockState AIR = Blocks.AIR.getDefaultState();
 
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> missingBlocksPositions = ArrayListMultimap.create();
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> extraBlocksPositions = ArrayListMultimap.create();
@@ -290,7 +288,7 @@ public class SchematicVerifier implements IInfoHudRenderer
                         this.getMapForMismatchType(mismatch.mismatchType).remove(MUTABLE_PAIR, pos);
                         this.checkBlockStates(pos.getX(), pos.getY(), pos.getZ(), mismatch.stateExpected, stateFound);
 
-                        if (stateFound != AIR && mismatch.stateFound == AIR)
+                        if (stateFound.isAir() == false && mismatch.stateFound.isAir())
                         {
                             this.clientBlocks++;
                         }
@@ -592,12 +590,12 @@ public class SchematicVerifier implements IInfoHudRenderer
 
                     this.checkBlockStates(x, y, z, stateSchematic, stateClient);
 
-                    if (stateSchematic != AIR)
+                    if (stateSchematic.isAir() == false)
                     {
                         this.schematicBlocks++;
                     }
 
-                    if (stateClient != AIR)
+                    if (stateClient.isAir() == false)
                     {
                         this.clientBlocks++;
                     }
@@ -621,9 +619,9 @@ public class SchematicVerifier implements IInfoHudRenderer
             {
                 BlockMismatch mismatch;
 
-                if (stateSchematic != AIR)
+                if (stateSchematic.isAir() == false)
                 {
-                    if (stateClient == AIR)
+                    if (stateClient.isAir())
                     {
                         mismatch = new BlockMismatch(MismatchType.MISSING, stateSchematic, stateClient, 1);
                         this.missingBlocksPositions.put(Pair.of(stateSchematic, stateClient), pos);
