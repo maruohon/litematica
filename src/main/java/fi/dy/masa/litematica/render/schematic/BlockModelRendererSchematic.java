@@ -59,7 +59,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
     }
 
-    public boolean renderModelSmooth(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long rand)
+    public boolean renderModelSmooth(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
     {
         boolean renderedSomething = false;
         float[] quadBounds = new float[EnumFacing.values().length * 2];
@@ -68,6 +68,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
         for (EnumFacing side : EnumFacing.values())
         {
+            random.setSeed(seedIn);
             List<BakedQuad> quads = modelIn.getQuads(stateIn, side, random);
 
             if (quads.isEmpty() == false)
@@ -80,6 +81,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             }
         }
 
+        random.setSeed(seedIn);
         List<BakedQuad> quads = modelIn.getQuads(stateIn, (EnumFacing)null, random);
 
         if (quads.isEmpty() == false)
@@ -91,13 +93,14 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         return renderedSomething;
     }
 
-    public boolean renderModelFlat(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long rand)
+    public boolean renderModelFlat(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
     {
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
 
         for (EnumFacing side : EnumFacing.values())
         {
+            random.setSeed(seedIn);
             List<BakedQuad> quads = modelIn.getQuads(stateIn, side, random);
 
             if (quads.isEmpty() == false)
@@ -111,6 +114,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             }
         }
 
+        random.setSeed(seedIn);
         List<BakedQuad> quads = modelIn.getQuads(stateIn, null, random);
 
         if (quads.isEmpty() == false)
