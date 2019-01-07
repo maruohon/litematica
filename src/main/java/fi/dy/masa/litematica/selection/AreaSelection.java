@@ -121,7 +121,16 @@ public class AreaSelection
     private void updateCalculatedOrigin()
     {
         Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(this.subRegionBoxes.values());
-        this.calculatedOrigin = pair.getLeft();
+
+        if (pair != null)
+        {
+            this.calculatedOrigin = pair.getLeft();
+        }
+        else
+        {
+            this.calculatedOrigin = BlockPos.ORIGIN;
+        }
+
         this.calculatedOriginDirty = false;
     }
 
