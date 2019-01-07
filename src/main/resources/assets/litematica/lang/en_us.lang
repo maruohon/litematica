@@ -262,6 +262,10 @@ litematica.label.none_lower=none
 litematica.label.no=no
 litematica.label.yes=yes
 
+litematica.message.error.no_placement_selected=§cNo placement selected§r
+litematica.message.error.only_works_in_single_player=§cThis operation only works in single player§r
+litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
+
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.area_clear_fail=§cFailed to clear the area(s)§r
 litematica.message.area_cleared=Area cleared
@@ -279,8 +283,6 @@ litematica.message.moved_max_layer_to=Moved max layer to %s
 litematica.message.moved_min_layer_to=Moved min layer to %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
 litematica.message.no_area_selected=§cNo area selected§r
-litematica.message.no_placement_selected=§cNo placement selected§r
-litematica.message.only_works_in_single_player=§cThis operation only works in single player§r
 litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s

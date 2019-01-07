@@ -559,8 +559,14 @@ public class SchematicPlacementManager
                     {
                         public void run()
                         {
-                            schematic.placeToWorld(world, schematicPlacement, false);
-                            StringUtils.printActionbarMessage("litematica.message.schematic_pasted");
+                            if (schematic.placeToWorld(world, schematicPlacement, false))
+                            {
+                                StringUtils.printActionbarMessage("litematica.message.schematic_pasted");
+                            }
+                            else
+                            {
+                                StringUtils.printActionbarMessage("litematica.message.error.schematic_paste_failed");
+                            }
                         }
                     });
 
@@ -568,12 +574,12 @@ public class SchematicPlacementManager
                 }
                 else
                 {
-                    StringUtils.printActionbarMessage("litematica.message.only_works_in_single_player");
+                    StringUtils.printActionbarMessage("litematica.message.error.only_works_in_single_player");
                 }
             }
             else
             {
-                StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                StringUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
             }
         }
     }

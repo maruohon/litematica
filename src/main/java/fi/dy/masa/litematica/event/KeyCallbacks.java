@@ -259,7 +259,7 @@ public class KeyCallbacks
                     }
                     else
                     {
-                        StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                        StringUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
                     }
 
                     return true;
@@ -274,7 +274,7 @@ public class KeyCallbacks
                     }
                     else
                     {
-                        StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                        StringUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
                     }
 
                     return true;
@@ -295,7 +295,7 @@ public class KeyCallbacks
                         }
                         else
                         {
-                            StringUtils.printActionbarMessage("litematica.message.no_placement_selected");
+                            StringUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
                         }
                     }
 
