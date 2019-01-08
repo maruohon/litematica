@@ -215,7 +215,7 @@ public class WorldUtils
 
         BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, size);
-        SchematicPlacement schematicPlacement = SchematicPlacement.createFor(litematicaSchematic, BlockPos.ORIGIN, "foo", true, true);
+        SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
         litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
 
         SchematicaSchematic schematic = SchematicaSchematic.createFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities);
@@ -251,7 +251,7 @@ public class WorldUtils
 
         BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, size);
-        SchematicPlacement schematicPlacement = SchematicPlacement.createFor(litematicaSchematic, BlockPos.ORIGIN, "foo", true, true);
+        SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
         litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
 
         Template template = new Template();

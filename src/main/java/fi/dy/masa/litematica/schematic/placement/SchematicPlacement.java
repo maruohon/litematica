@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -85,6 +86,29 @@ public class SchematicPlacement
         SchematicPlacement placement = new SchematicPlacement(schematic, origin, name, enabled, enableRender);
         placement.setBoxesBBColorNext();
         placement.resetAllSubRegionsToSchematicValues(InfoUtils.INFO_MESSAGE_CONSUMER);
+
+        return placement;
+    }
+
+    /**
+     * Creates a placement that can be used for schematic conversions.
+     * The origin point will be adjusted such that the actual minimum corner of the sub regions
+     * will be at the provided origin point.
+     * Also, this placement will not affect the SchematicPlacementManager and cause
+     * schematic chunk rebuilds, nor will it affect the rendering related things.
+     * @param schematic
+     * @param origin
+     * @return
+     */
+    public static SchematicPlacement createForSchematicConversion(LitematicaSchematic schematic, BlockPos origin)
+    {
+        // Adjust the origin such that the actual sub regions minimum corner is at the provided origin,
+        // regardless of where the defined origin point is in relation to the minimum corner.
+        Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(schematic.getAreas().values());
+        BlockPos originAdjusted = pair != null ? origin.subtract(pair.getLeft()) : origin;
+        System.out.printf("or1: %s, or2: %s\n", origin, originAdjusted);
+        SchematicPlacement placement = new SchematicPlacement(schematic, originAdjusted, "?", true, true);
+        placement.resetAllSubRegionsToSchematicValues(InfoUtils.INFO_MESSAGE_CONSUMER, false);
 
         return placement;
     }
@@ -657,15 +681,22 @@ public class SchematicPlacement
 
     public void resetAllSubRegionsToSchematicValues(IStringConsumer feedback)
     {
+        this.resetAllSubRegionsToSchematicValues(feedback, true);
+    }
+
+    public void resetAllSubRegionsToSchematicValues(IStringConsumer feedback, boolean updatePlacementManager)
+    {
         if (this.isLocked())
         {
             feedback.setString("litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
-        // Marks the currently touched chunks before doing the modification
-        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-        manager.onPrePlacementChange(this);
+        if (updatePlacementManager)
+        {
+            // Marks the currently touched chunks before doing the modification
+            DataManager.getSchematicPlacementManager().onPrePlacementChange(this);
+        }
 
         Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
         this.relativeSubRegionPlacements.clear();
@@ -677,7 +708,10 @@ public class SchematicPlacement
             this.relativeSubRegionPlacements.put(name, new SubRegionPlacement(entry.getValue(), name));
         }
 
-        this.onModified(manager);
+        if (updatePlacementManager)
+        {
+            this.onModified(DataManager.getSchematicPlacementManager());
+        }
     }
 
     public void resetSubRegionToSchematicValues(String regionName, IMessageConsumer feedback)
