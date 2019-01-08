@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -39,6 +41,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
@@ -187,6 +190,116 @@ public class WorldUtils
         }
 
         return null;
+    }
+
+    public static boolean convertLitematicaSchematicToSchematicaSchematic(
+            File inputDir, String inputFileName, File outputDir, String outputFileName, boolean ignoreEntities, boolean override, IStringConsumer feedback)
+    {
+        SchematicaSchematic schematic = convertLitematicaSchematicToSchematicaSchematic(inputDir, inputFileName, ignoreEntities, feedback);
+        return schematic != null && schematic.writeToFile(outputDir, outputFileName, override, feedback);
+    }
+
+    @Nullable
+    public static SchematicaSchematic convertLitematicaSchematicToSchematicaSchematic(File inputDir, String inputFileName, boolean ignoreEntities, IStringConsumer feedback)
+    {
+        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(inputDir, inputFileName, feedback);
+
+        if (litematicaSchematic == null)
+        {
+            feedback.setString("litematica.error.schematic_conversion.litematica_to_schematic.failed_to_read_schematic");
+            return null;
+        }
+
+        WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
+        WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().profiler);
+
+        BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
+        WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, size);
+        SchematicPlacement schematicPlacement = SchematicPlacement.createFor(litematicaSchematic, BlockPos.ORIGIN, "foo", true, true);
+        litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
+
+        SchematicaSchematic schematic = SchematicaSchematic.createFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities);
+
+        if (schematic == null)
+        {
+            feedback.setString("litematica.error.schematic_conversion.litematica_to_schematic.failed_to_create_schematic");
+        }
+
+        return schematic;
+    }
+
+    public static boolean convertLitematicaSchematicToVanillaStructure(
+            File inputDir, String inputFileName, File outputDir, String outputFileName, boolean ignoreEntities, boolean override, IStringConsumer feedback)
+    {
+        Template template = convertLitematicaSchematicToVanillaStructure(inputDir, inputFileName, ignoreEntities, feedback);
+        return writeVanillaStructureToFile(template, outputDir, outputFileName, override, feedback);
+    }
+
+    @Nullable
+    public static Template convertLitematicaSchematicToVanillaStructure(File inputDir, String inputFileName, boolean ignoreEntities, IStringConsumer feedback)
+    {
+        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(inputDir, inputFileName, feedback);
+
+        if (litematicaSchematic == null)
+        {
+            feedback.setString("litematica.error.schematic_conversion.litematica_to_schematic.failed_to_read_schematic");
+            return null;
+        }
+
+        WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
+        WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().profiler);
+
+        BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
+        WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, size);
+        SchematicPlacement schematicPlacement = SchematicPlacement.createFor(litematicaSchematic, BlockPos.ORIGIN, "foo", true, true);
+        litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
+
+        Template template = new Template();
+        template.takeBlocksFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities == false, Blocks.STRUCTURE_VOID);
+
+        return template;
+    }
+
+    private static boolean writeVanillaStructureToFile(Template template, File dir, String fileNameIn, boolean override, IStringConsumer feedback)
+    {
+        String fileName = fileNameIn;
+        String extension = ".nbt";
+
+        if (fileName.endsWith(extension) == false)
+        {
+            fileName = fileName + extension;
+        }
+
+        File file = new File(dir, fileName);
+        FileOutputStream os = null;
+
+        try
+        {
+            if (dir.exists() == false && dir.mkdirs() == false)
+            {
+                feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.directory_creation_failed", dir.getAbsolutePath()));
+                return false;
+            }
+
+            if (override == false && file.exists())
+            {
+                feedback.setString(I18n.format("litematica.error.structure_write_to_file_failed.exists", file.getAbsolutePath()));
+                return false;
+            }
+
+            NBTTagCompound tag = template.writeToNBT(new NBTTagCompound());
+            os = new FileOutputStream(file);
+            CompressedStreamTools.writeCompressed(tag, os);
+            os.close();
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            feedback.setString(I18n.format("litematica.error.structure_write_to_file_failed.exception", file.getAbsolutePath()));
+        }
+
+        return false;
     }
 
     private static Template readTemplateFromStream(InputStream stream, DataFixer fixer) throws IOException

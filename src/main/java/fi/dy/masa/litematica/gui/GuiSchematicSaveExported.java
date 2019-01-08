@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.GuiSchematicManager.ExportType;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
@@ -13,28 +14,30 @@ import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 
-public class GuiSchematicSaveImported extends GuiSchematicSaveBase
+public class GuiSchematicSaveExported extends GuiSchematicSaveBase
 {
+    private final ExportType exportType;
     private final DirectoryEntryType type;
     private final File dirSource;
     private final String inputFileName;
 
-    public GuiSchematicSaveImported(DirectoryEntryType type, File dirSource, String inputFileName)
+    public GuiSchematicSaveExported(DirectoryEntryType type, File dirSource, String inputFileName, ExportType exportType)
     {
         super(null);
 
+        this.exportType = exportType;
         this.type = type;
         this.dirSource = dirSource;
         this.inputFileName = inputFileName;
         this.defaultText = FileUtils.getNameWithoutExtension(inputFileName);
-        this.title = I18n.format("litematica.gui.title.save_imported_schematic");
+        this.title = I18n.format("litematica.gui.title.save_exported_schematic", exportType.getDisplayName(), inputFileName);
         this.useTitleHierarchy = false;
     }
 
     @Override
     public String getBrowserContext()
     {
-        return "schematic_save_imported";
+        return "schematic_save_exported";
     }
 
     @Override
@@ -51,10 +54,10 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
-        private final GuiSchematicSaveImported gui;
+        private final GuiSchematicSaveExported gui;
         private final ButtonType type;
 
-        public ButtonListener(ButtonType type, GuiSchematicSaveImported gui)
+        public ButtonListener(ButtonType type, GuiSchematicSaveExported gui)
         {
             this.type = type;
             this.gui = gui;
@@ -88,29 +91,30 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
                     boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
                     FileType fileType = FileType.fromFile(new File(inDir, inFile));
 
-                    if (fileType == FileType.SCHEMATICA_SCHEMATIC)
+                    if (fileType == FileType.LITEMATICA_SCHEMATIC)
                     {
-                        if (WorldUtils.convertSchematicaSchematicToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
+                        if (this.gui.exportType == ExportType.SCHEMATIC)
                         {
-                            this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
-                            this.gui.getListWidget().refreshEntries();
+                            if (WorldUtils.convertLitematicaSchematicToSchematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
+                            {
+                                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_exported_as", fileName);
+                                this.gui.getListWidget().refreshEntries();
+                            }
                         }
-
-                        return;
-                    }
-                    else if (fileType == FileType.VANILLA_STRUCTURE)
-                    {
-                        if (WorldUtils.convertStructureToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
+                        else if (this.gui.exportType == ExportType.VANILLA)
                         {
-                            this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
-                            this.gui.getListWidget().refreshEntries();
+                            if (WorldUtils.convertLitematicaSchematicToVanillaStructure(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
+                            {
+                                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_exported_as", fileName);
+                                this.gui.getListWidget().refreshEntries();
+                            }
                         }
 
                         return;
                     }
                 }
 
-                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", this.gui.inputFileName);
+                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_export.unsupported_type", this.gui.inputFileName);
             }
             else if (this.type == ButtonType.CREATE_DIRECTORY)
             {

@@ -32,7 +32,7 @@ import net.minecraft.util.ScreenShotHelper;
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
     private static PreviewGenerator previewGenerator;
-    private ExportType exportType = ExportType.SCHEMATICA;
+    private ExportType exportType = ExportType.SCHEMATIC;
 
     public GuiSchematicManager()
     {
@@ -102,9 +102,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
         if (type == ButtonListener.Type.EXPORT_TYPE)
         {
-            int w1 = this.mc.fontRenderer.getStringWidth(ExportType.SCHEMATICA.getDisplayName()) + 10;
-            int w2 = this.mc.fontRenderer.getStringWidth(ExportType.VANILLA.getDisplayName()) + 10;
-            buttonWidth = Math.max(w1, w2);
+            buttonWidth = this.mc.fontRenderer.getStringWidth(this.exportType.getDisplayName()) + 10;
             button = new ConfigButtonOptionList(id, x, y, buttonWidth, 20, new ConfigWrapper());
         }
         else if (hover != null)
@@ -150,13 +148,14 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         @Override
         public IConfigOptionListEntry getDefaultOptionListValue()
         {
-            return ExportType.SCHEMATICA;
+            return ExportType.SCHEMATIC;
         }
 
         @Override
         public void setOptionListValue(IConfigOptionListEntry value)
         {
             GuiSchematicManager.this.exportType = (ExportType) value;
+            GuiSchematicManager.this.initGui();
         }
     }
 
@@ -196,6 +195,9 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             {
                 if (fileType == FileType.LITEMATICA_SCHEMATIC)
                 {
+                    GuiSchematicSaveExported gui = new GuiSchematicSaveExported(entry.getType(), entry.getDirectory(), entry.getName(), this.gui.exportType);
+                    gui.setParent(this.gui);
+                    this.gui.mc.displayGuiScreen(gui);
                 }
                 else
                 {
@@ -377,8 +379,8 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
     public enum ExportType implements IConfigOptionListEntry
     {
-        SCHEMATICA  ("Schematica"),
-        VANILLA     ("Vanilla");
+        SCHEMATIC   ("Schematic"),
+        VANILLA     ("Vanilla Structure");
 
         private final String displayName;
 
@@ -438,7 +440,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 }
             }
 
-            return ExportType.SCHEMATICA;
+            return ExportType.SCHEMATIC;
         }
     }
 }

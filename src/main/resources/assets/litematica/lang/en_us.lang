@@ -38,8 +38,10 @@ litematica.error.schematic_save.schematic_creation_failed=Failed to create the s
 litematica.error.schematic_read_from_file_failed.cant_read=Failed to read schematic from file '%s'
 litematica.error.schematic_read_from_file_failed.exception=Exception while trying to read schematic from file '%s'
 litematica.error.schematic_write_to_file_failed.directory_creation_failed=Failed to create schematic directory '%s'
-litematica.error.schematic_write_to_file_failed.exception=Failed to write the schematic to file '%s'
+litematica.error.schematic_write_to_file_failed.exception=Failed to write the schematic to file '%s' (exception)
 litematica.error.schematic_write_to_file_failed.exists=Failed to write the schematic to file '%s', file already exists
+litematica.error.structure_write_to_file_failed.exception=Failed to write the structure to file '%s' (exception)
+litematica.error.structure_write_to_file_failed.exists=Failed to write the structure to file '%s', file already exists
 
 litematica.hotkeys.category.generic_hotkeys=Generic hotkeys
 
@@ -229,6 +231,7 @@ litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.rename_area_sub_region=Rename Sub Region
 litematica.gui.title.rename_schematic=Rename Schematic
 litematica.gui.title.create_schematic_from_selection=Save the currently selected area as a Schematic
+litematica.gui.title.save_exported_schematic=Save an exported %s of '%s'
 litematica.gui.title.save_imported_schematic=Save an imported Schematic
 litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
 litematica.gui.title.save_schematic_filename=Schematic File Name
@@ -288,6 +291,7 @@ litematica.message.placement.moved_placement_origin=Moved placement origin from 
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.scheduled_task_added=Scheduled task added...
+litematica.message.schematic_exported_as=Schematic exported as '%s'
 litematica.message.schematic_pasted=Schematic Pasted in world
 litematica.message.schematic_placement_created=Placement created for '%s'
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
