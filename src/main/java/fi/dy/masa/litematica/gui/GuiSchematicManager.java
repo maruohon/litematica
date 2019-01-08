@@ -58,6 +58,11 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     {
         super.initGui();
 
+        this.createButtons();
+    }
+
+    private void createButtons()
+    {
         int id = 0;
         int x = 10;
         int y = this.height - 36;
@@ -90,7 +95,8 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     @Override
     public void onSelectionChange(@Nullable DirectoryEntry entry)
     {
-        this.initGui();
+        this.clearButtons();
+        this.createButtons();
     }
 
     private int createButton(int id, int x, int y, ButtonListener.Type type)
@@ -155,7 +161,8 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         public void setOptionListValue(IConfigOptionListEntry value)
         {
             GuiSchematicManager.this.exportType = (ExportType) value;
-            GuiSchematicManager.this.initGui();
+            GuiSchematicManager.this.clearButtons();
+            GuiSchematicManager.this.createButtons();
         }
     }
 
@@ -237,8 +244,11 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         {
             if (this.type == Type.SET_PREVIEW && mouseButton == 1)
             {
-                previewGenerator = null;
-                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_preview_cancelled");
+                if (previewGenerator != null)
+                {
+                    previewGenerator = null;
+                    this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_preview_cancelled");
+                }
             }
             else
             {
