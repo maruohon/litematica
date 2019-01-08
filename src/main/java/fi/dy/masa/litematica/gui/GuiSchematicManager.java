@@ -238,6 +238,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             if (this.type == Type.SET_PREVIEW && mouseButton == 1)
             {
                 previewGenerator = null;
+                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_preview_cancelled");
             }
             else
             {
