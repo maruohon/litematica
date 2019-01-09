@@ -159,7 +159,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
 
                 if (placement != null)
                 {
-                    if (this.gui.getSelectionManager().createSelectionFromPlacement(dir, placement) == false)
+                    if (this.gui.getSelectionManager().createSelectionFromPlacement(dir, placement, this.gui) == false)
                     {
                         this.gui.addMessage(MessageType.ERROR, "litematica.error.area_selection.from_placement_failed", placement.getName());
                     }

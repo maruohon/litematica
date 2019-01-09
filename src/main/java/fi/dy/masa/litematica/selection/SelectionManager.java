@@ -136,6 +136,13 @@ public class SelectionManager
         if (file.exists() && file.isFile())
         {
             String newFileName = FileUtils.generateSafeFileName(newName);
+
+            if (newFileName.isEmpty())
+            {
+                feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.invalid_safe_file_name", newFileName);
+                return false;
+            }
+
             File newFile = new File(dir, newFileName + ".json");
 
             if (newFile.exists() == false && file.renameTo(newFile))
@@ -225,14 +232,16 @@ public class SelectionManager
     public String createNewSelection(File dir, final String nameIn)
     {
         String name = nameIn;
-        File file = new File(dir, FileUtils.generateSafeFileName(name) + ".json");
+        String safeName = FileUtils.generateSafeFileName(name);
+        File file = new File(dir, safeName + ".json");
         String selectionId = file.getAbsolutePath();
         int i = 1;
 
-        while (this.selections.containsKey(selectionId) || file.exists())
+        while (i < 1000 && (safeName.isEmpty() || this.selections.containsKey(selectionId) || file.exists()))
         {
             name = nameIn + " " + i;
-            file = new File(dir, FileUtils.generateSafeFileName(name) + ".json");
+            safeName = FileUtils.generateSafeFileName(name);
+            file = new File(dir, safeName + ".json");
             selectionId = file.getAbsolutePath();
             i++;
         }
@@ -250,9 +259,17 @@ public class SelectionManager
         return this.currentSelectionId;
     }
 
-    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement)
+    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, IMessageConsumer feedback)
     {
-        File file = new File(dir, FileUtils.generateSafeFileName(placement.getName()) + ".json");
+        String safeName = FileUtils.generateSafeFileName(placement.getName());
+
+        if (safeName.isEmpty())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.invalid_safe_file_name", safeName);
+            return false;
+        }
+
+        File file = new File(dir, safeName + ".json");
         String name = file.getAbsolutePath();
         AreaSelection selection = this.getSelection(name);
 

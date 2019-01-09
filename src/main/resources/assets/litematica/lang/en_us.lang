@@ -6,6 +6,7 @@ language.code=en_US
 litematica.error.area_selection.from_placement_failed=Failed to create a new selection from the placement '%s'
 litematica.error.area_selection.no_placement_selected=No Schematic Placement selected!
 litematica.error.area_selection.rename.already_exists=Error: An area already exists with the file name '%s'
+litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated safe file name '%s'
 
 litematica.error.duplicate_schematic_load=Error: Tried to load a duplicate schematic + placement
 litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
