@@ -393,7 +393,8 @@ public class KeyCallbacks
                 }
                 else if (mode == OperationMode.DELETE)
                 {
-                    WorldUtils.deleteSelectionVolumes(this.mc);
+                    boolean removeEntities = true; // TODO
+                    WorldUtils.deleteSelectionVolumes(this.mc, removeEntities);
                     return true;
                 }
             }

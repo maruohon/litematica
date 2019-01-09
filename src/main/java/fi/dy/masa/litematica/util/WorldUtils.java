@@ -42,6 +42,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
@@ -54,6 +56,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -792,7 +795,7 @@ public class WorldUtils
         return false;
     }
 
-    public static void deleteSelectionVolumes(Minecraft mc)
+    public static void deleteSelectionVolumes(Minecraft mc, boolean removeEntities)
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
@@ -820,7 +823,7 @@ public class WorldUtils
                                 boxes = area.getAllSubRegionBoxes();
                             }
 
-                            if (deleteSelectionVolumes(world, boxes))
+                            if (deleteSelectionVolumes(world, boxes, removeEntities))
                             {
                                 StringUtils.printActionbarMessage("litematica.message.area_cleared");
                             }
@@ -845,7 +848,7 @@ public class WorldUtils
         }
     }
 
-    public static boolean deleteSelectionVolumes(World world, Collection<Box> boxes)
+    public static boolean deleteSelectionVolumes(World world, Collection<Box> boxes, boolean removeEntities)
     {
         IBlockState air = Blocks.AIR.getDefaultState();
         IBlockState barrier = Blocks.BARRIER.getDefaultState();
@@ -872,6 +875,20 @@ public class WorldUtils
                         }
 
                         world.setBlockState(posMutable, air, 0x12);
+                    }
+                }
+            }
+
+            if (removeEntities)
+            {
+                AxisAlignedBB bb = PositionUtils.createEnclosingAABB(posMin, posMax);
+                List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, bb);
+
+                for (Entity entity : entities)
+                {
+                    if ((entity instanceof EntityPlayer) == false)
+                    {
+                        entity.setDead();
                     }
                 }
             }
