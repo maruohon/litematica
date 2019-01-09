@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
@@ -11,6 +13,7 @@ import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
+import fi.dy.masa.litematica.materials.MaterialListSorter;
 import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
@@ -210,9 +213,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
                 case WRITE_TO_FILE:
                     File dir = new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
-                    DataDump dump = new DataDump(2, DataDump.Format.ASCII);
-                    this.addLinesToDump(dump, materialList);
-                    File file = DataDump.dumpDataToFile(dir, "material_list", dump.getLines());
+                    File file = DataDump.dumpDataToFile(dir, "material_list", this.getMaterialListDump(materialList).getLines());
 
                     if (file != null)
                     {
@@ -235,22 +236,33 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             this.parent.initGui(); // Re-create buttons/text fields
         }
 
-        private void addLinesToDump(DataDump dump, MaterialListBase materialList)
+        private DataDump getMaterialListDump(MaterialListBase materialList)
         {
+            DataDump dump = new DataDump(4, DataDump.Format.ASCII);
             int multiplier = materialList.getMultiplier();
 
-            for (MaterialListEntry entry : materialList.getMaterialsAll())
+            ArrayList<MaterialListEntry> list = new ArrayList<>();
+            list.addAll(materialList.getMaterialsFiltered(false));
+            Collections.sort(list, new MaterialListSorter(materialList));
+
+            for (MaterialListEntry entry : list)
             {
-                int count = entry.getCountTotal() * multiplier;
-                dump.addData(entry.getStack().getDisplayName(), String.valueOf(count));
+                int total = entry.getCountTotal() * multiplier;
+                int missing = entry.getCountMissing();
+                int available = entry.getCountAvailable();
+                dump.addData(entry.getStack().getDisplayName(), String.valueOf(total), String.valueOf(missing), String.valueOf(available));
             }
 
             String titleTotal = multiplier > 1 ? String.format("Total (x%d)", multiplier) : "Total";
-            dump.addTitle("Item", titleTotal);
+            dump.addTitle("Item", titleTotal, "Missing", "Available");
             dump.addHeader(materialList.getTitle());
             dump.setColumnProperties(1, DataDump.Alignment.RIGHT, true); // total
-            dump.setSort(true);
+            dump.setColumnProperties(2, DataDump.Alignment.RIGHT, true); // missing
+            dump.setColumnProperties(3, DataDump.Alignment.RIGHT, true); // available
+            dump.setSort(false);
             dump.setUseColumnSeparator(true);
+
+            return dump;
         }
 
         public enum Type
