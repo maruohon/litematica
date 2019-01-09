@@ -7,6 +7,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
@@ -297,6 +299,15 @@ public class RayTraceUtils
     @Nullable
     public static RayTraceResult traceToSchematicWorld(Entity entity, double range, boolean respectRenderRange)
     {
+        boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isValid() && Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
+
+        if (respectRenderRange &&
+            (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false ||
+             Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == invert))
+        {
+            return null;
+        }
+
         World world = SchematicWorldHandler.getSchematicWorld();
 
         if (world == null)
