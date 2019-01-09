@@ -108,6 +108,10 @@ public class MaterialCache
         {
             return ItemStack.EMPTY;
         }
+        else if (block == Blocks.FARMLAND)
+        {
+            return new ItemStack(Blocks.DIRT);
+        }
         else if (block == Blocks.LAVA)
         {
             return new ItemStack(Items.LAVA_BUCKET);
