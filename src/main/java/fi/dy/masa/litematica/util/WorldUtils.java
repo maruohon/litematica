@@ -513,7 +513,7 @@ public class WorldUtils
                     InventoryUtils.setPickedItemToHand(stack, mc);
                     mc.playerController.sendSlotPacket(mc.player.getHeldItem(EnumHand.MAIN_HAND), 36 + inv.currentItem);
 
-                    return true;
+                    //return true;
                 }
                 else
                 {
@@ -526,9 +526,11 @@ public class WorldUtils
                         InventoryUtils.setPickedItemToHand(stack, mc);
                     }
 
-                    return shouldPick == false || canPick;
+                    //return shouldPick == false || canPick;
                 }
             }
+
+            return true;
         }
 
         return false;
