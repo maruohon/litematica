@@ -3,6 +3,8 @@ package fi.dy.masa.litematica.util;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.malilib.util.Constants;
@@ -224,5 +226,14 @@ public class EntityUtils
                 entity.setUniqueId(UUID.randomUUID());
             }
         }
+    }
+
+    public static boolean shouldPickBlock(EntityPlayer player)
+    {
+        return Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() &&
+                (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() == false ||
+                isHoldingItem(player, DataManager.getToolItem()) == false) &&
+                Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+                Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue();
     }
 }

@@ -121,6 +121,11 @@ public class KeyCallbacks
         @Override
         public boolean onKeyAction(KeyAction action, IKeybind key)
         {
+            if (this.mc.player == null || this.mc.world == null)
+            {
+                return false;
+            }
+
             OperationMode mode = DataManager.getOperationMode();
 
             boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
@@ -217,7 +222,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
                 {
-                    if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
+                    if (EntityUtils.shouldPickBlock(this.mc.player))
                     {
                         return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
                     }
@@ -226,7 +231,7 @@ public class KeyCallbacks
                 }
                 else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
                 {
-                    if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
+                    if (EntityUtils.shouldPickBlock(this.mc.player))
                     {
                         int keyCodeUse = this.mc.gameSettings.keyBindUseItem.getKeyCode();
 
