@@ -390,13 +390,21 @@ public class SchematicPlacement
         for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
         {
             String name = entry.getKey();
+            BlockPos areaSize = areaSizes.get(name);
+
+            if (areaSize == null)
+            {
+                LiteModLitematica.logger.warn("SchematicPlacement.getSubRegionBoxes(): Size for sub-region '{}' not found in the schematic '{}'", name, this.schematic.getMetadata().getName());
+                continue;
+            }
+
             SubRegionPlacement placement = entry.getValue();
 
             if (placement.matchesRequirement(required))
             {
                 BlockPos boxOriginRelative = placement.getPos();
                 BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
-                BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSizes.get(name));
+                BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSize);
                 pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
                 pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
 
@@ -418,13 +426,22 @@ public class SchematicPlacement
         {
             if (placement.matchesRequirement(required))
             {
-                BlockPos boxOriginRelative = placement.getPos();
-                BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
-                BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSizes.get(regionName));
-                pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
-                pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
+                BlockPos areaSize = areaSizes.get(regionName);
 
-                builder.put(regionName, new Box(boxOriginAbsolute, pos2, regionName));
+                if (areaSize != null)
+                {
+                    BlockPos boxOriginRelative = placement.getPos();
+                    BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
+                    BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSize);
+                    pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
+                    pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
+
+                    builder.put(regionName, new Box(boxOriginAbsolute, pos2, regionName));
+                }
+                else
+                {
+                    LiteModLitematica.logger.warn("SchematicPlacement.getSubRegionBoxFor(): Size for sub-region '{}' not found in the schematic '{}'", regionName, this.schematic.getMetadata().getName());
+                }
             }
         }
 
