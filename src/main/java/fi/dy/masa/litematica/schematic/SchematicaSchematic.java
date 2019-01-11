@@ -309,10 +309,6 @@ public class SchematicaSchematic
     {
         Mirror mirror = placement.getMirror();
         Rotation rotation = placement.getRotation();
-        BlockPos posEnd = posStart.add(PositionUtils.getRelativeEndPositionFromAreaSize(this.size));
-        BlockPos pos1 = PositionUtils.getMinCorner(posStart, posEnd);
-        BlockPos pos2 = PositionUtils.getMaxCorner(posStart, posEnd).add(1, 1, 1);
-        List<Entity> existingEntitiesInArea = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos1, pos2), null);
 
         for (NBTTagCompound tag : this.entities)
         {
@@ -323,8 +319,6 @@ public class SchematicaSchematic
 
             if (entity != null)
             {
-                EntityUtils.handleSchematicPlacementEntityUUIDCollision(world, entity, existingEntitiesInArea);
-
                 float rotationYaw = entity.getMirroredYaw(mirror);
                 rotationYaw = rotationYaw + (entity.rotationYaw - entity.getRotatedYaw(rotation));
                 entity.setLocationAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.rotationPitch);

@@ -380,16 +380,12 @@ public class LitematicaSchematic
             mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
         }
 
-        List<Entity> existingEntitiesInArea = EntityUtils.getEntitiesWithinSubRegion(world, origin, regionPos, regionSize, schematicPlacement, placement);
-
         for (EntityInfo info : entityList)
         {
             Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
 
             if (entity != null)
             {
-                EntityUtils.handleSchematicPlacementEntityUUIDCollision(world, entity, existingEntitiesInArea);
-
                 Vec3d pos = info.posVec;
                 pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
@@ -618,16 +614,12 @@ public class LitematicaSchematic
             mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
         }
 
-        List<Entity> existingEntitiesInArea = EntityUtils.getEntitiesWithinSubRegion(world, origin, regionPos, regionSize, schematicPlacement, placement);
-
         for (EntityInfo info : entityList)
         {
             Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
 
             if (entity != null)
             {
-                EntityUtils.handleSchematicPlacementEntityUUIDCollision(world, entity, existingEntitiesInArea);
-
                 Vec3d pos = info.posVec;
                 pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());

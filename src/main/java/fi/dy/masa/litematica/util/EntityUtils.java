@@ -21,7 +21,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 
 public class EntityUtils
 {
@@ -127,7 +126,14 @@ public class EntityUtils
     {
         try
         {
-            return EntityList.createEntityFromNBT(nbt, world);
+            Entity entity = EntityList.createEntityFromNBT(nbt, world);
+
+            if (entity != null)
+            {
+                entity.setUniqueId(UUID.randomUUID());
+            }
+
+            return entity;
         }
         catch (Exception e)
         {
@@ -193,39 +199,6 @@ public class EntityUtils
         AxisAlignedBB bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
 
         return world.getEntitiesInAABBexcluding(null, bb, null);
-    }
-
-    /**
-     * First checks if there are existing entities in the given list by the same UUID,
-     * and if so, removes that old entity from the world.
-     * If there are entities by the same UUID in the world after that,
-     * then the passed entity will be assigned a new random UUID.
-     * @param world
-     * @param entity
-     * @param existingEntitiesInArea
-     */
-    public static void handleSchematicPlacementEntityUUIDCollision(World world, Entity entity, List<Entity> existingEntitiesInArea)
-    {
-        // Use the original UUID if possible. If there is an entity with the same UUID within the pasted area,
-        // then the old one will be killed. Otherwise if there is no entity currently in the world with
-        // the same UUID, then the original UUID will be used.
-        UUID uuidOriginal = entity.getUniqueID();
-
-        // An existing entity with the same UUID is somewhere else in the world, use a new random UUID for the new entity.
-        if (world instanceof WorldServer && ((WorldServer) world).getEntityFromUuid(uuidOriginal) != null)
-        {
-            Entity existingEntityWithinArea = EntityUtils.findEntityByUUID(existingEntitiesInArea, uuidOriginal);
-
-            // An existing entity by with the same UUID is within the same sub-region area, remove the old entity.
-            if (existingEntityWithinArea != null)
-            {
-                world.removeEntityDangerously(existingEntityWithinArea);
-            }
-            else
-            {
-                entity.setUniqueId(UUID.randomUUID());
-            }
-        }
     }
 
     public static boolean shouldPickBlock(EntityPlayer player)
