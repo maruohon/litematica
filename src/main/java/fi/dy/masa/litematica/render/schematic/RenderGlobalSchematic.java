@@ -438,8 +438,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         }
     }
 
-    @Override
-    public int renderBlockLayer(BlockRenderLayer blockLayerIn, double partialTicks, int pass, Entity entityIn)
+    public int renderBlockLayer(BlockRenderLayer blockLayerIn, double partialTicks, Entity entityIn)
     {
         RenderHelper.disableStandardItemLighting();
 

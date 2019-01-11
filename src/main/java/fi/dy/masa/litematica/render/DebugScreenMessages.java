@@ -20,7 +20,7 @@ public class DebugScreenMessages
 
         if (mc.gameSettings.showDebugInfo && world != null)
         {
-            RenderGlobal render = LitematicaRenderer.getInstance().getRenderGlobal();
+            RenderGlobal render = LitematicaRenderer.getInstance().getWorldRenderer();
 
             String pre = TextFormatting.GOLD.toString();
             String rst = TextFormatting.RESET.toString();

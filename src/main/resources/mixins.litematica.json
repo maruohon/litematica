@@ -13,6 +13,7 @@
         "MixinBlockRail",
         "MixinChunk",
         "MixinChunkProviderClient",
+        "MixinEntityRenderer",
         "MixinMinecraft",
         "MixinNetHandlerPlayClient",
         "MixinRenderGlobal",

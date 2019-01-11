@@ -27,6 +27,7 @@ public class Configs implements IConfigHandler
 
     public static class Generic
     {
+        public static final ConfigBoolean       BETTER_RENDER_ORDER     = new ConfigBoolean(    "betterRenderOrder", true, "If enabled, then the schematic rendering is done\nby injecting the different render call into the vanilla\nrendering code. This should result in better translucent block\nrendering/ordering and schematic blocks not getting rendered\nthrough the client world blocks/terrain.\nIf the rendering doesn't work (for example with Optifine),\ntry disabling this option.");
         public static final ConfigBoolean       CHANGE_SELECTED_CORNER  = new ConfigBoolean(    "changeSelectedCornerOnMove", true, "If true, then the selected corner of an area selection\nis always set to the last moved corner,\nwhen using the set corner hotkeys");
         public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place\nthat block in that position");
         public static final ConfigBoolean       EASY_PLACE_HOLD_ENABLED = new ConfigBoolean(    "easyPlaceHoldEnabled", false, "When enabled, then simply holding down the use key\nand looking at different schematic blocks will place them");
@@ -42,6 +43,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       VERBOSE_LOGGING         = new ConfigBoolean(    "verboseLogging", false, "If enabled, then some debug messages of various\nthings will be printed to the console");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
+                BETTER_RENDER_ORDER,
                 CHANGE_SELECTED_CORNER,
                 EASY_PLACE_MODE,
                 EASY_PLACE_HOLD_ENABLED,

@@ -365,7 +365,7 @@ public class WorldUtils
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
             {
-                RenderGlobal rg = LitematicaRenderer.getInstance().getRenderGlobal();
+                RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
                 rg.markBlockRangeForRenderUpdate((chunkPos.getX() << 4) - 1, (chunkPos.getY() << 4) - 1, (chunkPos.getZ() << 4) - 1,
                                                  (chunkPos.getX() << 4) + 1, (chunkPos.getY() << 4) + 1, (chunkPos.getZ() << 4) + 1);
             }
@@ -384,7 +384,7 @@ public class WorldUtils
 
             if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
             {
-                RenderGlobal rg = LitematicaRenderer.getInstance().getRenderGlobal();
+                RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
                 rg.markBlockRangeForRenderUpdate(pos.getX() - 1, pos.getY() - 1, pos.getZ() - 1,pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
             }
         }
@@ -400,7 +400,7 @@ public class WorldUtils
             final int xMax = Math.max(x1, x2);
             final int cxMin = (xMin >> 4);
             final int cxMax = (xMax >> 4);
-            RenderGlobal rg = LitematicaRenderer.getInstance().getRenderGlobal();
+            RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
             Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
 
@@ -429,7 +429,7 @@ public class WorldUtils
 
         if (world != null)
         {
-            RenderGlobal rg = LitematicaRenderer.getInstance().getRenderGlobal();
+            RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
             Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
 
@@ -454,7 +454,7 @@ public class WorldUtils
             final int zMax = Math.max(z1, z2);
             final int czMin = (zMin >> 4);
             final int czMax = (zMax >> 4);
-            RenderGlobal rg = LitematicaRenderer.getInstance().getRenderGlobal();
+            RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
             Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
             Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
 
