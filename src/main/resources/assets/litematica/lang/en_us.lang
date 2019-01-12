@@ -290,6 +290,7 @@ litematica.message.no_area_selected=§cNo area selected§r
 litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
+litematica.message.removed_area_origin=Removed the explicit/manual area origin point
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.scheduled_task_added=Scheduled task added...
 litematica.message.schematic_exported_as=Schematic exported as '%s'

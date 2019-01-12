@@ -461,12 +461,21 @@ public class KeyCallbacks
 
                     if (selection != null)
                     {
-                        String name = selection.getCurrentSubRegionBoxName();
-
-                        if (name != null && selection.removeSelectedSubRegionBox())
+                        if (selection.isOriginSelected())
                         {
-                            StringUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
-                            return true;
+                            selection.setExplicitOrigin(null);
+                            selection.setOriginSelected(false);
+                            StringUtils.printActionbarMessage("litematica.message.removed_area_origin");
+                        }
+                        else
+                        {
+                            String name = selection.getCurrentSubRegionBoxName();
+
+                            if (name != null && selection.removeSelectedSubRegionBox())
+                            {
+                                StringUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
+                                return true;
+                            }
                         }
                     }
                 }
