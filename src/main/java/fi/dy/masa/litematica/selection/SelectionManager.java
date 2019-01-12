@@ -292,7 +292,7 @@ public class SelectionManager
     {
         AreaSelection area = this.getCurrentSelection();
 
-        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        if (area != null)
         {
             RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
 

@@ -154,6 +154,8 @@ public class AreaSelection
     public String createNewSubRegionBox(BlockPos pos1, final String nameIn)
     {
         this.clearCurrentSelectedCorner();
+        this.setOriginSelected(false);
+
         String name = nameIn;
         int i = 1;
 
