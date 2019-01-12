@@ -407,18 +407,17 @@ public class OverlayRenderer
     {
         if (mc.world != null && mc.player != null)
         {
-            if (Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue() &&
-                Configs.InfoOverlays.RENDER_BLOCK_INFO_OVERLAY.getBooleanValue() &&
-                (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
-                 Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld()))
+            boolean infoOverlayKeyActive = Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld();
+
+            if (infoOverlayKeyActive &&
+                Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue() &&
+                Configs.InfoOverlays.RENDER_BLOCK_INFO_OVERLAY.getBooleanValue())
             {
                 this.renderVerifierOverlay(mc);
             }
 
             boolean renderBlockInfoLines = Configs.InfoOverlays.RENDER_BLOCK_INFO_LINES.getBooleanValue();
-            boolean renderInfoOverlay = Configs.InfoOverlays.ENABLE_INFO_OVERLAY_RENDERING.getBooleanValue() &&
-                                        (Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isValid() == false ||
-                                        Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld());
+            boolean renderInfoOverlay = infoOverlayKeyActive && Configs.InfoOverlays.ENABLE_INFO_OVERLAY_RENDERING.getBooleanValue();
             RayTraceWrapper traceWrapper = null;
 
             if (renderBlockInfoLines || renderInfoOverlay)

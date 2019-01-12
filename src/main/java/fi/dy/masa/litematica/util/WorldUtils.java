@@ -541,11 +541,10 @@ public class WorldUtils
 
     public static void easyPlaceOnUseTick(Minecraft mc)
     {
-        if (Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
+        if (mc.player != null &&
+            Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
             Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-            mc.player != null &&
-            (Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() ||
-             Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isValid() == false) &&
+            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() &&
             KeybindMulti.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
         {
             WorldUtils.handleEasyPlace(mc);

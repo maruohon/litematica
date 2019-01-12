@@ -157,8 +157,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         if (mc.player != null)
         {
             if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-                (Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() ||
-                 Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isValid() == false))
+                Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
             {
                 WorldUtils.handleEasyPlace(mc);
                 return true;

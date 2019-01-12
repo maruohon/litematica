@@ -299,7 +299,7 @@ public class RayTraceUtils
     @Nullable
     public static RayTraceResult traceToSchematicWorld(Entity entity, double range, boolean respectRenderRange)
     {
-        boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isValid() && Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
+        boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
 
         if (respectRenderRange &&
             (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false ||
