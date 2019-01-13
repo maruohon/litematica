@@ -3,17 +3,22 @@ package fi.dy.masa.litematica.render.infohud;
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.tool.OperationMode;
 import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.util.BlockUtils;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 public class ToolHud extends InfoHud
@@ -33,8 +38,7 @@ public class ToolHud extends InfoHud
     @Override
     protected boolean shouldRender()
     {
-        return EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem()) &&
-                Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
+        return Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() && EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem());
     }
 
     @Override
@@ -104,6 +108,26 @@ public class ToolHud extends InfoHud
                     }
                 }
 
+                if (mode.getUsesBlockPrimary())
+                {
+                    IBlockState state = mode.getPrimaryBlock();
+
+                    if (state != null)
+                    {
+                        lines.add(I18n.format("litematica.tool_hud.block_1", this.getBlockString(state)));
+                    }
+                }
+
+                if (mode.getUsesBlockSecondary())
+                {
+                    IBlockState state = mode.getSecondaryBlock();
+
+                    if (state != null)
+                    {
+                        lines.add(I18n.format("litematica.tool_hud.block_2", this.getBlockString(state)));
+                    }
+                }
+
                 str = green + Configs.Generic.SELECTION_MODE.getOptionListValue().getDisplayName() + rst;
                 lines.add(I18n.format("litematica.hud.area_selection.selection_mode", str));
             }
@@ -154,5 +178,34 @@ public class ToolHud extends InfoHud
         str = I18n.format("litematica.hud.selected_mode");
         lines.add(String.format("%s [%s%d%s/%s%d%s]: %s%s%s", str, green, mode.ordinal() + 1, white,
                 green, OperationMode.values().length, white, green, mode.getName(), rst));
+    }
+
+    protected String getBlockString(IBlockState state)
+    {
+        String strNone = I18n.format("litematica.hud.misc.none_brackets");
+        ItemStack stack = MaterialCache.getInstance().getItemForState(state);
+        String strBlock;
+
+        if (stack.isEmpty() == false)
+        {
+            String gold = GuiBase.TXT_GOLD;
+            String green = GuiBase.TXT_GREEN;
+            String rst = GuiBase.TXT_RST;
+
+            strBlock = green + stack.getDisplayName() + rst;
+            EnumFacing facing = BlockUtils.getFirstPropertyFacingValue(state);
+
+            if (facing != null)
+            {
+                String strFacing = gold + facing.getName().toLowerCase() + rst;
+                strBlock += " - " + I18n.format("litematica.tool_hud.facing", strFacing);
+            }
+        }
+        else
+        {
+            strBlock = strNone;
+        }
+
+        return strBlock;
     }
 }

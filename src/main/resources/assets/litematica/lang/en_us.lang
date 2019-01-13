@@ -249,6 +249,8 @@ litematica.hud.area_selection.selected_area=Area: %s
 litematica.hud.area_selection.selected_sub_region=Sub-region: %s
 litematica.hud.area_selection.selection_mode=Selection Mode: %s
 
+litematica.hud.misc.none_brackets=<none>
+
 litematica.hud.schematic_placement.hover_info.placement_locked=This placement has been locked and can't\nbe modified without unlocking it first
 litematica.hud.schematic_placement.hover_info.placement_modified=This placement has been modified
 litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=This sub-region has been modified
@@ -259,6 +261,10 @@ litematica.hud.schematic_placement.sub_region_modified=Sub-region modified
 litematica.hud.schematic_placement.sub_regions_modified=Regions modified
 
 litematica.hud.selected_mode=Mode
+
+litematica.tool_hud.block_1=Block: %s
+litematica.tool_hud.block_2=Replace: %s
+litematica.tool_hud.facing=Facing: %s
 
 litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
 
@@ -273,6 +279,8 @@ litematica.message.error.schematic_paste_failed=§cSchematic Paste to world fail
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.area_clear_fail=§cFailed to clear the area(s)§r
 litematica.message.area_cleared=Area cleared
+litematica.message.area_filled=Area filled
+litematica.message.area_fill_fail=Failed to fill the area
 litematica.message.area_selections.selection_created_from_placement=Created a new selection from placement '%s'
 litematica.message.directory_created=Directory '%s' created
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'

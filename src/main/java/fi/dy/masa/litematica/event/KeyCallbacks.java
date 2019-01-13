@@ -22,11 +22,12 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.AreaSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.tool.OperationMode;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.LayerMode;
-import fi.dy.masa.litematica.util.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
@@ -75,6 +76,8 @@ public class KeyCallbacks
         Hotkeys.TOOL_PLACE_CORNER_1.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_2.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeybind().setCallback(callbackHotkeys);
 
         Hotkeys.ADD_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
         Hotkeys.DELETE_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
@@ -172,7 +175,15 @@ public class KeyCallbacks
                     {
                         SelectionManager sm = DataManager.getSelectionManager();
 
-                        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
+                        if (mode.getUsesBlockPrimary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeybind().isKeybindHeld())
+                        {
+                            WorldUtils.setToolModeBlockState(mode, true, this.mc);
+                        }
+                        else if (mode.getUsesBlockSecondary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeybind().isKeybindHeld())
+                        {
+                            WorldUtils.setToolModeBlockState(mode, false, this.mc);
+                        }
+                        else if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
                         {
                             if (sm.hasGrabbedElement())
                             {
@@ -391,10 +402,20 @@ public class KeyCallbacks
                     DataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
                     return true;
                 }
+                else if (mode == OperationMode.FILL && mode.getPrimaryBlock() != null)
+                {
+                    ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), null);
+                    return true;
+                }
+                else if (mode == OperationMode.REPLACE_BLOCK && mode.getPrimaryBlock() != null && mode.getSecondaryBlock() != null)
+                {
+                    ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), mode.getSecondaryBlock());
+                    return true;
+                }
                 else if (mode == OperationMode.DELETE)
                 {
                     boolean removeEntities = true; // TODO
-                    WorldUtils.deleteSelectionVolumes(this.mc, removeEntities);
+                    ToolUtils.deleteSelectionVolumes(this.mc, removeEntities);
                     return true;
                 }
             }

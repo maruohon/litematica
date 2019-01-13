@@ -6,10 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
-import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -20,14 +18,15 @@ import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.tool.OperationMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
@@ -42,11 +41,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -56,7 +52,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -65,7 +60,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
@@ -472,6 +466,27 @@ public class WorldUtils
         }
     }
 
+    public static void setToolModeBlockState(OperationMode mode, boolean primary, Minecraft mc)
+    {
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+
+        if (traceWrapper != null &&
+            traceWrapper.getHitType() == HitType.VANILLA &&
+            traceWrapper.getRayTraceResult().typeOfHit == RayTraceResult.Type.BLOCK)
+        {
+            IBlockState state = mc.world.getBlockState(traceWrapper.getRayTraceResult().getBlockPos());
+
+            if (primary)
+            {
+                mode.setPrimaryBlock(state);
+            }
+            else
+            {
+                mode.setSecondaryBlock(state);
+            }
+        }
+    }
+
     /**
      * Does a ray trace to the schematic world, and returns either the closest or the furthest hit block.
      * @param closest
@@ -792,108 +807,6 @@ public class WorldUtils
         }
 
         return false;
-    }
-
-    public static void deleteSelectionVolumes(Minecraft mc, boolean removeEntities)
-    {
-        if (mc.player != null && mc.player.capabilities.isCreativeMode)
-        {
-            final AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
-
-            if (area != null)
-            {
-                if (mc.isSingleplayer())
-                {
-                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
-
-                    world.addScheduledTask(new Runnable()
-                    {
-                        public void run()
-                        {
-                            Box currentBox = area.getSelectedSubRegionBox();
-                            Collection<Box> boxes;
-
-                            if (currentBox != null)
-                            {
-                                boxes = ImmutableList.of(currentBox);
-                            }
-                            else
-                            {
-                                boxes = area.getAllSubRegionBoxes();
-                            }
-
-                            if (deleteSelectionVolumes(world, boxes, removeEntities))
-                            {
-                                StringUtils.printActionbarMessage("litematica.message.area_cleared");
-                            }
-                            else
-                            {
-                                StringUtils.printActionbarMessage("litematica.message.area_clear_fail");
-                            }
-                        }
-                    });
-
-                    StringUtils.printActionbarMessage("litematica.message.scheduled_task_added");
-                }
-                else
-                {
-                    StringUtils.printActionbarMessage("litematica.message.only_works_in_single_player");
-                }
-            }
-            else
-            {
-                StringUtils.printActionbarMessage("litematica.message.no_area_selected");
-            }
-        }
-    }
-
-    public static boolean deleteSelectionVolumes(World world, Collection<Box> boxes, boolean removeEntities)
-    {
-        IBlockState air = Blocks.AIR.getDefaultState();
-        IBlockState barrier = Blocks.BARRIER.getDefaultState();
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-
-        for (Box box : boxes)
-        {
-            BlockPos posMin = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
-            BlockPos posMax = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
-
-            for (int z = posMin.getZ(); z <= posMax.getZ(); ++z)
-            {
-                for (int x = posMin.getX(); x <= posMax.getX(); ++x)
-                {
-                    for (int y = posMax.getY(); y >= posMin.getY(); --y)
-                    {
-                        posMutable.setPos(x, y, z);
-                        TileEntity te = world.getTileEntity(posMutable);
-
-                        if (te instanceof IInventory)
-                        {
-                            ((IInventory) te).clear();
-                            world.setBlockState(posMutable, barrier, 0x12);
-                        }
-
-                        world.setBlockState(posMutable, air, 0x12);
-                    }
-                }
-            }
-
-            if (removeEntities)
-            {
-                AxisAlignedBB bb = PositionUtils.createEnclosingAABB(posMin, posMax);
-                List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, bb);
-
-                for (Entity entity : entities)
-                {
-                    if ((entity instanceof EntityPlayer) == false)
-                    {
-                        entity.setDead();
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 
     public static boolean easyPlaceIsPositionCached(BlockPos pos)
