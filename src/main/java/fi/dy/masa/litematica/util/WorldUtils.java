@@ -469,21 +469,22 @@ public class WorldUtils
     public static void setToolModeBlockState(OperationMode mode, boolean primary, Minecraft mc)
     {
         RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        IBlockState state = Blocks.AIR.getDefaultState();
 
         if (traceWrapper != null &&
             traceWrapper.getHitType() == HitType.VANILLA &&
             traceWrapper.getRayTraceResult().typeOfHit == RayTraceResult.Type.BLOCK)
         {
-            IBlockState state = mc.world.getBlockState(traceWrapper.getRayTraceResult().getBlockPos());
+            state = mc.world.getBlockState(traceWrapper.getRayTraceResult().getBlockPos());
+        }
 
-            if (primary)
-            {
-                mode.setPrimaryBlock(state);
-            }
-            else
-            {
-                mode.setSecondaryBlock(state);
-            }
+        if (primary)
+        {
+            mode.setPrimaryBlock(state);
+        }
+        else
+        {
+            mode.setSecondaryBlock(state);
         }
     }
 

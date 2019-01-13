@@ -182,28 +182,20 @@ public class ToolHud extends InfoHud
 
     protected String getBlockString(IBlockState state)
     {
-        String strNone = I18n.format("litematica.hud.misc.none_brackets");
         ItemStack stack = MaterialCache.getInstance().getItemForState(state);
         String strBlock;
 
-        if (stack.isEmpty() == false)
+        String green = GuiBase.TXT_GREEN;
+        String rst = GuiBase.TXT_RST;
+
+        strBlock = green + stack.getDisplayName() + rst;
+        EnumFacing facing = BlockUtils.getFirstPropertyFacingValue(state);
+
+        if (facing != null)
         {
             String gold = GuiBase.TXT_GOLD;
-            String green = GuiBase.TXT_GREEN;
-            String rst = GuiBase.TXT_RST;
-
-            strBlock = green + stack.getDisplayName() + rst;
-            EnumFacing facing = BlockUtils.getFirstPropertyFacingValue(state);
-
-            if (facing != null)
-            {
-                String strFacing = gold + facing.getName().toLowerCase() + rst;
-                strBlock += " - " + I18n.format("litematica.tool_hud.facing", strFacing);
-            }
-        }
-        else
-        {
-            strBlock = strNone;
+            String strFacing = gold + facing.getName().toLowerCase() + rst;
+            strBlock += " - " + I18n.format("litematica.tool_hud.facing", strFacing);
         }
 
         return strBlock;
