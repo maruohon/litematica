@@ -62,11 +62,18 @@ public class LitematicaRenderer
 
     private void calculateFinishTime()
     {
-        int fpsLimit = this.mc.gameSettings.limitFramerate;
-        int fpsMin = Math.min(Minecraft.getDebugFPS(), fpsLimit);
-        fpsMin = Math.max(fpsMin, 60);
+        long fpsLimit = this.mc.gameSettings.limitFramerate;
+        long fpsMin = Math.min(Minecraft.getDebugFPS(), fpsLimit);
+        fpsMin = Math.max(fpsMin, 60L);
 
-        this.finishTimeNano = System.nanoTime() + Math.max((long)(1000000000 / fpsMin / 8), 0L);
+        if (Configs.Generic.RENDER_THREAD_NO_TIMEOUT.getBooleanValue())
+        {
+            this.finishTimeNano = Long.MAX_VALUE;
+        }
+        else
+        {
+            this.finishTimeNano = System.nanoTime() + Math.max(1000000000L / fpsMin / 2L, 0L);
+        }
     }
 
     public void renderSchematicWorld(float partialTicks)
@@ -97,8 +104,6 @@ public class LitematicaRenderer
 
     private void renderWorld(float partialTicks, long finishTimeNano)
     {
-        RenderGlobalSchematic renderGlobal = this.getWorldRenderer();
-
         this.mc.profiler.endStartSection("litematica_culling");
         Entity entity = this.mc.getRenderViewEntity();
         ICamera icamera = this.createCamera(entity, partialTicks);
@@ -110,6 +115,7 @@ public class LitematicaRenderer
         this.mc.profiler.endStartSection("litematica_prepare_terrain");
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         RenderHelper.disableStandardItemLighting();
+        RenderGlobalSchematic renderGlobal = this.getWorldRenderer();
 
         this.mc.profiler.endStartSection("litematica_terrain_setup");
         renderGlobal.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
@@ -258,15 +264,15 @@ public class LitematicaRenderer
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
             this.renderPiecewiseBlocks = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert && Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue();
 
-            this.calculateFinishTime();
-            RenderGlobalSchematic renderGlobal = this.getWorldRenderer();
-
             this.mc.profiler.startSection("litematica_culling");
 
             Entity entity = this.mc.getRenderViewEntity();
             ICamera icamera = this.createCamera(entity, partialTicks);
 
             this.startShaderIfEnabled();
+
+            this.calculateFinishTime();
+            RenderGlobalSchematic renderGlobal = this.getWorldRenderer();
 
             this.mc.profiler.endStartSection("litematica_terrain_setup");
             renderGlobal.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
