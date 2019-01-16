@@ -23,6 +23,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -67,7 +68,7 @@ public class MaterialListUtils
 
         Minecraft mc = Minecraft.getMinecraft();
 
-        return getMaterialList(countsTotal, countsTotal, mc.player);
+        return getMaterialList(countsTotal, countsTotal, new Object2IntOpenHashMap<>(), mc.player);
     }
 
     public static List<MaterialListEntry> createMaterialListFor(SchematicPlacement placement)
@@ -83,6 +84,7 @@ public class MaterialListUtils
 
         Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
         Object2IntOpenHashMap<IBlockState> countsMissing = new Object2IntOpenHashMap<>();
+        Object2IntOpenHashMap<IBlockState> countsMismatch = new Object2IntOpenHashMap<>();
 
         //if (placement.getMaterialListType() == BlockInfoListType.RENDER_LAYERS)
         {
@@ -118,12 +120,21 @@ public class MaterialListUtils
                         {
                             posMutable.setPos(x, y, z);
                             IBlockState stateSchematic = worldSchematic.getBlockState(posMutable).getActualState(worldSchematic, posMutable);
-                            IBlockState stateClient = worldClient.getBlockState(posMutable).getActualState(worldClient, posMutable);
-                            countsTotal.addTo(stateSchematic, 1);
 
-                            if (stateClient != stateSchematic)
+                            if (stateSchematic.getBlock() != Blocks.AIR)
                             {
-                                countsMissing.addTo(stateSchematic, 1);
+                                IBlockState stateClient = worldClient.getBlockState(posMutable).getActualState(worldClient, posMutable);
+                                countsTotal.addTo(stateSchematic, 1);
+
+                                if (stateClient.getBlock() == Blocks.AIR)
+                                {
+                                    countsMissing.addTo(stateSchematic, 1);
+                                }
+                                else if (stateClient != stateSchematic)
+                                {
+                                    countsMissing.addTo(stateSchematic, 1);
+                                    countsMismatch.addTo(stateSchematic, 1);
+                                }
                             }
                         }
                     }
@@ -131,12 +142,13 @@ public class MaterialListUtils
             }
         }
 
-        return getMaterialList(countsTotal, countsMissing, mc.player);
+        return getMaterialList(countsTotal, countsMissing, countsMismatch, mc.player);
     }
 
     private static List<MaterialListEntry> getMaterialList(
             Object2IntOpenHashMap<IBlockState> countsTotal,
             Object2IntOpenHashMap<IBlockState> countsMissing,
+            Object2IntOpenHashMap<IBlockState> countsMismatch,
             EntityPlayer player)
     {
         List<MaterialListEntry> list = new ArrayList<>();
@@ -146,16 +158,22 @@ public class MaterialListUtils
             MaterialCache cache = MaterialCache.getInstance();
             Object2IntOpenHashMap<ItemType> itemTypesTotal = new Object2IntOpenHashMap<>();
             Object2IntOpenHashMap<ItemType> itemTypesMissing = new Object2IntOpenHashMap<>();
+            Object2IntOpenHashMap<ItemType> itemTypesMismatch = new Object2IntOpenHashMap<>();
 
             convertStatesToStacks(countsTotal, itemTypesTotal, cache);
             convertStatesToStacks(countsMissing, itemTypesMissing, cache);
+            convertStatesToStacks(countsMismatch, itemTypesMismatch, cache);
 
             Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.inventory);
 
             for (ItemType type : itemTypesTotal.keySet())
             {
                 int countAvailable = playerInvItems.getInt(type);
-                list.add(new MaterialListEntry(type.getStack().copy(), itemTypesTotal.getInt(type), itemTypesMissing.getInt(type), countAvailable));
+                list.add(new MaterialListEntry(type.getStack().copy(),
+                        itemTypesTotal.getInt(type),
+                        itemTypesMissing.getInt(type),
+                        itemTypesMismatch.getInt(type),
+                        countAvailable));
             }
         }
 

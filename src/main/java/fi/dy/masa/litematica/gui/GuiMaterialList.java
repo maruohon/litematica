@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
+import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
@@ -90,6 +91,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + gap;
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRender(), ButtonListener.Type.TOGGLE_INFO_HUD) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_IGNORED) + gap;
+        x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_CACHE) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + gap;
         y += 22;
 
@@ -100,6 +102,35 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+
+        // Progress: Done xx % / Missing xx % / Wrong xx %
+        long total = this.materialList.getCountTotal();
+        long missing = this.materialList.getCountMissing() - this.materialList.getCountMismatched();
+        long mismatch = this.materialList.getCountMismatched();
+
+        if (total != 0)
+        {
+            double pctDone = ((double) (total - (missing + mismatch)) / (double) total) * 100;
+            double pctMissing = ((double) missing / (double) total) * 100;
+            double pctMismatch = ((double) mismatch / (double) total) * 100;
+            String strp;
+
+            if (missing == 0 && mismatch == 0)
+            {
+                strp = I18n.format("litematica.gui.label.material_list.progress.done", String.format("%.0f %%%%", pctDone));
+            }
+            else
+            {
+                String str1 = I18n.format("litematica.gui.label.material_list.progress.done", String.format("%.1f %%%%", pctDone));
+                String str2 = I18n.format("litematica.gui.label.material_list.progress.missing", String.format("%.1f %%%%", pctMissing));
+                String str3 = I18n.format("litematica.gui.label.material_list.progress.mismatch", String.format("%.1f %%%%", pctMismatch));
+                strp = String.format("%s / %s / %s", str1, str2, str3);
+            }
+
+            str = I18n.format("litematica.gui.label.material_list.progress", strp);
+            w = this.fontRenderer.getStringWidth(str);
+            this.addLabel(12, this.height - 30, w, 12, 0xFFFFFFFF, str);
+        }
     }
 
     private int createButton(int x, int y, int width, ButtonListener.Type type)
@@ -129,6 +160,12 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         }
 
         ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+
+        if (type == ButtonListener.Type.CLEAR_CACHE)
+        {
+            button.setHoverStrings("litematica.gui.button.hover.material_list.clear_cache");
+        }
+
         this.addButton(button, listener);
 
         return width;
@@ -211,6 +248,11 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                     materialList.clearIgnored();
                     break;
 
+                case CLEAR_CACHE:
+                    MaterialCache.getInstance().clearCache();
+                    this.parent.addGuiMessage(MessageType.SUCCESS, "litematica.message.material_list.material_cache_cleared", 3000);
+                    break;
+
                 case WRITE_TO_FILE:
                     File dir = new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
                     File file = DataDump.dumpDataToFile(dir, "material_list", this.getMaterialListDump(materialList).getLines());
@@ -272,6 +314,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             HIDE_AVAILABLE      ("litematica.gui.button.material_list.hide_available"),
             TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
             CLEAR_IGNORED       ("litematica.gui.button.material_list.clear_ignored"),
+            CLEAR_CACHE         ("litematica.gui.button.material_list.clear_cache"),
             WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
             CHANGE_MULTIPLIER   ("");
 

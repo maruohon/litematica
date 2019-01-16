@@ -8,13 +8,15 @@ public class MaterialListEntry
     private final ItemType item;
     private final int countTotal;
     private final int countMissing;
+    private final int countMismatched;
     private int countAvailable;
 
-    public MaterialListEntry(ItemStack stack, int countTotal, int countMissing, int countAvailable)
+    public MaterialListEntry(ItemStack stack, int countTotal, int countMissing, int countMismatched, int countAvailable)
     {
         this.item = new ItemType(stack, false, false);
         this.countTotal = countTotal;
         this.countMissing = countMissing;
+        this.countMismatched = countMismatched;
         this.countAvailable = countAvailable;
     }
 
@@ -40,6 +42,11 @@ public class MaterialListEntry
     public int getCountMissing()
     {
         return this.countMissing;
+    }
+
+    public int getCountMismatched()
+    {
+        return this.countMismatched;
     }
 
     public int getCountAvailable()

@@ -70,10 +70,12 @@ litematica.gui.button.config_gui.info_overlays=Info Overlays
 litematica.gui.button.config_gui.render_layers=Render Layers
 litematica.gui.button.config_gui.visuals=Visuals
 
+litematica.gui.button.hover.material_list.clear_cache=Clears the Material Cache\nNormally this should not be needed\nThis can be used instead of deleting the 'material_cache.nbt'\nfile in case the cache has some wrong data, like items\nstored for blocks that shouldn't have them, like piston heads
 litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift to select the sub regions used for the Material List
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 
 litematica.gui.button.material_list=Material List
+litematica.gui.button.material_list.clear_cache=Clear cache
 litematica.gui.button.material_list.clear_ignored=Clear ignored
 litematica.gui.button.material_list.hide_available=Hide available: %s
 litematica.gui.button.material_list.ignore=Ignore
@@ -162,6 +164,10 @@ litematica.gui.label.material_list.item=Item
 litematica.gui.label.material_list.missing=Missing
 litematica.gui.label.material_list.multiplier=Multiplier: %s
 litematica.gui.label.material_list.name=Name
+litematica.gui.label.material_list.progress=Progress: %s
+litematica.gui.label.material_list.progress.done=Done %s
+litematica.gui.label.material_list.progress.mismatch=Mismatched %s
+litematica.gui.label.material_list.progress.missing=Missing %s
 litematica.gui.label.material_list.total=Total
 
 litematica.gui.label.origin.auto=Auto
@@ -288,6 +294,7 @@ litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.in_memory_schematic_created=Created an in-memory schematic as '%s'
 litematica.message.layer_range.range_max=max
 litematica.message.layer_range.range_min=min
+litematica.message.material_list.material_cache_cleared=Material Cache cleared
 litematica.message.material_list_written_to_file=Material list written to file '%s'
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
 litematica.message.moved_layer_range=Moved layer range §a%s§r by §a%s§r on the §a%s§r axis

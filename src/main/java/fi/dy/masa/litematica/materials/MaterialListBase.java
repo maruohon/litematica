@@ -23,6 +23,9 @@ public abstract class MaterialListBase
     protected boolean reverse;
     protected boolean hideAvailable;
     protected int multiplier = 1;
+    protected long countTotal;
+    protected long countMissing;
+    protected long countMismatched;
 
     protected abstract List<MaterialListEntry> createMaterialListEntries();
 
@@ -104,6 +107,7 @@ public abstract class MaterialListBase
     {
         this.materialListAll = ImmutableList.copyOf(this.createMaterialListEntries());
         this.refreshPreFilteredList();
+        this.updateCounts();
     }
 
     /**
@@ -157,6 +161,35 @@ public abstract class MaterialListBase
     public void setMultiplier(int multiplier)
     {
         this.multiplier = MathHelper.clamp(multiplier, 1, Integer.MAX_VALUE);
+    }
+
+    public void updateCounts()
+    {
+        this.countTotal = 0;
+        this.countMissing = 0;
+        this.countMismatched = 0;
+
+        for (MaterialListEntry entry : this.materialListAll)
+        {
+            this.countTotal += entry.getCountTotal();
+            this.countMissing += entry.getCountMissing();
+            this.countMismatched += entry.getCountMismatched();
+        }
+    }
+
+    public long getCountTotal()
+    {
+        return this.countTotal;
+    }
+
+    public long getCountMissing()
+    {
+        return this.countMissing;
+    }
+
+    public long getCountMismatched()
+    {
+        return this.countMismatched;
     }
 
     public BlockInfoListType getMaterialListType()

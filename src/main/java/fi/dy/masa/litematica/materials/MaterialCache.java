@@ -62,6 +62,11 @@ public class MaterialCache
         return INSTANCE;
     }
 
+    public void clearCache()
+    {
+        this.itemsForStates.clear();
+    }
+
     public ItemStack getItemForState(IBlockState state)
     {
         ItemStack stack = this.itemsForStates.get(state);
@@ -104,7 +109,11 @@ public class MaterialCache
     {
         Block block = state.getBlock();
 
-        if (block == Blocks.PISTON_EXTENSION || block == Blocks.PORTAL || block == Blocks.END_PORTAL || block == Blocks.END_GATEWAY)
+        if (block == Blocks.PISTON_HEAD ||
+            block == Blocks.PISTON_EXTENSION ||
+            block == Blocks.PORTAL ||
+            block == Blocks.END_PORTAL ||
+            block == Blocks.END_GATEWAY)
         {
             return ItemStack.EMPTY;
         }
