@@ -30,6 +30,7 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
+import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
@@ -87,8 +88,8 @@ public class KeyCallbacks
         Hotkeys.SET_AREA_ORIGIN.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
-        Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_RENDERING));
-        Hotkeys.TOGGLE_SCHEMATIC_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SCHEMATIC_RENDERING));
+        Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(new MainRenderToggle(Configs.Visuals.ENABLE_RENDERING));
+        Hotkeys.TOGGLE_SCHEMATIC_RENDERING.getKeybind().setCallback(new MainRenderToggle(Configs.Visuals.ENABLE_SCHEMATIC_RENDERING));
         Hotkeys.TOGGLE_INFO_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.ENABLE_INFO_OVERLAY_RENDERING));
         Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING));
         Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED));
@@ -109,6 +110,27 @@ public class KeyCallbacks
             {
                 InventoryUtils.setPickBlockableSlots(Configs.Generic.PICK_BLOCKABLE_SLOTS.getStringValue());
             }
+        }
+    }
+
+    private static class MainRenderToggle extends KeyCallbackToggleBooleanConfigWithMessage
+    {
+        public MainRenderToggle(IConfigBoolean config)
+        {
+            super(config);
+        }
+
+        @Override
+        public boolean onKeyAction(KeyAction action, IKeybind key)
+        {
+            super.onKeyAction(action, key);
+
+            if (this.config.getBooleanValue())
+            {
+                WorldUtils.markAllSchematicChunksForRenderUpdate();
+            }
+
+            return true;
         }
     }
 
