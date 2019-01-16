@@ -18,7 +18,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 
 public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialListEntry>
 {
@@ -217,10 +216,18 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int countTotal = this.entry.getCountTotal() * multiplier;
             int countMissing = multiplier == 1 ? this.entry.getCountMissing() : countTotal;
             int countAvailable = this.entry.getCountAvailable();
-            String pre = countAvailable >= countMissing ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+            String green = GuiBase.TXT_GREEN;
+            String gold = GuiBase.TXT_GOLD;
+            String red = GuiBase.TXT_RED;
+            String pre;
             mc.fontRenderer.drawString(this.entry.getStack().getDisplayName(), x1 + 20, y, color);
+
             mc.fontRenderer.drawString(String.valueOf(countTotal)          , x2, y, color);
+
+            pre = countMissing == 0 ? green : (countAvailable >= countMissing ? gold : red);
             mc.fontRenderer.drawString(pre + String.valueOf(countMissing)  , x3, y, color);
+
+            pre = countAvailable >= countMissing ? green : red;
             mc.fontRenderer.drawString(pre + String.valueOf(countAvailable), x4, y, color);
 
             GlStateManager.pushMatrix();
