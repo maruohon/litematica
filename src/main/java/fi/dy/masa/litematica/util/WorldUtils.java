@@ -520,7 +520,7 @@ public class WorldUtils
 
         if (blockSchematic instanceof BlockSlab && stateSchematic.get(BlockSlab.TYPE) == SlabType.DOUBLE)
         {
-            Block blockClient = stateSchematic.getBlock();
+            Block blockClient = stateClient.getBlock();
 
             if (blockClient instanceof BlockSlab && stateClient.get(BlockSlab.TYPE) != SlabType.DOUBLE)
             {
