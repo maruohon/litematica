@@ -293,7 +293,7 @@ public class LitematicaRenderer
             if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
             {
                 GlStateManager.enablePolygonOffset();
-                GlStateManager.doPolygonOffset(-0.2f, -0.4f);
+                GlStateManager.doPolygonOffset(-0.3f, -0.6f);
             }
 
             GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
@@ -302,6 +302,12 @@ public class LitematicaRenderer
             this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, this.entity);
 
             this.disableShader();
+
+            if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+            {
+                GlStateManager.doPolygonOffset(0f, 0f);
+                GlStateManager.disablePolygonOffset();
+            }
         }
     }
 
@@ -309,12 +315,24 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewise && this.renderPiecewiseBlocks)
         {
+            if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+            {
+                GlStateManager.enablePolygonOffset();
+                GlStateManager.doPolygonOffset(-0.3f, -0.6f);
+            }
+
             this.mc.profiler.endStartSection("litematica_blocks_cutout_mipped");
             this.startShaderIfEnabled();
 
             this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, partialTicks, this.entity);
 
             this.disableShader();
+
+            if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+            {
+                GlStateManager.doPolygonOffset(0f, 0f);
+                GlStateManager.disablePolygonOffset();
+            }
         }
     }
 
@@ -322,6 +340,12 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewise && this.renderPiecewiseBlocks)
         {
+            if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+            {
+                GlStateManager.enablePolygonOffset();
+                GlStateManager.doPolygonOffset(-0.3f, -0.6f);
+            }
+
             this.mc.profiler.endStartSection("litematica_blocks_cutout");
             this.startShaderIfEnabled();
 
@@ -345,12 +369,24 @@ public class LitematicaRenderer
         {
             if (this.renderPiecewiseBlocks)
             {
+                if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+                {
+                    GlStateManager.enablePolygonOffset();
+                    GlStateManager.doPolygonOffset(-0.3f, -0.6f);
+                }
+
                 this.mc.profiler.endStartSection("litematica_translucent");
                 this.startShaderIfEnabled();
 
                 this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, this.entity);
 
                 this.disableShader();
+
+                if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
+                {
+                    GlStateManager.doPolygonOffset(0f, 0f);
+                    GlStateManager.disablePolygonOffset();
+                }
 
                 this.mc.profiler.endStartSection("litematica_overlay");
 
