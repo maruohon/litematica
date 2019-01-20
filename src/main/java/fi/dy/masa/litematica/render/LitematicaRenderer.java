@@ -263,7 +263,7 @@ public class LitematicaRenderer
         if (this.renderPiecewise)
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
-            this.renderPiecewiseBlocks = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert && Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue();
+            this.renderPiecewiseBlocks = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert && Configs.Visuals.SCHEMATIC_BLOCKS_ENABLED.getBooleanValue();
 
             this.mc.profiler.startSection("litematica_culling");
 
@@ -395,11 +395,11 @@ public class LitematicaRenderer
                     GlStateManager.doPolygonOffset(0f, 0f);
                     GlStateManager.disablePolygonOffset();
                 }
-
-                this.mc.profiler.endStartSection("litematica_overlay");
-
-                this.renderSchematicOverlay();
             }
+
+            this.mc.profiler.endStartSection("litematica_overlay");
+
+            this.renderSchematicOverlay();
 
             this.cleanup();
         }
