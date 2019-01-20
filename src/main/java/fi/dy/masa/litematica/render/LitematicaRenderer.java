@@ -32,6 +32,7 @@ public class LitematicaRenderer
     private ICamera camera;
     private boolean renderPiecewise;
     private boolean renderPiecewiseBlocks;
+    private boolean renderPiecewisePrepared;
     private boolean translucentSchematic;
 
     public static LitematicaRenderer getInstance()
@@ -266,6 +267,11 @@ public class LitematicaRenderer
 
             this.mc.profiler.startSection("litematica_culling");
 
+            if (this.mc.getRenderViewEntity() == null)
+            {
+                this.mc.setRenderViewEntity(this.mc.player);
+            }
+
             Entity entity = this.mc.getRenderViewEntity();
             ICamera icamera = this.createCamera(entity, partialTicks);
 
@@ -281,12 +287,14 @@ public class LitematicaRenderer
             renderGlobal.updateChunks(this.finishTimeNano);
 
             this.mc.profiler.endSection();
+
+            this.renderPiecewisePrepared = true;
         }
     }
 
     public void piecewiseRenderSolid(float partialTicks)
     {
-        if (this.renderPiecewise && this.renderPiecewiseBlocks)
+        if (this.renderPiecewise && this.renderPiecewisePrepared && this.renderPiecewiseBlocks)
         {
             this.mc.profiler.endStartSection("litematica_blocks_solid");
 
@@ -313,7 +321,7 @@ public class LitematicaRenderer
 
     public void piecewiseRenderCutoutMipped(float partialTicks)
     {
-        if (this.renderPiecewise && this.renderPiecewiseBlocks)
+        if (this.renderPiecewise && this.renderPiecewisePrepared && this.renderPiecewiseBlocks)
         {
             if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
             {
@@ -338,7 +346,7 @@ public class LitematicaRenderer
 
     public void piecewiseRenderCutout(float partialTicks)
     {
-        if (this.renderPiecewise && this.renderPiecewiseBlocks)
+        if (this.renderPiecewise && this.renderPiecewisePrepared && this.renderPiecewiseBlocks)
         {
             if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
             {
@@ -365,7 +373,7 @@ public class LitematicaRenderer
 
     public void piecewiseRenderTranslucent(float partialTicks)
     {
-        if (this.renderPiecewise)
+        if (this.renderPiecewise && this.renderPiecewisePrepared)
         {
             if (this.renderPiecewiseBlocks)
             {
@@ -399,7 +407,7 @@ public class LitematicaRenderer
 
     public void piecewiseRenderEntities(float partialTicks)
     {
-        if (this.renderPiecewise && this.renderPiecewiseBlocks)
+        if (this.renderPiecewise && this.renderPiecewisePrepared && this.renderPiecewiseBlocks)
         {
             this.mc.profiler.endStartSection("litematica_entities");
             this.startShaderIfEnabled();
@@ -432,5 +440,6 @@ public class LitematicaRenderer
     {
         this.entity = null;
         this.camera = null;
+        this.renderPiecewisePrepared = false;
     }
 }
