@@ -331,7 +331,7 @@ public class OverlayRenderer
             if (verifier.getSelectedMismatchTypeForRender() != null)
             {
                 List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
-                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 10);
+                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 128);
                 BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
                 this.renderSchematicMismatches(verifier.getSelectedMismatchTypeForRender(), posList, posLook, partialTicks);
             }
@@ -471,7 +471,7 @@ public class OverlayRenderer
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
-            RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 10);
+            RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 128);
 
             if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
             {
