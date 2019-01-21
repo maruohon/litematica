@@ -361,7 +361,7 @@ public class RayTraceUtils
         if (placement != null && placement.hasVerifier())
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
-            List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
+            List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
             RayTraceResult traceMismatch = traceToPositions(posList, entity, range);
 
             // Mismatch overlay has priority over other hits

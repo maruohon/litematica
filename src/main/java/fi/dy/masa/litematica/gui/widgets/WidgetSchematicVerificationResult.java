@@ -66,6 +66,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         this.verifier = guiSchematicVerifier.getPlacement().getSchematicVerifier();
         this.isOdd = isOdd;
 
+        // Main header
         if (entry.header1 != null && entry.header2 != null)
         {
             this.header1 = entry.header1;
@@ -75,6 +76,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             this.count = 0;
             this.buttonIgnore = null;
         }
+        // Category title
         else if (entry.header1 != null)
         {
             this.header1 = entry.header1;
@@ -84,6 +86,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             this.count = 0;
             this.buttonIgnore = null;
         }
+        // Mismatch entry
         else
         {
             this.header1 = null;
@@ -204,22 +207,53 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         return (this.buttonIgnore == null || mouseX < this.buttonIgnore.x) && super.canSelectAt(mouseX, mouseY, mouseButton);
     }
 
+    protected boolean isRegularEntry()
+    {
+        return this.header1 == null;
+    }
+
+    protected boolean shouldRenderAsSelected()
+    {
+        if (this.mismatchEntry.type == BlockMismatchEntry.Type.CATEGORY_TITLE)
+        {
+            return this.verifier.isMismatchCategorySelected(this.mismatchEntry.mismatchType);
+        }
+        else if (this.mismatchEntry.type == BlockMismatchEntry.Type.DATA)
+        {
+            return this.verifier.isMismatchEntrySelected(this.mismatchEntry.blockMismatch);
+        }
+
+        return false;
+    }
+
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
+        selected = this.shouldRenderAsSelected();
+
+        // Default color for even entries
+        int color = 0xA0303030;
+
         // Draw a lighter background for the hovered and the selected entry
-        if (this.header1 == null && this.header2 == null && (selected || this.isMouseOver(mouseX, mouseY)))
+        if (selected)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
+            color = 0xA0707070;
         }
+        else if (this.isMouseOver(mouseX, mouseY))
+        {
+            color = 0xA0505050;
+        }
+        // Draw a slightly darker background for odd entries
         else if (this.isOdd)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
+            color = 0xA0101010;
         }
-        // Draw a slightly lighter background for even entries
-        else
+
+        GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, color);
+
+        if (selected)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
+            RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
         }
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -227,7 +261,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         int x2 = this.getColumnPosX(1);
         int x3 = this.getColumnPosX(2);
         int y = this.y + 7;
-        int color = 0xFFFFFFFF;
+        color = 0xFFFFFFFF;
 
         if (this.header1 != null && this.header2 != null)
         {

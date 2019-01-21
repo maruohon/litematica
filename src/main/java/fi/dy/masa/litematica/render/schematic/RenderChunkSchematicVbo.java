@@ -473,6 +473,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     {
         OverlayType[] neighborTypes = new OverlayType[4];
         Vec3i[] neighborPositions = new Vec3i[4];
+        int lines = 0;
 
         for (EnumFacing.Axis axis : PositionUtils.AXES_ALL)
         {
@@ -538,10 +539,12 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     {
                         //System.out.printf("plop 2 index: %d, ind: %d, pos: %s, off: %s\n", index, ind, pos, posTmp);
                         RenderUtils.drawBlockBoxEdgeBatchedLines(pos, axis, corner, this.overlayColor, bufferOverlayOutlines);
+                        lines++;
                     }
                 }
             }
         }
+        //System.out.printf("typeSelf: %s, pos: %s, lines: %d\n", typeSelf, pos, lines);
     }
 
     protected OverlayType getOverlayType(IBlockState stateSchematic, IBlockState stateClient)

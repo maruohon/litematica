@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.gui;
 
-import java.util.Collections;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
@@ -32,8 +31,6 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     private static MismatchType resultMode = MismatchType.ALL;
 
     private final SchematicPlacement placement;
-    @Nullable
-    private BlockMismatchEntry selectedDataEntry;
 
     public GuiSchematicVerifier(SchematicPlacement placement)
     {
@@ -234,29 +231,20 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         {
             SchematicVerifier verifier = this.placement.getSchematicVerifier();
 
-            // Clear the selection when clicking again on the selected entry
-            if (entry.equals(this.selectedDataEntry))
-            {
-                this.selectedDataEntry = null;
-                this.getListWidget().clearSelection();
-                this.placement.getSchematicVerifier().clearActiveMismatchRenderPositions();
-            }
             // Main header - show the currently missing/unseen chunks
-            else if (entry.type == BlockMismatchEntry.Type.HEADER)
+            if (entry.type == BlockMismatchEntry.Type.HEADER)
             {
                 verifier.updateRequiredChunksStringList();
             }
             // Category title - show all mismatches of that type
             else if (entry.type == BlockMismatchEntry.Type.CATEGORY_TITLE)
             {
-                this.selectedDataEntry = entry;
-                verifier.updateMismatchOverlaysForType(entry.mismatchType, null);
+                verifier.toggleMismatchCategorySelected(entry.mismatchType);
             }
             // A specific mismatch pair - show only those state pairs
             else if (entry.type == BlockMismatchEntry.Type.DATA)
             {
-                this.selectedDataEntry = entry;
-                verifier.updateMismatchOverlaysForType(entry.mismatchType, entry.blockMismatch);
+                verifier.toggleMismatchEntrySelected(entry.blockMismatch);
             }
         }
     }
@@ -460,13 +448,19 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     break;
 
                 case RESET_IGNORED:
-                    this.parent.placement.getSchematicVerifier().setIgnoredStateMismatches(Collections.emptyList());
+                    this.parent.placement.getSchematicVerifier().resetIgnoredStateMismatches();
                     break;
 
                 case TOGGLE_INFO_HUD:
                     SchematicVerifier verifier = this.parent.placement.getSchematicVerifier();
                     verifier.setInfoHudRenderingEnabled(! verifier.getShouldRender());
                     InfoHud.getInstance().setEnabled(true);
+
+                    if (verifier.getShouldRender())
+                    {
+                        InfoHud.getInstance().addInfoHudRenderer(verifier, true);
+                    }
+
                     break;
             }
 

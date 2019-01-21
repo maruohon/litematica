@@ -245,6 +245,7 @@ litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 litematica.gui.title.schematic_manager=Schematic Manager
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
+litematica.gui.title.schematic_verifier_errors=Verifier errors
 
 litematica.hud.area_selection.box_count=Boxes: %s
 litematica.hud.area_selection.dimensions_position=Dim: %s - p1: %s, p2: %s

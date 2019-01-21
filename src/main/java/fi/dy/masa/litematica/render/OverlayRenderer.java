@@ -17,7 +17,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchRenderPos;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -328,17 +328,19 @@ public class OverlayRenderer
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
 
-            if (verifier.getSelectedMismatchTypeForRender() != null)
+            List<MismatchRenderPos> list = verifier.getSelectedMismatchPositionsForRender();
+
+            if (list.isEmpty() == false)
             {
-                List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
+                List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
                 RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 128);
                 BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
-                this.renderSchematicMismatches(verifier.getSelectedMismatchTypeForRender(), posList, posLook, partialTicks);
+                this.renderSchematicMismatches(list, posLook, partialTicks);
             }
         }
     }
 
-    private void renderSchematicMismatches(MismatchType type, List<BlockPos> posList, @Nullable BlockPos lookPos, float partialTicks)
+    private void renderSchematicMismatches(List<MismatchRenderPos> posList, @Nullable BlockPos lookPos, float partialTicks)
     {
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
@@ -346,48 +348,49 @@ public class OverlayRenderer
         GlStateManager.disableTexture2D();
         GlStateManager.pushMatrix();
 
-        if (posList.isEmpty() == false)
-        {
-            GlStateManager.glLineWidth(2f);
+        GlStateManager.glLineWidth(2f);
 
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+        MismatchRenderPos lookedEntry = null;
+
+        for (MismatchRenderPos entry : posList)
+        {
+            if (entry.pos.equals(lookPos) == false)
+            {
+                RenderUtils.renderBlockOutlineBatched(entry.pos, 0.002, entry.type.getColor(), this.mc.player, buffer, partialTicks);
+            }
+            else
+            {
+                lookedEntry = entry;
+            }
+        }
+
+        if (lookedEntry != null)
+        {
+            tessellator.draw();
             buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
 
-            for (BlockPos pos : posList)
-            {
-                if (lookPos == null || lookPos.equals(pos) == false)
-                {
-                    RenderUtils.renderBlockOutlineBatched(pos, 0.002, type.getColor(), this.mc.player, buffer, partialTicks);
-                }
-            }
-
-            if (lookPos != null)
-            {
-                tessellator.draw();
-                buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-
-                GlStateManager.glLineWidth(6f);
-                RenderUtils.renderBlockOutlineBatched(lookPos, 0.002, type.getColor(), this.mc.player, buffer, partialTicks);
-            }
-
-            tessellator.draw();
+            GlStateManager.glLineWidth(6f);
+            RenderUtils.renderBlockOutlineBatched(lookPos, 0.002, lookedEntry.type.getColor(), this.mc.player, buffer, partialTicks);
         }
+
+        tessellator.draw();
 
         if (Configs.Visuals.RENDER_ERROR_MARKER_SIDES.getBooleanValue())
         {
             GlStateManager.enableBlend();
             GlStateManager.disableCull();
 
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+            float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_ALPHA.getDoubleValue();
 
-            for (BlockPos pos : posList)
+            for (MismatchRenderPos entry : posList)
             {
-                Color4f color = type.getColor();
-                Color4f colorSides = new Color4f(color.r, color.g, color.b, (float) Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_ALPHA.getDoubleValue());
-                RenderUtils.renderAreaSidesBatched(pos, pos, colorSides, 0.002, this.mc.player, partialTicks, buffer);
+                Color4f color = entry.type.getColor();
+                color = new Color4f(color.r, color.g, color.b, alpha);
+                RenderUtils.renderAreaSidesBatched(entry.pos, entry.pos, color, 0.002, this.mc.player, partialTicks, buffer);
             }
 
             tessellator.draw();
@@ -470,7 +473,7 @@ public class OverlayRenderer
         if (placement != null && placement.hasVerifier())
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
-            List<BlockPos> posList = verifier.getSelectedMismatchPositionsForRender();
+            List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
             RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 128);
 
             if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)

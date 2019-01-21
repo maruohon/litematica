@@ -32,6 +32,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
 
         this.browserEntryHeight = 22;
         this.guiSchematicVerifier = parent;
+        this.allowMultiSelection = true;
         this.sorter = new VerifierResultSorter(parent.getPlacement().getSchematicVerifier());
         this.setParent(parent);
     }
