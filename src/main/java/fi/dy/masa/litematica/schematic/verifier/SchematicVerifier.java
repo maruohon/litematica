@@ -79,6 +79,7 @@ public class SchematicVerifier implements IInfoHudRenderer
     private boolean verificationStarted;
     private boolean verificationActive;
     private boolean finished;
+    private boolean shouldRenderInfoHud;
     private int totalRequiredChunks;
     private long schematicBlocks;
     private long clientBlocks;
@@ -88,7 +89,7 @@ public class SchematicVerifier implements IInfoHudRenderer
     @Override
     public boolean getShouldRender()
     {
-        return Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
+        return this.shouldRenderInfoHud;
     }
 
     @Override
@@ -191,7 +192,12 @@ public class SchematicVerifier implements IInfoHudRenderer
     public void clearActiveMismatchRenderPositions()
     {
         this.selectedMismatchPositions.clear();
-        InfoHud.getInstance().removeInfoHudRenderersOfType(SchematicVerifier.class, true);
+        this.infoLines.clear();
+    }
+
+    public void setInfoHudRenderingEnabled(boolean enabled)
+    {
+        this.shouldRenderInfoHud = enabled && Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
     }
 
     @Nullable
@@ -221,7 +227,8 @@ public class SchematicVerifier implements IInfoHudRenderer
             this.completionListener = completionListener;
             this.verificationStarted = true;
 
-            InfoHud.getInstance().addInfoHudRenderer(this, true);
+            this.setInfoHudRenderingEnabled(true);
+            InfoHud.getInstance().addInfoHudRenderer(this, false);
             DataManager.addSchematicVerificationTask(this.schematicPlacement);
         }
 
@@ -273,7 +280,8 @@ public class SchematicVerifier implements IInfoHudRenderer
         this.blockMismatches.clear();
         this.correctStateCounts.clear();
 
-        InfoHud.getInstance().removeInfoHudRenderer(this, true);
+        this.setInfoHudRenderingEnabled(false);
+        InfoHud.getInstance().removeInfoHudRenderer(this, false);
         this.clearActiveMismatchRenderPositions();
     }
 
@@ -749,6 +757,8 @@ public class SchematicVerifier implements IInfoHudRenderer
                 BlockPos pos = positionList.get(i);
                 this.infoLines.add(String.format("x: %6d, y: %3d, z: %6d", pos.getX(), pos.getY(), pos.getZ()));
             }
+
+            this.setInfoHudRenderingEnabled(true);
         }
     }
 

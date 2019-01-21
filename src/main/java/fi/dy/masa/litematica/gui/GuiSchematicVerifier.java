@@ -177,7 +177,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
             case TOGGLE_INFO_HUD:
             {
-                boolean val = InfoHud.getInstance().isEnabled();
+                boolean val = InfoHud.getInstance().isEnabled() && this.placement.getSchematicVerifier().getShouldRender();
                 String str = (val ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (val ? "on" : "off")) + TXT_RST;
                 label = I18n.format("litematica.gui.button.schematic_verifier.toggle_info_hud", str);
                 //int buttonWidth = this.mc.fontRenderer.getStringWidth(label);
@@ -235,7 +235,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             SchematicVerifier verifier = this.placement.getSchematicVerifier();
 
             // Clear the selection when clicking again on the selected entry
-            if (this.selectedDataEntry == entry)
+            if (entry.equals(this.selectedDataEntry))
             {
                 this.selectedDataEntry = null;
                 this.getListWidget().clearSelection();
@@ -310,6 +310,57 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             this.blockMismatch = blockMismatch;
             this.header1 = null;
             this.header2 = null;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((blockMismatch == null) ? 0 : blockMismatch.hashCode());
+            result = prime * result + ((header1 == null) ? 0 : header1.hashCode());
+            result = prime * result + ((header2 == null) ? 0 : header2.hashCode());
+            result = prime * result + ((mismatchType == null) ? 0 : mismatchType.hashCode());
+            result = prime * result + ((type == null) ? 0 : type.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            BlockMismatchEntry other = (BlockMismatchEntry) obj;
+            if (blockMismatch == null)
+            {
+                if (other.blockMismatch != null)
+                    return false;
+            }
+            else if (!blockMismatch.equals(other.blockMismatch))
+                return false;
+            if (header1 == null)
+            {
+                if (other.header1 != null)
+                    return false;
+            }
+            else if (!header1.equals(other.header1))
+                return false;
+            if (header2 == null)
+            {
+                if (other.header2 != null)
+                    return false;
+            }
+            else if (!header2.equals(other.header2))
+                return false;
+            if (mismatchType != other.mismatchType)
+                return false;
+            if (type != other.type)
+                return false;
+            return true;
         }
 
         public enum Type
@@ -413,7 +464,9 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     break;
 
                 case TOGGLE_INFO_HUD:
-                    InfoHud.getInstance().toggleEnabled();
+                    SchematicVerifier verifier = this.parent.placement.getSchematicVerifier();
+                    verifier.setInfoHudRenderingEnabled(! verifier.getShouldRender());
+                    InfoHud.getInstance().setEnabled(true);
                     break;
             }
 
