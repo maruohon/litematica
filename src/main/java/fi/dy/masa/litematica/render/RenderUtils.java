@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.render;
 
 import java.util.List;
 import org.lwjgl.opengl.GL11;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.Color4f;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
@@ -21,6 +22,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
 
@@ -402,7 +404,7 @@ public class RenderUtils
      */
     public static void drawBlockModelOutlinesBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
-        for (final EnumFacing side : EnumFacing.values())
+        for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
             renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, 0));
         }
@@ -451,12 +453,17 @@ public class RenderUtils
 
     public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
-        for (final EnumFacing side : EnumFacing.values())
+        for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
             renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, 0));
         }
 
         renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, 0));
+    }
+
+    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, EnumFacing side, Color4f color, double expand, BufferBuilder buffer)
+    {
+        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, 0));
     }
 
     private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
@@ -484,6 +491,80 @@ public class RenderUtils
 
             buffer.pos(fx, fy, fz).color(color.r, color.g, color.b, color.a).endVertex();
         }
+    }
+
+    /**
+     * Assumes a BufferBuilder in GL_QUADS mode has been initialized
+     */
+    public static void drawBlockBoxSideBatchedQuads(BlockPos pos, EnumFacing side, Color4f color, double expand, BufferBuilder buffer)
+    {
+        double minX = pos.getX() - expand;
+        double minY = pos.getY() - expand;
+        double minZ = pos.getZ() - expand;
+        double maxX = pos.getX() + expand + 1;
+        double maxY = pos.getY() + expand + 1;
+        double maxZ = pos.getZ() + expand + 1;
+
+        switch (side)
+        {
+            case DOWN:
+                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case UP:
+                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case NORTH:
+                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case SOUTH:
+                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case WEST:
+                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case EAST:
+                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+        }
+    }
+
+    public static void drawBlockBoxEdgeBatchedLines(BlockPos pos, EnumFacing.Axis axis, int cornerIndex, Color4f color, BufferBuilder buffer)
+    {
+        Vec3i offset = PositionUtils.getEdgeNeighborOffsets(axis, cornerIndex)[cornerIndex];
+
+        double minX = pos.getX() + offset.getX();
+        double minY = pos.getY() + offset.getY();
+        double minZ = pos.getZ() + offset.getZ();
+        double maxX = pos.getX() + offset.getX() + (axis == EnumFacing.Axis.X ? 1 : 0);
+        double maxY = pos.getY() + offset.getY() + (axis == EnumFacing.Axis.Y ? 1 : 0);
+        double maxZ = pos.getZ() + offset.getZ() + (axis == EnumFacing.Axis.Z ? 1 : 0);
+
+        //System.out.printf("pos: %s, axis: %s, ind: %d\n", pos, axis, cornerIndex);
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
     public static void renderInventoryOverlay(int xOffsetMult, World world, BlockPos pos, Minecraft mc)

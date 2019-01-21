@@ -1,16 +1,16 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.util.BlockRenderLayer;
 
 public class CompiledChunkSchematic extends CompiledChunk
 {
-    private final boolean[] overlayLayersUsed = new boolean[OverlayType.values().length];
-    private final boolean[] overlayLayersStarted = new boolean[OverlayType.values().length];
+    private final boolean[] overlayLayersUsed = new boolean[OverlayRenderType.values().length];
+    private final boolean[] overlayLayersStarted = new boolean[OverlayRenderType.values().length];
     private final BufferBuilder.State[] blockBufferStates = new BufferBuilder.State[BlockRenderLayer.values().length];
-    private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayType.values().length];
+    private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.values().length];
     private boolean overlayEmpty = true;
 
     public boolean isOverlayEmpty()
@@ -18,23 +18,23 @@ public class CompiledChunkSchematic extends CompiledChunk
         return this.overlayEmpty;
     }
 
-    protected void setOverlayTypeUsed(OverlayType type)
+    protected void setOverlayTypeUsed(OverlayRenderType type)
     {
         this.overlayEmpty = false;
         this.overlayLayersUsed[type.ordinal()] = true;
     }
 
-    public boolean isOverlayTypeEmpty(OverlayType type)
+    public boolean isOverlayTypeEmpty(OverlayRenderType type)
     {
         return this.overlayLayersUsed[type.ordinal()] == false;
     }
 
-    public void setOverlayTypeStarted(OverlayType type)
+    public void setOverlayTypeStarted(OverlayRenderType type)
     {
         this.overlayLayersStarted[type.ordinal()] = true;
     }
 
-    public boolean isOverlayTypeStarted(OverlayType type)
+    public boolean isOverlayTypeStarted(OverlayRenderType type)
     {
         return this.overlayLayersStarted[type.ordinal()];
     }
@@ -49,12 +49,12 @@ public class CompiledChunkSchematic extends CompiledChunk
         this.blockBufferStates[layer.ordinal()] = state;
     }
 
-    public BufferBuilder.State getOverlayBufferState(OverlayType type)
+    public BufferBuilder.State getOverlayBufferState(OverlayRenderType type)
     {
         return this.overlayBufferStates[type.ordinal()];
     }
 
-    public void setOverlayBufferState(OverlayType type, BufferBuilder.State state)
+    public void setOverlayBufferState(OverlayRenderType type, BufferBuilder.State state)
     {
         this.overlayBufferStates[type.ordinal()] = state;
     }

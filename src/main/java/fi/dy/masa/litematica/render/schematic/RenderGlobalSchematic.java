@@ -14,7 +14,7 @@ import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.litematica.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
@@ -541,11 +541,11 @@ public class RenderGlobalSchematic extends RenderGlobal
 
     public void renderBlockOverlays()
     {
-        this.renderBlockOverlay(OverlayType.OUTLINE);
-        this.renderBlockOverlay(OverlayType.QUAD);
+        this.renderBlockOverlay(OverlayRenderType.OUTLINE);
+        this.renderBlockOverlay(OverlayRenderType.QUAD);
     }
 
-    private void renderBlockOverlay(OverlayType type)
+    private void renderBlockOverlay(OverlayRenderType type)
     {
         this.mc.profiler.startSection("litematica_overlay_filter_empty");
 
@@ -571,7 +571,7 @@ public class RenderGlobalSchematic extends RenderGlobal
         this.mc.profiler.endSection();
     }
 
-    private void renderBlockOverlayBuffers(OverlayType type)
+    private void renderBlockOverlayBuffers(OverlayRenderType type)
     {
         this.mc.entityRenderer.enableLightmap();
 

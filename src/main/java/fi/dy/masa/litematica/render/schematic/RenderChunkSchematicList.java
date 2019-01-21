@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 public class RenderChunkSchematicList extends RenderChunkSchematicVbo
 {
     private static final int BLOCK_LAYERS = BlockRenderLayer.values().length;
-    private static final int LIST_SIZE = BLOCK_LAYERS + OverlayType.values().length;
+    private static final int LIST_SIZE = BLOCK_LAYERS + OverlayRenderType.values().length;
 
     private final int baseDisplayList;
     private final int baseOverlay;
@@ -27,7 +27,7 @@ public class RenderChunkSchematicList extends RenderChunkSchematicVbo
         return compiledChunk.isLayerEmpty(layer) == false ? this.baseDisplayList + layer.ordinal() : -1;
     }
 
-    public int getOverlayDisplayList(OverlayType type, CompiledChunkSchematic compiledChunk)
+    public int getOverlayDisplayList(OverlayRenderType type, CompiledChunkSchematic compiledChunk)
     {
         return compiledChunk.isOverlayTypeEmpty(type) == false ? this.baseOverlay + type.ordinal() : -1;
     }

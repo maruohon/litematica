@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.util.BlockRenderLayer;
@@ -27,7 +27,7 @@ public class RenderListSchematic extends ChunkRenderContainerSchematic
     }
 
     @Override
-    public void renderBlockOverlays(OverlayType type)
+    public void renderBlockOverlays(OverlayRenderType type)
     {
         if (this.initialized)
         {

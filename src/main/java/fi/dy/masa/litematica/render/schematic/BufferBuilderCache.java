@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.util.BlockRenderLayer;
 
@@ -16,7 +16,7 @@ public class BufferBuilderCache
         this.worldRenderers[BlockRenderLayer.CUTOUT_MIPPED.ordinal()] = new BufferBuilder(131072);
         this.worldRenderers[BlockRenderLayer.TRANSLUCENT.ordinal()] = new BufferBuilder(262144);
 
-        this.overlayBufferBuilders = new BufferBuilder[OverlayType.values().length];
+        this.overlayBufferBuilders = new BufferBuilder[OverlayRenderType.values().length];
 
         for (int i = 0; i < this.overlayBufferBuilders.length; ++i)
         {
@@ -34,7 +34,7 @@ public class BufferBuilderCache
         return this.worldRenderers[id];
     }
 
-    public BufferBuilder getOverlayBuffer(OverlayType type)
+    public BufferBuilder getOverlayBuffer(OverlayRenderType type)
     {
         return this.overlayBufferBuilders[type.ordinal()];
     }

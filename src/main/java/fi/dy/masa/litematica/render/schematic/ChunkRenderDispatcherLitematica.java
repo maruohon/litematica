@@ -16,7 +16,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -291,7 +291,7 @@ public class ChunkRenderDispatcherLitematica
         }
     }
 
-    public ListenableFuture<Object> uploadChunkOverlay(final OverlayType type, final BufferBuilder buffer,
+    public ListenableFuture<Object> uploadChunkOverlay(final OverlayRenderType type, final BufferBuilder buffer,
             final RenderChunkSchematicVbo renderChunk, final CompiledChunkSchematic compiledChunk, final double distanceSq)
     {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread())
