@@ -207,11 +207,6 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         return (this.buttonIgnore == null || mouseX < this.buttonIgnore.x) && super.canSelectAt(mouseX, mouseY, mouseButton);
     }
 
-    protected boolean isRegularEntry()
-    {
-        return this.header1 == null;
-    }
-
     protected boolean shouldRenderAsSelected()
     {
         if (this.mismatchEntry.type == BlockMismatchEntry.Type.CATEGORY_TITLE)
