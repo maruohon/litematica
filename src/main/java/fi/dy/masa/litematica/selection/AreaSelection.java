@@ -333,8 +333,15 @@ public class AreaSelection
 
     public void setCoordinate(Box box, Corner corner, CoordinateType type, int value)
     {
-        box.setCoordinate(value, corner, type);
-        this.calculatedOriginDirty = true;
+        if (corner != null && corner != Corner.NONE)
+        {
+            box.setCoordinate(value, corner, type);
+            this.calculatedOriginDirty = true;
+        }
+        else if (this.explicitOrigin != null)
+        {
+            this.setExplicitOrigin(PositionUtils.getModifiedPosition(this.explicitOrigin, value, type));
+        }
     }
 
     public BlockPos getSubRegionCornerPos(Box box, Corner corner)

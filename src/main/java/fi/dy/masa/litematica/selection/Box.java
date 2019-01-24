@@ -142,23 +142,9 @@ public class Box
 
     public void setCoordinate(int value, Corner corner, CoordinateType type)
     {
-        BlockPos posOld = this.getPosition(corner);
-        BlockPos posNew = posOld;
-
-        switch (type)
-        {
-            case X:
-                posNew = new BlockPos(        value, posOld.getY(), posOld.getZ());
-                break;
-            case Y:
-                posNew = new BlockPos(posOld.getX(),         value, posOld.getZ());
-                break;
-            case Z:
-                posNew = new BlockPos(posOld.getX(), posOld.getY(),         value);
-                break;
-        }
-
-        this.setPosition(posNew, corner);
+        BlockPos pos = this.getPosition(corner);
+        pos = PositionUtils.getModifiedPosition(pos, value, type);
+        this.setPosition(pos, corner);
     }
 
     @Nullable

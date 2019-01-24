@@ -304,6 +304,45 @@ public class PositionUtils
     }
 
     /**
+     * Returns the given position adjusted such that the coordinate indicated by <b>type</b>
+     * is set to the value in <b>value</b>
+     * @param pos
+     * @param value
+     * @param type
+     * @return
+     */
+    public static BlockPos getModifiedPosition(BlockPos pos, int value, CoordinateType type)
+    {
+
+        switch (type)
+        {
+            case X:
+                pos = new BlockPos(     value, pos.getY(), pos.getZ());
+                break;
+            case Y:
+                pos = new BlockPos(pos.getX(),      value, pos.getZ());
+                break;
+            case Z:
+                pos = new BlockPos(pos.getX(), pos.getY(),      value);
+                break;
+        }
+
+        return pos;
+    }
+
+    public static int getCoordinate(BlockPos pos, CoordinateType type)
+    {
+        switch (type)
+        {
+            case X: return pos.getX();
+            case Y: return pos.getY();
+            case Z: return pos.getZ();
+        }
+
+        return 0;
+    }
+
+    /**
      * Mirrors and then rotates the given position around the origin
      */
     public static BlockPos getTransformedBlockPos(BlockPos pos, Mirror mirror, Rotation rotation)

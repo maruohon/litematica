@@ -69,40 +69,44 @@ public class GuiAreaSelectionEditorSimple extends GuiBase
 
         y += 20;
         x = 20;
+        width = 68;
 
-        int yCoords = y;
-        width = 100;
-        label = I18n.format("litematica.gui.label.area_editor.corner_1");
+        this.createCoordinateInputs(x, y, width, Corner.CORNER_1);
+        x += width + 42;
+        this.createCoordinateInputs(x, y, width, Corner.CORNER_2);
+        x += width + 42;
+
+        // Manual Origin defined
+        if (this.selection.getExplicitOrigin() != null)
+        {
+            this.createCoordinateInputs(x, y, width, Corner.NONE);
+        }
+    }
+
+    protected void createCoordinateInputs(int x, int y, int width, Corner corner)
+    {
+        String label = "";
+
+        switch (corner)
+        {
+            case CORNER_1: label = I18n.format("litematica.gui.label.area_editor.corner_1"); break;
+            case CORNER_2: label = I18n.format("litematica.gui.label.area_editor.corner_2"); break;
+            case NONE: label = I18n.format("litematica.gui.label.area_editor.origin"); break;
+        }
+
         this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
         y += 14;
 
-        this.createCoordinateInput(x, y, width, CoordinateType.X, Corner.CORNER_1);
+        this.createCoordinateInput(x, y, width, CoordinateType.X, corner);
         y += 20;
 
-        this.createCoordinateInput(x, y, width, CoordinateType.Y, Corner.CORNER_1);
+        this.createCoordinateInput(x, y, width, CoordinateType.Y, corner);
         y += 20;
 
-        this.createCoordinateInput(x, y, width, CoordinateType.Z, Corner.CORNER_1);
+        this.createCoordinateInput(x, y, width, CoordinateType.Z, corner);
         y += 22;
 
-        this.createButton(x + 10, y, -1, Corner.CORNER_1, ButtonListener.Type.MOVE_TO_PLAYER);
-
-        x += width + 50;
-        y = yCoords;
-        label = I18n.format("litematica.gui.label.area_editor.corner_2");
-        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
-        y += 14;
-
-        this.createCoordinateInput(x, y, width, CoordinateType.X, Corner.CORNER_2);
-        y += 20;
-
-        this.createCoordinateInput(x, y, width, CoordinateType.Y, Corner.CORNER_2);
-        y += 20;
-
-        this.createCoordinateInput(x, y, width, CoordinateType.Z, Corner.CORNER_2);
-        y += 22;
-
-        this.createButton(x + 10, y, -1, Corner.CORNER_2, ButtonListener.Type.MOVE_TO_PLAYER);
+        this.createButton(x + 10, y, -1, corner, ButtonListener.Type.MOVE_TO_PLAYER);
     }
 
     private void createCoordinateInput(int x, int y, int width, CoordinateType coordType, Corner corner)
@@ -112,7 +116,7 @@ public class GuiAreaSelectionEditorSimple extends GuiBase
         int offset = 12;
 
         y += 2;
-        BlockPos pos = this.getBox().getPosition(corner);
+        BlockPos pos = corner == Corner.NONE ? this.selection.getEffectiveOrigin() : this.getBox().getPosition(corner);
         String text = "";
         ButtonListener.Type type = null;
 
@@ -177,29 +181,11 @@ public class GuiAreaSelectionEditorSimple extends GuiBase
 
     private void createCoordinateButton(int x, int y, Corner corner, CoordinateType coordType, ButtonListener.Type type)
     {
-        String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
+        String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift");
         ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
         ButtonListener listener = new ButtonListener(type, corner, coordType, this);
         this.addButton(button, listener);
     }
-
-    /*
-    @Nullable
-    protected CoordinateType getCoordinateTypeForButton(ButtonListener.Type type)
-    {
-        switch (type)
-        {
-            case NUDGE_COORD_X:
-                return  CoordinateType.X;
-            case NUDGE_COORD_Y:
-                return  CoordinateType.Y;
-            case NUDGE_COORD_Z:
-                return  CoordinateType.Z;
-            default:
-                return null;
-        }
-    }
-    */
 
     protected Box getBox()
     {
@@ -220,8 +206,18 @@ public class GuiAreaSelectionEditorSimple extends GuiBase
 
     protected void moveCoordinate(int amount, Corner corner, CoordinateType type)
     {
-        int newValue = this.getBox().getCoordinate(corner, type) + amount;
-        this.getBox().setCoordinate(newValue, corner, type);
+        int oldValue;
+
+        if (corner == Corner.NONE)
+        {
+            oldValue = PositionUtils.getCoordinate(this.selection.getEffectiveOrigin(), type);
+        }
+        else
+        {
+            oldValue = this.getBox().getCoordinate(corner, type);
+        }
+
+        this.selection.setCoordinate(this.getBox(), corner, type, oldValue + amount);
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
@@ -248,8 +244,9 @@ public class GuiAreaSelectionEditorSimple extends GuiBase
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             int amount = mouseButton == 1 ? -1 : 1;
-            if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
-            if (GuiScreen.isAltKeyDown()) { amount *= 4; }
+            if (GuiScreen.isCtrlKeyDown()) { amount *= 100; }
+            if (GuiScreen.isShiftKeyDown()) { amount *= 10; }
+            if (GuiScreen.isAltKeyDown()) { amount *= 5; }
 
             this.parent.setNextMessageType(MessageType.ERROR);
 
@@ -299,7 +296,15 @@ public class GuiAreaSelectionEditorSimple extends GuiBase
                     if (this.parent.mc.player != null)
                     {
                         BlockPos pos = new BlockPos(this.parent.mc.player);
-                        this.parent.selection.setSelectedSubRegionCornerPos(pos, this.corner);
+
+                        if (this.corner == Corner.NONE)
+                        {
+                            this.parent.selection.setExplicitOrigin(pos);
+                        }
+                        else
+                        {
+                            this.parent.selection.setSelectedSubRegionCornerPos(pos, this.corner);
+                        }
                     }
                     break;
 
