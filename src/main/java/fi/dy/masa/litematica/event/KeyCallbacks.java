@@ -4,7 +4,6 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
-import fi.dy.masa.litematica.gui.GuiAreaSelectionManager.SelectedBoxRenamer;
 import fi.dy.masa.litematica.gui.GuiConfigs;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
@@ -20,7 +19,7 @@ import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.AreaSelectionMode;
+import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.OperationMode;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -32,7 +31,6 @@ import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -170,12 +168,12 @@ public class KeyCallbacks
                         SelectionManager sm = DataManager.getSelectionManager();
                         boolean moveEverything = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
 
-                        if (Configs.Generic.SELECTION_MODE.getOptionListValue() == AreaSelectionMode.CORNERS)
+                        if (Configs.Generic.SELECTION_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
                         {
                             Corner corner = isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2;
                             sm.setPositionOfCurrentSelectionToRayTrace(this.mc, corner, moveEverything, maxDistance);
                         }
-                        else if (Configs.Generic.SELECTION_MODE.getOptionListValue() == AreaSelectionMode.CUBOID)
+                        else if (Configs.Generic.SELECTION_MODE.getOptionListValue() == CornerSelectionMode.EXPAND)
                         {
                             sm.handleCuboidModeMouseClick(this.mc, maxDistance, isToolSecondary, moveEverything);
                         }
@@ -349,19 +347,12 @@ public class KeyCallbacks
             {
                 if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind())
                 {
-                    SelectionManager sm = DataManager.getSelectionManager();
-                    AreaSelection sel = sm.getCurrentSelection();
+                    SelectionManager manager = DataManager.getSelectionManager();
 
-                    if (sel != null)
+                    if (manager.getCurrentSelection() != null)
                     {
-                        String name = sel.getCurrentSubRegionBoxName();
-
-                        if (name != null)
-                        {
-                            String title = "litematica.gui.title.rename_area_sub_region";
-                            this.mc.displayGuiScreen(new GuiTextInputFeedback(128, title, name, null, new SelectedBoxRenamer(sm)));
-                            return true;
-                        }
+                        manager.openEditGui(null);
+                        return true;
                     }
                 }
                 else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
@@ -486,10 +477,12 @@ public class KeyCallbacks
                     if (selection != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        selection.createNewSubRegionBox(pos, selection.getName());
 
-                        String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                        StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
+                        if (selection.createNewSubRegionBox(pos, selection.getName()) != null)
+                        {
+                            String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                            StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
+                        }
 
                         return true;
                     }

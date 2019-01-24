@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.PositionUtils.CoordinateType;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.util.math.BlockPos;
@@ -106,6 +107,58 @@ public class Box
         {
             this.size = new BlockPos(1, 1, 1);
         }
+    }
+
+    public BlockPos getPosition(Corner corner)
+    {
+        return corner == Corner.CORNER_1 ? this.getPos1() : this.getPos2();
+    }
+
+    public int getCoordinate(Corner corner, CoordinateType type)
+    {
+        BlockPos pos = this.getPosition(corner);
+
+        switch (type)
+        {
+            case X: return pos.getX();
+            case Y: return pos.getY();
+            case Z: return pos.getZ();
+        }
+
+        return 0;
+    }
+
+    protected void setPosition(BlockPos pos, Corner corner)
+    {
+        if (corner == Corner.CORNER_1)
+        {
+            this.setPos1(pos);
+        }
+        else if (corner == Corner.CORNER_2)
+        {
+            this.setPos2(pos);
+        }
+    }
+
+    public void setCoordinate(int value, Corner corner, CoordinateType type)
+    {
+        BlockPos posOld = this.getPosition(corner);
+        BlockPos posNew = posOld;
+
+        switch (type)
+        {
+            case X:
+                posNew = new BlockPos(        value, posOld.getY(), posOld.getZ());
+                break;
+            case Y:
+                posNew = new BlockPos(posOld.getX(),         value, posOld.getZ());
+                break;
+            case Z:
+                posNew = new BlockPos(posOld.getX(), posOld.getY(),         value);
+                break;
+        }
+
+        this.setPosition(posNew, corner);
     }
 
     @Nullable

@@ -21,6 +21,7 @@ import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.OperationMode;
 import fi.dy.masa.litematica.util.LayerRange;
@@ -57,6 +58,7 @@ public class DataManager implements IDirectoryCache
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
     private LayerRange renderRange = new LayerRange();
     private OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
+    private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
     @Nullable
     private MaterialListBase materialList;
 
@@ -190,6 +192,11 @@ public class DataManager implements IDirectoryCache
     public static LayerRange getRenderLayerRange()
     {
         return getInstance().renderRange;
+    }
+
+    public static AreaSelectionSimple getSimpleArea()
+    {
+        return getInstance().areaSimple;
     }
 
     @Override
@@ -347,6 +354,11 @@ public class DataManager implements IDirectoryCache
                 this.operationMode = OperationMode.AREA_SELECTION;
             }
         }
+
+        if (JsonUtils.hasObject(obj, "area_simple"))
+        {
+            this.areaSimple = AreaSelectionSimple.fromJson(obj.get("area_simple").getAsJsonObject());
+        }
     }
 
     private JsonObject toJson()
@@ -357,6 +369,7 @@ public class DataManager implements IDirectoryCache
         obj.add("placements", this.schematicPlacementManager.toJson());
         obj.add("operation_mode", new JsonPrimitive(this.operationMode.name()));
         obj.add("render_range", this.renderRange.toJson());
+        obj.add("area_simple", this.areaSimple.toJson());
 
         return obj;
     }

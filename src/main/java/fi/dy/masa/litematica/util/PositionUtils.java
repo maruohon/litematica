@@ -658,6 +658,13 @@ public class PositionUtils
         }
     }
 
+    public enum CoordinateType
+    {
+        X,
+        Y,
+        Z
+    }
+
     public enum Corner
     {
         NONE,

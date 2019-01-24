@@ -51,16 +51,21 @@ litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the 
 litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot=Use the screenshot keybind to set the preview
 litematica.info.schematic_manager.preview.success=Preview image successfully set
 
+litematica.gui.button.area_editor.change_mode=Selection Mode: %s
+litematica.gui.button.area_editor.origin_enabled=Manual Origin: %s
+litematica.gui.button.area_editor.set_box_name=Set box name
+litematica.gui.button.area_editor.set_selection_name=Set selection name
+
 litematica.gui.button.area_selections.create_directory=Create directory
 litematica.gui.button.area_selections.create_new_selection=New selection
 litematica.gui.button.area_selections.create_selection_from_placement=From Placement
 
-litematica.gui.button.change_menu.create_schematic_from_area=Create schematic from selection
-litematica.gui.button.change_menu.load_schematics_to_memory=Load schematics to memory
+litematica.gui.button.change_menu.area_editor=Area Editor
+litematica.gui.button.change_menu.load_schematics_to_memory=Load Schematics
 litematica.gui.button.change_menu.schematic_manager=Schematic Manager
-litematica.gui.button.change_menu.show_area_selections=Show area selections
-litematica.gui.button.change_menu.show_loaded_schematics=Show loaded schematics
-litematica.gui.button.change_menu.show_schematic_placements=Show schematic placements
+litematica.gui.button.change_menu.show_area_selections=Area Selection browser
+litematica.gui.button.change_menu.show_loaded_schematics=Loaded Schematics
+litematica.gui.button.change_menu.show_schematic_placements=Schematic Placements
 litematica.gui.button.change_menu.to_main_menu=Litematica menu
 
 litematica.gui.button.config_gui.colors=Colors
@@ -144,8 +149,15 @@ litematica.gui.button.set_preview=Set preview
 litematica.gui.button.unload=Unload
 litematica.gui.button.unlocked=Unlocked
 
+litematica.gui.label.area_editor.box_name=Sub-region box name
+litematica.gui.label.area_editor.selection_name=Selection name
+litematica.gui.label.area_editor.corner_1=Corner 1
+litematica.gui.label.area_editor.corner_2=Corner 2
+
 litematica.gui.label.area_selection_box_count=Boxes: %d
 litematica.gui.label.area_selection_origin=Origin: %s
+litematica.gui.label.area_selection.mode.normal=Normal
+litematica.gui.label.area_selection.mode.simple=Simple
 
 litematica.gui.label.block_info.state_client=Client World Block State
 litematica.gui.label.block_info.state_schematic=Schematic World Block State
@@ -220,6 +232,7 @@ litematica.gui.label.schematic_verifier.missing_chunks=Missing Chunks (%d)
 litematica.gui.label_colored.off=§cOFF§r
 litematica.gui.label_colored.on=§aON§r
 
+litematica.gui.title.area_editor_simple=Area Editor (Simple mode)
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
@@ -250,7 +263,7 @@ litematica.gui.title.schematic_verifier_errors=Verifier errors
 litematica.hud.area_selection.box_count=Boxes: %s
 litematica.hud.area_selection.dimensions_position=Dim: %s - p1: %s, p2: %s
 litematica.hud.area_selection.mode.corners=Corners
-litematica.hud.area_selection.mode.cuboid=Cuboid
+litematica.hud.area_selection.mode.expand=Expand
 litematica.hud.area_selection.origin=Origin: %s
 litematica.hud.area_selection.selected_area=Area: %s
 litematica.hud.area_selection.selected_sub_region=Sub-region: %s

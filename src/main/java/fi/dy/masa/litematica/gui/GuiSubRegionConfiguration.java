@@ -6,6 +6,7 @@ import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -394,12 +395,5 @@ public class GuiSubRegionConfiguration extends GuiBase
 
             return false;
         }
-    }
-
-    public enum CoordinateType
-    {
-        X,
-        Y,
-        Z
     }
 }

@@ -10,18 +10,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
+import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSimple;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -38,10 +43,26 @@ public class SelectionManager
     private String currentSelectionId;
     @Nullable
     private GrabbedElement grabbedElement;
+    private SelectionMode mode = SelectionMode.NORMAL;
+
+    public SelectionMode getSelectionMode()
+    {
+        return this.mode;
+    }
+
+    public void setMode(SelectionMode mode)
+    {
+        this.mode = mode;
+    }
 
     @Nullable
     public String getCurrentSelectionId()
     {
+        if (this.mode == SelectionMode.SIMPLE)
+        {
+            return DataManager.getSimpleArea().getName();
+        }
+
         return this.currentSelectionId;
     }
 
@@ -54,6 +75,11 @@ public class SelectionManager
     @Nullable
     public AreaSelection getSelection(String selectionId)
     {
+        if (this.mode == SelectionMode.SIMPLE)
+        {
+            return DataManager.getSimpleArea();
+        }
+
         return selectionId != null ? this.selections.get(selectionId) : null;
     }
 
@@ -403,7 +429,12 @@ public class SelectionManager
                     return;
                 }
 
-                if (movingCorner)
+                if (movingOrigin)
+                {
+                    this.moveSelectionOrigin(area, pos, moveEntireSelection);
+                }
+                // Moving a corner
+                else
                 {
                     int cornerIndex = corner.ordinal();
 
@@ -419,11 +450,6 @@ public class SelectionManager
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                     StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", cornerIndex, posStr);
-                }
-                // Moving the origin point
-                else
-                {
-                    this.moveSelectionOrigin(area, pos, moveEntireSelection);
                 }
             }
         }
@@ -580,6 +606,23 @@ public class SelectionManager
         this.readOnlySelections.clear();
     }
 
+    public GuiBase getEditGui()
+    {
+        return this.getSelectionMode() == SelectionMode.NORMAL ? new GuiAreaSelectionEditorNormal() : new GuiAreaSelectionEditorSimple();
+    }
+
+    public void openEditGui(@Nullable GuiScreen parent)
+    {
+        GuiBase gui = this.getEditGui();
+
+        if (parent != null)
+        {
+            gui.setParent(parent);
+        }
+
+        Minecraft.getMinecraft().displayGuiScreen(gui);
+    }
+
     public void loadFromJson(JsonObject obj)
     {
         this.clear();
@@ -595,11 +638,18 @@ public class SelectionManager
                 this.setCurrentSelection(currentId);
             }
         }
+
+        if (JsonUtils.hasString(obj, "mode"))
+        {
+            this.mode = SelectionMode.fromString(obj.get("mode").getAsString());
+        }
     }
 
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
+
+        obj.add("mode", new JsonPrimitive(this.mode.name()));
 
         try
         {

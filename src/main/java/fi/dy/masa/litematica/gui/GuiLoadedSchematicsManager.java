@@ -50,7 +50,7 @@ public class GuiLoadedSchematicsManager extends GuiListBase<LitematicaSchematic,
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         x += buttonWidth + 4;
 
-        type = ButtonListenerChangeMenu.ButtonType.SHOW_PLACEMENTS;
+        type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label, type.getIcon());

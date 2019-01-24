@@ -49,7 +49,7 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
         String label;
         ButtonGeneric button;
 
-        ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.SHOW_LOADED;
+        ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS;
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
         button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label, type.getIcon());

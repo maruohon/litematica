@@ -7,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 
 public enum ButtonIcons implements IGuiIcon
 {
+    AREA_EDITOR             (102,  70, 14, 14),
     AREA_SELECTION          (102,   0, 14, 14),
     LOADED_SCHEMATICS       (102,  14, 14, 14),
     SCHEMATIC_BROWSER       (102,  28, 14, 14),

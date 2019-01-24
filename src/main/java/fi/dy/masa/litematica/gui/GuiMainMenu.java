@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -26,16 +28,18 @@ public class GuiMainMenu extends GuiBase
         int y = 30;
         this.id = 0;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SHOW_PLACEMENTS);
+        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS);
         y += 22;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SHOW_LOADED);
+        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS);
         y += 22;
 
         this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS);
         y += 44;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SHOW_AREA_SELECTIONS);
+        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER);
+        y += 22;
+        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.AREA_EDITOR);
         y += 44;
 
         this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_MANAGER);
@@ -64,31 +68,31 @@ public class GuiMainMenu extends GuiBase
         {
             GuiBase gui = null;
 
-            if (this.type == ButtonType.SHOW_LOADED)
+            switch (this.type)
             {
-                gui = new GuiLoadedSchematicsManager();
+                case AREA_EDITOR:
+                    DataManager.getSelectionManager().setMode(SelectionMode.SIMPLE); // FIXME remove, for debug
+                    gui = DataManager.getSelectionManager().getEditGui();
+                    break;
+                case AREA_SELECTION_BROWSER:
+                    gui = new GuiAreaSelectionManager();
+                    break;
+                case LOAD_SCHEMATICS:
+                    gui = new GuiSchematicLoad();
+                    break;
+                case LOADED_SCHEMATICS:
+                    gui = new GuiLoadedSchematicsManager();
+                    break;
+                case MAIN_MENU:
+                    gui = new GuiMainMenu();
+                    break;
+                case SCHEMATIC_MANAGER:
+                    gui = new GuiSchematicManager();
+                    break;
+                case SCHEMATIC_PLACEMENTS:
+                    gui = new GuiPlacementManager();
+                    break;
             }
-            else if (this.type == ButtonType.SHOW_PLACEMENTS)
-            {
-                gui = new GuiPlacementManager();
-            }
-            else if (this.type == ButtonType.SHOW_AREA_SELECTIONS)
-            {
-                gui = new GuiAreaSelectionManager();
-            }
-            else if (this.type == ButtonType.LOAD_SCHEMATICS)
-            {
-                gui = new GuiSchematicLoad();
-            }
-            else if (this.type == ButtonType.SCHEMATIC_MANAGER)
-            {
-                gui = new GuiSchematicManager();
-            }
-            else if (this.type == ButtonType.MAIN_MENU)
-            {
-                gui = new GuiMainMenu();
-            }
-
             if (gui != null)
             {
                 gui.setParent(this.parent);
@@ -106,15 +110,15 @@ public class GuiMainMenu extends GuiBase
         public enum ButtonType
         {
             // List loaded Schematics in SchematicHolder
-            SHOW_LOADED             ("litematica.gui.button.change_menu.show_loaded_schematics", ButtonIcons.LOADED_SCHEMATICS),
+            LOADED_SCHEMATICS       ("litematica.gui.button.change_menu.show_loaded_schematics", ButtonIcons.LOADED_SCHEMATICS),
             // List Schematics placements
-            SHOW_PLACEMENTS         ("litematica.gui.button.change_menu.show_schematic_placements", ButtonIcons.SCHEMATIC_PLACEMENTS),
-            // Load Schematics from file to memory
-            SHOW_AREA_SELECTIONS    ("litematica.gui.button.change_menu.show_area_selections", ButtonIcons.AREA_SELECTION),
+            SCHEMATIC_PLACEMENTS    ("litematica.gui.button.change_menu.show_schematic_placements", ButtonIcons.SCHEMATIC_PLACEMENTS),
+            // Open the Area Selection browser
+            AREA_SELECTION_BROWSER  ("litematica.gui.button.change_menu.show_area_selections", ButtonIcons.AREA_SELECTION),
+            // Open the Area Editor GUI
+            AREA_EDITOR             ("litematica.gui.button.change_menu.area_editor", ButtonIcons.AREA_EDITOR),
             // Load Schematics from file to memory
             LOAD_SCHEMATICS         ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcons.SCHEMATIC_BROWSER),
-            // Create a new Schematic from an area selection
-            CREATE_SCHEMATIC        ("litematica.gui.button.change_menu.create_schematic_from_area", null),
             // Edit Schematics (description or icon), or convert between formats
             SCHEMATIC_MANAGER       ("litematica.gui.button.change_menu.schematic_manager", ButtonIcons.SCHEMATIC_MANAGER),
             // Switch to the Litematica main menu

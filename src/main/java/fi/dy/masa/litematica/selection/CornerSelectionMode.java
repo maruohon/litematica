@@ -3,15 +3,15 @@ package fi.dy.masa.litematica.selection;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import net.minecraft.client.resources.I18n;
 
-public enum AreaSelectionMode implements IConfigOptionListEntry
+public enum CornerSelectionMode implements IConfigOptionListEntry
 {
     CORNERS     ("corners",     "litematica.hud.area_selection.mode.corners"),
-    CUBOID      ("cuboid",      "litematica.hud.area_selection.mode.cuboid");
+    EXPAND      ("expand",      "litematica.hud.area_selection.mode.expand");
 
     private final String configString;
     private final String translationKey;
 
-    private AreaSelectionMode(String configString, String translationKey)
+    private CornerSelectionMode(String configString, String translationKey)
     {
         this.configString = configString;
         this.translationKey = translationKey;
@@ -53,14 +53,14 @@ public enum AreaSelectionMode implements IConfigOptionListEntry
     }
 
     @Override
-    public AreaSelectionMode fromString(String name)
+    public CornerSelectionMode fromString(String name)
     {
         return fromStringStatic(name);
     }
 
-    public static AreaSelectionMode fromStringStatic(String name)
+    public static CornerSelectionMode fromStringStatic(String name)
     {
-        for (AreaSelectionMode mode : AreaSelectionMode.values())
+        for (CornerSelectionMode mode : CornerSelectionMode.values())
         {
             if (mode.configString.equalsIgnoreCase(name))
             {
@@ -68,6 +68,6 @@ public enum AreaSelectionMode implements IConfigOptionListEntry
             }
         }
 
-        return AreaSelectionMode.CORNERS;
+        return CornerSelectionMode.CORNERS;
     }
 }
