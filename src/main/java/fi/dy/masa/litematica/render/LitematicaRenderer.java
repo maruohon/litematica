@@ -304,7 +304,6 @@ public class LitematicaRenderer
                 GlStateManager.doPolygonOffset(-0.3f, -0.6f);
             }
 
-            GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
             this.startShaderIfEnabled();
 
             this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, this.entity);

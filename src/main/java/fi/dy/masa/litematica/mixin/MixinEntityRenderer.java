@@ -52,7 +52,7 @@ public abstract class MixinEntityRenderer
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/RenderGlobal;renderEntities(" +
-                     "Lnet/minecraft/entity/Entity;Lnet/minecraft/client/renderer/culling/ICamera;F)V", shift = Shift.AFTER))
+                     "Lnet/minecraft/entity/Entity;Lnet/minecraft/client/renderer/culling/ICamera;F)V"))
     private void renderEntities(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewiseRenderEntities(partialTicks);
