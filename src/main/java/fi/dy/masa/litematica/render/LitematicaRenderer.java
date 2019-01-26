@@ -31,6 +31,7 @@ public class LitematicaRenderer
     private Entity entity;
     private ICamera camera;
     private boolean renderPiecewise;
+    private boolean renderPiecewiseSchematic;
     private boolean renderPiecewiseBlocks;
     private boolean renderPiecewisePrepared;
     private boolean translucentSchematic;
@@ -263,7 +264,8 @@ public class LitematicaRenderer
         if (this.renderPiecewise)
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
-            this.renderPiecewiseBlocks = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert && Configs.Visuals.SCHEMATIC_BLOCKS_ENABLED.getBooleanValue();
+            this.renderPiecewiseSchematic = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
+            this.renderPiecewiseBlocks = this.renderPiecewiseSchematic && Configs.Visuals.SCHEMATIC_BLOCKS_ENABLED.getBooleanValue();
 
             this.mc.profiler.startSection("litematica_culling");
 
@@ -396,9 +398,11 @@ public class LitematicaRenderer
                 }
             }
 
-            this.mc.profiler.endStartSection("litematica_overlay");
-
-            this.renderSchematicOverlay();
+            if (this.renderPiecewiseSchematic)
+            {
+                this.mc.profiler.endStartSection("litematica_overlay");
+                this.renderSchematicOverlay();
+            }
 
             this.cleanup();
         }
