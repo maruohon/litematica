@@ -84,7 +84,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
             EntityPlayer player = mc.player;
 
-            if (toolEnabled == false || EntityUtils.isHoldingItem(player, DataManager.getToolItem()) == false)
+            if (toolEnabled == false || EntityUtils.hasToolItem(player) == false)
             {
                 return false;
             }

@@ -38,7 +38,7 @@ public class ToolHud extends InfoHud
     @Override
     protected boolean shouldRender()
     {
-        return Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() && EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem());
+        return Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() && EntityUtils.hasToolItem(this.mc.player);
     }
 
     @Override

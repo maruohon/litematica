@@ -24,6 +24,18 @@ import net.minecraft.world.World;
 
 public class EntityUtils
 {
+    public static boolean hasToolItem(EntityLivingBase entity)
+    {
+        ItemStack toolItem = DataManager.getToolItem();
+
+        if (toolItem.isEmpty())
+        {
+            return entity.getHeldItemMainhand().isEmpty();
+        }
+
+        return isHoldingItem(entity, toolItem);
+    }
+
     public static boolean isHoldingItem(EntityLivingBase entity, ItemStack stackReference)
     {
         return getHeldItemOfType(entity, stackReference).isEmpty() == false;
@@ -205,7 +217,7 @@ public class EntityUtils
     {
         return Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() &&
                 (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() == false ||
-                isHoldingItem(player, DataManager.getToolItem()) == false) &&
+                hasToolItem(player) == false) &&
                 Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
                 Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue();
     }

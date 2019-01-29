@@ -451,6 +451,12 @@ public class DataManager implements IDirectoryCache
 
     public static void setToolItem(String itemName)
     {
+        if (itemName.isEmpty() || itemName.equals("empty"))
+        {
+            toolItem = ItemStack.EMPTY;
+            return;
+        }
+
         try
         {
             Matcher matcher = PATTERN_ITEM_META.matcher(itemName);

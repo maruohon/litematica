@@ -150,7 +150,7 @@ public class KeyCallbacks
             OperationMode mode = DataManager.getOperationMode();
 
             boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
-            boolean hasTool = EntityUtils.isHoldingItem(this.mc.player, DataManager.getToolItem());
+            boolean hasTool = EntityUtils.hasToolItem(this.mc.player);
             boolean isToolPrimary = key == Hotkeys.TOOL_PLACE_CORNER_1.getKeybind();
             boolean isToolSecondary = key == Hotkeys.TOOL_PLACE_CORNER_2.getKeybind();
             boolean isToolSelect = key == Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind();
