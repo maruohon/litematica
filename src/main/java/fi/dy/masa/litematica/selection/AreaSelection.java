@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.selection;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.CoordinateType;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.EnumFacing;
@@ -152,6 +155,11 @@ public class AreaSelection
         return this.currentBox != null ? this.subRegionBoxes.get(this.currentBox) : null;
     }
 
+    public Collection<String> getAllSubRegionNames()
+    {
+        return this.subRegionBoxes.keySet();
+    }
+
     public List<Box> getAllSubRegionBoxes()
     {
         return ImmutableList.copyOf(this.subRegionBoxes.values());
@@ -178,17 +186,23 @@ public class AreaSelection
         this.currentBox = name;
         this.subRegionBoxes.put(name, box);
         this.setSubRegionCornerPos(box, Corner.CORNER_1, pos1);
+        this.setSubRegionCornerPos(box, Corner.CORNER_2, pos1);
 
         return name;
     }
 
     public void clearCurrentSelectedCorner()
     {
+        this.setCurrentSelectedCorner(Corner.NONE);
+    }
+
+    public void setCurrentSelectedCorner(Corner corner)
+    {
         Box box = this.getSelectedSubRegionBox();
 
         if (box != null)
         {
-            box.setSelectedCorner(Corner.NONE);
+            box.setSelectedCorner(corner);
         }
     }
 
@@ -216,7 +230,14 @@ public class AreaSelection
 
     public boolean removeSubRegionBox(String name)
     {
-        return this.subRegionBoxes.remove(name) != null;
+        boolean success = this.subRegionBoxes.remove(name) != null;
+
+        if (success && name.equals(this.currentBox))
+        {
+            this.currentBox = null;
+        }
+
+        return success;
     }
 
     public boolean removeSelectedSubRegionBox()
@@ -228,10 +249,25 @@ public class AreaSelection
 
     public boolean renameSubRegionBox(String oldName, String newName)
     {
+        return this.renameSubRegionBox(oldName, newName, null);
+    }
+
+    public boolean renameSubRegionBox(String oldName, String newName, @Nullable IMessageConsumer feedback)
+    {
         Box box = this.subRegionBoxes.get(oldName);
 
-        if (box != null && this.subRegionBoxes.containsKey(newName) == false)
+        if (box != null)
         {
+            if (this.subRegionBoxes.containsKey(newName))
+            {
+                if (feedback != null)
+                {
+                    feedback.addMessage(MessageType.ERROR, "litematica.error.area_editor.rename_sub_region.exists", newName);
+                }
+
+                return false;
+            }
+
             this.subRegionBoxes.remove(oldName);
             box.setName(newName);
             this.subRegionBoxes.put(newName, box);
@@ -331,9 +367,9 @@ public class AreaSelection
         }
     }
 
-    public void setCoordinate(Box box, Corner corner, CoordinateType type, int value)
+    public void setCoordinate(@Nullable Box box, Corner corner, CoordinateType type, int value)
     {
-        if (corner != null && corner != Corner.NONE)
+        if (box != null && corner != null && corner != Corner.NONE)
         {
             box.setCoordinate(value, corner, type);
             this.calculatedOriginDirty = true;

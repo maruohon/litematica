@@ -13,6 +13,9 @@ litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort th
 litematica.error.generic.schematic_world_not_loaded=Schematic world was not loaded
 litematica.error.invalid_directory=Invalid directory '%s'
 
+litematica.error.area_editor.create_sub_region.exists=A sub-region by the name '%s' already exists
+litematica.error.area_editor.rename_sub_region.exists=Failed to rename the sub-region:\nA sub-region already exists by the name '%s'
+
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=Failed to create the Litematica schematic
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
 litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the Structure to a Litematica Schematic
@@ -52,9 +55,11 @@ litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot=Use
 litematica.info.schematic_manager.preview.success=Preview image successfully set
 
 litematica.gui.button.area_editor.change_mode=Selection Mode: %s
+litematica.gui.button.area_editor.create_schematic=Save Schematic
+litematica.gui.button.area_editor.create_sub_region=New sub-region
 litematica.gui.button.area_editor.origin_enabled=Manual Origin: %s
-litematica.gui.button.area_editor.set_box_name=Set box name
-litematica.gui.button.area_editor.set_selection_name=Set selection name
+litematica.gui.button.area_editor.set_box_name=Set
+litematica.gui.button.area_editor.set_selection_name=Set
 
 litematica.gui.button.area_selections.create_directory=Create directory
 litematica.gui.button.area_selections.create_new_selection=New selection
@@ -75,6 +80,7 @@ litematica.gui.button.config_gui.info_overlays=Info Overlays
 litematica.gui.button.config_gui.render_layers=Render Layers
 litematica.gui.button.config_gui.visuals=Visuals
 
+litematica.gui.button.hover.area_editor.shift_for_in_memory=Hold Shift to create an in-memory-only schematic
 litematica.gui.button.hover.material_list.clear_cache=Clears the Material Cache\nNormally this should not be needed\nThis can be used instead of deleting the 'material_cache.nbt'\nfile in case the cache has some wrong data, like items\nstored for blocks that shouldn't have them, like piston heads
 litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift to select the sub regions used for the Material List
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
@@ -155,6 +161,10 @@ litematica.gui.label.area_editor.selection_name=Selection name
 litematica.gui.label.area_editor.corner_1=Corner 1
 litematica.gui.label.area_editor.corner_2=Corner 2
 litematica.gui.label.area_editor.origin=Origin
+litematica.gui.label.area_editor.dimensions=Dimensions
+litematica.gui.label.area_editor.pos1=Corner 1
+litematica.gui.label.area_editor.pos2=Corner 2
+litematica.gui.label.area_editor.sub_regions=Sub-regions (%s)
 
 litematica.gui.label.area_selection_box_count=Boxes: %d
 litematica.gui.label.area_selection_origin=Origin: %s
@@ -234,7 +244,10 @@ litematica.gui.label.schematic_verifier.missing_chunks=Missing Chunks (%d)
 litematica.gui.label_colored.off=§cOFF§r
 litematica.gui.label_colored.on=§aON§r
 
+litematica.gui.title.area_editor_normal=Area Editor (Normal/Multi-box mode)
 litematica.gui.title.area_editor_simple=Area Editor (Simple mode)
+litematica.gui.title.area_editor_sub_region=Area Editor (sub-region)
+litematica.gui.title.area_editor.sub_region_name=Sub-region name
 litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
@@ -294,6 +307,7 @@ litematica.label.none_lower=none
 litematica.label.no=no
 litematica.label.yes=yes
 
+litematica.message.error.no_area_selected=§cNo area selected§r
 litematica.message.error.no_placement_selected=§cNo placement selected§r
 litematica.message.error.only_works_in_single_player=§cThis operation only works in single player§r
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r

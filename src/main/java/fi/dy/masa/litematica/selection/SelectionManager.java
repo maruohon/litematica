@@ -80,13 +80,19 @@ public class SelectionManager
             return DataManager.getSimpleArea();
         }
 
+        return this.getNormalSelection(selectionId);
+    }
+
+    @Nullable
+    protected AreaSelection getNormalSelection(String selectionId)
+    {
         return selectionId != null ? this.selections.get(selectionId) : null;
     }
 
     @Nullable
     public AreaSelection getOrLoadSelection(String selectionId)
     {
-        AreaSelection selection = this.getSelection(selectionId);
+        AreaSelection selection = this.getNormalSelection(selectionId);
 
         if (selection == null)
         {
@@ -104,7 +110,7 @@ public class SelectionManager
     @Nullable
     public AreaSelection getOrLoadSelectionReadOnly(String selectionId)
     {
-        AreaSelection selection = this.getSelection(selectionId);
+        AreaSelection selection = this.getNormalSelection(selectionId);
 
         if (selection == null)
         {
@@ -153,6 +159,14 @@ public class SelectionManager
         }
 
         return false;
+    }
+
+    public boolean renameSelection(String selectionId, String newName, IMessageConsumer feedback)
+    {
+        File dir = new File(selectionId);
+        dir = dir.getParentFile();
+
+        return this.renameSelection(dir, selectionId, newName, feedback);
     }
 
     public boolean renameSelection(File dir, String selectionId, String newName, IMessageConsumer feedback)
@@ -283,6 +297,57 @@ public class SelectionManager
         JsonUtils.writeJsonToFile(selection.toJson(), file);
 
         return this.currentSelectionId;
+    }
+
+    public boolean createNewSubRegion(Minecraft mc, boolean printMessage)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection selection = sm.getCurrentSelection();
+
+        if (selection != null && mc.player != null)
+        {
+            BlockPos pos = new BlockPos(mc.player.getPositionVector());
+
+            if (selection.createNewSubRegionBox(pos, selection.getName()) != null)
+            {
+                if (printMessage)
+                {
+                    String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                    StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean createNewSubRegionIfDoesntExist(String name, Minecraft mc, IMessageConsumer feedback)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection selection = sm.getCurrentSelection();
+
+        if (selection != null && mc.player != null)
+        {
+            if (selection.getSubRegionBox(name) != null)
+            {
+                feedback.addMessage(MessageType.ERROR, "litematica.error.area_editor.create_sub_region.exists", name);
+                return false;
+            }
+
+            BlockPos pos = new BlockPos(mc.player.getPositionVector());
+
+            if (selection.createNewSubRegionBox(pos, name) != null)
+            {
+                String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                feedback.addMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, IMessageConsumer feedback)
@@ -606,21 +671,35 @@ public class SelectionManager
         this.readOnlySelections.clear();
     }
 
+    @Nullable
     public GuiBase getEditGui()
     {
-        return this.getSelectionMode() == SelectionMode.NORMAL ? new GuiAreaSelectionEditorNormal() : new GuiAreaSelectionEditorSimple();
+        if (this.getSelectionMode() == SelectionMode.NORMAL)
+        {
+            AreaSelection selection = this.getCurrentSelection();
+
+            if (selection != null)
+            {
+                return new GuiAreaSelectionEditorNormal(selection);
+            }
+        }
+        else
+        {
+            return new GuiAreaSelectionEditorSimple(DataManager.getSimpleArea());
+        }
+
+        return null;
     }
 
     public void openEditGui(@Nullable GuiScreen parent)
     {
         GuiBase gui = this.getEditGui();
 
-        if (parent != null)
+        if (gui != null)
         {
             gui.setParent(parent);
+            Minecraft.getMinecraft().displayGuiScreen(gui);
         }
-
-        Minecraft.getMinecraft().displayGuiScreen(gui);
     }
 
     public void loadFromJson(JsonObject obj)

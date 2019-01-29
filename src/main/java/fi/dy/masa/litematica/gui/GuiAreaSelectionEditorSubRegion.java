@@ -4,29 +4,33 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.math.BlockPos;
 
-public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
+public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimple
 {
-    protected GuiTextFieldGeneric textFieldBoxName;
+    protected final Box box;
 
-    public GuiAreaSelectionEditorSimple(AreaSelection selection)
+    public GuiAreaSelectionEditorSubRegion(AreaSelection selection, Box box)
     {
         super(selection);
 
-        this.title = I18n.format("litematica.gui.title.area_editor_simple");
+        this.box = box;
+        this.title = I18n.format("litematica.gui.title.area_editor_sub_region");
+    }
+
+    @Override
+    protected void createSelectionEditFields()
+    {
+        // NO-OP
     }
 
     @Override
     protected int addSubRegionFields(int x, int y)
     {
-        this.createButton(x, 24, -1, ButtonListener.Type.CREATE_SCHEMATIC);
-
         x = 12;
+        y = 24;
         String label = I18n.format("litematica.gui.label.area_editor.box_name");
         this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
         y += 13;
@@ -46,12 +50,6 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
         this.createCoordinateInputs(x, y, width, Corner.CORNER_2);
         x += width + 42;
 
-        // Manual Origin defined
-        if (this.selection.getExplicitOrigin() != null)
-        {
-            this.createCoordinateInputs(x, y, width, Corner.NONE);
-        }
-
         return y;
     }
 
@@ -59,34 +57,20 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     @Nullable
     protected Box getBox()
     {
-        return this.selection.getSelectedSubRegionBox();
+        return this.box;
     }
 
     @Override
     protected void renameSubRegion()
     {
-        String oldName = this.selection.getCurrentSubRegionBoxName();
+        String oldName = this.box.getName();
         String newName = this.textFieldBoxName.getText();
         this.selection.renameSubRegionBox(oldName, newName);
     }
 
     @Override
-    protected void renameSelectionFile(String selectionId, String newName)
-    {
-        // Only rename the special simple selection - it doesn't have a file
-        this.selection.setName(newName);
-    }
-
-    @Override
     protected void createOrigin()
     {
-        if (this.getBox() != null)
-        {
-            BlockPos pos1 = this.getBox().getPos1();
-            BlockPos pos2 = this.getBox().getPos2();
-            BlockPos origin = PositionUtils.getMinCorner(pos1, pos2);
-            this.selection.setExplicitOrigin(origin);
-        }
     }
 
     @Override

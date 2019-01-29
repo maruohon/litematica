@@ -68,6 +68,10 @@ public class AreaSelectionSimple extends AreaSelection
             this.subRegionBoxes.put(box.getName(), box);
             this.currentBox = box.getName();
         }
+        else if (this.currentBox == null || this.subRegionBoxes.get(this.currentBox) == null)
+        {
+            this.currentBox = this.subRegionBoxes.keySet().iterator().next();
+        }
     }
 
     public static AreaSelectionSimple fromJson(JsonObject obj)

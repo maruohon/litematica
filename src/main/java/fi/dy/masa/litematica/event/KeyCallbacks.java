@@ -11,8 +11,6 @@ import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiPlacementManager;
 import fi.dy.masa.litematica.gui.GuiRenderLayer;
-import fi.dy.masa.litematica.gui.GuiSchematicSave;
-import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.materials.MaterialListBase;
@@ -26,11 +24,11 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.LayerMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigBoolean;
-import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -352,31 +350,20 @@ public class KeyCallbacks
                     if (manager.getCurrentSelection() != null)
                     {
                         manager.openEditGui(null);
-                        return true;
                     }
+                    else
+                    {
+                        StringUtils.printActionbarMessage("litematica.message.error.no_area_selected");
+                    }
+                    return true;
                 }
                 else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
                 {
-                    SelectionManager sm = DataManager.getSelectionManager();
-                    AreaSelection area = sm.getCurrentSelection();
-
-                    if (area != null)
-                    {
-                        this.mc.displayGuiScreen(new GuiSchematicSave());
-                        return true;
-                    }
+                    return SchematicUtils.saveSchematic(false);
                 }
                 else if (key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
                 {
-                    SelectionManager sm = DataManager.getSelectionManager();
-                    AreaSelection area = sm.getCurrentSelection();
-
-                    if (area != null)
-                    {
-                        String title = "litematica.gui.title.create_in_memory_schematic";
-                        this.mc.displayGuiScreen(new GuiTextInput(128, title, area.getName(), null, new InMemorySchematicCreator(area)));
-                        return true;
-                    }
+                    return SchematicUtils.saveSchematic(true);
                 }
             }
 
@@ -471,21 +458,7 @@ public class KeyCallbacks
             {
                 if (mode.getUsesAreaSelection())
                 {
-                    SelectionManager sm = DataManager.getSelectionManager();
-                    AreaSelection selection = sm.getCurrentSelection();
-
-                    if (selection != null)
-                    {
-                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-
-                        if (selection.createNewSubRegionBox(pos, selection.getName()) != null)
-                        {
-                            String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                            StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
-                        }
-
-                        return true;
-                    }
+                    return DataManager.getSelectionManager().createNewSubRegion(this.mc, true);
                 }
             }
             else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())

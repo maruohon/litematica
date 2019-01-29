@@ -19,6 +19,9 @@ public class Box
 
     public Box()
     {
+        this.pos1 = BlockPos.ORIGIN;
+        this.pos2 = BlockPos.ORIGIN;
+        this.updateSize();
     }
 
     public Box(@Nullable BlockPos pos1, @Nullable BlockPos pos2, String name)

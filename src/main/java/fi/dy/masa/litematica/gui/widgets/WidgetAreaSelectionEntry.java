@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
+import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileType;
@@ -44,8 +45,8 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         if (entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(entry.getFullPath()) == FileType.JSON)
         {
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
-            //posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.RENAME);
+            posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
         }
 
         this.buttonsStartX = posX;
@@ -161,6 +162,15 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
             }
             else if (this.type == ButtonType.CONFIGURE)
             {
+                AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
+
+                if (selection != null)
+                {
+                    GuiAreaSelectionEditorNormal gui = new GuiAreaSelectionEditorNormal(selection);
+                    gui.setParent(this.widget.mc.currentScreen);
+                    gui.setSelectionId(selectionId);
+                    this.widget.mc.displayGuiScreen(gui);
+                }
             }
 
             this.widget.parent.refreshEntries();

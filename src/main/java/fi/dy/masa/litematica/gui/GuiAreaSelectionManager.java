@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.GuiSchematicSaveBase.DirectoryCreator;
 import fi.dy.masa.litematica.gui.widgets.WidgetAreaSelectionBrowser;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -56,6 +57,10 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         this.id = 0;
         int x = this.mc.currentScreen.width - 13;
         int y = 24;
+
+        ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_EDITOR;
+        ButtonGeneric button = new ButtonGeneric(this.id++, 10, y, -1, 20, I18n.format(type.getLabelKey()), type.getIcon());
+        this.addButton(button, new ButtonListenerChangeMenu(type, this));
 
         // These are placed from right to left
         x = this.createButton(x, y, ButtonListener.ButtonType.CREATE_DIRECTORY);

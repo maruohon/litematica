@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -71,7 +70,6 @@ public class GuiMainMenu extends GuiBase
             switch (this.type)
             {
                 case AREA_EDITOR:
-                    DataManager.getSelectionManager().setMode(SelectionMode.SIMPLE); // FIXME remove, for debug
                     gui = DataManager.getSelectionManager().getEditGui();
                     break;
                 case AREA_SELECTION_BROWSER:
@@ -93,12 +91,12 @@ public class GuiMainMenu extends GuiBase
                     gui = new GuiPlacementManager();
                     break;
             }
+
             if (gui != null)
             {
                 gui.setParent(this.parent);
+                Minecraft.getMinecraft().displayGuiScreen(gui);
             }
-
-            Minecraft.getMinecraft().displayGuiScreen(gui);
         }
 
         @Override
