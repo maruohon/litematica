@@ -9,7 +9,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.tool.OperationMode;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.config.HudAlignment;
@@ -50,7 +50,7 @@ public class ToolHud extends InfoHud
     @Override
     protected void updateHudText()
     {
-        OperationMode mode = DataManager.getOperationMode();
+        ToolMode mode = DataManager.getToolMode();
         List<String> lines = this.lineList;
         lines.clear();
         String str;
@@ -177,7 +177,7 @@ public class ToolHud extends InfoHud
 
         str = I18n.format("litematica.hud.selected_mode");
         lines.add(String.format("%s [%s%d%s/%s%d%s]: %s%s%s", str, green, mode.ordinal() + 1, white,
-                green, OperationMode.values().length, white, green, mode.getName(), rst));
+                green, ToolMode.values().length, white, green, mode.getName(), rst));
     }
 
     protected String getBlockString(IBlockState state)

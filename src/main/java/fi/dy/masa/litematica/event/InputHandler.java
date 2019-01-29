@@ -7,7 +7,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.tool.OperationMode;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
@@ -89,7 +89,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 return false;
             }
 
-            OperationMode mode = DataManager.getOperationMode();
+            ToolMode mode = DataManager.getToolMode();
 
             if (dWheel != 0)
             {
@@ -121,7 +121,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
                 else if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
                 {
-                    DataManager.setOperationMode(DataManager.getOperationMode().cycle(player, amount < 0));
+                    DataManager.setToolMode(DataManager.getToolMode().cycle(player, amount < 0));
                     return true;
                 }
             }
@@ -130,7 +130,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
-    public static boolean nudgeSelection(int amount, OperationMode mode, EntityPlayer player)
+    public static boolean nudgeSelection(int amount, ToolMode mode, EntityPlayer player)
     {
         if (mode.getUsesAreaSelection())
         {

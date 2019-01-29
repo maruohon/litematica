@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -11,8 +12,6 @@ import net.minecraft.client.resources.I18n;
 
 public class GuiMainMenu extends GuiBase
 {
-    private int id;
-
     public GuiMainMenu()
     {
         this.title = I18n.format("litematica.gui.title.litematica_main_menu");
@@ -25,29 +24,50 @@ public class GuiMainMenu extends GuiBase
 
         int x = 20;
         int y = 30;
-        this.id = 0;
+        int width = this.getButtonWidth();
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS);
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS);
         y += 22;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS);
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS);
         y += 22;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS);
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS);
         y += 44;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER);
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.AREA_EDITOR);
         y += 22;
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.AREA_EDITOR);
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER);
         y += 44;
 
-        this.createChangeMenuButton(x, y, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_MANAGER);
+        String label = I18n.format("litematica.gui.button.tool_mode", DataManager.getToolMode().getName());
+        int width2 = this.mc.fontRenderer.getStringWidth(label) + 10;
+
+        y = this.height - 30;
+        ButtonGeneric button = new ButtonGeneric(0, x, y, width2, 20, label);
+        this.addButton(button, new ButtonListenerCycleToolMode(this));
+
+        x += width + 20;
+        y = 30;
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_MANAGER);
     }
 
-    private void createChangeMenuButton(int x, int y, ButtonListenerChangeMenu.ButtonType type)
+    private void createChangeMenuButton(int x, int y, int width, ButtonListenerChangeMenu.ButtonType type)
     {
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, 200, 20, I18n.format(type.getLabelKey()), type.getIcon());
+        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, type.getDisplayName(), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this));
+    }
+
+    private int getButtonWidth()
+    {
+        int width = 0;
+
+        for (ButtonListenerChangeMenu.ButtonType type : ButtonListenerChangeMenu.ButtonType.values())
+        {
+            width = Math.max(width, this.mc.fontRenderer.getStringWidth(type.getDisplayName()) + 24);
+        }
+
+        return width;
     }
 
     public static class ButtonListenerChangeMenu implements IButtonActionListener<ButtonGeneric>
@@ -136,10 +156,39 @@ public class GuiMainMenu extends GuiBase
                 return this.labelKey;
             }
 
+            public String getDisplayName()
+            {
+                return I18n.format(this.getLabelKey());
+            }
+
             public ButtonIcons getIcon()
             {
                 return this.icon;
             }
+        }
+    }
+
+    private static class ButtonListenerCycleToolMode implements IButtonActionListener<ButtonGeneric>
+    {
+        private final GuiMainMenu gui;
+
+        private ButtonListenerCycleToolMode(GuiMainMenu gui)
+        {
+            this.gui = gui;
+        }
+
+        @Override
+        public void actionPerformed(ButtonGeneric control)
+        {
+            this.actionPerformedWithButton(control, 0);
+        }
+
+        @Override
+        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        {
+            ToolMode mode = DataManager.getToolMode().cycle(Minecraft.getMinecraft().player, mouseButton == 0);
+            DataManager.setToolMode(mode);
+            this.gui.initGui();
         }
     }
 }

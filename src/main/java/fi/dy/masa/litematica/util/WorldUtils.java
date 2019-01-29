@@ -18,7 +18,7 @@ import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.tool.OperationMode;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
@@ -485,7 +485,7 @@ public class WorldUtils
         }
     }
 
-    public static void setToolModeBlockState(OperationMode mode, boolean primary, Minecraft mc)
+    public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
     {
         RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
         IBlockState state = Blocks.AIR.getDefaultState();

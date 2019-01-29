@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.tool.OperationMode;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.LayerMode;
@@ -147,7 +147,7 @@ public class KeyCallbacks
                 return false;
             }
 
-            OperationMode mode = DataManager.getOperationMode();
+            ToolMode mode = DataManager.getToolMode();
 
             boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
             boolean hasTool = EntityUtils.hasToolItem(this.mc.player);
@@ -397,22 +397,22 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && hasTool && toolEnabled)
             {
-                if (mode == OperationMode.PASTE_SCHEMATIC)
+                if (mode == ToolMode.PASTE_SCHEMATIC)
                 {
                     DataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
                     return true;
                 }
-                else if (mode == OperationMode.FILL && mode.getPrimaryBlock() != null)
+                else if (mode == ToolMode.FILL && mode.getPrimaryBlock() != null)
                 {
                     ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), null);
                     return true;
                 }
-                else if (mode == OperationMode.REPLACE_BLOCK && mode.getPrimaryBlock() != null && mode.getSecondaryBlock() != null)
+                else if (mode == ToolMode.REPLACE_BLOCK && mode.getPrimaryBlock() != null && mode.getSecondaryBlock() != null)
                 {
                     ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), mode.getSecondaryBlock());
                     return true;
                 }
-                else if (mode == OperationMode.DELETE)
+                else if (mode == ToolMode.DELETE)
                 {
                     boolean removeEntities = true; // TODO
                     ToolUtils.deleteSelectionVolumes(this.mc, removeEntities);
@@ -452,7 +452,7 @@ public class KeyCallbacks
         @Override
         public boolean onKeyAction(KeyAction action, IKeybind key)
         {
-            OperationMode mode = DataManager.getOperationMode();
+            ToolMode mode = DataManager.getToolMode();
 
             if (key == Hotkeys.ADD_SELECTION_BOX.getKeybind())
             {

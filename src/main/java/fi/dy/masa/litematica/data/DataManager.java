@@ -23,7 +23,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.tool.OperationMode;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -57,7 +57,7 @@ public class DataManager implements IDirectoryCache
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
     private LayerRange renderRange = new LayerRange();
-    private OperationMode operationMode = OperationMode.SCHEMATIC_PLACEMENT;
+    private ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
     @Nullable
     private MaterialListBase materialList;
@@ -179,12 +179,12 @@ public class DataManager implements IDirectoryCache
         getInstance().materialList = materialList;
     }
 
-    public static OperationMode getOperationMode()
+    public static ToolMode getToolMode()
     {
         return getInstance().operationMode;
     }
 
-    public static void setOperationMode(OperationMode mode)
+    public static void setToolMode(ToolMode mode)
     {
         getInstance().operationMode = mode;
     }
@@ -345,13 +345,13 @@ public class DataManager implements IDirectoryCache
         {
             try
             {
-                this.operationMode = OperationMode.valueOf(obj.get("operation_mode").getAsString());
+                this.operationMode = ToolMode.valueOf(obj.get("operation_mode").getAsString());
             }
             catch (Exception e) {}
 
             if (this.operationMode == null)
             {
-                this.operationMode = OperationMode.AREA_SELECTION;
+                this.operationMode = ToolMode.AREA_SELECTION;
             }
         }
 

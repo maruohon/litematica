@@ -5,7 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 
-public enum OperationMode
+public enum ToolMode
 {
     AREA_SELECTION      ("litematica.operation_mode.name.area_selection", false),
     SCHEMATIC_PLACEMENT ("litematica.operation_mode.name.schematic_placement", true),
@@ -23,12 +23,12 @@ public enum OperationMode
     @Nullable private IBlockState blockPrimary;
     @Nullable private IBlockState blockSecondary;
 
-    private OperationMode(String unlocName, boolean usesSchematic)
+    private ToolMode(String unlocName, boolean usesSchematic)
     {
         this(unlocName, usesSchematic, false, false);
     }
 
-    private OperationMode(String unlocName, boolean usesSchematic, boolean usesBlockPrimary, boolean usesBlockSecondary)
+    private ToolMode(String unlocName, boolean usesSchematic, boolean usesBlockPrimary, boolean usesBlockSecondary)
     {
         this.unlocName = unlocName;
         this.usesSchematic = usesSchematic;
@@ -83,7 +83,7 @@ public enum OperationMode
         return I18n.format(this.unlocName);
     }
 
-    public OperationMode cycle(EntityPlayer player, boolean forward)
+    public ToolMode cycle(EntityPlayer player, boolean forward)
     {
         int id = this.ordinal();
         int numModes = player.capabilities.isCreativeMode ? values().length : 2;

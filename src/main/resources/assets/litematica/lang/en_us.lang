@@ -153,6 +153,7 @@ litematica.gui.button.save_schematic=Save Schematic
 litematica.gui.button.save_to_file=Save to file
 litematica.gui.button.schematic_verifier=Schematic Verifier
 litematica.gui.button.set_preview=Set preview
+litematica.gui.button.tool_mode=Tool Mode: %s
 litematica.gui.button.unload=Unload
 litematica.gui.button.unlocked=Unlocked
 

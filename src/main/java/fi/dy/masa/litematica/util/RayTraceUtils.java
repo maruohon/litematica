@@ -56,7 +56,7 @@ public class RayTraceUtils
 
         clearTraceVars();
 
-        if (DataManager.getOperationMode().getUsesSchematic() == false && area != null)
+        if (DataManager.getToolMode().getUsesSchematic() == false && area != null)
         {
             for (Box box : area.getAllSubRegionBoxes())
             {
@@ -78,7 +78,7 @@ public class RayTraceUtils
             }
         }
 
-        if (DataManager.getOperationMode().getUsesSchematic())
+        if (DataManager.getToolMode().getUsesSchematic())
         {
             for (SchematicPlacement placement : DataManager.getSchematicPlacementManager().getAllSchematicsPlacements())
             {
