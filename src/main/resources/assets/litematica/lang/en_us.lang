@@ -320,6 +320,7 @@ litematica.message.area_filled=Area filled
 litematica.message.area_fill_fail=Failed to fill the area
 litematica.message.area_selections.selection_created_from_placement=Created a new selection from placement '%s'
 litematica.message.directory_created=Directory '%s' created
+litematica.message.easy_place_fail=Action prevented by the Easy Place mode
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.in_memory_schematic_created=Created an in-memory schematic as '%s'
@@ -336,6 +337,7 @@ litematica.message.no_area_selected=§cNo area selected§r
 litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
+litematica.message.placement_restriction_in_effect=Action prevented by Placement Restriction mode
 litematica.message.removed_area_origin=Removed the explicit/manual area origin point
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.scheduled_task_added=Scheduled task added...

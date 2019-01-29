@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
+import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
@@ -27,6 +28,7 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
@@ -593,15 +595,16 @@ public class WorldUtils
         if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
             RayTraceResult trace = traceWrapper.getRayTraceResult();
+            RayTraceResult traceVanilla = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, 6);
             BlockPos pos = trace.getBlockPos();
             World world = SchematicWorldHandler.getSchematicWorld();
             IBlockState stateSchematic = world.getBlockState(pos);
-            ItemStack stack = ItemUtils.getItemForBlock(world, pos, stateSchematic, true);
+            ItemStack stack = MaterialCache.getInstance().getItemForState(stateSchematic);
 
             // Already placed to that position, possible server sync delay
             if (easyPlaceIsPositionCached(pos))
             {
-                return true;
+                return false;
             }
 
             if (stack.isEmpty() == false)
@@ -610,19 +613,19 @@ public class WorldUtils
 
                 if (stateSchematic == stateClient)
                 {
-                    return true;
+                    return false;
                 }
 
                 // Abort if there is already a block in the target position
                 if (easyPlaceBlockChecksCancel(stateSchematic, stateClient, mc.world, pos))
                 {
-                    return true;
+                    return false;
                 }
 
                 // Abort if the required item was not able to be pick-block'd
                 if (doSchematicWorldPickBlock(true, mc) == false)
                 {
-                    return true;
+                    return false;
                 }
 
                 EnumHand hand = EntityUtils.getUsedHandForItem(mc.player, stack);
@@ -630,11 +633,31 @@ public class WorldUtils
                 // Abort if the wrong item is in the player's hand
                 if (hand == null)
                 {
-                    return true;
+                    return false;
                 }
 
                 Vec3d hitPos = trace.hitVec;
                 EnumFacing sideOrig = trace.sideHit;
+
+                // If there is a block in the world right behind the targeted schematic block, then use
+                // that block as the click position
+                if (traceVanilla != null && traceVanilla.typeOfHit == RayTraceResult.Type.BLOCK)
+                {
+                    BlockPos posVanilla = traceVanilla.getBlockPos();
+                    IBlockState stateVanilla = mc.world.getBlockState(posVanilla);
+
+                    if (stateVanilla.getBlock().isReplaceable(mc.world, posVanilla) == false)
+                    {
+                        posVanilla = posVanilla.offset(traceVanilla.sideHit);
+
+                        if (pos.equals(posVanilla))
+                        {
+                            hitPos = traceVanilla.hitVec;
+                            sideOrig = traceVanilla.sideHit;
+                        }
+                    }
+                }
+
                 EnumFacing side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
 
                 // Carpet Accurate Placement protocol support, plus BlockSlab support
@@ -663,10 +686,12 @@ public class WorldUtils
                         mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand);
                     }
                 }
+
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     private static boolean easyPlaceBlockChecksCancel(IBlockState stateSchematic, IBlockState stateClient, World worldClient, BlockPos pos)
@@ -782,6 +807,28 @@ public class WorldUtils
      */
     public static boolean handlePlacementRestriction(Minecraft mc)
     {
+        boolean cancel = placementRestrictionInEffect(mc);
+
+        if (cancel)
+        {
+            StringUtils.printActionbarMessage("litematica.message.placement_restriction_in_effect");
+        }
+
+        return cancel;
+    }
+
+    /**
+     * Does placement restriction checks for the targeted position.
+     * If the targeted position is outside of the current layer range, or should be air
+     * in the schematic, or the player is holding the wrong item in hand, then true is returned
+     * to indicate that the use action should be cancelled.
+     * @param mc
+     * @param doEasyPlace
+     * @param restrictPlacement
+     * @return
+     */
+    private static boolean placementRestrictionInEffect(Minecraft mc)
+    {
         RayTraceResult trace = mc.objectMouseOver;
 
         if (trace.typeOfHit == RayTraceResult.Type.BLOCK)
@@ -812,17 +859,12 @@ public class WorldUtils
             }
 
             IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-            ItemStack stack = ItemUtils.getItemForBlock(worldSchematic, pos, stateSchematic, true);
+            ItemStack stack = MaterialCache.getInstance().getItemForState(stateSchematic);
 
-            if (stack.isEmpty() == false)
+            // The player is holding the wrong item for the targeted position
+            if (stack.isEmpty() || EntityUtils.getUsedHandForItem(mc.player, stack) == null)
             {
-                EnumHand hand = EntityUtils.getUsedHandForItem(mc.player, stack);
-
-                // The player is holding the wrong item for the targeted position
-                if (hand == null)
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
