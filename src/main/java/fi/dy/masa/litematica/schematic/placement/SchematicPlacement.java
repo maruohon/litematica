@@ -476,23 +476,10 @@ public class SchematicPlacement
         return set;
     }
 
-    public Map<String, StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
+    public ImmutableMap<String, StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
     {
-        ImmutableMap<String, Box> map = this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
-        Map<String, StructureBoundingBox> mapOut = new HashMap<>();
-
-        for (Map.Entry<String, Box> entry : map.entrySet())
-        {
-            Box box = entry.getValue();
-            StructureBoundingBox bb = box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
-
-            if (bb != null)
-            {
-                mapOut.put(entry.getKey(), bb);
-            }
-        }
-
-        return mapOut;
+        ImmutableMap<String, Box> subRegions = this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
+        return PositionUtils.getBoxesWithinChunk(chunkX, chunkZ, subRegions);
     }
 
     @Nullable
@@ -504,35 +491,12 @@ public class SchematicPlacement
 
     public Set<ChunkPos> getTouchedChunks()
     {
-        return this.getTouchedChunks(this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED));
+        return PositionUtils.getTouchedChunks(this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED));
     }
 
     public Set<ChunkPos> getTouchedChunksForRegion(String regionName)
     {
-        return this.getTouchedChunks(this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED));
-    }
-
-    private Set<ChunkPos> getTouchedChunks(ImmutableMap<String, Box> boxes)
-    {
-        Set<ChunkPos> set = new HashSet<>();
-
-        for (Box box : boxes.values())
-        {
-            final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX()) >> 4;
-            final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
-            final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX()) >> 4;
-            final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
-
-            for (int cz = boxZMin; cz <= boxZMax; ++cz)
-            {
-                for (int cx = boxXMin; cx <= boxXMax; ++cx)
-                {
-                    set.add(new ChunkPos(cx, cz));
-                }
-            }
-        }
-
-        return set;
+        return PositionUtils.getTouchedChunks(this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED));
     }
 
     private void checkAreSubRegionsModified()

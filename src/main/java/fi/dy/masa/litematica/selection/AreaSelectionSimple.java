@@ -74,6 +74,11 @@ public class AreaSelectionSimple extends AreaSelection
         }
     }
 
+    public AreaSelectionSimple copy()
+    {
+        return fromJson(this.toJson());
+    }
+
     public static AreaSelectionSimple fromJson(JsonObject obj)
     {
         AreaSelectionSimple area = new AreaSelectionSimple(false);

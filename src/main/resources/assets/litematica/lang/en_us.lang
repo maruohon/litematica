@@ -312,6 +312,9 @@ litematica.message.error.no_area_selected=§cNo area selected§r
 litematica.message.error.no_placement_selected=§cNo placement selected§r
 litematica.message.error.only_works_in_single_player=§cThis operation only works in single player§r
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
+litematica.message.error.schematic_save_failed=Failed to save schematic to file '%s'
+litematica.message.error.schematic_save_interrupted=Schematic saving interrupted or stopped
+litematica.message.error.schematic_save_no_area_selected=§cSchematic saving failed - no area selected§r
 
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.area_clear_fail=§cFailed to clear the area(s)§r
@@ -333,7 +336,6 @@ litematica.message.moved_layer_range=Moved layer range §a%s§r by §a%s§r on t
 litematica.message.moved_max_layer_to=Moved max layer to %s
 litematica.message.moved_min_layer_to=Moved min layer to %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
-litematica.message.no_area_selected=§cNo area selected§r
 litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
@@ -348,6 +350,7 @@ litematica.message.schematic_preview_cancelled=Preview task cancelled
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
 litematica.message.schematic_rendering_refreshed=Schematic rendering refreshed
 litematica.message.schematic_saved_as=Schematic saved as '%s'
+litematica.message.schematic_save_task_created=Schematic saving task created
 litematica.message.set_area_origin=Set the area origin point to %s
 litematica.message.set_layer_axis_to=Set layer axis to %s
 litematica.message.set_layer_mode_to=Set layer mode to %s

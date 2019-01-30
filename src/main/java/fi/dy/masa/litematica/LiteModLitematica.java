@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.InitCompleteListener;
 import com.mumfrey.liteloader.LiteMod;
-import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoader;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.Configs;
@@ -15,15 +14,13 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.litematica.event.RenderHandler;
-import fi.dy.masa.litematica.render.DebugScreenMessages;
-import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
 import fi.dy.masa.malilib.event.RenderEventHandler;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import net.minecraft.client.Minecraft;
 
-public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener, Tickable
+public class LiteModLitematica implements LiteMod, Configurable, InitCompleteListener
 {
     public static final Logger logger = LogManager.getLogger(Reference.MOD_ID);
 
@@ -71,14 +68,6 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     @Override
     public void upgradeSettings(String version, File configPath, File oldConfigPath)
     {
-    }
-
-    @Override
-    public void onTick(Minecraft mc, float partialTicks, boolean inGame, boolean clock)
-    {
-        InputHandler.onTick();
-        WorldUtils.easyPlaceOnUseTick(mc);
-        DebugScreenMessages.update(mc);
     }
 
     public static void logInfo(String message, Object... args)

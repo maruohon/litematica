@@ -71,7 +71,7 @@ public class ToolUtils
             }
             else
             {
-                StringUtils.printActionbarMessage("litematica.message.no_area_selected");
+                StringUtils.printActionbarMessage("litematica.message.error.no_area_selected");
             }
         }
     }
@@ -199,7 +199,7 @@ public class ToolUtils
             }
             else
             {
-                StringUtils.printActionbarMessage("litematica.message.no_area_selected");
+                StringUtils.printActionbarMessage("litematica.message.error.no_area_selected");
             }
         }
     }

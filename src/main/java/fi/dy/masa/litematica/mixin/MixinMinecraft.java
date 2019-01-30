@@ -66,6 +66,6 @@ public abstract class MixinMinecraft
     @Inject(method = "runTick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getSystemTime()J"))
     private void onRunTickEnd(CallbackInfo ci)
     {
-        DataManager.runTasks();
+        DataManager.runTasks((Minecraft)(Object) this);
     }
 }

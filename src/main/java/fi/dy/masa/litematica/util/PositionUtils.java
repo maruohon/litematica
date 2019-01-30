@@ -3,9 +3,13 @@ package fi.dy.masa.litematica.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -234,6 +238,52 @@ public class PositionUtils
         return volume;
     }
 
+    public static ImmutableMap<String, StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, ImmutableMap<String, Box> subRegions)
+    {
+        ImmutableMap.Builder<String, StructureBoundingBox> builder = new ImmutableMap.Builder<>();
+
+        for (Map.Entry<String, Box> entry : subRegions.entrySet())
+        {
+            Box box = entry.getValue();
+            StructureBoundingBox bb = box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
+
+            if (bb != null)
+            {
+                builder.put(entry.getKey(), bb);
+            }
+        }
+
+        return builder.build();
+    }
+
+    public static Set<ChunkPos> getTouchedChunks(ImmutableMap<String, Box> boxes)
+    {
+        return getTouchedChunksForBoxes(boxes.values());
+    }
+
+    public static Set<ChunkPos> getTouchedChunksForBoxes(Collection<Box> boxes)
+    {
+        Set<ChunkPos> set = new HashSet<>();
+
+        for (Box box : boxes)
+        {
+            final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX()) >> 4;
+            final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
+            final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX()) >> 4;
+            final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
+
+            for (int cz = boxZMin; cz <= boxZMax; ++cz)
+            {
+                for (int cx = boxXMin; cx <= boxXMax; ++cx)
+                {
+                    set.add(new ChunkPos(cx, cz));
+                }
+            }
+        }
+
+        return set;
+    }
+
     @Nullable
     public static StructureBoundingBox getBoundsWithinChunkForBox(Box box, int chunkX, int chunkZ)
     {
@@ -277,6 +327,11 @@ public class PositionUtils
         int maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1;
 
         return createAABB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public static AxisAlignedBB createAABBFrom(StructureBoundingBox bb)
+    {
+        return createAABB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
     }
 
     /**

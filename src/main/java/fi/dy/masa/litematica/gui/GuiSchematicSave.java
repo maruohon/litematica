@@ -3,22 +3,19 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.world.World;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase
 {
@@ -103,20 +100,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
                     return;
                 }
 
-                boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
-                LitematicaSchematic schematic = this.gui.schematic;
-
-                if (schematic == null)
+                // Saving a schematic from memory
+                if (this.gui.schematic != null)
                 {
-                    schematic = this.createSchematicFromWorld(ignoreEntities);
-                }
-                else
-                {
+                    LitematicaSchematic schematic = this.gui.schematic;
                     schematic.getMetadata().setTimeModified(System.currentTimeMillis());
-                }
 
-                if (schematic != null)
-                {
                     if (schematic.writeToFile(dir, fileName, GuiScreen.isShiftKeyDown(), this.gui))
                     {
                         this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
@@ -125,7 +114,21 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
                 }
                 else
                 {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.schematic_creation_failed");
+                    AreaSelection area = this.selectionManager.getCurrentSelection();
+
+                    if (area != null)
+                    {
+                        String author = this.gui.mc.player.getName();
+                        boolean takeEntities = this.gui.checkboxIgnoreEntities.isChecked() == false;
+                        LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author, this.gui);
+                        TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, GuiScreen.isShiftKeyDown());
+                        TaskScheduler.getInstance().scheduleTask(task, 10);
+                        this.gui.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
+                    }
+                    else
+                    {
+                        this.gui.addMessage(MessageType.ERROR, "litematica.message.error.schematic_save_no_area_selected");
+                    }
                 }
             }
             else if (this.type == ButtonType.CREATE_DIRECTORY)
@@ -140,25 +143,6 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
             this.actionPerformed(control);
-        }
-
-        @Nullable
-        private LitematicaSchematic createSchematicFromWorld(boolean ignoreEntities)
-        {
-            AreaSelection area = this.selectionManager.getCurrentSelection();
-
-            if (area != null)
-            {
-                String author = this.gui.mc.player.getName();
-                World world = WorldUtils.getBestWorld(this.gui.mc);
-
-                if (world != null)
-                {
-                    return LitematicaSchematic.createFromWorld(world, area, ignoreEntities, author, this.gui);
-                }
-            }
-
-            return null;
         }
     }
 
@@ -178,13 +162,13 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
         {
             boolean takeEntities = true; // TODO
             String author = this.mc.player.getName();
-            LitematicaSchematic schematic = LitematicaSchematic.createFromWorld(this.mc.world, this.area, takeEntities, author, InfoUtils.INFO_MESSAGE_CONSUMER);
+            LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(this.area, author, null);
 
             if (schematic != null)
             {
                 schematic.getMetadata().setName(string);
-                SchematicHolder.getInstance().addSchematic(schematic, true);
-                StringUtils.printActionbarMessage("litematica.message.in_memory_schematic_created", string);
+                TaskSaveSchematic task = new TaskSaveSchematic(schematic, this.area, takeEntities);
+                TaskScheduler.getInstance().scheduleTask(task, 10);
             }
         }
     }

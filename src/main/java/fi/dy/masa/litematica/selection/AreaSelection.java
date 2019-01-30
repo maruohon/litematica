@@ -165,6 +165,13 @@ public class AreaSelection
         return ImmutableList.copyOf(this.subRegionBoxes.values());
     }
 
+    public ImmutableMap<String, Box> getAllSubRegions()
+    {
+        ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
+        builder.putAll(this.subRegionBoxes);
+        return builder.build();
+    }
+
     @Nullable
     public String createNewSubRegionBox(BlockPos pos1, final String nameIn)
     {
@@ -383,6 +390,11 @@ public class AreaSelection
     public BlockPos getSubRegionCornerPos(Box box, Corner corner)
     {
         return corner == Corner.CORNER_2 ? box.getPos2() : box.getPos1();
+    }
+
+    public AreaSelection copy()
+    {
+        return fromJson(this.toJson());
     }
 
     public static AreaSelection fromJson(JsonObject obj)

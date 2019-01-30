@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.LiteModLitematica;
@@ -21,6 +22,8 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -159,7 +162,7 @@ public class LitematicaSchematic
         schematic.setSubRegionPositions(boxes, origin);
         schematic.setSubRegionSizes(boxes);
 
-        schematic.takeBlocksFromWorld(world, boxes, origin);
+        schematic.takeBlocksFromWorld(world, boxes);
 
         if (ignoreEntities == false)
         {
@@ -174,6 +177,53 @@ public class LitematicaSchematic
         schematic.metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
         schematic.metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
         schematic.metadata.setTotalBlocks(schematic.totalBlocks);
+
+        return schematic;
+    }
+
+    /**
+     * Creates an empty schematic with all the maps and lists and containers already created.
+     * This is intended to be used for the chunk-wise schematic creation.
+     * @param area
+     * @param author
+     * @param feedback
+     * @return
+     */
+    public static LitematicaSchematic createEmptySchematic(AreaSelection area, String author, @Nullable IMessageConsumer feedback)
+    {
+        List<Box> boxes = PositionUtils.getValidBoxes(area);
+
+        if (boxes.isEmpty())
+        {
+            if (feedback != null)
+            {
+                feedback.addMessage(MessageType.ERROR, I18n.format("litematica.error.schematic.create.no_selections"));
+            }
+            return null;
+        }
+
+        LitematicaSchematic schematic = new LitematicaSchematic(null);
+        schematic.setSubRegionPositions(boxes, area.getEffectiveOrigin());
+        schematic.setSubRegionSizes(boxes);
+        schematic.metadata.setAuthor(author);
+        schematic.metadata.setName(area.getName());
+        schematic.metadata.setRegionCount(boxes.size());
+        schematic.metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
+        schematic.metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
+
+        for (Box box : boxes)
+        {
+            String regionName = box.getName();
+            BlockPos size = box.getSize();
+            final int sizeX = Math.abs(size.getX());
+            final int sizeY = Math.abs(size.getY());
+            final int sizeZ = Math.abs(size.getZ());
+            LitematicaBlockStateContainer container = new LitematicaBlockStateContainer(sizeX, sizeY, sizeZ);
+            schematic.blockContainers.put(regionName, container);
+            schematic.tileEntities.put(regionName, new HashMap<>());
+            schematic.entities.put(regionName, new ArrayList<>());
+            schematic.pendingBlockTicks.put(regionName, new HashMap<>());
+        }
 
         return schematic;
     }
@@ -685,7 +735,50 @@ public class LitematicaSchematic
         }
     }
 
-    private void takeBlocksFromWorld(World world, List<Box> boxes, BlockPos origin)
+    public void takeEntitiesFromWorldWithinChunk(World world, int chunkX, int chunkZ,
+            ImmutableMap<String, StructureBoundingBox> volumes, ImmutableMap<String, Box> boxes,
+            Set<UUID> existingEntities, BlockPos origin)
+    {
+        for (Map.Entry<String, StructureBoundingBox> entry : volumes.entrySet())
+        {
+            String regionName = entry.getKey();
+            List<EntityInfo> list = this.entities.get(regionName);
+            Box box = boxes.get(regionName);
+
+            if (box == null || list == null)
+            {
+                continue;
+            }
+
+            AxisAlignedBB bb = PositionUtils.createAABBFrom(entry.getValue());
+            List<Entity> entities = world.getEntitiesInAABBexcluding(null, bb, null);
+            BlockPos regionPosAbs = box.getPos1();
+
+            for (Entity entity : entities)
+            {
+                UUID uuid = entity.getUniqueID();
+                /*
+                if (entity.posX >= bb.minX && entity.posX < bb.maxX &&
+                    entity.posY >= bb.minY && entity.posY < bb.maxY &&
+                    entity.posZ >= bb.minZ && entity.posZ < bb.maxZ)
+                */
+                if (existingEntities.contains(uuid) == false)
+                {
+                    NBTTagCompound tag = new NBTTagCompound();
+
+                    if (entity.writeToNBTOptional(tag))
+                    {
+                        Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
+                        NBTUtils.writeEntityPositionToTag(posVec, tag);
+                        list.add(new EntityInfo(posVec, tag));
+                        existingEntities.add(uuid);
+                    }
+                }
+            }
+        }
+    }
+
+    private void takeBlocksFromWorld(World world, List<Box> boxes)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
 
@@ -776,6 +869,116 @@ public class LitematicaSchematic
             this.blockContainers.put(box.getName(), container);
             this.tileEntities.put(box.getName(), tileEntityMap);
             this.pendingBlockTicks.put(box.getName(), tickMap);
+        }
+    }
+
+    public void takeBlocksFromWorldWithinChunk(World world, int chunkX, int chunkZ,
+            ImmutableMap<String, StructureBoundingBox> volumes, ImmutableMap<String, Box> boxes)
+    {
+        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
+
+        for (Map.Entry<String, StructureBoundingBox> volumeEntry : volumes.entrySet())
+        {
+            String regionName = volumeEntry.getKey();
+            StructureBoundingBox bb = volumeEntry.getValue();
+            Box box = boxes.get(regionName);
+
+            if (box == null)
+            {
+                LiteModLitematica.logger.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
+                continue;
+            }
+
+            LitematicaBlockStateContainer container = this.blockContainers.get(regionName);
+            Map<BlockPos, NBTTagCompound> tileEntityMap = this.tileEntities.get(regionName);
+            Map<BlockPos, NextTickListEntry> tickMap = this.pendingBlockTicks.get(regionName);
+
+            if (container == null || tileEntityMap == null || tickMap == null)
+            {
+                LiteModLitematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
+                continue;
+            }
+
+            // We want to loop nice & easy from 0 to n here, but the per-sub-region pos1 can be at
+            // any corner of the area. Thus we need to offset from the total area origin
+            // to the minimum/negative corner (ie. 0,0 in the loop) corner here.
+            final BlockPos minCorner = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            final int offsetX = minCorner.getX();
+            final int offsetY = minCorner.getY();
+            final int offsetZ = minCorner.getZ();
+            // Relative coordinates within the sub-region container:
+            final int startX = bb.minX - minCorner.getX();
+            final int startY = bb.minY - minCorner.getY();
+            final int startZ = bb.minZ - minCorner.getZ();
+            final int endX = startX + (bb.maxX - bb.minX);
+            final int endY = startY + (bb.maxY - bb.minY);
+            final int endZ = startZ + (bb.maxZ - bb.minZ);
+
+            for (int y = startY; y <= endY; ++y)
+            {
+                for (int z = startZ; z <= endZ; ++z)
+                {
+                    for (int x = startX; x <= endX; ++x)
+                    {
+                        posMutable.setPos(x + offsetX, y + offsetY, z + offsetZ);
+                        IBlockState state = world.getBlockState(posMutable).getActualState(world, posMutable);
+                        container.set(x, y, z, state);
+
+                        if (state.getBlock() != Blocks.AIR)
+                        {
+                            this.totalBlocks++;
+                        }
+
+                        if (state.getBlock().hasTileEntity())
+                        {
+                            TileEntity te = world.getTileEntity(posMutable);
+
+                            if (te != null)
+                            {
+                                // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
+                                BlockPos pos = new BlockPos(x, y, z);
+                                NBTTagCompound tag = te.writeToNBT(new NBTTagCompound());
+                                NBTUtils.writeBlockPosToTag(pos, tag);
+                                tileEntityMap.put(pos, tag);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (world instanceof WorldServer)
+            {
+                StructureBoundingBox structureBB = StructureBoundingBox.createProper(
+                        startX  , startY  , startZ  ,
+                        endX + 1, endY + 1, endZ + 1);
+                List<NextTickListEntry> pendingTicks = ((WorldServer) world).getPendingBlockUpdates(structureBB, false);
+
+                if (pendingTicks != null)
+                {
+                    final int listSize = pendingTicks.size();
+                    final long currentTime = world.getTotalWorldTime();
+
+                    // The getPendingBlockUpdates() method doesn't check the y-coordinate... :-<
+                    for (int i = 0; i < listSize; ++i)
+                    {
+                        NextTickListEntry entry = pendingTicks.get(i);
+
+                        if (entry.position.getY() >= offsetY && entry.position.getY() < structureBB.maxY)
+                        {
+                            // Store the delay, ie. relative time
+                            BlockPos posRelative = new BlockPos(
+                                    entry.position.getX() - minCorner.getX(),
+                                    entry.position.getY() - minCorner.getY(),
+                                    entry.position.getZ() - minCorner.getZ());
+                            NextTickListEntry newEntry = new NextTickListEntry(posRelative, entry.getBlock());
+                            newEntry.setPriority(entry.priority);
+                            newEntry.setScheduledTime(entry.scheduledTime - currentTime);
+
+                            tickMap.put(posRelative, newEntry);
+                        }
+                    }
+                }
+            }
         }
     }
 
