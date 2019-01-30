@@ -64,7 +64,7 @@ public class GuiMainMenu extends GuiBase
 
         for (ButtonListenerChangeMenu.ButtonType type : ButtonListenerChangeMenu.ButtonType.values())
         {
-            width = Math.max(width, this.mc.fontRenderer.getStringWidth(type.getDisplayName()) + 24);
+            width = Math.max(width, this.mc.fontRenderer.getStringWidth(type.getDisplayName()) + 30);
         }
 
         return width;

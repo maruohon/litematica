@@ -151,7 +151,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         }
 
         textX = posX + 18;
-        posY += 10;
+        posY += 12;
         lineCount = 0;
 
         for (MaterialListEntry entry : list)

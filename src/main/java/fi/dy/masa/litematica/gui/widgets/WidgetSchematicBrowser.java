@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +26,8 @@ import net.minecraft.util.math.Vec3i;
 
 public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 {
+    protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
+
     protected final Map<File, SchematicMetadata> cachedMetadata = new HashMap<>();
     protected final Map<File, Pair<ResourceLocation, DynamicTexture>> cachedPreviewImages = new HashMap<>();
     protected final GuiSchematicBrowserBase parent;
@@ -228,6 +231,18 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             catch (Exception e)
             {
             }
+        }
+    }
+
+    public static class FileFilterSchematics implements FileFilter
+    {
+        @Override
+        public boolean accept(File pathName)
+        {
+            String name = pathName.getName();
+            return  name.endsWith(".litematic") ||
+                    name.endsWith(".schematic") ||
+                    name.endsWith(".nbt");
         }
     }
 }
