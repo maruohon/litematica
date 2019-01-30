@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -139,6 +140,11 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
     {
         if (this.finished)
         {
+            long time = (new Date()).getTime();
+            this.schematic.getMetadata().setTimeCreated(time);
+            this.schematic.getMetadata().setTimeModified(time);
+            this.schematic.getMetadata().setTotalBlocks(this.schematic.getTotalBlocks());
+
             if (this.dir != null)
             {
                 if (this.schematic.writeToFile(this.dir, this.fileName, this.overrideFile, InfoUtils.INFO_MESSAGE_CONSUMER))

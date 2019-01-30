@@ -85,6 +85,11 @@ public class LitematicaSchematic
         return this.totalSize;
     }
 
+    public int getTotalBlocks()
+    {
+        return this.totalBlocks;
+    }
+
     public SchematicMetadata getMetadata()
     {
         return this.metadata;
