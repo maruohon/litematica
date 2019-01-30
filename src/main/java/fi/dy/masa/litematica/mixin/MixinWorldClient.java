@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.util.WorldUtils;
 import net.minecraft.block.state.IBlockState;
@@ -28,12 +27,7 @@ public abstract class MixinWorldClient extends World
     @Inject(method = "invalidateRegionAndSetBlock", at = @At("HEAD"))
     private void onInvalidateRegionAndSetBlock(BlockPos pos, IBlockState state, CallbackInfoReturnable<Boolean> ci)
     {
-        SchematicVerifier verifier = DataManager.getActiveSchematicVerifier();
-
-        if (verifier != null)
-        {
-            verifier.markBlockChanged(pos);
-        }
+        SchematicVerifier.markVerifierBlockChanges(pos);
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
             Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())

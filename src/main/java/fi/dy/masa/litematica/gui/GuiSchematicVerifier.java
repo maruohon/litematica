@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVerificationResults;
@@ -431,18 +430,15 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
                 case STOP:
                     this.parent.placement.getSchematicVerifier().stopVerification();
-                    DataManager.removeSchematicVerificationTask();
                     break;
 
                 case RESET_VERIFIER:
                     this.parent.placement.getSchematicVerifier().reset();
-                    DataManager.removeSchematicVerificationTask();
                     break;
 
                 case SET_LIST_TYPE:
-                    this.parent.placement.getSchematicVerifier().reset();
-                    DataManager.removeSchematicVerificationTask();
                     SchematicPlacement placement = this.parent.placement;
+                    placement.getSchematicVerifier().reset();
                     BlockInfoListType type = placement.getSchematicVerifierType();
                     placement.setSchematicVerifierType((BlockInfoListType) type.cycle(mouseButton == 0));
                     break;
@@ -455,11 +451,6 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     SchematicVerifier verifier = this.parent.placement.getSchematicVerifier();
                     verifier.setInfoHudRenderingEnabled(! verifier.getShouldRender());
                     InfoHud.getInstance().setEnabled(true);
-
-                    if (verifier.getShouldRender())
-                    {
-                        InfoHud.getInstance().addInfoHudRenderer(verifier, true);
-                    }
 
                     break;
             }

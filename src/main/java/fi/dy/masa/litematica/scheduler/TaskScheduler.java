@@ -81,7 +81,30 @@ public class TaskScheduler
         return false;
     }
 
-    public boolean removeTask(Class <? extends ITask> clazz)
+    public boolean removeTask(ITask task)
+    {
+        task.stop();
+        return this.tasks.remove(task);
+    }
+
+    public <T extends ITask> List<T> getTasksOfType(Class <? extends T> clazz)
+    {
+        List<T> list = new ArrayList<>();
+
+        for (int i = 0; i < this.tasks.size(); ++i)
+        {
+            ITask task = this.tasks.get(i);
+
+            if (clazz.isAssignableFrom(task.getClass()))
+            {
+                list.add(clazz.cast(task));
+            }
+        }
+
+        return list;
+    }
+
+    public boolean removeTasksOfType(Class <? extends ITask> clazz)
     {
         boolean removed = false;
 

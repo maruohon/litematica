@@ -20,6 +20,8 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.scheduler.TaskBase;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.ItemUtils;
@@ -45,11 +47,12 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 
-public class SchematicVerifier implements IInfoHudRenderer
+public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 {
     private static final MutablePair<IBlockState, IBlockState> MUTABLE_PAIR = new MutablePair<>();
     private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
     private static final IBlockState AIR = Blocks.AIR.getDefaultState();
+    private static final List<SchematicVerifier> ACTIVE_VERIFIERS = new ArrayList<>();
 
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> missingBlocksPositions = ArrayListMultimap.create();
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> extraBlocksPositions = ArrayListMultimap.create();
@@ -79,15 +82,23 @@ public class SchematicVerifier implements IInfoHudRenderer
     private boolean verificationStarted;
     private boolean verificationActive;
     private boolean finished;
-    private boolean shouldRenderInfoHud;
+    private boolean shouldRenderInfoHud = true;
     private int totalRequiredChunks;
     private long schematicBlocks;
     private long clientBlocks;
 
+    public static void markVerifierBlockChanges(BlockPos pos)
+    {
+        for (int i = 0; i < ACTIVE_VERIFIERS.size(); ++i)
+        {
+            ACTIVE_VERIFIERS.get(i).markBlockChanged(pos);
+        }
+    }
+
     @Override
     public boolean getShouldRender()
     {
-        return this.shouldRenderInfoHud;
+        return this.shouldRenderInfoHud && Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
     }
 
     @Override
@@ -249,7 +260,7 @@ public class SchematicVerifier implements IInfoHudRenderer
 
     public void setInfoHudRenderingEnabled(boolean enabled)
     {
-        this.shouldRenderInfoHud = enabled && Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
+        this.shouldRenderInfoHud = enabled;
     }
 
     public List<MismatchRenderPos> getSelectedMismatchPositionsForRender()
@@ -260,6 +271,26 @@ public class SchematicVerifier implements IInfoHudRenderer
     public List<BlockPos> getSelectedMismatchBlockPositionsForRender()
     {
         return this.mismatchBlockPositionsForRender;
+    }
+
+    @Override
+    public boolean canExecute()
+    {
+        return Minecraft.getMinecraft().world != null;
+    }
+
+    @Override
+    public boolean shouldRemove()
+    {
+        return this.canExecute() == false;
+    }
+
+    @Override
+    public boolean execute()
+    {
+        this.verifyChunks();
+        this.checkChangedPositions();
+        return false;
     }
 
     public void startVerification(WorldClient worldClient, WorldSchematic worldSchematic,
@@ -278,10 +309,9 @@ public class SchematicVerifier implements IInfoHudRenderer
             this.completionListener = completionListener;
             this.verificationStarted = true;
 
+            TaskScheduler.getInstance().scheduleTask(this, 10);
             InfoHud.getInstance().addInfoHudRenderer(this, false);
-            //InfoHud.getInstance().setEnabled(true);
-            //this.setInfoHudRenderingEnabled(true);
-            DataManager.addSchematicVerificationTask(this.schematicPlacement);
+            ACTIVE_VERIFIERS.add(this);
         }
 
         this.verificationActive = true;
@@ -334,7 +364,9 @@ public class SchematicVerifier implements IInfoHudRenderer
         this.selectedCategories.clear();
         this.selectedEntries.clear();
 
-        this.setInfoHudRenderingEnabled(false);
+        ACTIVE_VERIFIERS.remove(this);
+        TaskScheduler.getInstance().removeTask(this);
+
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
         this.clearActiveMismatchRenderPositions();
     }
@@ -352,7 +384,7 @@ public class SchematicVerifier implements IInfoHudRenderer
         }
     }
 
-    public void checkChangedPositions()
+    private void checkChangedPositions()
     {
         if (this.finished && this.recheckQueue.isEmpty() == false)
         {
@@ -418,7 +450,7 @@ public class SchematicVerifier implements IInfoHudRenderer
         }
     }
 
-    public boolean verifyChunks()
+    private boolean verifyChunks()
     {
         if (this.verificationActive)
         {
@@ -860,8 +892,6 @@ public class SchematicVerifier implements IInfoHudRenderer
                 String pre = entry.type.getColorCode();
                 this.infoLines.add(String.format("%sx: %4d, y: %3d, z: %4d%s", pre, pos.getX(), pos.getY(), pos.getZ(), rst));
             }
-
-            this.setInfoHudRenderingEnabled(true);
         }
     }
 

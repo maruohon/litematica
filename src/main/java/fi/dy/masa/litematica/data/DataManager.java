@@ -21,9 +21,7 @@ import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.render.DebugScreenMessages;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -51,11 +49,7 @@ public class DataManager implements IDirectoryCache
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static ConfigGuiTab configGuiTab = ConfigGuiTab.GENERIC;
     private static boolean createPlacementOnLoad = true;
-
     private static boolean canSave;
-
-    @Nullable
-    private static SchematicPlacement placementToVerify = null;
     private static long clientTickStart;
 
     private final SelectionManager selectionManager = new SelectionManager();
@@ -90,28 +84,6 @@ public class DataManager implements IDirectoryCache
         return clientTickStart;
     }
 
-    public static boolean addSchematicVerificationTask(SchematicPlacement placement)
-    {
-        if (placementToVerify == null)
-        {
-            placementToVerify = placement;
-            return true;
-        }
-
-        return false;
-    }
-
-    public static void removeSchematicVerificationTask()
-    {
-        placementToVerify = null;
-    }
-
-    @Nullable
-    public static SchematicVerifier getActiveSchematicVerifier()
-    {
-        return placementToVerify != null ? placementToVerify.getSchematicVerifier() : null;
-    }
-
     public static void runTasks(Minecraft mc)
     {
         InputHandler.onTick();
@@ -120,13 +92,6 @@ public class DataManager implements IDirectoryCache
 
         getInstance().schematicPlacementManager.processQueuedChunks();
         TaskScheduler.getInstance().runTasks();
-
-        if (placementToVerify != null)
-        {
-            SchematicVerifier verifier = placementToVerify.getSchematicVerifier();
-            verifier.verifyChunks();
-            verifier.checkChangedPositions();
-        }
     }
 
     public static ItemStack getToolItem()
