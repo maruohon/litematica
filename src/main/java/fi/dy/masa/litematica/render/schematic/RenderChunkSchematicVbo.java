@@ -151,7 +151,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         }
 
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparency\n");
-        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
+        if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue())
         {
             OverlayRenderType type = OverlayRenderType.QUAD;
             bufferState = compiledChunk.getOverlayBufferState(type);
@@ -318,7 +318,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
             }
         }
 
-        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
+        if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue())
         {
             OverlayType type = this.getOverlayType(stateSchematic, stateClient);
 

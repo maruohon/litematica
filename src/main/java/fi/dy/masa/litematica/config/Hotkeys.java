@@ -45,16 +45,17 @@ public class Hotkeys
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_1       = new ConfigHotkey("setSelectionBoxPosition1",          "M,1",  "Set the first position of the currently selected\nbox to the player's position");
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_2       = new ConfigHotkey("setSelectionBoxPosition2",          "M,2",  "Set the second position of the currently selected\nbox to the player's position");
     public static final ConfigHotkey TOGGLE_ALL_RENDERING               = new ConfigHotkey("toggleAllRendering",                "M,R",  "Toggle all rendering on/off", "All Rendering");
-    public static final ConfigHotkey TOGGLE_SCHEMATIC_RENDERING         = new ConfigHotkey("toggleSchematicRendering",          "M,G",  "Toggle schematic rendering (blocks & overlay) on/off", "Schematic Rendering");
-    public static final ConfigHotkey TOGGLE_INFO_OVERLAY_RENDERING      = new ConfigHotkey("toggleInfoOverlayRendering",        "M,I",  "Toggle the info overlay rendering (for hovered block info)", "Info Overlay");
-    public static final ConfigHotkey TOGGLE_MISMATCH_OVERLAY_RENDERING  = new ConfigHotkey("toggleMismatchOverlayRendering",    "M,E",  "Toggle the mismatch overlay rendering (for Schematic Verifier)", "Verifier Mismatch Overlay");
-    public static final ConfigHotkey TOGGLE_OVERLAY_RENDERING           = new ConfigHotkey("toggleOverlayRendering",            "M,O",  "Toggle the block overlay rendering on/off", "All Block Overlay Rendering");
-    public static final ConfigHotkey TOGGLE_OVERLAY_OUTLINE_RENDERING   = new ConfigHotkey("toggleOverlayOutlineRendering",     "",     "Toggle the block overlay outline rendering on/off", "Block Overlay Outline Rendering");
-    public static final ConfigHotkey TOGGLE_OVERLAY_SIDE_RENDERING      = new ConfigHotkey("toggleOverlaySideRendering",        "",     "Toggle the block overlay side rendering on/off", "Block Overlay Sides/Quads Rendering");
-    public static final ConfigHotkey TOGGLE_PLACEMENT_RESTRICTION       = new ConfigHotkey("togglePlacementRestriction",        "", "A hotkey to toggle the placement restriction mode");
-    public static final ConfigHotkey TOGGLE_SCHEMATIC_BLOCK_RENDERING   = new ConfigHotkey("toggleSchematicBlockRendering",     "",     "Toggle schematic block rendering on/off", "Schematic Block Rendering");
-    public static final ConfigHotkey TOGGLE_SELECTION_BOXES_RENDERING   = new ConfigHotkey("toggleSelectionBoxesRendering",     "M,X",  "Toggle selection boxes rendering on/off", "Selection Boxes Rendering");
-    public static final ConfigHotkey TOGGLE_TRANSLUCENT_RENDERING       = new ConfigHotkey("toggleTranslucentRendering",        "",     "Toggle translucent vs. opaque ghost block rendering", "Translucent Schematic Blocks Rendering");
+    public static final ConfigHotkey TOGGLE_AREA_SELECTION_RENDERING    = new ConfigHotkey("toggleAreaSelectionBoxesRendering", "M,X",  "Toggle Area Selection boxes rendering on/off");
+    public static final ConfigHotkey TOGGLE_SCHEMATIC_RENDERING         = new ConfigHotkey("toggleSchematicRendering",          "M,G",  "Toggle schematic rendering (blocks & overlay) on/off");
+    public static final ConfigHotkey TOGGLE_INFO_OVERLAY_RENDERING      = new ConfigHotkey("toggleInfoOverlayRendering",        "M,I",  "Toggle the info overlay rendering (for hovered block info)");
+    public static final ConfigHotkey TOGGLE_MISMATCH_OVERLAY_RENDERING  = new ConfigHotkey("toggleMismatchOverlayRendering",    "",     "Toggle the mismatch overlay rendering (for Schematic Verifier)");
+    public static final ConfigHotkey TOGGLE_OVERLAY_RENDERING           = new ConfigHotkey("toggleOverlayRendering",            "M,O",  "Toggle the block overlay rendering on/off");
+    public static final ConfigHotkey TOGGLE_OVERLAY_OUTLINE_RENDERING   = new ConfigHotkey("toggleOverlayOutlineRendering",     "",     "Toggle the block overlay outline rendering on/off");
+    public static final ConfigHotkey TOGGLE_OVERLAY_SIDE_RENDERING      = new ConfigHotkey("toggleOverlaySideRendering",        "",     "Toggle the block overlay side rendering on/off");
+    public static final ConfigHotkey TOGGLE_PLACEMENT_BOXES_RENDERING   = new ConfigHotkey("togglePlacementBoxesRendering",     "",     "Toggle Schematic Placement boxes rendering on/off");
+    public static final ConfigHotkey TOGGLE_PLACEMENT_RESTRICTION       = new ConfigHotkey("togglePlacementRestriction",        "",     "A hotkey to toggle the placement restriction mode");
+    public static final ConfigHotkey TOGGLE_SCHEMATIC_BLOCK_RENDERING   = new ConfigHotkey("toggleSchematicBlockRendering",     "",     "Toggle schematic block rendering on/off");
+    public static final ConfigHotkey TOGGLE_TRANSLUCENT_RENDERING       = new ConfigHotkey("toggleTranslucentRendering",        "",     "Toggle translucent vs. opaque ghost block rendering");
     public static final ConfigHotkey TOOL_ENABLED_TOGGLE                = new ConfigHotkey("toolEnabledToggle",                 "M,T",  "The keybind to toggle the \"tool\" item functionality on/off");
     public static final ConfigHotkey TOOL_PLACE_CORNER_1                = new ConfigHotkey("toolPlaceCorner1",                  "BUTTON0", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use while holding the \"tool\" item\nto place the primary/first corner");
     public static final ConfigHotkey TOOL_PLACE_CORNER_2                = new ConfigHotkey("toolPlaceCorner2",                  "BUTTON1", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use while holding the \"tool\" item\nto place the second corner");
@@ -101,15 +102,16 @@ public class Hotkeys
             SET_SELECTION_BOX_POSITION_1,
             SET_SELECTION_BOX_POSITION_2,
             TOGGLE_ALL_RENDERING,
-            TOGGLE_SCHEMATIC_RENDERING,
+            TOGGLE_AREA_SELECTION_RENDERING,
             TOGGLE_INFO_OVERLAY_RENDERING,
             TOGGLE_MISMATCH_OVERLAY_RENDERING,
             TOGGLE_OVERLAY_RENDERING,
             TOGGLE_OVERLAY_OUTLINE_RENDERING,
             TOGGLE_OVERLAY_SIDE_RENDERING,
+            TOGGLE_PLACEMENT_BOXES_RENDERING,
             TOGGLE_PLACEMENT_RESTRICTION,
             TOGGLE_SCHEMATIC_BLOCK_RENDERING,
-            TOGGLE_SELECTION_BOXES_RENDERING,
+            TOGGLE_SCHEMATIC_RENDERING,
             TOGGLE_TRANSLUCENT_RENDERING,
             TOOL_ENABLED_TOGGLE,
             TOOL_PLACE_CORNER_1,

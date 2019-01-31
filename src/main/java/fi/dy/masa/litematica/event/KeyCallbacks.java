@@ -85,15 +85,16 @@ public class KeyCallbacks
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(callbackMessage);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(callbackMessage);
         Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(new MainRenderToggle(Configs.Visuals.ENABLE_RENDERING));
+        Hotkeys.TOGGLE_AREA_SELECTION_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING));
         Hotkeys.TOGGLE_SCHEMATIC_RENDERING.getKeybind().setCallback(new MainRenderToggle(Configs.Visuals.ENABLE_SCHEMATIC_RENDERING));
         Hotkeys.TOGGLE_INFO_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.ENABLE_INFO_OVERLAY_RENDERING));
         Hotkeys.TOGGLE_MISMATCH_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING));
-        Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED));
+        Hotkeys.TOGGLE_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY));
         Hotkeys.TOGGLE_OVERLAY_OUTLINE_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES));
         Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES));
         Hotkeys.TOGGLE_PLACEMENT_RESTRICTION.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PLACEMENT_RESTRICTION));
-        Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.SCHEMATIC_BLOCKS_ENABLED));
-        Hotkeys.TOGGLE_SELECTION_BOXES_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SELECTION_BOXES_RENDERING));
+        Hotkeys.TOGGLE_PLACEMENT_BOXES_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING));
+        Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS));
         Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT));
         Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.TOOL_ITEM_ENABLED));
     }

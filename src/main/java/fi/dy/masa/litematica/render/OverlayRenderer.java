@@ -117,7 +117,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSelectionAreas(float partialTicks)
+    public void renderBoxes(float partialTicks)
     {
         Entity renderViewEntity = this.mc.getRenderViewEntity();
         float expand = 0.001f;
@@ -126,9 +126,10 @@ public class OverlayRenderer
 
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
-        final boolean hasWork = currentSelection != null || this.placements.isEmpty() == false;
+        boolean renderAreas = currentSelection != null && Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue();
+        boolean renderPlacements = this.placements.isEmpty() == false && Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING.getBooleanValue();
 
-        if (hasWork)
+        if (renderAreas || renderPlacements)
         {
             GlStateManager.depthMask(true);
             GlStateManager.disableLighting();
@@ -136,78 +137,75 @@ public class OverlayRenderer
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
             GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
             GlStateManager.pushMatrix();
-        }
 
-        if (currentSelection != null)
-        {
-            GlStateManager.enablePolygonOffset();
-            GlStateManager.doPolygonOffset(-1.2f, -0.2f);
-            GlStateManager.depthMask(false);
-
-            Box currentBox = currentSelection.getSelectedSubRegionBox();
-
-            for (Box box : currentSelection.getAllSubRegionBoxes())
+            if (renderAreas)
             {
-                BoxType type = box == currentBox ? BoxType.AREA_SELECTED : BoxType.AREA_UNSELECTED;
-                this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
-            }
+                GlStateManager.enablePolygonOffset();
+                GlStateManager.doPolygonOffset(-1.2f, -0.2f);
+                GlStateManager.depthMask(false);
 
-            BlockPos origin = currentSelection.getExplicitOrigin();
+                Box currentBox = currentSelection.getSelectedSubRegionBox();
 
-            if (origin != null)
-            {
-                Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
-                RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
-            }
-
-            GlStateManager.depthMask(true);
-            GlStateManager.doPolygonOffset(0f, 0f);
-            GlStateManager.disablePolygonOffset();
-        }
-
-        if (this.placements.isEmpty() == false)
-        {
-            SchematicPlacementManager spm = DataManager.getSchematicPlacementManager();
-            SchematicPlacement currentPlacement = spm.getSelectedSchematicPlacement();
-
-            for (Map.Entry<SchematicPlacement, ImmutableMap<String, Box>> entry : this.placements.entrySet())
-            {
-                SchematicPlacement schematicPlacement = entry.getKey();
-                ImmutableMap<String, Box> boxMap = entry.getValue();
-                boolean origin = schematicPlacement.getSelectedSubRegionPlacement() == null;
-
-                for (Map.Entry<String, Box> entryBox : boxMap.entrySet())
+                for (Box box : currentSelection.getAllSubRegionBoxes())
                 {
-                    String boxName = entryBox.getKey();
-                    boolean boxSelected = schematicPlacement == currentPlacement && (origin || boxName.equals(schematicPlacement.getSelectedSubRegionName()));
-                    BoxType type = boxSelected ? BoxType.PLACEMENT_SELECTED : BoxType.PLACEMENT_UNSELECTED;
-                    this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, schematicPlacement);
+                    BoxType type = box == currentBox ? BoxType.AREA_SELECTED : BoxType.AREA_UNSELECTED;
+                    this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
                 }
 
-                Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
-                RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+                BlockPos origin = currentSelection.getExplicitOrigin();
 
-                if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX.getBooleanValue())
+                if (origin != null)
                 {
-                    Box box = schematicPlacement.getEclosingBox();
+                    Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
+                    RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+                }
 
-                    if (schematicPlacement.shouldRenderEnclosingBox() && box != null)
+                GlStateManager.depthMask(true);
+                GlStateManager.doPolygonOffset(0f, 0f);
+                GlStateManager.disablePolygonOffset();
+            }
+
+            if (renderPlacements)
+            {
+                SchematicPlacementManager spm = DataManager.getSchematicPlacementManager();
+                SchematicPlacement currentPlacement = spm.getSelectedSchematicPlacement();
+
+                for (Map.Entry<SchematicPlacement, ImmutableMap<String, Box>> entry : this.placements.entrySet())
+                {
+                    SchematicPlacement schematicPlacement = entry.getKey();
+                    ImmutableMap<String, Box> boxMap = entry.getValue();
+                    boolean origin = schematicPlacement.getSelectedSubRegionPlacement() == null;
+
+                    for (Map.Entry<String, Box> entryBox : boxMap.entrySet())
                     {
-                        RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
+                        String boxName = entryBox.getKey();
+                        boolean boxSelected = schematicPlacement == currentPlacement && (origin || boxName.equals(schematicPlacement.getSelectedSubRegionName()));
+                        BoxType type = boxSelected ? BoxType.PLACEMENT_SELECTED : BoxType.PLACEMENT_UNSELECTED;
+                        this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, schematicPlacement);
+                    }
 
-                        if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
+                    Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
+                    RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+
+                    if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX.getBooleanValue())
+                    {
+                        Box box = schematicPlacement.getEclosingBox();
+
+                        if (schematicPlacement.shouldRenderEnclosingBox() && box != null)
                         {
-                            float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
-                            color = new Color4f(color.r, color.g, color.b, alpha);
-                            RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, renderViewEntity, partialTicks);
+                            RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
+
+                            if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
+                            {
+                                float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
+                                color = new Color4f(color.r, color.g, color.b, alpha);
+                                RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, renderViewEntity, partialTicks);
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (hasWork)
-        {
             GlStateManager.popMatrix();
             GlStateManager.enableTexture2D();
             GlStateManager.enableCull();

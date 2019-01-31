@@ -130,7 +130,7 @@ public class LitematicaRenderer
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();
 
-        if (Configs.Visuals.SCHEMATIC_BLOCKS_ENABLED.getBooleanValue())
+        if (Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue())
         {
             GlStateManager.pushMatrix();
 
@@ -208,7 +208,7 @@ public class LitematicaRenderer
 
     public void renderSchematicOverlay()
     {
-        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
+        if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue())
         {
             GlStateManager.pushMatrix();
             GlStateManager.disableTexture2D();
@@ -265,7 +265,7 @@ public class LitematicaRenderer
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
             this.renderPiecewiseSchematic = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
-            this.renderPiecewiseBlocks = this.renderPiecewiseSchematic && Configs.Visuals.SCHEMATIC_BLOCKS_ENABLED.getBooleanValue();
+            this.renderPiecewiseBlocks = this.renderPiecewiseSchematic && Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue();
 
             this.mc.profiler.startSection("litematica_culling");
 

@@ -26,10 +26,7 @@ public class RenderHandler implements IRenderer
                 LitematicaRenderer.getInstance().renderSchematicWorld(partialTicks);
             }
 
-            if (Configs.Visuals.ENABLE_SELECTION_BOXES_RENDERING.getBooleanValue())
-            {
-                OverlayRenderer.getInstance().renderSelectionAreas(partialTicks);
-            }
+            OverlayRenderer.getInstance().renderBoxes(partialTicks);
 
             if (Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue())
             {
