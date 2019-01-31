@@ -65,7 +65,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         int y = 28;
         int id = 0;
 
-        this.textFieldRename = new GuiTextFieldGeneric(id, this.mc.fontRenderer, x, y + 2, width, 16);
+        this.textFieldRename = new GuiTextFieldGeneric(x, y + 2, width, 16, this.mc.fontRenderer);
         this.textFieldRename.setMaxStringLength(256);
         this.textFieldRename.setText(this.placement.getName());
         this.addTextField(this.textFieldRename, null);
@@ -171,7 +171,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             case Z: text = String.valueOf(pos.getZ()); break;
         }
 
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(0, x + offset, y + 1, width, 16, this.mc.fontRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y + 1, width, 16, this.mc.fontRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.placement, this);
         this.addTextField(textField, listener);

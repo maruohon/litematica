@@ -37,7 +37,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         this.schematic = schematic;
 
         Minecraft mc = Minecraft.getMinecraft();
-        this.textField = new GuiTextFieldGeneric(0, mc.fontRenderer, 10, 32, 90, 20);
+        this.textField = new GuiTextFieldGeneric(10, 32, 90, 20, mc.fontRenderer);
         this.textField.setMaxStringLength(256);
         this.textField.setFocused(true);
     }

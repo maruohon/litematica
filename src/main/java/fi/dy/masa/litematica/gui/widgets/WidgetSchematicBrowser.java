@@ -2,10 +2,8 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
@@ -74,14 +72,9 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected void addFileEntriesToList(File dir, List<DirectoryEntry> list)
+    protected FileFilter getFileFilter()
     {
-        for (File file : dir.listFiles(SCHEMATIC_FILTER))
-        {
-            list.add(new DirectoryEntry(DirectoryEntryType.fromFile(file), dir, file.getName()));
-        }
-
-        Collections.sort(list);
+        return SCHEMATIC_FILTER;
     }
 
     @Override

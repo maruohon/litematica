@@ -89,7 +89,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         y += 13;
 
         int width = 202;
-        this.textFieldSelectionName = new GuiTextFieldGeneric(0, this.mc.fontRenderer, x, y + 2, width, 16);
+        this.textFieldSelectionName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.mc.fontRenderer);
         this.textFieldSelectionName.setText(this.selection.getName());
         this.addTextField(this.textFieldSelectionName, new TextFieldListenerDummy());
         x += width + 4;
@@ -219,7 +219,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                 break;
         }
 
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(0, x + offset, y, width, 16, this.mc.fontRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y, width, 16, this.mc.fontRenderer);
         TextFieldListener listener = new TextFieldListener(coordType, corner, this);
         textField.setText(text);
         this.addTextField(textField, listener);

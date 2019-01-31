@@ -2,8 +2,6 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Collections;
-import java.util.List;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.Icons;
@@ -42,14 +40,9 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected void addFileEntriesToList(File dir, List<DirectoryEntry> list)
+    protected FileFilter getFileFilter()
     {
-        for (File file : dir.listFiles(JSON_FILTER))
-        {
-            list.add(new DirectoryEntry(DirectoryEntryType.fromFile(file), dir, file.getName()));
-        }
-
-        Collections.sort(list);
+        return JSON_FILTER;
     }
 
     @Override

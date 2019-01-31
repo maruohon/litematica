@@ -19,14 +19,12 @@ public class GuiRenderLayer extends GuiBase
 {
     private GuiTextField textField1;
     private GuiTextField textField2;
-    private int id;
 
     @Override
     public void initGui()
     {
         super.initGui();
 
-        this.id = 0;
         int x = 10;
         int y = 26;
 
@@ -59,7 +57,7 @@ public class GuiRenderLayer extends GuiBase
             width = this.mc.fontRenderer.getStringWidth(label) + 10;
         }
 
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
         button.enabled = enabled;
         this.addButton(button, listener);
 
@@ -74,7 +72,7 @@ public class GuiRenderLayer extends GuiBase
             String label = type.getDisplayName();
             int width = this.mc.fontRenderer.getStringWidth(label) + 10;
 
-            ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+            ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
             this.addButton(button, listener);
 
             return width;
@@ -119,7 +117,7 @@ public class GuiRenderLayer extends GuiBase
 
         if (layerMode == LayerMode.LAYER_RANGE)
         {
-            this.textField2 = new GuiTextFieldInteger(this.id++, x, y, width, 20, this.mc.fontRenderer);
+            this.textField2 = new GuiTextFieldInteger(x, y, width, 20, this.mc.fontRenderer);
             this.addTextField(this.textField2, this.createTextFieldListener(layerMode, true));
             this.createValueAdjustButton(x + width + 3, y, true);
             y += 23;
@@ -129,7 +127,7 @@ public class GuiRenderLayer extends GuiBase
             this.textField2 = null;
         }
 
-        this.textField1 = new GuiTextFieldInteger(this.id++, x, y, width, 20, this.mc.fontRenderer);
+        this.textField1 = new GuiTextFieldInteger(x, y, width, 20, this.mc.fontRenderer);
         this.addTextField(this.textField1, this.createTextFieldListener(layerMode, false));
         this.createValueAdjustButton(x + width + 3, y, false);
         y += 23;
@@ -159,7 +157,7 @@ public class GuiRenderLayer extends GuiBase
         LayerRange layerRange = DataManager.getRenderLayerRange();
         LayerMode layerMode = layerRange.getLayerMode();
         ButtonListenerChangeValue listener = new ButtonListenerChangeValue(layerMode, isSecondValue, this);
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y + 2, Icons.BUTTON_PLUS_MINUS_16);
+        ButtonGeneric button = new ButtonGeneric(0, x, y + 2, Icons.BUTTON_PLUS_MINUS_16);
         this.addButton(button, listener);
     }
 
