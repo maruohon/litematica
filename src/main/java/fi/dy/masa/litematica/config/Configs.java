@@ -8,6 +8,7 @@ import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.HudAlignment;
@@ -127,11 +128,13 @@ public class Configs implements IConfigHandler
 
     public static class InfoOverlays
     {
-        public static final ConfigInteger       BLOCK_INFO_OFFSET_X                 = new ConfigInteger("blockInfoLinesOffsetX", 4, 0, 2000, "The x offset of the block info lines from the selected edge");
-        public static final ConfigInteger       BLOCK_INFO_OFFSET_Y                 = new ConfigInteger("blockInfoLinesOffsetY", 4, 0, 2000, "The y offset of the block info lines from the selected edge");
-        public static final ConfigDouble        BLOCK_INFO_FONT_SCALE               = new ConfigDouble( "blockInfoFontScale", 0.5, 0, 10, "The font scale for the block info lines");
         public static final ConfigOptionList    BLOCK_INFO_LINES_ALIGNMENT          = new ConfigOptionList("blockInfoLinesAlignment", HudAlignment.TOP_RIGHT, "The alignment of the block info lines overlay");
-        public static final ConfigBoolean       ENABLE_INFO_OVERLAY_RENDERING       = new ConfigBoolean("enableInfoOverlayRendering", true, "Enable Info Overlay rendering to show block info\nabout the looked-at block or verifier error marker", "Info Overlay Rendering");
+        public static final ConfigDouble        BLOCK_INFO_LINES_FONT_SCALE         = new ConfigDouble( "blockInfoLinesFontScale", 0.5, 0, 10, "The font scale for the block info lines");
+        public static final ConfigInteger       BLOCK_INFO_LINES_OFFSET_X           = new ConfigInteger("blockInfoLinesOffsetX", 4, 0, 2000, "The x offset of the block info lines from the selected edge");
+        public static final ConfigInteger       BLOCK_INFO_LINES_OFFSET_Y           = new ConfigInteger("blockInfoLinesOffsetY", 4, 0, 2000, "The y offset of the block info lines from the selected edge");
+        public static final ConfigOptionList    BLOCK_INFO_OVERLAY_ALIGNMENT        = new ConfigOptionList("blockInfoOverlayAlignment", BlockInfoAlignment.CENTER, "The alignment of the Block Info Overlay");
+        public static final ConfigInteger       BLOCK_INFO_OVERLAY_OFFSET_Y         = new ConfigInteger("blockInfoOverlayOffsetY", 6, -2000, 2000, "The y offset of the block info overlay from the selected edge");
+        public static final ConfigBoolean       ENABLE_BLOCK_INFO_OVERLAY_RENDERING = new ConfigBoolean("enableBlockInfoOverlayRendering", true, "Enable Block Info Overlay rendering to show block info\nabout the looked-at block or verifier error marker", "Block Info Overlay Rendering");
         public static final ConfigBoolean       ENABLE_VERIFIER_OVERLAY_RENDERING   = new ConfigBoolean("enableVerifierOverlayRendering", true, "Enable Schematic Verifier marker overlay rendering", "Verifier Overlay Rendering");
         public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList("infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\",\nused for schematic verifier mismatch positions etc.");
         public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger("infoHudMaxLines", 10, 1, 32, "The maximum number of info lines to show on the HUD at once");
@@ -141,16 +144,18 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       VERIFIER_ERROR_HILIGHT_MAX_POSITIONS = new ConfigInteger("verifierErrorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render\nat once in the Schematic Verifier overlay.");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                ENABLE_INFO_OVERLAY_RENDERING,
+                ENABLE_BLOCK_INFO_OVERLAY_RENDERING,
                 ENABLE_VERIFIER_OVERLAY_RENDERING,
                 RENDER_BLOCK_INFO_LINES,
                 RENDER_BLOCK_INFO_OVERLAY,
 
                 BLOCK_INFO_LINES_ALIGNMENT,
+                BLOCK_INFO_OVERLAY_ALIGNMENT,
                 INFO_HUD_ALIGNMENT,
-                BLOCK_INFO_OFFSET_X,
-                BLOCK_INFO_OFFSET_Y,
-                BLOCK_INFO_FONT_SCALE,
+                BLOCK_INFO_LINES_OFFSET_X,
+                BLOCK_INFO_LINES_OFFSET_Y,
+                BLOCK_INFO_OVERLAY_OFFSET_Y,
+                BLOCK_INFO_LINES_FONT_SCALE,
                 INFO_HUD_MAX_LINES,
                 VERIFIER_ERROR_HILIGHT_ALPHA,
                 VERIFIER_ERROR_HILIGHT_MAX_POSITIONS

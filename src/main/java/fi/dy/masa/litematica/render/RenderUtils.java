@@ -2,9 +2,13 @@ package fi.dy.masa.litematica.render;
 
 import java.util.List;
 import org.lwjgl.opengl.GL11;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.LeftRight;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.Color4f;
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -17,13 +21,10 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryLargeChest;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
 
 public class RenderUtils
@@ -567,51 +568,59 @@ public class RenderUtils
         buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
-    public static void renderInventoryOverlay(int xOffsetMult, World world, BlockPos pos, Minecraft mc)
+    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, Minecraft mc)
     {
-        IInventory inv = null;
-        TileEntity te = world.getTileEntity(pos);
+        int heightSch = renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc);
+        int heightCli = renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc);
 
-        if (te instanceof IInventory)
-        {
-            inv = (IInventory) te;
-            IBlockState state = world.getBlockState(pos);
+        return Math.max(heightSch, heightCli);
+    }
 
-            if (state.getBlock() instanceof BlockChest)
-            {
-                ILockableContainer cont = ((BlockChest) state.getBlock()).getLockableContainer(world, pos);
-
-                if (cont instanceof InventoryLargeChest)
-                {
-                    inv = (InventoryLargeChest) cont;
-                }
-            }
-        }
+    public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
+            World world, BlockPos pos, Minecraft mc)
+    {
+        IInventory inv = InventoryUtils.getInventory(world, pos);
 
         if (inv != null)
         {
-            ScaledResolution res = new ScaledResolution(mc);
-            final int xCenter = res.getScaledWidth() / 2;
-            final int yCenter = res.getScaledHeight() / 2;
+            final InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
+            final InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, inv.getSizeInventory());
 
-            final int totalSlots = inv.getSizeInventory();
-            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
-            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
-            final int rows = (int) Math.ceil(totalSlots / props.slotsPerRow);
-
-            int xInv = xCenter - (props.width / 2) + (props.width / 2 + 4) * xOffsetMult;
-            int yInv = yCenter - 6 - props.height;
-
-            if (rows > 6)
-            {
-                yInv -= (rows - 6) * 18;
-            }
-
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
-            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);
+            return renderInventoryOverlay(align, side, offY, inv, type, props, mc);
         }
+
+        return 0;
+    }
+
+    public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
+            IInventory inv, InventoryRenderType type, InventoryProperties props, Minecraft mc)
+    {
+        ScaledResolution res = new ScaledResolution(mc);
+
+        int xInv = 0;
+        int yInv = 0;
+
+        switch (align)
+        {
+            case CENTER:
+                xInv = res.getScaledWidth() / 2 - (props.width / 2);
+                yInv = res.getScaledHeight() / 2 - props.height - offY;
+                break;
+            case TOP_CENTER:
+                xInv = res.getScaledWidth() / 2 - (props.width / 2);
+                yInv = offY;
+                break;
+        }
+
+        if      (side == LeftRight.LEFT)  { xInv -= (props.width / 2 + 4); }
+        else if (side == LeftRight.RIGHT) { xInv += (props.width / 2 + 4); }
+
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, props.totalSlots, mc);
+        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);
+
+        return props.height;
     }
 
     /*

@@ -304,6 +304,9 @@ litematica.tool_hud.facing=Facing: %s
 
 litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
 
+litematica.label.alignment.center=Center
+litematica.label.alignment.top_center=Top Center
+
 litematica.label.none_lower=none
 litematica.label.no=no
 litematica.label.yes=yes

@@ -21,12 +21,14 @@ import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchRender
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.block.Block;
@@ -92,6 +94,8 @@ public class OverlayRenderer
 
     private long infoUpdateTime;
     private List<String> blockInfoLines = new ArrayList<>();
+    private int blockInfoX;
+    private int blockInfoY;
 
     private OverlayRenderer()
     {
@@ -418,7 +422,7 @@ public class OverlayRenderer
             }
 
             boolean renderBlockInfoLines = Configs.InfoOverlays.RENDER_BLOCK_INFO_LINES.getBooleanValue();
-            boolean renderInfoOverlay = infoOverlayKeyActive && Configs.InfoOverlays.ENABLE_INFO_OVERLAY_RENDERING.getBooleanValue();
+            boolean renderInfoOverlay = infoOverlayKeyActive && Configs.InfoOverlays.ENABLE_BLOCK_INFO_OVERLAY_RENDERING.getBooleanValue();
             RayTraceWrapper traceWrapper = null;
 
             if (renderBlockInfoLines || renderInfoOverlay)
@@ -452,9 +456,9 @@ public class OverlayRenderer
             this.infoUpdateTime = currentTime;
         }
 
-        int x = Configs.InfoOverlays.BLOCK_INFO_OFFSET_X.getIntegerValue();
-        int y = Configs.InfoOverlays.BLOCK_INFO_OFFSET_Y.getIntegerValue();
-        double fontScale = Configs.InfoOverlays.BLOCK_INFO_FONT_SCALE.getDoubleValue();
+        int x = Configs.InfoOverlays.BLOCK_INFO_LINES_OFFSET_X.getIntegerValue();
+        int y = Configs.InfoOverlays.BLOCK_INFO_LINES_OFFSET_Y.getIntegerValue();
+        double fontScale = Configs.InfoOverlays.BLOCK_INFO_LINES_FONT_SCALE.getDoubleValue();
         int textColor = 0xFFFFFFFF;
         int bgColor = 0xA0505050;
         HudAlignment alignment = (HudAlignment) Configs.InfoOverlays.BLOCK_INFO_LINES_ALIGNMENT.getOptionListValue();
@@ -491,17 +495,19 @@ public class OverlayRenderer
 
     private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, Minecraft mc)
     {
-        ScaledResolution sr = new ScaledResolution(mc);
-
+        IBlockState air = Blocks.AIR.getDefaultState();
+        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+        World worldClient = WorldUtils.getBestWorld(mc);
         BlockPos pos = traceWrapper.getRayTraceResult().getBlockPos();
+
         IBlockState stateClient = mc.world.getBlockState(pos);
         stateClient = stateClient.getActualState(mc.world, pos);
-        World worldClient = WorldUtils.getBestWorld(mc);
 
-        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
         stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
-        IBlockState air = Blocks.AIR.getDefaultState();
+
+        int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
+        BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
 
         ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
         ItemUtils.setItemForBlock(mc.world, pos, stateClient);
@@ -509,37 +515,58 @@ public class OverlayRenderer
         // Not just a missing block
         if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
         {
-            BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
-            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
+            int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
 
-            RenderUtils.renderInventoryOverlay(-1, worldSchematic, pos, mc);
-            RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
+            BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
+            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+            info.render(this.blockInfoX, this.blockInfoY, mc);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
+            int invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.CENTER, offY, worldClient, pos, mc);
+
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-            info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-            RenderUtils.renderInventoryOverlay(0, worldClient, pos, mc);
+            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+            info.render(this.blockInfoX, this.blockInfoY, mc);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            int xOffset = 0;
-            TileEntity te = mc.world.getTileEntity(pos);
+            TileEntity te = worldClient.getTileEntity(pos);
 
             if (te instanceof IInventory)
             {
+                int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
+
                 BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-                info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-                RenderUtils.renderInventoryOverlay(1, worldClient, pos, mc);
-                xOffset = -1;
+                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+                info.render(this.blockInfoX, this.blockInfoY, mc);
             }
             else
             {
-                BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
-                info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-            }
+                int invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.CENTER, offY, worldSchematic, pos, mc);
 
-            RenderUtils.renderInventoryOverlay(xOffset, worldSchematic, pos, mc);
+                BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
+                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+                info.render(this.blockInfoX, this.blockInfoY, mc);
+            }
+        }
+    }
+
+    protected void getOverlayPosition(int width, int height, int offY, int invHeight, Minecraft mc)
+    {
+        ScaledResolution sr = new ScaledResolution(mc);
+        BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+
+        switch (align)
+        {
+            case CENTER:
+                this.blockInfoX = sr.getScaledWidth() / 2 - width / 2;
+                this.blockInfoY = sr.getScaledHeight() / 2 + offY;
+                break;
+            case TOP_CENTER:
+                this.blockInfoX = sr.getScaledWidth() / 2 - width / 2;
+                this.blockInfoY = invHeight + offY + (invHeight > 0 ? offY : 0);
+                break;
         }
     }
 
