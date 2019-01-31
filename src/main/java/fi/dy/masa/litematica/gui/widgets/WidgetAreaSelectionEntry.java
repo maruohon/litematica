@@ -15,6 +15,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -88,7 +89,8 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
         {
             AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(this.getDirectoryEntry().getFullPath().getAbsolutePath());
-            return selection != null ? selection.getName() : "<error>";
+            String prefix = this.entry.getDisplayNamePrefix();
+            return selection != null ? (prefix != null ? prefix + selection.getName() : selection.getName()) : "<error>";
         }
 
         return super.getDisplayName();
@@ -126,7 +128,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
-            this.parent.drawHoveringText(text, mouseX, mouseY);
+            RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
     }
 
