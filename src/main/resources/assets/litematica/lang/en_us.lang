@@ -226,6 +226,7 @@ litematica.gui.label.schematic_placement.origin=Origin: %s
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:
 litematica.gui.label.schematic_placement.schematic_file=File: %s
 litematica.gui.label.schematic_placement.schematic_name=Schematic: %s
+litematica.gui.label.schematic_placement.sub_region_count=Sub-regions: %s
 litematica.gui.label.schematic_placement.sub_regions=Sub-regions (%s):
 
 litematica.gui.label.schematic_save.checkbox.ignore_entities=Ignore entities

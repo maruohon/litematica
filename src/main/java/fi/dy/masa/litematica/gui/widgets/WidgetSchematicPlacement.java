@@ -148,16 +148,6 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        File schematicFile = this.placement.getSchematic().getFile();
-        String fileName = schematicFile != null ? schematicFile.getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
-
-        List<String> text = new ArrayList<>();
-        text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
-        text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
-        BlockPos o = this.placement.getOrigin();
-        String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
-        text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
-
         if (this.placement.isLocked() &&
                  GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 38, this.y + 6, 11, 11))
         {
@@ -172,6 +162,16 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         }
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 18, this.height))
         {
+            File schematicFile = this.placement.getSchematic().getFile();
+            String fileName = schematicFile != null ? schematicFile.getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
+            List<String> text = new ArrayList<>();
+            text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
+            text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
+            BlockPos o = this.placement.getOrigin();
+            String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
+            text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
+            text.add(I18n.format("litematica.gui.label.schematic_placement.sub_region_count", String.valueOf(this.placement.getSubRegionCount())));
+
             RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
     }
