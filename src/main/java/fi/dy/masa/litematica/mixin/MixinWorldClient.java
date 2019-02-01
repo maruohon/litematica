@@ -10,15 +10,20 @@ import fi.dy.masa.litematica.data.SchematicVerifier;
 import fi.dy.masa.litematica.util.WorldUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.profiler.Profiler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.storage.ISaveHandler;
+import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.world.storage.WorldSavedDataStorage;
 
 @Mixin(WorldClient.class)
 public abstract class MixinWorldClient extends World
 {
-    protected MixinWorldClient()
+    protected MixinWorldClient(ISaveHandler saveHandler, WorldSavedDataStorage dataStorage, WorldInfo worldInfo, Dimension dimension, Profiler profiler, boolean isRemote)
     {
-        super(null, null, null, null, null, true);
+        super(saveHandler, dataStorage, worldInfo, dimension, profiler, isRemote);
     }
 
     @Inject(method = "invalidateRegionAndSetBlock", at = @At("HEAD"))
