@@ -23,7 +23,7 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
     }
 
     @Override
-    public void refreshEntries()
+    protected void refreshBrowserEntries()
     {
         this.listContents.clear();
         this.listContents.addAll(DataManager.getSchematicPlacementManager().getAllSchematicsPlacements());

@@ -26,7 +26,7 @@ public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchemat
     }
 
     @Override
-    public void refreshEntries()
+    protected void refreshBrowserEntries()
     {
         this.listContents.clear();
 

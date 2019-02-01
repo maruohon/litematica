@@ -61,7 +61,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         int width = Math.min(300, sr.getScaledWidth() - 200);
-        int x = 10;
+        int x = 12;
         int y = 28;
         int id = 0;
 
@@ -71,8 +71,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.addTextField(this.textFieldRename, null);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
 
-        String label = I18n.format("litematica.gui.label.schematic_placement.sub_regions", this.placement.getAllSubRegionsPlacements().size());
-        this.addLabel(x, y + 20, -1, 20, 0xFFFFFFFF, label);
+        String label = I18n.format("litematica.gui.label.schematic_placement.sub_regions", this.placement.getSubRegionCount());
+        this.addLabel(x + 2, y + 26, -1, 20, 0xFFFFFFFF, label);
 
         x = sr.getScaledWidth() - 154;
         x -= this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_OFF) + 2;
@@ -312,7 +312,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     @Override
     protected WidgetListPlacementSubRegions createListWidget(int listX, int listY)
     {
-        return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+        return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.zLevel, this);
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>

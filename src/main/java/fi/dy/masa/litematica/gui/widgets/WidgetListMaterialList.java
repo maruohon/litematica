@@ -62,7 +62,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     }
 
     @Override
-    public void refreshEntries()
+    protected void refreshBrowserEntries()
     {
         this.refreshData();
         this.reCreateListEntryWidgets();

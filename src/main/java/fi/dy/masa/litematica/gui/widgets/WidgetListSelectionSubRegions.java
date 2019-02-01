@@ -1,9 +1,15 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Comparator;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.util.AlphaNumComparator.AlphaNumStringComparator;
+import net.minecraft.client.Minecraft;
 
 public class WidgetListSelectionSubRegions extends WidgetListBase<String, WidgetSelectionSubRegion>
 {
@@ -18,6 +24,8 @@ public class WidgetListSelectionSubRegions extends WidgetListBase<String, Widget
         this.gui = gui;
         this.selection = selection;
         this.browserEntryHeight = 22;
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
+        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
     }
 
     public GuiAreaSelectionEditorNormal getEditorGui()
@@ -26,13 +34,21 @@ public class WidgetListSelectionSubRegions extends WidgetListBase<String, Widget
     }
 
     @Override
-    public void refreshEntries()
+    protected Collection<String> getAllEntries()
     {
-        this.listContents.clear();
-        this.listContents.addAll(this.selection.getAllSubRegionNames());
-        Collections.sort(this.listContents);
+        return this.selection.getAllSubRegionNames();
+    }
 
-        this.reCreateListEntryWidgets();
+    @Override
+    protected Comparator<String> getComparator()
+    {
+        return new AlphaNumStringComparator();
+    }
+
+    @Override
+    protected boolean entryMatchesFilter(String entry, String filterText)
+    {
+        return entry.toLowerCase().indexOf(filterText) != -1;
     }
 
     @Override

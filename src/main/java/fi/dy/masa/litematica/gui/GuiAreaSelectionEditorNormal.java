@@ -610,7 +610,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 140;
+        return this.height - 146;
     }
 
     @Override

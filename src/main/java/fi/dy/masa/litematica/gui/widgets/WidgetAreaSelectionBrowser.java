@@ -29,11 +29,6 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected void drawAdditionalContents(int mouseX, int mouseY)
-    {
-    }
-
-    @Override
     protected File getRootDirectory()
     {
         return DataManager.getAreaSelectionsBaseDirectory();

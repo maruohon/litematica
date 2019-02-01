@@ -79,7 +79,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
     }
 
     @Override
-    public void refreshEntries()
+    protected void refreshBrowserEntries()
     {
         this.listContents.clear();
 
