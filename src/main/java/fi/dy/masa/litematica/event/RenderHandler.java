@@ -2,10 +2,12 @@ package fi.dy.masa.litematica.event;
 
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import net.minecraft.client.Minecraft;
 
@@ -32,6 +34,12 @@ public class RenderHandler implements IRenderer
             {
                 OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
             }
+
+            if (DataManager.getToolMode() == ToolMode.REBUILD &&
+                Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
+            {
+                OverlayRenderer.getInstance().renderBlockReplaceOverlay(partialTicks);
+            }
         }
     }
 
@@ -45,7 +53,7 @@ public class RenderHandler implements IRenderer
         {
             ToolHud.getInstance().renderHud();
             InfoHud.getInstance().renderHud();
-            OverlayRenderer.getInstance().renderHoverInfo(mc);
+            OverlayRenderer.getInstance().renderHoverInfo(mc, partialTicks);
         }
     }
 }

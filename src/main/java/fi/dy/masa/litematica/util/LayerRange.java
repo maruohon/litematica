@@ -71,13 +71,13 @@ public class LayerRange
         switch (this.layerMode)
         {
             case ALL:
-                return this.getWorldMinValueForAxis(this.axis);
+                return getWorldMinValueForAxis(this.axis);
             case SINGLE_LAYER:
                 return this.layerSingle;
             case ALL_ABOVE:
                 return this.layerAbove;
             case ALL_BELOW:
-                return this.getWorldMinValueForAxis(this.axis);
+                return getWorldMinValueForAxis(this.axis);
             case LAYER_RANGE:
                 return this.layerRangeMin;
             default:
@@ -90,11 +90,11 @@ public class LayerRange
         switch (this.layerMode)
         {
             case ALL:
-                return this.getWorldMaxValueForAxis(this.axis);
+                return getWorldMaxValueForAxis(this.axis);
             case SINGLE_LAYER:
                 return this.layerSingle;
             case ALL_ABOVE:
-                return this.getWorldMaxValueForAxis(this.axis);
+                return getWorldMaxValueForAxis(this.axis);
             case ALL_BELOW:
                 return this.layerBelow;
             case LAYER_RANGE:
@@ -125,7 +125,7 @@ public class LayerRange
         }
     }
 
-    public int getWorldMinValueForAxis(EnumFacing.Axis axis)
+    public static int getWorldMinValueForAxis(EnumFacing.Axis axis)
     {
         switch (axis)
         {
@@ -138,7 +138,7 @@ public class LayerRange
         }
     }
 
-    public int getWorldMaxValueForAxis(EnumFacing.Axis axis)
+    public static int getWorldMaxValueForAxis(EnumFacing.Axis axis)
     {
         switch (axis)
         {
@@ -181,21 +181,21 @@ public class LayerRange
     public void setLayerSingle(int layer)
     {
         this.markAffectedLayersForRenderUpdate();
-        this.layerSingle = this.getClampedValue(layer);
+        this.layerSingle = this.getWorldLimitsClampedValue(layer);
         this.markAffectedLayersForRenderUpdate();
     }
 
     public void setLayerAbove(int layer)
     {
         this.markAffectedLayersForRenderUpdate();
-        this.layerAbove = this.getClampedValue(layer);
+        this.layerAbove = this.getWorldLimitsClampedValue(layer);
         this.markAffectedLayersForRenderUpdate();
     }
 
     public void setLayerBelow(int layer)
     {
         this.markAffectedLayersForRenderUpdate();
-        this.layerBelow = this.getClampedValue(layer);
+        this.layerBelow = this.getWorldLimitsClampedValue(layer);
         this.markAffectedLayersForRenderUpdate();
     }
 
@@ -207,7 +207,7 @@ public class LayerRange
     private void setLayerRangeMin(int layer, boolean force)
     {
         this.markAffectedLayersForRenderUpdate();
-        this.layerRangeMin = this.getClampedValue(layer);
+        this.layerRangeMin = this.getWorldLimitsClampedValue(layer);
 
         if (force == false)
         {
@@ -225,7 +225,7 @@ public class LayerRange
     private void setLayerRangeMax(int layer, boolean force)
     {
         this.markAffectedLayersForRenderUpdate();
-        this.layerRangeMax = this.getClampedValue(layer);
+        this.layerRangeMax = this.getWorldLimitsClampedValue(layer);
 
         if (force == false)
         {
@@ -388,7 +388,7 @@ public class LayerRange
         return true;
     }
 
-    private int getClampedValue(int value)
+    private int getWorldLimitsClampedValue(int value)
     {
         if (this.axis == EnumFacing.Axis.Y)
         {
@@ -537,6 +537,16 @@ public class LayerRange
             default:
                 return false;
         }
+    }
+
+    public int getClampedValue(int value, EnumFacing.Axis type)
+    {
+        if (this.axis == type)
+        {
+            return MathHelper.clamp(value, this.getLayerMin(), this.getLayerMax());
+        }
+
+        return MathHelper.clamp(value, getWorldMinValueForAxis(type), getWorldMaxValueForAxis(type));
     }
 
     @Nullable

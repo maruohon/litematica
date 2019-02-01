@@ -408,7 +408,7 @@ public class OverlayRenderer
         GlStateManager.enableDepth();
     }
 
-    public void renderHoverInfo(Minecraft mc)
+    public void renderHoverInfo(Minecraft mc, float partialTicks)
     {
         if (mc.world != null && mc.player != null)
         {
@@ -629,6 +629,40 @@ public class OverlayRenderer
             }
 
             this.blockInfoLines.add(property.getName() + ": " + valueName);
+        }
+    }
+
+    public void renderBlockReplaceOverlay(float partialTicks)
+    {
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 10, true);
+
+        if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
+        {
+            Entity entity = this.mc.player;
+            RayTraceResult trace = traceWrapper.getRayTraceResult();
+            BlockPos pos = trace.getBlockPos();
+
+            GlStateManager.depthMask(false);
+            GlStateManager.disableLighting();
+            GlStateManager.disableCull();
+            GlStateManager.enableBlend();
+            //GlStateManager.pushMatrix();
+            //GlStateManager.disableDepth();
+            GlStateManager.disableTexture2D();
+            double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
+            double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
+            double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+            Color4f color = Configs.Colors.SCHEMATIC_REBUILD_OVERLAY_COLOR.getColor();
+
+            fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
+                    entity, pos, trace.sideHit, trace.hitVec, dx, dy, dz, color);
+
+            GlStateManager.enableTexture2D();
+            //GlStateManager.enableDepth();
+            //GlStateManager.popMatrix();
+            GlStateManager.disableBlend();
+            GlStateManager.enableCull();
+            GlStateManager.depthMask(true);
         }
     }
 

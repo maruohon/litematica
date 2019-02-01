@@ -186,7 +186,7 @@ public class SchematicPlacementManager
         return list;
     }
 
-    public List<PlacementPart> getAllPlacementTouchingSubChunk(SubChunkPos pos)
+    public List<PlacementPart> getAllPlacementsTouchingSubChunk(SubChunkPos pos)
     {
         return this.touchedVolumesInSubChunk.get(pos);
     }
@@ -411,7 +411,7 @@ public class SchematicPlacementManager
         }
     }
 
-    void markChunksForRebuild(SchematicPlacement placement)
+    public void markChunksForRebuild(SchematicPlacement placement)
     {
         if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
         {

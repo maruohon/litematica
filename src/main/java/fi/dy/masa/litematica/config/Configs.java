@@ -169,13 +169,15 @@ public class Configs implements IConfigHandler
         public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_MISSING     = new ConfigColor("schematicOverlayColorMissing",       "0x2C33B3E6", "The color of the blocks overlay for missing blocks");
         public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK = new ConfigColor("schematicOverlayColorWrongBlock",    "0x4CFF3333", "The color of the blocks overlay for wrong blocks");
         public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_WRONG_STATE = new ConfigColor("schematicOverlayColorWrongState",    "0x4CFF9010", "The color of the blocks overlay for wrong block states");
+        public static final ConfigColor SCHEMATIC_REBUILD_OVERLAY_COLOR     = new ConfigColor("schematicRebuildOverlayColor",       "0x4C33CC33", "The color of Schematic Rebuild mode's replace selector overlay");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 AREA_SELECTION_BOX_SIDE_COLOR,
                 SCHEMATIC_OVERLAY_COLOR_EXTRA,
                 SCHEMATIC_OVERLAY_COLOR_MISSING,
                 SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK,
-                SCHEMATIC_OVERLAY_COLOR_WRONG_STATE
+                SCHEMATIC_OVERLAY_COLOR_WRONG_STATE,
+                SCHEMATIC_REBUILD_OVERLAY_COLOR
         );
     }
 
