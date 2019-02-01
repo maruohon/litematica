@@ -1,10 +1,16 @@
 package fi.dy.masa.litematica.util;
 
 import java.util.Comparator;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
 public class SubChunkPos extends Vec3i
 {
+    public SubChunkPos(BlockPos pos)
+    {
+        this(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+    }
+
     public SubChunkPos(int x, int y, int z)
     {
         super(x, y, z);

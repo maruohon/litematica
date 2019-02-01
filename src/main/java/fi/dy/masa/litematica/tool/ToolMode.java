@@ -7,13 +7,14 @@ import net.minecraft.entity.player.EntityPlayer;
 
 public enum ToolMode
 {
-    AREA_SELECTION      ("litematica.operation_mode.name.area_selection", false),
-    SCHEMATIC_PLACEMENT ("litematica.operation_mode.name.schematic_placement", true),
-    FILL                ("litematica.operation_mode.name.fill", false, true, false),
-    REPLACE_BLOCK       ("litematica.operation_mode.name.replace_block", false, true, true),
-    PASTE_SCHEMATIC     ("litematica.operation_mode.name.paste_schematic", true),
-    GRID_PASTE          ("litematica.operation_mode.name.grid_paste", true),
-    DELETE              ("litematica.operation_mode.name.delete", false);
+    AREA_SELECTION      ("litematica.tool_mode.name.area_selection", false),
+    SCHEMATIC_PLACEMENT ("litematica.tool_mode.name.schematic_placement", true),
+    FILL                ("litematica.tool_mode.name.fill", false, true, false),
+    REPLACE_BLOCK       ("litematica.tool_mode.name.replace_block", false, true, true),
+    PASTE_SCHEMATIC     ("litematica.tool_mode.name.paste_schematic", true),
+    GRID_PASTE          ("litematica.tool_mode.name.grid_paste", true),
+    DELETE              ("litematica.tool_mode.name.delete", false),
+    REBUILD             ("litematica.tool_mode.name.rebuild", true);
 
     private final String unlocName;
     private final boolean usesSchematic;

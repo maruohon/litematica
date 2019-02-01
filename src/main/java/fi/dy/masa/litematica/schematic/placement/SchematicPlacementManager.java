@@ -49,7 +49,7 @@ public class SchematicPlacementManager
 {
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
     private final HashMultimap<ChunkPos, SchematicPlacement> schematicsTouchingChunk = HashMultimap.create();
-    private final ArrayListMultimap<SubChunkPos, StructureBoundingBox> touchedVolumesInSubChunk = ArrayListMultimap.create();
+    private final ArrayListMultimap<SubChunkPos, PlacementPart> touchedVolumesInSubChunk = ArrayListMultimap.create();
     private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
     private final Set<ChunkPos> chunksToUnload = new HashSet<>();
     private final Set<ChunkPos> chunksPreChange = new HashSet<>();
@@ -176,7 +176,19 @@ public class SchematicPlacementManager
 
     public List<StructureBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
     {
-        return this.touchedVolumesInSubChunk.get(subChunk);
+        List<StructureBoundingBox> list = new ArrayList<>();
+
+        for (PlacementPart part : this.touchedVolumesInSubChunk.get(subChunk))
+        {
+            list.add(part.getBox());
+        }
+
+        return list;
+    }
+
+    public List<PlacementPart> getAllPlacementTouchingSubChunk(SubChunkPos pos)
+    {
+        return this.touchedVolumesInSubChunk.get(pos);
     }
 
     public Set<SubChunkPos> getAllTouchedSubChunks()
@@ -377,8 +389,9 @@ public class SchematicPlacementManager
                 {
                     Map<String, StructureBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
 
-                    for (StructureBoundingBox bbOrig : boxMap.values())
+                    for (Map.Entry<String, StructureBoundingBox> entry : boxMap.entrySet())
                     {
+                        StructureBoundingBox bbOrig = entry.getValue();
                         final int startCY = (bbOrig.minY >> 4);
                         final int endCY = (bbOrig.maxY >> 4);
 
@@ -388,7 +401,8 @@ public class SchematicPlacementManager
                             int y2 = Math.min((cy << 4) + 15, bbOrig.maxY);
 
                             StructureBoundingBox bbSub = new StructureBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
-                            this.touchedVolumesInSubChunk.put(new SubChunkPos(pos.x, cy, pos.z), bbSub);
+                            PlacementPart part = new PlacementPart(placement, entry.getKey(), bbSub);
+                            this.touchedVolumesInSubChunk.put(new SubChunkPos(pos.x, cy, pos.z), part);
                             //System.out.printf("updateTouchedBoxesInChunk box at %d, %d, %d: %s\n", pos.x, cy, pos.z, bbSub);
                         }
                     }
@@ -409,6 +423,11 @@ public class SchematicPlacementManager
     {
         //System.out.printf("rebuilding %d chunks: %s\n", chunks.size(), chunks);
         this.chunksToRebuild.addAll(chunks);
+    }
+
+    public void markChunkForRebuild(ChunkPos pos)
+    {
+        this.chunksToRebuild.add(pos);
     }
 
     private void onPlacementModified(SchematicPlacement placement)
@@ -676,5 +695,34 @@ public class SchematicPlacementManager
         }
 
         OverlayRenderer.getInstance().updatePlacementCache();
+    }
+
+    public static class PlacementPart
+    {
+        private final SchematicPlacement placement;
+        private final String subRegionName;
+        private final StructureBoundingBox bb;
+
+        public PlacementPart(SchematicPlacement placement, String subRegionName, StructureBoundingBox bb)
+        {
+            this.placement = placement;
+            this.subRegionName = subRegionName;
+            this.bb = bb;
+        }
+
+        public SchematicPlacement getPlacement()
+        {
+            return this.placement;
+        }
+
+        public String getSubRegionName()
+        {
+            return this.subRegionName;
+        }
+
+        public StructureBoundingBox getBox()
+        {
+            return this.bb;
+        }
     }
 }

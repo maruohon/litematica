@@ -38,6 +38,7 @@ public class Hotkeys
     public static final ConfigHotkey RERENDER_SCHEMATIC                 = new ConfigHotkey("rerenderSchematic",                 "F3,M", "Hotkey to refresh/redraw only the schematic, instead of\nhaving to refresh the vanilla terrain too with F3 + A");
     public static final ConfigHotkey SAVE_AREA_AS_IN_MEMORY_SCHEMATIC   = new ConfigHotkey("saveAreaAsInMemorySchematic",       "LCONTROL,S",  "Save the current Area Selection as an in-memory Schematic");
     public static final ConfigHotkey SAVE_AREA_AS_SCHEMATIC_TO_FILE     = new ConfigHotkey("saveAreaAsSchematicToFile",         "LCONTROL,LMENU,S",  "Save the current Area Selection as a Schematic to a file");
+    public static final ConfigHotkey SCHEMATIC_REBUILD_REPLACE          = new ConfigHotkey("schematicRebuildReplace",           "",     "Modifier key to activate the replace mode/function\nin the Schematic Rebuild tool mode");
     public static final ConfigHotkey SELECTION_GRAB_MODIFIER            = new ConfigHotkey("selectionGrabModifier",             "LCONTROL,LMENU", KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to \"grab\" a selection\nbox or corner for cursor moving.");
     public static final ConfigHotkey SELECTION_NUDGE_MODIFIER           = new ConfigHotkey("selectionNudgeModifier",            "LMENU", KeybindSettings.MODIFIER_INGAME, "The modifier key to hold while scrolling\nto nudge the selected area or corner");
     public static final ConfigHotkey SELECTION_MODE_CYCLE               = new ConfigHotkey("selectionModeCycle",                "LCONTROL,M", "Change the mode between Corners and Cuboid\nin the Area Selection mode");
@@ -95,6 +96,7 @@ public class Hotkeys
             RERENDER_SCHEMATIC,
             SAVE_AREA_AS_IN_MEMORY_SCHEMATIC,
             SAVE_AREA_AS_SCHEMATIC_TO_FILE,
+            SCHEMATIC_REBUILD_REPLACE,
             SELECTION_GRAB_MODIFIER,
             SELECTION_NUDGE_MODIFIER,
             SELECTION_MODE_CYCLE,

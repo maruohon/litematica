@@ -366,10 +366,11 @@ litematica.message.value.off=OFF
 
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
 
-litematica.operation_mode.name.area_selection=Area Selection
-litematica.operation_mode.name.delete=Delete
-litematica.operation_mode.name.fill=Fill
-litematica.operation_mode.name.grid_paste=Grid Paste Schematic in world
-litematica.operation_mode.name.paste_schematic=Paste Schematic in world
-litematica.operation_mode.name.replace_block=Replace block
-litematica.operation_mode.name.schematic_placement=Schematic Placement
+litematica.tool_mode.name.area_selection=Area Selection
+litematica.tool_mode.name.delete=Delete
+litematica.tool_mode.name.fill=Fill
+litematica.tool_mode.name.grid_paste=Grid Paste Schematic in world
+litematica.tool_mode.name.paste_schematic=Paste Schematic in world
+litematica.tool_mode.name.rebuild=Rebuild Schematic
+litematica.tool_mode.name.replace_block=Replace block
+litematica.tool_mode.name.schematic_placement=Schematic Placement

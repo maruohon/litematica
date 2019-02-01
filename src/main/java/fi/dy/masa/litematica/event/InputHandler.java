@@ -9,12 +9,14 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -81,6 +83,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode() + 100)
             {
                 return this.handleUseKey(mc);
+            }
+            else if (eventButtonState && eventButton == mc.gameSettings.keyBindAttack.getKeyCode() + 100)
+            {
+                return this.handleAttackKey(mc);
             }
 
             EntityPlayer player = mc.player;
@@ -153,12 +159,29 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
+    private boolean handleAttackKey(Minecraft mc)
+    {
+        if (mc.player != null && KeybindMulti.getTriggeredCount() == 0)
+        {
+            if (DataManager.getToolMode() == ToolMode.REBUILD)
+            {
+                return SchematicUtils.breakSchematicBlock(mc);
+            }
+        }
+
+        return false;
+    }
+
     private boolean handleUseKey(Minecraft mc)
     {
         if (mc.player != null)
         {
-            if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-                Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
+            if (DataManager.getToolMode() == ToolMode.REBUILD && KeybindMulti.getTriggeredCount() == 0)
+            {
+                return SchematicUtils.placeSchematicBlock(mc);
+            }
+            else if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+                     Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
             {
                 if (WorldUtils.handleEasyPlace(mc) == false)
                 {
