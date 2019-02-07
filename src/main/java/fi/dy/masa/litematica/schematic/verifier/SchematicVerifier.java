@@ -84,8 +84,9 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     private boolean finished;
     private boolean shouldRenderInfoHud = true;
     private int totalRequiredChunks;
-    private long schematicBlocks;
-    private long clientBlocks;
+    private int schematicBlocks;
+    private int clientBlocks;
+    private int correctStatesCount;
 
     public static void markVerifierBlockChanges(BlockPos pos)
     {
@@ -137,37 +138,42 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         return this.requiredChunks.size();
     }
 
-    public long getSchematicTotalBlocks()
+    public int getSchematicTotalBlocks()
     {
         return this.schematicBlocks;
     }
 
-    public long getRealWorldTotalBlocks()
+    public int getRealWorldTotalBlocks()
     {
         return this.clientBlocks;
     }
 
-    public long getMissingBlocks()
+    public int getMissingBlocks()
     {
         return this.missingBlocksPositions.size();
     }
 
-    public long getExtraBlocks()
+    public int getExtraBlocks()
     {
         return this.extraBlocksPositions.size();
     }
 
-    public long getMismatchedBlocks()
+    public int getMismatchedBlocks()
     {
         return this.wrongBlocksPositions.size();
     }
 
-    public long getMismatchedStates()
+    public int getMismatchedStates()
     {
         return this.wrongStatesPositions.size();
     }
 
-    public long getTotalErrors()
+    public int getCorrectStatesCount()
+    {
+        return this.correctStatesCount;
+    }
+
+    public int getTotalErrors()
     {
         return this.getMismatchedBlocks() +
                 this.getMismatchedStates() +
@@ -350,7 +356,11 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         this.verificationStarted = false;
         this.finished = false;
         this.totalRequiredChunks = 0;
+        this.correctStatesCount = 0;
+        this.schematicBlocks = 0;
+        this.clientBlocks = 0;
         this.requiredChunks.clear();
+        this.recheckQueue.clear();
 
         this.missingBlocksPositions.clear();
         this.extraBlocksPositions.clear();
@@ -360,6 +370,8 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         this.correctStateCounts.clear();
         this.selectedCategories.clear();
         this.selectedEntries.clear();
+        this.mismatchBlockPositionsForRender.clear();
+        this.mismatchPositionsForRender.clear();
 
         ACTIVE_VERIFIERS.remove(this);
         TaskScheduler.getInstance().removeTask(this);
@@ -736,6 +748,11 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         {
             ItemUtils.setItemForBlock(this.worldClient, pos, stateClient);
             this.correctStateCounts.addTo(stateClient, 1);
+
+            if (stateSchematic != AIR)
+            {
+                ++this.correctStatesCount;
+            }
         }
     }
 

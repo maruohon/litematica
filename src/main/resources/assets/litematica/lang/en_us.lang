@@ -242,6 +242,9 @@ litematica.gui.label.schematic_verifier_display_type.missing=Missing Blocks
 litematica.gui.label.schematic_verifier_display_type.wrong_blocks=Wrong Blocks
 litematica.gui.label.schematic_verifier_display_type.wrong_state=Wrong States
 litematica.gui.label.schematic_verifier.missing_chunks=Missing Chunks (%d)
+litematica.gui.label.schematic_verifier.status.done_errors=Wrong: §cB: %s§r, §6S: %s§r, Missing: §b%s§r, Extra: §d%s§r
+litematica.gui.label.schematic_verifier.status.done_correct_total=Correct: §a%s§r, Total: %s
+litematica.gui.label.schematic_verifier.status.verifying=Unseen Chunks: %s / %s
 
 litematica.gui.label_colored.off=§cOFF§r
 litematica.gui.label_colored.on=§aON§r
