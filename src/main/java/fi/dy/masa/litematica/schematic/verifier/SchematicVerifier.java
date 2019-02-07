@@ -101,6 +101,11 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         return this.shouldRenderInfoHud && Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
     }
 
+    public void toggleShouldRenderInfoHUD()
+    {
+        this.shouldRenderInfoHud = ! this.shouldRenderInfoHud;
+    }
+
     @Override
     public List<String> getText()
     {
@@ -258,11 +263,6 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         this.infoLines.clear();
     }
 
-    public void setInfoHudRenderingEnabled(boolean enabled)
-    {
-        this.shouldRenderInfoHud = enabled;
-    }
-
     public List<MismatchRenderPos> getSelectedMismatchPositionsForRender()
     {
         return this.mismatchPositionsForRender;
@@ -296,23 +296,20 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     public void startVerification(WorldClient worldClient, WorldSchematic worldSchematic,
             SchematicPlacement schematicPlacement, ICompletionListener completionListener)
     {
-        if (this.verificationStarted == false)
-        {
-            this.reset();
+        this.reset();
 
-            this.worldClient = worldClient;
-            this.worldSchematic = worldSchematic;
-            this.schematicPlacement = schematicPlacement;
+        this.worldClient = worldClient;
+        this.worldSchematic = worldSchematic;
+        this.schematicPlacement = schematicPlacement;
 
-            this.requiredChunks.addAll(schematicPlacement.getTouchedChunks());
-            this.totalRequiredChunks = this.requiredChunks.size();
-            this.completionListener = completionListener;
-            this.verificationStarted = true;
+        this.requiredChunks.addAll(schematicPlacement.getTouchedChunks());
+        this.totalRequiredChunks = this.requiredChunks.size();
+        this.completionListener = completionListener;
+        this.verificationStarted = true;
 
-            TaskScheduler.getInstance().scheduleTask(this, 10);
-            InfoHud.getInstance().addInfoHudRenderer(this, false);
-            ACTIVE_VERIFIERS.add(this);
-        }
+        TaskScheduler.getInstance().scheduleTask(this, 10);
+        InfoHud.getInstance().addInfoHudRenderer(this, true);
+        ACTIVE_VERIFIERS.add(this);
 
         this.verificationActive = true;
 

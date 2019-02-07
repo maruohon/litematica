@@ -449,8 +449,16 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
                 case TOGGLE_INFO_HUD:
                     SchematicVerifier verifier = this.parent.placement.getSchematicVerifier();
-                    verifier.setInfoHudRenderingEnabled(! verifier.getShouldRender());
-                    InfoHud.getInstance().setEnabled(true);
+                    verifier.toggleShouldRenderInfoHUD();
+
+                    if (verifier.getShouldRender())
+                    {
+                        InfoHud.getInstance().addInfoHudRenderer(verifier, true);
+                    }
+                    else
+                    {
+                        InfoHud.getInstance().removeInfoHudRenderer(verifier, false);
+                    }
 
                     break;
             }

@@ -13,7 +13,7 @@ public class InfoHud
     protected final Minecraft mc;
     protected final List<String> lineList = new ArrayList<>();
     protected final List<IInfoHudRenderer> renderers = new ArrayList<>();
-    protected boolean enabled;
+    protected boolean enabled = true;
 
     public static InfoHud getInstance()
     {
