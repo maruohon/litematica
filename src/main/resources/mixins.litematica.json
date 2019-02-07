@@ -7,7 +7,6 @@
         "IMixinBlockRendererDispatcher",
         "IMixinCompiledChunk",
         "IMixinNBTTagLongArray",
-        "IMixinRenderChunk",
         "IMixinViewFrustum",
         "IMixinWorldClient",
         "MixinBlockRail",

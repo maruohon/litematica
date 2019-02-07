@@ -11,7 +11,6 @@ import com.google.common.collect.Sets;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
-import fi.dy.masa.litematica.mixin.IMixinRenderChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.litematica.util.OverlayType;
@@ -48,7 +47,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     public static int schematicRenderChunksUpdated;
 
     private final RenderGlobalSchematic renderGlobal;
-    private final VertexBufferSchematic[] vertexBufferOverlay = new VertexBufferSchematic[OverlayRenderType.values().length];
+    private final VertexBuffer[] vertexBufferOverlay = new VertexBuffer[OverlayRenderType.values().length];
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private final List<StructureBoundingBox> boxes = new ArrayList<>();
     private final EnumSet<OverlayRenderType> existingOverlays = EnumSet.noneOf(OverlayRenderType.class);
@@ -69,22 +68,9 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
         if (OpenGlHelper.useVbo())
         {
-            // Delete the vanilla buffers and re-create them using our overridden class
-            VertexBuffer[] buffers = ((IMixinRenderChunk) this).getVertexBuffers();
-
-            for (int i = 0; i < buffers.length; ++i)
-            {
-                if (buffers[i] != null)
-                {
-                    buffers[i].deleteGlBuffers();
-                }
-
-                buffers[i] = new VertexBufferSchematic(DefaultVertexFormats.BLOCK);
-            }
-
             for (int i = 0; i < OverlayRenderType.values().length; ++i)
             {
-                this.vertexBufferOverlay[i] = new VertexBufferSchematic(DefaultVertexFormats.POSITION_COLOR);
+                this.vertexBufferOverlay[i] = new VertexBuffer(DefaultVertexFormats.POSITION_COLOR);
             }
         }
     }
@@ -99,7 +85,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         return this.existingOverlays;
     }
 
-    public VertexBufferSchematic getOverlayVertexBuffer(OverlayRenderType type)
+    public VertexBuffer getOverlayVertexBuffer(OverlayRenderType type)
     {
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("getOverlayVertexBuffer: type: %s, buf: %s\n", type, this.vertexBufferOverlay[type.ordinal()]);
         return this.vertexBufferOverlay[type.ordinal()];
