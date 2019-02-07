@@ -24,7 +24,6 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
         this.sorter = new MaterialListSorter(parent.getMaterialList());
 
         this.setParent(parent);
-        this.refreshData();
     }
 
     @Override
@@ -39,13 +38,6 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     {
         super.offsetSelectionOrScrollbar(amount, changeSelection);
         lastScrollbarPosition = this.scrollBar.getValue();
-    }
-
-    public void refreshData()
-    {
-        this.listContents.clear();
-        this.listContents.addAll(this.gui.getMaterialList().getMaterialsFiltered(true));
-        Collections.sort(this.listContents, this.sorter);
     }
 
     @Override
@@ -64,7 +56,10 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     @Override
     protected void refreshBrowserEntries()
     {
-        this.refreshData();
+        this.listContents.clear();
+        this.listContents.addAll(this.gui.getMaterialList().getMaterialsFiltered(true));
+        Collections.sort(this.listContents, this.sorter);
+
         this.reCreateListEntryWidgets();
 
         if (this.scrollbarRestored == false && lastScrollbarPosition <= this.scrollBar.getMaxValue())

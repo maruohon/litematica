@@ -46,7 +46,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 80;
+        return this.height - 68;
     }
 
     @Override

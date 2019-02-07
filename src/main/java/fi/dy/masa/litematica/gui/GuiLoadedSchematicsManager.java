@@ -14,7 +14,7 @@ public class GuiLoadedSchematicsManager extends GuiListBase<LitematicaSchematic,
 
     public GuiLoadedSchematicsManager()
     {
-        super(10, 40);
+        super(12, 30);
 
         this.title = I18n.format("litematica.gui.title.manage_loaded_schematics");
     }
@@ -28,7 +28,7 @@ public class GuiLoadedSchematicsManager extends GuiListBase<LitematicaSchematic,
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 80;
+        return this.height - 68;
     }
 
     @Override
@@ -36,8 +36,8 @@ public class GuiLoadedSchematicsManager extends GuiListBase<LitematicaSchematic,
     {
         super.initGui();
 
-        int x = 10;
-        int y = this.height - 36;
+        int x = 12;
+        int y = this.height - 26;
         int buttonWidth;
         this.id = 0;
         String label;

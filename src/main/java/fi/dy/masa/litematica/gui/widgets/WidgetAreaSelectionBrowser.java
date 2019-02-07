@@ -21,6 +21,7 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
 
         this.browserEntryHeight = 22;
         this.guiAreaSelectionManager = parent;
+        this.allowKeyboardNavigation = false;
     }
 
     public GuiAreaSelectionManager getSelectionManagerGui()

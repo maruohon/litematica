@@ -22,7 +22,7 @@ public class GuiMainMenu extends GuiBase
     {
         super.initGui();
 
-        int x = 20;
+        int x = 12;
         int y = 30;
         int width = this.getButtonWidth();
 
@@ -43,7 +43,7 @@ public class GuiMainMenu extends GuiBase
         String label = I18n.format("litematica.gui.button.tool_mode", DataManager.getToolMode().getName());
         int width2 = this.mc.fontRenderer.getStringWidth(label) + 10;
 
-        y = this.height - 30;
+        y = this.height - 26;
         ButtonGeneric button = new ButtonGeneric(0, x, y, width2, 20, label);
         this.addButton(button, new ButtonListenerCycleToolMode(this));
 

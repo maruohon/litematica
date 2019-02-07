@@ -336,12 +336,6 @@ public class GuiRenderLayer extends GuiBase
         }
 
         @Override
-        public boolean onGuiClosed(GuiTextField textField)
-        {
-            return this.onTextChange(textField);
-        }
-
-        @Override
         public boolean onTextChange(GuiTextField textField)
         {
             int value = 0;

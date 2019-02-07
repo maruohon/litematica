@@ -19,7 +19,7 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
 
     public GuiPlacementManager()
     {
-        super(10, 40);
+        super(12, 30);
 
         this.title = I18n.format("litematica.gui.title.manage_schematic_placements");
         this.manager = DataManager.getSchematicPlacementManager();
@@ -34,7 +34,7 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 80;
+        return this.height - 64;
     }
 
     @Override
@@ -42,8 +42,8 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
     {
         super.initGui();
 
-        int x = 10;
-        int y = this.height - 36;
+        int x = 12;
+        int y = this.height - 26;
         int buttonWidth;
         this.id = 0;
         String label;

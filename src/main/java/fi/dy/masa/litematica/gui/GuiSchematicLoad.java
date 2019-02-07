@@ -31,7 +31,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
     public GuiSchematicLoad()
     {
-        super(10, 34);
+        super(12, 34);
 
         this.title = I18n.format("litematica.gui.title.load_schematic");
     }
@@ -53,7 +53,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
     {
         super.initGui();
 
-        int x = 10;
+        int x = 12;
         int y = this.height - 40;
         int buttonWidth;
         String label;

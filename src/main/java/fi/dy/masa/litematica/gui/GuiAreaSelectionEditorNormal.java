@@ -512,12 +512,6 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
 
         @Override
-        public boolean onGuiClosed(GuiTextField textField)
-        {
-            return this.onTextChange(textField);
-        }
-
-        @Override
         public boolean onTextChange(GuiTextField textField)
         {
             this.parent.updatePosition(textField.getText(), this.corner, this.type);
@@ -527,12 +521,6 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
     public static class TextFieldListenerDummy implements ITextFieldListener<GuiTextField>
     {
-        @Override
-        public boolean onGuiClosed(GuiTextField textField)
-        {
-            return false;
-        }
-
         @Override
         public boolean onTextChange(GuiTextField textField)
         {
