@@ -20,10 +20,13 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
@@ -149,6 +152,13 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
             {
                 if (this.schematic.writeToFile(this.dir, this.fileName, this.overrideFile, InfoUtils.INFO_MESSAGE_CONSUMER))
                 {
+                    GuiScreen gui = Minecraft.getMinecraft().currentScreen;
+
+                    if (gui instanceof IMessageConsumer)
+                    {
+                        ((IMessageConsumer) gui).addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", this.fileName);
+                    }
+
                     StringUtils.printActionbarMessage("litematica.message.schematic_saved_as", this.fileName);
                 }
                 else
