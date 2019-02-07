@@ -15,6 +15,7 @@ import fi.dy.masa.malilib.util.Constants;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockDoor;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -123,11 +124,25 @@ public class MaterialCache
         }
         else if (block == Blocks.LAVA)
         {
-            return new ItemStack(Items.LAVA_BUCKET);
+            if (state.getValue(BlockLiquid.LEVEL) == 0)
+            {
+                return new ItemStack(Items.LAVA_BUCKET);
+            }
+            else
+            {
+                return ItemStack.EMPTY;
+            }
         }
         else if (block == Blocks.WATER)
         {
-            return new ItemStack(Items.WATER_BUCKET);
+            if (state.getValue(BlockLiquid.LEVEL) == 0)
+            {
+                return new ItemStack(Items.WATER_BUCKET);
+            }
+            else
+            {
+                return ItemStack.EMPTY;
+            }
         }
         else if (block instanceof BlockDoor && state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.UPPER)
         {
