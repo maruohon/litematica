@@ -14,7 +14,9 @@ litematica.error.generic.schematic_world_not_loaded=Schematic world was not load
 litematica.error.invalid_directory=Invalid directory '%s'
 
 litematica.error.area_editor.create_sub_region.exists=A sub-region by the name '%s' already exists
+litematica.error.area_editor.open_gui.no_selection=Currently in Selection Mode: Normal, but no area is currently selected
 litematica.error.area_editor.rename_sub_region.exists=Failed to rename the sub-region:\nA sub-region already exists by the name '%s'
+litematica.error.area_editor.switch_mode.no_selection=Can't switch to Selection Mode: Normal,\nbecause there is currently no area selected
 
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=Failed to create the Litematica schematic
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
@@ -61,6 +63,7 @@ litematica.gui.button.area_editor.origin_enabled=Manual Origin: %s
 litematica.gui.button.area_editor.set_box_name=Set
 litematica.gui.button.area_editor.set_selection_name=Set
 
+litematica.gui.button.area_selection_mode=Area Selection Mode: %s
 litematica.gui.button.area_selections.create_directory=Create directory
 litematica.gui.button.area_selections.create_new_selection=New selection
 litematica.gui.button.area_selections.create_selection_from_placement=From Placement
@@ -285,9 +288,10 @@ litematica.hud.area_selection.dimensions_position=Dim: %s - p1: %s, p2: %s
 litematica.hud.area_selection.mode.corners=Corners
 litematica.hud.area_selection.mode.expand=Expand
 litematica.hud.area_selection.origin=Origin: %s
-litematica.hud.area_selection.selected_area=Area: %s
+litematica.hud.area_selection.selected_area_normal=Area: %s
+litematica.hud.area_selection.selected_area_simple=Area [§6Simple mode§r]: %s
 litematica.hud.area_selection.selected_sub_region=Sub-region: %s
-litematica.hud.area_selection.selection_mode=Selection Mode: %s
+litematica.hud.area_selection.selection_corners_mode=Corners Mode: %s
 
 litematica.hud.misc.none_brackets=<none>
 

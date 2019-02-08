@@ -74,7 +74,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     {
         if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
         {
-            selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentSelectionId());
+            selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentNormalSelectionId());
             super.render(mouseX, mouseY, selected);
         }
         else

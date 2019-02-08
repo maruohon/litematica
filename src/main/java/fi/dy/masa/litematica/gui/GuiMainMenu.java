@@ -2,6 +2,8 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -46,6 +48,13 @@ public class GuiMainMenu extends GuiBase
         y = this.height - 26;
         ButtonGeneric button = new ButtonGeneric(0, x, y, width2, 20, label);
         this.addButton(button, new ButtonListenerCycleToolMode(this));
+
+        int x2 = x + width2 + 4;
+        SelectionMode mode = DataManager.getSelectionManager().getSelectionMode();
+        label = I18n.format("litematica.gui.button.area_selection_mode", mode.getDisplayName());
+        width2 = this.mc.fontRenderer.getStringWidth(label) + 10;
+        button = new ButtonGeneric(0, x2, y, width2, 20, label);
+        this.addButton(button, new ButtonListenerCycleAreaMode(this));
 
         x += width + 20;
         y = 30;
@@ -188,6 +197,30 @@ public class GuiMainMenu extends GuiBase
         {
             ToolMode mode = DataManager.getToolMode().cycle(Minecraft.getMinecraft().player, mouseButton == 0);
             DataManager.setToolMode(mode);
+            this.gui.initGui();
+        }
+    }
+
+    private static class ButtonListenerCycleAreaMode implements IButtonActionListener<ButtonGeneric>
+    {
+        private final GuiMainMenu gui;
+
+        private ButtonListenerCycleAreaMode(GuiMainMenu gui)
+        {
+            this.gui = gui;
+        }
+
+        @Override
+        public void actionPerformed(ButtonGeneric control)
+        {
+            this.actionPerformedWithButton(control, 0);
+        }
+
+        @Override
+        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        {
+            SelectionManager manager = DataManager.getSelectionManager();
+            manager.setMode(manager.getSelectionMode().cycle(true));
             this.gui.initGui();
         }
     }

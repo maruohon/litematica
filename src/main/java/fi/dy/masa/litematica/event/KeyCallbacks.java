@@ -168,12 +168,12 @@ public class KeyCallbacks
                         SelectionManager sm = DataManager.getSelectionManager();
                         boolean moveEverything = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
 
-                        if (Configs.Generic.SELECTION_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
+                        if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
                         {
                             Corner corner = isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2;
                             sm.setPositionOfCurrentSelectionToRayTrace(this.mc, corner, moveEverything, maxDistance);
                         }
-                        else if (Configs.Generic.SELECTION_MODE.getOptionListValue() == CornerSelectionMode.EXPAND)
+                        else if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.EXPAND)
                         {
                             sm.handleCuboidModeMouseClick(this.mc, maxDistance, isToolSecondary, moveEverything);
                         }
@@ -516,7 +516,7 @@ public class KeyCallbacks
             {
                 if (mode.getUsesAreaSelection())
                 {
-                    Configs.Generic.SELECTION_MODE.setOptionListValue(Configs.Generic.SELECTION_MODE.getOptionListValue().cycle(false));
+                    Configs.Generic.SELECTION_CORNERS_MODE.setOptionListValue(Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().cycle(false));
                     return true;
                 }
             }

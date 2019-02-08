@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -55,6 +56,7 @@ public class ToolHud extends InfoHud
         lines.clear();
         String str;
         String green = GuiBase.TXT_GREEN;
+        String orange = GuiBase.TXT_GOLD;
         String white = GuiBase.TXT_WHITE;
         String rst = GuiBase.TXT_RST;
         String strYes = green + I18n.format("litematica.label.yes") + rst;
@@ -67,7 +69,16 @@ public class ToolHud extends InfoHud
 
             if (selection != null)
             {
-                lines.add(I18n.format("litematica.hud.area_selection.selected_area", green + selection.getName() + rst));
+                String name = green + selection.getName() + rst;
+
+                if (sm.getSelectionMode() == SelectionMode.NORMAL)
+                {
+                    lines.add(I18n.format("litematica.hud.area_selection.selected_area_normal", name));
+                }
+                else
+                {
+                    lines.add(I18n.format("litematica.hud.area_selection.selected_area_simple", name));
+                }
 
                 String strOr;
                 BlockPos o = selection.getExplicitOrigin();
@@ -83,7 +94,7 @@ public class ToolHud extends InfoHud
                 }
                 int count = selection.getAllSubRegionBoxes().size();
 
-                str = String.format("%d, %d, %d [%s]", o.getX(), o.getY(), o.getZ(), strOr);
+                str = String.format("%d, %d, %d %s[%s%s%s]", o.getX(), o.getY(), o.getZ(), rst, orange, strOr, rst);
                 String strOrigin = I18n.format("litematica.hud.area_selection.origin", green + str + rst);
                 String strBoxes = I18n.format("litematica.hud.area_selection.box_count", green + count + rst);
 
@@ -128,8 +139,8 @@ public class ToolHud extends InfoHud
                     }
                 }
 
-                str = green + Configs.Generic.SELECTION_MODE.getOptionListValue().getDisplayName() + rst;
-                lines.add(I18n.format("litematica.hud.area_selection.selection_mode", str));
+                str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
+                lines.add(I18n.format("litematica.hud.area_selection.selection_corners_mode", str));
             }
         }
         else if (mode.getUsesSchematic())

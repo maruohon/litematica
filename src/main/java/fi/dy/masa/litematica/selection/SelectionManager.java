@@ -67,6 +67,17 @@ public class SelectionManager
     }
 
     @Nullable
+    public String getCurrentNormalSelectionId()
+    {
+        return this.currentSelectionId;
+    }
+
+    public boolean hasNormalSelection()
+    {
+        return this.getNormalSelection(this.currentSelectionId) != null;
+    }
+
+    @Nullable
     public AreaSelection getCurrentSelection()
     {
         return this.getSelection(this.currentSelectionId);
@@ -682,13 +693,26 @@ public class SelectionManager
             {
                 return new GuiAreaSelectionEditorNormal(selection);
             }
+            else
+            {
+                GuiScreen current = Minecraft.getMinecraft().currentScreen;
+
+                if (current instanceof IMessageConsumer)
+                {
+                    ((IMessageConsumer) current).addMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
+                }
+                else
+                {
+                    StringUtils.printActionbarMessage("litematica.error.area_editor.open_gui.no_selection");
+                }
+
+                return null;
+            }
         }
         else
         {
             return new GuiAreaSelectionEditorSimple(DataManager.getSimpleArea());
         }
-
-        return null;
     }
 
     public void openEditGui(@Nullable GuiScreen parent)

@@ -400,8 +400,18 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
                 case CHANGE_MODE:
                     SelectionManager manager = DataManager.getSelectionManager();
-                    manager.setMode(manager.getSelectionMode().cycle(true));
-                    manager.openEditGui(null);
+                    SelectionMode newMode = manager.getSelectionMode().cycle(true);
+
+                    if (newMode == SelectionMode.NORMAL && manager.hasNormalSelection() == false)
+                    {
+                        this.parent.addMessage(MessageType.WARNING, "litematica.error.area_editor.switch_mode.no_selection");
+                    }
+                    else
+                    {
+                        manager.setMode(newMode);
+                        manager.openEditGui(null);
+                        return;
+                    }
                     break;
 
                 case CREATE_SCHEMATIC:

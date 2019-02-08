@@ -106,7 +106,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         {
             String selectionId = entry.getFullPath().getAbsolutePath();
 
-            if (selectionId.equals(this.selectionManager.getCurrentSelectionId()))
+            if (selectionId.equals(this.selectionManager.getCurrentNormalSelectionId()))
             {
                 this.selectionManager.setCurrentSelection(null);
             }
