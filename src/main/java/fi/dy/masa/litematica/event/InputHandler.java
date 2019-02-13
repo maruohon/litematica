@@ -51,17 +51,17 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onKeyInput(int eventKey, boolean eventKeyState)
+    public boolean onKeyInput(int keyCode, int scanCode, int modifiers, boolean eventKeyState)
     {
         if (eventKeyState)
         {
             Minecraft mc = Minecraft.getInstance();
 
-            if (mc.gameSettings.keyBindUseItem.func_197984_a(eventKey))
+            if (mc.gameSettings.keyBindUseItem.matchesKey(keyCode, scanCode))
             {
                 return this.handleUseKey(mc);
             }
-            else if (mc.gameSettings.keyBindScreenshot.func_197984_a(eventKey))
+            else if (mc.gameSettings.keyBindScreenshot.matchesKey(keyCode, scanCode))
             {
                 return GuiSchematicManager.setPreviewImage();
             }
