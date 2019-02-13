@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
@@ -19,6 +21,7 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3i;
@@ -166,7 +169,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 GlStateManager.color4f(1f, 1f, 1f, 1f);
                 this.bindTexture(pair.getLeft());
 
-                int iconSize = (int) Math.sqrt(pair.getRight().getTextureData().getWidth());
+                int iconSize = pair.getRight().getTextureData().getWidth();
                 Gui.drawModalRectWithCustomSizedTexture(x + 10, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
@@ -212,14 +215,20 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
                 if (size * size == previewImageData.length)
                 {
-                    //BufferedImage buf = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
-                    //buf.setRGB(0, 0, size, size, previewImageData, 0, size);
-
-                    DynamicTexture tex = new DynamicTexture(size, size, true);
-                    ResourceLocation rl = new ResourceLocation("litematica", file.getAbsolutePath());
+                    NativeImage image = new NativeImage(size, size, false);
+                    DynamicTexture tex = new DynamicTexture(image);
+                    ResourceLocation rl = new ResourceLocation("litematica", DigestUtils.sha1Hex(file.getAbsolutePath()));
                     this.mc.getTextureManager().loadTexture(rl, tex);
 
-                    System.arraycopy(previewImageData, 0, tex.getTextureData(), 0, previewImageData.length);
+                    for (int y = 0, i = 0; y < size; ++y)
+                    {
+                        for (int x = 0; x < size; ++x)
+                        {
+                            int val = previewImageData[i++];
+                            image.setPixelRGBA(x, y, val);
+                        }
+                    }
+
                     tex.updateDynamicTexture();
 
                     this.cachedPreviewImages.put(file, Pair.of(rl, tex));
@@ -227,6 +236,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             }
             catch (Exception e)
             {
+                Litematica.logger.warn("Failed to create a preview image", e);
             }
         }
     }
