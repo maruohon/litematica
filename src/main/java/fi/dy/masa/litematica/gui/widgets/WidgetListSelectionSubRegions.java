@@ -26,6 +26,7 @@ public class WidgetListSelectionSubRegions extends WidgetListBase<String, Widget
         this.browserEntryHeight = 22;
         this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
+        this.shouldSortList = true;
     }
 
     public GuiAreaSelectionEditorNormal getEditorGui()

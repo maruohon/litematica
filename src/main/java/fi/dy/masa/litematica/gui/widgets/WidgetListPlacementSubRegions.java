@@ -24,6 +24,7 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
         this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
         //this.widgetSearchBar.setSearchOpen(true);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
+        this.shouldSortList = true;
     }
 
     public GuiPlacementConfiguration getParentGui()
