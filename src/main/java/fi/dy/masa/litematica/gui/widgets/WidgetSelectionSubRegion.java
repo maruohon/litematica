@@ -89,9 +89,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
         if (selected)
         {
-            GlStateManager.translate(0, 0, 1);
-            RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
-            GlStateManager.translate(0, 0, -1);
+            RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0, 0.001f);
         }
 
         this.mc.fontRenderer.drawString(this.entry, this.x + 2, this.y + 7, 0xFFFFFFFF);
