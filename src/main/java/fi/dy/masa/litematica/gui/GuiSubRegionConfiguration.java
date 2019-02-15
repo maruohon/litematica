@@ -113,7 +113,9 @@ public class GuiSubRegionConfiguration extends GuiBase
         int offset = this.mc.fontRenderer.getStringWidth(label) + 4;
 
         // The sub-region placements are relative
-        BlockPos pos = this.placement.getPos().add(this.schematicPlacement.getOrigin());
+        BlockPos pos = this.placement.getPos();
+        pos = PositionUtils.getTransformedBlockPos(pos, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
+        pos = pos.add(this.schematicPlacement.getOrigin());
         String text = "";
 
         switch (type)

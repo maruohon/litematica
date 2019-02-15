@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -17,6 +18,7 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
 public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlacement>
@@ -154,6 +156,13 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             List<String> text = new ArrayList<>();
             text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.schematicPlacement.getSchematic().getMetadata().getName()));
             text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
+
+            BlockPos o = this.placement.getPos();
+            o = PositionUtils.getTransformedBlockPos(o, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
+            o = o.add(this.schematicPlacement.getOrigin());
+            String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
+            text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
+
             RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
     }
