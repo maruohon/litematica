@@ -24,7 +24,6 @@ import net.minecraft.client.resources.I18n;
 public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetAreaSelectionBrowser> implements ISelectionListener<DirectoryEntry>
 {
     private SelectionManager selectionManager;
-    private int id;
 
     public GuiAreaSelectionManager()
     {
@@ -52,15 +51,15 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     {
         super.initGui();
 
-        this.id = 0;
         int x = this.mc.currentScreen.width - 13;
         int y = 24;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_EDITOR;
-        ButtonGeneric button = new ButtonGeneric(this.id++, 10, y, -1, 20, I18n.format(type.getLabelKey()), type.getIcon());
+        ButtonGeneric button = new ButtonGeneric(0, 10, y, -1, 20, I18n.format(type.getLabelKey()), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this));
 
         // These are placed from right to left
+        x = this.createButton(x, y, ButtonListener.ButtonType.UNSELECT);
         x = this.createButton(x, y, ButtonListener.ButtonType.FROM_PLACEMENT);
         x = this.createButton(x, y, ButtonListener.ButtonType.NEW_SELECTION);
     }
@@ -70,7 +69,15 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         String label = I18n.format(type.getLabelKey());
         int len = this.mc.fontRenderer.getStringWidth(label) + 10;
         x -= (len + 2);
-        this.addButton(new ButtonGeneric(this.id++, x, y, len, 20, label), new ButtonListener(type, this));
+
+        ButtonGeneric button = new ButtonGeneric(0, x, y, len, 20, label);
+
+        if (type == ButtonListener.ButtonType.UNSELECT)
+        {
+            button.setHoverStrings("litematica.gui.button.hover.area_selections.unselect");
+        }
+
+        this.addButton(button, new ButtonListener(type, this));
 
         return x;
     }
@@ -163,6 +170,10 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
                     this.gui.addMessage(MessageType.ERROR, "litematica.error.area_selection.no_placement_selected");
                 }
             }
+            else if (this.type == ButtonType.UNSELECT)
+            {
+                DataManager.getSelectionManager().setCurrentSelection(null);
+            }
         }
 
         @Override
@@ -174,7 +185,8 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         public enum ButtonType
         {
             NEW_SELECTION       ("litematica.gui.button.area_selections.create_new_selection"),
-            FROM_PLACEMENT      ("litematica.gui.button.area_selections.create_selection_from_placement");
+            FROM_PLACEMENT      ("litematica.gui.button.area_selections.create_selection_from_placement"),
+            UNSELECT            ("litematica.gui.button.area_selections.unselect");
 
             private final String labelKey;
 

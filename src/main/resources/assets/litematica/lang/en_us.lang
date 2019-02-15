@@ -66,6 +66,7 @@ litematica.gui.button.area_selection_mode=Area Selection Mode: %s
 litematica.gui.button.area_selections.create_directory=Create directory
 litematica.gui.button.area_selections.create_new_selection=New selection
 litematica.gui.button.area_selections.create_selection_from_placement=From Placement
+litematica.gui.button.area_selections.unselect=Unselect
 
 litematica.gui.button.change_menu.area_editor=Area Editor
 litematica.gui.button.change_menu.load_schematics_to_memory=Load Schematics
@@ -83,6 +84,7 @@ litematica.gui.button.config_gui.render_layers=Render Layers
 litematica.gui.button.config_gui.visuals=Visuals
 
 litematica.gui.button.hover.area_editor.shift_for_in_memory=Hold Shift to create an in-memory-only schematic
+litematica.gui.button.hover.area_selections.unselect=Unselects the current Area Selection
 litematica.gui.button.hover.material_list.clear_cache=Clears the Material Cache\nNormally this should not be needed\nThis can be used instead of deleting the 'material_cache.nbt'\nfile in case the cache has some wrong data, like items\nstored for blocks that shouldn't have them, like piston heads
 litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift to select the sub regions used for the Material List
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
