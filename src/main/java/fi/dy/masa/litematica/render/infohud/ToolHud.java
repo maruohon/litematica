@@ -171,11 +171,15 @@ public class ToolHud extends InfoHud
                 {
                     String areaName = placement.getName();
                     str = I18n.format("litematica.hud.schematic_placement.selected_sub_region");
-                    lines.add(String.format("%s: %s%s%s", str, green, areaName, rst));
-
-                    str = I18n.format("litematica.hud.schematic_placement.sub_region_modified");
+                    String str2 = I18n.format("litematica.hud.schematic_placement.sub_region_modified");
                     strTmp = placement.isRegionPlacementModifiedFromDefault() ? strYes : strNo;
-                    lines.add(String.format("%s: %s", str, strTmp));
+                    lines.add(String.format("%s: %s%s%s - %s: %s", str, green, areaName, rst, str2, strTmp));
+
+                    or = placement.getPos();
+                    or = PositionUtils.getTransformedBlockPos(or, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+                    or = or.add(schematicPlacement.getOrigin());
+                    str = String.format("%d, %d, %d", or.getX(), or.getY(), or.getZ());
+                    lines.add(I18n.format("litematica.hud.schematic_placement.sub_region_origin", green + str + rst));
                 }
             }
             else
