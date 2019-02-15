@@ -5,7 +5,6 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager.ExportType;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -115,12 +114,6 @@ public class GuiSchematicSaveExported extends GuiSchematicSaveBase
                 }
 
                 this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_export.unsupported_type", this.gui.inputFileName);
-            }
-            else if (this.type == ButtonType.CREATE_DIRECTORY)
-            {
-                File dir = this.gui.getListWidget().getCurrentDirectory();
-                String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
             }
         }
 

@@ -13,7 +13,6 @@ litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated 
 litematica.error.duplicate_schematic_load=Error: Tried to load a duplicate schematic + placement
 litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
 litematica.error.generic.schematic_world_not_loaded=Schematic world was not loaded
-litematica.error.invalid_directory=Invalid directory '%s'
 
 litematica.error.area_editor.create_sub_region.exists=A sub-region by the name '%s' already exists
 litematica.error.area_editor.open_gui.no_selection=Currently in Selection Mode: Normal, but no area is currently selected
@@ -36,9 +35,7 @@ litematica.error.schematic_manager.schematic_import.unsupported_type=The selecte
 litematica.error.schematic_placements.remove_fail_locked=The placement is locked!\n- Hold Shift to force remove it
 
 litematica.error.schematic_save.directory_doesnt_exist=No such directory: '%s'
-litematica.error.schematic_save.failed_to_create_directory=Failed to create directory '%s'
 litematica.error.schematic_save.file_already_exists=File '%s' already exists
-litematica.error.schematic_save.file_or_directory_already_exists=File or directory '%s' already exists
 litematica.error.schematic_save.invalid_directory=Invalid directory '%s'
 litematica.error.schematic_save.invalid_schematic_name=Invalid schematic name '%s'
 litematica.error.schematic_save.schematic_creation_failed=Failed to create the schematic!
@@ -341,7 +338,6 @@ litematica.message.area_cleared=Area cleared
 litematica.message.area_filled=Area filled
 litematica.message.area_fill_fail=Failed to fill the area
 litematica.message.area_selections.selection_created_from_placement=Created a new selection from placement '%s'
-litematica.message.directory_created=Directory '%s' created
 litematica.message.easy_place_fail=Action prevented by the Easy Place mode
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move

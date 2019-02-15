@@ -3,14 +3,12 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.GuiSchematicSaveBase.DirectoryCreator;
 import fi.dy.masa.litematica.gui.widgets.WidgetAreaSelectionBrowser;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -63,7 +61,6 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         this.addButton(button, new ButtonListenerChangeMenu(type, this));
 
         // These are placed from right to left
-        x = this.createButton(x, y, ButtonListener.ButtonType.CREATE_DIRECTORY);
         x = this.createButton(x, y, ButtonListener.ButtonType.FROM_PLACEMENT);
         x = this.createButton(x, y, ButtonListener.ButtonType.NEW_SELECTION);
     }
@@ -145,13 +142,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         @Override
         public void actionPerformed(ButtonGeneric control)
         {
-            if (this.type == ButtonType.CREATE_DIRECTORY)
-            {
-                File dir = this.gui.getListWidget().getCurrentDirectory();
-                String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
-            }
-            else if (this.type == ButtonType.NEW_SELECTION)
+            if (this.type == ButtonType.NEW_SELECTION)
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_area_selection";
@@ -182,7 +173,6 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
 
         public enum ButtonType
         {
-            CREATE_DIRECTORY    ("litematica.gui.button.area_selections.create_directory"),
             NEW_SELECTION       ("litematica.gui.button.area_selections.create_new_selection"),
             FROM_PLACEMENT      ("litematica.gui.button.area_selections.create_selection_from_placement");
 

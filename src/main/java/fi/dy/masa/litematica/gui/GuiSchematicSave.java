@@ -8,7 +8,6 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -146,12 +145,6 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
                         this.gui.addMessage(MessageType.ERROR, "litematica.message.error.schematic_save_no_area_selected");
                     }
                 }
-            }
-            else if (this.type == ButtonType.CREATE_DIRECTORY)
-            {
-                File dir = this.gui.getListWidget().getCurrentDirectory();
-                String title = "litematica.gui.title.create_directory";
-                this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, title, "", this.gui, new DirectoryCreator(dir, this.gui, this.gui.getListWidget())));
             }
         }
 
