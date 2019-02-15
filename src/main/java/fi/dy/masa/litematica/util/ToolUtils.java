@@ -158,8 +158,11 @@ public class ToolUtils
         {
             final AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
 
-            if (area != null)
+            if (area != null && area.getAllSubRegionBoxes().size() > 0)
             {
+                Box currentBox = area.getSelectedSubRegionBox();
+                final ImmutableList<Box> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
+
                 if (mc.isSingleplayer())
                 {
                     final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
@@ -168,18 +171,6 @@ public class ToolUtils
                     {
                         public void run()
                         {
-                            Box currentBox = area.getSelectedSubRegionBox();
-                            Collection<Box> boxes;
-
-                            if (currentBox != null)
-                            {
-                                boxes = ImmutableList.of(currentBox);
-                            }
-                            else
-                            {
-                                boxes = area.getAllSubRegionBoxes();
-                            }
-
                             if (deleteSelectionVolumes(world, boxes, removeEntities))
                             {
                                 InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
@@ -193,9 +184,13 @@ public class ToolUtils
 
                     InfoUtils.showMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }
+                else if (fillSelectionVolumesCommand(boxes, Blocks.AIR.getDefaultState(), null, mc))
+                {
+                    InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
+                }
                 else
                 {
-                    InfoUtils.showMessage(MessageType.ERROR, "litematica.message.only_works_in_single_player");
+                    InfoUtils.showMessage(MessageType.ERROR, "litematica.message.area_clear_fail");
                 }
             }
             else
