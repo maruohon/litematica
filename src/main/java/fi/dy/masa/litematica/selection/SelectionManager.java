@@ -23,8 +23,8 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
@@ -324,7 +324,7 @@ public class SelectionManager
                 if (printMessage)
                 {
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    StringUtils.printActionbarMessage("litematica.message.added_selection_box", posStr);
+                    InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
                 }
 
                 return true;
@@ -479,7 +479,7 @@ public class SelectionManager
                         trace.getHitCorner(),
                         trace.getHitVec(),
                         entity.getPositionEyes(1f).distanceTo(trace.getHitVec()));
-                StringUtils.printActionbarMessage("litematica.message.grabbed_element_for_moving");
+                InfoUtils.printActionbarMessage("litematica.message.grabbed_element_for_moving");
                 return true;
             }
         }
@@ -525,7 +525,7 @@ public class SelectionManager
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", cornerIndex, posStr);
+                    InfoUtils.printActionbarMessage("litematica.message.set_selection_box_point", cornerIndex, posStr);
                 }
             }
         }
@@ -544,7 +544,7 @@ public class SelectionManager
 
             String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            StringUtils.printActionbarMessage("litematica.message.moved_area_origin", posStrOld, posStrNew);
+            InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.moved_area_origin", posStrOld, posStrNew);
         }
     }
 
@@ -695,17 +695,7 @@ public class SelectionManager
             }
             else
             {
-                GuiScreen current = Minecraft.getMinecraft().currentScreen;
-
-                if (current instanceof IMessageConsumer)
-                {
-                    ((IMessageConsumer) current).addMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
-                }
-                else
-                {
-                    StringUtils.printActionbarMessage("litematica.error.area_editor.open_gui.no_selection");
-                }
-
+                InfoUtils.showMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
                 return null;
             }
         }

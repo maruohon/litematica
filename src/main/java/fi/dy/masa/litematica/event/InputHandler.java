@@ -17,7 +17,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -196,7 +196,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 if (WorldUtils.handleEasyPlace(mc) == false)
                 {
-                    StringUtils.printActionbarMessage("litematica.message.easy_place_fail");
+                    InfoUtils.printActionbarMessage("litematica.message.easy_place_fail");
                 }
 
                 return true;

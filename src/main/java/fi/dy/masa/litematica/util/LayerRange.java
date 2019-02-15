@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.util;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
@@ -165,7 +165,7 @@ public class LayerRange
         if (printMessage)
         {
             String val = TextFormatting.GREEN.toString() + mode.getDisplayName();
-            StringUtils.printActionbarMessage("litematica.message.set_layer_mode_to", val);
+            InfoUtils.printActionbarMessage("litematica.message.set_layer_mode_to", val);
         }
     }
 
@@ -175,7 +175,7 @@ public class LayerRange
 
         WorldUtils.markAllSchematicChunksForRenderUpdate();
         String val = TextFormatting.GREEN.toString() + axis.getName();
-        StringUtils.printActionbarMessage("litematica.message.set_layer_axis_to", val);
+        InfoUtils.printActionbarMessage("litematica.message.set_layer_axis_to", val);
     }
 
     public void setLayerSingle(int layer)
@@ -336,21 +336,21 @@ public class LayerRange
                 this.setLayerSingle(this.layerSingle + amount);
 
                 String val = strTo + this.layerSingle;
-                StringUtils.printActionbarMessage("litematica.message.set_layer_to", val);
+                InfoUtils.printActionbarMessage("litematica.message.set_layer_to", val);
                 break;
             }
             case ALL_ABOVE:
             {
                 this.setLayerAbove(this.layerAbove + amount);
                 String val = strTo + this.layerAbove;
-                StringUtils.printActionbarMessage("litematica.message.moved_min_layer_to", val);
+                InfoUtils.printActionbarMessage("litematica.message.moved_min_layer_to", val);
                 break;
             }
             case ALL_BELOW:
             {
                 this.setLayerBelow(this.layerBelow + amount);
                 String val = strTo + this.layerBelow;
-                StringUtils.printActionbarMessage("litematica.message.moved_max_layer_to", val);
+                InfoUtils.printActionbarMessage("litematica.message.moved_max_layer_to", val);
                 break;
             }
             case LAYER_RANGE:
@@ -377,7 +377,7 @@ public class LayerRange
 
                     String val2 = String.valueOf(amount);
                     String val3 = this.axis.getName().toLowerCase();
-                    StringUtils.printActionbarMessage("litematica.message.moved_layer_range", val1, val2, val3);
+                    InfoUtils.printActionbarMessage("litematica.message.moved_layer_range", val1, val2, val3);
                 }
 
                 break;

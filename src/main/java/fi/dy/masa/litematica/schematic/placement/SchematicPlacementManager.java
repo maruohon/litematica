@@ -32,7 +32,6 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
@@ -504,7 +503,7 @@ public class SchematicPlacementManager
         {
             if (schematicPlacement.isLocked())
             {
-                StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+                InfoUtils.showMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
                 return;
             }
 
@@ -515,7 +514,7 @@ public class SchematicPlacementManager
                 schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), pos, InfoUtils.INFO_MESSAGE_CONSUMER);
 
                 String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                StringUtils.printActionbarMessage("litematica.message.placement.moved_subregion_to", posStr);
+                InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.placement.moved_subregion_to", posStr);
             }
             // Moving the origin point
             else
@@ -524,7 +523,7 @@ public class SchematicPlacementManager
                 schematicPlacement.setOrigin(pos, InfoUtils.INFO_MESSAGE_CONSUMER);
                 String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
                 String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                StringUtils.printActionbarMessage("litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
+                InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
             }
         }
     }
@@ -537,7 +536,7 @@ public class SchematicPlacementManager
         {
             if (schematicPlacement.isLocked())
             {
-                StringUtils.printActionbarMessage("litematica.message.placement.cant_modify_is_locked");
+                InfoUtils.showMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
                 return;
             }
 
@@ -580,25 +579,25 @@ public class SchematicPlacementManager
                         {
                             if (schematic.placeToWorld(world, schematicPlacement, false))
                             {
-                                StringUtils.printActionbarMessage("litematica.message.schematic_pasted");
+                                InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
                             }
                             else
                             {
-                                StringUtils.printActionbarMessage("litematica.message.error.schematic_paste_failed");
+                                InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
                             }
                         }
                     });
 
-                    StringUtils.printActionbarMessage("litematica.message.scheduled_task_added");
+                    InfoUtils.showMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }
                 else
                 {
-                    StringUtils.printActionbarMessage("litematica.message.error.only_works_in_single_player");
+                    InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.only_works_in_single_player");
                 }
             }
             else
             {
-                StringUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
             }
         }
     }

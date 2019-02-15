@@ -34,7 +34,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 
@@ -295,7 +295,7 @@ public class KeyCallbacks
                     }
                     else
                     {
-                        StringUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                        InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
                     }
 
                     return true;
@@ -310,7 +310,7 @@ public class KeyCallbacks
                     }
                     else
                     {
-                        StringUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                        InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
                     }
 
                     return true;
@@ -331,7 +331,7 @@ public class KeyCallbacks
                         }
                         else
                         {
-                            StringUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                            InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
                         }
                     }
 
@@ -355,7 +355,7 @@ public class KeyCallbacks
                     }
                     else
                     {
-                        StringUtils.printActionbarMessage("litematica.message.error.no_area_selected");
+                        InfoUtils.printActionbarMessage("litematica.message.error.no_area_selected");
                     }
                     return true;
                 }
@@ -426,7 +426,7 @@ public class KeyCallbacks
                 if (mode.getUsesSchematic())
                 {
                     WorldUtils.markAllSchematicChunksForRenderUpdate();
-                    StringUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
+                    InfoUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
                 }
                 return true;
             }
@@ -476,7 +476,7 @@ public class KeyCallbacks
                         {
                             selection.setExplicitOrigin(null);
                             selection.setOriginSelected(false);
-                            StringUtils.printActionbarMessage("litematica.message.removed_area_origin");
+                            InfoUtils.printActionbarMessage("litematica.message.removed_area_origin");
                         }
                         else
                         {
@@ -484,7 +484,7 @@ public class KeyCallbacks
 
                             if (name != null && selection.removeSelectedSubRegionBox())
                             {
-                                StringUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
+                                InfoUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
                                 return true;
                             }
                         }
@@ -532,7 +532,7 @@ public class KeyCallbacks
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                         area.setExplicitOrigin(pos);
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                        StringUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
+                        InfoUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
                         return true;
                     }
                 }
@@ -552,7 +552,7 @@ public class KeyCallbacks
                         area.setSelectedSubRegionCornerPos(pos, corner);
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                        StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", corner.ordinal(), posStr);
+                        InfoUtils.printActionbarMessage("litematica.message.set_selection_box_point", corner.ordinal(), posStr);
                         return true;
                     }
                 }

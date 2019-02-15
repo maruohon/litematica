@@ -7,7 +7,8 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -47,31 +48,31 @@ public class ToolUtils
 
                             if (fillSelectionVolumesDirect(world, boxes, state, stateToReplace))
                             {
-                                StringUtils.printActionbarMessage("litematica.message.area_filled");
+                                InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.area_filled");
                             }
                             else
                             {
-                                StringUtils.printActionbarMessage("litematica.message.area_fill_fail");
+                                InfoUtils.showMessage(MessageType.ERROR, "litematica.message.area_fill_fail");
                             }
 
                             WorldUtils.setShouldPreventOnBlockAdded(false);
                         }
                     });
 
-                    StringUtils.printActionbarMessage("litematica.message.scheduled_task_added");
+                    InfoUtils.showMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }
                 else if (fillSelectionVolumesCommand(boxes, state, stateToReplace, mc))
                 {
-                    StringUtils.printActionbarMessage("litematica.message.area_filled");
+                    InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.area_filled");
                 }
                 else
                 {
-                    StringUtils.printActionbarMessage("litematica.message.area_fill_fail");
+                    InfoUtils.showMessage(MessageType.ERROR, "litematica.message.area_fill_fail");
                 }
             }
             else
             {
-                StringUtils.printActionbarMessage("litematica.message.error.no_area_selected");
+                InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
             }
         }
     }
@@ -181,25 +182,25 @@ public class ToolUtils
 
                             if (deleteSelectionVolumes(world, boxes, removeEntities))
                             {
-                                StringUtils.printActionbarMessage("litematica.message.area_cleared");
+                                InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
                             }
                             else
                             {
-                                StringUtils.printActionbarMessage("litematica.message.area_clear_fail");
+                                InfoUtils.showMessage(MessageType.ERROR, "litematica.message.area_clear_fail");
                             }
                         }
                     });
 
-                    StringUtils.printActionbarMessage("litematica.message.scheduled_task_added");
+                    InfoUtils.showMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }
                 else
                 {
-                    StringUtils.printActionbarMessage("litematica.message.only_works_in_single_player");
+                    InfoUtils.showMessage(MessageType.ERROR, "litematica.message.only_works_in_single_player");
                 }
             }
             else
             {
-                StringUtils.printActionbarMessage("litematica.message.error.no_area_selected");
+                InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
             }
         }
     }

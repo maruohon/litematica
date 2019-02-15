@@ -14,7 +14,6 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.config.IConfigOptionList;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -24,7 +23,6 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ScreenShotHelper;
@@ -235,7 +233,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             {
                 previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
                 this.gui.mc.displayGuiScreen(null);
-                StringUtils.printActionbarMessage("litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot");
+                InfoUtils.printActionbarMessage("litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot");
             }
         }
 
@@ -374,7 +372,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
                     schematic.writeToFile(this.dir, this.fileName, true, InfoUtils.INFO_MESSAGE_CONSUMER);
 
-                    InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiBase.TXT_GREEN + I18n.format("litematica.info.schematic_manager.preview.success"));
+                    InfoUtils.showMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
                 }
                 catch (Exception e)
                 {
@@ -383,7 +381,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else
             {
-                InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiBase.TXT_RED + I18n.format("litematica.error.schematic_rename.read_failed"));
+                InfoUtils.showMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
             }
         }
     }

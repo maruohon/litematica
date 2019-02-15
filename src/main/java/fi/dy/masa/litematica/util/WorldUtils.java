@@ -28,7 +28,7 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
@@ -811,7 +811,7 @@ public class WorldUtils
 
         if (cancel)
         {
-            StringUtils.printActionbarMessage("litematica.message.placement_restriction_in_effect");
+            InfoUtils.printActionbarMessage("litematica.message.placement_restriction_in_effect");
         }
 
         return cancel;
