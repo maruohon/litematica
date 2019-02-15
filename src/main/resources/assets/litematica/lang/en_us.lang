@@ -203,6 +203,7 @@ litematica.gui.label.origin.manual=Manual
 
 litematica.gui.label.placement_sub.region_name=Region name: %s
 litematica.gui.label.placement_sub.region_position=Region position
+litematica.gui.label.placement_sub.region_size=Region size: %s
 
 litematica.gui.label.placement_settings.placement_origin=Placement origin
 
@@ -223,6 +224,7 @@ litematica.gui.label.schematic_info.total_blocks=Total blocks: §f%d§r
 litematica.gui.label.schematic_load.checkbox.create_placement=Create a placement
 litematica.gui.label.schematic_load.hoverinfo.create_placement=Immediately create a new placement\nand select that placement
 
+litematica.gui.label.schematic_placement.enclosing_size=Enclosing size: %s
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.in_memory=IN-MEMORY ONLY
 litematica.gui.label.schematic_placement.origin=Origin: %s

@@ -51,7 +51,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 94;
+        return this.height - 104;
     }
 
     @Override
@@ -123,7 +123,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
-        int buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
 
         // Move these buttons to the bottom (left) of the screen, if the height isn't enough for them
         // to fit below the other buttons
@@ -137,6 +137,13 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
             ButtonGeneric button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+
+            x += buttonWidth + 4;
+            type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
+            label = I18n.format(type.getLabelKey());
+            buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
+            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+            this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         }
         else
         {
@@ -149,6 +156,13 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             x = this.width - buttonWidth - 10;
 
             ButtonGeneric button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+            this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+
+            type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
+            label = I18n.format(type.getLabelKey());
+            buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
+            x -= (buttonWidth + 4);
+            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         }
 

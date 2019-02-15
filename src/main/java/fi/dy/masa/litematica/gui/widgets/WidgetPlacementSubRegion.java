@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.gui.button.ButtonOnOff;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -19,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.TextFormatting;
 
 public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlacement>
@@ -142,7 +144,8 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        File schematicFile = this.schematicPlacement.getSchematic().getFile();
+        LitematicaSchematic schematic = this.schematicPlacement.getSchematic();
+        File schematicFile = schematic.getFile();
         String fileName = schematicFile != null ? schematicFile.getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
 
         if (this.placement.isRegionPlacementModifiedFromDefault() &&
@@ -154,7 +157,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 14, this.height))
         {
             List<String> text = new ArrayList<>();
-            text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.schematicPlacement.getSchematic().getMetadata().getName()));
+            text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", schematic.getMetadata().getName()));
             text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
 
             BlockPos o = this.placement.getPos();
@@ -162,6 +165,14 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             o = o.add(this.schematicPlacement.getOrigin());
             String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
             text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
+
+            Vec3i size = schematic.getAreaSize(this.placement.getName());
+
+            if (size != null)
+            {
+                String strSize = String.format("%d x %d x %d", size.getX(), size.getY(), size.getZ());
+                text.add(I18n.format("litematica.gui.label.placement_sub.region_size", strSize));
+            }
 
             RenderUtils.drawHoverText(mouseX, mouseY, text);
         }

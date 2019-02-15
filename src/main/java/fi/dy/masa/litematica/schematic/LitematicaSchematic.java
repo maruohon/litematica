@@ -64,7 +64,6 @@ public class LitematicaSchematic
     private final Map<String, BlockPos> subRegionPositions = new HashMap<>();
     private final Map<String, BlockPos> subRegionSizes = new HashMap<>();
     private final SchematicMetadata metadata = new SchematicMetadata();
-    private Vec3i totalSize = BlockPos.ORIGIN;
     private int totalBlocks;
     @Nullable
     private final File schematicFile;
@@ -82,7 +81,7 @@ public class LitematicaSchematic
 
     public Vec3i getTotalSize()
     {
-        return this.totalSize;
+        return this.metadata.getEnclosingSize();
     }
 
     public int getTotalBlocks()
@@ -166,8 +165,6 @@ public class LitematicaSchematic
 
         LitematicaSchematic schematic = new LitematicaSchematic(null);
         long time = (new Date()).getTime();
-
-        schematic.totalSize = PositionUtils.getEnclosingAreaSize(area);
 
         BlockPos origin = area.getEffectiveOrigin();
         schematic.setSubRegionPositions(boxes, origin);
@@ -1020,7 +1017,6 @@ public class LitematicaSchematic
         NBTTagCompound nbt = new NBTTagCompound();
 
         nbt.setInteger("Version", SCHEMATIC_VERSION);
-        nbt.setTag("TotalSize", NBTUtils.createBlockPosTag(this.totalSize));
         nbt.setTag("Metadata", this.metadata.writeToNBT());
         nbt.setTag("Regions", this.writeSubRegionsToNBT());
 
@@ -1141,13 +1137,6 @@ public class LitematicaSchematic
 
         if (version >= 1 && version <= SCHEMATIC_VERSION)
         {
-            BlockPos size = NBTUtils.readBlockPos(nbt.getCompoundTag("TotalSize"));
-
-            if (size != null)
-            {
-                this.totalSize = size;
-            }
-
             this.metadata.readFromNBT(nbt.getCompoundTag("Metadata"));
             this.readSubRegionsFromNBT(nbt.getCompoundTag("Regions"), version);
 
