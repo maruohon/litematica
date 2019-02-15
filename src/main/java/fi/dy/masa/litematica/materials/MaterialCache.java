@@ -6,12 +6,12 @@ import java.io.FileOutputStream;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockDoor;
@@ -220,7 +220,7 @@ public class MaterialCache
 
     protected File getCacheDir()
     {
-        return new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+        return new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
     }
 
     protected File getCacheFile()

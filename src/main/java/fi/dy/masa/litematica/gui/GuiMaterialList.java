@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
@@ -24,6 +23,7 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -254,7 +254,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                     break;
 
                 case WRITE_TO_FILE:
-                    File dir = new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+                    File dir = new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
                     File file = DataDump.dumpDataToFile(dir, "material_list", this.getMaterialListDump(materialList).getLines());
 
                     if (file != null)

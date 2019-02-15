@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mumfrey.liteloader.core.LiteLoader;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
@@ -350,12 +349,12 @@ public class DataManager implements IDirectoryCache
 
     public static File getCurrentConfigDirectory()
     {
-        return new File(LiteLoader.getCommonConfigFolder(), Reference.MOD_ID);
+        return new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
     }
 
     public static File getSchematicsBaseDirectory()
     {
-        File dir = FileUtils.getCanonicalFileIfPossible(new File(Minecraft.getMinecraft().gameDir, "schematics"));
+        File dir = FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics"));
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
