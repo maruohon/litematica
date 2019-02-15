@@ -4,8 +4,8 @@ language.code=en_US
 
 
 litematica.error.area_selection.copy_failed=Failed to copy the selection
+litematica.error.area_selection.create_failed=Failed to create a new selection by the name '%s', file already exists
 litematica.error.area_selection.failed_to_load=Failed to load the Area Selection
-litematica.error.area_selection.from_placement_failed=Failed to create a new selection from the placement '%s'
 litematica.error.area_selection.no_placement_selected=No Schematic Placement selected!
 litematica.error.area_selection.rename.already_exists=Error: An area already exists with the file name '%s'
 litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated safe file name '%s'
@@ -267,6 +267,7 @@ litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Regi
 litematica.gui.title.configs=Configs
 litematica.gui.title.copy_area_selection=Copy Area Selection '%s'
 litematica.gui.title.create_area_selection=Create a new Area Selection
+litematica.gui.title.create_area_selection_from_placement=Create a new Area Selection from a Schematic Placement
 litematica.gui.title.create_directory=Create a new directory
 litematica.gui.title.create_in_memory_schematic=Create an in-memory Schematic
 litematica.gui.title.litematica_main_menu=Litematica Main Menu

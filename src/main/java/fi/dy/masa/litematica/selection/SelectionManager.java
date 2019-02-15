@@ -228,22 +228,14 @@ public class SelectionManager
 
                 if (selection != null)
                 {
-                    String oldName = selection.getName();
+                    this.renameSubRegionBoxIfSingle(selection, newName);
                     selection.setName(newName);
+
                     this.selections.put(newId, selection);
 
                     if (selectionId.equals(this.currentSelectionId))
                     {
                         this.currentSelectionId = newId;
-                    }
-
-                    List<Box> boxes = selection.getAllSubRegionBoxes();
-
-                    // If the selection had only one box with the exact same name as the area selection itself,
-                    // then also rename that box to the new name.
-                    if (boxes.size() == 1 && boxes.get(0).getName().equals(oldName))
-                    {
-                        selection.renameSubRegionBox(oldName, newName);
                     }
 
                     return true;
@@ -386,9 +378,9 @@ public class SelectionManager
         return false;
     }
 
-    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, IMessageConsumer feedback)
+    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, String name, IMessageConsumer feedback)
     {
-        String safeName = FileUtils.generateSafeFileName(placement.getName());
+        String safeName = FileUtils.generateSafeFileName(name);
 
         if (safeName.isEmpty())
         {
@@ -397,20 +389,24 @@ public class SelectionManager
         }
 
         File file = new File(dir, safeName + ".json");
-        String name = file.getAbsolutePath();
-        AreaSelection selection = this.getSelection(name);
+        String selectionId = file.getAbsolutePath();
+        AreaSelection selection = this.getOrLoadSelection(selectionId);
 
         if (selection == null)
         {
             selection = AreaSelection.fromPlacement(placement);
+            this.renameSubRegionBoxIfSingle(selection, name);
+            selection.setName(name);
 
-            this.selections.put(name, selection);
-            this.currentSelectionId = name;
+            this.selections.put(selectionId, selection);
+            this.currentSelectionId = selectionId;
 
             JsonUtils.writeJsonToFile(selection.toJson(), file);
 
             return true;
         }
+
+        feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.create_failed", safeName);
 
         return false;
     }
@@ -647,6 +643,18 @@ public class SelectionManager
                 sel.setSelectedSubRegionCornerPos(posMin, Corner.CORNER_1);
                 sel.setSelectedSubRegionCornerPos(posMax, Corner.CORNER_2);
             }
+        }
+    }
+
+    private void renameSubRegionBoxIfSingle(AreaSelection selection, String newName)
+    {
+        List<Box> boxes = selection.getAllSubRegionBoxes();
+
+        // If the selection had only one box with the exact same name as the area selection itself,
+        // then also rename that box to the new name.
+        if (boxes.size() == 1 && boxes.get(0).getName().equals(selection.getName()))
+        {
+            selection.renameSubRegionBox(selection.getName(), newName);
         }
     }
 

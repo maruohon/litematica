@@ -159,20 +159,13 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             }
             else if (this.type == ButtonType.FROM_PLACEMENT)
             {
-                File dir = this.gui.getListWidget().getCurrentDirectory();
                 SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
                 if (placement != null)
                 {
-                    if (this.gui.getSelectionManager().createSelectionFromPlacement(dir, placement, this.gui) == false)
-                    {
-                        this.gui.addMessage(MessageType.ERROR, "litematica.error.area_selection.from_placement_failed", placement.getName());
-                    }
-                    else
-                    {
-                        this.gui.addMessage(MessageType.SUCCESS, "litematica.message.area_selections.selection_created_from_placement", placement.getName());
-                        this.gui.getListWidget().refreshEntries();
-                    }
+                    File dir = this.gui.getListWidget().getCurrentDirectory();
+                    String title = "litematica.gui.title.create_area_selection_from_placement";
+                    this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, placement.getName(), this.gui, new SelectionCreatorPlacement(placement, dir, this.gui)));
                 }
                 else
                 {
@@ -239,6 +232,33 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         {
             this.gui.selectionManager.createNewSelection(this.dir, string);
             this.gui.getListWidget().refreshEntries();
+        }
+    }
+
+    public static class SelectionCreatorPlacement implements IStringConsumerFeedback
+    {
+        private final SchematicPlacement placement;
+        private final File dir;
+        private final GuiAreaSelectionManager gui;
+
+        public SelectionCreatorPlacement(SchematicPlacement placement, File dir, GuiAreaSelectionManager gui)
+        {
+            this.placement = placement;
+            this.dir = dir;
+            this.gui = gui;
+        }
+
+        @Override
+        public boolean setString(String name)
+        {
+            if (this.gui.getSelectionManager().createSelectionFromPlacement(this.dir, this.placement, name, this.gui))
+            {
+                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.area_selections.selection_created_from_placement", name);
+                this.gui.getListWidget().refreshEntries();
+                return true;
+            }
+
+            return false;
         }
     }
 }
