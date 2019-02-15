@@ -182,6 +182,11 @@ public class SelectionManager
 
     public boolean renameSelection(File dir, String selectionId, String newName, IMessageConsumer feedback)
     {
+        return this.renameSelection(dir, selectionId, newName, false, feedback);
+    }
+
+    public boolean renameSelection(File dir, String selectionId, String newName, boolean copy, IMessageConsumer feedback)
+    {
         File file = new File(selectionId);
 
         if (file.exists() && file.isFile())
@@ -196,14 +201,34 @@ public class SelectionManager
 
             File newFile = new File(dir, newFileName + ".json");
 
-            if (newFile.exists() == false && file.renameTo(newFile))
+            if (newFile.exists() == false && (copy || file.renameTo(newFile)))
             {
-                AreaSelection selection = this.selections.remove(selectionId);
+                String newId = newFile.getAbsolutePath();
+                AreaSelection selection;
+
+                if (copy)
+                {
+                    try
+                    {
+                        org.apache.commons.io.FileUtils.copyFile(file, newFile);
+                    }
+                    catch (Exception e)
+                    {
+                        feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.copy_failed");
+                        LiteModLitematica.logger.warn("Copy failed", e);
+                        return false;
+                    }
+
+                    selection = this.getOrLoadSelection(newId);
+                }
+                else
+                {
+                    selection = this.selections.remove(selectionId);
+                }
 
                 if (selection != null)
                 {
                     String oldName = selection.getName();
-                    String newId = newFile.getAbsolutePath();
                     selection.setName(newName);
                     this.selections.put(newId, selection);
 

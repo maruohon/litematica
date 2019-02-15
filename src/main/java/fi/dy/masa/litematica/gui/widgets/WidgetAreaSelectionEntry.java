@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
@@ -47,6 +48,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         {
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.RENAME);
+            posX = this.createButton(posX, posY, ButtonListener.ButtonType.COPY);
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
         }
 
@@ -155,8 +157,23 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 String title = "litematica.gui.title.rename_area_selection";
                 AreaSelection selection = this.selectionManager.getSelection(selectionId);
                 String name = selection != null ? selection.getName() : "<error>";
-                SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget);
+                SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, false);
                 this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, name, this.widget.parent.getSelectionManagerGui(), renamer));
+            }
+            else if (this.type == ButtonType.COPY)
+            {
+                AreaSelection selection = this.selectionManager.getSelection(selectionId);
+
+                if (selection != null)
+                {
+                    String title = I18n.format("litematica.gui.title.copy_area_selection", selection.getName());
+                    SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, true);
+                    this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
+                }
+                else
+                {
+                    this.widget.parent.getSelectionManagerGui().addMessage(MessageType.ERROR, "litematica.error.area_selection.failed_to_load");
+                }
             }
             else if (this.type == ButtonType.REMOVE)
             {
@@ -187,6 +204,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         public enum ButtonType
         {
             RENAME          ("litematica.gui.button.rename"),
+            COPY            ("litematica.gui.button.copy"),
             CONFIGURE       ("litematica.gui.button.configure"),
             REMOVE          (TextFormatting.RED.toString() + "-");
 
@@ -208,18 +226,20 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     {
         private final WidgetAreaSelectionEntry widget;
         private final SelectionManager selectionManager;
+        private final boolean copy;
 
-        public SelectionRenamer(SelectionManager selectionManager, WidgetAreaSelectionEntry widget)
+        public SelectionRenamer(SelectionManager selectionManager, WidgetAreaSelectionEntry widget, boolean copy)
         {
             this.widget = widget;
             this.selectionManager = selectionManager;
+            this.copy = copy;
         }
 
         @Override
         public boolean setString(String string)
         {
-            String oldName = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
-            return this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), oldName, string, this.widget.parent.getSelectionManagerGui());
+            String selectionId = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
+            return this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), selectionId, string, this.copy, this.widget.parent.getSelectionManagerGui());
         }
     }
 }
