@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -118,10 +119,25 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
 
                     if (area != null)
                     {
+                        boolean overwrite = GuiScreen.isShiftKeyDown();
+                        String fileNameTmp = fileName;
+
+                        // The file name extension gets added in the schematic write method, so need to add it here for the check
+                        if (fileNameTmp.endsWith(LitematicaSchematic.FILE_EXTENSION) == false)
+                        {
+                            fileNameTmp += LitematicaSchematic.FILE_EXTENSION;
+                        }
+
+                        if (FileUtils.canWriteToFile(dir, fileNameTmp, overwrite) == false)
+                        {
+                            this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", fileName);
+                            return;
+                        }
+
                         String author = this.gui.mc.player.getName();
                         boolean takeEntities = this.gui.checkboxIgnoreEntities.isChecked() == false;
                         LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author, this.gui);
-                        TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, GuiScreen.isShiftKeyDown());
+                        TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
                         TaskScheduler.getInstance().scheduleTask(task, 10);
                         this.gui.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
                     }
