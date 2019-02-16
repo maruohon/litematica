@@ -957,8 +957,8 @@ public class LitematicaSchematic
             if (world instanceof WorldServer)
             {
                 StructureBoundingBox structureBB = StructureBoundingBox.createProper(
-                        startX  , startY  , startZ  ,
-                        endX + 1, endY + 1, endZ + 1);
+                        offsetX + startX  , offsetY + startY  , offsetZ + startZ  ,
+                        offsetX + endX + 1, offsetY + endY + 1, offsetZ + endZ + 1);
                 List<NextTickListEntry> pendingTicks = ((WorldServer) world).getPendingBlockUpdates(structureBB, false);
 
                 if (pendingTicks != null)
