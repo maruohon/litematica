@@ -50,33 +50,47 @@ public class RenderUtils
         RenderGlobal.drawSelectionBoundingBox(aabb, color.r, color.g, color.b, color.a);
     }
 
-    public static void renderBlockOutlineBatched(BlockPos pos, double expand,
-            Color4f color, Entity renderViewEntity, BufferBuilder buffer, float partialTicks)
+    public static void drawBlockBoundingBoxOutlinesBatchedLines(BlockPos pos, Color4f color, double expand, BufferBuilder buffer,
+            Entity renderViewEntity, float partialTicks)
     {
         double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
         double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+        double minX = pos.getX() - dx - expand;
+        double minY = pos.getY() - dy - expand;
+        double minZ = pos.getZ() - dz - expand;
+        double maxX = pos.getX() - dx + expand + 1;
+        double maxY = pos.getY() - dy + expand + 1;
+        double maxZ = pos.getZ() - dz + expand + 1;
 
-        RenderGlobal.drawBoundingBox(buffer,
-                pos.getX() - dx - expand,
-                pos.getY() - dy - expand,
-                pos.getZ() - dz - expand,
-                pos.getX() + 1 - dx + expand,
-                pos.getY() + 1 - dy + expand,
-                pos.getZ() + 1 - dz + expand,
-                color.r, color.g, color.b, color.a);
+        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 
-    public static void renderBlockOverlay(BlockPos pos, double expand, Color4f color, BufferBuilder buffer)
+    public static void drawConnectingLineBatchedLines(BlockPos pos1, BlockPos pos2, boolean center, Color4f color, BufferBuilder buffer,
+            Entity renderViewEntity, float partialTicks)
     {
-        RenderGlobal.drawBoundingBox(buffer,
-                pos.getX() - expand,
-                pos.getY() - expand,
-                pos.getZ() - expand,
-                pos.getX() + 1 + expand,
-                pos.getY() + 1 + expand,
-                pos.getZ() + 1 + expand,
-                color.r, color.g, color.b, color.a);
+        double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
+        double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
+        double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+        double x1 = pos1.getX() - dx;
+        double y1 = pos1.getY() - dy;
+        double z1 = pos1.getZ() - dz;
+        double x2 = pos2.getX() - dx;
+        double y2 = pos2.getY() - dy;
+        double z2 = pos2.getZ() - dz;
+
+        if (center)
+        {
+            x1 += 0.5;
+            y1 += 0.5;
+            z1 += 0.5;
+            x2 += 0.5;
+            y2 += 0.5;
+            z2 += 0.5;
+        }
+
+        buffer.pos(x1, y1, z1).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x2, y2, z2).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,

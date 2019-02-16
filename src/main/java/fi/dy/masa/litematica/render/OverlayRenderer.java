@@ -42,6 +42,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
@@ -352,30 +353,47 @@ public class OverlayRenderer
 
         GlStateManager.glLineWidth(2f);
 
+        EntityPlayer player = this.mc.player;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
         MismatchRenderPos lookedEntry = null;
+        MismatchRenderPos prevEntry = null;
+        boolean connections = Configs.Visuals.RENDER_ERROR_MARKER_CONNECTIONS.getBooleanValue();
 
         for (MismatchRenderPos entry : posList)
         {
+            Color4f color = entry.type.getColor();
+
             if (entry.pos.equals(lookPos) == false)
             {
-                RenderUtils.renderBlockOutlineBatched(entry.pos, 0.002, entry.type.getColor(), this.mc.player, buffer, partialTicks);
+                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.pos, color, 0.002, buffer, player, partialTicks);
             }
             else
             {
                 lookedEntry = entry;
             }
+
+            if (connections && prevEntry != null)
+            {
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, entry.pos, false, color, buffer, player, partialTicks);
+            }
+
+            prevEntry = entry;
         }
 
         if (lookedEntry != null)
         {
+            if (connections && prevEntry != null)
+            {
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, lookedEntry.pos, false, lookedEntry.type.getColor(), buffer, player, partialTicks);
+            }
+
             tessellator.draw();
-            buffer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+            buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
             GlStateManager.glLineWidth(6f);
-            RenderUtils.renderBlockOutlineBatched(lookPos, 0.002, lookedEntry.type.getColor(), this.mc.player, buffer, partialTicks);
+            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, player, partialTicks);
         }
 
         tessellator.draw();
