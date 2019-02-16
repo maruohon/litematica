@@ -250,7 +250,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
                 case CLEAR_CACHE:
                     MaterialCache.getInstance().clearCache();
-                    this.parent.addGuiMessage(MessageType.SUCCESS, "litematica.message.material_list.material_cache_cleared", 3000);
+                    this.parent.addMessage(MessageType.SUCCESS, 3000, "litematica.message.material_list.material_cache_cleared");
                     break;
 
                 case WRITE_TO_FILE:

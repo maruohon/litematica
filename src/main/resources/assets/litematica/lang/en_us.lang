@@ -381,6 +381,7 @@ litematica.message.value.on=ON
 litematica.message.value.off=OFF
 
 litematica.message.warn.layer_mode_currently_at=Note: You are currently in the '%s' render layer mode
+litematica.message.warn.schematic_load_non_litematica=Warning: When you directly load non-Litematica schematics, the created placements won't be persistent.\nAlso if you have to load the schematic many times, then the schematic type conversion lag spike (for large schematics) will happen each time you load it.\n\nIt is therefore recommended to either import the schematic and save it in the Litematica format via the Schematic Manager menu, or better yet, paste the original schematic into a temporary world using MCEdit or the Paste mode in Litematica, and then make a new Litematica schematic from that, preferably using multiple sub-regions to tightly capture the build, where applicable.
 
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
 

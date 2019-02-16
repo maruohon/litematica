@@ -20,6 +20,7 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.IStringListConsumer;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -140,6 +141,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
             this.gui.setNextMessageType(MessageType.ERROR);
             LitematicaSchematic schematic = null;
             FileType fileType = FileType.fromFile(entry.getFullPath());
+            boolean warnType = false;
 
             if (fileType == FileType.LITEMATICA_SCHEMATIC)
             {
@@ -148,10 +150,12 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
             else if (fileType == FileType.SCHEMATICA_SCHEMATIC)
             {
                 schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
+                warnType = true;
             }
             else if (fileType == FileType.VANILLA_STRUCTURE)
             {
                 schematic = WorldUtils.convertStructureToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
+                warnType = true;
             }
             else
             {
@@ -194,6 +198,11 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                         DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
                         this.gui.mc.displayGuiScreen(new GuiMaterialList(materialList));
                     }
+                }
+
+                if (warnType)
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, 15000, "litematica.message.warn.schematic_load_non_litematica");
                 }
             }
         }
