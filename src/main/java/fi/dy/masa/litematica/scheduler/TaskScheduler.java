@@ -26,29 +26,35 @@ public class TaskScheduler
 
     public void runTasks()
     {
-        for (int i = 0; i < this.tasks.size(); ++i)
+        if (this.tasks.isEmpty() == false)
         {
-            boolean finished = false;
-            ITask task = this.tasks.get(i);
+            for (int i = 0; i < this.tasks.size(); ++i)
+            {
+                boolean finished = false;
+                ITask task = this.tasks.get(i);
 
-            if (task.shouldRemove())
-            {
-                finished = true;
-            }
-            else if (task.canExecute() && task.getTimer().tick())
-            {
-                finished = task.execute();
-            }
+                if (task.shouldRemove())
+                {
+                    finished = true;
+                }
+                else if (task.canExecute() && task.getTimer().tick())
+                {
+                    finished = task.execute();
+                }
 
-            if (finished)
-            {
-                task.stop();
-                this.tasks.remove(i);
-                --i;
+                if (finished)
+                {
+                    task.stop();
+                    this.tasks.remove(i);
+                    --i;
+                }
             }
         }
 
-        this.addNewTasks();
+        if (this.tasksToAdd.isEmpty() == false)
+        {
+            this.addNewTasks();
+        }
     }
 
     private void addNewTasks()

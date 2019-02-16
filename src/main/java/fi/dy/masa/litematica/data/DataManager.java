@@ -12,20 +12,16 @@ import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
-import fi.dy.masa.litematica.render.DebugScreenMessages;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.LayerRange;
-import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -81,16 +77,6 @@ public class DataManager implements IDirectoryCache
     public static long getClientTickStartTime()
     {
         return clientTickStart;
-    }
-
-    public static void runTasks(Minecraft mc)
-    {
-        InputHandler.onTick();
-        WorldUtils.easyPlaceOnUseTick(mc);
-        DebugScreenMessages.update(mc);
-
-        getInstance().schematicPlacementManager.processQueuedChunks();
-        TaskScheduler.getInstance().runTasks();
     }
 
     public static ItemStack getToolItem()

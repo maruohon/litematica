@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.render;
 import com.mumfrey.liteloader.util.debug.DebugMessage;
 import com.mumfrey.liteloader.util.debug.DebugMessage.Position;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.util.text.TextFormatting;
 
@@ -16,19 +16,22 @@ public class DebugScreenMessages
 
     public static void update(Minecraft mc)
     {
-        WorldClient world = SchematicWorldHandler.getSchematicWorld();
-
-        if (mc.gameSettings.showDebugInfo && world != null)
+        if (mc.gameSettings.showDebugInfo)
         {
-            RenderGlobal render = LitematicaRenderer.getInstance().getWorldRenderer();
+            WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
 
-            String pre = TextFormatting.GOLD.toString();
-            String rst = TextFormatting.RESET.toString();
+            if (world != null)
+            {
+                RenderGlobal render = LitematicaRenderer.getInstance().getWorldRenderer();
 
-            MESSAGE_RENDERER.setMessage(String.format("%s[Litematica]%s %s", pre, rst, render.getDebugInfoRenders()));
+                String pre = TextFormatting.GOLD.toString();
+                String rst = TextFormatting.RESET.toString();
 
-            String str = String.format("E %s TE: %d", world.getDebugLoadedEntities(), world.loadedTileEntityList.size());
-            MESSAGE_ENTITIES.setMessage(String.format("%s[Litematica]%s %s %s", pre, rst, render.getDebugInfoEntities(), str));
+                MESSAGE_RENDERER.setMessage(String.format("%s[Litematica]%s %s", pre, rst, render.getDebugInfoRenders()));
+
+                String str = String.format("E %s TE: %d", world.getDebugLoadedEntities(), world.loadedTileEntityList.size());
+                MESSAGE_ENTITIES.setMessage(String.format("%s[Litematica]%s %s %s", pre, rst, render.getDebugInfoEntities(), str));
+            }
         }
     }
 }
