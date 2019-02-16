@@ -1,23 +1,30 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import java.util.Collection;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import net.minecraft.client.Minecraft;
 
 public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchematic, WidgetSchematicEntry>
 {
     private final IMessageConsumer messageConsumer;
 
-    public WidgetListLoadedSchematics(int x, int y, int width, int height,
+    public WidgetListLoadedSchematics(int x, int y, int width, int height, float zLevel,
             IMessageConsumer messageConsumer, @Nullable ISelectionListener<LitematicaSchematic> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
         this.messageConsumer = messageConsumer;
         this.browserEntryHeight = 22;
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
+        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
     }
 
     public IMessageConsumer getMessageConsumer()
@@ -26,14 +33,16 @@ public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchemat
     }
 
     @Override
-    protected void refreshBrowserEntries()
+    protected Collection<LitematicaSchematic> getAllEntries()
     {
-        this.listContents.clear();
+        return SchematicHolder.getInstance().getAllSchematics();
+    }
 
-        SchematicHolder holder = SchematicHolder.getInstance();
-        this.listContents.addAll(holder.getAllSchematics());
-
-        this.reCreateListEntryWidgets();
+    @Override
+    protected boolean entryMatchesFilter(LitematicaSchematic entry, String filterText)
+    {
+        return entry.getMetadata().getName().toLowerCase().indexOf(filterText) != -1 ||
+               (entry.getFile() != null && entry.getFile().getName().toLowerCase().indexOf(filterText) != -1);
     }
 
     @Override
