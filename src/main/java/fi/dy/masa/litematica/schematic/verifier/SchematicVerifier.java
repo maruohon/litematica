@@ -403,7 +403,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             {
                 BlockPos pos = iter.next();
 
-                if (this.worldClient.isBlockLoaded(pos, false) &&
+                if (this.worldClient.isAreaLoaded(pos, 1, false) &&
                     this.worldSchematic.isBlockLoaded(pos, false))
                 {
                     BlockMismatch mismatch = this.blockMismatches.get(pos);
@@ -474,9 +474,21 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                 }
 
                 ChunkPos pos = iter.next();
+                int count = 0;
 
-                if (this.worldClient.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z) &&
-                    this.worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
+                for (int cx = pos.x - 1; cx <= pos.x + 1; ++cx)
+                {
+                    for (int cz = pos.z - 1; cz <= pos.z + 1; ++cz)
+                    {
+                        if (this.worldClient.getChunkProvider().isChunkGeneratedAt(cx, cz))
+                        {
+                            ++count;
+                        }
+                    }
+                }
+
+                // Require the surrounding chunks in the client world to be loaded as well
+                if (count == 9 && this.worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z))
                 {
                     Chunk chunkClient = this.worldClient.getChunk(pos.x, pos.z);
                     Chunk chunkSchematic = this.worldSchematic.getChunk(pos.x, pos.z);
