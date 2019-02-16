@@ -431,16 +431,17 @@ public class OverlayRenderer
         if (mc.world != null && mc.player != null)
         {
             boolean infoOverlayKeyActive = Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld();
+            boolean verifierOverlayRendered = false;
 
             if (infoOverlayKeyActive &&
                 Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue() &&
                 Configs.InfoOverlays.RENDER_BLOCK_INFO_OVERLAY.getBooleanValue())
             {
-                this.renderVerifierOverlay(mc);
+                verifierOverlayRendered = this.renderVerifierOverlay(mc);
             }
 
             boolean renderBlockInfoLines = Configs.InfoOverlays.RENDER_BLOCK_INFO_LINES.getBooleanValue();
-            boolean renderInfoOverlay = infoOverlayKeyActive && Configs.InfoOverlays.ENABLE_BLOCK_INFO_OVERLAY_RENDERING.getBooleanValue();
+            boolean renderInfoOverlay = verifierOverlayRendered == false && infoOverlayKeyActive && Configs.InfoOverlays.ENABLE_BLOCK_INFO_OVERLAY_RENDERING.getBooleanValue();
             RayTraceWrapper traceWrapper = null;
 
             if (renderBlockInfoLines || renderInfoOverlay)
@@ -486,7 +487,7 @@ public class OverlayRenderer
         fi.dy.masa.malilib.render.RenderUtils.renderText(mc, x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
     }
 
-    private void renderVerifierOverlay(Minecraft mc)
+    private boolean renderVerifierOverlay(Minecraft mc)
     {
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -504,11 +505,13 @@ public class OverlayRenderer
                 {
                     BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
                     ScaledResolution sr = new ScaledResolution(mc);
-                    info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 10, mc);
-                    return;
+                    info.render(sr.getScaledWidth() / 2 - info.getTotalWidth() / 2, sr.getScaledHeight() / 2 + 6, mc);
+                    return true;
                 }
             }
         }
+
+        return false;
     }
 
     private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, Minecraft mc)
