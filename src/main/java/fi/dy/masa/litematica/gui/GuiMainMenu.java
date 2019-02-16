@@ -108,7 +108,7 @@ public class GuiMainMenu extends GuiBase
                     gui = new GuiSchematicLoad();
                     break;
                 case LOADED_SCHEMATICS:
-                    gui = new GuiLoadedSchematicsManager();
+                    gui = new GuiSchematicLoadedList();
                     break;
                 case MAIN_MENU:
                     gui = new GuiMainMenu();
@@ -117,7 +117,7 @@ public class GuiMainMenu extends GuiBase
                     gui = new GuiSchematicManager();
                     break;
                 case SCHEMATIC_PLACEMENTS:
-                    gui = new GuiPlacementManager();
+                    gui = new GuiSchematicPlacementsList();
                     break;
             }
 

@@ -1,15 +1,15 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.GuiPlacementManager;
+import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 
 public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
 {
-    private final GuiPlacementManager parent;
+    private final GuiSchematicPlacementsList parent;
 
-    public WidgetListSchematicPlacements(int x, int y, int width, int height, GuiPlacementManager parent)
+    public WidgetListSchematicPlacements(int x, int y, int width, int height, GuiSchematicPlacementsList parent)
     {
         super(x, y, width, height, parent);
 
@@ -17,7 +17,7 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
         this.browserEntryHeight = 22;
     }
 
-    public GuiPlacementManager getParentGui()
+    public GuiSchematicPlacementsList getParentGui()
     {
         return this.parent;
     }

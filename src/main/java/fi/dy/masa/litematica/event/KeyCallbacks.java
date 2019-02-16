@@ -9,7 +9,7 @@ import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
-import fi.dy.masa.litematica.gui.GuiPlacementManager;
+import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.GuiRenderLayer;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
@@ -381,7 +381,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind())
             {
-                this.mc.displayGuiScreen(new GuiPlacementManager());
+                this.mc.displayGuiScreen(new GuiSchematicPlacementsList());
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeybind())

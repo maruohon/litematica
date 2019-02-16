@@ -8,11 +8,11 @@ import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import net.minecraft.client.resources.I18n;
 
-public class GuiLoadedSchematicsManager extends GuiListBase<LitematicaSchematic, WidgetSchematicEntry, WidgetListLoadedSchematics>
+public class GuiSchematicLoadedList extends GuiListBase<LitematicaSchematic, WidgetSchematicEntry, WidgetListLoadedSchematics>
 {
     private int id;
 
-    public GuiLoadedSchematicsManager()
+    public GuiSchematicLoadedList()
     {
         super(12, 30);
 
