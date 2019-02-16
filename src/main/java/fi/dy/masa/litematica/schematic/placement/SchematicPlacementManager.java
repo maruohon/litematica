@@ -21,6 +21,7 @@ import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
+import fi.dy.masa.litematica.util.LayerMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -205,6 +206,14 @@ public class SchematicPlacementManager
             if (messageConsumer != null)
             {
                 messageConsumer.addMessage(MessageType.SUCCESS, I18n.format("litematica.message.schematic_placement_created", placement.getName()));
+
+                LayerMode mode = DataManager.getRenderLayerRange().getLayerMode();
+
+                if (mode != LayerMode.ALL)
+                {
+                    messageConsumer.addMessage(MessageType.WARNING, "litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
+                    InfoUtils.printInGameMessage(MessageType.WARNING, "litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
+                }
             }
         }
         else if (messageConsumer != null)

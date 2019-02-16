@@ -377,6 +377,8 @@ litematica.message.toggled=Toggled %s %s
 litematica.message.value.on=ON
 litematica.message.value.off=OFF
 
+litematica.message.warn.layer_mode_currently_at=Note: You are currently in the %s render layer mode
+
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
 
 litematica.tool_mode.name.area_selection=Area Selection
