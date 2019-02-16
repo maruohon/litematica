@@ -8,7 +8,9 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -38,7 +40,7 @@ public class GuiRenderLayer extends GuiBase
         x = 10;
         y = 60;
 
-        x += this.createLayerConfigButton(x, y, ButtonListenerMode.Type.MODE) + 10;
+        x += this.createLayerConfigButton(x, y, ButtonListenerMode.Type.MODE) + 4;
         this.createLayerConfigButton(x, y, ButtonListenerMode.Type.AXIS);
         y += 26;
         x = 10;
@@ -119,8 +121,23 @@ public class GuiRenderLayer extends GuiBase
         {
             this.textField2 = new GuiTextFieldInteger(x, y, width, 20, this.mc.fontRenderer);
             this.addTextField(this.textField2, this.createTextFieldListener(layerMode, true));
+
+            String label = I18n.format("litematica.gui.label.render_layers.hotkey");
+            String hover = I18n.format("litematica.gui.label.render_layers.hover.hotkey");
+            int cbx = x + width + 24;
+
+            WidgetCheckBox cb = new WidgetCheckBox(cbx, y + 4, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, this.mc, hover);
+            cb.setChecked(layerRange.getMoveLayerRangeMax(), false);
+            cb.setListener(new RangeHotkeyListener(true));
+            this.addWidget(cb);
+
             this.createValueAdjustButton(x + width + 3, y, true);
             y += 23;
+
+            cb = new WidgetCheckBox(cbx, y + 4, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, this.mc, hover);
+            cb.setChecked(layerRange.getMoveLayerRangeMin(), false);
+            cb.setListener(new RangeHotkeyListener(false));
+            this.addWidget(cb);
         }
         else
         {
@@ -380,6 +397,31 @@ public class GuiRenderLayer extends GuiBase
             }
 
             return true;
+        }
+    }
+
+    private static class RangeHotkeyListener implements ISelectionListener<WidgetCheckBox>
+    {
+        private final boolean isMax;
+
+        private RangeHotkeyListener(boolean isMax)
+        {
+            this.isMax = isMax;
+        }
+
+        @Override
+        public void onSelectionChange(WidgetCheckBox entry)
+        {
+            LayerRange range = DataManager.getRenderLayerRange();
+
+            if (this.isMax)
+            {
+                range.toggleHotkeyMoveRangeMax();
+            }
+            else
+            {
+                range.toggleHotkeyMoveRangeMin();
+            }
         }
     }
 }

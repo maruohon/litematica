@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.util;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.client.Minecraft;
@@ -30,6 +31,8 @@ public class LayerRange
     private int layerBelow = 0;
     private int layerRangeMin = 0;
     private int layerRangeMax = 0;
+    private boolean hotkeyRangeMin;
+    private boolean hotkeyRangeMax;
 
     public LayerMode getLayerMode()
     {
@@ -39,6 +42,26 @@ public class LayerRange
     public EnumFacing.Axis getAxis()
     {
         return this.axis;
+    }
+
+    public boolean getMoveLayerRangeMin()
+    {
+        return this.hotkeyRangeMin;
+    }
+
+    public boolean getMoveLayerRangeMax()
+    {
+        return this.hotkeyRangeMax;
+    }
+
+    public void toggleHotkeyMoveRangeMin()
+    {
+        this.hotkeyRangeMin = ! this.hotkeyRangeMin;
+    }
+
+    public void toggleHotkeyMoveRangeMax()
+    {
+        this.hotkeyRangeMax = ! this.hotkeyRangeMax;
     }
 
     public int getLayerSingle()
@@ -199,13 +222,15 @@ public class LayerRange
         this.markAffectedLayersForRenderUpdate();
     }
 
-    public void setLayerRangeMin(int layer)
+    public boolean setLayerRangeMin(int layer)
     {
-        this.setLayerRangeMin(layer, false);
+        return this.setLayerRangeMin(layer, false);
     }
 
-    private void setLayerRangeMin(int layer, boolean force)
+    private boolean setLayerRangeMin(int layer, boolean force)
     {
+        int old = this.layerRangeMin;
+
         this.markAffectedLayersForRenderUpdate();
         this.layerRangeMin = this.getWorldLimitsClampedValue(layer);
 
@@ -215,15 +240,19 @@ public class LayerRange
         }
 
         this.markAffectedLayersForRenderUpdate();
+
+        return this.layerRangeMin != old;
     }
 
-    public void setLayerRangeMax(int layer)
+    public boolean setLayerRangeMax(int layer)
     {
-        this.setLayerRangeMax(layer, false);
+        return this.setLayerRangeMax(layer, false);
     }
 
-    private void setLayerRangeMax(int layer, boolean force)
+    private boolean setLayerRangeMax(int layer, boolean force)
     {
+        int old = this.layerRangeMax;
+
         this.markAffectedLayersForRenderUpdate();
         this.layerRangeMax = this.getWorldLimitsClampedValue(layer);
 
@@ -233,6 +262,8 @@ public class LayerRange
         }
 
         this.markAffectedLayersForRenderUpdate();
+
+        return this.layerRangeMax != old;
     }
 
     public void setToPosition(Entity entity)
@@ -325,7 +356,8 @@ public class LayerRange
 
     public boolean moveLayer(int amount)
     {
-        String strTo = TextFormatting.GREEN.toString() + this.axis.getName().toLowerCase() + " = ";
+        String axisName = this.axis.getName().toLowerCase();
+        String strTo = GuiBase.TXT_GREEN + axisName + " = ";
 
         switch (this.layerMode)
         {
@@ -362,22 +394,33 @@ public class LayerRange
                     double playerPos = this.axis == Axis.Y ? player.posY : (this.axis == Axis.X ? player.posX : player.posZ);
                     double min = this.layerRangeMin + 0.5D;
                     double max = this.layerRangeMax + 0.5D;
-                    String val1;
+                    boolean minClosest = (Math.abs(playerPos - min) < Math.abs(playerPos - max)) || playerPos < min;
+                    boolean moveMin = this.hotkeyRangeMin || (minClosest          && this.hotkeyRangeMax == false);
+                    boolean moveMax = this.hotkeyRangeMax || (minClosest == false && this.hotkeyRangeMin == false);
+                    boolean moved = false;
 
-                    if (Math.abs(playerPos - min) < Math.abs(playerPos - max) || playerPos < min)
+                    if (moveMin)
                     {
-                        this.setLayerRangeMin(this.layerRangeMin + amount);
-                        val1 = I18n.format("litematica.message.layer_range.range_min");
-                    }
-                    else
-                    {
-                        this.setLayerRangeMax(this.layerRangeMax + amount);
-                        val1 = I18n.format("litematica.message.layer_range.range_max");
+                        moved |= this.setLayerRangeMin(this.layerRangeMin + amount);
                     }
 
-                    String val2 = String.valueOf(amount);
-                    String val3 = this.axis.getName().toLowerCase();
-                    InfoUtils.printActionbarMessage("litematica.message.moved_layer_range", val1, val2, val3);
+                    if (moveMax)
+                    {
+                        moved |= this.setLayerRangeMax(this.layerRangeMax + amount);
+                    }
+
+                    if (moved)
+                    {
+                        if (moveMin && moveMax)
+                        {
+                            InfoUtils.printActionbarMessage("litematica.message.moved_layer_range", String.valueOf(amount), axisName);
+                        }
+                        else
+                        {
+                            String val1 = moveMin ? I18n.format("litematica.message.layer_range.range_min") : I18n.format("litematica.message.layer_range.range_max");
+                            InfoUtils.printActionbarMessage("litematica.message.moved_layer_range_boundary", val1, String.valueOf(amount), axisName);
+                        }
+                    }
                 }
 
                 break;
@@ -593,6 +636,8 @@ public class LayerRange
         obj.add("layer_below", new JsonPrimitive(this.layerBelow));
         obj.add("layer_range_min", new JsonPrimitive(this.layerRangeMin));
         obj.add("layer_range_max", new JsonPrimitive(this.layerRangeMax));
+        obj.add("hotkey_range_min", new JsonPrimitive(this.hotkeyRangeMin));
+        obj.add("hotkey_range_max", new JsonPrimitive(this.hotkeyRangeMax));
 
         return obj;
     }
@@ -610,6 +655,8 @@ public class LayerRange
         range.layerBelow = JsonUtils.getInteger(obj, "layer_below");
         range.layerRangeMin = JsonUtils.getInteger(obj, "layer_range_min");
         range.layerRangeMax = JsonUtils.getInteger(obj, "layer_range_max");
+        range.hotkeyRangeMin = JsonUtils.getBoolean(obj, "hotkey_range_min");
+        range.hotkeyRangeMax = JsonUtils.getBoolean(obj, "hotkey_range_max");
 
         return range;
     }

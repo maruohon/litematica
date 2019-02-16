@@ -209,6 +209,8 @@ litematica.gui.label.placement_sub.region_size=Region size: %s
 
 litematica.gui.label.placement_settings.placement_origin=Placement origin
 
+litematica.gui.label.render_layers.hotkey=Hotkey
+litematica.gui.label.render_layers.hover.hotkey=The move layer hotkeys will affect this boundary.\nIf both are unselected, then the hotkeys will affect\nthe boundary that is closest to the player.
 litematica.gui.label.render_layers.layer=Layer
 litematica.gui.label.render_layers.layer_max=Max layer
 litematica.gui.label.render_layers.layer_min=Min layer
@@ -349,7 +351,8 @@ litematica.message.layer_range.range_min=min
 litematica.message.material_list.material_cache_cleared=Material Cache cleared
 litematica.message.material_list_written_to_file=Material list written to file '%s'
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
-litematica.message.moved_layer_range=Moved layer range §a%s§r by §a%s§r on the §a%s§r axis
+litematica.message.moved_layer_range=Moved the entire layer range by §a%s§r on the §a%s§r axis
+litematica.message.moved_layer_range_boundary=Moved layer range §a%s§r by §a%s§r on the §a%s§r axis
 litematica.message.moved_max_layer_to=Moved max layer to %s
 litematica.message.moved_min_layer_to=Moved min layer to %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
@@ -377,7 +380,7 @@ litematica.message.toggled=Toggled %s %s
 litematica.message.value.on=ON
 litematica.message.value.off=OFF
 
-litematica.message.warn.layer_mode_currently_at=Note: You are currently in the %s render layer mode
+litematica.message.warn.layer_mode_currently_at=Note: You are currently in the '%s' render layer mode
 
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
 
