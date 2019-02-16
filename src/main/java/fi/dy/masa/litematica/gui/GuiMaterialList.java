@@ -81,9 +81,9 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         String str = I18n.format("litematica.gui.label.material_list.multiplier");
         int w = this.fontRenderer.getStringWidth(str);
-        this.addLabel(this.width - w - 56, y + 4, w, 12, 0xFFFFFFFF, str);
+        this.addLabel(this.width - w - 56, y + 5, w, 12, 0xFFFFFFFF, str);
 
-        GuiTextFieldInteger tf = new GuiTextFieldInteger(this.width - 52, y, 40, 20, this.fontRenderer);
+        GuiTextFieldInteger tf = new GuiTextFieldInteger(this.width - 52, y + 2, 40, 16, this.fontRenderer);
         tf.setText(String.valueOf(this.materialList.getMultiplier()));
         MultiplierListener listener = new MultiplierListener(this.materialList, this);
         this.addTextField(tf, listener);
