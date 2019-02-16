@@ -19,14 +19,15 @@ import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.data.DataDump;
 import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
@@ -78,12 +79,16 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         String label;
         ButtonGeneric button;
 
-        String str = I18n.format("litematica.gui.label.material_list.multiplier", this.materialList.getMultiplier());
-        int w = this.fontRenderer.getStringWidth(str) + 6;
-        this.addLabel(this.width - w - 6, y + 4, w, 12, 0xFFFFFFFF, str);
-        this.createButton(this.width - w - 26, y + 2, -1, ButtonListener.Type.CHANGE_MULTIPLIER);
+        String str = I18n.format("litematica.gui.label.material_list.multiplier");
+        int w = this.fontRenderer.getStringWidth(str);
+        this.addLabel(this.width - w - 56, y + 4, w, 12, 0xFFFFFFFF, str);
 
-        this.addWidget(new WidgetInfoIcon(this.width - 23, 12, this.zLevel, Icons.INFO_11, "litematica.info.material_list"));
+        GuiTextFieldInteger tf = new GuiTextFieldInteger(this.width - 52, y, 40, 20, this.fontRenderer);
+        tf.setText(String.valueOf(this.materialList.getMultiplier()));
+        MultiplierListener listener = new MultiplierListener(this.materialList, this);
+        this.addTextField(tf, listener);
+
+        this.addWidget(new WidgetInfoIcon(this.width - 23, 10, this.zLevel, Icons.INFO_11, "litematica.info.material_list"));
 
         int gap = 2;
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + gap;
@@ -141,13 +146,6 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         if (type == ButtonListener.Type.LIST_TYPE)
         {
             label = type.getDisplayName(this.materialList.getMaterialListType().getDisplayName());
-        }
-        else if (type == ButtonListener.Type.CHANGE_MULTIPLIER)
-        {
-            String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
-            ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
-            this.addButton(button, listener);
-            return button.getButtonWidth();
         }
         else
         {
@@ -264,15 +262,6 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                         StringUtils.sendOpenFileChatMessage(this.parent.mc.player, key, file);
                     }
                     break;
-
-                case CHANGE_MULTIPLIER:
-                {
-                    int amount = mouseButton == 1 ? -1 : 1;
-                    if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
-                    if (GuiScreen.isAltKeyDown()) { amount *= 4; }
-                    materialList.setMultiplier(materialList.getMultiplier() + amount);
-                    break;
-                }
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
@@ -315,8 +304,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             TOGGLE_INFO_HUD     ("litematica.gui.button.material_list.toggle_info_hud"),
             CLEAR_IGNORED       ("litematica.gui.button.material_list.clear_ignored"),
             CLEAR_CACHE         ("litematica.gui.button.material_list.clear_cache"),
-            WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file"),
-            CHANGE_MULTIPLIER   ("");
+            WRITE_TO_FILE       ("litematica.gui.button.material_list.write_to_file");
 
             private final String translationKey;
 
@@ -334,6 +322,41 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             {
                 return I18n.format(this.translationKey, args);
             }
+        }
+    }
+
+    private static class MultiplierListener implements ITextFieldListener<GuiTextFieldInteger>
+    {
+        private final MaterialListBase materialList;
+        private final GuiMaterialList gui;
+
+        private MultiplierListener(MaterialListBase materialList, GuiMaterialList gui)
+        {
+            this.materialList = materialList;
+            this.gui = gui;
+        }
+
+        @Override
+        public boolean onTextChange(GuiTextFieldInteger textField)
+        {
+            try
+            {
+                int multiplier = Integer.parseInt(textField.getText());
+
+                if (multiplier != this.materialList.getMultiplier())
+                {
+                    this.materialList.setMultiplier(multiplier);
+                    this.gui.getListWidget().refreshEntries();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                this.materialList.setMultiplier(1);
+                this.gui.getListWidget().refreshEntries();
+            }
+
+            return false;
         }
     }
 }
