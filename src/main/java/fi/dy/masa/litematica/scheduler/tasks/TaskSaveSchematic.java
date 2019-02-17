@@ -147,7 +147,7 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
 
             if (this.dir != null)
             {
-                if (this.schematic.writeToFile(this.dir, this.fileName, this.overrideFile, InfoUtils.INFO_MESSAGE_CONSUMER))
+                if (this.schematic.writeToFile(this.dir, this.fileName, this.overrideFile))
                 {
                     InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", this.fileName);
                 }

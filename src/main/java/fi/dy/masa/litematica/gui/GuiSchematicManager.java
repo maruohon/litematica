@@ -323,7 +323,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 schematic.getMetadata().setName(string);
                 schematic.getMetadata().setTimeModified(System.currentTimeMillis());
 
-                if (schematic.writeToFile(this.dir, this.fileName, true, this.gui))
+                if (schematic.writeToFile(this.dir, this.fileName, true))
                 {
                     this.gui.getListWidget().clearSchematicMetadataCache();
                     return true;
@@ -412,7 +412,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                     schematic.getMetadata().setPreviewImagePixelData(pixels);
                     schematic.getMetadata().setTimeModified(System.currentTimeMillis());
 
-                    schematic.writeToFile(this.dir, this.fileName, true, InfoUtils.INFO_MESSAGE_CONSUMER);
+                    schematic.writeToFile(this.dir, this.fileName, true);
 
                     InfoUtils.showMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
                 }

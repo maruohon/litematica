@@ -106,7 +106,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
                     LitematicaSchematic schematic = this.gui.schematic;
                     schematic.getMetadata().setTimeModified(System.currentTimeMillis());
 
-                    if (schematic.writeToFile(dir, fileName, GuiScreen.isShiftKeyDown(), this.gui))
+                    if (schematic.writeToFile(dir, fileName, GuiScreen.isShiftKeyDown()))
                     {
                         this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                         this.gui.getListWidget().refreshEntries();
@@ -129,7 +129,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
 
                         if (FileUtils.canWriteToFile(dir, fileNameTmp, overwrite) == false)
                         {
-                            this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", fileName);
+                            this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", fileNameTmp);
                             return;
                         }
 
