@@ -11,6 +11,7 @@ litematica.error.area_selection.rename.already_exists=Error: An area already exi
 litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated safe file name '%s'
 
 litematica.error.duplicate_schematic_load=Error: Tried to load a duplicate schematic + placement
+litematica.error.generic.failed_to_delete_file=Failed to delete the file '%s'
 litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
 litematica.error.generic.schematic_world_not_loaded=Schematic world was not loaded
 
@@ -145,6 +146,7 @@ litematica.gui.button.configure=Configure
 litematica.gui.button.copy=Copy
 litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.create_placement=Create placement
+litematica.gui.button.delete=Delete
 litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
 litematica.gui.button.import=Import
@@ -259,6 +261,8 @@ litematica.gui.label.schematic_verifier.status.verifying=Unseen Chunks: %s / %s
 litematica.gui.label_colored.off=§cOFF§r
 litematica.gui.label_colored.on=§aON§r
 
+litematica.gui.message.confirm_file_deletion=Do you want to delete the file '%s'?
+
 litematica.gui.title.area_editor_normal=Area Editor (Normal/Multi-box mode)
 litematica.gui.title.area_editor_simple=Area Editor (Simple mode)
 litematica.gui.title.area_editor_sub_region=Area Editor (sub-region)
@@ -267,6 +271,7 @@ litematica.gui.title.area_selection_manager=Area Selection Manager
 litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
 litematica.gui.title.configs=Configs
+litematica.gui.title.confirm_file_deletion=Confirm file deletion
 litematica.gui.title.copy_area_selection=Copy Area Selection '%s'
 litematica.gui.title.create_area_selection=Create a new Area Selection
 litematica.gui.title.create_area_selection_from_placement=Create a new Area Selection from a Schematic Placement

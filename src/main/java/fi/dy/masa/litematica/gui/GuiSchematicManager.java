@@ -14,6 +14,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.config.IConfigOptionList;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
+import fi.dy.masa.malilib.gui.GuiConfirmAction;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -21,6 +22,7 @@ import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.Minecraft;
@@ -77,10 +79,12 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 x = this.createButton(id++, x, y, ButtonListener.Type.SET_PREVIEW);
                 x = this.createButton(id++, x, y, ButtonListener.Type.EXPORT_SCHEMATIC);
                 x = this.createButton(id++, x, y, ButtonListener.Type.EXPORT_TYPE);
+                x = this.createButton(id++, x, y, ButtonListener.Type.DELETE_SCHEMATIC);
             }
             else if (type == FileType.SCHEMATICA_SCHEMATIC || type == FileType.VANILLA_STRUCTURE)
             {
                 x = this.createButton(id++, x, y, ButtonListener.Type.IMPORT_SCHEMATIC);
+                x = this.createButton(id++, x, y, ButtonListener.Type.DELETE_SCHEMATIC);
             }
         }
 
@@ -229,6 +233,11 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 String oldName = schematic != null ? schematic.getMetadata().getName() : "";
                 this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), this.gui)));
             }
+            else if (this.type == Type.DELETE_SCHEMATIC)
+            {
+                FileDeleter deleter = new FileDeleter(entry.getFullPath());
+                this.gui.mc.displayGuiScreen(new GuiConfirmAction(400, "litematica.gui.title.confirm_file_deletion", deleter, this.gui, "litematica.gui.message.confirm_file_deletion", entry.getName()));
+            }
             else if (this.type == Type.SET_PREVIEW)
             {
                 previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
@@ -259,6 +268,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             IMPORT_SCHEMATIC            ("litematica.gui.button.import"),
             EXPORT_SCHEMATIC            ("litematica.gui.button.schematic_manager.export_as"),
             RENAME_SCHEMATIC            ("litematica.gui.button.rename"),
+            DELETE_SCHEMATIC            ("litematica.gui.button.delete"),
             SET_PREVIEW                 ("litematica.gui.button.set_preview", "litematica.info.schematic_manager.preview.right_click_to_cancel"),
             EXPORT_TYPE                 ("");
 
@@ -322,6 +332,38 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             else
             {
                 this.gui.setString(I18n.format("litematica.error.schematic_rename.read_failed"));
+            }
+
+            return false;
+        }
+    }
+
+    public static class FileDeleter implements IConfirmationListener
+    {
+        protected final File file;
+
+        public FileDeleter(File file)
+        {
+           this.file = file;
+        }
+
+        @Override
+        public boolean onActionCancelled()
+        {
+            return false;
+        }
+
+        @Override
+        public boolean onActionConfirmed()
+        {
+            try
+            {
+                this.file.delete();
+                return true;
+            }
+            catch (Exception e)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.failed_to_delete_file", file.getAbsolutePath());
             }
 
             return false;
