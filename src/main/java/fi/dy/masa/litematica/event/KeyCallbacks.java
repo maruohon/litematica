@@ -9,8 +9,8 @@ import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
-import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.GuiRenderLayer;
+import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.materials.MaterialListBase;
@@ -224,151 +224,6 @@ public class KeyCallbacks
                 }
             }
 
-            if (mode.getUsesSchematic())
-            {
-                if (key == Hotkeys.LAYER_NEXT.getKeybind())
-                {
-                    DataManager.getRenderLayerRange().moveLayer(1);
-                    return true;
-                }
-                else if (key == Hotkeys.LAYER_PREVIOUS.getKeybind())
-                {
-                    DataManager.getRenderLayerRange().moveLayer(-1);
-                    return true;
-                }
-                else if (key == Hotkeys.LAYER_SET_HERE.getKeybind())
-                {
-                    DataManager.getRenderLayerRange().setToPosition(this.mc.player);
-                    return true;
-                }
-                else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())
-                {
-                    DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(true));
-                    return true;
-                }
-                else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeybind())
-                {
-                    DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
-                    return true;
-                }
-                else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
-                {
-                    if (EntityUtils.shouldPickBlock(this.mc.player))
-                    {
-                        return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
-                    }
-
-                    return false;
-                }
-                else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
-                {
-                    if (EntityUtils.shouldPickBlock(this.mc.player))
-                    {
-                        int keyCodeUse = this.mc.gameSettings.keyBindUseItem.getKeyCode();
-
-                        // Only do the pick block here, if it's not bound to the use button.
-                        // If it's bound to the use button, then it will be done from the input handling.
-                        if (Hotkeys.PICK_BLOCK_LAST.getKeybind().matches(keyCodeUse) == false)
-                        {
-                            WorldUtils.doSchematicWorldPickBlock(false, this.mc);
-                        }
-                    }
-
-                    return false;
-                }
-                else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
-                {
-                    SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
-
-                    if (schematicPlacement != null)
-                    {
-                        SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
-
-                        if (placement != null)
-                        {
-                            this.mc.displayGuiScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
-                        }
-                        else
-                        {
-                            this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
-                        }
-                    }
-                    else
-                    {
-                        InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
-                    }
-
-                    return true;
-                }
-                else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind())
-                {
-                    SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
-
-                    if (schematicPlacement != null)
-                    {
-                        this.mc.displayGuiScreen(new GuiSchematicVerifier(schematicPlacement));
-                    }
-                    else
-                    {
-                        InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
-                    }
-
-                    return true;
-                }
-                else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind())
-                {
-                    MaterialListBase materialList = DataManager.getMaterialList();
-
-                    // No last-viewed material list currently stored, try to get one for the currently selected placement, if any
-                    if (materialList == null)
-                    {
-                        SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
-
-                        if (schematicPlacement != null)
-                        {
-                            materialList = schematicPlacement.getMaterialList();
-                            materialList.recreateMaterialList();
-                        }
-                        else
-                        {
-                            InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
-                        }
-                    }
-
-                    if (materialList != null)
-                    {
-                        this.mc.displayGuiScreen(new GuiMaterialList(materialList));
-                    }
-
-                    return true;
-                }
-            }
-            else if (mode.getUsesAreaSelection())
-            {
-                if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind())
-                {
-                    SelectionManager manager = DataManager.getSelectionManager();
-
-                    if (manager.getCurrentSelection() != null)
-                    {
-                        manager.openEditGui(null);
-                    }
-                    else
-                    {
-                        InfoUtils.printActionbarMessage("litematica.message.error.no_area_selected");
-                    }
-                    return true;
-                }
-                else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
-                {
-                    return SchematicUtils.saveSchematic(false);
-                }
-                else if (key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
-                {
-                    return SchematicUtils.saveSchematic(true);
-                }
-            }
-
             if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
                 this.mc.displayGuiScreen(new GuiMainMenu());
@@ -397,6 +252,150 @@ public class KeyCallbacks
 
                 return true;
             }
+            else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
+            {
+                SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                if (schematicPlacement != null)
+                {
+                    SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
+
+                    if (placement != null)
+                    {
+                        this.mc.displayGuiScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
+                    }
+                    else
+                    {
+                        this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
+                    }
+                }
+                else
+                {
+                    InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                }
+
+                return true;
+            }
+            else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind())
+            {
+                SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                if (schematicPlacement != null)
+                {
+                    this.mc.displayGuiScreen(new GuiSchematicVerifier(schematicPlacement));
+                }
+                else
+                {
+                    InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                }
+
+                return true;
+            }
+            else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind())
+            {
+                MaterialListBase materialList = DataManager.getMaterialList();
+
+                // No last-viewed material list currently stored, try to get one for the currently selected placement, if any
+                if (materialList == null)
+                {
+                    SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                    if (schematicPlacement != null)
+                    {
+                        materialList = schematicPlacement.getMaterialList();
+                        materialList.recreateMaterialList();
+                    }
+                    else
+                    {
+                        InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                    }
+                }
+
+                if (materialList != null)
+                {
+                    this.mc.displayGuiScreen(new GuiMaterialList(materialList));
+                }
+
+                return true;
+            }
+            else if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind())
+            {
+                SelectionManager manager = DataManager.getSelectionManager();
+
+                if (manager.getCurrentSelection() != null)
+                {
+                    manager.openEditGui(null);
+                }
+                else
+                {
+                    InfoUtils.printActionbarMessage("litematica.message.error.no_area_selected");
+                }
+                return true;
+            }
+            else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
+            {
+                WorldUtils.markAllSchematicChunksForRenderUpdate();
+                InfoUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
+                return true;
+            }
+            else if (key == Hotkeys.LAYER_NEXT.getKeybind())
+            {
+                DataManager.getRenderLayerRange().moveLayer(1);
+                return true;
+            }
+            else if (key == Hotkeys.LAYER_PREVIOUS.getKeybind())
+            {
+                DataManager.getRenderLayerRange().moveLayer(-1);
+                return true;
+            }
+            else if (key == Hotkeys.LAYER_SET_HERE.getKeybind())
+            {
+                DataManager.getRenderLayerRange().setToPosition(this.mc.player);
+                return true;
+            }
+            else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())
+            {
+                DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(true));
+                return true;
+            }
+            else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeybind())
+            {
+                DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
+                return true;
+            }
+            else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
+            {
+                if (EntityUtils.shouldPickBlock(this.mc.player))
+                {
+                    return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
+                }
+
+                return false;
+            }
+            else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
+            {
+                if (EntityUtils.shouldPickBlock(this.mc.player))
+                {
+                    int keyCodeUse = this.mc.gameSettings.keyBindUseItem.getKeyCode();
+
+                    // Only do the pick block here, if it's not bound to the use button.
+                    // If it's bound to the use button, then it will be done from the input handling.
+                    if (Hotkeys.PICK_BLOCK_LAST.getKeybind().matches(keyCodeUse) == false)
+                    {
+                        WorldUtils.doSchematicWorldPickBlock(false, this.mc);
+                    }
+                }
+
+                return false;
+            }
+            else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
+            {
+                return SchematicUtils.saveSchematic(false);
+            }
+            else if (key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
+            {
+                return SchematicUtils.saveSchematic(true);
+            }
             else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && hasTool && toolEnabled)
             {
                 if (mode == ToolMode.PASTE_SCHEMATIC)
@@ -420,15 +419,6 @@ public class KeyCallbacks
                     ToolUtils.deleteSelectionVolumes(this.mc, removeEntities);
                     return true;
                 }
-            }
-            else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
-            {
-                if (mode.getUsesSchematic())
-                {
-                    WorldUtils.markAllSchematicChunksForRenderUpdate();
-                    InfoUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
-                }
-                return true;
             }
             else if (key == Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeybind() ||
                      key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind())
