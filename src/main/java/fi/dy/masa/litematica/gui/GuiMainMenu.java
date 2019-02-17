@@ -30,35 +30,34 @@ public class GuiMainMenu extends GuiBase
 
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS);
         y += 22;
-
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS);
         y += 22;
-
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS);
         y += 44;
 
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.AREA_EDITOR);
         y += 22;
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER);
-        y += 44;
+        y += 22;
 
-        String label = I18n.format("litematica.gui.button.tool_mode", DataManager.getToolMode().getName());
+        SelectionMode mode = DataManager.getSelectionManager().getSelectionMode();
+        String label = I18n.format("litematica.gui.button.area_selection_mode", mode.getDisplayName());
+        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+        this.addButton(button, new ButtonListenerCycleAreaMode(this));
+
+        label = I18n.format("litematica.gui.button.tool_mode", DataManager.getToolMode().getName());
         int width2 = this.mc.fontRenderer.getStringWidth(label) + 10;
 
         y = this.height - 26;
-        ButtonGeneric button = new ButtonGeneric(0, x, y, width2, 20, label);
+        button = new ButtonGeneric(0, x, y, width2, 20, label);
         this.addButton(button, new ButtonListenerCycleToolMode(this));
-
-        int x2 = x + width2 + 4;
-        SelectionMode mode = DataManager.getSelectionManager().getSelectionMode();
-        label = I18n.format("litematica.gui.button.area_selection_mode", mode.getDisplayName());
-        width2 = this.mc.fontRenderer.getStringWidth(label) + 10;
-        button = new ButtonGeneric(0, x2, y, width2, 20, label);
-        this.addButton(button, new ButtonListenerCycleAreaMode(this));
 
         x += width + 20;
         y = 30;
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_MANAGER);
+        y += 44;
+
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.CONFIGURATION);
     }
 
     private void createChangeMenuButton(int x, int y, int width, ButtonListenerChangeMenu.ButtonType type)
@@ -74,6 +73,12 @@ public class GuiMainMenu extends GuiBase
         for (ButtonListenerChangeMenu.ButtonType type : ButtonListenerChangeMenu.ButtonType.values())
         {
             width = Math.max(width, this.mc.fontRenderer.getStringWidth(type.getDisplayName()) + 30);
+        }
+
+        for (SelectionMode mode : SelectionMode.values())
+        {
+            String label = I18n.format("litematica.gui.button.area_selection_mode", mode.getDisplayName());
+            width = Math.max(width, this.mc.fontRenderer.getStringWidth(label) + 10);
         }
 
         return width;
@@ -104,6 +109,9 @@ public class GuiMainMenu extends GuiBase
                 case AREA_SELECTION_BROWSER:
                     gui = new GuiAreaSelectionManager();
                     break;
+                case CONFIGURATION:
+                    Minecraft.getMinecraft().displayGuiScreen(new GuiConfigs());
+                    return;
                 case LOAD_SCHEMATICS:
                     gui = new GuiSchematicLoad();
                     break;
@@ -148,6 +156,8 @@ public class GuiMainMenu extends GuiBase
             LOAD_SCHEMATICS         ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcons.SCHEMATIC_BROWSER),
             // Edit Schematics (description or icon), or convert between formats
             SCHEMATIC_MANAGER       ("litematica.gui.button.change_menu.schematic_manager", ButtonIcons.SCHEMATIC_MANAGER),
+            // In-game Configuration GUI
+            CONFIGURATION           ("litematica.gui.button.change_menu.configuration_menu", ButtonIcons.CONFIGURATION),
             // Switch to the Litematica main menu
             MAIN_MENU               ("litematica.gui.button.change_menu.to_main_menu", null);
 

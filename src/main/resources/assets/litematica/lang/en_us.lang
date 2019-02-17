@@ -69,6 +69,7 @@ litematica.gui.button.area_selections.create_selection_from_placement=From Place
 litematica.gui.button.area_selections.unselect=Unselect
 
 litematica.gui.button.change_menu.area_editor=Area Editor
+litematica.gui.button.change_menu.configuration_menu=Configuration menu
 litematica.gui.button.change_menu.load_schematics_to_memory=Load Schematics
 litematica.gui.button.change_menu.schematic_manager=Schematic Manager
 litematica.gui.button.change_menu.show_area_selections=Area Selection browser

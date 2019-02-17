@@ -31,6 +31,12 @@ public class GuiConfigs extends GuiConfigsBase
         super.initGui();
         this.clearOptions();
 
+        if (DataManager.getConfigGuiTab() == ConfigGuiTab.RENDER_LAYERS)
+        {
+            this.mc.displayGuiScreen(new GuiRenderLayer());
+            return;
+        }
+
         this.id = 0;
         int x = 10;
         int y = 26;
