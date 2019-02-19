@@ -34,6 +34,12 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         return this.shouldRender;
     }
 
+    @Override
+    public boolean shouldRenderInGuis()
+    {
+        return Configs.Generic.RENDER_MATERIALS_IN_GUI.getBooleanValue();
+    }
+
     public void toggleShouldRender()
     {
         this.shouldRender = ! this.shouldRender;

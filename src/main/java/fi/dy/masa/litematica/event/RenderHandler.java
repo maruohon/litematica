@@ -49,11 +49,16 @@ public class RenderHandler implements IRenderer
         Minecraft mc = Minecraft.getMinecraft();
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-            mc.currentScreen == null && mc.gameSettings.showDebugInfo == false && mc.player != null)
+            mc.gameSettings.showDebugInfo == false && mc.player != null)
         {
-            ToolHud.getInstance().renderHud();
+            // The Info HUD renderers can decide if they want to be rendered in GUIs
             InfoHud.getInstance().renderHud();
-            OverlayRenderer.getInstance().renderHoverInfo(mc, partialTicks);
+
+            if (mc.currentScreen == null)
+            {
+                ToolHud.getInstance().renderHud();
+                OverlayRenderer.getInstance().renderHoverInfo(mc, partialTicks);
+            }
         }
     }
 }

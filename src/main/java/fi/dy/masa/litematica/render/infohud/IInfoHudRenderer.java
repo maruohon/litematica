@@ -12,6 +12,15 @@ public interface IInfoHudRenderer
     boolean getShouldRender();
 
     /**
+     * Whether or not this renderer should also be rendered when GUIs are open
+     * @return
+     */
+    default boolean shouldRenderInGuis()
+    {
+        return false;
+    }
+
+    /**
      * Returns the text lines rendered by the InfoHud, if any
      * @return
      */

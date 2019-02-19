@@ -53,12 +53,13 @@ public class InfoHud
             int xOffset = 2;
             int yOffset = 2;
             int lineIndex = 0;
+            boolean isGui = this.mc.currentScreen != null;
 
             if (this.renderers.isEmpty() == false)
             {
                 for (IInfoHudRenderer renderer : this.renderers)
                 {
-                    if (renderer.getShouldRender())
+                    if (renderer.getShouldRender() && (isGui == false || renderer.shouldRenderInGuis()))
                     {
                         List<String> lines = renderer.getText();
 
@@ -84,7 +85,7 @@ public class InfoHud
             {
                 for (IInfoHudRenderer renderer : this.renderers)
                 {
-                    if (renderer.getShouldRender())
+                    if (renderer.getShouldRender() && (isGui == false || renderer.shouldRenderInGuis()))
                     {
                         yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment());
                     }

@@ -40,6 +40,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       PICK_BLOCK_ENABLED      = new ConfigBoolean(    "pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
         public static final ConfigString        PICK_BLOCKABLE_SLOTS    = new ConfigString(     "pickBlockableSlots", "1,2,3,4,5", "The hotbar slots that are allowed to be\nused for the schematic pick block");
         public static final ConfigBoolean       PLACEMENT_RESTRICTION   = new ConfigBoolean(    "placementRestriction", false, "When enabled, the use key can only be used\nwhen holding the correct item for the targeted position,\nand the targeted position must have a missing block in the schematic", "Placement Restriction");
+        public static final ConfigBoolean       RENDER_MATERIALS_IN_GUI = new ConfigBoolean(    "renderMaterialListInGuis", false, "Whether or not the material list should\nbe rendered inside GUIs");
         public static final ConfigBoolean       RENDER_THREAD_NO_TIMEOUT = new ConfigBoolean(   "renderThreadNoTimeout", true, "Removes the timeout from the rendering worker threads.\nIf you get very stuttery rendering when moving around\nor dealing with large schematics, try disabling this. It will however make\nthe schematic rendering a lot slower in some cases.");
         public static final ConfigOptionList    SELECTION_CORNERS_MODE  = new ConfigOptionList( "selectionCornersMode", CornerSelectionMode.CORNERS, "The Area Selection corners mode to use (Corners, or Expand)");
         public static final ConfigOptionList    TOOL_HUD_ALIGNMENT      = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
@@ -55,6 +56,7 @@ public class Configs implements IConfigHandler
                 LOAD_ENTIRE_SCHEMATICS,
                 PICK_BLOCK_ENABLED,
                 PLACEMENT_RESTRICTION,
+                RENDER_MATERIALS_IN_GUI,
                 RENDER_THREAD_NO_TIMEOUT,
                 SELECTION_CORNERS_MODE,
                 TOOL_HUD_ALIGNMENT,
