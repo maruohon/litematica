@@ -19,6 +19,8 @@ import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.OverlayRenderer;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.LayerMode;
@@ -601,6 +603,8 @@ public class SchematicPlacementManager
                 }
                 else
                 {
+                    TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblock(schematicPlacement);
+                    TaskScheduler.getInstance().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
                     InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.only_works_in_single_player");
                 }
             }

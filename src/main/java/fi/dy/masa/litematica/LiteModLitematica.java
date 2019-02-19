@@ -73,12 +73,4 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
     public void upgradeSettings(String version, File configPath, File oldConfigPath)
     {
     }
-
-    public static void logInfo(String message, Object... args)
-    {
-        if (Configs.Generic.VERBOSE_LOGGING.getBooleanValue())
-        {
-            logger.info(message, args);
-        }
-    }
 }
