@@ -26,7 +26,6 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 {
     private final SelectionManager selectionManager;
     private final WidgetAreaSelectionBrowser parent;
-    private int id;
     private int buttonsStartX;
 
     public WidgetAreaSelectionEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
@@ -37,9 +36,8 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
         this.selectionManager = selectionManager;
         this.parent = parent;
-        this.id = 0;
 
-        int posX = x + width;
+        int posX = x + width - 2;
         int posY = y + 1;
 
         // Note: These are placed from right to left
@@ -59,10 +57,10 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     {
         String label = I18n.format(type.getLabelKey());
         int len = Math.max(this.mc.fontRenderer.getStringWidth(label) + 10, 20);
-        x -= (len + 2);
-        this.addButton(new ButtonGeneric(this.id++, x, y, len, 20, label), new ButtonListener(type, this.selectionManager, this));
+        x -= len;
+        this.addButton(new ButtonGeneric(x, y, len, 20, label), new ButtonListener(type, this.selectionManager, this));
 
-        return x;
+        return x - 2;
     }
 
     @Override

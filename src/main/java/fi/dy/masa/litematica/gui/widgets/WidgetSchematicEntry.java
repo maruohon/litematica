@@ -52,22 +52,22 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
 
         text = I18n.format("litematica.gui.button.unload");
         len = mc.fontRenderer.getStringWidth(text) + 10;
-        posX -= (len + 4);
+        posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.UNLOAD, this);
-        this.addButton(new ButtonGeneric(0, posX, y, len, 20, text), listener);
+        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
 
         text = I18n.format("litematica.gui.button.save_to_file");
         len = mc.fontRenderer.getStringWidth(text) + 10;
-        posX -= (len + 4);
+        posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.SAVE_TO_FILE, this);
-        this.addButton(new ButtonGeneric(0, posX, y, len, 20, text), listener);
+        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
 
         text = I18n.format("litematica.gui.button.create_placement");
         len = mc.fontRenderer.getStringWidth(text) + 10;
-        posX -= (len + 4);
+        posX -= (len + 2);
         String tip = I18n.format("litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled");
         listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
-        this.addButton(new ButtonGeneric(0, posX, y, len, 20, text, tip), listener);
+        this.addButton(new ButtonGeneric(posX, y, len, 20, text, tip), listener);
 
         this.buttonsStartX = posX;
         this.typeIconX = this.x + 2;

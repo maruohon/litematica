@@ -6,13 +6,13 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
@@ -44,7 +44,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         this.isOdd = isOdd;
         this.mc = mc;
 
-        int posX = x + width;
+        int posX = x + width - 2;
         int posY = y + 1;
 
         // Note: These are placed from right to left
@@ -59,19 +59,18 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
     {
         String label = I18n.format(type.getTranslationKey());
         int len = this.mc.fontRenderer.getStringWidth(label) + 10;
-        xRight -= (len + 2);
-        this.addButton(new ButtonGeneric(0, xRight, y, len, 20, label), new ButtonListener(type, this));
+        xRight -= len;
+        this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this));
 
-        return xRight;
+        return xRight - 2;
     }
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, WidgetSchematicPlacement.ButtonListener.ButtonType type)
     {
-        ButtonOnOff button = ButtonOnOff.create(xRight + 1, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
-        xRight -= button.getButtonWidth();
+        ButtonOnOff button = ButtonOnOff.createOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this));
 
-        return xRight;
+        return xRight - button.getButtonWidth() - 2;
     }
 
     @Override

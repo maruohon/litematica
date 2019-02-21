@@ -77,7 +77,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         String label = I18n.format(type.getTranslationKey());
         int len = this.mc.fontRenderer.getStringWidth(label) + 10;
         xRight -= (len + 2);
-        this.addButton(new ButtonGeneric(0, xRight, y, len, 20, label), new ButtonListener(type, this.materialList, this.entry, this.listWidget));
+        this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this.materialList, this.entry, this.listWidget));
 
         return xRight;
     }

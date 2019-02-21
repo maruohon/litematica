@@ -68,12 +68,12 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, str, this.mc);
         this.addWidget(this.checkboxIgnoreEntities);
 
-        x = this.createButton(1, x, y, ButtonType.SAVE);
+        x = this.createButton(x, y, ButtonType.SAVE);
     }
 
     protected abstract IButtonActionListener<ButtonGeneric> createButtonListener(ButtonType type);
 
-    private int createButton(int id, int x, int y, ButtonType type)
+    private int createButton(int x, int y, ButtonType type)
     {
         String label = I18n.format(type.getLabelKey());
         int width = this.mc.fontRenderer.getStringWidth(label) + 10;
@@ -82,11 +82,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         if (type == ButtonType.SAVE)
         {
-            button = new ButtonGeneric(id, x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
+            button = new ButtonGeneric(x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
         }
         else
         {
-            button = new ButtonGeneric(id, x, y, width, 20, label);
+            button = new ButtonGeneric(x, y, width, 20, label);
         }
 
         this.addButton(button, this.createButtonListener(type));

@@ -114,7 +114,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(0, x, y, buttonWidth, 20, label);
+        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
     }
 
@@ -208,7 +208,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             width = this.mc.fontRenderer.getStringWidth(label) + 10;
         }
 
-        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
         button.enabled = enabled;
         this.addButton(button, listener);
 

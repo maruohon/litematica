@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -11,6 +10,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import net.minecraft.client.Minecraft;
@@ -40,7 +40,6 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         super.initGui();
 
-        int id = 0;
         int width = 120;
         int x = this.width - width - 10;
         int y = 22;
@@ -91,7 +90,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         label = I18n.format("litematica.gui.button.placement_sub.placement_configuration");
         int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
         x = 10;
-        ButtonGeneric button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
 
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
@@ -100,7 +99,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         int menuButtonWidth = this.fontRenderer.getStringWidth(label) + 20;
         x = sr.getScaledHeight() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
 
-        button = new ButtonGeneric(id, x, y, menuButtonWidth, 20, label);
+        button = new ButtonGeneric(x, y, menuButtonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         this.updateElements();
@@ -133,7 +132,7 @@ public class GuiSubRegionConfiguration extends GuiBase
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = ButtonOnOff.create(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = ButtonOnOff.createOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this.schematicPlacement, this.placement, this));
         return button.getButtonWidth();
     }
@@ -153,7 +152,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 String str = pre + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
                 String hover = I18n.format("litematica.gui.button.schematic_placement.hover.rendering", str);
 
-                this.addButton(new ButtonGeneric(0, x, y, width, 20, label, hover), listener);
+                this.addButton(new ButtonGeneric(x, y, width, 20, label, hover), listener);
                 break;
             }
 
@@ -162,7 +161,7 @@ public class GuiSubRegionConfiguration extends GuiBase
             case NUDGE_COORD_Z:
             {
                 String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
-                ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
+                ButtonGeneric button = new ButtonGeneric(x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return;
             }
@@ -184,7 +183,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 break;
         }
 
-        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
         this.addButton(button, listener);
 
         if (type == ButtonListener.Type.RESET_PLACEMENT)

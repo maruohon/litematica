@@ -39,7 +39,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         this.isOdd = isOdd;
         this.parent = parent;
 
-        int posX = x + width;
+        int posX = x + width - 2;
         int posY = y + 1;
 
         posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
@@ -53,10 +53,10 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
     {
         String label = I18n.format(type.getLabelKey());
         int len = Math.max(this.mc.fontRenderer.getStringWidth(label) + 10, 20);
-        x -= (len + 2);
-        this.addButton(new ButtonGeneric(0, x, y, len, 20, label), new ButtonListener(type, this));
+        x -= len;
+        this.addButton(new ButtonGeneric(x, y, len, 20, label), new ButtonListener(type, this));
 
-        return x;
+        return x - 2;
     }
 
     @Override

@@ -260,9 +260,6 @@ litematica.gui.label.schematic_verifier.status.done_errors=Wrong: §cBlock: %s§
 litematica.gui.label.schematic_verifier.status.done_correct_total=§aCorrect: %s§r, Total: %s
 litematica.gui.label.schematic_verifier.status.verifying=Unseen Chunks: %s / %s
 
-litematica.gui.label_colored.off=§cOFF§r
-litematica.gui.label_colored.on=§aON§r
-
 litematica.gui.message.confirm_file_deletion=Do you want to delete the file '%s'?
 
 litematica.gui.title.area_editor_normal=Area Editor (Normal/Multi-box mode)

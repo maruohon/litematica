@@ -6,7 +6,6 @@ import java.util.Collections;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialCache;
@@ -22,6 +21,7 @@ import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
@@ -33,7 +33,6 @@ import net.minecraft.client.resources.I18n;
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
 {
     private final MaterialListBase materialList;
-    private int id;
 
     public GuiMaterialList(MaterialListBase materialList)
     {
@@ -75,7 +74,6 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         int x = 12;
         int y = 24;
         int buttonWidth;
-        this.id = 0;
         String label;
         ButtonGeneric button;
 
@@ -105,7 +103,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         label = I18n.format(type.getLabelKey());
         buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         // Progress: Done xx % / Missing xx % / Wrong xx %
@@ -152,12 +150,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             label = type.getDisplayName();
         }
 
-        if (width == -1)
-        {
-            width = this.mc.fontRenderer.getStringWidth(label) + 10;
-        }
-
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
 
         if (type == ButtonListener.Type.CLEAR_CACHE)
         {
@@ -171,7 +164,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = ButtonOnOff.create(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = ButtonOnOff.createOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this));
         return button.getButtonWidth();
     }

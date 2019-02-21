@@ -63,7 +63,6 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
     private void createButtons()
     {
-        int id = 0;
         int x = 10;
         int y = this.height - 36;
 
@@ -75,23 +74,23 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
             if (type == FileType.LITEMATICA_SCHEMATIC)
             {
-                x = this.createButton(id++, x, y, ButtonListener.Type.RENAME_SCHEMATIC);
-                x = this.createButton(id++, x, y, ButtonListener.Type.SET_PREVIEW);
-                x = this.createButton(id++, x, y, ButtonListener.Type.EXPORT_SCHEMATIC);
-                x = this.createButton(id++, x, y, ButtonListener.Type.EXPORT_TYPE);
-                x = this.createButton(id++, x, y, ButtonListener.Type.DELETE_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.RENAME_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.SET_PREVIEW);
+                x = this.createButton(x, y, ButtonListener.Type.EXPORT_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.EXPORT_TYPE);
+                x = this.createButton(x, y, ButtonListener.Type.DELETE_SCHEMATIC);
             }
             else if (type == FileType.SCHEMATICA_SCHEMATIC || type == FileType.VANILLA_STRUCTURE)
             {
-                x = this.createButton(id++, x, y, ButtonListener.Type.IMPORT_SCHEMATIC);
-                x = this.createButton(id++, x, y, ButtonListener.Type.DELETE_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.IMPORT_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.DELETE_SCHEMATIC);
             }
         }
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         String label = I18n.format(type.getLabelKey());
         int buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        this.addButton(new ButtonGeneric(id++, this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
+        this.addButton(new ButtonGeneric(this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
     }
 
     @Override
@@ -101,7 +100,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         this.createButtons();
     }
 
-    private int createButton(int id, int x, int y, ButtonListener.Type type)
+    private int createButton(int x, int y, ButtonListener.Type type)
     {
         String label = type.getLabel();
         String hover = type.getHoverText();
@@ -111,15 +110,15 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         if (type == ButtonListener.Type.EXPORT_TYPE)
         {
             buttonWidth = this.mc.fontRenderer.getStringWidth(this.exportType.getDisplayName()) + 10;
-            button = new ConfigButtonOptionList(id, x, y, buttonWidth, 20, new ConfigWrapper());
+            button = new ConfigButtonOptionList(x, y, buttonWidth, 20, new ConfigWrapper());
         }
         else if (hover != null)
         {
-            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label, hover);
+            button = new ButtonGeneric(x, y, buttonWidth, 20, label, hover);
         }
         else
         {
-            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+            button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         }
 
         this.addButton(button, new ButtonListener(type, this));

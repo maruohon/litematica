@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.gui;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.gui.widgets.WidgetListPlacementSubRegions;
 import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegion;
 import fi.dy.masa.litematica.materials.MaterialListBase;
@@ -16,6 +15,7 @@ import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
@@ -63,7 +63,6 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         int width = Math.min(300, sr.getScaledWidth() - 200);
         int x = 12;
         int y = 28;
-        int id = 0;
 
         this.textFieldRename = new GuiTextFieldGeneric(x, y + 2, width, 16, this.mc.fontRenderer);
         this.textFieldRename.setMaxStringLength(256);
@@ -135,14 +134,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             x += this.createButton(x, y, -1, ButtonListener.Type.OPEN_MATERIAL_LIST_GUI) + 2;
             x += this.createButton(x, y, -1, ButtonListener.Type.OPEN_VERIFIER_GUI) + 2;
 
-            ButtonGeneric button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+            ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
             x += buttonWidth + 4;
             type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
             label = I18n.format(type.getLabelKey());
             buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
-            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+            button = new ButtonGeneric(x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         }
         else
@@ -155,14 +154,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             y += 26;
             x = this.width - buttonWidth - 10;
 
-            ButtonGeneric button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+            ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
             type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
             label = I18n.format(type.getLabelKey());
             buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
             x -= (buttonWidth + 4);
-            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+            button = new ButtonGeneric(x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         }
 
@@ -193,7 +192,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = ButtonOnOff.create(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = ButtonOnOff.createOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         String hoverString = type.getHoverText();
 
         if (hoverString != null)
@@ -220,7 +219,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 String str = (enabled ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
                 String hover = I18n.format("litematica.gui.button.schematic_placement.hover.enclosing_box", str);
 
-                this.addButton(new ButtonGeneric(0, x, y, icon, hover), listener);
+                this.addButton(new ButtonGeneric(x, y, icon, hover), listener);
 
                 return icon.getWidth();
             }
@@ -233,7 +232,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 String str = pre + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
                 String hover = I18n.format("litematica.gui.button.schematic_placement.hover.rendering", str);
 
-                this.addButton(new ButtonGeneric(0, x, y, width, 20, label, hover), listener);
+                this.addButton(new ButtonGeneric(x, y, width, 20, label, hover), listener);
                 break;
             }
 
@@ -256,7 +255,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             case NUDGE_COORD_Z:
             {
                 String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
-                ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
+                ButtonGeneric button = new ButtonGeneric(x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return width;
             }
@@ -276,7 +275,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             x -= width;
         }
 
-        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
 
         this.addButton(button, listener);
 

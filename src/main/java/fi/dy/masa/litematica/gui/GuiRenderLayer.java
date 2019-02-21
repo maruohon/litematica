@@ -59,7 +59,7 @@ public class GuiRenderLayer extends GuiBase
             width = this.mc.fontRenderer.getStringWidth(label) + 10;
         }
 
-        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
         button.enabled = enabled;
         this.addButton(button, listener);
 
@@ -74,7 +74,7 @@ public class GuiRenderLayer extends GuiBase
             String label = type.getDisplayName();
             int width = this.mc.fontRenderer.getStringWidth(label) + 10;
 
-            ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+            ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
             this.addButton(button, listener);
 
             return width;
@@ -174,7 +174,7 @@ public class GuiRenderLayer extends GuiBase
         LayerRange layerRange = DataManager.getRenderLayerRange();
         LayerMode layerMode = layerRange.getLayerMode();
         ButtonListenerChangeValue listener = new ButtonListenerChangeValue(layerMode, isSecondValue, this);
-        ButtonGeneric button = new ButtonGeneric(0, x, y + 2, Icons.BUTTON_PLUS_MINUS_16);
+        ButtonGeneric button = new ButtonGeneric(x, y + 2, Icons.BUTTON_PLUS_MINUS_16);
         this.addButton(button, listener);
     }
 

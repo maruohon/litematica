@@ -50,7 +50,6 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     private final int count;
     private final boolean isOdd;
     @Nullable private final ButtonGeneric buttonIgnore;
-    private int id;
 
     public WidgetSchematicVerificationResult(int x, int y, int width, int height, float zLevel, boolean isOdd,
             WidgetListSchematicVerificationResults listWidget, GuiSchematicVerifier guiSchematicVerifier,
@@ -130,7 +129,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         String label = I18n.format(type.getLabelKey());
         int buttonWidth = mc.fontRenderer.getStringWidth(label) + 10;
         x -= buttonWidth;
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListener(type, this.mismatchEntry, this.guiSchematicVerifier));
 
         return button;

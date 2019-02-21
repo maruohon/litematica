@@ -55,7 +55,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         int y = 24;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_EDITOR;
-        ButtonGeneric button = new ButtonGeneric(0, 10, y, -1, 20, I18n.format(type.getLabelKey()), type.getIcon());
+        ButtonGeneric button = new ButtonGeneric(10, y, -1, 20, I18n.format(type.getLabelKey()), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this));
 
         // These are placed from right to left
@@ -70,7 +70,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         int len = this.mc.fontRenderer.getStringWidth(label) + 10;
         x -= (len + 2);
 
-        ButtonGeneric button = new ButtonGeneric(0, x, y, len, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, len, 20, label);
 
         if (type == ButtonListener.ButtonType.UNSELECT)
         {

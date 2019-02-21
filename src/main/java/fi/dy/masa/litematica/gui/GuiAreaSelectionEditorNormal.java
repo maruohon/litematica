@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.gui;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.gui.widgets.WidgetSelectionSubRegion;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -20,6 +19,7 @@ import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
@@ -126,14 +126,14 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         y = this.height - 26;
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
         String label = I18n.format(type.getLabelKey());
-        button = new ButtonGeneric(0, x, y, -1, 20, label, type.getIcon());
+        button = new ButtonGeneric(x, y, -1, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
         int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(0, x, y, buttonWidth, 20, label);
+        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         return y;
@@ -229,7 +229,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
     protected int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = ButtonOnOff.create(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = ButtonOnOff.createOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, null, null, this));
         return button.getButtonWidth();
     }
@@ -258,7 +258,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             width = this.mc.fontRenderer.getStringWidth(label) + 10;
         }
 
-        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
         ButtonListener listener = new ButtonListener(type, corner, null, this);
         this.addButton(button, listener);
 
@@ -273,7 +273,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected void createCoordinateButton(int x, int y, Corner corner, CoordinateType coordType, ButtonListener.Type type)
     {
         String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift");
-        ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
+        ButtonGeneric button = new ButtonGeneric(x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
         ButtonListener listener = new ButtonListener(type, corner, coordType, this);
         this.addButton(button, listener);
     }
