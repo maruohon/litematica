@@ -4,9 +4,9 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.util.PositionUtils.CoordinateType;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.util.math.BlockPos;
 
 public class Box

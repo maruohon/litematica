@@ -14,6 +14,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -750,13 +751,6 @@ public class PositionUtils
 
             return dx * dx + dz * dz;
         }
-    }
-
-    public enum CoordinateType
-    {
-        X,
-        Y,
-        Z
     }
 
     public enum Corner
