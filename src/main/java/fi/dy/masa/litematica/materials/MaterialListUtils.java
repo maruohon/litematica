@@ -13,12 +13,12 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.litematica.util.LayerMode;
-import fi.dy.masa.litematica.util.LayerRange;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.ItemType;
+import fi.dy.masa.malilib.util.LayerRange;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -92,8 +92,7 @@ public class MaterialListUtils
 
             if (placement.getMaterialList().getMaterialListType() == BlockInfoListType.ALL)
             {
-                range = new LayerRange();
-                range.setLayerMode(LayerMode.ALL, false);
+                range = new LayerRange(SchematicWorldRefresher.INSTANCE);
             }
 
             EnumFacing.Axis axis = range.getAxis();

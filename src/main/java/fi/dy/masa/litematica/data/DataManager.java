@@ -21,10 +21,11 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
-import fi.dy.masa.litematica.util.LayerRange;
+import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.LayerRange;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.init.Items;
@@ -49,7 +50,7 @@ public class DataManager implements IDirectoryCache
 
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
-    private LayerRange renderRange = new LayerRange();
+    private LayerRange renderRange = new LayerRange(SchematicWorldRefresher.INSTANCE);
     private ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
     @Nullable
@@ -297,7 +298,7 @@ public class DataManager implements IDirectoryCache
 
         if (JsonUtils.hasObject(obj, "render_range"))
         {
-            this.renderRange = LayerRange.fromJson(JsonUtils.getNestedObject(obj, "render_range", false));
+            this.renderRange = LayerRange.createFromJson(JsonUtils.getNestedObject(obj, "render_range", false), SchematicWorldRefresher.INSTANCE);
         }
 
         if (JsonUtils.hasString(obj, "operation_mode"))

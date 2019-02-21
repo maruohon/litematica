@@ -106,10 +106,6 @@ litematica.gui.button.placement_sub.placement_configuration=Placement configurat
 litematica.gui.button.placement_sub.reset_sub_region_placement=Reset sub-region
 litematica.gui.button.placement_sub.slice_type=Slice: %s
 
-litematica.gui.button.render_layers_gui.axis=Axis: %s
-litematica.gui.button.render_layers_gui.layers=Layers: %s
-litematica.gui.button.render_layers_gui.set_here=Set Here
-
 litematica.gui.button.schematic_manager.export_as=Export as:
 
 litematica.gui.button.schematic_placement.abbr.rendering=R
@@ -186,12 +182,6 @@ litematica.gui.label.block_info.state_schematic=Schematic World Block State
 litematica.gui.label.block_info_list_type.all=All
 litematica.gui.label.block_info_list_type.render_layers=Render Layers
 
-litematica.gui.label.layer_mode.all=All
-litematica.gui.label.layer_mode.all_above=All above
-litematica.gui.label.layer_mode.all_below=All below
-litematica.gui.label.layer_mode.layer_range=Layer Range
-litematica.gui.label.layer_mode.single_layer=Single Layer
-
 litematica.gui.label.material_list.available=Available
 litematica.gui.label.material_list.item=Item
 litematica.gui.label.material_list.missing=Missing
@@ -214,9 +204,6 @@ litematica.gui.label.placement_settings.placement_origin=Placement origin
 
 litematica.gui.label.render_layers.hotkey=Hotkey
 litematica.gui.label.render_layers.hover.hotkey=The move layer hotkeys will affect this boundary.\nIf both are unselected, then the hotkeys will affect\nthe boundary that is closest to the player.
-litematica.gui.label.render_layers.layer=Layer
-litematica.gui.label.render_layers.layer_max=Max layer
-litematica.gui.label.render_layers.layer_min=Min layer
 
 litematica.gui.label.schematic_info.author=Author: §f%s§r
 litematica.gui.label.schematic_info.description=Description:

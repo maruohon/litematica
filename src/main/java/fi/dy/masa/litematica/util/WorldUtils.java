@@ -11,9 +11,7 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import fi.dy.masa.litematica.materials.MaterialCache;
-import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -29,7 +27,7 @@ import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import fi.dy.masa.malilib.util.LayerRange;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
@@ -41,7 +39,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -55,7 +52,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -64,7 +60,6 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 import net.minecraft.world.gen.structure.template.Template;
 
@@ -346,144 +341,6 @@ public class WorldUtils
         else
         {
             return mc.world;
-        }
-    }
-
-    public static void markSchematicChunkForRenderUpdate(SubChunkPos chunkPos)
-    {
-        World world = SchematicWorldHandler.getSchematicWorld();
-
-        if (world != null)
-        {
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
-            long key = ChunkPos.asLong(chunkPos.getX(), chunkPos.getZ());
-
-            if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
-            {
-                RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-                rg.markBlockRangeForRenderUpdate((chunkPos.getX() << 4) - 1, (chunkPos.getY() << 4) - 1, (chunkPos.getZ() << 4) - 1,
-                                                 (chunkPos.getX() << 4) + 1, (chunkPos.getY() << 4) + 1, (chunkPos.getZ() << 4) + 1);
-            }
-        }
-    }
-
-    public static void markSchematicChunksForRenderUpdate(ChunkPos chunkPos)
-    {
-        World world = SchematicWorldHandler.getSchematicWorld();
-
-        if (world != null)
-        {
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
-            long key = ChunkPos.asLong(chunkPos.x, chunkPos.z);
-
-            if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
-            {
-                RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-                rg.markBlockRangeForRenderUpdate((chunkPos.x << 4) - 1,   0, (chunkPos.z << 4) - 1,
-                                                 (chunkPos.x << 4) + 1, 255, (chunkPos.z << 4) + 1);
-            }
-        }
-    }
-
-    public static void markSchematicChunkForRenderUpdate(BlockPos pos)
-    {
-        World world = SchematicWorldHandler.getSchematicWorld();
-
-        if (world != null)
-        {
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
-            long key = ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
-
-            if (schematicChunks.containsKey(key) && clientChunks.containsKey(key))
-            {
-                RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-                rg.markBlockRangeForRenderUpdate(pos.getX() - 1, pos.getY() - 1, pos.getZ() - 1,pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
-            }
-        }
-    }
-
-    public static void markSchematicChunksForRenderUpdateBetweenX(int x1, int x2)
-    {
-        World world = SchematicWorldHandler.getSchematicWorld();
-
-        if (world != null)
-        {
-            final int xMin = Math.min(x1, x2);
-            final int xMax = Math.max(x1, x2);
-            final int cxMin = (xMin >> 4);
-            final int cxMax = (xMax >> 4);
-            RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
-
-            for (Chunk chunk : schematicChunks.values())
-            {
-                // Only mark chunks that are actually rendered (if the schematic world contains more chunks)
-                if (chunk.x >= cxMin && chunk.x <= cxMax && chunk.isEmpty() == false &&
-                    clientChunks.containsKey(ChunkPos.asLong(chunk.x, chunk.z)))
-                {
-                    x1 = Math.max( chunk.x << 4      , xMin);
-                    x2 = Math.min((chunk.x << 4) + 15, xMax);
-                    rg.markBlockRangeForRenderUpdate(x1, 0, (chunk.z << 4), x2, 255, (chunk.z << 4) + 15);
-                }
-            }
-        }
-    }
-
-    public static void markAllSchematicChunksForRenderUpdate()
-    {
-        markSchematicChunksForRenderUpdateBetweenY(LayerRange.WORLD_VERTICAL_SIZE_MIN, LayerRange.WORLD_VERTICAL_SIZE_MAX);
-    }
-
-    public static void markSchematicChunksForRenderUpdateBetweenY(int y1, int y2)
-    {
-        World world = SchematicWorldHandler.getSchematicWorld();
-
-        if (world != null)
-        {
-            RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
-
-            for (Chunk chunk : schematicChunks.values())
-            {
-                // Only mark chunks that are actually rendered (if the schematic world contains more chunks)
-                if (chunk.isEmpty() == false && clientChunks.containsKey(ChunkPos.asLong(chunk.x, chunk.z)))
-                {
-                    rg.markBlockRangeForRenderUpdate((chunk.x << 4) - 1, y1, (chunk.z << 4) - 1, (chunk.x << 4) + 16, y2, (chunk.z << 4) + 16);
-                }
-            }
-        }
-    }
-
-    public static void markSchematicChunksForRenderUpdateBetweenZ(int z1, int z2)
-    {
-        World world = SchematicWorldHandler.getSchematicWorld();
-
-        if (world != null)
-        {
-            final int zMin = Math.min(z1, z2);
-            final int zMax = Math.max(z1, z2);
-            final int czMin = (zMin >> 4);
-            final int czMax = (zMax >> 4);
-            RenderGlobal rg = LitematicaRenderer.getInstance().getWorldRenderer();
-            Long2ObjectMap<Chunk> schematicChunks = ((IMixinChunkProviderClient) (Object) world.getChunkProvider()).getLoadedChunks();
-            Long2ObjectMap<Chunk> clientChunks = ((IMixinChunkProviderClient) (Object) Minecraft.getMinecraft().world.getChunkProvider()).getLoadedChunks();
-
-            for (Chunk chunk : schematicChunks.values())
-            {
-                // Only mark chunks that are actually rendered (if the schematic world contains more chunks)
-                if (chunk.z >= czMin && chunk.z <= czMax && chunk.isEmpty() == false &&
-                    clientChunks.containsKey(ChunkPos.asLong(chunk.x, chunk.z)))
-                {
-                    z1 = Math.max( chunk.z << 4      , zMin);
-                    z2 = Math.min((chunk.z << 4) + 15, zMax);
-                    rg.markBlockRangeForRenderUpdate((chunk.x << 4), 0, z1, (chunk.x << 4) + 15, 255, z2);
-                }
-            }
         }
     }
 

@@ -6,7 +6,7 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -117,7 +117,7 @@ public class GuiConfigs extends GuiConfigsBase
     {
         super.onSettingsChanged();
 
-        WorldUtils.markAllSchematicChunksForRenderUpdate();
+        SchematicWorldRefresher.INSTANCE.updateAll();
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>

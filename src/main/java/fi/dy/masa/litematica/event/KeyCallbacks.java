@@ -22,9 +22,9 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.InventoryUtils;
-import fi.dy.masa.litematica.util.LayerMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.SchematicUtils;
+import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.IConfigBase;
@@ -35,6 +35,7 @@ import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.LayerMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 
@@ -125,7 +126,7 @@ public class KeyCallbacks
 
             if (this.config.getBooleanValue())
             {
-                WorldUtils.markAllSchematicChunksForRenderUpdate();
+                SchematicWorldRefresher.INSTANCE.updateAll();
             }
 
             return true;
@@ -334,7 +335,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
             {
-                WorldUtils.markAllSchematicChunksForRenderUpdate();
+                SchematicWorldRefresher.INSTANCE.updateAll();
                 InfoUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
                 return true;
             }
