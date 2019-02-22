@@ -45,7 +45,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -321,26 +320,6 @@ public class WorldUtils
             {
                 world.getChunkProvider().loadChunk(cx, cz);
             }
-        }
-    }
-
-    /**
-     * Best name. Returns the integrated server world for the current dimension
-     * in single player, otherwise just the client world.
-     * @param mc
-     * @return
-     */
-    @Nullable
-    public static World getBestWorld(Minecraft mc)
-    {
-        if (mc.isSingleplayer())
-        {
-            IntegratedServer server = mc.getIntegratedServer();
-            return server.getWorld(mc.world.provider.getDimensionType().getId());
-        }
-        else
-        {
-            return mc.world;
         }
     }
 

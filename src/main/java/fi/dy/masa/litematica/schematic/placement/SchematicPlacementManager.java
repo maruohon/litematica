@@ -35,6 +35,7 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.SubChunkPos;
+import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
@@ -581,7 +582,7 @@ public class SchematicPlacementManager
             {
                 if (mc.isSingleplayer())
                 {
-                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
+                    final WorldServer world = mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld()));
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
 
                     world.addScheduledTask(new Runnable()
@@ -605,7 +606,7 @@ public class SchematicPlacementManager
                 {
                     TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblock(schematicPlacement);
                     TaskScheduler.getInstance().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
-                    InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.only_works_in_single_player");
+                    InfoUtils.showMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }
             }
             else

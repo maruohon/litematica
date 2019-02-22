@@ -26,12 +26,12 @@ import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ResourceLocation;
 
 public class DataManager implements IDirectoryCache
@@ -378,31 +378,17 @@ public class DataManager implements IDirectoryCache
     private static String getStorageFileName(boolean globalData)
     {
         Minecraft mc = Minecraft.getMinecraft();
+        String name = StringUtils.getWorldOrServerName();
 
-        if (mc.world != null)
+        if (name != null)
         {
-            // TODO How to fix this for Forge custom dimensions compatibility (if the type ID is not unique)?
-            final int dimension = mc.world.provider.getDimensionType().getId();
-
-            if (mc.isSingleplayer())
+            if (globalData)
             {
-                IntegratedServer server = mc.getIntegratedServer();
-
-                if (server != null)
-                {
-                    String nameEnd = globalData ? ".json" : "_dim" + dimension + ".json";
-                    return Reference.MOD_ID + "_" + server.getFolderName() + nameEnd;
-                }
+                return Reference.MOD_ID + "_" + name + ".json";
             }
             else
             {
-                ServerData server = mc.getCurrentServerData();
-
-                if (server != null)
-                {
-                    String nameEnd = globalData ? ".json" : "_dim" + dimension + ".json";
-                    return Reference.MOD_ID + "_" + server.serverIP.replace(':', '_') + nameEnd;
-                }
+                return Reference.MOD_ID + "_" + name + "_dim" + WorldUtils.getDimensionId(mc.world) + ".json";
             }
         }
 

@@ -38,7 +38,8 @@ public class ToolUtils
 
                 if (mc.isSingleplayer())
                 {
-                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
+                    final int dimId = fi.dy.masa.malilib.util.WorldUtils.getDimensionId(mc.player.getEntityWorld());
+                    final WorldServer world = mc.getIntegratedServer().getWorld(dimId);
 
                     world.addScheduledTask(new Runnable()
                     {
@@ -165,7 +166,8 @@ public class ToolUtils
 
                 if (mc.isSingleplayer())
                 {
-                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().provider.getDimensionType().getId());
+                    final int dimId = fi.dy.masa.malilib.util.WorldUtils.getDimensionId(mc.player.getEntityWorld());
+                    final WorldServer world = mc.getIntegratedServer().getWorld(dimId);
 
                     world.addScheduledTask(new Runnable()
                     {
