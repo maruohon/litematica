@@ -88,7 +88,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         this.addWidget(new WidgetInfoIcon(this.width - 23, 10, this.zLevel, Icons.INFO_11, "litematica.info.material_list"));
 
-        int gap = 2;
+        int gap = 1;
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + gap;
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + gap;
@@ -159,7 +159,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         this.addButton(button, listener);
 
-        return width;
+        return button.getButtonWidth();
     }
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
