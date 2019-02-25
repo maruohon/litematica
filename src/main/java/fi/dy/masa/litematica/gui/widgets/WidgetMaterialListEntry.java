@@ -27,7 +27,9 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             "litematica.gui.label.material_list.missing",
             "litematica.gui.label.material_list.available" };
     private static int maxNameLength;
-    private static int maxCountLength;
+    private static int maxCountLength1;
+    private static int maxCountLength2;
+    private static int maxCountLength3;
 
     private final MaterialListBase materialList;
     private final WidgetListMaterialList listWidget;
@@ -82,20 +84,23 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         return xRight;
     }
 
-    public static void setMaxNameLength(List<MaterialListEntry> materials, Minecraft mc)
+    public static void setMaxNameLength(List<MaterialListEntry> materials, int multiplier, Minecraft mc)
     {
         FontRenderer font = mc.fontRenderer;
         maxNameLength = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[0]) + GuiBase.TXT_RST);
-        maxCountLength = 7 * font.getStringWidth("8");
+        maxCountLength1 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[1]) + GuiBase.TXT_RST);
+        maxCountLength2 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[2]) + GuiBase.TXT_RST);
+        maxCountLength3 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[3]) + GuiBase.TXT_RST);
 
         for (MaterialListEntry entry : materials)
         {
-            maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName()));
-        }
+            int countTotal = entry.getCountTotal() * multiplier;
+            int countMissing = multiplier == 1 ? entry.getCountMissing() : countTotal;
 
-        for (int i = 1; i < HEADERS.length; ++i)
-        {
-            maxCountLength = Math.max(maxCountLength, font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[i]) + GuiBase.TXT_RST));
+            maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName()));
+            maxCountLength1 = Math.max(maxCountLength1, font.getStringWidth(String.valueOf(countTotal)));
+            maxCountLength2 = Math.max(maxCountLength2, font.getStringWidth(String.valueOf(countMissing)));
+            maxCountLength3 = Math.max(maxCountLength3, font.getStringWidth(String.valueOf(entry.getCountAvailable())));
         }
     }
 
@@ -122,8 +127,8 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     {
         int x1 = this.x + 4;
         int x2 = x1 + maxNameLength + 40; // item icon plus offset
-        int x3 = x2 + maxCountLength + 20;
-        int x4 = x3 + maxCountLength + 20;
+        int x3 = x2 + maxCountLength1 + 20;
+        int x4 = x3 + maxCountLength2 + 20;
 
         switch (column)
         {
@@ -131,7 +136,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             case 1: return x2;
             case 2: return x3;
             case 3: return x4;
-            case 4: return x4 + maxCountLength + 20;
+            case 4: return x4 + maxCountLength3 + 20;
             default: return x1;
         }
     }

@@ -45,7 +45,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         Minecraft mc = Minecraft.getMinecraft();
 
         MaterialListUtils.updateAvailableCounts(this.materialList.getMaterialsAll(), mc.player);
-        WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), mc);
+        WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), materialList.getMultiplier(), mc);
 
         // Remember the last opened material list, for the hotkey
         if (DataManager.getMaterialList() == null)
@@ -205,7 +205,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             {
                 case REFRESH_LIST:
                     materialList.recreateMaterialList();
-                    WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), this.parent.mc);
+                    WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), materialList.getMultiplier(), this.parent.mc);
                     break;
 
                 case LIST_TYPE:
