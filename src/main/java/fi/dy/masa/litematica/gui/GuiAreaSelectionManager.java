@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -51,6 +52,14 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     {
         super.initGui();
 
+        this.reCreateGuiElements();
+    }
+
+    protected void reCreateGuiElements()
+    {
+        this.clearButtons();
+        this.clearWidgets();
+
         int x = this.mc.currentScreen.width - 13;
         int y = 24;
 
@@ -62,6 +71,21 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         x = this.createButton(x, y, ButtonListener.ButtonType.UNSELECT);
         x = this.createButton(x, y, ButtonListener.ButtonType.FROM_PLACEMENT);
         x = this.createButton(x, y, ButtonListener.ButtonType.NEW_SELECTION);
+
+        String currentSelection = this.selectionManager.getCurrentNormalSelectionId();
+
+        if (currentSelection != null)
+        {
+            int len = DataManager.getAreaSelectionsBaseDirectory().getAbsolutePath().length();
+
+            if (currentSelection.length() > len + 1)
+            {
+                currentSelection = FileUtils.getNameWithoutExtension(currentSelection.substring(len + 1));
+                String str = I18n.format("litematica.gui.label.area_selection_manager.current_selection", currentSelection);
+                int w = this.mc.fontRenderer.getStringWidth(str);
+                this.addLabel(10, this.height - 15, w, 14, 0xFFFFFFFF, str);
+            }
+        }
     }
 
     private int createButton(int x, int y, ButtonListener.ButtonType type)
@@ -118,6 +142,8 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             {
                 this.selectionManager.setCurrentSelection(selectionId);
             }
+
+            this.reCreateGuiElements();
         }
     }
 
@@ -173,6 +199,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             else if (this.type == ButtonType.UNSELECT)
             {
                 DataManager.getSelectionManager().setCurrentSelection(null);
+                this.gui.reCreateGuiElements();
             }
         }
 
