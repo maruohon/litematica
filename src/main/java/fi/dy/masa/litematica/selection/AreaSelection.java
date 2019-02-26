@@ -224,6 +224,7 @@ public class AreaSelection
         if (replace || this.subRegionBoxes.containsKey(box.getName()) == false)
         {
             this.subRegionBoxes.put(box.getName(), box);
+            this.calculatedOriginDirty = true;
             return true;
         }
 
@@ -233,11 +234,13 @@ public class AreaSelection
     public void removeAllSubRegionBoxes()
     {
         this.subRegionBoxes.clear();
+        this.calculatedOriginDirty = true;
     }
 
     public boolean removeSubRegionBox(String name)
     {
         boolean success = this.subRegionBoxes.remove(name) != null;
+        this.calculatedOriginDirty = true;
 
         if (success && name.equals(this.currentBox))
         {
@@ -251,6 +254,7 @@ public class AreaSelection
     {
         boolean success = this.currentBox != null ? this.subRegionBoxes.remove(this.currentBox) != null : false;
         this.currentBox = null;
+        this.calculatedOriginDirty = true;
         return success;
     }
 
