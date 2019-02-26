@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
@@ -75,8 +76,10 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     }
 
     @Override
-    protected void renameSelectionFile(String selectionId, String newName)
+    protected void renameSelection(String selectionId, String newName)
     {
+        SelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
+
         // Only rename the special simple selection - it doesn't have a file
         this.selection.setName(newName);
     }

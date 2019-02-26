@@ -343,24 +343,17 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
     protected void renameSelection()
     {
-        String oldSelectionName = this.selection.getName();
-        String oldBoxName = this.selection.getCurrentSubRegionBoxName();
-        String newName = this.textFieldSelectionName.getText();
-
-        if (oldSelectionName.equals(oldBoxName))
-        {
-            this.selection.renameSubRegionBox(oldBoxName, newName);
-        }
-
         if (this.selectionId != null)
         {
-            this.renameSelectionFile(this.selectionId, newName);
+            String newName = this.textFieldSelectionName.getText();
+            this.renameSelection(this.selectionId, newName);
         }
     }
 
-    protected void renameSelectionFile(String selectionId, String newName)
+    protected void renameSelection(String selectionId, String newName)
     {
         DataManager.getSelectionManager().renameSelection(selectionId, newName, this);
+        this.selectionId = DataManager.getSelectionManager().getCurrentSelectionId();
     }
 
     protected static class ButtonListener implements IButtonActionListener<ButtonGeneric>
