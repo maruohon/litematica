@@ -48,8 +48,7 @@ public class RenderHandler implements IRenderer
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-            mc.gameSettings.showDebugInfo == false && mc.player != null)
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
             // The Info HUD renderers can decide if they want to be rendered in GUIs
             InfoHud.getInstance().renderHud();
