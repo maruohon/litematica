@@ -18,7 +18,7 @@ litematica.error.generic.schematic_world_not_loaded=Schematic world was not load
 litematica.error.area_editor.create_sub_region.exists=A sub-region by the name '%s' already exists
 litematica.error.area_editor.open_gui.no_selection=Currently in Selection Mode: Normal, but no area is currently selected
 litematica.error.area_editor.rename_sub_region.exists=Failed to rename the sub-region:\nA sub-region already exists by the name '%s'
-litematica.error.area_editor.switch_mode.no_selection=Can't switch to Selection Mode: Normal,\nbecause there is currently no area selected
+litematica.error.area_editor.switch_mode.no_selection=Can't switch to Selection Mode: Normal, because there is currently no area selected.\nSelect an area or create a new selection in the Area Selection browser
 
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=Failed to create the Litematica schematic
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
@@ -56,7 +56,8 @@ litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the 
 litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot=Use the screenshot keybind to set the preview
 litematica.info.schematic_manager.preview.success=Preview image successfully set
 
-litematica.gui.button.area_editor.change_mode=Selection Mode: %s
+litematica.gui.button.area_editor.change_corner_mode=Corner Mode: %s
+litematica.gui.button.area_editor.change_selection_mode=Selection Mode: %s
 litematica.gui.button.area_editor.create_schematic=Save Schematic
 litematica.gui.button.area_editor.create_sub_region=New sub-region
 litematica.gui.button.area_editor.origin_enabled=Manual Origin: %s
@@ -170,6 +171,8 @@ litematica.gui.label.area_editor.dimensions=Dimensions
 litematica.gui.label.area_editor.pos1=Corner 1
 litematica.gui.label.area_editor.pos2=Corner 2
 litematica.gui.label.area_editor.sub_regions=Sub-regions (%s)
+
+litematica.gui.label.area_selection_manager.current_selection=Selected area: %s
 
 litematica.gui.label.area_selection_box_count=Boxes: %d
 litematica.gui.label.area_selection_origin=Origin: %s

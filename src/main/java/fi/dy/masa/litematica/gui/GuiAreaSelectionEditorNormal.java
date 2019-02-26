@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
@@ -76,12 +77,10 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         int x = xLeft - 2;
         int y = 24;
 
-        x += this.createButton(x, y, -1, ButtonListener.Type.CHANGE_MODE) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.CHANGE_SELECTION_MODE) + 4;
+        x += this.createButton(x, y, -1, ButtonListener.Type.CHANGE_CORNER_MODE) + 4;
+        this.xOrigin = x;
 
-        boolean currentlyOn = this.selection.getExplicitOrigin() != null;
-        x += this.createButtonOnOff(x, y, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED) + 4;
-
-        this.xOrigin = x + 20;
         x = xLeft;
         y += 20;
 
@@ -104,16 +103,18 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         int width = 68;
         int xSave = 10;
         int ySave = y + 4;
-        int xOrigin = x;
-        int yOrigin = 6;
 
         xSave += this.createButton(xSave, ySave, -1, ButtonListener.Type.CREATE_SUB_REGION) + 4;
+
+        boolean currentlyOn = this.selection.getExplicitOrigin() != null;
+        xSave += this.createButtonOnOff(xSave, ySave, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED) + 4;
         xSave += this.createButton(xSave, ySave, -1, ButtonListener.Type.CREATE_SCHEMATIC) + 4;
 
         // Manual Origin defined
         if (this.selection.getExplicitOrigin() != null)
         {
-            this.createCoordinateInputs(xOrigin, yOrigin, width, Corner.NONE);
+            x = Math.max(xSave, this.xOrigin);
+            this.createCoordinateInputs(x, 5, width, Corner.NONE);
         }
 
         x = 12;
@@ -149,7 +150,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.selection.setExplicitOrigin(origin);
     }
 
-    protected void createCoordinateInputs(int x, int y, int width, Corner corner)
+    protected int createCoordinateInputs(int x, int y, int width, Corner corner)
     {
         String label = "";
         WidgetCheckBox widget = null;
@@ -190,6 +191,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         y += 22;
 
         this.createButton(x + 10, y, -1, corner, ButtonListener.Type.MOVE_TO_PLAYER);
+        y += 22;
+
+        return y;
     }
 
     protected void createCoordinateInput(int x, int y, int width, CoordinateType coordType, Corner corner)
@@ -243,10 +247,15 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     {
         String label;
 
-        if (type == ButtonListener.Type.CHANGE_MODE)
+        if (type == ButtonListener.Type.CHANGE_SELECTION_MODE)
         {
             SelectionMode mode = DataManager.getSelectionManager().getSelectionMode();
             label = type.getDisplayName(mode.getDisplayName());
+        }
+        else if (type == ButtonListener.Type.CHANGE_CORNER_MODE)
+        {
+            String name = Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName();
+            label = type.getDisplayName(name);
         }
         else
         {
@@ -398,7 +407,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     this.parent.moveCoordinate(amount, this.corner, this.coordinateType);
                     break;
 
-                case CHANGE_MODE:
+                case CHANGE_SELECTION_MODE:
                     SelectionManager manager = DataManager.getSelectionManager();
                     SelectionMode newMode = manager.getSelectionMode().cycle(true);
 
@@ -412,6 +421,10 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                         manager.openEditGui(null);
                         return;
                     }
+                    break;
+
+                case CHANGE_CORNER_MODE:
+                    Configs.Generic.SELECTION_CORNERS_MODE.setOptionListValue(Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().cycle(false));
                     break;
 
                 case CREATE_SCHEMATIC:
@@ -476,7 +489,8 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             TOGGLE_ORIGIN_ENABLED   ("litematica.gui.button.area_editor.origin_enabled"),
             CREATE_SUB_REGION       ("litematica.gui.button.area_editor.create_sub_region"),
             CREATE_SCHEMATIC        ("litematica.gui.button.area_editor.create_schematic"),
-            CHANGE_MODE             ("litematica.gui.button.area_editor.change_mode"),
+            CHANGE_SELECTION_MODE   ("litematica.gui.button.area_editor.change_selection_mode"),
+            CHANGE_CORNER_MODE      ("litematica.gui.button.area_editor.change_corner_mode"),
             MOVE_TO_PLAYER          ("litematica.gui.button.move_to_player"),
             NUDGE_COORD_X           (""),
             NUDGE_COORD_Y           (""),

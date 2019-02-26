@@ -24,12 +24,13 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     @Override
     protected int addSubRegionFields(int x, int y)
     {
-        this.createButton(x, 24, -1, ButtonListener.Type.CREATE_SCHEMATIC);
-
         x = 12;
         String label = I18n.format("litematica.gui.label.area_editor.box_name");
         this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
         y += 13;
+
+        boolean currentlyOn = this.selection.getExplicitOrigin() != null;
+        this.createButtonOnOff(this.xOrigin, 24, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED);
 
         int width = 202;
         this.textFieldBoxName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.mc.fontRenderer);
@@ -41,9 +42,10 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
         x = 12;
         width = 68;
 
+        int nextY = 0;
         this.createCoordinateInputs(x, y, width, Corner.CORNER_1);
         x += width + 42;
-        this.createCoordinateInputs(x, y, width, Corner.CORNER_2);
+        nextY = this.createCoordinateInputs(x, y, width, Corner.CORNER_2);
         x += width + 42;
 
         // Manual Origin defined
@@ -51,6 +53,8 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
         {
             this.createCoordinateInputs(x, y, width, Corner.NONE);
         }
+
+        this.createButton(22, nextY, -1, ButtonListener.Type.CREATE_SCHEMATIC);
 
         return y;
     }
