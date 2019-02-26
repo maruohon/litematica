@@ -54,10 +54,14 @@ public class GuiMainMenu extends GuiBase
 
         x += width + 20;
         y = 30;
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.CONFIGURATION);
+        y += 44;
+
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_MANAGER);
         y += 44;
 
-        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.CONFIGURATION);
+        y += 44;
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_VERSION_MANAGER);
     }
 
     private void createChangeMenuButton(int x, int y, int width, ButtonListenerChangeMenu.ButtonType type)
@@ -127,6 +131,9 @@ public class GuiMainMenu extends GuiBase
                 case SCHEMATIC_PLACEMENTS:
                     gui = new GuiSchematicPlacementsList();
                     break;
+                case SCHEMATIC_VERSION_MANAGER:
+                    gui = new GuiSchematicVersionManager();
+                    break;
             }
 
             if (gui != null)
@@ -145,21 +152,23 @@ public class GuiMainMenu extends GuiBase
         public enum ButtonType
         {
             // List loaded Schematics in SchematicHolder
-            LOADED_SCHEMATICS       ("litematica.gui.button.change_menu.show_loaded_schematics", ButtonIcons.LOADED_SCHEMATICS),
+            LOADED_SCHEMATICS           ("litematica.gui.button.change_menu.show_loaded_schematics", ButtonIcons.LOADED_SCHEMATICS),
             // List Schematics placements
-            SCHEMATIC_PLACEMENTS    ("litematica.gui.button.change_menu.show_schematic_placements", ButtonIcons.SCHEMATIC_PLACEMENTS),
+            SCHEMATIC_PLACEMENTS        ("litematica.gui.button.change_menu.show_schematic_placements", ButtonIcons.SCHEMATIC_PLACEMENTS),
             // Open the Area Selection browser
-            AREA_SELECTION_BROWSER  ("litematica.gui.button.change_menu.show_area_selections", ButtonIcons.AREA_SELECTION),
+            AREA_SELECTION_BROWSER      ("litematica.gui.button.change_menu.show_area_selections", ButtonIcons.AREA_SELECTION),
             // Open the Area Editor GUI
-            AREA_EDITOR             ("litematica.gui.button.change_menu.area_editor", ButtonIcons.AREA_EDITOR),
+            AREA_EDITOR                 ("litematica.gui.button.change_menu.area_editor", ButtonIcons.AREA_EDITOR),
             // Load Schematics from file to memory
-            LOAD_SCHEMATICS         ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcons.SCHEMATIC_BROWSER),
+            LOAD_SCHEMATICS             ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcons.SCHEMATIC_BROWSER),
             // Edit Schematics (description or icon), or convert between formats
-            SCHEMATIC_MANAGER       ("litematica.gui.button.change_menu.schematic_manager", ButtonIcons.SCHEMATIC_MANAGER),
+            SCHEMATIC_MANAGER           ("litematica.gui.button.change_menu.schematic_manager", ButtonIcons.SCHEMATIC_MANAGER),
+            // Open the Schematic Versioning/projects/snapshots/whatever browser
+            SCHEMATIC_VERSION_MANAGER   ("litematica.gui.button.change_menu.schematic_version_manager", ButtonIcons.SCHEMATIC_VERSIONS),
             // In-game Configuration GUI
-            CONFIGURATION           ("litematica.gui.button.change_menu.configuration_menu", ButtonIcons.CONFIGURATION),
+            CONFIGURATION               ("litematica.gui.button.change_menu.configuration_menu", ButtonIcons.CONFIGURATION),
             // Switch to the Litematica main menu
-            MAIN_MENU               ("litematica.gui.button.change_menu.to_main_menu", null);
+            MAIN_MENU                   ("litematica.gui.button.change_menu.to_main_menu", null);
 
             private final String labelKey;
             private final ButtonIcons icon;

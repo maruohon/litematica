@@ -131,6 +131,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     DataManager.setToolMode(DataManager.getToolMode().cycle(player, amount < 0));
                     return true;
                 }
+                else if (Hotkeys.SCHEMATIC_VERSION_CYCLE_MODIFIER.getKeybind().isKeybindHeld())
+                {
+                    if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+                    {
+                        DataManager.getSchematicVersionManager().cycleVersion(amount);
+                    }
+                    return true;
+                }
             }
         }
 

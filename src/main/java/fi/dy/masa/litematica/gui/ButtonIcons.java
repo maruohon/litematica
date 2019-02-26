@@ -13,7 +13,8 @@ public enum ButtonIcons implements IGuiIcon
     LOADED_SCHEMATICS       (102,  14, 14, 14),
     SCHEMATIC_BROWSER       (102,  28, 14, 14),
     SCHEMATIC_MANAGER       (102,  56, 14, 14),
-    SCHEMATIC_PLACEMENTS    (102,  42, 14, 14);
+    SCHEMATIC_PLACEMENTS    (102,  42, 14, 14),
+    SCHEMATIC_VERSIONS      (102,  98, 14, 14);
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 

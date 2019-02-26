@@ -135,7 +135,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
 
                         String author = this.gui.mc.player.getName();
                         boolean takeEntities = this.gui.checkboxIgnoreEntities.isChecked() == false;
-                        LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author, this.gui);
+                        LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
                         TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
                         TaskScheduler.getInstance().scheduleTask(task, 10);
                         this.gui.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
@@ -171,7 +171,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
         {
             boolean takeEntities = true; // TODO
             String author = this.mc.player.getName();
-            LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(this.area, author, null);
+            LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(this.area, author);
 
             if (schematic != null)
             {

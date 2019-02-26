@@ -14,6 +14,8 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSimple;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.versioning.SchematicProject;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
@@ -80,6 +82,17 @@ public class SelectionManager
     @Nullable
     public AreaSelection getCurrentSelection()
     {
+        if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+        {
+            SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+            return project != null ? project.getSelection() : null;
+        }
+
+        if (this.mode == SelectionMode.SIMPLE)
+        {
+            return DataManager.getSimpleArea();
+        }
+
         return this.getSelection(this.currentSelectionId);
     }
 
@@ -144,7 +157,12 @@ public class SelectionManager
     @Nullable
     private AreaSelection tryLoadSelectionFromFile(String selectionId)
     {
-        File file = new File(selectionId);
+        return tryLoadSelectionFromFile(new File(selectionId));
+    }
+
+    @Nullable
+    public static AreaSelection tryLoadSelectionFromFile(File file)
+    {
         JsonElement el = JsonUtils.parseJsonFile(file);
 
         if (el != null && el.isJsonObject())
@@ -228,7 +246,7 @@ public class SelectionManager
 
                 if (selection != null)
                 {
-                    this.renameSubRegionBoxIfSingle(selection, newName);
+                    renameSubRegionBoxIfSingle(selection, newName);
                     selection.setName(newName);
 
                     this.selections.put(newId, selection);
@@ -262,7 +280,7 @@ public class SelectionManager
         return false;
     }
 
-    public boolean renameSelectedSubRegionBox(String selectionId, String newName)
+    private boolean renameSelectedSubRegionBox(String selectionId, String newName)
     {
         AreaSelection selection = this.getSelection(selectionId);
 
@@ -277,12 +295,6 @@ public class SelectionManager
         }
 
         return false;
-    }
-
-    public boolean renameSubRegionBox(String selectionId, String oldName, String newName)
-    {
-        AreaSelection selection = this.getSelection(selectionId);
-        return selection != null && selection.renameSubRegionBox(oldName, newName);
     }
 
     public void setCurrentSelection(@Nullable String selectionId)
@@ -395,7 +407,7 @@ public class SelectionManager
         if (selection == null)
         {
             selection = AreaSelection.fromPlacement(placement);
-            this.renameSubRegionBoxIfSingle(selection, name);
+            renameSubRegionBoxIfSingle(selection, name);
             selection.setName(name);
 
             this.selections.put(selectionId, selection);
@@ -646,7 +658,7 @@ public class SelectionManager
         }
     }
 
-    private void renameSubRegionBoxIfSingle(AreaSelection selection, String newName)
+    public static void renameSubRegionBoxIfSingle(AreaSelection selection, String newName)
     {
         List<Box> boxes = selection.getAllSubRegionBoxes();
 
@@ -734,7 +746,7 @@ public class SelectionManager
         }
         else
         {
-            return new GuiAreaSelectionEditorSimple(DataManager.getSimpleArea());
+            return new GuiAreaSelectionEditorSimple(this.getCurrentSelection());
         }
     }
 

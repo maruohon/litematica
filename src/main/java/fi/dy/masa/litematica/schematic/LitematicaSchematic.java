@@ -23,7 +23,6 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -198,16 +197,13 @@ public class LitematicaSchematic
      * @param feedback
      * @return
      */
-    public static LitematicaSchematic createEmptySchematic(AreaSelection area, String author, @Nullable IMessageConsumer feedback)
+    public static LitematicaSchematic createEmptySchematic(AreaSelection area, String author)
     {
         List<Box> boxes = PositionUtils.getValidBoxes(area);
 
         if (boxes.isEmpty())
         {
-            if (feedback != null)
-            {
-                feedback.addMessage(MessageType.ERROR, I18n.format("litematica.error.schematic.create.no_selections"));
-            }
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, I18n.format("litematica.error.schematic.create.no_selections"));
             return null;
         }
 
@@ -327,11 +323,6 @@ public class LitematicaSchematic
                 {
                     IBlockState state = container.get(x, y, z);
 
-                    if (state.getBlock() == Blocks.AIR)
-                    {
-                        continue;
-                    }
-
                     posMutable.setPos(x, y, z);
                     NBTTagCompound teNBT = tileMap.get(posMutable);
 
@@ -346,6 +337,11 @@ public class LitematicaSchematic
                     if (mirrorMain != Mirror.NONE) { state = state.withMirror(mirrorMain); }
                     if (mirrorSub != Mirror.NONE)  { state = state.withMirror(mirrorSub); }
                     if (rotationCombined != Rotation.NONE) { state = state.withRotation(rotationCombined); }
+
+                    if (world.getBlockState(pos).getActualState(world, pos) == state)
+                    {
+                        continue;
+                    }
 
                     if (teNBT != null)
                     {
@@ -1355,7 +1351,7 @@ public class LitematicaSchematic
     }
 
     @Nullable
-    public static LitematicaSchematic createFromFile(File dir, String fileName, IStringConsumer feedback)
+    public static LitematicaSchematic createFromFile(File dir, String fileName)
     {
         if (fileName.endsWith(FILE_EXTENSION) == false)
         {
@@ -1366,7 +1362,7 @@ public class LitematicaSchematic
 
         if (fileSchematic.exists() == false || fileSchematic.canRead() == false)
         {
-            feedback.setString(I18n.format("litematica.error.schematic_read_from_file_failed.cant_read", fileSchematic.getAbsolutePath()));
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", fileSchematic.getAbsolutePath());
             return null;
         }
 
@@ -1388,7 +1384,7 @@ public class LitematicaSchematic
         }
         catch (Exception e)
         {
-            feedback.setString(I18n.format("litematica.error.schematic_read_from_file_failed.exception", fileSchematic.getAbsolutePath()));
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.exception", fileSchematic.getAbsolutePath());
         }
 
         return null;

@@ -18,6 +18,7 @@ import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.versioning.SchematicVersionManager;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -50,6 +51,7 @@ public class DataManager implements IDirectoryCache
 
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
+    private final SchematicVersionManager schematicVersionManager = new SchematicVersionManager();
     private LayerRange renderRange = new LayerRange(SchematicWorldRefresher.INSTANCE);
     private ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
@@ -113,6 +115,11 @@ public class DataManager implements IDirectoryCache
     public static SchematicPlacementManager getSchematicPlacementManager()
     {
         return getInstance().schematicPlacementManager;
+    }
+
+    public static SchematicVersionManager getSchematicVersionManager()
+    {
+        return getInstance().schematicVersionManager;
     }
 
     @Nullable
@@ -272,6 +279,7 @@ public class DataManager implements IDirectoryCache
     {
         this.selectionManager.clear();
         this.schematicPlacementManager.clear();
+        this.schematicVersionManager.clear();
         this.materialList = null;
 
         File file = getCurrentStorageFile(false);
@@ -294,6 +302,11 @@ public class DataManager implements IDirectoryCache
         if (JsonUtils.hasObject(obj, "placements"))
         {
             this.schematicPlacementManager.loadFromJson(obj.get("placements").getAsJsonObject());
+        }
+
+        if (JsonUtils.hasObject(obj, "version_manager"))
+        {
+            this.schematicVersionManager.loadFromJson(obj.get("version_manager").getAsJsonObject());
         }
 
         if (JsonUtils.hasObject(obj, "render_range"))
@@ -327,6 +340,7 @@ public class DataManager implements IDirectoryCache
 
         obj.add("selections", this.selectionManager.toJson());
         obj.add("placements", this.schematicPlacementManager.toJson());
+        obj.add("version_manager", this.schematicVersionManager.toJson());
         obj.add("operation_mode", new JsonPrimitive(this.operationMode.name()));
         obj.add("render_range", this.renderRange.toJson());
         obj.add("area_simple", this.areaSimple.toJson());

@@ -1,10 +1,12 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
@@ -19,7 +21,14 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     {
         super(selection);
 
-        this.title = I18n.format("litematica.gui.title.area_editor_simple");
+        if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+        {
+            this.title = I18n.format("litematica.gui.title.area_editor_normal_version_control");
+        }
+        else
+        {
+            this.title = I18n.format("litematica.gui.title.area_editor_simple");
+        }
     }
 
     @Override

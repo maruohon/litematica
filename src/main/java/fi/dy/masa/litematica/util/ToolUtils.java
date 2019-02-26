@@ -153,12 +153,15 @@ public class ToolUtils
         return true;
     }
 
-    public static void deleteSelectionVolumes(Minecraft mc, boolean removeEntities)
+    public static void deleteSelectionVolumes(boolean removeEntities, Minecraft mc)
+    {
+        deleteSelectionVolumes(DataManager.getSelectionManager().getCurrentSelection(), removeEntities, mc);
+    }
+
+    public static void deleteSelectionVolumes(final AreaSelection area, boolean removeEntities, Minecraft mc)
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
-            final AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
-
             if (area != null && area.getAllSubRegionBoxes().size() > 0)
             {
                 Box currentBox = area.getSelectedSubRegionBox();

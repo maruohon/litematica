@@ -228,7 +228,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else if (this.type == Type.RENAME_SCHEMATIC)
             {
-                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
+                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
                 String oldName = schematic != null ? schematic.getMetadata().getName() : "";
                 this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), this.gui)));
             }
@@ -315,7 +315,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         @Override
         public boolean setString(String string)
         {
-            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName, this.gui);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName);
 
             if (schematic != null)
             {
@@ -382,7 +382,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
         public void createAndSetPreviewImage()
         {
-            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName, InfoUtils.INFO_MESSAGE_CONSUMER);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName);
 
             if (schematic != null)
             {

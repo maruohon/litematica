@@ -16,6 +16,7 @@ import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.versioning.SchematicProject;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -71,6 +72,8 @@ public class KeyCallbacks
         Hotkeys.RERENDER_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_1.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_2.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind().setCallback(callbackHotkeys);
@@ -397,6 +400,22 @@ public class KeyCallbacks
             {
                 return SchematicUtils.saveSchematic(true);
             }
+            else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeybind())
+            {
+                if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+                {
+                    DataManager.getSchematicVersionManager().cycleVersion(1);
+                }
+                return true;
+            }
+            else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeybind())
+            {
+                if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+                {
+                    DataManager.getSchematicVersionManager().cycleVersion(-1);
+                }
+                return true;
+            }
             else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && hasTool && toolEnabled)
             {
                 if (mode == ToolMode.PASTE_SCHEMATIC)
@@ -417,7 +436,20 @@ public class KeyCallbacks
                 else if (mode == ToolMode.DELETE)
                 {
                     boolean removeEntities = true; // TODO
-                    ToolUtils.deleteSelectionVolumes(this.mc, removeEntities);
+                    ToolUtils.deleteSelectionVolumes(removeEntities, this.mc);
+                    return true;
+                }
+                else if (mode == ToolMode.VERSION_CONTROL)
+                {
+                    SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+                    SchematicPlacement placement = project != null ? project.getCurrentPlacement() : null;;
+
+                    if (placement != null)
+                    {
+                        AreaSelection selection = AreaSelection.fromPlacement(placement);
+                        ToolUtils.deleteSelectionVolumes(selection, true, this.mc);
+                        DataManager.getSchematicPlacementManager().pastePlacementToWorld(placement, this.mc);
+                    }
                     return true;
                 }
             }

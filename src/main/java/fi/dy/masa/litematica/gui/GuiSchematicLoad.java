@@ -145,7 +145,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
             if (fileType == FileType.LITEMATICA_SCHEMATIC)
             {
-                schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
+                schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
             }
             else if (fileType == FileType.SCHEMATICA_SCHEMATIC)
             {

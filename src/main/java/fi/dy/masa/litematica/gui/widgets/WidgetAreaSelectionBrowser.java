@@ -10,7 +10,8 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 
 public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
 {
-    protected static final FileFilter JSON_FILTER = new FileFilterJson();
+    public static final FileFilter JSON_FILTER = new FileFilterJson();
+
     private final GuiAreaSelectionManager guiAreaSelectionManager;
 
     public WidgetAreaSelectionBrowser(int x, int y, int width, int height,

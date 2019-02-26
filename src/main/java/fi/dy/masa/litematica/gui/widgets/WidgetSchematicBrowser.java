@@ -183,7 +183,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
         if (meta == null)
         {
-            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
 
             if (schematic != null)
             {

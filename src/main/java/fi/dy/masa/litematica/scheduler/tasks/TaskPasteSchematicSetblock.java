@@ -34,7 +34,6 @@ import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
 {
-    private final SchematicPlacement placement;
     private final ArrayListMultimap<ChunkPos, StructureBoundingBox> boxesInChunks = ArrayListMultimap.create();
     private final List<String> infoHudLines = new ArrayList<>();
     private final int maxCommandsPerTick;
@@ -44,7 +43,6 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
     public TaskPasteSchematicSetblock(SchematicPlacement placement)
     {
-        this.placement = placement;
         this.maxCommandsPerTick = Configs.Generic.PASTE_COMMAND_LIMIT.getIntegerValue();
 
         Set<ChunkPos> touchedChunks = placement.getTouchedChunks();
@@ -65,8 +63,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         Minecraft mc = Minecraft.getMinecraft();
 
         // Only use this command-based task in multiplayer
-        return this.boxesInChunks.isEmpty() == false && placement.isEnabled() && mc.world != null && mc.player != null &&
-               mc.isSingleplayer() == false && mc.player.capabilities.isCreativeMode;
+        return this.boxesInChunks.isEmpty() == false && mc.world != null && mc.player != null && mc.isSingleplayer() == false;
     }
 
     @Override

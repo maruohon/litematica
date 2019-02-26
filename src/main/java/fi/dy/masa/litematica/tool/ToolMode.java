@@ -14,7 +14,8 @@ public enum ToolMode
     PASTE_SCHEMATIC     ("litematica.tool_mode.name.paste_schematic", true),
     GRID_PASTE          ("litematica.tool_mode.name.grid_paste", true),
     DELETE              ("litematica.tool_mode.name.delete", false),
-    REBUILD             ("litematica.tool_mode.name.rebuild", true);
+    REBUILD             ("litematica.tool_mode.name.rebuild", true),
+    VERSION_CONTROL     ("litematica.tool_mode.name.version_control", false);
 
     private final String unlocName;
     private final boolean usesSchematic;

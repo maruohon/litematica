@@ -574,10 +574,13 @@ public class SchematicPlacementManager
 
     public void pasteCurrentPlacementToWorld(Minecraft mc)
     {
+        this.pastePlacementToWorld(this.getSelectedSchematicPlacement(), mc);
+    }
+
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, Minecraft mc)
+    {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
-            final SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
-
             if (schematicPlacement != null)
             {
                 if (mc.isSingleplayer())

@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
 
 public class SchematicHolder
 {
@@ -24,7 +23,7 @@ public class SchematicHolder
     }
 
     @Nullable
-    public LitematicaSchematic getOrLoad(File file, IStringConsumer feedback)
+    public LitematicaSchematic getOrLoad(File file)
     {
         for (LitematicaSchematic schematic : this.schematics)
         {
@@ -34,7 +33,7 @@ public class SchematicHolder
             }
         }
 
-        LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName(), feedback);
+        LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName());
 
         if (schematic != null)
         {

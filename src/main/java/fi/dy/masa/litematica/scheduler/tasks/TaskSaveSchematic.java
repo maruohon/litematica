@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.scheduler.TaskBase;
@@ -42,6 +43,7 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
     private final List<String> infoHudLines = new ArrayList<>();
     @Nullable private final File dir;
     @Nullable private final String fileName;
+    @Nullable private ICompletionListener completionListener;
     private final boolean takeEntities;
     private final boolean overrideFile;
     private boolean finished;
@@ -63,6 +65,11 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
         this.overrideFile = overrideFile;
         this.updateInfoHudLines();
         InfoHud.getInstance().addInfoHudRenderer(this, true);
+    }
+
+    public void setCompletionListener(ICompletionListener listener)
+    {
+        this.completionListener = listener;
     }
 
     @Override
@@ -162,6 +169,11 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
                 String name = this.schematic.getMetadata().getName();
                 SchematicHolder.getInstance().addSchematic(this.schematic, true);
                 InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.in_memory_schematic_created", name);
+            }
+
+            if (this.completionListener != null)
+            {
+                this.completionListener.onTaskCompleted();
             }
         }
         else

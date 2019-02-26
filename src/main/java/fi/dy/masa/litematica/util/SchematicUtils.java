@@ -15,10 +15,14 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
@@ -43,7 +47,14 @@ public class SchematicUtils
         {
             Minecraft mc = Minecraft.getMinecraft();
 
-            if (inMemoryOnly)
+            if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+            {
+                String title = "litematica.gui.title.schematic_version_manager.save_new_version";
+                GuiTextInput gui = new GuiTextInput(512, title, area.getName(), null, new SchematicVersionCreator());
+                gui.setParent(mc.currentScreen);
+                mc.displayGuiScreen(gui);
+            }
+            else if (inMemoryOnly)
             {
                 String title = "litematica.gui.title.create_in_memory_schematic";
                 GuiTextInput gui = new GuiTextInput(512, title, area.getName(), null, new InMemorySchematicCreator(area));
@@ -469,6 +480,15 @@ public class SchematicUtils
             this.hitVec = hitVec;
             this.stateOriginal = stateOriginal;
             this.stateNew = stateNew;
+        }
+    }
+
+    public static class SchematicVersionCreator implements IStringConsumerFeedback
+    {
+        @Override
+        public boolean setString(String string)
+        {
+            return DataManager.getSchematicVersionManager().commitNewVersion(string);
         }
     }
 }
