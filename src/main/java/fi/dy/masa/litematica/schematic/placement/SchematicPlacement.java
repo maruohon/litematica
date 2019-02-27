@@ -59,6 +59,7 @@ public class SchematicPlacement
     private boolean renderEnclosingBox;
     private boolean regionPlacementsModified;
     private boolean locked;
+    private boolean shouldBeSaved = true;
     private int boxesBBColor;
     private Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
     @Nullable
@@ -131,6 +132,21 @@ public class SchematicPlacement
     public boolean shouldRenderEnclosingBox()
     {
         return this.renderEnclosingBox;
+    }
+
+    /**
+     * Returns whether or not this placement should be saved by the SchematicPlacementManager
+     * when it saves the list of placements.
+     * @return
+     */
+    public boolean shouldBeSaved()
+    {
+        return this.shouldBeSaved;
+    }
+
+    public void setShouldBeSaved(boolean shouldbeSaved)
+    {
+        this.shouldBeSaved = shouldbeSaved;
     }
 
     public boolean matchesRequirement(RequiredEnabled required)

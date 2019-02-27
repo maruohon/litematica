@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.apache.commons.io.FileUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -28,6 +29,7 @@ public class SchematicProject
 {
     private final List<SchematicVersion> versions = new ArrayList<>();
     private final File directory;
+    private File projectFile;
     private BlockPos origin = BlockPos.ORIGIN;
     private String projectName = "unnamed";
     private AreaSelection selection = new AreaSelection();
@@ -41,9 +43,10 @@ public class SchematicProject
     @Nullable
     private SchematicPlacement currentPlacement;
 
-    public SchematicProject(File directory)
+    public SchematicProject(File directory, File projectFile)
     {
         this.directory = directory;
+        this.projectFile = projectFile;
     }
 
     public File getDirectory()
@@ -69,12 +72,30 @@ public class SchematicProject
     public void setName(String name)
     {
         // TODO should renaming be allowed? Should the schematics and versions be renamed/updated when renamed?
-        this.projectName = name;
-        this.selection.setName(name);
-        this.selectionSimple.setName(name);
-        SelectionManager.renameSubRegionBoxIfSingle(this.selection, name);
-        SelectionManager.renameSubRegionBoxIfSingle(this.selectionSimple, name);
-        this.dirty = true;
+        File newFile = new File(this.directory, name + ".json");
+
+        if (newFile.exists() == false)
+        {
+            try
+            {
+                FileUtils.moveFile(this.projectFile, newFile);
+                this.projectName = name;
+                this.projectFile = newFile;
+                this.selection.setName(name);
+                this.selectionSimple.setName(name);
+                SelectionManager.renameSubRegionBoxIfSingle(this.selection, name);
+                SelectionManager.renameSubRegionBoxIfSingle(this.selectionSimple, name);
+                this.dirty = true;
+            }
+            catch (Exception e)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.failed_to_rename_project_file_exception", newFile.getAbsolutePath());
+            }
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.failed_to_rename_project_file_exists", name);
+        }
     }
 
     public void setOrigin(BlockPos origin)
@@ -97,7 +118,7 @@ public class SchematicProject
 
     public File getProjectFile()
     {
-        return new File(this.getDirectory(), this.getName() + ".json");
+        return this.projectFile;
     }
 
     public BlockPos getOrigin()
@@ -149,6 +170,7 @@ public class SchematicProject
                 {
                     BlockPos areaPosition = this.origin.add(version.getAreaOffset());
                     this.currentPlacement = SchematicPlacement.createFor(schematic, areaPosition, version.getName(), true, true);
+                    this.currentPlacement.setShouldBeSaved(false);
                     DataManager.getSchematicPlacementManager().addSchematicPlacement(this.currentPlacement, null);
                 }
                 else
@@ -266,9 +288,7 @@ public class SchematicProject
 
     public boolean saveToFile()
     {
-        File file = this.getProjectFile();
-
-        if (this.dirty == false || JsonUtils.writeJsonToFile(this.toJson(), file))
+        if (this.dirty == false || JsonUtils.writeJsonToFile(this.toJson(), this.projectFile))
         {
             this.dirty = false;
             return true;
@@ -304,7 +324,7 @@ public class SchematicProject
     }
 
     @Nullable
-    public static SchematicProject fromJson(JsonObject obj)
+    public static SchematicProject fromJson(JsonObject obj, File projectFile)
     {
         BlockPos origin = JsonUtils.blockPosFromJson(obj, "origin");
 
@@ -313,8 +333,9 @@ public class SchematicProject
             JsonUtils.hasInteger(obj, "current_version_id") &&
             origin != null)
         {
-            SchematicProject project = new SchematicProject(new File(JsonUtils.getString(obj, "directory")));
+            SchematicProject project = new SchematicProject(new File(JsonUtils.getString(obj, "directory")), projectFile);
             project.projectName = JsonUtils.getString(obj, "name");
+            project.origin = origin;
 
             if (JsonUtils.hasObject(obj, "selection_normal"))
             {
@@ -346,7 +367,6 @@ public class SchematicProject
                 }
             }
 
-            project.origin = origin;
             int id = project.versions.size() - 1;
 
             if (JsonUtils.hasInteger(obj, "current_version_id"))
@@ -360,6 +380,7 @@ public class SchematicProject
             }
 
             project.switchVersion(id);
+            project.dirty = false;
 
             return project;
         }

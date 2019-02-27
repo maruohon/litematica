@@ -648,6 +648,12 @@ public class SchematicPlacementManager
             for (int i = 0; i < this.schematicPlacements.size(); ++i)
             {
                 SchematicPlacement placement = this.schematicPlacements.get(i);
+
+                if (placement.shouldBeSaved() == false)
+                {
+                    continue;
+                }
+
                 JsonObject objPlacement = placement.toJson();
 
                 if (objPlacement != null)

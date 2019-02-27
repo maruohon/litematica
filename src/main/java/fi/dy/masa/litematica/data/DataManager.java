@@ -269,6 +269,7 @@ public class DataManager implements IDirectoryCache
 
     private void savePerDimensionData()
     {
+        this.schematicVersionManager.saveCurrentProject();
         JsonObject root = this.toJson();
 
         File file = getCurrentStorageFile(false);

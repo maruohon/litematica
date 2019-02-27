@@ -135,7 +135,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 {
                     if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
                     {
-                        DataManager.getSchematicVersionManager().cycleVersion(amount);
+                        DataManager.getSchematicVersionManager().cycleVersion(amount * -1);
                     }
                     return true;
                 }

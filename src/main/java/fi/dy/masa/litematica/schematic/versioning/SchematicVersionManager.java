@@ -28,7 +28,7 @@ public class SchematicVersionManager
     {
         this.closeCurrentProject();
 
-        this.currentProject = new SchematicProject(dir);
+        this.currentProject = new SchematicProject(dir, new File(dir, projectName + ".json"));
         this.currentProject.setName(projectName);
         this.currentProject.setOrigin(new BlockPos(Minecraft.getMinecraft().player));
         this.currentProject.saveToFile();
@@ -44,7 +44,7 @@ public class SchematicVersionManager
 
             if (el != null && el.isJsonObject())
             {
-                this.currentProject = SchematicProject.fromJson(el.getAsJsonObject());
+                this.currentProject = SchematicProject.fromJson(el.getAsJsonObject(), projectFile);
                 return this.currentProject != null;
             }
         }
@@ -61,6 +61,14 @@ public class SchematicVersionManager
             this.currentProject.saveToFile();
             this.removeCurrentPlacement();
             this.currentProject = null;
+        }
+    }
+
+    public void saveCurrentProject()
+    {
+        if (this.currentProject != null)
+        {
+            this.currentProject.saveToFile();
         }
     }
 
@@ -126,7 +134,7 @@ public class SchematicVersionManager
 
             if (el != null && el.isJsonObject())
             {
-                this.currentProject = SchematicProject.fromJson(el.getAsJsonObject());
+                this.currentProject = SchematicProject.fromJson(el.getAsJsonObject(), file);
             }
         }
     }
