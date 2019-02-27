@@ -12,11 +12,14 @@ public class ClientTickHandler implements IClientTickHandler
     @Override
     public void onClientTick(Minecraft mc)
     {
-        InputHandler.onTick();
-        WorldUtils.easyPlaceOnUseTick(mc);
-        DebugScreenMessages.update(mc);
+        if (mc.world != null && mc.player != null)
+        {
+            InputHandler.onTick();
+            WorldUtils.easyPlaceOnUseTick(mc);
+            DebugScreenMessages.update(mc);
 
-        DataManager.getSchematicPlacementManager().processQueuedChunks();
-        TaskScheduler.getInstance().runTasks();
+            DataManager.getSchematicPlacementManager().processQueuedChunks();
+            TaskScheduler.getInstance().runTasks();
+        }
     }
 }

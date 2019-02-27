@@ -66,9 +66,12 @@ public class SchematicPlacementManager
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
-            for (ChunkPos pos : this.chunksToUnload)
+            if (worldSchematic != null)
             {
-                this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
+                for (ChunkPos pos : this.chunksToUnload)
+                {
+                    this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
+                }
             }
 
             this.chunksToUnload.clear();
