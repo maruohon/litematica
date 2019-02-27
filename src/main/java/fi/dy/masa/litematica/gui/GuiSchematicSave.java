@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -17,7 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 
-public class GuiSchematicSave extends GuiSchematicSaveBase
+public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
     private final SelectionManager selectionManager;
 
@@ -65,6 +66,18 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
     protected IButtonActionListener<ButtonGeneric> createButtonListener(ButtonType type)
     {
         return new ButtonListener(type, this.selectionManager, this);
+    }
+
+    @Override
+    public void onTaskCompleted()
+    {
+        GuiScreen gui = this.mc.currentScreen;
+
+        if (gui == this)
+        {
+            this.getListWidget().refreshEntries();
+            this.getListWidget().clearSchematicMetadataCache();
+        }
     }
 
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
@@ -137,6 +150,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase
                         boolean takeEntities = this.gui.checkboxIgnoreEntities.isChecked() == false;
                         LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
                         TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
+                        task.setCompletionListener(this.gui);
                         TaskScheduler.getInstance().scheduleTask(task, 10);
                         this.gui.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
                     }
