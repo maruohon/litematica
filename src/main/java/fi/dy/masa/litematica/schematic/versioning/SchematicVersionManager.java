@@ -113,6 +113,19 @@ public class SchematicVersionManager
         return false;
     }
 
+    public boolean pasteCurrentVersionToWorld()
+    {
+        SchematicProject project = this.getCurrentProject();
+
+        if (project != null)
+        {
+            project.pasteToWorld();
+            return true;
+        }
+
+        return false;
+    }
+
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();

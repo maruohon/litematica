@@ -16,7 +16,6 @@ import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.schematic.versioning.SchematicProject;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -441,15 +440,7 @@ public class KeyCallbacks
                 }
                 else if (mode == ToolMode.VERSION_CONTROL)
                 {
-                    SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
-                    SchematicPlacement placement = project != null ? project.getCurrentPlacement() : null;;
-
-                    if (placement != null)
-                    {
-                        AreaSelection selection = AreaSelection.fromPlacement(placement);
-                        ToolUtils.deleteSelectionVolumes(selection, true, this.mc);
-                        DataManager.getSchematicPlacementManager().pastePlacementToWorld(placement, this.mc);
-                    }
+                    DataManager.getSchematicVersionManager().pasteCurrentVersionToWorld();
                     return true;
                 }
             }

@@ -12,6 +12,7 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.math.BlockPos;
 
 public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase
 {
@@ -86,6 +87,10 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase
                 y += 12;
                 this.fontRenderer.drawString(w + version.getName() + r, x + 4, y, color);
                 y += 12;
+                BlockPos o = project.getOrigin();
+                str = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
+                str = I18n.format("litematica.gui.label.area_selection_origin", w + str + r);
+                this.fontRenderer.drawString(str, x, y, color);
             }
         }
     }

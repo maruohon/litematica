@@ -19,6 +19,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
+import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -33,6 +34,7 @@ public class SchematicProject
     private BlockPos origin = BlockPos.ORIGIN;
     private String projectName = "unnamed";
     private AreaSelection selection = new AreaSelection();
+    private AreaSelection lastSeenArea = new AreaSelection();
     private AreaSelectionSimple selectionSimple = new AreaSelectionSimple(true);
     private int currentVersionId = -1;
     private int lastCheckedOutVersion = -1;
@@ -71,7 +73,6 @@ public class SchematicProject
 
     public void setName(String name)
     {
-        // TODO should renaming be allowed? Should the schematics and versions be renamed/updated when renamed?
         File newFile = new File(this.directory, name + ".json");
 
         if (newFile.exists() == false)
@@ -104,7 +105,15 @@ public class SchematicProject
 
     public void setOrigin(BlockPos origin)
     {
-        this.getSelection().moveEntireSelectionTo(origin, false);
+        BlockPos offset = this.selection.getEffectiveOrigin().subtract(this.origin);
+        this.selection.moveEntireSelectionTo(origin.add(offset), false);
+
+        offset = this.selectionSimple.getEffectiveOrigin().subtract(this.origin);
+        this.selectionSimple.moveEntireSelectionTo(origin.add(offset), false);
+
+        offset = this.lastSeenArea.getEffectiveOrigin().subtract(this.origin);
+        this.lastSeenArea.moveEntireSelectionTo(origin.add(offset), false);
+
         this.origin = origin;
 
         if (this.currentVersion != null)
@@ -130,7 +139,6 @@ public class SchematicProject
         return this.origin;
     }
 
-    @Nullable
     public AreaSelection getSelection()
     {
         if (DataManager.getSelectionManager().getSelectionMode() == SelectionMode.SIMPLE)
@@ -187,6 +195,22 @@ public class SchematicProject
         }
     }
 
+    public void pasteToWorld()
+    {
+        if (this.currentPlacement != null)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+            this.deleteLastSeenArea(mc);
+            this.cacheCurrentAreaFromPlacement();
+            DataManager.getSchematicPlacementManager().pastePlacementToWorld(this.currentPlacement, mc);
+        }
+    }
+
+    private void deleteLastSeenArea(Minecraft mc)
+    {
+        ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, mc);
+    }
+
     public void removeCurrentPlacement()
     {
         if (this.currentPlacement != null)
@@ -229,6 +253,15 @@ public class SchematicProject
         }
 
         return false;
+    }
+
+    private void cacheCurrentAreaFromPlacement()
+    {
+        if (this.currentPlacement != null)
+        {
+            this.lastSeenArea = AreaSelection.fromPlacement(this.currentPlacement);
+            this.dirty = true;
+        }
     }
 
     public boolean commitNewVersion(String name)
@@ -284,9 +317,9 @@ public class SchematicProject
         this.origin = BlockPos.ORIGIN;
         this.versions.clear();
         this.selection = new AreaSelection();
+        this.lastSeenArea = new AreaSelection();
         this.lastCheckedOutVersion = -1;
         this.currentVersionId = -1;
-        //this.currentVersionNumber = 0;
         this.saveInProgress = false;
     }
 
@@ -311,6 +344,7 @@ public class SchematicProject
         obj.add("current_version_id", new JsonPrimitive(this.currentVersionId));
         obj.add("selection_normal", this.selection.toJson());
         obj.add("selection_simple", this.selectionSimple.toJson());
+        obj.add("last_seen_area", this.lastSeenArea.toJson());
 
         JsonArray arr = new JsonArray();
 
@@ -349,6 +383,11 @@ public class SchematicProject
             if (JsonUtils.hasObject(obj, "selection_simple"))
             {
                 project.selectionSimple = AreaSelectionSimple.fromJson(JsonUtils.getNestedObject(obj, "selection_simple", false));
+            }
+
+            if (JsonUtils.hasObject(obj, "last_seen_area"))
+            {
+                project.lastSeenArea = AreaSelection.fromJson(JsonUtils.getNestedObject(obj, "last_seen_area", false));
             }
 
             if (JsonUtils.hasArray(obj, "versions"))
@@ -442,6 +481,7 @@ public class SchematicProject
             SchematicVersion version = new SchematicVersion(this.name, this.fileName, this.areaOffset, this.version, System.currentTimeMillis());
             SchematicProject.this.versions.add(version);
             SchematicProject.this.switchVersion(SchematicProject.this.versions.size() - 1);
+            SchematicProject.this.cacheCurrentAreaFromPlacement();
             SchematicProject.this.saveInProgress = false;
 
             InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_versioning.version_saved", this.version, this.name);
