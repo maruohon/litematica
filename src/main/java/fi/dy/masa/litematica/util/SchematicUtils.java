@@ -442,7 +442,7 @@ public class SchematicUtils
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
 
         // The relative offset of the affected region's corners, to the sub-region's origin corner
-        BlockPos boxMinRel = new BlockPos(worldPos.getX() - origin.getX() - regionPosTransformed.getX(), worldPos.getY() - origin.getY(), worldPos.getZ() - origin.getZ() - regionPosTransformed.getZ());
+        BlockPos boxMinRel = new BlockPos(worldPos.getX() - origin.getX() - regionPosTransformed.getX(), worldPos.getY() - origin.getY() - regionPosTransformed.getY(), worldPos.getZ() - origin.getZ() - regionPosTransformed.getZ());
 
         // Reverse transform that relative offset, to get the untransformed orientation's offsets
         boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, regionPlacement.getMirror(), regionPlacement.getRotation());
