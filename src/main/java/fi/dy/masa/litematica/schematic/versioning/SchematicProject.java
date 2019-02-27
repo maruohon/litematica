@@ -78,7 +78,11 @@ public class SchematicProject
         {
             try
             {
-                FileUtils.moveFile(this.projectFile, newFile);
+                if (this.projectFile.exists())
+                {
+                    FileUtils.moveFile(this.projectFile, newFile);
+                }
+
                 this.projectName = name;
                 this.projectFile = newFile;
                 this.selection.setName(name);
