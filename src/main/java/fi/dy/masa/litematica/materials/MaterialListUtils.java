@@ -187,12 +187,23 @@ public class MaterialListUtils
         // Convert from counts per IBlockState to counts per different stacks
         for (IBlockState state : blockStatesIn.keySet())
         {
-            ItemStack stack = cache.getItemForState(state);
-
-            if (stack.isEmpty() == false)
+            if (cache.requiresMultipleItems(state))
             {
-                ItemType type = new ItemType(stack, false, true);
-                itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
+                for (ItemStack stack : cache.getItems(state))
+                {
+                    ItemType type = new ItemType(stack, false, true);
+                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
+                }
+            }
+            else
+            {
+                ItemStack stack = cache.getItemForState(state);
+
+                if (stack.isEmpty() == false)
+                {
+                    ItemType type = new ItemType(stack, false, true);
+                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
+                }
             }
         }
     }

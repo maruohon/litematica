@@ -368,7 +368,7 @@ public class WorldUtils
         {
             World world = SchematicWorldHandler.getSchematicWorld();
             IBlockState state = world.getBlockState(pos);
-            ItemStack stack = ItemUtils.getItemForBlock(world, pos, state, true);
+            ItemStack stack = MaterialCache.getInstance().getItemForState(state, world, pos);
 
             if (stack.isEmpty() == false)
             {
