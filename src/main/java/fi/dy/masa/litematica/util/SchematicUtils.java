@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
+import fi.dy.masa.litematica.mixin.IMixinItemBlockSpecial;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -29,6 +30,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -133,7 +135,7 @@ public class SchematicUtils
     {
         ItemStack stack = mc.player.getHeldItemMainhand();
 
-        if (stack.isEmpty() == false && stack.getItem() instanceof ItemBlock)
+        if (stack.isEmpty() == false && (stack.getItem() instanceof ItemBlock || stack.getItem() instanceof ItemBlockSpecial))
         {
             WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
             RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
@@ -147,9 +149,18 @@ public class SchematicUtils
                 int meta = stack.getItem().getMetadata(stack.getMetadata());
                 BlockPos pos = trace.getBlockPos();
                 IBlockState stateOriginal = world.getBlockState(pos);
+                IBlockState stateNew = Blocks.AIR.getDefaultState();
 
-                IBlockState stateNew = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
+                if (stack.getItem() instanceof ItemBlock)
+                {
+                    stateNew = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
                                     side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, meta, mc.player);
+                }
+                else if (stack.getItem() instanceof ItemBlockSpecial)
+                {
+                    stateNew = ((IMixinItemBlockSpecial) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
+                                    side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, 0, mc.player);
+                }
 
                 return new ReplacementInfo(pos, side, hitVec, stateOriginal, stateNew);
             }

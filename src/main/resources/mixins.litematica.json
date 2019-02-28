@@ -6,6 +6,7 @@
     "client": [
         "IMixinBlockRendererDispatcher",
         "IMixinCompiledChunk",
+        "IMixinItemBlockSpecial",
         "IMixinNBTTagLongArray",
         "IMixinViewFrustum",
         "IMixinWorldClient",
