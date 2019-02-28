@@ -148,7 +148,9 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       ENABLE_BLOCK_INFO_OVERLAY_RENDERING = new ConfigBoolean("enableBlockInfoOverlayRendering", true, "Enable Block Info Overlay rendering to show block info\nabout the looked-at block or verifier error marker", "Block Info Overlay Rendering");
         public static final ConfigBoolean       ENABLE_VERIFIER_OVERLAY_RENDERING   = new ConfigBoolean("enableVerifierOverlayRendering", true, "Enable Schematic Verifier marker overlay rendering", "Verifier Overlay Rendering");
         public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList("infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\",\nused for schematic verifier mismatch positions etc.");
-        public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger("infoHudMaxLines", 10, 1, 32, "The maximum number of info lines to show on the HUD at once");
+        public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger("infoHudMaxLines", 10, 1, 128, "The maximum number of info lines to show on the HUD at once");
+        public static final ConfigInteger       MATERIAL_LIST_HUD_MAX_LINES         = new ConfigInteger("materialListHudMaxLines", 10, 1, 128, "The maximum number of items to show on\nthe Material List Info HUD at once");
+        public static final ConfigDouble        MATERIAL_LIST_HUD_SCALE             = new ConfigDouble( "materialListHudScale", 1, 0.1, 4, "Scale factor for the Material List Info HUD");
         public static final ConfigBoolean       RENDER_BLOCK_INFO_LINES             = new ConfigBoolean("renderBlockInfoLines", true, "If enabled, then MiniHUD-style block info overlay\nis rendered for the looked-at block");
         public static final ConfigBoolean       RENDER_BLOCK_INFO_OVERLAY           = new ConfigBoolean("renderBlockInfoOverlay", true, "If enabled, then an info overlay is rendered\nwhile looking at schematic blocks or schematic verifier\nerror markers, and holding the 'renderInfoOverlay' key");
         public static final ConfigDouble        VERIFIER_ERROR_HILIGHT_ALPHA        = new ConfigDouble( "verifierErrorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
@@ -168,6 +170,8 @@ public class Configs implements IConfigHandler
                 BLOCK_INFO_OVERLAY_OFFSET_Y,
                 BLOCK_INFO_LINES_FONT_SCALE,
                 INFO_HUD_MAX_LINES,
+                MATERIAL_LIST_HUD_MAX_LINES,
+                MATERIAL_LIST_HUD_SCALE,
                 VERIFIER_ERROR_HILIGHT_ALPHA,
                 VERIFIER_ERROR_HILIGHT_MAX_POSITIONS
         );
@@ -176,6 +180,7 @@ public class Configs implements IConfigHandler
     public static class Colors
     {
         public static final ConfigColor AREA_SELECTION_BOX_SIDE_COLOR       = new ConfigColor("areaSelectionBoxSideColor",          "0x30FFFFFF", "The color of the area selection boxes, when they are unselected");
+        public static final ConfigColor MATERIAL_LIST_HUD_ITEM_COUNTS       = new ConfigColor("materialListHudItemCountsColor",     "0xFFFFAA00", "The color of the item count text in the Material List info HUD");
         public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_EXTRA       = new ConfigColor("schematicOverlayColorExtra",         "0x4CFF4CE6", "The color of the blocks overlay for extra blocks");
         public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_MISSING     = new ConfigColor("schematicOverlayColorMissing",       "0x2C33B3E6", "The color of the blocks overlay for missing blocks");
         public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK = new ConfigColor("schematicOverlayColorWrongBlock",    "0x4CFF3333", "The color of the blocks overlay for wrong blocks");
@@ -184,6 +189,7 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 AREA_SELECTION_BOX_SIDE_COLOR,
+                MATERIAL_LIST_HUD_ITEM_COUNTS,
                 SCHEMATIC_OVERLAY_COLOR_EXTRA,
                 SCHEMATIC_OVERLAY_COLOR_MISSING,
                 SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK,

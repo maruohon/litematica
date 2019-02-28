@@ -77,10 +77,10 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         ScaledResolution res = new ScaledResolution(mc);
         FontRenderer font = mc.fontRenderer;
-        double scale = 1;
+        final double scale = Configs.InfoOverlays.MATERIAL_LIST_HUD_SCALE.getDoubleValue();
+        final int maxLines = Configs.InfoOverlays.MATERIAL_LIST_HUD_MAX_LINES.getIntegerValue();
         int bgMargin = 2;
         int lineHeight = 16;
-        int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
         int contentHeight = (Math.min(list.size(), maxLines) * lineHeight) + bgMargin + 10;
         int maxTextLength = 0;
         int maxCountLength = 0;
@@ -90,7 +90,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         int textColor = 0xFFFFFFFF;
         boolean useBackground = true;
         boolean useShadow = false;
-        int lineCount = 0;
+        final int size = Math.min(list.size(), maxLines);
 
         // Only Chuck Norris can divide by zero
         if (scale == 0d)
@@ -98,22 +98,18 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             return 0;
         }
 
-        for (MaterialListEntry entry : list)
+        for (int i = 0; i < size; ++i)
         {
+            MaterialListEntry entry = list.get(i);
             maxTextLength = Math.max(maxTextLength, font.getStringWidth(entry.getStack().getDisplayName()));
             int multiplier = this.materialList.getMultiplier();
             int count = multiplier == 1 ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
             count *= multiplier;
             String strCount = GuiBase.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + GuiBase.TXT_RST;
             maxCountLength = Math.max(maxCountLength, font.getStringWidth(strCount));
-
-            if (++lineCount >= maxLines)
-            {
-                break;
-            }
         }
 
-        int maxLineLength = maxTextLength + maxCountLength + 30;
+        final int maxLineLength = maxTextLength + maxCountLength + 30;
 
         switch (alignment)
         {
@@ -130,7 +126,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         if (scale != 1d)
         {
             GlStateManager.pushMatrix();
-            GlStateManager.scale(scale, scale, 0);
+            GlStateManager.scale(scale, scale, scale);
         }
 
         posY = RenderUtils.getHudPosY((int) posY, yOffset, contentHeight, scale, alignment);
@@ -144,61 +140,62 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         String title = GuiBase.TXT_BOLD + I18n.format("litematica.gui.button.material_list") + GuiBase.TXT_RST;
 
-        int textX = posX + 2;
-        int textY = posY + 2;
-
         if (useShadow)
         {
-            font.drawStringWithShadow(title, textX, textY, textColor);
+            font.drawStringWithShadow(title, posX + 2, posY + 2, textColor);
         }
         else
         {
-            font.drawString(title, textX, textY, textColor);
+            font.drawString(title, posX + 2, posY + 2, textColor);
         }
 
-        textX = posX + 18;
         posY += 12;
-        lineCount = 0;
+        final int itemCountTextColor = Configs.Colors.MATERIAL_LIST_HUD_ITEM_COUNTS.getIntegerValue();
+        int x = posX + 18;
+        int y = posY + 4;
 
-        for (MaterialListEntry entry : list)
+        for (int i = 0; i < size; ++i)
         {
-            textY = posY + 4;
+            MaterialListEntry entry = list.get(i);
             String text = entry.getStack().getDisplayName();
             int multiplier = this.materialList.getMultiplier();
             int count = multiplier == 1 ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
             count *= multiplier;
-            String strCount = GuiBase.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + GuiBase.TXT_RST;
+            String strCount = this.getFormattedCountString(count, entry.getStack().getMaxStackSize());
             int cntLen = font.getStringWidth(strCount);
             int cntPosX = posX + maxLineLength - cntLen - 2;
 
             if (useShadow)
             {
-                font.drawStringWithShadow(text, textX, textY, textColor);
-                font.drawStringWithShadow(strCount, cntPosX, textY, textColor);
+                font.drawStringWithShadow(text, x, y, textColor);
+                font.drawStringWithShadow(strCount, cntPosX, y, itemCountTextColor);
             }
             else
             {
-                font.drawString(text, textX, textY, textColor);
-                font.drawString(strCount, cntPosX, textY, textColor);
+                font.drawString(text, x, y, textColor);
+                font.drawString(strCount, cntPosX, y, itemCountTextColor);
             }
 
-            GlStateManager.pushMatrix();
-            GlStateManager.disableLighting();
-            RenderHelper.enableGUIStandardItemLighting();
-
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, entry.getStack(), posX, posY);
-
-            GlStateManager.disableBlend();
-            RenderHelper.disableStandardItemLighting();
-            GlStateManager.popMatrix();
-
-            posY += lineHeight;
-
-            if (++lineCount >= maxLines)
-            {
-                break;
-            }
+            y += lineHeight;
         }
+
+        x = posX;
+        y = posY;
+
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        RenderHelper.enableGUIStandardItemLighting();
+
+        for (int i = 0; i < size; ++i)
+        {
+            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, list.get(i).getStack(), x, y);
+            y += lineHeight;
+        }
+
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableBlend();
 
         if (scale != 1d)
         {
