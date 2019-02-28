@@ -200,6 +200,13 @@ public class SchematicProject
         if (this.currentPlacement != null)
         {
             Minecraft mc = Minecraft.getMinecraft();
+
+            if (mc.player == null || mc.player.capabilities.isCreativeMode == false)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+                return;
+            }
+
             this.deleteLastSeenArea(mc);
             this.cacheCurrentAreaFromPlacement();
             DataManager.getSchematicPlacementManager().pastePlacementToWorld(this.currentPlacement, mc);

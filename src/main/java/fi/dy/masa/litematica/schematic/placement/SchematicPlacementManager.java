@@ -636,6 +636,10 @@ public class SchematicPlacementManager
                 InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
             }
         }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+        }
     }
 
     public void clear()

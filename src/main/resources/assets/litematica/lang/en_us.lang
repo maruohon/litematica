@@ -11,6 +11,7 @@ litematica.error.area_selection.rename.already_exists=Error: An area already exi
 litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated safe file name '%s'
 
 litematica.error.duplicate_schematic_placement=Error: Tried to add a placement that already exists
+litematica.error.generic.creative_mode_only=This action is only available in Creative mode
 litematica.error.generic.failed_to_delete_file=Failed to delete the file '%s'
 litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
 litematica.error.generic.schematic_world_not_loaded=Schematic world was not loaded

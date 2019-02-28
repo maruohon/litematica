@@ -76,6 +76,10 @@ public class ToolUtils
                 InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
             }
         }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+        }
     }
 
     public static boolean fillSelectionVolumesDirect(World world, Collection<Box> boxes, IBlockState state, @Nullable IBlockState stateToReplace)
@@ -202,6 +206,10 @@ public class ToolUtils
             {
                 InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
             }
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
         }
     }
 
