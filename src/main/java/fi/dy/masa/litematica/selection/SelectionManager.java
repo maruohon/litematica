@@ -353,7 +353,7 @@ public class SelectionManager
                 if (printMessage)
                 {
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
                 }
 
                 return true;
@@ -577,7 +577,7 @@ public class SelectionManager
 
             String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.moved_area_origin", posStrOld, posStrNew);
+            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_area_origin", posStrOld, posStrNew);
         }
     }
 
@@ -740,7 +740,7 @@ public class SelectionManager
             }
             else
             {
-                InfoUtils.showMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
+                InfoUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
                 return null;
             }
         }

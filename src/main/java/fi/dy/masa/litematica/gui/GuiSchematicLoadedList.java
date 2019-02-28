@@ -64,6 +64,6 @@ public class GuiSchematicLoadedList extends GuiListBase<LitematicaSchematic, Wid
     @Override
     protected WidgetListLoadedSchematics createListWidget(int listX, int listY)
     {
-        return new WidgetListLoadedSchematics(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.zLevel, this, null);
+        return new WidgetListLoadedSchematics(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.zLevel, null);
     }
 }

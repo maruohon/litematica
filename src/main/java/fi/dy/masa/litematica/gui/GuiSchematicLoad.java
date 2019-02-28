@@ -177,7 +177,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
                         SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, enabled, enabled);
-                        manager.addSchematicPlacement(placement, this.gui);
+                        manager.addSchematicPlacement(placement, true);
                         manager.setSelectedSchematicPlacement(placement);
                     }
                 }

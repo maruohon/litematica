@@ -186,7 +186,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
                 boolean enabled = GuiScreen.isShiftKeyDown() == false;
 
                 SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name, enabled, enabled);
-                DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
+                DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, true);
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {

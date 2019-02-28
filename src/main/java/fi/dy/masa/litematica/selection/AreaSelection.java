@@ -321,7 +321,7 @@ public class AreaSelection
         {
             String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String newStr = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.moved_selection", oldStr, newStr);
+            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_selection", oldStr, newStr);
         }
     }
 

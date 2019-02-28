@@ -339,7 +339,7 @@ public class SchematicUtils
         // Nothing from the targeted placement is selected, don't replace anything
         else
         {
-            InfoUtils.printInGameMessage(MessageType.WARNING, 20000, "litematica.message.warn.schematic_rebuild_placement_not_selected");
+            InfoUtils.showInGameMessage(MessageType.WARNING, 20000, "litematica.message.warn.schematic_rebuild_placement_not_selected");
             return false;
         }
 

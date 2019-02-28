@@ -156,11 +156,11 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
             {
                 if (this.schematic.writeToFile(this.dir, this.fileName, this.overrideFile))
                 {
-                    InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", this.fileName);
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", this.fileName);
                 }
                 else
                 {
-                    InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.schematic_save_failed", this.fileName);
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_save_failed", this.fileName);
                 }
             }
             // In-memory only
@@ -168,7 +168,7 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
             {
                 String name = this.schematic.getMetadata().getName();
                 SchematicHolder.getInstance().addSchematic(this.schematic, true);
-                InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.in_memory_schematic_created", name);
+                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.in_memory_schematic_created", name);
             }
 
             if (this.completionListener != null)
@@ -178,7 +178,7 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
         }
         else
         {
-            InfoUtils.showMessage(MessageType.WARNING, "litematica.message.error.schematic_save_interrupted");
+            InfoUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.message.error.schematic_save_interrupted");
         }
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);

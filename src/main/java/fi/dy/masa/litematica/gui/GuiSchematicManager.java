@@ -413,7 +413,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
                     schematic.writeToFile(this.dir, this.fileName, true);
 
-                    InfoUtils.showMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
                 }
                 catch (Exception e)
                 {
@@ -422,7 +422,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else
             {
-                InfoUtils.showMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
+                InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
             }
         }
     }

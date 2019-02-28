@@ -183,7 +183,7 @@ public class SchematicProject
                     BlockPos areaPosition = this.origin.add(version.getAreaOffset());
                     this.currentPlacement = SchematicPlacement.createFor(schematic, areaPosition, version.getName(), true, true);
                     this.currentPlacement.setShouldBeSaved(false);
-                    DataManager.getSchematicPlacementManager().addSchematicPlacement(this.currentPlacement, null);
+                    DataManager.getSchematicPlacementManager().addSchematicPlacement(this.currentPlacement, true);
                 }
                 else
                 {

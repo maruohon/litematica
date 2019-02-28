@@ -221,11 +221,11 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     {
         if (this.finished)
         {
-            InfoUtils.showMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted_using_setblock", this.sentCommandsTotal);
+            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted_using_setblock", this.sentCommandsTotal);
         }
         else
         {
-            InfoUtils.showMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
+            InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
         }
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
