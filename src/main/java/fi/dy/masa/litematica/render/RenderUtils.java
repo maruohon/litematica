@@ -24,6 +24,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
@@ -419,12 +420,14 @@ public class RenderUtils
      */
     public static void drawBlockModelOutlinesBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
+        long rand = MathHelper.getPositionRandom(pos);
+
         for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
-            renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, 0));
+            renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, rand));
         }
 
-        renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, null, 0));
+        renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, null, rand));
     }
 
     private static void renderModelQuadOutlines(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
@@ -468,17 +471,20 @@ public class RenderUtils
 
     public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
+        long rand = MathHelper.getPositionRandom(pos);
+
         for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
-            renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, 0));
+            renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, rand));
         }
 
-        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, 0));
+        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, rand));
     }
 
     public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, EnumFacing side, Color4f color, double expand, BufferBuilder buffer)
     {
-        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, 0));
+        long rand = MathHelper.getPositionRandom(pos);
+        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, rand));
     }
 
     private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
