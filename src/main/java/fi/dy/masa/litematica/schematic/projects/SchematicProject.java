@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -160,6 +161,11 @@ public class SchematicProject
         this.selectionMode = this.selectionMode.cycle(true);
     }
 
+    public ImmutableList<SchematicVersion> getAllVersions()
+    {
+        return ImmutableList.copyOf(this.versions);
+    }
+
     @Nullable
     public SchematicVersion getCurrentVersion()
     {
@@ -194,7 +200,16 @@ public class SchematicProject
                     BlockPos areaPosition = this.origin.add(version.getAreaOffset());
                     this.currentPlacement = SchematicPlacement.createFor(schematic, areaPosition, version.getName(), true, true);
                     this.currentPlacement.setShouldBeSaved(false);
-                    DataManager.getSchematicPlacementManager().addSchematicPlacement(this.currentPlacement, true);
+                    DataManager.getSchematicPlacementManager().addSchematicPlacement(this.currentPlacement, false);
+
+                    long time = schematic.getMetadata().getTimeCreated();
+
+                    if (time != version.getTimeStamp())
+                    {
+                        version = new SchematicVersion(version.getName(), version.getFileName(), version.getAreaOffset(), version.getVersion(), time);
+                        this.versions.set(this.currentVersionId, version);
+                        this.dirty = true;
+                    }
                 }
                 else
                 {
@@ -241,33 +256,38 @@ public class SchematicProject
     {
         if (this.currentVersionId >= 0)
         {
-            return this.switchVersion(this.currentVersionId + amount);
+            return this.switchVersion(this.currentVersionId + amount, true);
         }
 
         return false;
     }
 
-    public boolean switchVersion(int version)
+    public boolean switchVersion(int version, boolean createPlacement)
     {
         if (version != this.currentVersionId && version >= 0 && version < this.versions.size())
         {
             this.currentVersionId = version;
             this.currentVersion = this.versions.get(this.currentVersionId);
-            this.createAndAddPlacement();
             this.dirty = true;
+
+            if (createPlacement)
+            {
+                this.createAndAddPlacement();
+            }
+
             return true;
         }
 
         return false;
     }
 
-    public boolean switchVersion(SchematicVersion version)
+    public boolean switchVersion(SchematicVersion version, boolean createPlacement)
     {
         int index = this.versions.indexOf(version);
 
         if (index >= 0 && version != this.getCurrentVersion())
         {
-            return this.switchVersion(index);
+            return this.switchVersion(index, createPlacement);
         }
 
         return false;
@@ -381,7 +401,7 @@ public class SchematicProject
     }
 
     @Nullable
-    public static SchematicProject fromJson(JsonObject obj, File projectFile)
+    public static SchematicProject fromJson(JsonObject obj, File projectFile, boolean createPlacement)
     {
         BlockPos origin = JsonUtils.blockPosFromJson(obj, "origin");
 
@@ -446,7 +466,8 @@ public class SchematicProject
                 }
             }
 
-            project.switchVersion(id);
+            project.switchVersion(id, createPlacement);
+
             project.dirty = false;
 
             return project;
@@ -504,7 +525,7 @@ public class SchematicProject
         {
             SchematicVersion version = new SchematicVersion(this.name, this.fileName, this.areaOffset, this.version, System.currentTimeMillis());
             SchematicProject.this.versions.add(version);
-            SchematicProject.this.switchVersion(SchematicProject.this.versions.size() - 1);
+            SchematicProject.this.switchVersion(SchematicProject.this.versions.size() - 1, true);
             SchematicProject.this.cacheCurrentAreaFromPlacement();
             SchematicProject.this.saveInProgress = false;
 

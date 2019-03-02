@@ -499,7 +499,7 @@ public class SchematicUtils
         @Override
         public boolean setString(String string)
         {
-            return DataManager.getSchematicVersionManager().commitNewVersion(string);
+            return DataManager.getSchematicProjectsManager().commitNewVersion(string);
         }
     }
 }

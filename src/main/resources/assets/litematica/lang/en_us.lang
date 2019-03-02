@@ -109,6 +109,7 @@ litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
 litematica.gui.button.hover.schematic_projects.move_origin_to_player=Move the project origin to the player's current position\nThis will also move the area selection and placement
+litematica.gui.button.hover.schematic_projects.place_to_world_warning=§6Warning: This will delete/overwrite the current blocks\n§6in the world within the area that was previously\n§6placed from a version, or saved as a version\n§6(basically the last seen "effective area selection")
 
 litematica.gui.button.material_list=Material List
 litematica.gui.button.material_list.clear_cache=Clear cache
@@ -146,6 +147,13 @@ litematica.gui.button.schematic_placements.remove=Remove
 litematica.gui.button.schematic_placements.rendering_enabled=Rendering: %s
 litematica.gui.button.schematic_placements.select=Select
 
+litematica.gui.button.schematic_projects.close_project=Close current project
+litematica.gui.button.schematic_projects.create_project=Create project
+litematica.gui.button.schematic_projects.load_project=Load project
+litematica.gui.button.schematic_projects.move_origin_to_player=Move to player
+litematica.gui.button.schematic_projects.open_manager_gui=Open Manager
+litematica.gui.button.schematic_projects.open_project_browser=Projects Browser
+
 litematica.gui.button.schematic_verifier.ignore=Ignore
 litematica.gui.button.schematic_verifier.range_type=Range: %s
 litematica.gui.button.schematic_verifier.reset_ignored=Reset ignored
@@ -154,11 +162,6 @@ litematica.gui.button.schematic_verifier.resume=Resume verification
 litematica.gui.button.schematic_verifier.start=Start verification
 litematica.gui.button.schematic_verifier.stop=Stop verification
 litematica.gui.button.schematic_verifier.toggle_info_hud=Info HUD: %s
-
-litematica.gui.button.schematic_projects.close_project=Close current project
-litematica.gui.button.schematic_projects.create_project=Create project
-litematica.gui.button.schematic_projects.load_project=Load project
-litematica.gui.button.schematic_projects.move_origin_to_player=Move to player
 
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.configure=Configure
@@ -173,6 +176,7 @@ litematica.gui.button.load_schematic_to_memory=Load Schematic to memory
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
 litematica.gui.button.ok=Ok
+litematica.gui.button.place_to_world=Place to world
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
 litematica.gui.button.rotation_value=Rotation: %s
@@ -260,6 +264,7 @@ litematica.gui.label.schematic_projects.currently_open_project=Currently open pr
 litematica.gui.label.schematic_projects.origin=Origin:
 litematica.gui.label.schematic_projects.project=Project:
 litematica.gui.label.schematic_projects.version=Version: %s (of %s)
+litematica.gui.label.schematic_projects.version_entry=Ver. %d - %s
 litematica.gui.label.schematic_projects.version_name=Version name:
 
 litematica.gui.label.schematic_save.checkbox.ignore_entities=Ignore entities
@@ -314,8 +319,9 @@ litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a
 litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 litematica.gui.title.schematic_manager=Schematic Manager
+litematica.gui.title.schematic_project_manager=Schematic Project Manager
 litematica.gui.title.schematic_projects.save_new_version=Save new schematic version
-litematica.gui.title.schematic_projects_manager=Schematic Projects Manager
+litematica.gui.title.schematic_projects_browser=Schematic Projects Browser
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
 litematica.gui.title.schematic_verifier_errors=Verifier errors
 

@@ -27,6 +27,7 @@ public class Hotkeys
     public static final ConfigHotkey OPEN_GUI_MAIN_MENU                 = new ConfigHotkey("openGuiMainMenu",                   "M",    KeybindSettings.RELEASE_EXCLUSIVE, "Open the Litematica main menu");
     public static final ConfigHotkey OPEN_GUI_MATERIAL_LIST             = new ConfigHotkey("openGuiMaterialList",               "M,L",  "Open the Material List GUI for the currently\nselected schematic placement");
     public static final ConfigHotkey OPEN_GUI_SCHEMATIC_PLACEMENTS      = new ConfigHotkey("openGuiSchematicPlacements",        "M,P",  KeybindSettings.EXCLUSIVE, "Open the Schematic Placements GUI");
+    public static final ConfigHotkey OPEN_GUI_SCHEMATIC_PROJECTS        = new ConfigHotkey("openGuiSchematicProjects",          "",     "Open the Schematic Projects GUI");
     public static final ConfigHotkey OPEN_GUI_SCHEMATIC_VERIFIER        = new ConfigHotkey("openGuiSchematicVerifier",          "M,V",  "Open the Schematic Verifier GUI for the currently\nselected schematic placement");
     public static final ConfigHotkey OPEN_GUI_SELECTION_MANAGER         = new ConfigHotkey("openGuiSelectionManager",           "M,S",  "Open the Area Selection manager GUI");
     public static final ConfigHotkey OPEN_GUI_SETTINGS                  = new ConfigHotkey("openGuiSettings",                   "M,C",  "Open the Config GUI");
@@ -90,6 +91,7 @@ public class Hotkeys
             OPEN_GUI_MAIN_MENU,
             OPEN_GUI_MATERIAL_LIST,
             OPEN_GUI_SCHEMATIC_PLACEMENTS,
+            OPEN_GUI_SCHEMATIC_PROJECTS,
             OPEN_GUI_SCHEMATIC_VERIFIER,
             OPEN_GUI_SELECTION_MANAGER,
             OPEN_GUI_SETTINGS,

@@ -5,6 +5,8 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
+import fi.dy.masa.litematica.gui.GuiSchematicProjectsBrowser;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -14,9 +16,26 @@ import net.minecraft.util.math.BlockPos;
 public class SchematicProjectsManager
 {
     //private static final Pattern PATTERN_NAME_NUMBER = Pattern.compile("(.*)([0-9]+)$");
+    private final Minecraft mc = Minecraft.getMinecraft();
 
     @Nullable
     private SchematicProject currentProject;
+
+    public void openSchematicProjectsGui()
+    {
+        if (this.currentProject != null)
+        {
+            GuiSchematicProjectManager gui = new GuiSchematicProjectManager(this.currentProject);
+            gui.setParent(this.mc.currentScreen);
+            this.mc.displayGuiScreen(gui);
+        }
+        else
+        {
+            GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
+            gui.setParent(this.mc.currentScreen);
+            this.mc.displayGuiScreen(gui);
+        }
+    }
 
     @Nullable
     public SchematicProject getCurrentProject()
@@ -30,7 +49,7 @@ public class SchematicProjectsManager
 
         this.currentProject = new SchematicProject(dir, new File(dir, projectName + ".json"));
         this.currentProject.setName(projectName);
-        this.currentProject.setOrigin(new BlockPos(Minecraft.getMinecraft().player));
+        this.currentProject.setOrigin(new BlockPos(this.mc.player));
         this.currentProject.saveToFile();
     }
 
@@ -38,20 +57,31 @@ public class SchematicProjectsManager
     {
         this.closeCurrentProject();
 
+        this.currentProject = this.loadProjectFromFile(projectFile, true);
+
+        if (this.currentProject == null)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Nullable
+    public SchematicProject loadProjectFromFile(File projectFile, boolean createPlacement)
+    {
         if (projectFile.getName().endsWith(".json") && projectFile.exists() && projectFile.isFile() && projectFile.canRead())
         {
             JsonElement el = JsonUtils.parseJsonFile(projectFile);
 
             if (el != null && el.isJsonObject())
             {
-                this.currentProject = SchematicProject.fromJson(el.getAsJsonObject(), projectFile);
-                return this.currentProject != null;
+                return SchematicProject.fromJson(el.getAsJsonObject(), projectFile, createPlacement);
             }
         }
 
-        InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
-
-        return false;
+        return null;
     }
 
     public void closeCurrentProject()
@@ -147,7 +177,7 @@ public class SchematicProjectsManager
 
             if (el != null && el.isJsonObject())
             {
-                this.currentProject = SchematicProject.fromJson(el.getAsJsonObject(), file);
+                this.currentProject = SchematicProject.fromJson(el.getAsJsonObject(), file, true);
             }
         }
     }

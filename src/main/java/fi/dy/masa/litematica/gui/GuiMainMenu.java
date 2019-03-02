@@ -131,8 +131,8 @@ public class GuiMainMenu extends GuiBase
                     gui = new GuiSchematicPlacementsList();
                     break;
                 case SCHEMATIC_PROJECTS_MANAGER:
-                    gui = new GuiSchematicProjectsManager();
-                    break;
+                    DataManager.getSchematicProjectsManager().openSchematicProjectsGui();
+                    return;
             }
 
             if (gui != null)

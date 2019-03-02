@@ -215,7 +215,7 @@ public class OverlayRenderer
 
             if (isVersionMode)
             {
-                SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+                SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
 
                 if (project != null)
                 {

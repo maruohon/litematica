@@ -2,29 +2,34 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import java.io.FileFilter;
+import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase
+public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>
 {
+    @Nullable private SchematicProject selectedProject;
+    private final ISelectionListener<DirectoryEntry> selectionListener;
     protected final int infoWidth;
 
     public WidgetSchematicProjectBrowser(int x, int y, int width, int height, ISelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, DataManager.getDirectoryCache(), "version_control",
-                DataManager.getSchematicsBaseDirectory(), selectionListener, Icons.DUMMY);
+                DataManager.getSchematicsBaseDirectory(), null, Icons.DUMMY);
 
+        this.selectionListener = selectionListener;
         this.browserEntryHeight = 14;
         this.infoWidth = 170;
+        this.setSelectionListener(this);
     }
 
     @Override
@@ -46,26 +51,44 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase
     }
 
     @Override
+    public void onSelectionChange(@Nullable DirectoryEntry entry)
+    {
+        if (entry != null)
+        {
+            if (entry.getType() == DirectoryEntryType.FILE)
+            {
+                this.selectedProject = DataManager.getSchematicProjectsManager().loadProjectFromFile(entry.getFullPath(), false);
+            }
+            else
+            {
+                this.selectedProject = null;
+            }
+        }
+
+        this.selectionListener.onSelectionChange(entry);
+    }
+
+    @Override
     protected void drawAdditionalContents(int mouseX, int mouseY)
     {
-        SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+        int x = this.posX + this.totalWidth - this.infoWidth + 4;
+        int y = this.posY + 4;
+        int infoHeight = 100;
+        RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
+
+        SchematicProject project = this.selectedProject;
 
         if (project != null)
         {
-            int x = this.posX + this.totalWidth - this.infoWidth + 4;
-            int y = this.posY + 4;
-            int infoHeight = 100;
             String str;
             String w = GuiBase.TXT_WHITE;
             String r = GuiBase.TXT_RST;
             int color = 0xFFB0B0B0;
 
-            RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
-
             str = I18n.format("litematica.gui.label.schematic_projects.project");
             this.fontRenderer.drawString(str, x, y, color);
             y += 12;
-            this.fontRenderer.drawString(w + project.getName() + r, x + 4, y, color);
+            this.fontRenderer.drawString(w + project.getName() + r, x + 8, y, color);
             y += 12;
             int versionId = project .getCurrentVersionId();
             String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
@@ -76,24 +99,13 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase
 
             if (version != null)
             {
-                ToolHud.DATE.setTime(version.getTimeStamp());
-                str = ToolHud.SIMPLE_DATE_FORMAT.format(ToolHud.DATE);
-                str = I18n.format("litematica.hud.schematic_projects.current_version_date", w + str + r);
-                this.fontRenderer.drawString(str, x, y, color);
-                y += 12;
-
-                str = I18n.format("litematica.gui.label.schematic_projects.version_name");
-                this.fontRenderer.drawString(str, x, y, color);
-                y += 12;
-                this.fontRenderer.drawString(w + version.getName() + r, x + 4, y, color);
-                y += 12;
                 str = I18n.format("litematica.gui.label.schematic_projects.origin");
                 this.fontRenderer.drawString(str, x, y, color);
                 y += 12;
 
                 BlockPos o = project.getOrigin();
                 str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
-                this.fontRenderer.drawString(str, x, y, color);
+                this.fontRenderer.drawString(str, x + 8, y, color);
             }
         }
     }

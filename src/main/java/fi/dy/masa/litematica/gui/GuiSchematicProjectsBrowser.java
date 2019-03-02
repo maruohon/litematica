@@ -19,16 +19,15 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.util.math.BlockPos;
 
-public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicProjectBrowser>
+public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicProjectBrowser>
                                         implements ISelectionListener<DirectoryEntry>
 {
-    public GuiSchematicProjectsManager()
+    public GuiSchematicProjectsBrowser()
     {
         super(10, 40);
 
-        this.title = I18n.format("litematica.gui.title.schematic_projects_manager");
+        this.title = I18n.format("litematica.gui.title.schematic_projects_browser");
     }
 
     @Override
@@ -56,16 +55,11 @@ public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, Wid
         int x = 10;
         int y = this.height - 36;
 
-        SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+        SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
 
-        // There is currently a project open
         if (project != null)
         {
-            String str = I18n.format("litematica.gui.label.schematic_projects.currently_open_project", project.getName());
-            int w = this.mc.fontRenderer.getStringWidth(str);
-            this.addLabel(x, 26, w, 14, 0xFFFFFFFF, str);
-
-            this.createButton(this.width - 10, 16, true, ButtonListener.Type.MOVE_ORIGIN);
+            x += this.createButton(x, y, false, ButtonListener.Type.OPEN_MANAGER_GUI);
         }
 
         x += this.createButton(x, y, false, ButtonListener.Type.CREATE_PROJECT);
@@ -119,7 +113,7 @@ public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, Wid
     }
 
     @Override
-    public void onSelectionChange(DirectoryEntry entry)
+    public void onSelectionChange(@Nullable DirectoryEntry entry)
     {
         this.reCreateGuiElements();
     }
@@ -134,9 +128,9 @@ public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, Wid
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final Type type;
-        private final GuiSchematicProjectsManager gui;
+        private final GuiSchematicProjectsBrowser gui;
 
-        public ButtonListener(Type type, GuiSchematicProjectsManager gui)
+        public ButtonListener(Type type, GuiSchematicProjectsBrowser gui)
         {
             this.type = type;
             this.gui = gui;
@@ -156,9 +150,9 @@ public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, Wid
 
                 if (entry != null && entry.getType() == DirectoryEntryType.FILE)
                 {
-                    if (DataManager.getSchematicVersionManager().openProject(entry.getFullPath()))
+                    if (DataManager.getSchematicProjectsManager().openProject(entry.getFullPath()))
                     {
-                        SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+                        SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
                         String name = project != null ? project.getName() : "<error>";
                         InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
                         this.gui.reCreateGuiElements();
@@ -173,27 +167,27 @@ public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, Wid
             }
             else if (this.type == Type.CLOSE_PROJECT)
             {
-                DataManager.getSchematicVersionManager().closeCurrentProject();
+                DataManager.getSchematicProjectsManager().closeCurrentProject();
                 this.gui.reCreateGuiElements();
             }
-            else if (this.type == Type.MOVE_ORIGIN)
+            else if (this.type == Type.OPEN_MANAGER_GUI)
             {
-                SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+                SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
 
                 if (project != null)
                 {
-                    project.setOrigin(new BlockPos(this.gui.mc.player));
-                    this.gui.reCreateGuiElements();
+                    GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
+                    this.gui.mc.displayGuiScreen(gui);
                 }
             }
         }
 
         public enum Type
         {
-            LOAD_PROJECT    ("litematica.gui.button.schematic_projects.load_project"),
-            CREATE_PROJECT  ("litematica.gui.button.schematic_projects.create_project"),
-            CLOSE_PROJECT   ("litematica.gui.button.schematic_projects.close_project"),
-            MOVE_ORIGIN     ("litematica.gui.button.schematic_projects.move_origin_to_player", "litematica.gui.button.hover.schematic_projects.move_origin_to_player");
+            OPEN_MANAGER_GUI    ("litematica.gui.button.schematic_projects.open_manager_gui"),
+            LOAD_PROJECT        ("litematica.gui.button.schematic_projects.load_project"),
+            CREATE_PROJECT      ("litematica.gui.button.schematic_projects.create_project"),
+            CLOSE_PROJECT       ("litematica.gui.button.schematic_projects.close_project");
 
             private final String translationKey;
             @Nullable
@@ -226,9 +220,9 @@ public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, Wid
     private static class ProjectCreator implements IStringConsumerFeedback
     {
         private final File dir;
-        private final GuiSchematicProjectsManager gui;
+        private final GuiSchematicProjectsBrowser gui;
 
-        private ProjectCreator(File dir, GuiSchematicProjectsManager gui)
+        private ProjectCreator(File dir, GuiSchematicProjectsBrowser gui)
         {
             this.dir = dir;
             this.gui = gui;
@@ -241,13 +235,12 @@ public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, Wid
 
             if (file.exists() == false)
             {
-                DataManager.getSchematicVersionManager().createNewProject(this.dir, projectName);
+                DataManager.getSchematicProjectsManager().createNewProject(this.dir, projectName);
                 // In here we need to add the message to the manager GUI, because InfoUtils.showGuiOrInGameMessage()
                 // would add it to the current GUI, which here is the text input GUI, which will close immediately
                 // after this method returns true.
                 this.gui.getListWidget().refreshEntries();
                 this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_created", projectName);
-                System.out.printf("plop\n");
                 return true;
             }
 

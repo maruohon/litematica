@@ -27,8 +27,8 @@ import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigBoolean;
+import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -62,6 +62,7 @@ public class KeyCallbacks
         Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SETTINGS.getKeybind().setCallback(callbackHotkeys);
@@ -102,10 +103,10 @@ public class KeyCallbacks
         Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.TOOL_ITEM_ENABLED));
     }
 
-    private static class ValueChangeCallback implements IValueChangeCallback
+    private static class ValueChangeCallback implements IValueChangeCallback<ConfigString>
     {
         @Override
-        public void onValueChanged(IConfigBase config)
+        public void onValueChanged(ConfigString config)
         {
             if (config == Configs.Generic.PICK_BLOCKABLE_SLOTS)
             {
@@ -240,6 +241,11 @@ public class KeyCallbacks
             else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind())
             {
                 this.mc.displayGuiScreen(new GuiSchematicPlacementsList());
+                return true;
+            }
+            else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeybind())
+            {
+                DataManager.getSchematicProjectsManager().openSchematicProjectsGui();
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeybind())
@@ -403,7 +409,7 @@ public class KeyCallbacks
             {
                 if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
                 {
-                    DataManager.getSchematicVersionManager().cycleVersion(1);
+                    DataManager.getSchematicProjectsManager().cycleVersion(1);
                 }
                 return true;
             }
@@ -411,7 +417,7 @@ public class KeyCallbacks
             {
                 if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
                 {
-                    DataManager.getSchematicVersionManager().cycleVersion(-1);
+                    DataManager.getSchematicProjectsManager().cycleVersion(-1);
                 }
                 return true;
             }
@@ -440,7 +446,7 @@ public class KeyCallbacks
                 }
                 else if (mode == ToolMode.SCHEMATIC_PROJECTS)
                 {
-                    DataManager.getSchematicVersionManager().pasteCurrentVersionToWorld();
+                    DataManager.getSchematicProjectsManager().pasteCurrentVersionToWorld();
                     return true;
                 }
             }

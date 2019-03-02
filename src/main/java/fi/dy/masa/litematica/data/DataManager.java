@@ -51,7 +51,7 @@ public class DataManager implements IDirectoryCache
 
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
-    private final SchematicProjectsManager schematicVersionManager = new SchematicProjectsManager();
+    private final SchematicProjectsManager schematicProjectsManager = new SchematicProjectsManager();
     private LayerRange renderRange = new LayerRange(SchematicWorldRefresher.INSTANCE);
     private ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
@@ -117,9 +117,9 @@ public class DataManager implements IDirectoryCache
         return getInstance().schematicPlacementManager;
     }
 
-    public static SchematicProjectsManager getSchematicVersionManager()
+    public static SchematicProjectsManager getSchematicProjectsManager()
     {
-        return getInstance().schematicVersionManager;
+        return getInstance().schematicProjectsManager;
     }
 
     @Nullable
@@ -269,7 +269,7 @@ public class DataManager implements IDirectoryCache
 
     private void savePerDimensionData()
     {
-        this.schematicVersionManager.saveCurrentProject();
+        this.schematicProjectsManager.saveCurrentProject();
         JsonObject root = this.toJson();
 
         File file = getCurrentStorageFile(false);
@@ -280,7 +280,7 @@ public class DataManager implements IDirectoryCache
     {
         this.selectionManager.clear();
         this.schematicPlacementManager.clear();
-        this.schematicVersionManager.clear();
+        this.schematicProjectsManager.clear();
         this.materialList = null;
 
         File file = getCurrentStorageFile(false);
@@ -305,9 +305,9 @@ public class DataManager implements IDirectoryCache
             this.schematicPlacementManager.loadFromJson(obj.get("placements").getAsJsonObject());
         }
 
-        if (JsonUtils.hasObject(obj, "version_manager"))
+        if (JsonUtils.hasObject(obj, "schematic_projects_manager"))
         {
-            this.schematicVersionManager.loadFromJson(obj.get("version_manager").getAsJsonObject());
+            this.schematicProjectsManager.loadFromJson(obj.get("schematic_projects_manager").getAsJsonObject());
         }
 
         if (JsonUtils.hasObject(obj, "render_range"))
@@ -341,7 +341,7 @@ public class DataManager implements IDirectoryCache
 
         obj.add("selections", this.selectionManager.toJson());
         obj.add("placements", this.schematicPlacementManager.toJson());
-        obj.add("version_manager", this.schematicVersionManager.toJson());
+        obj.add("schematic_projects_manager", this.schematicProjectsManager.toJson());
         obj.add("operation_mode", new JsonPrimitive(this.operationMode.name()));
         obj.add("render_range", this.renderRange.toJson());
         obj.add("area_simple", this.areaSimple.toJson());

@@ -72,7 +72,7 @@ public class ToolHud extends InfoHud
 
         if (mode == ToolMode.SCHEMATIC_PROJECTS)
         {
-            SchematicProjectsManager manager = DataManager.getSchematicVersionManager();
+            SchematicProjectsManager manager = DataManager.getSchematicProjectsManager();
             SchematicProject project = manager.getCurrentProject();
 
             if (project != null)
@@ -100,8 +100,7 @@ public class ToolHud extends InfoHud
                 lines.add(I18n.format("litematica.hud.schematic_projects.no_project_open"));
             }
         }
-
-        if (mode.getUsesAreaSelection())
+        else if (mode.getUsesAreaSelection())
         {
             SelectionManager sm = DataManager.getSelectionManager();
             AreaSelection selection = sm.getCurrentSelection();

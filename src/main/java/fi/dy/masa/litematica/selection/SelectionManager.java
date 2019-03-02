@@ -51,7 +51,7 @@ public class SelectionManager
     {
         if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
         {
-            SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+            SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
             return project != null ? project.getSelectionMode() : SelectionMode.SIMPLE;
         }
 
@@ -62,7 +62,7 @@ public class SelectionManager
     {
         if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
         {
-            SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+            SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
 
             if (project != null)
             {
@@ -106,7 +106,7 @@ public class SelectionManager
     {
         if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
         {
-            SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+            SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
             return project != null ? project.getSelection() : null;
         }
 

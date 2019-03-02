@@ -1,0 +1,120 @@
+package fi.dy.masa.litematica.gui.widgets;
+
+import java.util.Collection;
+import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
+import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.render.infohud.ToolHud;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
+import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.LeftRight;
+import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.render.RenderUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.math.BlockPos;
+
+public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion, WidgetSchematicVersion>
+{
+    private final SchematicProject project;
+    protected final int infoWidth;
+
+    public WidgetListSchematicVersions(int x, int y, int width, int height, float zLevel, SchematicProject project, GuiSchematicProjectManager parent)
+    {
+        super(x, y, width, height, parent);
+
+        this.project = project;
+        this.browserEntryHeight = 16;
+        this.infoWidth = 180;
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
+        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
+    }
+
+    @Override
+    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    {
+        // Draw an outline around the entire entry list
+        RenderUtils.drawOutlinedBox(this.posX, this.posY, this.browserWidth, this.browserHeight, 0xB0000000, COLOR_HORIZONTAL_BAR);
+
+        super.drawContents(mouseX, mouseY, partialTicks);
+
+        this.drawAdditionalContents(mouseX, mouseY);
+    }
+
+    protected void drawAdditionalContents(int mouseX, int mouseY)
+    {
+        int x = this.posX + this.totalWidth - this.infoWidth + 4;
+        int y = this.posY + 4;
+        int infoHeight = 140;
+        String str;
+        String w = GuiBase.TXT_WHITE;
+        String r = GuiBase.TXT_RST;
+        int color = 0xFFB0B0B0;
+
+        RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
+
+        str = I18n.format("litematica.gui.label.schematic_projects.project");
+        this.fontRenderer.drawString(str, x, y, color);
+        y += 12;
+        this.fontRenderer.drawString(w + this.project.getName() + r, x + 4, y, color);
+        y += 12;
+        int versionId = this.project.getCurrentVersionId();
+        String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
+        str = I18n.format("litematica.gui.label.schematic_projects.version", strVer, w + this.project.getVersionCount() + r);
+        this.fontRenderer.drawString(str, x, y, color);
+        y += 12;
+        SchematicVersion version = this.project.getCurrentVersion();
+
+        if (version != null)
+        {
+            ToolHud.DATE.setTime(version.getTimeStamp());
+            str = ToolHud.SIMPLE_DATE_FORMAT.format(ToolHud.DATE);
+            str = I18n.format("litematica.hud.schematic_projects.current_version_date", w + str + r);
+            this.fontRenderer.drawString(str, x, y, color);
+            y += 12;
+
+            str = I18n.format("litematica.gui.label.schematic_projects.version_name");
+            this.fontRenderer.drawString(str, x, y, color);
+            y += 12;
+            this.fontRenderer.drawString(w + version.getName() + r, x + 4, y, color);
+            y += 12;
+            str = I18n.format("litematica.gui.label.schematic_projects.origin");
+            this.fontRenderer.drawString(str, x, y, color);
+            y += 12;
+
+            BlockPos o = this.project.getOrigin();
+            str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
+            this.fontRenderer.drawString(str, x, y, color);
+        }
+    }
+
+    @Override
+    public void setSize(int width, int height)
+    {
+        super.setSize(width, height);
+
+        this.browserWidth = width - this.infoWidth - 6;
+        this.browserEntryWidth = this.browserWidth - 14;
+    }
+
+    @Override
+    protected Collection<SchematicVersion> getAllEntries()
+    {
+        return this.project.getAllVersions();
+    }
+
+    @Override
+    protected boolean entryMatchesFilter(SchematicVersion entry, String filterText)
+    {
+        return entry.getName().toLowerCase().indexOf(filterText) != -1 ||
+               entry.getFileName().toLowerCase().indexOf(filterText) != -1;
+    }
+
+    @Override
+    protected WidgetSchematicVersion createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SchematicVersion entry)
+    {
+        return new WidgetSchematicVersion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
+                this.zLevel, isOdd, entry, listIndex, this.project);
+    }
+}
