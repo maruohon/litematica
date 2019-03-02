@@ -18,7 +18,7 @@ import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.litematica.schematic.versioning.SchematicVersionManager;
+import fi.dy.masa.litematica.schematic.projects.SchematicProjectsManager;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -51,7 +51,7 @@ public class DataManager implements IDirectoryCache
 
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
-    private final SchematicVersionManager schematicVersionManager = new SchematicVersionManager();
+    private final SchematicProjectsManager schematicVersionManager = new SchematicProjectsManager();
     private LayerRange renderRange = new LayerRange(SchematicWorldRefresher.INSTANCE);
     private ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
@@ -117,7 +117,7 @@ public class DataManager implements IDirectoryCache
         return getInstance().schematicPlacementManager;
     }
 
-    public static SchematicVersionManager getSchematicVersionManager()
+    public static SchematicProjectsManager getSchematicVersionManager()
     {
         return getInstance().schematicVersionManager;
     }

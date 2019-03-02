@@ -15,7 +15,7 @@ public enum ToolMode
     GRID_PASTE          ("litematica.tool_mode.name.grid_paste",            true, true),
     DELETE              ("litematica.tool_mode.name.delete",                true, false),
     REBUILD             ("litematica.tool_mode.name.rebuild",               false, true),
-    VERSION_CONTROL     ("litematica.tool_mode.name.version_control",       false, false);
+    SCHEMATIC_PROJECTS  ("litematica.tool_mode.name.schematic_projects",    false, false);
 
     private final String unlocName;
     private final boolean creativeOnly;

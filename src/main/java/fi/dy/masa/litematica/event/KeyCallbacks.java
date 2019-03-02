@@ -401,7 +401,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeybind())
             {
-                if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+                if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
                 {
                     DataManager.getSchematicVersionManager().cycleVersion(1);
                 }
@@ -409,7 +409,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeybind())
             {
-                if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+                if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
                 {
                     DataManager.getSchematicVersionManager().cycleVersion(-1);
                 }
@@ -438,7 +438,7 @@ public class KeyCallbacks
                     ToolUtils.deleteSelectionVolumes(removeEntities, this.mc);
                     return true;
                 }
-                else if (mode == ToolMode.VERSION_CONTROL)
+                else if (mode == ToolMode.SCHEMATIC_PROJECTS)
                 {
                     DataManager.getSchematicVersionManager().pasteCurrentVersionToWorld();
                     return true;

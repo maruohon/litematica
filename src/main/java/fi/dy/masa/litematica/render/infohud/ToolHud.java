@@ -8,9 +8,9 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.schematic.versioning.SchematicProject;
-import fi.dy.masa.litematica.schematic.versioning.SchematicVersion;
-import fi.dy.masa.litematica.schematic.versioning.SchematicVersionManager;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
+import fi.dy.masa.litematica.schematic.projects.SchematicProjectsManager;
+import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -70,37 +70,38 @@ public class ToolHud extends InfoHud
         String strYes = green + I18n.format("litematica.label.yes") + rst;
         String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
 
-        if (mode == ToolMode.VERSION_CONTROL)
+        if (mode == ToolMode.SCHEMATIC_PROJECTS)
         {
-            SchematicVersionManager manager = DataManager.getSchematicVersionManager();
+            SchematicProjectsManager manager = DataManager.getSchematicVersionManager();
             SchematicProject project = manager.getCurrentProject();
 
             if (project != null)
             {
-                lines.add(I18n.format("litematica.hud.version_control.project_name", green + project.getName() + rst));
+                lines.add(I18n.format("litematica.hud.schematic_projects.project_name", green + project.getName() + rst));
                 SchematicVersion version = project.getCurrentVersion();
 
                 if (version != null)
                 {
-                    lines.add(I18n.format("litematica.hud.version_control.current_version_name", green + version.getName() + rst));
-                    lines.add(I18n.format("litematica.hud.version_control.current_version_number", green + version.getVersion() + rst, green + project.getVersionCount() + rst));
+                    lines.add(I18n.format("litematica.hud.schematic_projects.current_version_name", green + version.getName() + rst));
+                    lines.add(I18n.format("litematica.hud.schematic_projects.current_version_number", green + version.getVersion() + rst, green + project.getVersionCount() + rst));
                     DATE.setTime(version.getTimeStamp());
-                    lines.add(I18n.format("litematica.hud.version_control.current_version_date", green + SIMPLE_DATE_FORMAT.format(DATE) + rst));
+                    lines.add(I18n.format("litematica.hud.schematic_projects.current_version_date", green + SIMPLE_DATE_FORMAT.format(DATE) + rst));
                     BlockPos o = project.getOrigin();
                     str = String.format("%d, %d, %d", o.getX(), o.getY(), o.getZ());
-                    lines.add(I18n.format("litematica.hud.version_control.origin", green + str + rst));
+                    lines.add(I18n.format("litematica.hud.schematic_projects.origin", green + str + rst));
                 }
                 else
                 {
-                    lines.add(I18n.format("litematica.hud.version_control.no_versions"));
+                    lines.add(I18n.format("litematica.hud.schematic_projects.no_versions"));
                 }
             }
             else
             {
-                str = I18n.format("litematica.hud.version_control.no_project_open");
+                lines.add(I18n.format("litematica.hud.schematic_projects.no_project_open"));
             }
         }
-        else if (mode.getUsesAreaSelection())
+
+        if (mode.getUsesAreaSelection())
         {
             SelectionManager sm = DataManager.getSelectionManager();
             AreaSelection selection = sm.getCurrentSelection();

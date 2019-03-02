@@ -229,22 +229,6 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         }
     }
 
-    public static class SelectedBoxRenamer implements IStringConsumerFeedback
-    {
-        private final SelectionManager selectionManager;
-
-        public SelectedBoxRenamer(SelectionManager selectionManager)
-        {
-            this.selectionManager = selectionManager;
-        }
-
-        @Override
-        public boolean setString(String string)
-        {
-            return this.selectionManager.renameSelectedSubRegionBox(string);
-        }
-    }
-
     public static class SelectionCreator implements IStringConsumer
     {
         private final File dir;

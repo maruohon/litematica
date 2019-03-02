@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.schematic.versioning;
+package fi.dy.masa.litematica.schematic.projects;
 
 import java.io.File;
 import javax.annotation.Nullable;
@@ -11,7 +11,7 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 
-public class SchematicVersionManager
+public class SchematicProjectsManager
 {
     //private static final Pattern PATTERN_NAME_NUMBER = Pattern.compile("(.*)([0-9]+)$");
 
@@ -49,7 +49,7 @@ public class SchematicVersionManager
             }
         }
 
-        InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.failed_to_load_project");
+        InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
 
         return false;
     }
@@ -93,7 +93,7 @@ public class SchematicVersionManager
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.no_project_open");
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.no_project_open");
         }
 
         return false;
@@ -107,7 +107,7 @@ public class SchematicVersionManager
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.no_project_open");
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.no_project_open");
         }
 
         return false;

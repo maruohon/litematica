@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -61,7 +60,7 @@ public class GuiMainMenu extends GuiBase
         y += 44;
 
         y += 44;
-        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_VERSION_MANAGER);
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PROJECTS_MANAGER);
     }
 
     private void createChangeMenuButton(int x, int y, int width, ButtonListenerChangeMenu.ButtonType type)
@@ -131,8 +130,8 @@ public class GuiMainMenu extends GuiBase
                 case SCHEMATIC_PLACEMENTS:
                     gui = new GuiSchematicPlacementsList();
                     break;
-                case SCHEMATIC_VERSION_MANAGER:
-                    gui = new GuiSchematicVersionManager();
+                case SCHEMATIC_PROJECTS_MANAGER:
+                    gui = new GuiSchematicProjectsManager();
                     break;
             }
 
@@ -163,8 +162,8 @@ public class GuiMainMenu extends GuiBase
             LOAD_SCHEMATICS             ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcons.SCHEMATIC_BROWSER),
             // Edit Schematics (description or icon), or convert between formats
             SCHEMATIC_MANAGER           ("litematica.gui.button.change_menu.schematic_manager", ButtonIcons.SCHEMATIC_MANAGER),
-            // Open the Schematic Versioning/projects/snapshots/whatever browser
-            SCHEMATIC_VERSION_MANAGER   ("litematica.gui.button.change_menu.schematic_version_manager", ButtonIcons.SCHEMATIC_VERSIONS),
+            // Open the Schematic Projects browser
+            SCHEMATIC_PROJECTS_MANAGER  ("litematica.gui.button.change_menu.schematic_projects_manager", ButtonIcons.SCHEMATIC_PROJECTS),
             // In-game Configuration GUI
             CONFIGURATION               ("litematica.gui.button.change_menu.configuration_menu", ButtonIcons.CONFIGURATION),
             // Switch to the Litematica main menu
@@ -238,8 +237,7 @@ public class GuiMainMenu extends GuiBase
         @Override
         public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
         {
-            SelectionManager manager = DataManager.getSelectionManager();
-            manager.setMode(manager.getSelectionMode().cycle(true));
+            DataManager.getSelectionManager().switchSelectionMode();
             this.gui.initGui();
         }
     }

@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicProjectBrowser;
-import fi.dy.masa.litematica.schematic.versioning.SchematicProject;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
@@ -21,14 +21,14 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class GuiSchematicVersionManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicProjectBrowser>
+public class GuiSchematicProjectsManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicProjectBrowser>
                                         implements ISelectionListener<DirectoryEntry>
 {
-    public GuiSchematicVersionManager()
+    public GuiSchematicProjectsManager()
     {
         super(10, 40);
 
-        this.title = I18n.format("litematica.gui.title.schematic_version_manager");
+        this.title = I18n.format("litematica.gui.title.schematic_projects_manager");
     }
 
     @Override
@@ -61,7 +61,7 @@ public class GuiSchematicVersionManager extends GuiListBase<DirectoryEntry, Widg
         // There is currently a project open
         if (project != null)
         {
-            String str = I18n.format("litematica.gui.label.schematic_versioning.currently_open_project", project.getName());
+            String str = I18n.format("litematica.gui.label.schematic_projects.currently_open_project", project.getName());
             int w = this.mc.fontRenderer.getStringWidth(str);
             this.addLabel(x, 26, w, 14, 0xFFFFFFFF, str);
 
@@ -134,9 +134,9 @@ public class GuiSchematicVersionManager extends GuiListBase<DirectoryEntry, Widg
     private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
     {
         private final Type type;
-        private final GuiSchematicVersionManager gui;
+        private final GuiSchematicProjectsManager gui;
 
-        public ButtonListener(Type type, GuiSchematicVersionManager gui)
+        public ButtonListener(Type type, GuiSchematicProjectsManager gui)
         {
             this.type = type;
             this.gui = gui;
@@ -160,7 +160,7 @@ public class GuiSchematicVersionManager extends GuiListBase<DirectoryEntry, Widg
                     {
                         SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
                         String name = project != null ? project.getName() : "<error>";
-                        InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_versioning.project_loaded", name);
+                        InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
                         this.gui.reCreateGuiElements();
                     }
                 }
@@ -190,10 +190,10 @@ public class GuiSchematicVersionManager extends GuiListBase<DirectoryEntry, Widg
 
         public enum Type
         {
-            LOAD_PROJECT    ("litematica.gui.button.schematic_versioning.load_project"),
-            CREATE_PROJECT  ("litematica.gui.button.schematic_versioning.create_project"),
-            CLOSE_PROJECT   ("litematica.gui.button.schematic_versioning.close_project"),
-            MOVE_ORIGIN     ("litematica.gui.button.schematic_versioning.move_origin_to_player", "litematica.gui.button.hover.schematic_versioning.move_origin_to_player");
+            LOAD_PROJECT    ("litematica.gui.button.schematic_projects.load_project"),
+            CREATE_PROJECT  ("litematica.gui.button.schematic_projects.create_project"),
+            CLOSE_PROJECT   ("litematica.gui.button.schematic_projects.close_project"),
+            MOVE_ORIGIN     ("litematica.gui.button.schematic_projects.move_origin_to_player", "litematica.gui.button.hover.schematic_projects.move_origin_to_player");
 
             private final String translationKey;
             @Nullable
@@ -226,9 +226,9 @@ public class GuiSchematicVersionManager extends GuiListBase<DirectoryEntry, Widg
     private static class ProjectCreator implements IStringConsumerFeedback
     {
         private final File dir;
-        private final GuiSchematicVersionManager gui;
+        private final GuiSchematicProjectsManager gui;
 
-        private ProjectCreator(File dir, GuiSchematicVersionManager gui)
+        private ProjectCreator(File dir, GuiSchematicProjectsManager gui)
         {
             this.dir = dir;
             this.gui = gui;
@@ -246,12 +246,12 @@ public class GuiSchematicVersionManager extends GuiListBase<DirectoryEntry, Widg
                 // would add it to the current GUI, which here is the text input GUI, which will close immediately
                 // after this method returns true.
                 this.gui.getListWidget().refreshEntries();
-                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_versioning.project_created", projectName);
+                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_created", projectName);
                 System.out.printf("plop\n");
                 return true;
             }
 
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.project_already_exists", projectName);
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.project_already_exists", projectName);
 
             return false;
         }

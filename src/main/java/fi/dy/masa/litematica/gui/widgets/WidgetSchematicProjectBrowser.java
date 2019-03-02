@@ -5,8 +5,8 @@ import java.io.FileFilter;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
-import fi.dy.masa.litematica.schematic.versioning.SchematicProject;
-import fi.dy.masa.litematica.schematic.versioning.SchematicVersion;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
+import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
@@ -62,14 +62,14 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase
 
             RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
-            str = I18n.format("litematica.gui.label.schematic_versioning.project");
+            str = I18n.format("litematica.gui.label.schematic_projects.project");
             this.fontRenderer.drawString(str, x, y, color);
             y += 12;
             this.fontRenderer.drawString(w + project.getName() + r, x + 4, y, color);
             y += 12;
             int versionId = project .getCurrentVersionId();
             String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
-            str = I18n.format("litematica.gui.label.schematic_versioning.version", strVer, w + project.getVersionCount() + r);
+            str = I18n.format("litematica.gui.label.schematic_projects.version", strVer, w + project.getVersionCount() + r);
             this.fontRenderer.drawString(str, x, y, color);
             y += 12;
             SchematicVersion version = project.getCurrentVersion();
@@ -78,18 +78,21 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase
             {
                 ToolHud.DATE.setTime(version.getTimeStamp());
                 str = ToolHud.SIMPLE_DATE_FORMAT.format(ToolHud.DATE);
-                str = I18n.format("litematica.hud.version_control.current_version_date", w + str + r);
+                str = I18n.format("litematica.hud.schematic_projects.current_version_date", w + str + r);
                 this.fontRenderer.drawString(str, x, y, color);
                 y += 12;
 
-                str = I18n.format("litematica.gui.label.schematic_versioning.version_name");
+                str = I18n.format("litematica.gui.label.schematic_projects.version_name");
                 this.fontRenderer.drawString(str, x, y, color);
                 y += 12;
                 this.fontRenderer.drawString(w + version.getName() + r, x + 4, y, color);
                 y += 12;
+                str = I18n.format("litematica.gui.label.schematic_projects.origin");
+                this.fontRenderer.drawString(str, x, y, color);
+                y += 12;
+
                 BlockPos o = project.getOrigin();
-                str = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
-                str = I18n.format("litematica.gui.label.area_selection_origin", w + str + r);
+                str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
                 this.fontRenderer.drawString(str, x, y, color);
             }
         }

@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.schematic.versioning;
+package fi.dy.masa.litematica.schematic.projects;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ public class SchematicProject
     private AreaSelection selection = new AreaSelection();
     private AreaSelection lastSeenArea = new AreaSelection();
     private AreaSelectionSimple selectionSimple = new AreaSelectionSimple(true);
+    private SelectionMode selectionMode = SelectionMode.SIMPLE;
     private int currentVersionId = -1;
     private int lastCheckedOutVersion = -1;
     private boolean saveInProgress;
@@ -94,12 +95,12 @@ public class SchematicProject
             }
             catch (Exception e)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.failed_to_rename_project_file_exception", newFile.getAbsolutePath());
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_rename_project_file_exception", newFile.getAbsolutePath());
             }
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.failed_to_rename_project_file_exists", name);
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_rename_project_file_exists", name);
         }
     }
 
@@ -141,12 +142,22 @@ public class SchematicProject
 
     public AreaSelection getSelection()
     {
-        if (DataManager.getSelectionManager().getSelectionMode() == SelectionMode.SIMPLE)
+        if (this.selectionMode == SelectionMode.SIMPLE)
         {
             return this.selectionSimple;
         }
 
         return this.selection;
+    }
+
+    public SelectionMode getSelectionMode()
+    {
+        return this.selectionMode;
+    }
+
+    public void switchSelectionMode()
+    {
+        this.selectionMode = this.selectionMode.cycle(true);
     }
 
     @Nullable
@@ -187,7 +198,7 @@ public class SchematicProject
                 }
                 else
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.failed_to_load_schematic");
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_schematic");
                 }
 
                 this.lastCheckedOutVersion = this.currentVersionId;
@@ -352,6 +363,7 @@ public class SchematicProject
         obj.add("selection_normal", this.selection.toJson());
         obj.add("selection_simple", this.selectionSimple.toJson());
         obj.add("last_seen_area", this.lastSeenArea.toJson());
+        obj.add("selection_mode", new JsonPrimitive(this.selectionMode.name()));
 
         JsonArray arr = new JsonArray();
 
@@ -395,6 +407,11 @@ public class SchematicProject
             if (JsonUtils.hasObject(obj, "last_seen_area"))
             {
                 project.lastSeenArea = AreaSelection.fromJson(JsonUtils.getNestedObject(obj, "last_seen_area", false));
+            }
+
+            if (JsonUtils.hasString(obj, "selection_mode"))
+            {
+                project.selectionMode = SelectionMode.fromString(JsonUtils.getString(obj, "selection_mode"));
             }
 
             if (JsonUtils.hasArray(obj, "versions"))
@@ -442,25 +459,25 @@ public class SchematicProject
     {
         if (this.saveInProgress)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.save_already_in_progress");
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.save_already_in_progress");
             return false;
         }
 
         if (this.directory == null || this.directory.exists() == false || this.directory.isDirectory() == false)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.invalid_project_directory");
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.invalid_project_directory");
             return false;
         }
 
         if (this.getSelection().getAllSubRegionBoxes().size() == 0)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.empty_selection");
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.empty_selection");
             return false;
         }
 
         if (Minecraft.getMinecraft().player == null)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_versioning.null_player");
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.null_player");
             return false;
         }
 
@@ -491,7 +508,7 @@ public class SchematicProject
             SchematicProject.this.cacheCurrentAreaFromPlacement();
             SchematicProject.this.saveInProgress = false;
 
-            InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_versioning.version_saved", this.version, this.name);
+            InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.version_saved", this.version, this.name);
         }
     }
 }

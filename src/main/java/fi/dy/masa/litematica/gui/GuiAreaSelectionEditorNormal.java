@@ -37,7 +37,7 @@ import net.minecraft.util.text.TextFormatting;
 public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
                                           implements ISelectionListener<String>
 {
-    protected final AreaSelection selection;
+    @Nullable protected final AreaSelection selection;
     protected GuiTextFieldGeneric textFieldSelectionName;
     protected WidgetCheckBox checkBoxOrigin;
     protected WidgetCheckBox checkBoxCorner1;
@@ -47,7 +47,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int xOrigin;
     @Nullable protected String selectionId;
 
-    public GuiAreaSelectionEditorNormal(AreaSelection selection)
+    public GuiAreaSelectionEditorNormal(@Nullable AreaSelection selection)
     {
         super(8, 116);
 
@@ -55,9 +55,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.selectionId = DataManager.getSelectionManager().getCurrentSelectionId();
         this.useTitleHierarchy = false;
 
-        if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
         {
-            this.title = I18n.format("litematica.gui.title.area_editor_normal_version_control");
+            this.title = I18n.format("litematica.gui.title.area_editor_normal_schematic_projects");
         }
         else
         {
@@ -75,9 +75,16 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     {
         super.initGui();
 
-        this.createSelectionEditFields();
-        this.addSubRegionFields(this.xOrigin, this.yNext);
-        this.updateCheckBoxes();
+        if (this.selection != null)
+        {
+            this.createSelectionEditFields();
+            this.addSubRegionFields(this.xOrigin, this.yNext);
+            this.updateCheckBoxes();
+        }
+        else
+        {
+            this.addLabel(20, 30, 120, 12, 0xFFFFAA00, I18n.format("litematica.error.area_editor.no_selection"));
+        }
     }
 
     protected void createSelectionEditFields()
@@ -255,6 +262,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int createButton(int x, int y, int width, @Nullable Corner corner, ButtonListener.Type type)
     {
         String label;
+        boolean projectsMode = DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS;
 
         if (type == ButtonListener.Type.CHANGE_SELECTION_MODE)
         {
@@ -265,6 +273,10 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         {
             String name = Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName();
             label = type.getDisplayName(name);
+        }
+        else if (type == ButtonListener.Type.CREATE_SCHEMATIC && projectsMode)
+        {
+            label = I18n.format("litematica.gui.button.save_new_schematic_version");
         }
         else
         {
@@ -280,7 +292,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         ButtonListener listener = new ButtonListener(type, corner, null, this);
         this.addButton(button, listener);
 
-        if (type == ButtonListener.Type.CREATE_SCHEMATIC)
+        if (type == ButtonListener.Type.CREATE_SCHEMATIC && projectsMode == false)
         {
             button.setHoverStrings("litematica.gui.button.hover.area_editor.shift_for_in_memory");
         }
@@ -354,10 +366,10 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     {
         String newName = this.textFieldSelectionName.getText();
 
-        if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
         {
-            this.selection.setName(newName);
             SelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
+            this.selection.setName(newName);
         }
         else if (this.selectionId != null)
         {
@@ -425,10 +437,11 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     }
                     else
                     {
-                        manager.setMode(newMode);
+                        manager.switchSelectionMode();
                         manager.openEditGui(null);
                         return;
                     }
+
                     break;
 
                 case CHANGE_CORNER_MODE:

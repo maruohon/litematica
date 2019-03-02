@@ -14,7 +14,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSimple;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.versioning.SchematicProject;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -49,23 +49,40 @@ public class SelectionManager
 
     public SelectionMode getSelectionMode()
     {
+        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        {
+            SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+            return project != null ? project.getSelectionMode() : SelectionMode.SIMPLE;
+        }
+
         return this.mode;
     }
 
-    public void setMode(SelectionMode mode)
+    public void switchSelectionMode()
     {
-        this.mode = mode;
+        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        {
+            SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
+
+            if (project != null)
+            {
+                project.switchSelectionMode();
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.error.schematic_projects.in_projects_mode_but_no_project_open");
+            }
+        }
+        else
+        {
+            this.mode = this.mode.cycle(true);
+        }
     }
 
     @Nullable
     public String getCurrentSelectionId()
     {
-        if (this.mode == SelectionMode.SIMPLE)
-        {
-            return DataManager.getSimpleArea().getName();
-        }
-
-        return this.currentSelectionId;
+        return this.mode == SelectionMode.NORMAL ? this.currentSelectionId : null;
     }
 
     @Nullable
@@ -76,13 +93,18 @@ public class SelectionManager
 
     public boolean hasNormalSelection()
     {
+        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        {
+            return true;
+        }
+
         return this.getNormalSelection(this.currentSelectionId) != null;
     }
 
     @Nullable
     public AreaSelection getCurrentSelection()
     {
-        if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
         {
             SchematicProject project = DataManager.getSchematicVersionManager().getCurrentProject();
             return project != null ? project.getSelection() : null;
@@ -108,7 +130,7 @@ public class SelectionManager
     }
 
     @Nullable
-    protected AreaSelection getNormalSelection(String selectionId)
+    protected AreaSelection getNormalSelection(@Nullable String selectionId)
     {
         return selectionId != null ? this.selections.get(selectionId) : null;
     }
@@ -262,35 +284,6 @@ public class SelectionManager
             else
             {
                 feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.already_exists", newFile.getName());
-            }
-        }
-
-        return false;
-    }
-
-    public boolean renameSelectedSubRegionBox(String newName)
-    {
-        String selectionId = this.getCurrentSelectionId();
-
-        if (selectionId != null)
-        {
-            return this.renameSelectedSubRegionBox(selectionId, newName);
-        }
-
-        return false;
-    }
-
-    private boolean renameSelectedSubRegionBox(String selectionId, String newName)
-    {
-        AreaSelection selection = this.getSelection(selectionId);
-
-        if (selection != null)
-        {
-            String oldName = selection.getCurrentSubRegionBoxName();
-
-            if (oldName != null)
-            {
-                return selection.renameSubRegionBox(oldName, newName);
             }
         }
 

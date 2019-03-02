@@ -49,9 +49,9 @@ public class SchematicUtils
         {
             Minecraft mc = Minecraft.getMinecraft();
 
-            if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+            if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
             {
-                String title = "litematica.gui.title.schematic_version_manager.save_new_version";
+                String title = "litematica.gui.title.schematic_projects.save_new_version";
                 GuiTextInput gui = new GuiTextInput(512, title, area.getName(), null, new SchematicVersionCreator());
                 gui.setParent(mc.currentScreen);
                 mc.displayGuiScreen(gui);

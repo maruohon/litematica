@@ -133,7 +133,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 }
                 else if (Hotkeys.SCHEMATIC_VERSION_CYCLE_MODIFIER.getKeybind().isKeybindHeld())
                 {
-                    if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+                    if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
                     {
                         DataManager.getSchematicVersionManager().cycleVersion(amount * -1);
                     }

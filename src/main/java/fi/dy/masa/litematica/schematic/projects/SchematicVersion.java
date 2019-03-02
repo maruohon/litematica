@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.schematic.versioning;
+package fi.dy.masa.litematica.schematic.projects;
 
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;

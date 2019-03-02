@@ -15,10 +15,10 @@ import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult.Block
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchRenderPos;
-import fi.dy.masa.litematica.schematic.versioning.SchematicProject;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -127,15 +127,14 @@ public class OverlayRenderer
     public void renderBoxes(float partialTicks)
     {
         Entity renderViewEntity = this.mc.getRenderViewEntity();
-        float expand = 0.001f;
-        float lineWidthBlockBox = 2f;
-        float lineWidthArea = 1.5f;
-
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         boolean renderAreas = currentSelection != null && Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue();
         boolean renderPlacements = this.placements.isEmpty() == false && Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING.getBooleanValue();
-        boolean isVersionMode = DataManager.getToolMode() == ToolMode.VERSION_CONTROL;
+        boolean isVersionMode = DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS;
+        float expand = 0.001f;
+        float lineWidthBlockBox = 2f;
+        float lineWidthArea = isVersionMode ? 3f : 1.5f;
 
         if (renderAreas || renderPlacements || isVersionMode)
         {

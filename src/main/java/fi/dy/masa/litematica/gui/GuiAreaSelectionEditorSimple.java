@@ -21,9 +21,9 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     {
         super(selection);
 
-        if (DataManager.getToolMode() == ToolMode.VERSION_CONTROL)
+        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
         {
-            this.title = I18n.format("litematica.gui.title.area_editor_normal_version_control");
+            this.title = I18n.format("litematica.gui.title.area_editor_normal_schematic_projects");
         }
         else
         {
