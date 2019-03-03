@@ -15,6 +15,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IConfirmationListener;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
@@ -60,6 +61,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         x += this.createButton(x, y, false, ButtonListener.Type.OPEN_AREA_EDITOR);
         x += this.createButton(x, y, false, ButtonListener.Type.MOVE_ORIGIN);
         x += this.createButton(x, y, false, ButtonListener.Type.PLACE_TO_WORLD);
+        x += this.createButton(x, y, false, ButtonListener.Type.DELETE_AREA);
 
         y += 22;
         x = 10;
@@ -165,6 +167,14 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
                 GuiConfirmAction gui = new GuiConfirmAction(320, title, executor, this.gui, msg);
                 this.gui.mc.displayGuiScreen(gui);
             }
+            else if (this.type == Type.DELETE_AREA)
+            {
+                DeleteAreaExecutor executor = new DeleteAreaExecutor();
+                String title = "litematica.gui.title.schematic_projects.confirm_delete_area";
+                String msg = "litematica.gui.message.schematic_projects.confirm_delete_area";
+                GuiConfirmAction gui = new GuiConfirmAction(320, title, executor, this.gui, msg);
+                this.gui.mc.displayGuiScreen(gui);
+            }
             else if (this.type == Type.MOVE_ORIGIN)
             {
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
@@ -186,6 +196,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         public enum Type
         {
             CLOSE_PROJECT           ("litematica.gui.button.schematic_projects.close_project"),
+            DELETE_AREA             ("litematica.gui.button.schematic_projects.delete_area", "litematica.gui.button.hover.schematic_projects.delete_area"),
             MOVE_ORIGIN             ("litematica.gui.button.schematic_projects.move_origin_to_player", "litematica.gui.button.hover.schematic_projects.move_origin_to_player"),
             OPEN_AREA_EDITOR        ("litematica.gui.button.schematic_projects.open_area_editor"),
             OPEN_PROJECT_BROWSER    ("litematica.gui.button.schematic_projects.open_project_browser"),
@@ -225,6 +236,22 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         public boolean onActionConfirmed()
         {
             DataManager.getSchematicProjectsManager().pasteCurrentVersionToWorld();
+            return true;
+        }
+
+        @Override
+        public boolean onActionCancelled()
+        {
+            return false;
+        }
+    }
+
+    public static class DeleteAreaExecutor implements IConfirmationListener
+    {
+        @Override
+        public boolean onActionConfirmed()
+        {
+            DataManager.getSchematicProjectsManager().deleteLastSeenArea(Minecraft.getMinecraft());
             return true;
         }
 

@@ -240,7 +240,7 @@ public class SchematicProject
         }
     }
 
-    private void deleteLastSeenArea(Minecraft mc)
+    public void deleteLastSeenArea(Minecraft mc)
     {
         ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, mc);
     }

@@ -156,6 +156,19 @@ public class SchematicProjectsManager
         return false;
     }
 
+    public boolean deleteLastSeenArea(Minecraft mc)
+    {
+        SchematicProject project = this.getCurrentProject();
+
+        if (project != null)
+        {
+            project.deleteLastSeenArea(mc);
+            return true;
+        }
+
+        return false;
+    }
+
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
