@@ -52,15 +52,13 @@ public class SchematicUtils
             if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
             {
                 String title = "litematica.gui.title.schematic_projects.save_new_version";
-                GuiTextInput gui = new GuiTextInput(512, title, area.getName(), null, new SchematicVersionCreator());
-                gui.setParent(mc.currentScreen);
+                GuiTextInput gui = new GuiTextInput(512, title, area.getName(), mc.currentScreen, new SchematicVersionCreator());
                 mc.displayGuiScreen(gui);
             }
             else if (inMemoryOnly)
             {
                 String title = "litematica.gui.title.create_in_memory_schematic";
-                GuiTextInput gui = new GuiTextInput(512, title, area.getName(), null, new InMemorySchematicCreator(area));
-                gui.setParent(mc.currentScreen);
+                GuiTextInput gui = new GuiTextInput(512, title, area.getName(), mc.currentScreen, new InMemorySchematicCreator(area));
                 mc.displayGuiScreen(gui);
             }
             else

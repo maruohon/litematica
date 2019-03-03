@@ -11,7 +11,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.interfaces.ICompletionListener;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -22,9 +21,11 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.BlockPos;
 
 public class SchematicProject
@@ -528,6 +529,13 @@ public class SchematicProject
             SchematicProject.this.switchVersion(SchematicProject.this.versions.size() - 1, true);
             SchematicProject.this.cacheCurrentAreaFromPlacement();
             SchematicProject.this.saveInProgress = false;
+
+            GuiScreen gui = Minecraft.getMinecraft().currentScreen;
+
+            if (gui instanceof ICompletionListener)
+            {
+                ((ICompletionListener) gui).onTaskCompleted();
+            }
 
             InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.version_saved", this.version, this.name);
         }

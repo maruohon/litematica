@@ -6,21 +6,26 @@ import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVersions;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVersion;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.util.SchematicUtils;
+import fi.dy.masa.malilib.gui.GuiConfirmAction;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.interfaces.ICompletionListener;
+import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>
-                                        implements ISelectionListener<SchematicVersion>
+                                        implements ISelectionListener<SchematicVersion>, ICompletionListener
 {
     private final SchematicProject project;
 
     public GuiSchematicProjectManager(SchematicProject project)
     {
-        super(10, 40);
+        super(10, 24);
 
         this.project = project;
         this.title = I18n.format("litematica.gui.title.schematic_project_manager");
@@ -35,7 +40,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 80;
+        return this.height - 74;
     }
 
     @Override
@@ -49,15 +54,17 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
     private void createElements()
     {
         int x = 10;
-        int y = this.height - 36;
+        int y = this.height - 46;
 
-        String str = I18n.format("litematica.gui.label.schematic_projects.currently_open_project", this.project.getName());
-        int w = this.mc.fontRenderer.getStringWidth(str);
-        this.addLabel(x, 26, w, 14, 0xFFFFFFFF, str);
-
-        x += this.createButton(x, y, false, ButtonListener.Type.OPEN_PROJECT_BROWSER);
+        x += this.createButton(x, y, false, ButtonListener.Type.SAVE_VERSION);
+        x += this.createButton(x, y, false, ButtonListener.Type.OPEN_AREA_EDITOR);
         x += this.createButton(x, y, false, ButtonListener.Type.MOVE_ORIGIN);
         x += this.createButton(x, y, false, ButtonListener.Type.PLACE_TO_WORLD);
+
+        y += 22;
+        x = 10;
+        x += this.createButton(x, y, false, ButtonListener.Type.OPEN_PROJECT_BROWSER);
+        x += this.createButton(x, y, false, ButtonListener.Type.CLOSE_PROJECT);
     }
 
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
@@ -72,7 +79,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
 
         this.addButton(button, new ButtonListener(type, this));
 
-        return button.getButtonWidth() + 4;
+        return button.getButtonWidth() + 2;
     }
 
     private void reCreateGuiElements()
@@ -99,6 +106,12 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         }
 
         this.reCreateGuiElements();
+    }
+
+    @Override
+    public void onTaskCompleted()
+    {
+        this.getListWidget().refreshEntries();
     }
 
     @Override
@@ -131,9 +144,26 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
                 GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
                 this.gui.mc.displayGuiScreen(gui);
             }
+            else if (this.type == Type.SAVE_VERSION)
+            {
+                SchematicUtils.saveSchematic(false);
+            }
+            else if (this.type == Type.OPEN_AREA_EDITOR)
+            {
+                SelectionManager manager = DataManager.getSelectionManager();
+
+                if (manager.getCurrentSelection() != null)
+                {
+                    manager.openEditGui(this.gui.mc.currentScreen);
+                }
+            }
             else if (this.type == Type.PLACE_TO_WORLD)
             {
-                DataManager.getSchematicProjectsManager().pasteCurrentVersionToWorld();
+                PlaceToWorldExecutor executor = new PlaceToWorldExecutor();
+                String title = "litematica.gui.title.schematic_projects.confirm_place_to_world";
+                String msg = "litematica.gui.message.schematic_projects.confirm_place_to_world";
+                GuiConfirmAction gui = new GuiConfirmAction(320, title, executor, this.gui, msg);
+                this.gui.mc.displayGuiScreen(gui);
             }
             else if (this.type == Type.MOVE_ORIGIN)
             {
@@ -145,13 +175,22 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
                     this.gui.reCreateGuiElements();
                 }
             }
+            else if (this.type == Type.CLOSE_PROJECT)
+            {
+                DataManager.getSchematicProjectsManager().closeCurrentProject();
+                GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
+                this.gui.mc.displayGuiScreen(gui);
+            }
         }
 
         public enum Type
         {
+            CLOSE_PROJECT           ("litematica.gui.button.schematic_projects.close_project"),
+            MOVE_ORIGIN             ("litematica.gui.button.schematic_projects.move_origin_to_player", "litematica.gui.button.hover.schematic_projects.move_origin_to_player"),
+            OPEN_AREA_EDITOR        ("litematica.gui.button.schematic_projects.open_area_editor"),
             OPEN_PROJECT_BROWSER    ("litematica.gui.button.schematic_projects.open_project_browser"),
-            PLACE_TO_WORLD          ("litematica.gui.button.place_to_world", "litematica.gui.button.hover.schematic_projects.place_to_world_warning"),
-            MOVE_ORIGIN             ("litematica.gui.button.schematic_projects.move_origin_to_player", "litematica.gui.button.hover.schematic_projects.move_origin_to_player");
+            PLACE_TO_WORLD          ("litematica.gui.button.schematic_projects.place_to_world", "litematica.gui.button.hover.schematic_projects.place_to_world_warning"),
+            SAVE_VERSION            ("litematica.gui.button.schematic_projects.save_version", "litematica.gui.button.hover.schematic_projects.save_new_version");
 
             private final String translationKey;
             @Nullable private final String hoverText;
@@ -177,6 +216,22 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
             {
                 return this.hoverText != null ? I18n.format(this.hoverText) : null;
             }
+        }
+    }
+
+    public static class PlaceToWorldExecutor implements IConfirmationListener
+    {
+        @Override
+        public boolean onActionConfirmed()
+        {
+            DataManager.getSchematicProjectsManager().pasteCurrentVersionToWorld();
+            return true;
+        }
+
+        @Override
+        public boolean onActionCancelled()
+        {
+            return false;
         }
     }
 }

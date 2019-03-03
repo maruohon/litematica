@@ -110,6 +110,7 @@ litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click t
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
 litematica.gui.button.hover.schematic_projects.move_origin_to_player=Move the project origin to the player's current position\nThis will also move the area selection and placement
 litematica.gui.button.hover.schematic_projects.place_to_world_warning=§6Warning: This will delete/overwrite the current blocks\n§6in the world within the area that was previously\n§6placed from a version, or saved as a version\n§6(basically the last seen "effective area selection")
+litematica.gui.button.hover.schematic_projects.save_new_version=Saves a new schematic/version to the current project
 
 litematica.gui.button.material_list=Material List
 litematica.gui.button.material_list.clear_cache=Clear cache
@@ -151,8 +152,11 @@ litematica.gui.button.schematic_projects.close_project=Close current project
 litematica.gui.button.schematic_projects.create_project=Create project
 litematica.gui.button.schematic_projects.load_project=Load project
 litematica.gui.button.schematic_projects.move_origin_to_player=Move to player
+litematica.gui.button.schematic_projects.open_area_editor=Area Editor
 litematica.gui.button.schematic_projects.open_manager_gui=Open Manager
 litematica.gui.button.schematic_projects.open_project_browser=Projects Browser
+litematica.gui.button.schematic_projects.place_to_world=Place to world
+litematica.gui.button.schematic_projects.save_version=Save Version
 
 litematica.gui.button.schematic_verifier.ignore=Ignore
 litematica.gui.button.schematic_verifier.range_type=Range: %s
@@ -176,7 +180,6 @@ litematica.gui.button.load_schematic_to_memory=Load Schematic to memory
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
 litematica.gui.button.ok=Ok
-litematica.gui.button.place_to_world=Place to world
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
 litematica.gui.button.rotation_value=Rotation: %s
@@ -285,6 +288,7 @@ litematica.gui.label.schematic_verifier.status.done_correct_total=§aCorrect: %s
 litematica.gui.label.schematic_verifier.status.verifying=Unseen Chunks: %s / %s
 
 litematica.gui.message.confirm_file_deletion=Do you want to delete the file '%s'?
+litematica.gui.message.schematic_projects.confirm_place_to_world=Do you want to place this version to the world?\nIt will delete whatever blocks are within the area that the project manager last placed to the world, or last saved as a version. (Basically the "last seen affected area", such that if you were to cycle versions, it would not leave blocks behind from the previous version.)
 
 litematica.gui.title.area_editor_normal=Area Editor (Normal/Multi-box mode)
 litematica.gui.title.area_editor_normal_schematic_projects=Area Editor (§6§lSchematic Projects area§r)
@@ -320,6 +324,7 @@ litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 litematica.gui.title.schematic_manager=Schematic Manager
 litematica.gui.title.schematic_project_manager=Schematic Project Manager
+litematica.gui.title.schematic_projects.confirm_place_to_world=Confirm Place to world action
 litematica.gui.title.schematic_projects.save_new_version=Save new schematic version
 litematica.gui.title.schematic_projects_browser=Schematic Projects Browser
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'

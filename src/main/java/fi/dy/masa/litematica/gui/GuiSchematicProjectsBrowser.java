@@ -25,7 +25,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
 {
     public GuiSchematicProjectsBrowser()
     {
-        super(10, 40);
+        super(10, 30);
 
         this.title = I18n.format("litematica.gui.title.schematic_projects_browser");
     }
@@ -39,7 +39,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 80;
+        return this.height - 58;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
     private void createElements()
     {
         int x = 10;
-        int y = this.height - 36;
+        int y = this.height - 24;
 
         SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
 
@@ -94,7 +94,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
 
         this.addButton(button, new ButtonListener(type, this));
 
-        return button.getButtonWidth() + 4;
+        return button.getButtonWidth() + 2;
     }
 
     private void reCreateGuiElements()
@@ -153,16 +153,25 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
                     if (DataManager.getSchematicProjectsManager().openProject(entry.getFullPath()))
                     {
                         SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-                        String name = project != null ? project.getName() : "<error>";
-                        InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
-                        this.gui.reCreateGuiElements();
+
+                        if (project != null)
+                        {
+                            GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
+                            this.gui.mc.displayGuiScreen(gui);
+                            String name = project.getName();
+                            InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
+                        }
+                        else
+                        {
+                            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
+                        }
                     }
                 }
             }
             else if (this.type == Type.CREATE_PROJECT)
             {
                 ProjectCreator creator = new ProjectCreator(this.gui.getListWidget().getCurrentDirectory(), this.gui);
-                GuiTextInput gui = new GuiTextInput(256, "litematica.gui.title.create_schematic_version_project", "", this.gui.mc.currentScreen, creator);
+                GuiTextInput gui = new GuiTextInput(256, "litematica.gui.title.create_schematic_project", "", this.gui.mc.currentScreen, creator);
                 this.gui.mc.displayGuiScreen(gui);
             }
             else if (this.type == Type.CLOSE_PROJECT)

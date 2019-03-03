@@ -94,6 +94,9 @@ public class ToolHud extends InfoHud
                 {
                     lines.add(I18n.format("litematica.hud.schematic_projects.no_versions"));
                 }
+
+                str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
+                lines.add(I18n.format("litematica.hud.area_selection.selection_corners_mode", str));
             }
             else
             {
