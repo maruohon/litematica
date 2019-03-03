@@ -1,11 +1,19 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Comparator;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListSorter;
+import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
 {
@@ -21,7 +29,9 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
 
         this.browserEntryHeight = 22;
         this.gui = parent;
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 1, 0, Icons.FILE_ICON_SEARCH, LeftRight.RIGHT, Minecraft.getMinecraft());
         this.sorter = new MaterialListSorter(parent.getMaterialList());
+        this.shouldSortList = true;
 
         this.setParent(parent);
     }
@@ -54,13 +64,32 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     }
 
     @Override
+    protected Collection<MaterialListEntry> getAllEntries()
+    {
+        return this.gui.getMaterialList().getMaterialsFiltered(true);
+    }
+
+    @Override
+    protected Comparator<MaterialListEntry> getComparator()
+    {
+        return this.sorter;
+    }
+
+    @Override
+    protected boolean entryMatchesFilter(MaterialListEntry entry, String filterText)
+    {
+        ItemStack stack = entry.getStack();
+        ResourceLocation rl = Item.REGISTRY.getNameForObject(stack.getItem());
+        String regName = rl != null ? rl.toString() : "";
+
+        return stack.getDisplayName().toLowerCase().indexOf(filterText) != -1 ||
+               regName.indexOf(filterText) != -1;
+    }
+
+    @Override
     protected void refreshBrowserEntries()
     {
-        this.listContents.clear();
-        this.listContents.addAll(this.gui.getMaterialList().getMaterialsFiltered(true));
-        Collections.sort(this.listContents, this.sorter);
-
-        this.reCreateListEntryWidgets();
+        super.refreshBrowserEntries();
 
         if (this.scrollbarRestored == false && lastScrollbarPosition <= this.scrollBar.getMaxValue())
         {

@@ -208,12 +208,15 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
 
         if (this.header1 != null)
         {
-            mc.fontRenderer.drawString(this.header1, x1, y, color);
-            mc.fontRenderer.drawString(this.header2, x2, y, color);
-            mc.fontRenderer.drawString(this.header3, x3, y, color);
-            mc.fontRenderer.drawString(this.header4, x4, y, color);
+            if (this.listWidget.getSearchBarWidget().isSearchOpen() == false)
+            {
+                mc.fontRenderer.drawString(this.header1, x1, y, color);
+                mc.fontRenderer.drawString(this.header2, x2, y, color);
+                mc.fontRenderer.drawString(this.header3, x3, y, color);
+                mc.fontRenderer.drawString(this.header4, x4, y, color);
 
-            this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
+                this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
+            }
         }
         else if (this.entry != null)
         {
