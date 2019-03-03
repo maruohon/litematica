@@ -598,6 +598,11 @@ public class SchematicPlacementManager
 
     public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, Minecraft mc)
     {
+        this.pastePlacementToWorld(schematicPlacement, true, mc);
+    }
+
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, Minecraft mc)
+    {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
             if (schematicPlacement != null)
@@ -626,7 +631,7 @@ public class SchematicPlacementManager
                 }
                 else
                 {
-                    TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblock(schematicPlacement);
+                    TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblock(schematicPlacement, changedBlocksOnly);
                     TaskScheduler.getInstance().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
                     InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }

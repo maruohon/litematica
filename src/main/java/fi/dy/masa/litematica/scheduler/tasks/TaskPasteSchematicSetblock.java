@@ -25,7 +25,6 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -40,12 +39,18 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private final ArrayListMultimap<ChunkPos, StructureBoundingBox> boxesInChunks = ArrayListMultimap.create();
     private final List<String> infoHudLines = new ArrayList<>();
     private final int maxCommandsPerTick;
+    private final boolean changedBlockOnly;
     private int sentCommandsThisTick;
     private int sentCommandsTotal;
+    private int currentX;
+    private int currentY;
+    private int currentZ;
+    private boolean boxInProgress;
     private boolean finished;
 
-    public TaskPasteSchematicSetblock(SchematicPlacement placement)
+    public TaskPasteSchematicSetblock(SchematicPlacement placement, boolean changedBlockOnly)
     {
+        this.changedBlockOnly = changedBlockOnly;
         this.maxCommandsPerTick = Configs.Generic.PASTE_COMMAND_LIMIT.getIntegerValue();
 
         Set<ChunkPos> touchedChunks = placement.getTouchedChunks();
@@ -83,6 +88,11 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         WorldClient worldClient = mc.world;
         this.sentCommandsThisTick = 0;
         int processed = 0;
+
+        if (this.sentCommandsTotal == 0)
+        {
+            mc.player.sendChatMessage("/gamerule sendCommandFeedback false");
+        }
 
         if (this.boxesInChunks.isEmpty() == false)
         {
@@ -168,25 +178,35 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         Chunk chunkSchematic = worldSchematic.getChunkProvider().getLoadedChunk(pos.x, pos.z);
         Chunk chunkClient = worldClient.getChunkProvider().getLoadedChunk(pos.x, pos.z);
 
-        for (int z = minZ; z <= maxZ; ++z)
+        if (this.boxInProgress == false)
         {
-            for (int x = minX; x <= maxX; ++x)
+            this.currentX = minX;
+            this.currentY = minY;
+            this.currentZ = minZ;
+            this.boxInProgress = true;
+        }
+
+        for (; this.currentZ <= maxZ; ++this.currentZ)
+        {
+            for (; this.currentX <= maxX; ++this.currentX)
             {
-                for (int y = minY; y <= maxY; ++y)
+                for (; this.currentY <= maxY; ++this.currentY)
                 {
-                    posMutable.setPos(x, y, z);
+                    posMutable.setPos(this.currentX, this.currentY, this.currentZ);
                     IBlockState stateSchematic = chunkSchematic.getBlockState(posMutable);
 
-                    if (chunkClient.getBlockState(posMutable).getActualState(worldClient, posMutable) != stateSchematic)
+                    if (this.changedBlockOnly == false &&
+                        chunkClient.getBlockState(posMutable).getActualState(worldClient, posMutable) != stateSchematic)
                     {
-                        this.sendSetBlockCommand(x, y, z, stateSchematic, player);
+                        this.sendSetBlockCommand(this.currentX, this.currentY, this.currentZ, stateSchematic, player);
 
                         if (++this.sentCommandsThisTick >= this.maxCommandsPerTick)
                         {
                             // All finished for this box
-                            if (z >= maxZ && x >= maxX && y >= maxY)
+                            if (this.currentX >= maxX && this.currentY >= maxY && this.currentZ >= maxZ)
                             {
                                 this.summonEntities(box, worldSchematic, player);
+                                this.boxInProgress = false;
                                 return true;
                             }
                             else
@@ -196,10 +216,15 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                         }
                     }
                 }
+
+                this.currentY = minY;
             }
+
+            this.currentX = minX;
         }
 
         this.summonEntities(box, worldSchematic, player);
+        this.boxInProgress = false;
 
         return true;
     }
@@ -265,13 +290,20 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
             InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
         }
 
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
+
+        if (player != null)
+        {
+            player.sendChatMessage("/gamerule sendCommandFeedback true");
+        }
+
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
     }
 
     private void updateInfoHudLines()
     {
         this.infoHudLines.clear();
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
 
         if (player != null)
         {

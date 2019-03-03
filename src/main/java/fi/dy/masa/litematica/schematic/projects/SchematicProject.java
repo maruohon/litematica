@@ -236,7 +236,7 @@ public class SchematicProject
 
             this.deleteLastSeenArea(mc);
             this.cacheCurrentAreaFromPlacement();
-            DataManager.getSchematicPlacementManager().pastePlacementToWorld(this.currentPlacement, mc);
+            DataManager.getSchematicPlacementManager().pastePlacementToWorld(this.currentPlacement, false, mc);
         }
     }
 
