@@ -23,8 +23,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.TextFormatting;
@@ -183,6 +186,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                             // All finished for this box
                             if (z >= maxZ && x >= maxX && y >= maxY)
                             {
+                                this.summonEntities(box, worldSchematic, player);
                                 return true;
                             }
                             else
@@ -195,7 +199,40 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
             }
         }
 
+        this.summonEntities(box, worldSchematic, player);
+
         return true;
+    }
+
+    private void summonEntities(StructureBoundingBox box, WorldSchematic worldSchematic, EntityPlayerSP player)
+    {
+        AxisAlignedBB bb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+        List<Entity> entities = worldSchematic.getEntitiesWithinAABBExcludingEntity(null, bb);
+
+        for (Entity entity : entities)
+        {
+            ResourceLocation rl = EntityList.getKey(entity);
+
+            if (rl != null)
+            {
+                String entityName = rl.toString();
+                /*
+                NBTTagCompound nbt = new NBTTagCompound();
+                entity.writeToNBTOptional(nbt);
+                String nbtString = nbt.toString();
+                */
+
+                String strCommand = String.format("/summon %s %f %f %f", entityName, entity.posX, entity.posY, entity.posZ);
+                /*
+                String strCommand = String.format("/summon %s %f %f %f %s", entityName, entity.posX, entity.posY, entity.posZ, nbtString);
+                System.out.printf("entity: %s\n", entity);
+                System.out.printf("%s\n", strCommand);
+                System.out.printf("nbt: %s\n", nbtString);
+                */
+
+                player.sendChatMessage(strCommand);
+            }
+        }
     }
 
     private void sendSetBlockCommand(int x, int y, int z, IBlockState state, EntityPlayerSP player)
