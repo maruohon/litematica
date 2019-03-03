@@ -157,12 +157,27 @@ public class ToolUtils
         return true;
     }
 
+    public static void killEntitiesCommand(Collection<Box> boxes, Minecraft mc)
+    {
+        for (Box box : boxes)
+        {
+            BlockPos posMin = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            BlockPos posMax = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+
+            String cmd = String.format("/kill @e[type=!player,x=%d,y=%d,z=%d,dx=%d,dy=%d,dz=%d]",
+                    posMin.getX(), posMin.getY(), posMin.getZ(),
+                    posMax.getX() - posMin.getX() + 1, posMax.getY() - posMin.getY() + 1, posMax.getZ() - posMin.getZ() + 1);
+
+            mc.player.sendChatMessage(cmd);
+        }
+    }
+
     public static void deleteSelectionVolumes(boolean removeEntities, Minecraft mc)
     {
         deleteSelectionVolumes(DataManager.getSelectionManager().getCurrentSelection(), removeEntities, mc);
     }
 
-    public static void deleteSelectionVolumes(final AreaSelection area, boolean removeEntities, Minecraft mc)
+    public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities, Minecraft mc)
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
@@ -195,6 +210,7 @@ public class ToolUtils
                 }
                 else if (fillSelectionVolumesCommand(boxes, Blocks.AIR.getDefaultState(), null, mc))
                 {
+                    killEntitiesCommand(boxes, mc);
                     InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
                 }
                 else

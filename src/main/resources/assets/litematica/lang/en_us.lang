@@ -357,6 +357,7 @@ litematica.hud.selected_mode=Mode
 litematica.hud.schematic_projects.current_version_date=Date: %s
 litematica.hud.schematic_projects.current_version_name=Current version name: %s
 litematica.hud.schematic_projects.current_version_number=Version: %s / %s
+litematica.hud.schematic_projects.no_project_open=<no project open>
 litematica.hud.schematic_projects.no_versions=<no versions>
 litematica.hud.schematic_projects.origin=Project origin: %s
 litematica.hud.schematic_projects.project_name=Project: %s
