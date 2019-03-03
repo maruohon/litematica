@@ -156,6 +156,10 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         {
             button.setHoverStrings("litematica.gui.button.hover.material_list.clear_cache");
         }
+        else if (type == ButtonListener.Type.WRITE_TO_FILE)
+        {
+            button.setHoverStrings("litematica.gui.button.hover.material_list.write_hold_shift_for_csv");
+        }
 
         this.addButton(button, listener);
 
@@ -246,7 +250,9 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
                 case WRITE_TO_FILE:
                     File dir = new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
-                    File file = DataDump.dumpDataToFile(dir, "material_list", this.getMaterialListDump(materialList).getLines());
+                    boolean csv = isShiftKeyDown();
+                    String ext = csv ? ".csv" : ".txt";
+                    File file = DataDump.dumpDataToFile(dir, "material_list", ext, this.getMaterialListDump(materialList, csv).getLines());
 
                     if (file != null)
                     {
@@ -260,9 +266,9 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             this.parent.initGui(); // Re-create buttons/text fields
         }
 
-        private DataDump getMaterialListDump(MaterialListBase materialList)
+        private DataDump getMaterialListDump(MaterialListBase materialList, boolean csv)
         {
-            DataDump dump = new DataDump(4, DataDump.Format.ASCII);
+            DataDump dump = new DataDump(4, csv ? DataDump.Format.CSV : DataDump.Format.ASCII);
             int multiplier = materialList.getMultiplier();
 
             ArrayList<MaterialListEntry> list = new ArrayList<>();
@@ -272,7 +278,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             for (MaterialListEntry entry : list)
             {
                 int total = entry.getCountTotal() * multiplier;
-                int missing = entry.getCountMissing();
+                int missing = multiplier > 1 ? total : entry.getCountMissing();
                 int available = entry.getCountAvailable();
                 dump.addData(entry.getStack().getDisplayName(), String.valueOf(total), String.valueOf(missing), String.valueOf(available));
             }

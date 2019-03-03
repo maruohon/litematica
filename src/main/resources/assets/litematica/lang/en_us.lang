@@ -105,6 +105,7 @@ litematica.gui.button.config_gui.visuals=Visuals
 litematica.gui.button.hover.area_editor.shift_for_in_memory=Hold Shift to create an in-memory-only schematic
 litematica.gui.button.hover.area_selections.unselect=Unselects the current Area Selection
 litematica.gui.button.hover.material_list.clear_cache=Clears the Material Cache\nNormally this should not be needed\nThis can be used instead of deleting the 'material_cache.nbt'\nfile in case the cache has some wrong data, like items\nstored for blocks that shouldn't have them, like piston heads
+litematica.gui.button.hover.material_list.write_hold_shift_for_csv=Hold shift to write to a CSV file,\ninstead of the normal ASCII-art table text file
 litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift to select the sub regions used for the Material List
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
