@@ -16,7 +16,6 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
@@ -49,7 +48,7 @@ public class SchematicUtils
         {
             Minecraft mc = Minecraft.getMinecraft();
 
-            if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+            if (DataManager.getSchematicProjectsManager().hasProjectOpen())
             {
                 String title = "litematica.gui.title.schematic_projects.save_new_version";
                 GuiTextInput gui = new GuiTextInput(512, title, area.getName(), mc.currentScreen, new SchematicVersionCreator());

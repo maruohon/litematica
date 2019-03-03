@@ -70,7 +70,7 @@ public class ToolHud extends InfoHud
         String strYes = green + I18n.format("litematica.label.yes") + rst;
         String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
 
-        if (mode == ToolMode.SCHEMATIC_PROJECTS)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             SchematicProjectsManager manager = DataManager.getSchematicProjectsManager();
             SchematicProject project = manager.getCurrentProject();
@@ -102,6 +102,8 @@ public class ToolHud extends InfoHud
             {
                 lines.add(I18n.format("litematica.hud.schematic_projects.no_project_open"));
             }
+
+            return;
         }
         else if (mode.getUsesAreaSelection())
         {

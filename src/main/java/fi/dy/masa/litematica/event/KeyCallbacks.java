@@ -407,7 +407,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeybind())
             {
-                if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+                if (DataManager.getSchematicProjectsManager().hasProjectOpen())
                 {
                     DataManager.getSchematicProjectsManager().cycleVersion(1);
                 }
@@ -415,7 +415,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeybind())
             {
-                if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+                if (DataManager.getSchematicProjectsManager().hasProjectOpen())
                 {
                     DataManager.getSchematicProjectsManager().cycleVersion(-1);
                 }
@@ -423,7 +423,12 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && hasTool && toolEnabled)
             {
-                if (mode == ToolMode.PASTE_SCHEMATIC)
+                if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+                {
+                    DataManager.getSchematicProjectsManager().pasteCurrentVersionToWorld();
+                    return true;
+                }
+                else if (mode == ToolMode.PASTE_SCHEMATIC)
                 {
                     DataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
                     return true;
@@ -442,11 +447,6 @@ public class KeyCallbacks
                 {
                     boolean removeEntities = true; // TODO
                     ToolUtils.deleteSelectionVolumes(removeEntities, this.mc);
-                    return true;
-                }
-                else if (mode == ToolMode.SCHEMATIC_PROJECTS)
-                {
-                    DataManager.getSchematicProjectsManager().pasteCurrentVersionToWorld();
                     return true;
                 }
             }

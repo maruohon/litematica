@@ -66,6 +66,14 @@ public class GuiMainMenu extends GuiBase
     private void createChangeMenuButton(int x, int y, int width, ButtonListenerChangeMenu.ButtonType type)
     {
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, type.getDisplayName(), type.getIcon());
+
+        if (type == ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER &&
+            DataManager.getSchematicProjectsManager().hasProjectOpen())
+        {
+            button.enabled = false;
+            button.setHoverStrings("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+        }
+
         this.addButton(button, new ButtonListenerChangeMenu(type, this));
     }
 

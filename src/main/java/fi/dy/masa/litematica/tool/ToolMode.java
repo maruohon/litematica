@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.tool;
 
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.data.DataManager;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,8 +15,7 @@ public enum ToolMode
     PASTE_SCHEMATIC     ("litematica.tool_mode.name.paste_schematic",       true, true),
     GRID_PASTE          ("litematica.tool_mode.name.grid_paste",            true, true),
     DELETE              ("litematica.tool_mode.name.delete",                true, false),
-    REBUILD             ("litematica.tool_mode.name.rebuild",               false, true),
-    SCHEMATIC_PROJECTS  ("litematica.tool_mode.name.schematic_projects",    false, false);
+    REBUILD             ("litematica.tool_mode.name.rebuild",               false, true);
 
     private final String unlocName;
     private final boolean creativeOnly;
@@ -47,7 +47,7 @@ public enum ToolMode
 
     public boolean getUsesAreaSelection()
     {
-        return this.usesSchematic == false;
+        return this.usesSchematic == false || DataManager.getSchematicProjectsManager().hasProjectOpen();
     }
 
     public boolean getUsesBlockPrimary()

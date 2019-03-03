@@ -6,7 +6,6 @@ import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
@@ -21,7 +20,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     {
         super(selection);
 
-        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             this.title = I18n.format("litematica.gui.title.area_editor_normal_schematic_projects");
         }

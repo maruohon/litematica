@@ -15,7 +15,6 @@ import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSimple;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
-import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
@@ -49,7 +48,7 @@ public class SelectionManager
 
     public SelectionMode getSelectionMode()
     {
-        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
             return project != null ? project.getSelectionMode() : SelectionMode.SIMPLE;
@@ -60,7 +59,7 @@ public class SelectionManager
 
     public void switchSelectionMode()
     {
-        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
 
@@ -93,7 +92,7 @@ public class SelectionManager
 
     public boolean hasNormalSelection()
     {
-        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             return true;
         }
@@ -104,7 +103,7 @@ public class SelectionManager
     @Nullable
     public AreaSelection getCurrentSelection()
     {
-        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
             return project != null ? project.getSelection() : null;

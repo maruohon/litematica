@@ -43,6 +43,11 @@ public class SchematicProjectsManager
         return this.currentProject;
     }
 
+    public boolean hasProjectOpen()
+    {
+        return this.currentProject != null;
+    }
+
     public void createNewProject(File dir, String projectName)
     {
         this.closeCurrentProject();

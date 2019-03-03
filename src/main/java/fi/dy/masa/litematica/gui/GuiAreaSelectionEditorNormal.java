@@ -10,7 +10,6 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
-import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.SchematicUtils;
@@ -55,7 +54,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.selectionId = DataManager.getSelectionManager().getCurrentSelectionId();
         this.useTitleHierarchy = false;
 
-        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             this.title = I18n.format("litematica.gui.title.area_editor_normal_schematic_projects");
         }
@@ -262,7 +261,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int createButton(int x, int y, int width, @Nullable Corner corner, ButtonListener.Type type)
     {
         String label;
-        boolean projectsMode = DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS;
+        boolean projectsMode = DataManager.getSchematicProjectsManager().hasProjectOpen();
 
         if (type == ButtonListener.Type.CHANGE_SELECTION_MODE)
         {
@@ -366,7 +365,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     {
         String newName = this.textFieldSelectionName.getText();
 
-        if (DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             SelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
             this.selection.setName(newName);

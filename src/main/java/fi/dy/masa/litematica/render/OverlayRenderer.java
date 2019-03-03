@@ -22,7 +22,6 @@ import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchRender
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -131,12 +130,12 @@ public class OverlayRenderer
         AreaSelection currentSelection = sm.getCurrentSelection();
         boolean renderAreas = currentSelection != null && Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue();
         boolean renderPlacements = this.placements.isEmpty() == false && Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING.getBooleanValue();
-        boolean isVersionMode = DataManager.getToolMode() == ToolMode.SCHEMATIC_PROJECTS;
+        boolean isProjectMode = DataManager.getSchematicProjectsManager().hasProjectOpen();
         float expand = 0.001f;
         float lineWidthBlockBox = 2f;
-        float lineWidthArea = isVersionMode ? 3f : 1.5f;
+        float lineWidthArea = isProjectMode ? 3f : 1.5f;
 
-        if (renderAreas || renderPlacements || isVersionMode)
+        if (renderAreas || renderPlacements || isProjectMode)
         {
             GlStateManager.depthMask(true);
             GlStateManager.disableLighting();
@@ -213,7 +212,7 @@ public class OverlayRenderer
                 }
             }
 
-            if (isVersionMode)
+            if (isProjectMode)
             {
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
 
