@@ -171,6 +171,7 @@ public class LitematicaRenderer
 
             renderGlobal.renderEntities(entity, icamera, partialTicks);
 
+            GlStateManager.disableFog(); // Fixes Structure Blocks breaking all rendering
             GlStateManager.disableBlend();
             RenderHelper.disableStandardItemLighting();
 
