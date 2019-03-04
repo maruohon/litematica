@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.gui.Icons;
@@ -17,15 +18,20 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ResourceLocation;
 
 public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<BlockMismatchEntry>
@@ -38,6 +44,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     private static int maxNameLengthFound;
     private static int maxCountLength;
 
+    private final BlockModelShapes blockModelShapes;
     private final GuiSchematicVerifier guiSchematicVerifier;
     private final WidgetListSchematicVerificationResults listWidget;
     private final SchematicVerifier verifier;
@@ -59,6 +66,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
         this.columnCount = 3;
         this.mc = Minecraft.getMinecraft();
+        this.blockModelShapes = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
         this.mismatchEntry = entry;
         this.guiSchematicVerifier = guiSchematicVerifier;
         this.listWidget = listWidget;
@@ -115,10 +123,12 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         for (BlockMismatch entry : mismatches)
         {
             ItemStack stack = ItemUtils.getItemForState(entry.stateExpected);
-            maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(stack.getDisplayName()));
+            String name = BlockMismatchInfo.getDisplayName(entry.stateExpected, stack);
+            maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(name));
 
             stack = ItemUtils.getItemForState(entry.stateFound);
-            maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(stack.getDisplayName()));
+            name = BlockMismatchInfo.getDisplayName(entry.stateFound, stack);
+            maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(name));
         }
 
         maxCountLength = Math.max(maxCountLength, font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADER_COUNT) + GuiBase.TXT_RST));
@@ -273,33 +283,57 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE ||
                  this.mismatchEntry.blockMismatch.stateExpected.getBlock() != Blocks.AIR)) 
         {
-            mc.fontRenderer.drawString(this.mismatchInfo.stackExpected.getDisplayName(), x1 + 20, y, color);
+            mc.fontRenderer.drawString(this.mismatchInfo.nameExpected, x1 + 20, y, color);
 
             if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
             {
-                mc.fontRenderer.drawString(this.mismatchInfo.stackFound.getDisplayName(), x2 + 20, y, color);
+                mc.fontRenderer.drawString(this.mismatchInfo.nameFound, x2 + 20, y, color);
             }
 
             mc.fontRenderer.drawString(String.valueOf(this.count), x3, y, color);
 
-            GlStateManager.pushMatrix();
-            GlStateManager.disableLighting();
-            RenderHelper.enableGUIStandardItemLighting();
-
-            //mc.getRenderItem().zLevel -= 110;
             y = this.y + 3;
             Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackExpected, x1, y);
-            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackExpected, x1, y, null);
+
+            boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
+            boolean hasModelExpected = this.mismatchInfo.stateExpected.getRenderType() == EnumBlockRenderType.MODEL;
+            boolean hasModelFound    = this.mismatchInfo.stateFound.getRenderType() == EnumBlockRenderType.MODEL;
+            boolean isAirItemExpected = this.mismatchInfo.stackExpected.isEmpty();
+            boolean isAirItemFound    = this.mismatchInfo.stackExpected.isEmpty();
+            boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.mismatchInfo.stateExpected.getBlock() == Blocks.FLOWER_POT);
+            boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.mismatchInfo.stateFound.getBlock() == Blocks.FLOWER_POT);
+
+            GlStateManager.pushMatrix();
+            RenderHelper.enableGUIStandardItemLighting();
+
+            IBakedModel model;
+
+            if (useBlockModelExpected)
+            {
+                model = this.blockModelShapes.getModelForState(this.mismatchInfo.stateExpected);
+                RenderUtils.renderModelInGui(x1, y, model, this.mismatchInfo.stateExpected, 1);
+            }
+            else
+            {
+                mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackExpected, x1, y);
+                mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackExpected, x1, y, null);
+            }
 
             if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
             {
                 Gui.drawRect(x2, y, x2 + 16, y + 16, 0x20FFFFFF); // light background for the item
-                mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackFound, x2, y);
-                mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackFound, x2, y, null);
-            }
 
-            //mc.getRenderItem().zLevel += 110;
+                if (useBlockModelFound)
+                {
+                    model = this.blockModelShapes.getModelForState(this.mismatchInfo.stateFound);
+                    RenderUtils.renderModelInGui(x2, y, model, this.mismatchInfo.stateFound, 1);
+                }
+                else
+                {
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackFound, x2, y);
+                    mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackFound, x2, y, null);
+                }
+            }
 
             GlStateManager.disableBlend();
             RenderHelper.disableStandardItemLighting();
@@ -348,8 +382,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         private final ItemStack stackFound;
         private final String blockRegistrynameExpected;
         private final String blockRegistrynameFound;
-        private final String stackNameExpected;
-        private final String stackNameFound;
+        private final String nameExpected;
+        private final String nameFound;
         private final int totalWidth;
         private final int totalHeight;
         private final int columnWidthExpected;
@@ -362,25 +396,44 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             this.stackExpected = ItemUtils.getItemForState(this.stateExpected);
             this.stackFound = ItemUtils.getItemForState(this.stateFound);
 
-            ResourceLocation rl1 = Block.REGISTRY.getNameForObject(this.stateExpected.getBlock());
-            ResourceLocation rl2 = Block.REGISTRY.getNameForObject(this.stateFound.getBlock());
+            Minecraft mc = Minecraft.getMinecraft();
+            Block blockExpected = this.stateExpected.getBlock();
+            Block blockFound = this.stateFound.getBlock();
+            ResourceLocation rl1 = Block.REGISTRY.getNameForObject(blockExpected);
+            ResourceLocation rl2 = Block.REGISTRY.getNameForObject(blockFound);
+
             this.blockRegistrynameExpected = rl1 != null ? rl1.toString() : "<null>";
             this.blockRegistrynameFound = rl2 != null ? rl2.toString() : "<null>";
 
-            Minecraft mc = Minecraft.getMinecraft();
-            this.stackNameExpected = this.stackExpected.getDisplayName();
-            this.stackNameFound = this.stackFound.getDisplayName();
+            this.nameExpected = getDisplayName(stateExpected, this.stackExpected);
+            this.nameFound =    getDisplayName(stateFound,    this.stackFound);
+
             List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
             List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
 
-            int w1 = Math.max(mc.fontRenderer.getStringWidth(this.stackNameExpected) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
-            int w2 = Math.max(mc.fontRenderer.getStringWidth(this.stackNameFound) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
+            int w1 = Math.max(mc.fontRenderer.getStringWidth(this.nameExpected) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
+            int w2 = Math.max(mc.fontRenderer.getStringWidth(this.nameFound) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
             w1 = Math.max(w1, fi.dy.masa.litematica.render.RenderUtils.getMaxStringRenderLength(propsExpected, mc));
             w2 = Math.max(w2, fi.dy.masa.litematica.render.RenderUtils.getMaxStringRenderLength(propsFound, mc));
 
             this.columnWidthExpected = w1;
             this.totalWidth = this.columnWidthExpected + w2 + 40;
             this.totalHeight = Math.max(propsExpected.size(), propsFound.size()) * (mc.fontRenderer.FONT_HEIGHT + 2) + 60;
+        }
+
+        public static String getDisplayName(IBlockState state, ItemStack stack)
+        {
+            Block block = state.getBlock();
+            String key = block.getTranslationKey() + ".name";
+            String name = I18n.format(key);
+            name = key.equals(name) == false ? name : stack.getDisplayName();
+
+            if (block == Blocks.FLOWER_POT && state.getValue(BlockFlowerPot.CONTENTS) != BlockFlowerPot.EnumFlowerType.EMPTY)
+            {
+                name = ((new ItemStack(Items.FLOWER_POT)).getDisplayName()) + " & " + name;
+            }
+
+            return name;
         }
 
         public int getTotalWidth()
@@ -416,21 +469,50 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 GlStateManager.disableLighting();
                 RenderHelper.enableGUIStandardItemLighting();
 
-                //mc.getRenderItem().zLevel += 100;
-                Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-                mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stackExpected, x1, y);
-                mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackExpected, x1, y, null);
+                boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
+                boolean hasModelExpected = this.stateExpected.getRenderType() == EnumBlockRenderType.MODEL;
+                boolean hasModelFound    = this.stateFound.getRenderType() == EnumBlockRenderType.MODEL;
+                boolean isAirItemExpected = this.stackExpected.isEmpty();
+                boolean isAirItemFound    = this.stackExpected.isEmpty();
+                boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.stateExpected.getBlock() == Blocks.FLOWER_POT);
+                boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.stateFound.getBlock() == Blocks.FLOWER_POT);
+                BlockModelShapes blockModelShapes = mc.getBlockRendererDispatcher().getBlockModelShapes();
 
-                Gui.drawRect(x2, y, x2 + 16, y + 16, 0x20FFFFFF); // light background for the item
-                mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stackFound, x2, y);
-                mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackFound, x2, y, null);
+                //mc.getRenderItem().zLevel += 100;
+                Gui.drawRect(x1, y, x1 + 16, y + 16, 0x50C0C0C0); // light background for the item
+                Gui.drawRect(x2, y, x2 + 16, y + 16, 0x50C0C0C0); // light background for the item
+
+                IBakedModel model;
+
+                if (useBlockModelExpected)
+                {
+                    model = blockModelShapes.getModelForState(this.stateExpected);
+                    RenderUtils.renderModelInGui(x1, y, model, this.stateExpected, 1);
+                }
+                else
+                {
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stackExpected, x1, y);
+                    mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackExpected, x1, y, null);
+                }
+
+                if (useBlockModelFound)
+                {
+                    model = blockModelShapes.getModelForState(this.stateFound);
+                    RenderUtils.renderModelInGui(x2, y, model, this.stateFound, 1);
+                }
+                else
+                {
+                    mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stackFound, x2, y);
+                    mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackFound, x2, y, null);
+                }
+
                 //mc.getRenderItem().zLevel -= 100;
 
                 //GlStateManager.disableBlend();
                 RenderHelper.disableStandardItemLighting();
 
-                mc.fontRenderer.drawString(this.stackNameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
-                mc.fontRenderer.drawString(this.stackNameFound,    x2 + 20, y + 4, 0xFFFFFFFF);
+                mc.fontRenderer.drawString(this.nameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
+                mc.fontRenderer.drawString(this.nameFound,    x2 + 20, y + 4, 0xFFFFFFFF);
 
                 y += 20;
                 mc.fontRenderer.drawString(this.blockRegistrynameExpected, x1, y, 0xFF4060FF);
