@@ -47,6 +47,11 @@ public class ToolHud extends InfoHud
     @Override
     protected boolean shouldRender()
     {
+        return DataManager.getSchematicProjectsManager().hasProjectOpen() || this.hasEnabledTool();
+    }
+
+    protected boolean hasEnabledTool()
+    {
         return Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() && EntityUtils.hasToolItem(this.mc.player);
     }
 
@@ -60,8 +65,8 @@ public class ToolHud extends InfoHud
     protected void updateHudText()
     {
         ToolMode mode = DataManager.getToolMode();
-        List<String> lines = this.lineList;
-        lines.clear();
+        boolean hasEnabledTool = this.hasEnabledTool();
+        boolean projectsMode = DataManager.getSchematicProjectsManager().hasProjectOpen();
         String str;
         String green = GuiBase.TXT_GREEN;
         String orange = GuiBase.TXT_GOLD;
@@ -69,8 +74,22 @@ public class ToolHud extends InfoHud
         String rst = GuiBase.TXT_RST;
         String strYes = green + I18n.format("litematica.label.yes") + rst;
         String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
+        List<String> lines = this.lineList;
 
-        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+        lines.clear();
+
+        if (hasEnabledTool == false)
+        {
+            // Always render the projects mode indicator when a schematic project is open
+            if (projectsMode)
+            {
+                lines.add(I18n.format("litematica.hud.schematic_projects_mode"));
+            }
+
+            return;
+        }
+
+        if (projectsMode)
         {
             SchematicProjectsManager manager = DataManager.getSchematicProjectsManager();
             SchematicProject project = manager.getCurrentProject();
@@ -103,9 +122,13 @@ public class ToolHud extends InfoHud
                 lines.add(I18n.format("litematica.hud.schematic_projects.no_project_open"));
             }
 
+            lines.add(I18n.format("litematica.hud.schematic_projects_mode"));
+
             return;
         }
-        else if (mode.getUsesAreaSelection())
+
+
+        if (mode.getUsesAreaSelection())
         {
             SelectionManager sm = DataManager.getSelectionManager();
             AreaSelection selection = sm.getCurrentSelection();

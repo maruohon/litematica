@@ -367,6 +367,7 @@ litematica.hud.schematic_projects.no_project_open=<no project open>
 litematica.hud.schematic_projects.no_versions=<no versions>
 litematica.hud.schematic_projects.origin=Project origin: %s
 litematica.hud.schematic_projects.project_name=Project: %s
+litematica.hud.schematic_projects_mode=§6Schematic Projects mode§r
 
 litematica.tool_hud.block_1=Block: %s
 litematica.tool_hud.block_2=Replace: %s
