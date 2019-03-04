@@ -346,7 +346,9 @@ litematica.hud.area_selection.selected_area_simple=Area [§6Simple mode§r]: %s
 litematica.hud.area_selection.selected_sub_region=Sub-region: %s
 litematica.hud.area_selection.selection_corners_mode=Corners Mode: %s
 
+litematica.hud.misc.easy_place_mode_enabled=Easy Place mode §aON§r
 litematica.hud.misc.none_brackets=<none>
+litematica.hud.misc.placement_restriction_mode_enabled=Placement Restriction mode §aON§r
 litematica.hud.misc.render_layer_mode=Layer Mode: %s - %s
 litematica.hud.misc.render_layer_mode_all=Layer Mode: %s
 litematica.hud.misc.renderer_status=Renderers: A: %s S: %s B: %s O: %s SEL: %s
