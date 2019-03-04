@@ -30,6 +30,11 @@ public class InfoHud
         return enabled;
     }
 
+    protected double getScaleFactor()
+    {
+        return Configs.InfoOverlays.INFO_HUD_SCALE.getDoubleValue();
+    }
+
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
@@ -54,6 +59,7 @@ public class InfoHud
             int yOffset = 2;
             int lineIndex = 0;
             boolean isGui = this.mc.currentScreen != null;
+            double scale = Math.max(0.05, this.getScaleFactor());
 
             if (this.renderers.isEmpty() == false)
             {
@@ -78,7 +84,8 @@ public class InfoHud
 
             if (this.lineList.isEmpty() == false)
             {
-                yOffset += fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, xOffset, yOffset, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, 0, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                yOffset += (int) Math.ceil(ySize * scale);
             }
 
             if (this.renderers.isEmpty() == false)

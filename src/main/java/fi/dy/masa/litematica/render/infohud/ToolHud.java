@@ -62,6 +62,12 @@ public class ToolHud extends InfoHud
     }
 
     @Override
+    protected double getScaleFactor()
+    {
+        return Configs.InfoOverlays.TOOL_HUD_SCALE.getDoubleValue();
+    }
+
+    @Override
     protected void updateHudText()
     {
         ToolMode mode = DataManager.getToolMode();
@@ -75,8 +81,6 @@ public class ToolHud extends InfoHud
         String strYes = green + I18n.format("litematica.label.yes") + rst;
         String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
         List<String> lines = this.lineList;
-
-        lines.clear();
 
         if (hasEnabledTool == false)
         {

@@ -123,14 +123,19 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             default:
         }
 
+        if (scale != 1 && scale != 0)
+        {
+            yOffset = (int) (yOffset / scale);
+        }
+
+        posY = RenderUtils.getHudPosY(posY, yOffset, contentHeight, scale, alignment);
+        posY += RenderUtils.getHudOffsetForPotions(alignment, scale, mc.player);
+
         if (scale != 1d)
         {
             GlStateManager.pushMatrix();
             GlStateManager.scale(scale, scale, scale);
         }
-
-        posY = RenderUtils.getHudPosY((int) posY, yOffset, contentHeight, scale, alignment);
-        posY += RenderUtils.getHudOffsetForPotions(alignment, scale, mc.player);
 
         if (useBackground)
         {

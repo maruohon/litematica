@@ -149,10 +149,12 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       ENABLE_VERIFIER_OVERLAY_RENDERING   = new ConfigBoolean("enableVerifierOverlayRendering", true, "Enable Schematic Verifier marker overlay rendering", "Verifier Overlay Rendering");
         public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList("infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\",\nused for schematic verifier mismatch positions etc.");
         public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger("infoHudMaxLines", 10, 1, 128, "The maximum number of info lines to show on the HUD at once");
+        public static final ConfigDouble        INFO_HUD_SCALE                      = new ConfigDouble( "infoHudScale", 1, 0.1, 4, "Scale factor for the generic Info HUD text");
         public static final ConfigInteger       MATERIAL_LIST_HUD_MAX_LINES         = new ConfigInteger("materialListHudMaxLines", 10, 1, 128, "The maximum number of items to show on\nthe Material List Info HUD at once");
         public static final ConfigDouble        MATERIAL_LIST_HUD_SCALE             = new ConfigDouble( "materialListHudScale", 1, 0.1, 4, "Scale factor for the Material List Info HUD");
         public static final ConfigBoolean       RENDER_BLOCK_INFO_LINES             = new ConfigBoolean("renderBlockInfoLines", true, "If enabled, then MiniHUD-style block info overlay\nis rendered for the looked-at block");
         public static final ConfigBoolean       RENDER_BLOCK_INFO_OVERLAY           = new ConfigBoolean("renderBlockInfoOverlay", true, "If enabled, then an info overlay is rendered\nwhile looking at schematic blocks or schematic verifier\nerror markers, and holding the 'renderInfoOverlay' key");
+        public static final ConfigDouble        TOOL_HUD_SCALE                      = new ConfigDouble( "toolHudScale", 1, 0.1, 4, "Scale factor for the Tool HUD text");
         public static final ConfigDouble        VERIFIER_ERROR_HILIGHT_ALPHA        = new ConfigDouble( "verifierErrorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
         public static final ConfigInteger       VERIFIER_ERROR_HILIGHT_MAX_POSITIONS = new ConfigInteger("verifierErrorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render\nat once in the Schematic Verifier overlay.");
 
@@ -170,8 +172,10 @@ public class Configs implements IConfigHandler
                 BLOCK_INFO_OVERLAY_OFFSET_Y,
                 BLOCK_INFO_LINES_FONT_SCALE,
                 INFO_HUD_MAX_LINES,
+                INFO_HUD_SCALE,
                 MATERIAL_LIST_HUD_MAX_LINES,
                 MATERIAL_LIST_HUD_SCALE,
+                TOOL_HUD_SCALE,
                 VERIFIER_ERROR_HILIGHT_ALPHA,
                 VERIFIER_ERROR_HILIGHT_MAX_POSITIONS
         );
