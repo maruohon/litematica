@@ -228,8 +228,26 @@ public class SchematicUtils
 
                         if (posSchematic != null)
                         {
+                            IBlockState stateOriginal = container.get(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ());
+
+                            int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
+                            int increment = 0;
+
+                            if (stateOriginal.getBlock() != Blocks.AIR)
+                            {
+                                increment = state.getBlock() != Blocks.AIR ? 0 : -1;
+                            }
+                            else
+                            {
+                                increment = state.getBlock() != Blocks.AIR ? 1 : 0;
+                            }
+
+                            totalBlocks += increment;
+
                             container.set(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ(), state);
+                            part.getPlacement().getSchematic().getMetadata().setTotalBlocks(totalBlocks);
                             DataManager.getSchematicPlacementManager().markChunkForRebuild(new ChunkPos(cpos.getX(), cpos.getZ()));
+
                             return true;
                         }
 
@@ -273,6 +291,8 @@ public class SchematicUtils
                             final int maxX = Math.min(posMax.getX(), container.getSize().getX() - 1);
                             final int maxY = Math.min(posMax.getY(), container.getSize().getY() - 1);
                             final int maxZ = Math.min(posMax.getZ(), container.getSize().getZ() - 1);
+                            int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
+                            int increment = 0;
 
                             for (int y = minY; y <= maxY; ++y)
                             {
@@ -280,12 +300,27 @@ public class SchematicUtils
                                 {
                                     for (int x = minX; x <= maxX; ++x)
                                     {
+                                        IBlockState stateOriginal = container.get(x, y, z);
+
+                                        if (stateOriginal.getBlock() != Blocks.AIR)
+                                        {
+                                            increment = state.getBlock() != Blocks.AIR ? 0 : -1;
+                                        }
+                                        else
+                                        {
+                                            increment = state.getBlock() != Blocks.AIR ? 1 : 0;
+                                        }
+
+                                        totalBlocks += increment;
+
                                         container.set(x, y, z, state);
                                     }
                                 }
                             }
 
+                            part.getPlacement().getSchematic().getMetadata().setTotalBlocks(totalBlocks);
                             DataManager.getSchematicPlacementManager().markChunksForRebuild(placement);
+
                             return true;
                         }
 
@@ -353,6 +388,18 @@ public class SchematicUtils
 
         LayerRange range = DataManager.getRenderLayerRange();
         BlockPos origin = schematicPlacement.getOrigin();
+
+        int totalBlocks = schematicPlacement.getSchematic().getMetadata().getTotalBlocks();
+        int increment = 0;
+
+        if (stateOriginal.getBlock() != Blocks.AIR)
+        {
+            increment = stateNew.getBlock() != Blocks.AIR ? 0 : -1;
+        }
+        else
+        {
+            increment = stateNew.getBlock() != Blocks.AIR ? 1 : 0;
+        }
 
         for (String regionName : regions)
         {
@@ -425,11 +472,14 @@ public class SchematicUtils
                         if (container.get(x, y, z) == stateOriginal)
                         {
                             container.set(x, y, z, stateNew);
+                            totalBlocks += increment;
                         }
                     }
                 }
             }
         }
+
+        schematicPlacement.getSchematic().getMetadata().setTotalBlocks(totalBlocks);
 
         return true;
     }
