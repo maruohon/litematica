@@ -171,7 +171,15 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         if (mc.player != null && KeybindMulti.getTriggeredCount() == 0)
         {
-            if (DataManager.getToolMode() == ToolMode.REBUILD)
+            if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
+            {
+                return SchematicUtils.breakSchematicBlocks(mc);
+            }
+            else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
+            {
+                return SchematicUtils.breakAllIdenticalSchematicBlocks(mc);
+            }
+            else if (DataManager.getToolMode() == ToolMode.REBUILD)
             {
                 return SchematicUtils.breakSchematicBlock(mc);
             }

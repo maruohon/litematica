@@ -382,16 +382,23 @@ public class RayTraceUtils
     }
 
     @Nullable
-    public static BlockPos getSchematicWorldTraceIfClosest(World worldClient, Entity entity, double range)
+    public static RayTraceWrapper getSchematicWorldTraceWrapperIfClosest(World worldClient, Entity entity, double range)
     {
         RayTraceWrapper trace = getGenericTrace(worldClient, entity, range, true);
 
         if (trace != null && trace.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            return trace.getRayTraceResult().getBlockPos();
+            return trace;
         }
 
         return null;
+    }
+
+    @Nullable
+    public static BlockPos getSchematicWorldTraceIfClosest(World worldClient, Entity entity, double range)
+    {
+        RayTraceWrapper trace = getSchematicWorldTraceWrapperIfClosest(worldClient, entity, range);
+        return trace != null ? trace.getRayTraceResult().getBlockPos() : null;
     }
 
     @Nullable

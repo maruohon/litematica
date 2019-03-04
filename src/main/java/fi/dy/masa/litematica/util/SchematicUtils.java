@@ -127,6 +127,48 @@ public class SchematicUtils
         return false;
     }
 
+    public static boolean breakSchematicBlocks(Minecraft mc)
+    {
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+
+        if (wrapper != null)
+        {
+            RayTraceResult trace = wrapper.getRayTraceResult();
+            BlockPos pos = trace.getBlockPos();
+            EnumFacing playerFacingH = mc.player.getHorizontalFacing();
+            EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(trace.sideHit, playerFacingH, pos, trace.hitVec);
+
+            // Center region
+            if (direction == trace.sideHit)
+            {
+                direction = direction.getOpposite();
+            }
+
+            BlockPos posEnd = getReplacementBoxEndPos(pos, direction);
+
+            return setSchematicBlockStates(pos, posEnd, Blocks.AIR.getDefaultState());
+        }
+
+        return false;
+    }
+
+    public static boolean breakAllIdenticalSchematicBlocks(Minecraft mc)
+    {
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+
+        // The state can be null in 1.13+
+        if (wrapper != null)
+        {
+            RayTraceResult trace = wrapper.getRayTraceResult();
+            BlockPos pos = trace.getBlockPos();
+            IBlockState stateOriginal = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+
+            return setAllIdenticalSchematicBlockStates(pos, stateOriginal, Blocks.AIR.getDefaultState());
+        }
+
+        return false;
+    }
+
     @Nullable
     private static ReplacementInfo getTargetInfo(Minecraft mc)
     {
