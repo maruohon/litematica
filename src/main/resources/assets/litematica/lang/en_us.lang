@@ -385,6 +385,7 @@ litematica.label.none_lower=none
 litematica.label.no=no
 litematica.label.yes=yes
 
+litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.error.no_area_selected=§cNo area selected§r
 litematica.message.error.no_placement_selected=§cNo placement selected§r
 litematica.message.error.only_works_in_single_player=§cThis operation only works in single player§r
@@ -400,18 +401,11 @@ litematica.message.area_filled=Area filled
 litematica.message.area_fill_fail=Failed to fill the area
 litematica.message.area_selections.selection_created_from_placement=Created a new selection from placement '%s'
 litematica.message.easy_place_fail=Action prevented by the Easy Place mode
-litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.grabbed_element_for_moving=Grabbed an element to move
 litematica.message.in_memory_schematic_created=Created an in-memory schematic as '%s'
-litematica.message.layer_range.range_max=max
-litematica.message.layer_range.range_min=min
 litematica.message.material_list.material_cache_cleared=Material Cache cleared
 litematica.message.material_list_written_to_file=Material list written to file '%s'
 litematica.message.moved_area_origin=Moved the area origin point from %s => %s
-litematica.message.moved_layer_range=Moved the entire layer range by §a%s§r on the §a%s§r axis
-litematica.message.moved_layer_range_boundary=Moved layer range §a%s§r by §a%s§r on the §a%s§r axis
-litematica.message.moved_max_layer_to=Moved max layer to %s
-litematica.message.moved_min_layer_to=Moved min layer to %s
 litematica.message.moved_selection=Moved the current selection from %s => %s
 litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
@@ -430,9 +424,6 @@ litematica.message.schematic_rendering_refreshed=Schematic rendering refreshed
 litematica.message.schematic_saved_as=Schematic saved as '%s'
 litematica.message.schematic_save_task_created=Schematic saving task created
 litematica.message.set_area_origin=Set the area origin point to %s
-litematica.message.set_layer_axis_to=Set layer axis to %s
-litematica.message.set_layer_mode_to=Set layer mode to %s
-litematica.message.set_layer_to=Set layer to %s
 litematica.message.set_selection_box_point=Set/moved point %d to %s
 litematica.message.toggled=Toggled %s %s
 litematica.message.value.on=ON
