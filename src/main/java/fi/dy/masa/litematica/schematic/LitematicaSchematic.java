@@ -364,6 +364,7 @@ public class LitematicaSchematic
 
                         if (te != null)
                         {
+                            teNBT = teNBT.copy();
                             teNBT.setInteger("x", pos.getX());
                             teNBT.setInteger("y", pos.getY());
                             teNBT.setInteger("z", pos.getZ());
@@ -605,6 +606,7 @@ public class LitematicaSchematic
 
                         if (te != null)
                         {
+                            teNBT = teNBT.copy();
                             teNBT.setInteger("x", pos.getX());
                             teNBT.setInteger("y", pos.getY());
                             teNBT.setInteger("z", pos.getZ());
