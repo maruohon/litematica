@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
+import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.render.RenderUtils;
@@ -29,7 +30,13 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     }
 
     @Override
-    public boolean getShouldRender()
+    public boolean getShouldRenderText(RenderPhase phase)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean getShouldRenderCustom()
     {
         return this.shouldRender;
     }
@@ -46,7 +53,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     }
 
     @Override
-    public List<String> getText()
+    public List<String> getText(RenderPhase phase)
     {
         return Collections.emptyList();
     }

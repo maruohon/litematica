@@ -19,6 +19,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.litematica.scheduler.TaskBase;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -97,9 +98,10 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     }
 
     @Override
-    public boolean getShouldRender()
+    public boolean getShouldRenderText(RenderPhase phase)
     {
-        return this.shouldRenderInfoHud && Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
+        return this.shouldRenderInfoHud && phase == RenderPhase.POST &&
+               Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
     }
 
     public void toggleShouldRenderInfoHUD()
@@ -108,7 +110,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     }
 
     @Override
-    public List<String> getText()
+    public List<String> getText(RenderPhase phase)
     {
         return this.infoLines;
     }

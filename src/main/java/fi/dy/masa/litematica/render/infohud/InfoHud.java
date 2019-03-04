@@ -46,45 +46,35 @@ public class InfoHud
         return this.enabled;
     }
 
+    protected int getOffsetX()
+    {
+        return Configs.InfoOverlays.INFO_HUD_OFFSET_X.getIntegerValue();
+    }
+
+    protected int getOffsetY()
+    {
+        return Configs.InfoOverlays.INFO_HUD_OFFSET_Y.getIntegerValue();
+    }
+
     public void renderHud()
     {
         if (this.mc.player != null && this.shouldRender())
         {
             this.lineList.clear();
 
-            this.updateHudText();
-
             final int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
-            int xOffset = 2;
-            int yOffset = 2;
-            int lineIndex = 0;
+            int xOffset = this.getOffsetX();
+            int yOffset = this.getOffsetY();
             boolean isGui = this.mc.currentScreen != null;
             double scale = Math.max(0.05, this.getScaleFactor());
 
-            if (this.renderers.isEmpty() == false)
-            {
-                for (IInfoHudRenderer renderer : this.renderers)
-                {
-                    if (renderer.getShouldRender() && (isGui == false || renderer.shouldRenderInGuis()))
-                    {
-                        List<String> lines = renderer.getText();
-
-                        for (int i = 0; i < lines.size() && lineIndex < maxLines; ++i, ++lineIndex)
-                        {
-                            this.lineList.add(lines.get(i));
-                        }
-
-                        if (this.lineList.size() >= maxLines)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
+            this.getLinesForPhase(RenderPhase.PRE, maxLines, isGui);
+            this.updateHudText();
+            this.getLinesForPhase(RenderPhase.POST, maxLines, isGui);
 
             if (this.lineList.isEmpty() == false)
             {
-                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, 0, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, xOffset, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
                 yOffset += (int) Math.ceil(ySize * scale);
             }
 
@@ -92,9 +82,36 @@ public class InfoHud
             {
                 for (IInfoHudRenderer renderer : this.renderers)
                 {
-                    if (renderer.getShouldRender() && (isGui == false || renderer.shouldRenderInGuis()))
+                    if (renderer.getShouldRenderCustom() && (isGui == false || renderer.shouldRenderInGuis()))
                     {
+                        // FIXME: This is technically wrong, the yOffset should be separate per hud alignment
                         yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment());
+                    }
+                }
+            }
+        }
+    }
+
+    protected void getLinesForPhase(RenderPhase phase, int maxLines, boolean isGui)
+    {
+        if (this.renderers.isEmpty() == false)
+        {
+            for (int rendererIndex = 0; rendererIndex < this.renderers.size(); ++rendererIndex)
+            {
+                IInfoHudRenderer renderer = this.renderers.get(rendererIndex);
+
+                if (renderer.getShouldRenderText(phase) && (isGui == false || renderer.shouldRenderInGuis()))
+                {
+                    List<String> lines = renderer.getText(phase);
+
+                    for (int i = 0; i < lines.size() && this.lineList.size() < maxLines; ++i)
+                    {
+                        this.lineList.add(lines.get(i));
+                    }
+
+                    if (this.lineList.size() >= maxLines)
+                    {
+                        break;
                     }
                 }
             }

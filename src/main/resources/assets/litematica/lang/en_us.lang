@@ -347,6 +347,9 @@ litematica.hud.area_selection.selected_sub_region=Sub-region: %s
 litematica.hud.area_selection.selection_corners_mode=Corners Mode: %s
 
 litematica.hud.misc.none_brackets=<none>
+litematica.hud.misc.render_layer_mode=Layer Mode: %s - %s
+litematica.hud.misc.render_layer_mode_all=Layer Mode: %s
+litematica.hud.misc.renderer_status=Renderers: A: %s S: %s B: %s O: %s SEL: %s
 
 litematica.hud.schematic_placement.hover_info.placement_locked=This placement has been locked and can't\nbe modified without unlocking it first
 litematica.hud.schematic_placement.hover_info.placement_modified=This placement has been modified

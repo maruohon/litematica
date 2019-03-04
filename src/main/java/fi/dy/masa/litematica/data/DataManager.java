@@ -136,10 +136,10 @@ public class DataManager implements IDirectoryCache
         {
             MaterialListHudRenderer renderer = old.getHudRenderer();
 
-            if (renderer.getShouldRender())
+            if (renderer.getShouldRenderCustom())
             {
                 renderer.toggleShouldRender();
-                InfoHud.getInstance().removeInfoHudRenderer(renderer, true);
+                InfoHud.getInstance().removeInfoHudRenderer(renderer, false);
             }
         }
 

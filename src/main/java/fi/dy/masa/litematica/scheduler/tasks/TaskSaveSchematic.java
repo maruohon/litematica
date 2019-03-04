@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.litematica.scheduler.TaskBase;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -212,13 +213,13 @@ public class TaskSaveSchematic extends TaskBase implements IInfoHudRenderer
     }
 
     @Override
-    public boolean getShouldRender()
+    public boolean getShouldRenderText(RenderPhase phase)
     {
-        return true;
+        return phase == RenderPhase.POST;
     }
 
     @Override
-    public List<String> getText()
+    public List<String> getText(RenderPhase phase)
     {
         return this.infoHudLines;
     }

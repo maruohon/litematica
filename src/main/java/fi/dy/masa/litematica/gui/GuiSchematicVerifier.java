@@ -6,6 +6,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVerificationResults;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
@@ -194,7 +195,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
             case TOGGLE_INFO_HUD:
             {
-                boolean val = InfoHud.getInstance().isEnabled() && this.verifier.getShouldRender();
+                boolean val = InfoHud.getInstance().isEnabled() && this.verifier.getShouldRenderText(RenderPhase.POST);
                 String str = (val ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (val ? "on" : "off")) + TXT_RST;
                 label = I18n.format("litematica.gui.button.schematic_verifier.toggle_info_hud", str);
                 break;
@@ -467,7 +468,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                     SchematicVerifier verifier = this.parent.verifier;
                     verifier.toggleShouldRenderInfoHUD();
 
-                    if (verifier.getShouldRender())
+                    if (verifier.getShouldRenderText(RenderPhase.POST))
                     {
                         InfoHud.getInstance().addInfoHudRenderer(verifier, true);
                     }

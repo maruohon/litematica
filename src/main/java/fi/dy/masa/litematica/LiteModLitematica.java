@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.event.WorldLoadListener;
+import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.ClientTickHandler;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InputEventHandler;
@@ -65,6 +66,8 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
         WorldLoadListener listener = new WorldLoadListener();
         WorldLoadHandler.getInstance().registerWorldLoadPreHandler(listener);
         WorldLoadHandler.getInstance().registerWorldLoadPostHandler(listener);
+
+        StatusInfoRenderer.init();
     }
 
     @Override

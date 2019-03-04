@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableCollection;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.litematica.scheduler.TaskBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -328,13 +329,13 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     }
 
     @Override
-    public boolean getShouldRender()
+    public boolean getShouldRenderText(RenderPhase phase)
     {
-        return true;
+        return phase == RenderPhase.POST;
     }
 
     @Override
-    public List<String> getText()
+    public List<String> getText(RenderPhase phase)
     {
         return this.infoHudLines;
     }

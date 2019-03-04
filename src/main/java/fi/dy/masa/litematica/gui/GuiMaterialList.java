@@ -92,7 +92,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + gap;
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + gap;
-        x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRender(), ButtonListener.Type.TOGGLE_INFO_HUD) + gap;
+        x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRenderCustom(), ButtonListener.Type.TOGGLE_INFO_HUD) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_IGNORED) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_CACHE) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + gap;
@@ -228,7 +228,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                     MaterialListHudRenderer renderer = materialList.getHudRenderer();
                     renderer.toggleShouldRender();
 
-                    if (materialList.getHudRenderer().getShouldRender())
+                    if (materialList.getHudRenderer().getShouldRenderCustom())
                     {
                         InfoHud.getInstance().addInfoHudRenderer(renderer, true);
                     }
