@@ -196,7 +196,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                     posMutable.setPos(this.currentX, this.currentY, this.currentZ);
                     IBlockState stateSchematic = chunkSchematic.getBlockState(posMutable);
 
-                    if (this.changedBlockOnly == false &&
+                    if (this.changedBlockOnly == false ||
                         chunkClient.getBlockState(posMutable).getActualState(worldClient, posMutable) != stateSchematic)
                     {
                         this.sendSetBlockCommand(this.currentX, this.currentY, this.currentZ, stateSchematic, player);
