@@ -36,6 +36,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 
 public class SchematicUtils
 {
@@ -85,7 +86,12 @@ public class SchematicUtils
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            return setTargetedSchematicBlockState(info.pos.offset(info.side), info.stateNew);
+            BlockPos pos = info.pos.offset(info.side);
+
+            if (DataManager.getRenderLayerRange().isPositionWithinRange(pos))
+            {
+                return setTargetedSchematicBlockState(pos, info.stateNew);
+            }
         }
 
         return false;
@@ -361,7 +367,7 @@ public class SchematicUtils
                             }
 
                             part.getPlacement().getSchematic().getMetadata().setTotalBlocks(totalBlocks);
-                            DataManager.getSchematicPlacementManager().markChunksForRebuild(placement);
+                            DataManager.getSchematicPlacementManager().markAllPlacementsOfSchematicForRebuild(placement.getSchematic());
 
                             return true;
                         }
@@ -391,7 +397,7 @@ public class SchematicUtils
                     {
                         if (replaceAllIdenticalBlocks(manager, part, stateOriginal, stateNew))
                         {
-                            DataManager.getSchematicPlacementManager().markChunksForRebuild(part.getPlacement());
+                            manager.markAllPlacementsOfSchematicForRebuild(part.getPlacement().getSchematic());
                             return true;
                         }
 
@@ -429,7 +435,6 @@ public class SchematicUtils
         }
 
         LayerRange range = DataManager.getRenderLayerRange();
-        BlockPos origin = schematicPlacement.getOrigin();
 
         int totalBlocks = schematicPlacement.getSchematic().getMetadata().getTotalBlocks();
         int increment = 0;
@@ -453,57 +458,52 @@ public class SchematicUtils
                 continue;
             }
 
-            BlockPos regionSize = schematicPlacement.getSchematic().getAreaSize(regionName);
-            BlockPos regionPos = placement.getPos();
-
-            // These are the untransformed relative positions
-            BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
-            BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
-
-            // The transformed sub-region origin position
-            BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-
             int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
             int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
             int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
             int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
             int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
             int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
-            // The relative offset of the affected region's corners, to the sub-region's origin corner
-            BlockPos boxMinRel = new BlockPos(minX - origin.getX() - regionPosTransformed.getX(), minY - origin.getY(), minZ - origin.getZ() - regionPosTransformed.getZ());
-            BlockPos boxMaxRel = new BlockPos(maxX - origin.getX() - regionPosTransformed.getX(), maxY - origin.getY(), maxZ - origin.getZ() - regionPosTransformed.getZ());
 
-            // Reverse transform that relative offset, to get the untransformed orientation's offsets
-            boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, placement.getMirror(), placement.getRotation());
-            boxMaxRel = PositionUtils.getReverseTransformedBlockPos(boxMaxRel, placement.getMirror(), placement.getRotation());
+            BlockPos posStart = new BlockPos(minX, minY, minZ);
+            BlockPos posEnd = new BlockPos(maxX, maxY, maxZ);
 
-            boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-            boxMaxRel = PositionUtils.getReverseTransformedBlockPos(boxMaxRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+            BlockPos pos1 = getReverserTransformedWorldPosition(posStart, schematicPlacement.getSchematic(),
+                    regionName, schematicPlacement, schematicPlacement.getRelativeSubRegionPlacement(regionName));
+            BlockPos pos2 = getReverserTransformedWorldPosition(posEnd, schematicPlacement.getSchematic(),
+                    regionName, schematicPlacement, schematicPlacement.getRelativeSubRegionPlacement(regionName));
 
-            // Get the offset relative to the sub-region's minimum corner, instead of the origin corner (which can be at any corner)
-            boxMinRel = boxMinRel.subtract(posMinRel.subtract(regionPos));
-            boxMaxRel = boxMaxRel.subtract(posMinRel.subtract(regionPos));
+            if (pos1 == null || pos2 == null)
+            {
+                return false;
+            }
 
-            BlockPos posMin = PositionUtils.getMinCorner(boxMinRel, boxMaxRel);
-            BlockPos posMax = PositionUtils.getMaxCorner(boxMinRel, boxMaxRel);
+            BlockPos posStartWorld = PositionUtils.getMinCorner(pos1, pos2);
+            BlockPos posEndWorld   = PositionUtils.getMaxCorner(pos1, pos2);
 
-            final int startX = Math.max(posMin.getX(), 0);
-            final int startY = Math.max(posMin.getY(), 0);
-            final int startZ = Math.max(posMin.getZ(), 0);
-            final int endX = Math.min(posMax.getX(), container.getSize().getX() - 1);
-            final int endY = Math.min(posMax.getY(), container.getSize().getY() - 1);
-            final int endZ = Math.min(posMax.getZ(), container.getSize().getZ() - 1);
+            Vec3i size = container.getSize();
+            final int startX = Math.max(posStartWorld.getX(), 0);
+            final int startY = Math.max(posStartWorld.getY(), 0);
+            final int startZ = Math.max(posStartWorld.getZ(), 0);
+            final int endX = Math.min(posEndWorld.getX(), size.getX() - 1);
+            final int endY = Math.min(posEndWorld.getY(), size.getY() - 1);
+            final int endZ = Math.min(posEndWorld.getZ(), size.getZ() - 1);
 
             //System.out.printf("DEBUG == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
             //        regionName, startX, startY, startZ, endX, endY, endZ, container.getSize().getX(), container.getSize().getY(), container.getSize().getZ());
 
             if (startX < 0 || startY < 0 || startZ < 0 ||
-                endX >= container.getSize().getX() ||
-                endY >= container.getSize().getY() ||
-                endZ >= container.getSize().getZ())
+                endX >= size.getX() ||
+                endY >= size.getY() ||
+                endZ >= size.getZ())
             {
+                System.out.printf("OUT OF BOUNDS == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
+                        regionName, startX, startY, startZ, endX, endY, endZ, size.getX(), size.getY(), size.getZ());
                 return false;
             }
+
+            //System.out.printf("DEBUG == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
+            //        regionName, startX, startY, startZ, endX, endY, endZ, size.getX(), size.getY(), size.getZ());
 
             for (int y = startY; y <= endY; ++y)
             {
@@ -530,9 +530,40 @@ public class SchematicUtils
     public static BlockPos getSchematicContainerPositionFromWorldPosition(BlockPos worldPos, LitematicaSchematic schematic, String regionName,
             SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, LitematicaBlockStateContainer container)
     {
+        BlockPos boxMinRel = getReverserTransformedWorldPosition(worldPos, schematic, regionName, schematicPlacement, regionPlacement);
+
+        if (boxMinRel == null)
+        {
+            return null;
+        }
+
+        final int startX = boxMinRel.getX();
+        final int startY = boxMinRel.getY();
+        final int startZ = boxMinRel.getZ();
+        Vec3i size = container.getSize();
+
+        if (startX < 0 || startY < 0 || startZ < 0 || startX >= size.getX() || startY >= size.getY() || startZ >= size.getZ())
+        {
+            System.out.printf("DEBUG ============= OUT OF BOUNDS - region: %s, startX: %d, startY %s, startZ: %d - size x: %d y: %s z: %d =============\n",
+                    regionName, startX, startY, startZ, size.getX(), size.getY(), size.getZ());
+            return null;
+        }
+
+        return boxMinRel;
+    }
+
+    @Nullable
+    private static BlockPos getReverserTransformedWorldPosition(BlockPos worldPos, LitematicaSchematic schematic,
+            String regionName, SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement)
+    {
         BlockPos origin = schematicPlacement.getOrigin();
         BlockPos regionPos = regionPlacement.getPos();
         BlockPos regionSize = schematic.getAreaSize(regionName);
+
+        if (regionSize == null)
+        {
+            return null;
+        }
 
         // These are the untransformed relative positions
         BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
@@ -542,27 +573,19 @@ public class SchematicUtils
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
 
         // The relative offset of the affected region's corners, to the sub-region's origin corner
-        BlockPos boxMinRel = new BlockPos(worldPos.getX() - origin.getX() - regionPosTransformed.getX(), worldPos.getY() - origin.getY() - regionPosTransformed.getY(), worldPos.getZ() - origin.getZ() - regionPosTransformed.getZ());
+        BlockPos relPos = new BlockPos(worldPos.getX() - origin.getX() - regionPosTransformed.getX(),
+                                       worldPos.getY() - origin.getY() - regionPosTransformed.getY(),
+                                       worldPos.getZ() - origin.getZ() - regionPosTransformed.getZ());
 
         // Reverse transform that relative offset, to get the untransformed orientation's offsets
-        boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, regionPlacement.getMirror(), regionPlacement.getRotation());
+        relPos = PositionUtils.getReverseTransformedBlockPos(relPos, regionPlacement.getMirror(), regionPlacement.getRotation());
 
-        boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+        relPos = PositionUtils.getReverseTransformedBlockPos(relPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
 
         // Get the offset relative to the sub-region's minimum corner, instead of the origin corner (which can be at any corner)
-        boxMinRel = boxMinRel.subtract(posMinRel.subtract(regionPos));
+        relPos = relPos.subtract(posMinRel.subtract(regionPos));
 
-        final int startX = boxMinRel.getX();
-        final int startZ = boxMinRel.getZ();
-
-        if (startX < 0 || startZ < 0 || startX >= container.getSize().getX() || startZ >= container.getSize().getZ())
-        {
-            System.out.printf("DEBUG ============= OUT OF BOUNDS - region: %s, sx: %d, sz: %d, ex: %d, ez: %d - size x: %d z: %d =============\n",
-                    regionName, startX, startZ, startX, startZ, container.getSize().getX(), container.getSize().getZ());
-            return null;
-        }
-
-        return boxMinRel;
+        return relPos;
     }
 
     private static class ReplacementInfo

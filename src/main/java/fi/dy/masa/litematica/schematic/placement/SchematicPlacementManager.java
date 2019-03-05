@@ -441,6 +441,19 @@ public class SchematicPlacementManager
         }
     }
 
+    public void markAllPlacementsOfSchematicForRebuild(LitematicaSchematic schematic)
+    {
+        for (int i = 0; i < this.schematicPlacements.size(); ++i)
+        {
+            SchematicPlacement placement = this.schematicPlacements.get(i);
+
+            if (placement.getSchematic() == schematic)
+            {
+                this.markChunksForRebuild(placement);
+            }
+        }
+    }
+
     public void markChunksForRebuild(SchematicPlacement placement)
     {
         if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
