@@ -322,6 +322,7 @@ public class SchematicProject
             TaskScheduler.getInstance().scheduleTask(task, 2);
             this.saveInProgress = true;
             this.dirty = true;
+            this.saveToFile();
 
             return true;
         }
