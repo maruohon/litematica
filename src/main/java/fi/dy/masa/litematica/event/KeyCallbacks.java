@@ -164,10 +164,11 @@ public class KeyCallbacks
             if (toolEnabled && hasTool)
             {
                 int maxDistance = 200;
+                boolean projectMode =  DataManager.getSchematicProjectsManager().hasProjectOpen();
 
                 if (isToolPrimary || isToolSecondary)
                 {
-                    if (mode.getUsesAreaSelection())
+                    if (mode.getUsesAreaSelection() || projectMode)
                     {
                         SelectionManager sm = DataManager.getSelectionManager();
                         boolean moveEverything = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
@@ -191,11 +192,7 @@ public class KeyCallbacks
                 }
                 else if (isToolSelect)
                 {
-                    if (mode.getUsesSchematic())
-                    {
-                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
-                    }
-                    else if (mode.getUsesAreaSelection())
+                    if (mode.getUsesAreaSelection() || projectMode)
                     {
                         SelectionManager sm = DataManager.getSelectionManager();
 
@@ -222,6 +219,10 @@ public class KeyCallbacks
                         {
                             sm.changeSelection(this.mc.world, this.mc.player, maxDistance);
                         }
+                    }
+                    else if (mode.getUsesSchematic())
+                    {
+                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
                     }
 
                     return true;
