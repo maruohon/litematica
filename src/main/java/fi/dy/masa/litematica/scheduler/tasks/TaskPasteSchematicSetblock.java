@@ -26,6 +26,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -49,9 +50,9 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private boolean boxInProgress;
     private boolean finished;
 
-    public TaskPasteSchematicSetblock(SchematicPlacement placement, boolean changedBlockOnly)
+    public TaskPasteSchematicSetblock(SchematicPlacement placement, boolean changedBlocksOnly)
     {
-        this.changedBlockOnly = changedBlockOnly;
+        this.changedBlockOnly = changedBlocksOnly;
         this.maxCommandsPerTick = Configs.Generic.PASTE_COMMAND_LIMIT.getIntegerValue();
 
         Set<ChunkPos> touchedChunks = placement.getTouchedChunks();
@@ -195,9 +196,14 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                 {
                     posMutable.setPos(this.currentX, this.currentY, this.currentZ);
                     IBlockState stateSchematic = chunkSchematic.getBlockState(posMutable);
+                    IBlockState stateClient = chunkClient.getBlockState(posMutable).getActualState(worldClient, posMutable);
 
-                    if (this.changedBlockOnly == false ||
-                        chunkClient.getBlockState(posMutable).getActualState(worldClient, posMutable) != stateSchematic)
+                    if (stateSchematic.getBlock() == Blocks.AIR && stateClient.getBlock() == Blocks.AIR)
+                    {
+                        continue;
+                    }
+
+                    if (this.changedBlockOnly == false || stateClient != stateSchematic)
                     {
                         this.sendSetBlockCommand(this.currentX, this.currentY, this.currentZ, stateSchematic, player);
 
