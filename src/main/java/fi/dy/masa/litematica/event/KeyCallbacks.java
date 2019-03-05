@@ -421,7 +421,7 @@ public class KeyCallbacks
                 }
                 return true;
             }
-            else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && hasTool && toolEnabled)
+            else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && ((hasTool && toolEnabled) || Configs.Generic.EXECUTE_REQUIRE_TOOL.getBooleanValue() == false))
             {
                 if (DataManager.getSchematicProjectsManager().hasProjectOpen())
                 {
