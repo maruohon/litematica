@@ -219,6 +219,7 @@ public class LitematicaRenderer
             GlStateManager.pushMatrix();
             GlStateManager.disableTexture2D();
             GlStateManager.disableCull();
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.001F);
             GlStateManager.enablePolygonOffset();
             GlStateManager.doPolygonOffset(-0.4f, -0.8f);
             GlStateManager.enableBlend();
