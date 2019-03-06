@@ -181,16 +181,20 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
         File file = new File(entry.getDirectory(), entry.getName());
         SchematicMetadata meta = this.cachedMetadata.get(file);
 
-        if (meta == null)
+        if (meta == null && this.cachedMetadata.containsKey(file) == false)
         {
-            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
-
-            if (schematic != null)
+            if (entry.getName().endsWith(LitematicaSchematic.FILE_EXTENSION))
             {
-                meta = schematic.getMetadata();
-                this.cachedMetadata.put(file, meta);
-                this.createPreviewImage(file, meta);
+                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
+
+                if (schematic != null)
+                {
+                    meta = schematic.getMetadata();
+                    this.createPreviewImage(file, meta);
+                }
             }
+
+            this.cachedMetadata.put(file, meta);
         }
 
         return meta;
