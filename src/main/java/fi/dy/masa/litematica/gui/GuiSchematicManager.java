@@ -144,6 +144,11 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         return false;
     }
 
+    public static boolean hasPendingPreviewTask()
+    {
+        return previewGenerator != null;
+    }
+
     private class ConfigWrapper implements IConfigOptionList
     {
         @Override
@@ -241,7 +246,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             {
                 previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
                 this.gui.mc.displayGuiScreen(null);
-                InfoUtils.printActionbarMessage("litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot");
+                InfoUtils.showGuiAndInGameMessage(MessageType.INFO, "litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot");
             }
         }
 
@@ -413,7 +418,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
                     schematic.writeToFile(this.dir, this.fileName, true);
 
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
+                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
                 }
                 catch (Exception e)
                 {
@@ -422,7 +427,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else
             {
-                InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
             }
         }
     }

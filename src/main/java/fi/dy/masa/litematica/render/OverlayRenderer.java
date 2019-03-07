@@ -437,7 +437,7 @@ public class OverlayRenderer
         GlStateManager.enableDepth();
     }
 
-    public void renderHoverInfo(Minecraft mc, float partialTicks)
+    public void renderHoverInfo(Minecraft mc)
     {
         if (mc.world != null && mc.player != null)
         {
@@ -696,6 +696,18 @@ public class OverlayRenderer
             GlStateManager.enableCull();
             GlStateManager.depthMask(true);
         }
+    }
+
+    public void renderPreviewFrame(Minecraft mc)
+    {
+        ScaledResolution sr = new ScaledResolution(mc);
+        int width = sr.getScaledWidth();
+        int height = sr.getScaledHeight();
+        int x = width >= height ? (width - height) / 2 : 0;
+        int y = height >= width ? (height - width) / 2 : 0;
+        int longerSide = Math.min(width, height);
+
+        fi.dy.masa.malilib.render.RenderUtils.drawOutline(x, y, longerSide, longerSide, 2, 0xFFFFFFFF);
     }
 
     private enum BoxType

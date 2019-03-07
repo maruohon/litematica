@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.event;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.GuiSchematicManager;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -56,7 +57,12 @@ public class RenderHandler implements IRenderer
             if (mc.currentScreen == null)
             {
                 ToolHud.getInstance().renderHud();
-                OverlayRenderer.getInstance().renderHoverInfo(mc, partialTicks);
+                OverlayRenderer.getInstance().renderHoverInfo(mc);
+
+                if (GuiSchematicManager.hasPendingPreviewTask())
+                {
+                    OverlayRenderer.getInstance().renderPreviewFrame(mc);
+                }
             }
         }
     }
