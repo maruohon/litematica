@@ -84,7 +84,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     }
 
     @Override
-    protected void renameSelection(String selectionId, String newName)
+    protected void renameSelection(String newName)
     {
         SelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
 

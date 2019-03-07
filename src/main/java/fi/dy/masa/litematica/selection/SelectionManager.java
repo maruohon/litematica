@@ -109,23 +109,23 @@ public class SelectionManager
             return project != null ? project.getSelection() : null;
         }
 
-        if (this.mode == SelectionMode.SIMPLE)
-        {
-            return DataManager.getSimpleArea();
-        }
-
         return this.getSelection(this.currentSelectionId);
     }
 
     @Nullable
-    public AreaSelection getSelection(String selectionId)
+    public AreaSelection getSelection(@Nullable String selectionId)
     {
         if (this.mode == SelectionMode.SIMPLE)
         {
-            return DataManager.getSimpleArea();
+            return this.getSimpleSelection();
         }
 
         return this.getNormalSelection(selectionId);
+    }
+
+    protected AreaSelectionSimple getSimpleSelection()
+    {
+        return DataManager.getSimpleArea();
     }
 
     @Nullable
@@ -738,7 +738,7 @@ public class SelectionManager
         }
         else
         {
-            return new GuiAreaSelectionEditorSimple(this.getCurrentSelection());
+            return new GuiAreaSelectionEditorSimple(this.getSimpleSelection());
         }
     }
 

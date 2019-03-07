@@ -36,7 +36,7 @@ import net.minecraft.util.text.TextFormatting;
 public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
                                           implements ISelectionListener<String>
 {
-    @Nullable protected final AreaSelection selection;
+    protected final AreaSelection selection;
     protected GuiTextFieldGeneric textFieldSelectionName;
     protected WidgetCheckBox checkBoxOrigin;
     protected WidgetCheckBox checkBoxCorner1;
@@ -46,7 +46,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int xOrigin;
     @Nullable protected String selectionId;
 
-    public GuiAreaSelectionEditorNormal(@Nullable AreaSelection selection)
+    public GuiAreaSelectionEditorNormal(AreaSelection selection)
     {
         super(8, 116);
 
@@ -64,7 +64,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
     }
 
-    public void setSelectionId(String selectionId)
+    public void setSelectionId(@Nullable String selectionId)
     {
         this.selectionId = selectionId;
     }
@@ -370,16 +370,19 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             SelectionManager.renameSubRegionBoxIfSingle(this.selection, newName);
             this.selection.setName(newName);
         }
-        else if (this.selectionId != null)
+        else
         {
-            this.renameSelection(this.selectionId, newName);
+            this.renameSelection(newName);
         }
     }
 
-    protected void renameSelection(String selectionId, String newName)
+    protected void renameSelection(String newName)
     {
-        DataManager.getSelectionManager().renameSelection(selectionId, newName, this);
-        this.selectionId = DataManager.getSelectionManager().getCurrentSelectionId();
+        if (this.selectionId != null)
+        {
+            DataManager.getSelectionManager().renameSelection(this.selectionId, newName, this);
+            this.selectionId = DataManager.getSelectionManager().getCurrentSelectionId();
+        }
     }
 
     protected static class ButtonListener implements IButtonActionListener<ButtonGeneric>
