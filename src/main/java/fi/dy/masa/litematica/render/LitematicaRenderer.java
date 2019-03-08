@@ -6,7 +6,7 @@ import org.lwjgl.opengl.GL20;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
-import fi.dy.masa.litematica.render.shader.ShaderProgram;
+import fi.dy.masa.malilib.render.shader.ShaderProgram;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
@@ -23,6 +23,7 @@ public class LitematicaRenderer
     private static final LitematicaRenderer INSTANCE = new LitematicaRenderer();
 
     private static final ShaderProgram SHADER_ALPHA = new ShaderProgram("litematica", null, "shaders/alpha.frag");
+
     private Minecraft mc;
     private RenderGlobalSchematic worldRenderer;
     private int frameCount;
@@ -35,6 +36,14 @@ public class LitematicaRenderer
     private boolean renderPiecewiseBlocks;
     private boolean renderPiecewisePrepared;
     private boolean translucentSchematic;
+
+    static
+    {
+        int program = SHADER_ALPHA.getProgram();
+        GL20.glUseProgram(program);
+        GL20.glUniform1i(GL20.glGetUniformLocation(program, "texture"), 0);
+        GL20.glUseProgram(0);
+    }
 
     public static LitematicaRenderer getInstance()
     {
