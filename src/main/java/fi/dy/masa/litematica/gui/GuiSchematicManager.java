@@ -36,7 +36,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
     public GuiSchematicManager()
     {
-        super(10, 40);
+        super(10, 24);
 
         this.title = I18n.format("litematica.gui.title.schematic_manager");
     }
@@ -54,6 +54,12 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     }
 
     @Override
+    protected int getBrowserHeight()
+    {
+        return this.height - 60;
+    }
+
+    @Override
     public void initGui()
     {
         super.initGui();
@@ -64,7 +70,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     private void createButtons()
     {
         int x = 10;
-        int y = this.height - 36;
+        int y = this.height - 26;
 
         DirectoryEntry selected = this.getListWidget().getLastSelectedEntry();
 

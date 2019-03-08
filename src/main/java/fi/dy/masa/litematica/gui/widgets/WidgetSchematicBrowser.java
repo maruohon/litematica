@@ -39,7 +39,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
         this.title = I18n.format("litematica.gui.title.schematic_browser");
         this.infoWidth = 170;
-        this.infoHeight = 280;
+        this.infoHeight = 290;
         this.parent = parent;
     }
 
@@ -87,8 +87,9 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     {
         int x = this.posX + this.totalWidth - this.infoWidth;
         int y = this.posY;
+        int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, this.infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
         if (entry == null)
         {
@@ -111,7 +112,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             this.fontRenderer.drawString(meta.getName(), x + 4, y, valueColor);
             y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_info.author", meta.getAuthor());
+            str = I18n.format("litematica.gui.label.schematic_info.schematic_author", meta.getAuthor());
             this.fontRenderer.drawString(str, x, y, textColor);
             y += 12;
 
@@ -132,38 +133,64 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             this.fontRenderer.drawString(str, x, y, textColor);
             y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_info.total_volume", meta.getTotalVolume());
-            this.fontRenderer.drawString(str, x, y, textColor);
-            y += 12;
+            if (this.parent.height >= 340)
+            {
+                str = I18n.format("litematica.gui.label.schematic_info.total_volume", meta.getTotalVolume());
+                this.fontRenderer.drawString(str, x, y, textColor);
+                y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_info.total_blocks", meta.getTotalBlocks());
-            this.fontRenderer.drawString(str, x, y, textColor);
-            y += 12;
+                str = I18n.format("litematica.gui.label.schematic_info.total_blocks", meta.getTotalBlocks());
+                this.fontRenderer.drawString(str, x, y, textColor);
+                y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_info.enclosing_size");
-            this.fontRenderer.drawString(str, x, y, textColor);
-            y += 12;
+                str = I18n.format("litematica.gui.label.schematic_info.enclosing_size");
+                this.fontRenderer.drawString(str, x, y, textColor);
+                y += 12;
 
-            Vec3i areaSize = meta.getEnclosingSize();
-            String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
-            this.fontRenderer.drawString(tmp, x + 4, y, valueColor);
-            y += 12;
+                Vec3i areaSize = meta.getEnclosingSize();
+                String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
+                this.fontRenderer.drawString(tmp, x + 4, y, valueColor);
+                y += 12;
+            }
+            else
+            {
+                str = I18n.format("litematica.gui.label.schematic_info.total_blocks_and_volume", meta.getTotalBlocks(), meta.getTotalVolume());
+                this.fontRenderer.drawString(str, x, y, textColor);
+                y += 12;
+
+                Vec3i areaSize = meta.getEnclosingSize();
+                String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
+                str = I18n.format("litematica.gui.label.schematic_info.enclosing_size_value", tmp);
+                this.fontRenderer.drawString(str, x, y, textColor);
+                y += 12;
+            }
 
             /*
             str = I18n.format("litematica.gui.label.schematic_info.description");
             this.fontRenderer.drawString(str, x, y, textColor);
             */
-            y += 12;
+            //y += 12;
 
             Pair<ResourceLocation, DynamicTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
 
             if (pair != null)
             {
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                this.bindTexture(pair.getLeft());
+                y += 14;
 
                 int iconSize = (int) Math.sqrt(pair.getRight().getTextureData().length);
-                Gui.drawModalRectWithCustomSizedTexture(x + 10, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+                boolean needsScaling = height < this.infoHeight;
+
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+                if (needsScaling)
+                {
+                    iconSize = height - y + this.posY - 6;
+                }
+
+                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
+
+                this.bindTexture(pair.getLeft());
+                Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
     }

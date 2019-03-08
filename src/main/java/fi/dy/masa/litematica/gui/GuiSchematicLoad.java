@@ -32,7 +32,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
     public GuiSchematicLoad()
     {
-        super(12, 34);
+        super(12, 24);
 
         this.title = I18n.format("litematica.gui.title.load_schematic");
     }
@@ -47,6 +47,12 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
     public File getDefaultDirectory()
     {
         return DataManager.getSchematicsBaseDirectory();
+    }
+
+    @Override
+    public int getMaxInfoHeight()
+    {
+        return this.getBrowserHeight() + 10;
     }
 
     @Override
@@ -67,8 +73,8 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         this.checkboxCreatePlacementOnLoad.setListener(new CheckboxListener());
         this.checkboxCreatePlacementOnLoad.setChecked(DataManager.getCreatePlacementOnLoad());
         this.addWidget(this.checkboxCreatePlacementOnLoad);
-        y += 14;
 
+        y = this.height - 26;
         x += this.createButton(x, y, -1, ButtonListener.Type.LOAD_SCHEMATIC) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.MATERIAL_LIST) + 4;
 

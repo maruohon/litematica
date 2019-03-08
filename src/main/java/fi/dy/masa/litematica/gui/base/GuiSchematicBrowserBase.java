@@ -49,6 +49,11 @@ public abstract class GuiSchematicBrowserBase extends GuiListBase<DirectoryEntry
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 80;
+        return this.height - 70;
+    }
+
+    public int getMaxInfoHeight()
+    {
+        return this.getBrowserHeight();
     }
 }

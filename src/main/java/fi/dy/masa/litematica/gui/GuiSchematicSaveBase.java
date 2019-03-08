@@ -33,9 +33,21 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         this.schematic = schematic;
 
         Minecraft mc = Minecraft.getMinecraft();
-        this.textField = new GuiTextFieldGeneric(10, 32, 90, 20, mc.fontRenderer);
+        this.textField = new GuiTextFieldGeneric(10, 32, 160, 20, mc.fontRenderer);
         this.textField.setMaxStringLength(256);
         this.textField.setFocused(true);
+    }
+
+    @Override
+    public int getBrowserHeight()
+    {
+        return this.height - 80;
+    }
+
+    @Override
+    public int getMaxInfoHeight()
+    {
+        return super.getMaxInfoHeight();
     }
 
     @Override
@@ -43,7 +55,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         super.initGui();
 
-        ((IGuiTextField) this.textField).setInternalWidth(this.width - 273);
+        ((IGuiTextField) this.textField).setInternalWidth(this.width - 196);
         DirectoryEntry entry = this.getListWidget().getLastSelectedEntry();
 
         if (entry != null && entry.getType() != DirectoryEntryType.DIRECTORY)

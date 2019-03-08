@@ -71,6 +71,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     {
         super.initGui();
 
+        boolean isNarrow = this.width < this.getElementTotalWidth();
+
         int x = 12;
         int y = 24;
         int buttonWidth;
@@ -93,6 +95,13 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + gap;
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + gap;
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRenderCustom(), ButtonListener.Type.TOGGLE_INFO_HUD) + gap;
+
+        if (isNarrow)
+        {
+            x = 12;
+            y = this.height - 22;
+        }
+
         x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_IGNORED) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.CLEAR_CACHE) + gap;
         x += this.createButton(x, y, -1, ButtonListener.Type.WRITE_TO_FILE) + gap;
@@ -132,7 +141,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
             str = I18n.format("litematica.gui.label.material_list.progress", strp);
             w = this.fontRenderer.getStringWidth(str);
-            this.addLabel(12, this.height - 30, w, 12, 0xFFFFFFFF, str);
+            this.addLabel(12, this.height - 36, w, 12, 0xFFFFFFFF, str);
         }
     }
 
@@ -164,6 +173,23 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         this.addButton(button, listener);
 
         return button.getButtonWidth();
+    }
+
+    private int getElementTotalWidth()
+    {
+        int width = 0;
+
+        width += this.mc.fontRenderer.getStringWidth(ButtonListener.Type.REFRESH_LIST.getDisplayName());
+        width += this.mc.fontRenderer.getStringWidth(ButtonListener.Type.LIST_TYPE.getDisplayName(this.materialList.getMaterialListType().getDisplayName()));
+        width += this.mc.fontRenderer.getStringWidth(ButtonListener.Type.CLEAR_IGNORED.getDisplayName());
+        width += this.mc.fontRenderer.getStringWidth(ButtonListener.Type.CLEAR_CACHE.getDisplayName());
+        width += this.mc.fontRenderer.getStringWidth(ButtonListener.Type.WRITE_TO_FILE.getDisplayName());
+        width += ButtonOnOff.createOnOff(0, 0, -1, false, ButtonListener.Type.HIDE_AVAILABLE.getTranslationKey(), false).getButtonWidth();
+        width += ButtonOnOff.createOnOff(0, 0, -1, false, ButtonListener.Type.TOGGLE_INFO_HUD.getTranslationKey(), false).getButtonWidth();
+        width += this.mc.fontRenderer.getStringWidth(I18n.format("litematica.gui.label.material_list.multiplier"));
+        width += 130;
+
+        return width;
     }
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
