@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -15,7 +16,8 @@ public class GuiMainMenu extends GuiBase
 {
     public GuiMainMenu()
     {
-        this.title = I18n.format("litematica.gui.title.litematica_main_menu");
+        String version = String.format("v%s", Reference.MOD_VERSION);
+        this.title = I18n.format("litematica.gui.title.litematica_main_menu", version);
     }
 
     @Override
