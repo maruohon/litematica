@@ -420,7 +420,7 @@ litematica.message.moved_selection=Moved the current selection from %s => %s
 litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
-litematica.message.placement_restriction_in_effect=Action prevented by Placement Restriction mode
+litematica.message.placement_restriction_fail=Action prevented by Placement Restriction mode
 litematica.message.removed_area_origin=Removed the explicit/manual area origin point
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.scheduled_task_added=Scheduled task added...
