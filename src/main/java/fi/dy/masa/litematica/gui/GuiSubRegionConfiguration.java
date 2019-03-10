@@ -11,7 +11,9 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -129,6 +131,13 @@ public class GuiSubRegionConfiguration extends GuiBase
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
         this.addTextField(textField, listener);
+
+        String hover = I18n.format("litematica.hud.schematic_placement.hover_info.lock_coordinate");
+        x = x + offset + width + 20;
+        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "", this.mc, hover);
+        cb.setChecked(this.placement.isCoordinateLocked(type), false);
+        cb.setListener(new CoordinateLockListener(type, this.placement));
+        this.addWidget(cb);
     }
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
@@ -390,6 +399,24 @@ public class GuiSubRegionConfiguration extends GuiBase
             }
 
             return false;
+        }
+    }
+
+    private static class CoordinateLockListener implements ISelectionListener<WidgetCheckBox>
+    {
+        private final SubRegionPlacement placement;
+        private final CoordinateType type;
+
+        private CoordinateLockListener(CoordinateType type, SubRegionPlacement placement)
+        {
+            this.type = type;
+            this.placement = placement;
+        }
+
+        @Override
+        public void onSelectionChange(WidgetCheckBox entry)
+        {
+            this.placement.setCoordinateLocked(this.type, entry.isChecked());
         }
     }
 }

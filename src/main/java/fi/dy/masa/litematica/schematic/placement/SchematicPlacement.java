@@ -31,6 +31,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -60,6 +61,7 @@ public class SchematicPlacement
     private boolean regionPlacementsModified;
     private boolean locked;
     private boolean shouldBeSaved = true;
+    private int coordinateLockMask;
     private int boxesBBColor;
     private Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
     @Nullable
@@ -195,6 +197,26 @@ public class SchematicPlacement
     public void toggleLocked()
     {
         this.locked = ! this.locked;
+    }
+
+    public void setCoordinateLocked(CoordinateType coord, boolean locked)
+    {
+        int mask = 0x1 << coord.ordinal();
+
+        if (locked)
+        {
+            this.coordinateLockMask |= mask;
+        }
+        else
+        {
+            this.coordinateLockMask &= ~mask;
+        }
+    }
+
+    public boolean isCoordinateLocked(CoordinateType coord)
+    {
+        int mask = 0x1 << coord.ordinal();
+        return (this.coordinateLockMask & mask) != 0;
     }
 
     public String getName()
@@ -758,6 +780,8 @@ public class SchematicPlacement
             return this;
         }
 
+        origin = PositionUtils.getModifiedPartiallyLockedPosition(this.origin, origin, this.coordinateLockMask);
+
         if (this.origin.equals(origin) == false)
         {
             // Marks the currently touched chunks before doing the modification
@@ -865,6 +889,7 @@ public class SchematicPlacement
             obj.add("enable_render", new JsonPrimitive(this.enableRender));
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
             obj.add("locked", new JsonPrimitive(this.isLocked()));
+            obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
             obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
             obj.add("verifier_type", new JsonPrimitive(this.verifierType.getStringValue()));
 
@@ -941,6 +966,7 @@ public class SchematicPlacement
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
             schematicPlacement.renderEnclosingBox = JsonUtils.getBoolean(obj, "render_enclosing_box");
             schematicPlacement.locked = JsonUtils.getBoolean(obj, "locked");
+            schematicPlacement.coordinateLockMask = JsonUtils.getInteger(obj, "locked_coords");
 
             if (JsonUtils.hasInteger(obj, "bb_color"))
             {

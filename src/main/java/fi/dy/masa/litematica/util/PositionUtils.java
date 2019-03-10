@@ -608,6 +608,35 @@ public class PositionUtils
         }
     }
 
+    public static BlockPos getModifiedPartiallyLockedPosition(BlockPos posOriginal, BlockPos posNew, int lockMask)
+    {
+        if (lockMask != 0)
+        {
+            int x = posNew.getX();
+            int y = posNew.getY();
+            int z = posNew.getZ();
+
+            if ((lockMask & (0x1 << CoordinateType.X.ordinal())) != 0)
+            {
+                x = posOriginal.getX();
+            }
+
+            if ((lockMask & (0x1 << CoordinateType.Y.ordinal())) != 0)
+            {
+                y = posOriginal.getY();
+            }
+
+            if ((lockMask & (0x1 << CoordinateType.Z.ordinal())) != 0)
+            {
+                z = posOriginal.getZ();
+            }
+
+            posNew = new BlockPos(x, y, z);
+        }
+
+        return posNew;
+    }
+
     /**
      * Gets the "front" facing from the given positions,
      * so that pos1 is in the "front left" corner and pos2 is in the "back right" corner

@@ -565,9 +565,13 @@ public class SchematicPlacementManager
             {
                 BlockPos old = schematicPlacement.getOrigin();
                 schematicPlacement.setOrigin(pos, InfoUtils.INFO_MESSAGE_CONSUMER);
-                String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
-                String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
+
+                if (old.equals(schematicPlacement.getOrigin()) == false)
+                {
+                    String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
+                    String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
+                }
             }
         }
     }
