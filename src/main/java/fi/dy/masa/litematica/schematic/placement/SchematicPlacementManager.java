@@ -620,6 +620,12 @@ public class SchematicPlacementManager
         {
             if (schematicPlacement != null)
             {
+                if (PositionUtils.isPlacementWithinWorld(mc.world, schematicPlacement, false) == false)
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.placement_paste_outside_world");
+                    return;
+                }
+
                 if (mc.isSingleplayer())
                 {
                     final WorldServer world = mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld()));
@@ -635,7 +641,7 @@ public class SchematicPlacementManager
                             }
                             else
                             {
-                                InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
+                                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
                             }
                         }
                     });
@@ -651,7 +657,7 @@ public class SchematicPlacementManager
             }
             else
             {
-                InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
             }
         }
         else

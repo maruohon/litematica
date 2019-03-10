@@ -10,10 +10,13 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableMap;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
@@ -96,14 +99,59 @@ public class PositionUtils
 
     public static boolean arePositionsWithinWorld(World world, BlockPos pos1, BlockPos pos2)
     {
-        if (pos1.getY() >= 0 && pos1.getY() < 256 &&
-            pos2.getY() >= 0 && pos2.getY() < 256)
+        if (pos1.getY() >= LayerRange.WORLD_VERTICAL_SIZE_MIN && pos1.getY() <= LayerRange.WORLD_VERTICAL_SIZE_MAX &&
+            pos2.getY() >= LayerRange.WORLD_VERTICAL_SIZE_MIN && pos2.getY() <= LayerRange.WORLD_VERTICAL_SIZE_MAX)
         {
             WorldBorder border = world.getWorldBorder();
             return border.contains(pos1) && border.contains(pos2);
         }
 
         return false;
+    }
+
+    public static boolean isBoxWithinWorld(World world, Box box)
+    {
+        if (box.getPos1() != null && box.getPos2() != null)
+        {
+            return arePositionsWithinWorld(world, box.getPos1(), box.getPos2());
+        }
+
+        return false;
+    }
+
+    public static boolean isPlacementWithinWorld(World world, SchematicPlacement schematicPlacement, boolean respectRenderRange)
+    {
+        LayerRange range = DataManager.getRenderLayerRange();
+        BlockPos.MutableBlockPos posMutable1 = new BlockPos.MutableBlockPos();
+        BlockPos.MutableBlockPos posMutable2 = new BlockPos.MutableBlockPos();
+
+        for (Box box : schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values())
+        {
+            if (respectRenderRange)
+            {
+                if (range.intersectsBox(box.getPos1(), box.getPos2()))
+                {
+                    StructureBoundingBox bb = range.getClampedArea(box.getPos1(), box.getPos2());
+
+                    if (bb != null)
+                    {
+                        posMutable1.setPos(bb.minX, bb.minY, bb.minZ);
+                        posMutable2.setPos(bb.maxX, bb.maxY, bb.maxZ);
+
+                        if (arePositionsWithinWorld(world, posMutable1, posMutable2) == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            else if (isBoxWithinWorld(world, box) == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static BlockPos getAreaSizeFromRelativeEndPosition(BlockPos posEndRelative)

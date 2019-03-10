@@ -393,6 +393,7 @@ litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.error.no_area_selected=§cNo area selected§r
 litematica.message.error.no_placement_selected=§cNo placement selected§r
 litematica.message.error.only_works_in_single_player=§cThis operation only works in single player§r
+litematica.message.error.placement_paste_outside_world=The placement can't be pasted in the current position, because it goes outside the world bounds
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
 litematica.message.error.schematic_save_failed=Failed to save schematic to file '%s'
 litematica.message.error.schematic_save_interrupted=Schematic saving interrupted or stopped
