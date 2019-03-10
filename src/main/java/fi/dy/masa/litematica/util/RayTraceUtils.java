@@ -409,8 +409,15 @@ public class RayTraceUtils
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
         RayTraceResult result = getRayTraceFromEntity(worldClient, entity, false, range);
-        final double closestVanilla = result.typeOfHit != RayTraceResult.Type.MISS ? result.hitVec.distanceTo(eyesPos) : -1D;
 
+        if (result.typeOfHit != RayTraceResult.Type.BLOCK)
+        {
+            return null;
+        }
+
+        final double closestVanilla = result.hitVec.squareDistanceTo(eyesPos);
+
+        BlockPos closestVanillaPos = result.getBlockPos();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         List<RayTraceResult> list = rayTraceSchematicWorldBlocksToList(worldSchematic, eyesPos, lookEndPos, false, false, false, true, 200);
         RayTraceResult furthestTrace = null;
@@ -420,12 +427,18 @@ public class RayTraceUtils
         {
             for (RayTraceResult trace : list)
             {
-                double dist = trace.hitVec.distanceTo(eyesPos);
+                double dist = trace.hitVec.squareDistanceTo(eyesPos);
 
-                if ((furthestDist < 0 || dist > furthestDist) && (dist < closestVanilla || closestVanilla < 0))
+                if ((furthestDist < 0 || dist > furthestDist) && (dist < closestVanilla || closestVanilla < 0) &&
+                     trace.getBlockPos().equals(closestVanillaPos) == false)
                 {
                     furthestDist = dist;
                     furthestTrace = trace;
+                }
+
+                if (closestVanilla >= 0 && dist > closestVanilla)
+                {
+                    break;
                 }
             }
         }
