@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.config.HudAlignment;
@@ -135,6 +136,12 @@ public class ToolHud extends InfoHud
         String white = GuiBase.TXT_WHITE;
         String strYes = green + I18n.format("litematica.label.yes") + rst;
         String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
+
+        if (mode == ToolMode.DELETE)
+        {
+            String strp = ToolModeData.DELETE.getUsePlacement() ? "litematica.hud.delete.target_mode.placement" : "litematica.hud.delete.target_mode.area";
+            lines.add(I18n.format("litematica.hud.delete.target_mode", green + I18n.format(strp) + rst));
+        }
 
         if (mode.getUsesAreaSelection())
         {

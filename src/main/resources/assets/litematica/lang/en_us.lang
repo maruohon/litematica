@@ -348,6 +348,10 @@ litematica.hud.area_selection.selected_area_simple=Area [§6Simple mode§r]: %s
 litematica.hud.area_selection.selected_sub_region=Sub-region: %s
 litematica.hud.area_selection.selection_corners_mode=Corners Mode: %s
 
+litematica.hud.delete.target_mode=Delete target mode: %s
+litematica.hud.delete.target_mode.area=Current Area
+litematica.hud.delete.target_mode.placement=Current Placement
+
 litematica.hud.misc.easy_place_mode_enabled=Easy Place mode §aON§r
 litematica.hud.misc.none_brackets=<none>
 litematica.hud.misc.placement_restriction_mode_enabled=Placement Restriction mode §aON§r

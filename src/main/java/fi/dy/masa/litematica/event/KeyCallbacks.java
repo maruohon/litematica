@@ -20,6 +20,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -535,11 +536,16 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeybind())
             {
-                if (mode.getUsesAreaSelection())
+                if (mode == ToolMode.DELETE)
+                {
+                    ToolModeData.DELETE.toggleUsePlacement();
+                }
+                else if (mode.getUsesAreaSelection())
                 {
                     Configs.Generic.SELECTION_CORNERS_MODE.setOptionListValue(Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().cycle(false));
-                    return true;
                 }
+
+                return true;
             }
             else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
             {

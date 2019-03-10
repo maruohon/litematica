@@ -5,8 +5,11 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.Block;
@@ -174,7 +177,23 @@ public class ToolUtils
 
     public static void deleteSelectionVolumes(boolean removeEntities, Minecraft mc)
     {
-        deleteSelectionVolumes(DataManager.getSelectionManager().getCurrentSelection(), removeEntities, mc);
+        AreaSelection area = null;
+
+        if (DataManager.getToolMode() == ToolMode.DELETE && ToolModeData.DELETE.getUsePlacement())
+        {
+            SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+            if (placement != null)
+            {
+                area = AreaSelection.fromPlacement(placement);
+            }
+        }
+        else
+        {
+            area = DataManager.getSelectionManager().getCurrentSelection();
+        }
+
+        deleteSelectionVolumes(area, removeEntities, mc);
     }
 
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities, Minecraft mc)
@@ -201,7 +220,7 @@ public class ToolUtils
                             }
                             else
                             {
-                                InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.area_clear_fail");
+                                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.area_clear_fail");
                             }
                         }
                     });
@@ -215,12 +234,12 @@ public class ToolUtils
                 }
                 else
                 {
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.area_clear_fail");
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.area_clear_fail");
                 }
             }
             else
             {
-                InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
             }
         }
         else

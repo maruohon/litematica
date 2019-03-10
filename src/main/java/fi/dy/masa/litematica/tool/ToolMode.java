@@ -42,12 +42,17 @@ public enum ToolMode
 
     public boolean getUsesSchematic()
     {
+        if (this == ToolMode.DELETE && ToolModeData.DELETE.getUsePlacement())
+        {
+            return true;
+        }
+
         return this.usesSchematic;
     }
 
     public boolean getUsesAreaSelection()
     {
-        return this.usesSchematic == false || DataManager.getSchematicProjectsManager().hasProjectOpen();
+        return this.getUsesSchematic() == false || DataManager.getSchematicProjectsManager().hasProjectOpen();
     }
 
     public boolean getUsesBlockPrimary()
