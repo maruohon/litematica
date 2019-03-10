@@ -390,7 +390,19 @@ public class DataManager implements IDirectoryCache
 
     public static File getAreaSelectionsBaseDirectory()
     {
-        File dir = FileUtils.getCanonicalFileIfPossible(new File(getCurrentConfigDirectory(), "area_selections"));
+        File dir;
+        String name = StringUtils.getWorldOrServerName();
+
+        if (Configs.Generic.AREAS_PER_WORLD.getBooleanValue() && name != null)
+        {
+            // The 'area_selections' sub-directory is to prevent showing the world name or server IP in the browser,
+            // as the root directory name is shown in the navigation widget
+            dir = FileUtils.getCanonicalFileIfPossible(new File(new File(new File(getCurrentConfigDirectory(), "area_selections_per_world"), name), "area_selections"));
+        }
+        else
+        {
+            dir = FileUtils.getCanonicalFileIfPossible(new File(getCurrentConfigDirectory(), "area_selections"));
+        }
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
