@@ -291,9 +291,11 @@ public class SelectionManager
 
     public void setCurrentSelection(@Nullable String selectionId)
     {
-        if (selectionId == null || this.selections.containsKey(selectionId))
+        this.currentSelectionId = selectionId;
+
+        if (this.currentSelectionId != null)
         {
-            this.currentSelectionId = selectionId;
+            this.getOrLoadSelection(this.currentSelectionId);
         }
     }
 
@@ -394,7 +396,7 @@ public class SelectionManager
 
         File file = new File(dir, safeName + ".json");
         String selectionId = file.getAbsolutePath();
-        AreaSelection selection = this.getOrLoadSelection(selectionId);
+        AreaSelection selection = this.getOrLoadSelectionReadOnly(selectionId);
 
         if (selection == null)
         {

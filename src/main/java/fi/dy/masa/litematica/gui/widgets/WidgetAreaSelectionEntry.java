@@ -100,7 +100,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
         List<String> text = new ArrayList<>();
-        AreaSelection selection = this.selectionManager.getOrLoadSelection(this.getDirectoryEntry().getFullPath().getAbsolutePath());
+        AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(this.getDirectoryEntry().getFullPath().getAbsolutePath());
 
         if (selection != null)
         {
