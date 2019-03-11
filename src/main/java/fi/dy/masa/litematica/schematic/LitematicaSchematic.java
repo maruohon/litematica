@@ -286,11 +286,12 @@ public class LitematicaSchematic
             @Nullable Map<BlockPos, NextTickListEntry> scheduledTicks, boolean notifyNeighbors)
     {
         // These are the untransformed relative positions
-        BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
+        BlockPos posEndRelSub = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize);
+        BlockPos posEndRel = posEndRelSub.add(regionPos);
         BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
 
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        BlockPos posEndAbs = PositionUtils.getTransformedPlacementPosition(regionSize.add(-1, -1, -1), schematicPlacement, placement).add(regionPosTransformed).add(origin);
+        BlockPos posEndAbs = PositionUtils.getTransformedBlockPos(posEndRelSub, placement.getMirror(), placement.getRotation()).add(regionPosTransformed).add(origin);
         BlockPos regionPosAbs = regionPosTransformed.add(origin);
 
         if (PositionUtils.arePositionsWithinWorld(world, regionPosAbs, posEndAbs) == false)
