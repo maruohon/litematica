@@ -160,6 +160,7 @@ public class SchematicProject
     public void switchSelectionMode()
     {
         this.selectionMode = this.selectionMode.cycle(true);
+        this.dirty = true;
     }
 
     public ImmutableList<SchematicVersion> getAllVersions()
