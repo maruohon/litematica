@@ -140,6 +140,12 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         ButtonGeneric button;
 
         y = this.height - 26;
+
+        if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
+        {
+            this.addLabel(16, y - 22, 120, 12, 0xFFFFAA00, I18n.format("litematica.warning.area_editor.area_rendering_disabled"));
+        }
+
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
         String label = I18n.format(type.getLabelKey());
         button = new ButtonGeneric(x, y, -1, 20, label, type.getIcon());

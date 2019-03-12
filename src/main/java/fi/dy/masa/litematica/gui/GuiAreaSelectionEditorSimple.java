@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -63,7 +64,12 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
             this.createCoordinateInputs(x, y, width, Corner.NONE);
         }
 
-        this.createButton(22, nextY, -1, ButtonListener.Type.CREATE_SCHEMATIC);
+        x = this.createButton(22, nextY, -1, ButtonListener.Type.CREATE_SCHEMATIC) + 26;
+
+        if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
+        {
+            this.addLabel(x, nextY, 120, 12, 0xFFFFAA00, I18n.format("litematica.warning.area_editor.area_rendering_disabled"));
+        }
 
         return y;
     }

@@ -452,6 +452,8 @@ litematica.message.warn.schematic_rendering_disabled=Warning: Schematic renderin
 
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
 
+litematica.warning.area_editor.area_rendering_disabled=Note: The Area Selection boxes rendering is currently disabled\nSee Visuals -> enableAreaSelectionBoxesRendering
+
 litematica.tool_mode.name.area_selection=Area Selection
 litematica.tool_mode.name.delete=Delete
 litematica.tool_mode.name.fill=Fill
