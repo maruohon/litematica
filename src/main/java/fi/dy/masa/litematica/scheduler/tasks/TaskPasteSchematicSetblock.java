@@ -195,20 +195,21 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                     posMutable.setPos(this.currentX, this.currentY, this.currentZ);
 
                     IBlockState stateSchematicOrig = chunkSchematic.getBlockState(posMutable);
-                    // Discard the non-meta state info, as it depends on neighbor blocks which will
-                    // be synced with some delay from the server
-                    @SuppressWarnings("deprecation")
-                    IBlockState stateSchematic = stateSchematicOrig.getBlock().getStateFromMeta(stateSchematicOrig.getBlock().getMetaFromState(stateSchematicOrig));
                     IBlockState stateClient = chunkClient.getBlockState(posMutable);
 
-                    if (stateSchematic.getBlock() == Blocks.AIR && stateClient.getBlock() == Blocks.AIR)
+                    if (stateSchematicOrig.getBlock() == Blocks.AIR && stateClient.getBlock() == Blocks.AIR)
                     {
                         continue;
                     }
 
+                    // Discard the non-meta state info, as it depends on neighbor blocks which will
+                    // be synced with some delay from the server
+                    @SuppressWarnings("deprecation")
+                    IBlockState stateSchematic = stateSchematicOrig.getBlock().getStateFromMeta(stateSchematicOrig.getBlock().getMetaFromState(stateSchematicOrig));
+
                     if (this.changedBlockOnly == false || stateClient != stateSchematic)
                     {
-                        this.sendSetBlockCommand(this.currentX, this.currentY, this.currentZ, stateSchematic, player);
+                        this.sendSetBlockCommand(this.currentX, this.currentY, this.currentZ, stateSchematicOrig, player);
 
                         if (++this.sentCommandsThisTick >= this.maxCommandsPerTick)
                         {
