@@ -162,16 +162,28 @@ public class ToolUtils
 
     public static void killEntitiesCommand(Collection<Box> boxes, Minecraft mc)
     {
+        World world = mc.world;
+
+        if (world == null)
+        {
+            return;
+        }
+
         for (Box box : boxes)
         {
             BlockPos posMin = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
             BlockPos posMax = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+            AxisAlignedBB bb = new AxisAlignedBB(posMin, posMax.add(1, 1, 1));
+            List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(mc.player, bb);
 
-            String cmd = String.format("/kill @e[type=!player,x=%d,y=%d,z=%d,dx=%d,dy=%d,dz=%d]",
-                    posMin.getX(), posMin.getY(), posMin.getZ(),
-                    posMax.getX() - posMin.getX() + 1, posMax.getY() - posMin.getY() + 1, posMax.getZ() - posMin.getZ() + 1);
+            if (entities.size() > 0)
+            {
+                String cmd = String.format("/kill @e[type=!player,x=%d,y=%d,z=%d,dx=%d,dy=%d,dz=%d]",
+                        posMin.getX(), posMin.getY(), posMin.getZ(),
+                        posMax.getX() - posMin.getX() + 1, posMax.getY() - posMin.getY() + 1, posMax.getZ() - posMin.getZ() + 1);
 
-            mc.player.sendChatMessage(cmd);
+                mc.player.sendChatMessage(cmd);
+            }
         }
     }
 
