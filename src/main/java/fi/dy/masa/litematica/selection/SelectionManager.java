@@ -103,10 +103,11 @@ public class SelectionManager
     @Nullable
     public AreaSelection getCurrentSelection()
     {
-        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+        SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
+
+        if (project != null)
         {
-            SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-            return project != null ? project.getSelection() : null;
+            return project.getSelection();
         }
 
         return this.getSelection(this.currentSelectionId);
@@ -724,10 +725,10 @@ public class SelectionManager
     @Nullable
     public GuiBase getEditGui()
     {
+        AreaSelection selection = this.getCurrentSelection();
+
         if (this.getSelectionMode() == SelectionMode.NORMAL)
         {
-            AreaSelection selection = this.getCurrentSelection();
-
             if (selection != null)
             {
                 return new GuiAreaSelectionEditorNormal(selection);
@@ -740,7 +741,7 @@ public class SelectionManager
         }
         else
         {
-            return new GuiAreaSelectionEditorSimple(this.getSimpleSelection());
+            return new GuiAreaSelectionEditorSimple(selection);
         }
     }
 
