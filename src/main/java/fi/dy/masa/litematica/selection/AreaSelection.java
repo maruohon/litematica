@@ -36,7 +36,7 @@ public class AreaSelection
 
     public static AreaSelection fromPlacement(SchematicPlacement placement)
     {
-        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.ANY);
+        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
         BlockPos origin = placement.getOrigin();
 
         AreaSelection selection = new AreaSelection();
