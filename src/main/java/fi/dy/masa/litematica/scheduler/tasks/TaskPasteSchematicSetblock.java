@@ -174,40 +174,35 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     protected boolean processBox(ChunkPos pos, StructureBoundingBox box,
             WorldSchematic worldSchematic, WorldClient worldClient, EntityPlayerSP player)
     {
-        final int minX = box.minX;
-        final int minY = box.minY;
-        final int minZ = box.minZ;
-        final int maxX = box.maxX;
-        final int maxY = box.maxY;
-        final int maxZ = box.maxZ;
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         Chunk chunkSchematic = worldSchematic.getChunkProvider().getLoadedChunk(pos.x, pos.z);
         Chunk chunkClient = worldClient.getChunkProvider().getLoadedChunk(pos.x, pos.z);
 
         if (this.boxInProgress == false)
         {
-            this.currentX = minX;
-            this.currentY = minY;
-            this.currentZ = minZ;
+            this.currentX = box.minX;
+            this.currentY = box.minY;
+            this.currentZ = box.minZ;
             this.boxInProgress = true;
         }
 
-        for (; this.currentZ <= maxZ; ++this.currentZ)
+        for (; this.currentZ <= box.maxZ; ++this.currentZ)
         {
-            for (; this.currentX <= maxX; ++this.currentX)
+            for (; this.currentX <= box.maxX; ++this.currentX)
             {
-                for (; this.currentY <= maxY; ++this.currentY)
+                for (; this.currentY <= box.maxY; ++this.currentY)
                 {
                     posMutable.setPos(this.currentX, this.currentY, this.currentZ);
-                    IBlockState stateSchematic = chunkSchematic.getBlockState(posMutable);
-                    IBlockState stateClient = chunkClient.getBlockState(posMutable).getActualState(worldClient, posMutable);
+
+                    IBlockState stateSchematicOrig = chunkSchematic.getBlockState(posMutable);
+                    // Discard the non-meta state info, as it depends on neighbor blocks which will
+                    // be synced with some delay from the server
+                    @SuppressWarnings("deprecation")
+                    IBlockState stateSchematic = stateSchematicOrig.getBlock().getStateFromMeta(stateSchematicOrig.getBlock().getMetaFromState(stateSchematicOrig));
+                    IBlockState stateClient = chunkClient.getBlockState(posMutable);
 
                     if (stateSchematic.getBlock() == Blocks.AIR && stateClient.getBlock() == Blocks.AIR)
                     {
-                        if (this.currentX >= maxX && this.currentY >= maxY && this.currentZ >= maxZ)
-                        {
-                            this.boxInProgress = false;
-                        }
                         continue;
                     }
 
@@ -218,7 +213,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                         if (++this.sentCommandsThisTick >= this.maxCommandsPerTick)
                         {
                             // All finished for this box
-                            if (this.currentX >= maxX && this.currentY >= maxY && this.currentZ >= maxZ)
+                            if (this.currentX >= box.maxX && this.currentY >= box.maxY && this.currentZ >= box.maxZ)
                             {
                                 this.summonEntities(box, worldSchematic, player);
                                 this.boxInProgress = false;
@@ -226,16 +221,17 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                             }
                             else
                             {
+                                ++this.currentY;
                                 return false;
                             }
                         }
                     }
                 }
 
-                this.currentY = minY;
+                this.currentY = box.minY;
             }
 
-            this.currentX = minX;
+            this.currentX = box.minX;
         }
 
         this.summonEntities(box, worldSchematic, player);
