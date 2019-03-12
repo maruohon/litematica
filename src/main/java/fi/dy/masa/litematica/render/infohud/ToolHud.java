@@ -199,30 +199,30 @@ public class ToolHud extends InfoHud
                         lines.add(I18n.format("litematica.hud.area_selection.dimensions_position", strDim, strp1, strp2));
                     }
                 }
-
-                if (mode.getUsesBlockPrimary())
-                {
-                    IBlockState state = mode.getPrimaryBlock();
-
-                    if (state != null)
-                    {
-                        lines.add(I18n.format("litematica.tool_hud.block_1", this.getBlockString(state)));
-                    }
-                }
-
-                if (mode.getUsesBlockSecondary())
-                {
-                    IBlockState state = mode.getSecondaryBlock();
-
-                    if (state != null)
-                    {
-                        lines.add(I18n.format("litematica.tool_hud.block_2", this.getBlockString(state)));
-                    }
-                }
-
-                str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
-                lines.add(I18n.format("litematica.hud.area_selection.selection_corners_mode", str));
             }
+
+            if (mode.getUsesBlockPrimary())
+            {
+                IBlockState state = mode.getPrimaryBlock();
+
+                if (state != null)
+                {
+                    lines.add(I18n.format("litematica.tool_hud.block_1", this.getBlockString(state)));
+                }
+            }
+
+            if (mode.getUsesBlockSecondary())
+            {
+                IBlockState state = mode.getSecondaryBlock();
+
+                if (state != null)
+                {
+                    lines.add(I18n.format("litematica.tool_hud.block_2", this.getBlockString(state)));
+                }
+            }
+
+            str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
+            lines.add(I18n.format("litematica.hud.area_selection.selection_corners_mode", str));
         }
         else if (mode.getUsesSchematic())
         {

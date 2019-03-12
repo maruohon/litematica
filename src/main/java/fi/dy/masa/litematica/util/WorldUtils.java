@@ -21,7 +21,6 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
-import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -330,14 +329,13 @@ public class WorldUtils
 
     public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
     {
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, true, 6);
         IBlockState state = Blocks.AIR.getDefaultState();
 
-        if (traceWrapper != null &&
-            traceWrapper.getHitType() == HitType.VANILLA &&
-            traceWrapper.getRayTraceResult().typeOfHit == RayTraceResult.Type.BLOCK)
+        if (trace != null &&
+            trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
-            state = mc.world.getBlockState(traceWrapper.getRayTraceResult().getBlockPos());
+            state = mc.world.getBlockState(trace.getBlockPos());
         }
 
         if (primary)
