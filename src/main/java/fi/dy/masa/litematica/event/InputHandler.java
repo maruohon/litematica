@@ -195,7 +195,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
                 {
-                    return SchematicUtils.replaceSchematicBlocks(mc);
+                    return SchematicUtils.replaceSchematicBlocksInDirection(mc);
                 }
                 else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
                 {

@@ -608,6 +608,21 @@ public class PositionUtils
         }
     }
 
+    public static Rotation getReverseRotation(Rotation rotationIn)
+    {
+        switch (rotationIn)
+        {
+            case COUNTERCLOCKWISE_90:
+                return Rotation.CLOCKWISE_90;
+            case CLOCKWISE_90:
+                return Rotation.COUNTERCLOCKWISE_90;
+            case CLOCKWISE_180:
+                return Rotation.CLOCKWISE_180;
+            default:
+                return rotationIn;
+        }
+    }
+
     public static BlockPos getModifiedPartiallyLockedPosition(BlockPos posOriginal, BlockPos posNew, int lockMask)
     {
         if (lockMask != 0)

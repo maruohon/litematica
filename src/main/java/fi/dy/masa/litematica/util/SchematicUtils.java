@@ -32,6 +32,8 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -97,7 +99,7 @@ public class SchematicUtils
         return false;
     }
 
-    public static boolean replaceSchematicBlocks(Minecraft mc)
+    public static boolean replaceSchematicBlocksInDirection(Minecraft mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -276,6 +278,8 @@ public class SchematicUtils
 
                         if (posSchematic != null)
                         {
+                            state = getUntransformedBlockState(state, placement, regionName);
+
                             IBlockState stateOriginal = container.get(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ());
 
                             int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
@@ -341,6 +345,8 @@ public class SchematicUtils
                             final int maxZ = Math.min(posMax.getZ(), container.getSize().getZ() - 1);
                             int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
                             int increment = 0;
+
+                            state = getUntransformedBlockState(state, placement, regionName);
 
                             for (int y = minY; y <= maxY; ++y)
                             {
@@ -411,7 +417,7 @@ public class SchematicUtils
     }
 
     private static boolean replaceAllIdenticalBlocks(SchematicPlacementManager manager, PlacementPart part,
-            IBlockState stateOriginal, IBlockState stateNew)
+            IBlockState stateOriginalIn, IBlockState stateNewIn)
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
         String selected = schematicPlacement.getSelectedSubRegionName();
@@ -439,13 +445,13 @@ public class SchematicUtils
         int totalBlocks = schematicPlacement.getSchematic().getMetadata().getTotalBlocks();
         int increment = 0;
 
-        if (stateOriginal.getBlock() != Blocks.AIR)
+        if (stateOriginalIn.getBlock() != Blocks.AIR)
         {
-            increment = stateNew.getBlock() != Blocks.AIR ? 0 : -1;
+            increment = stateNewIn.getBlock() != Blocks.AIR ? 0 : -1;
         }
         else
         {
-            increment = stateNew.getBlock() != Blocks.AIR ? 1 : 0;
+            increment = stateNewIn.getBlock() != Blocks.AIR ? 1 : 0;
         }
 
         for (String regionName : regions)
@@ -504,6 +510,9 @@ public class SchematicUtils
 
             //System.out.printf("DEBUG == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
             //        regionName, startX, startY, startZ, endX, endY, endZ, size.getX(), size.getY(), size.getZ());
+
+            IBlockState stateOriginal = getUntransformedBlockState(stateOriginalIn, schematicPlacement, regionName);
+            IBlockState stateNew = getUntransformedBlockState(stateNewIn, schematicPlacement, regionName);
 
             for (int y = startY; y <= endY; ++y)
             {
@@ -586,6 +595,42 @@ public class SchematicUtils
         relPos = relPos.subtract(posMinRel.subtract(regionPos));
 
         return relPos;
+    }
+
+    public static IBlockState getUntransformedBlockState(IBlockState state, SchematicPlacement schematicPlacement, String subRegionName)
+    {
+        SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(subRegionName);
+
+        if (placement != null)
+        {
+            final Rotation rotationCombined = PositionUtils.getReverseRotation(schematicPlacement.getRotation().add(placement.getRotation()));
+            final Mirror mirrorMain = schematicPlacement.getMirror();
+            Mirror mirrorSub = placement.getMirror();
+
+            if (mirrorSub != Mirror.NONE &&
+                (schematicPlacement.getRotation() == Rotation.CLOCKWISE_90 ||
+                 schematicPlacement.getRotation() == Rotation.COUNTERCLOCKWISE_90))
+            {
+                mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
+            }
+
+            if (rotationCombined != Rotation.NONE)
+            {
+                state = state.withRotation(rotationCombined);
+            }
+
+            if (mirrorSub != Mirror.NONE)
+            {
+                state = state.withMirror(mirrorSub);
+            }
+
+            if (mirrorMain != Mirror.NONE)
+            {
+                state = state.withMirror(mirrorMain);
+            }
+        }
+
+        return state;
     }
 
     private static class ReplacementInfo
