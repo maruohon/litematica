@@ -320,7 +320,7 @@ public class SchematicProject
 
             TaskSaveSchematic task = new TaskSaveSchematic(this.directory, fileName, schematic, selection.copy(), true, false);
             task.setCompletionListener(listener);
-            TaskScheduler.getInstance().scheduleTask(task, 2);
+            TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 2);
             this.saveInProgress = true;
             this.dirty = true;
             this.saveToFile();
@@ -525,6 +525,27 @@ public class SchematicProject
 
         @Override
         public void onTaskCompleted()
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+
+            if (mc.isCallingFromMinecraftThread())
+            {
+                this.saveVersion();
+            }
+            else
+            {
+                mc.addScheduledTask(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        SaveCompletionListener.this.saveVersion();
+                    }
+                });
+            }
+        }
+
+        private void saveVersion()
         {
             SchematicVersion version = new SchematicVersion(this.name, this.fileName, this.areaOffset, this.version, System.currentTimeMillis());
             SchematicProject.this.versions.add(version);

@@ -33,7 +33,7 @@ public class WorldLoadListener implements IWorldLoadListener
         }
         else
         {
-            TaskScheduler.getInstance().clearTasks();
+            TaskScheduler.getInstanceClient().clearTasks();
             SchematicHolder.getInstance().clearLoadedSchematics();
             InfoHud.getInstance().reset(); // remove the line providers and clear the data
         }

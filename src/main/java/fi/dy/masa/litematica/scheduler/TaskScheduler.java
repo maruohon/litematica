@@ -2,10 +2,13 @@ package fi.dy.masa.litematica.scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 public class TaskScheduler
 {
-    private static final TaskScheduler INSTANCE = new TaskScheduler();
+    private static final TaskScheduler INSTANCE_CLIENT = new TaskScheduler();
+    private static final TaskScheduler INSTANCE_SERVER = new TaskScheduler();
+
     private List<ITask> tasks = new ArrayList<>();
     private List<ITask> tasksToAdd = new ArrayList<>();
 
@@ -13,47 +16,66 @@ public class TaskScheduler
     {
     }
 
-    public static TaskScheduler getInstance()
+    public static TaskScheduler getInstanceClient()
     {
-        return INSTANCE;
+        return INSTANCE_CLIENT;
+    }
+
+    public static TaskScheduler getInstanceServer()
+    {
+        return INSTANCE_SERVER;
+    }
+
+    public static TaskScheduler getServerInstanceIfExistsOrClient()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        // Yes this is actually correct despite the naming - in single player we want to
+        // schedule stuff to the integrated server's thread in some cases
+        return mc.isSingleplayer() ? INSTANCE_SERVER : INSTANCE_CLIENT;
     }
 
     public void scheduleTask(ITask task, int interval)
     {
-        task.createTimer(interval);
-        this.tasksToAdd.add(task);
+        synchronized (this)
+        {
+            task.createTimer(interval);
+            this.tasksToAdd.add(task);
+        }
     }
 
     public void runTasks()
     {
-        if (this.tasks.isEmpty() == false)
+        synchronized (this)
         {
-            for (int i = 0; i < this.tasks.size(); ++i)
+            if (this.tasks.isEmpty() == false)
             {
-                boolean finished = false;
-                ITask task = this.tasks.get(i);
+                for (int i = 0; i < this.tasks.size(); ++i)
+                {
+                    boolean finished = false;
+                    ITask task = this.tasks.get(i);
 
-                if (task.shouldRemove())
-                {
-                    finished = true;
-                }
-                else if (task.canExecute() && task.getTimer().tick())
-                {
-                    finished = task.execute();
-                }
+                    if (task.shouldRemove())
+                    {
+                        finished = true;
+                    }
+                    else if (task.canExecute() && task.getTimer().tick())
+                    {
+                        finished = task.execute();
+                    }
 
-                if (finished)
-                {
-                    task.stop();
-                    this.tasks.remove(i);
-                    --i;
+                    if (finished)
+                    {
+                        task.stop();
+                        this.tasks.remove(i);
+                        --i;
+                    }
                 }
             }
-        }
 
-        if (this.tasksToAdd.isEmpty() == false)
-        {
-            this.addNewTasks();
+            if (this.tasksToAdd.isEmpty() == false)
+            {
+                this.addNewTasks();
+            }
         }
     }
 
@@ -69,75 +91,95 @@ public class TaskScheduler
         this.tasksToAdd.clear();
     }
 
+    /*
     public boolean hasTasks()
     {
-        return this.tasks.isEmpty() == false || this.tasksToAdd.isEmpty() == false;
+        synchronized (this)
+        {
+            return this.tasks.isEmpty() == false || this.tasksToAdd.isEmpty() == false;
+        }
     }
 
     public boolean hasTask(Class <? extends ITask> clazz)
     {
-        for (ITask task : this.tasks)
+        synchronized (this)
         {
-            if (clazz.equals(task.getClass()))
+            for (ITask task : this.tasks)
             {
-                return true;
+                if (clazz.equals(task.getClass()))
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
-
-        return false;
-    }
-
-    public boolean removeTask(ITask task)
-    {
-        task.stop();
-        return this.tasks.remove(task);
     }
 
     public <T extends ITask> List<T> getTasksOfType(Class <? extends T> clazz)
     {
-        List<T> list = new ArrayList<>();
-
-        for (int i = 0; i < this.tasks.size(); ++i)
+        synchronized (this)
         {
-            ITask task = this.tasks.get(i);
+            List<T> list = new ArrayList<>();
 
-            if (clazz.isAssignableFrom(task.getClass()))
+            for (int i = 0; i < this.tasks.size(); ++i)
             {
-                list.add(clazz.cast(task));
-            }
-        }
+                ITask task = this.tasks.get(i);
 
-        return list;
+                if (clazz.isAssignableFrom(task.getClass()))
+                {
+                    list.add(clazz.cast(task));
+                }
+            }
+
+            return list;
+        }
     }
 
     public boolean removeTasksOfType(Class <? extends ITask> clazz)
     {
-        boolean removed = false;
-
-        for (int i = 0; i < this.tasks.size(); ++i)
+        synchronized (this)
         {
-            ITask task = this.tasks.get(i);
+            boolean removed = false;
 
-            if (clazz.equals(task.getClass()))
+            for (int i = 0; i < this.tasks.size(); ++i)
             {
-                task.stop();
-                this.tasks.remove(i);
-                removed = true;
-                --i;
-            }
-        }
+                ITask task = this.tasks.get(i);
 
-        return removed;
+                if (clazz.equals(task.getClass()))
+                {
+                    task.stop();
+                    this.tasks.remove(i);
+                    removed = true;
+                    --i;
+                }
+            }
+
+            return removed;
+        }
+    }
+    */
+
+    public boolean removeTask(ITask task)
+    {
+        synchronized (this)
+        {
+            task.stop();
+            return this.tasks.remove(task);
+        }
     }
 
     public void clearTasks()
     {
-        for (int i = 0; i < this.tasks.size(); ++i)
+        synchronized (this)
         {
-            ITask task = this.tasks.get(i);
-            task.stop();
-        }
+            for (int i = 0; i < this.tasks.size(); ++i)
+            {
+                ITask task = this.tasks.get(i);
+                task.stop();
+            }
 
-        this.tasks.clear();
+            this.tasks.clear();
+        }
     }
 }

@@ -797,14 +797,16 @@ public class PositionUtils
         private BlockPos posReference = BlockPos.ORIGIN;
         private boolean closestFirst;
 
-        public void setClosestFirst(boolean closestFirst)
+        public ChunkPosComparator setClosestFirst(boolean closestFirst)
         {
             this.closestFirst = closestFirst;
+            return this;
         }
 
-        public void setReferencePosition(BlockPos pos)
+        public ChunkPosComparator setReferencePosition(BlockPos pos)
         {
             this.posReference = pos;
+            return this;
         }
 
         @Override

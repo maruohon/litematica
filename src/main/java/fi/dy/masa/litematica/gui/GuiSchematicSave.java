@@ -71,6 +71,27 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     @Override
     public void onTaskCompleted()
     {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc.isCallingFromMinecraftThread())
+        {
+            this.refreshList();
+        }
+        else
+        {
+            mc.addScheduledTask(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    GuiSchematicSave.this.refreshList();
+                }
+            });
+        }
+    }
+
+    private void refreshList()
+    {
         GuiScreen gui = this.mc.currentScreen;
 
         if (gui == this)
@@ -151,7 +172,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                         LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
                         TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
                         task.setCompletionListener(this.gui);
-                        TaskScheduler.getInstance().scheduleTask(task, 10);
+                        TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
                         this.gui.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
                     }
                     else
@@ -191,7 +212,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
             {
                 schematic.getMetadata().setName(string);
                 TaskSaveSchematic task = new TaskSaveSchematic(schematic, this.area, takeEntities);
-                TaskScheduler.getInstance().scheduleTask(task, 10);
+                TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
             }
         }
     }

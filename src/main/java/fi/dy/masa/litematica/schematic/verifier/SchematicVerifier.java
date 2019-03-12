@@ -315,7 +315,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         this.completionListener = completionListener;
         this.verificationStarted = true;
 
-        TaskScheduler.getInstance().scheduleTask(this, 10);
+        TaskScheduler.getInstanceClient().scheduleTask(this, 10);
         InfoHud.getInstance().addInfoHudRenderer(this, true);
         ACTIVE_VERIFIERS.add(this);
 
@@ -376,7 +376,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         this.mismatchPositionsForRender.clear();
 
         ACTIVE_VERIFIERS.remove(this);
-        TaskScheduler.getInstance().removeTask(this);
+        TaskScheduler.getInstanceClient().removeTask(this);
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
         this.clearActiveMismatchRenderPositions();

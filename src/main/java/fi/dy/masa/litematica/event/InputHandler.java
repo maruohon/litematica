@@ -230,18 +230,17 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
-    public static void onTick()
+    public static void onTick(Minecraft mc)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        SelectionManager sm = DataManager.getSelectionManager();
 
-        if (mc.world != null && mc.player != null)
+        if (sm.hasGrabbedElement())
         {
-            SelectionManager sm = DataManager.getSelectionManager();
-
-            if (sm.hasGrabbedElement())
-            {
-                sm.moveGrabbedElement(mc.player);
-            }
+            sm.moveGrabbedElement(mc.player);
+        }
+        else
+        {
+            WorldUtils.easyPlaceOnUseTick(mc);
         }
     }
 }
