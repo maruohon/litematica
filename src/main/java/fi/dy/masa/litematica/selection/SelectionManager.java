@@ -526,7 +526,7 @@ public class SelectionManager
 
             if (movingCorner || movingOrigin)
             {
-                BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance);
+                BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
                 if (pos == null)
                 {
@@ -584,7 +584,7 @@ public class SelectionManager
         {
             if (selection.isOriginSelected())
             {
-                BlockPos newOrigin = this.getTargetedPosition(mc.world, mc.player, maxDistance);
+                BlockPos newOrigin = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
                 if (newOrigin != null)
                 {
@@ -610,7 +610,7 @@ public class SelectionManager
 
         if (area != null && area.getSelectedSubRegionBox() != null)
         {
-            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance);
+            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
             if (pos != null)
             {
@@ -626,7 +626,7 @@ public class SelectionManager
 
         if (sel != null && sel.getSelectedSubRegionBox() != null)
         {
-            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, false);
+            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
             if (pos != null)
             {
@@ -666,13 +666,7 @@ public class SelectionManager
     }
 
     @Nullable
-    private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance)
-    {
-        return this.getTargetedPosition(world, player, maxDistance, true);
-    }
-
-    @Nullable
-    private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance, boolean sneakToInset)
+    private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance, boolean sneakToOffset)
     {
         RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(world, player, false, maxDistance);
 
@@ -683,8 +677,8 @@ public class SelectionManager
 
         BlockPos pos = trace.getBlockPos();
 
-        // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
-        if (player.isSneaking() != sneakToInset)
+        // Sneaking puts the position adjacent the targeted block face, not sneaking puts it inside the targeted block
+        if (sneakToOffset && player.isSneaking())
         {
             pos = pos.offset(trace.sideHit);
         }
