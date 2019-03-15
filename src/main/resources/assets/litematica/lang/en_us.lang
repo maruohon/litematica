@@ -71,6 +71,7 @@ litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the 
 litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot=Use the normal screenshot key to set the preview.\nOr right click the Set preview button to cancel setting the preview.
 litematica.info.schematic_manager.preview.success=Preview image successfully set
 
+litematica.gui.button.area_editor.analyze_area=Analyze Area
 litematica.gui.button.area_editor.change_corner_mode=Corner Mode: %s
 litematica.gui.button.area_editor.change_selection_mode=Selection Mode: %s
 litematica.gui.button.area_editor.create_schematic=Save Schematic
@@ -230,6 +231,7 @@ litematica.gui.label.material_list.progress.mismatch=Mismatched %s
 litematica.gui.label.material_list.progress.missing=Missing %s
 litematica.gui.label.material_list.total=Total
 
+litematica.gui.label.missing_chunks=Missing Chunks (%d)
 litematica.gui.label.origin.auto=Auto
 litematica.gui.label.origin.manual=Manual
 
@@ -288,7 +290,6 @@ litematica.gui.label.schematic_verifier_display_type.extra=Extra Blocks
 litematica.gui.label.schematic_verifier_display_type.missing=Missing Blocks
 litematica.gui.label.schematic_verifier_display_type.wrong_blocks=Wrong Blocks
 litematica.gui.label.schematic_verifier_display_type.wrong_state=Wrong States
-litematica.gui.label.schematic_verifier.missing_chunks=Missing Chunks (%d)
 litematica.gui.label.schematic_verifier.status.done_errors=Wrong: §cBlock: %s§r, §6State: %s§r, §bMissing: %s§r, §dExtra: %s§r
 litematica.gui.label.schematic_verifier.status.done_correct_total=§aCorrect: %s§r, Total: %s
 litematica.gui.label.schematic_verifier.status.verifying=Unseen Chunks: %s / %s
@@ -317,6 +318,7 @@ litematica.gui.title.litematica_main_menu=Litematica %s
 litematica.gui.title.load_schematic=Load Schematic
 litematica.gui.title.manage_loaded_schematics=Manage loaded Schematics
 litematica.gui.title.manage_schematic_placements=Manage Schematic Placements
+litematica.gui.title.material_list.area_analyzer=Area Analysis for selection '%s'
 litematica.gui.title.material_list.placement=Material List for placement '%s'
 litematica.gui.title.material_list.schematic=Material List for schematic '%s' (%s of %s regions)
 litematica.gui.title.material_list.select_schematic_regions=Select the sub-regions for the Material List for '%s'

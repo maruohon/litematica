@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -294,11 +295,28 @@ public class PositionUtils
         for (Map.Entry<String, Box> entry : subRegions.entrySet())
         {
             Box box = entry.getValue();
-            StructureBoundingBox bb = box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
+            StructureBoundingBox bb = box != null ? getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
 
             if (bb != null)
             {
                 builder.put(entry.getKey(), bb);
+            }
+        }
+
+        return builder.build();
+    }
+
+    public static ImmutableList<StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<Box> boxes)
+    {
+        ImmutableList.Builder<StructureBoundingBox> builder = new ImmutableList.Builder<>();
+
+        for (Box box : boxes)
+        {
+            StructureBoundingBox bb = getBoundsWithinChunkForBox(box, chunkX, chunkZ);
+
+            if (bb != null)
+            {
+                builder.add(bb);
             }
         }
 

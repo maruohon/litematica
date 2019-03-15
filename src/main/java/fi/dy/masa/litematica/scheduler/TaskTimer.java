@@ -30,4 +30,9 @@ public class TaskTimer
     {
         this.counter = this.interval;
     }
+
+    public void setNextDelay(int delay)
+    {
+        this.counter = delay;
+    }
 }

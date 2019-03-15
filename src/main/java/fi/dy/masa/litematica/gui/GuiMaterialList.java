@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
 import fi.dy.masa.litematica.gui.widgets.WidgetMaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialCache;
+import fi.dy.masa.litematica.materials.MaterialListAreaAnalyzer;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
@@ -25,12 +26,14 @@ import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
+import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
+                             implements ICompletionListener
 {
     private final MaterialListBase materialList;
 
@@ -39,6 +42,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         super(10, 44);
 
         this.materialList = materialList;
+        this.materialList.setCompletionListener(this);
         this.title = this.materialList.getTitle();
         this.useTitleHierarchy = false;
 
@@ -92,7 +96,12 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         int gap = 1;
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + gap;
-        x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + gap;
+
+        if (this.materialList.supportsRenderLayers())
+        {
+            x += this.createButton(x, y, -1, ButtonListener.Type.LIST_TYPE) + gap;
+        }
+
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHideAvailable(), ButtonListener.Type.HIDE_AVAILABLE) + gap;
         x += this.createButtonOnOff(x, y, -1, this.materialList.getHudRenderer().getShouldRenderCustom(), ButtonListener.Type.TOGGLE_INFO_HUD) + gap;
 
@@ -120,7 +129,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         long missing = this.materialList.getCountMissing() - this.materialList.getCountMismatched();
         long mismatch = this.materialList.getCountMismatched();
 
-        if (total != 0)
+        if (total != 0 && (this.materialList instanceof MaterialListAreaAnalyzer) == false)
         {
             double pctDone = ((double) (total - (missing + mismatch)) / (double) total) * 100;
             double pctMissing = ((double) missing / (double) total) * 100;
@@ -205,6 +214,17 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     }
 
     @Override
+    public void onTaskCompleted()
+    {
+        // re-create the list widgets when a material list task finishes
+        if (this.mc.currentScreen == this)
+        {
+            WidgetMaterialListEntry.setMaxNameLength(this.materialList.getMaterialsAll(), this.materialList.getMultiplier(), this.mc);
+            this.initGui();
+        }
+    }
+
+    @Override
     protected WidgetListMaterialList createListWidget(int listX, int listY)
     {
         return new WidgetListMaterialList(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
@@ -234,14 +254,13 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             switch (this.type)
             {
                 case REFRESH_LIST:
-                    materialList.recreateMaterialList();
-                    WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), materialList.getMultiplier(), this.parent.mc);
+                    materialList.reCreateMaterialList();
                     break;
 
                 case LIST_TYPE:
                     BlockInfoListType type = materialList.getMaterialListType();
                     materialList.setMaterialListType((BlockInfoListType) type.cycle(mouseButton == 0));
-                    materialList.recreateMaterialList();
+                    materialList.reCreateMaterialList();
                     break;
 
                 case HIDE_AVAILABLE:

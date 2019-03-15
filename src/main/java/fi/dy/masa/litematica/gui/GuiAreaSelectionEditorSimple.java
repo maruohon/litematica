@@ -56,6 +56,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
         this.createCoordinateInputs(x, y, width, Corner.CORNER_1);
         x += width + 42;
         nextY = this.createCoordinateInputs(x, y, width, Corner.CORNER_2);
+        this.createButton(x + 10, nextY, -1, ButtonListener.Type.ANALYZE_AREA);
         x += width + 42;
 
         // Manual Origin defined

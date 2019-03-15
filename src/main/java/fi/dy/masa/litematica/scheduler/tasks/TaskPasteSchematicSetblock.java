@@ -8,8 +8,6 @@ import com.google.common.collect.ArrayListMultimap;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.render.infohud.RenderPhase;
-import fi.dy.masa.litematica.scheduler.TaskBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils.ChunkPosComparator;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -18,7 +16,6 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
@@ -39,8 +36,6 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private final ArrayListMultimap<ChunkPos, StructureBoundingBox> boxesInChunks = ArrayListMultimap.create();
     private final List<StructureBoundingBox> boxesInCurrentChunk = new ArrayList<>();
     private final List<ChunkPos> chunks = new ArrayList<>();
-    private final List<String> infoHudLines = new ArrayList<>();
-    private final Minecraft mc;
     private final ChunkPosComparator comparator;
     private final int maxCommandsPerTick;
     private final boolean changedBlockOnly;
@@ -58,7 +53,6 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     {
         this.changedBlockOnly = changedBlocksOnly;
         this.maxCommandsPerTick = Configs.Generic.PASTE_COMMAND_LIMIT.getIntegerValue();
-        this.mc = Minecraft.getMinecraft();
         this.comparator = new ChunkPosComparator();
         this.comparator.setClosestFirst(true);
 
@@ -82,12 +76,6 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         // Only use this command-based task in multiplayer
         return this.boxesInChunks.isEmpty() == false && this.mc.world != null &&
                this.mc.player != null && this.mc.isSingleplayer() == false;
-    }
-
-    @Override
-    public boolean shouldRemove()
-    {
-        return this.canExecute() == false;
     }
 
     @Override
@@ -193,19 +181,8 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
             return false;
         }
 
-        for (int cx = pos.x - 1; cx <= pos.x + 1; ++cx)
-        {
-            for (int cz = pos.z - 1; cz <= pos.z + 1; ++cz)
-            {
-                if (worldClient.getChunkProvider().isChunkGeneratedAt(cx, cz) == false)
-                {
-                    return false;
-                }
-            }
-        }
-
         // Chunk exists in the schematic world, and all the surrounding chunks are loaded in the client world, good to go
-        return true;
+        return this.areSurroundingChunksLoaded(pos, worldClient, 1);
     }
 
     protected boolean processBox(ChunkPos pos, StructureBoundingBox box,
@@ -359,17 +336,5 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
             ChunkPos pos = this.chunks.get(i);
             this.infoHudLines.add(String.format("cx: %5d, cz: %5d (x: %d, z: %d)", pos.x, pos.z, pos.x << 4, pos.z << 4));
         }
-    }
-
-    @Override
-    public boolean getShouldRenderText(RenderPhase phase)
-    {
-        return phase == RenderPhase.POST;
-    }
-
-    @Override
-    public List<String> getText(RenderPhase phase)
-    {
-        return this.infoHudLines;
     }
 }

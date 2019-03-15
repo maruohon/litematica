@@ -293,8 +293,7 @@ public class SchematicPlacement
     {
         if (this.materialList == null)
         {
-            this.materialList = new MaterialListPlacement(this);
-            this.materialList.recreateMaterialList();
+            this.materialList = new MaterialListPlacement(this, true);
         }
 
         return this.materialList;

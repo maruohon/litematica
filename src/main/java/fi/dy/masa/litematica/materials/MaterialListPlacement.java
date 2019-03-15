@@ -1,7 +1,10 @@
 package fi.dy.masa.litematica.materials;
 
-import java.util.List;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.resources.I18n;
 
 public class MaterialListPlacement extends MaterialListBase
@@ -10,9 +13,25 @@ public class MaterialListPlacement extends MaterialListBase
 
     public MaterialListPlacement(SchematicPlacement placement)
     {
+        this(placement, false);
+    }
+
+    public MaterialListPlacement(SchematicPlacement placement, boolean reCreate)
+    {
         super();
 
         this.placement = placement;
+
+        if (reCreate)
+        {
+            this.reCreateMaterialList();
+        }
+    }
+
+    @Override
+    public boolean supportsRenderLayers()
+    {
+        return true;
     }
 
     @Override
@@ -28,8 +47,10 @@ public class MaterialListPlacement extends MaterialListBase
     }
 
     @Override
-    protected List<MaterialListEntry> createMaterialListEntries()
+    public void reCreateMaterialList()
     {
-        return MaterialListUtils.createMaterialListFor(this.placement);
+        TaskCountBlocksPlacement task = new TaskCountBlocksPlacement(this.placement, this);
+        TaskScheduler.getInstanceClient().scheduleTask(task, 20);
+        InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
     }
 }

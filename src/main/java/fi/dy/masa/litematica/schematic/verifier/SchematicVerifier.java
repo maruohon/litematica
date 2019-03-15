@@ -20,8 +20,8 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
-import fi.dy.masa.litematica.scheduler.TaskBase;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.TaskBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.ItemUtils;
@@ -932,7 +932,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         if (this.requiredChunks.isEmpty() == false && player != null)
         {
             String pre = TextFormatting.WHITE.toString() + TextFormatting.BOLD.toString();
-            String title = I18n.format("litematica.gui.label.schematic_verifier.missing_chunks", this.requiredChunks.size());
+            String title = I18n.format("litematica.gui.label.missing_chunks", this.requiredChunks.size());
             this.infoLines.add(String.format("%s%s%s", pre, title, TextFormatting.RESET.toString()));
 
             List<ChunkPos> list = new ArrayList<>();

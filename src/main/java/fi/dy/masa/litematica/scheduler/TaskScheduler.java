@@ -39,6 +39,7 @@ public class TaskScheduler
         synchronized (this)
         {
             task.createTimer(interval);
+            task.getTimer().setNextDelay(0);
             this.tasksToAdd.add(task);
         }
     }

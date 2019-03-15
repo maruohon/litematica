@@ -199,8 +199,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                     }
                     else
                     {
-                        MaterialListSchematic materialList = new MaterialListSchematic(schematic);
-                        materialList.recreateMaterialList();
+                        MaterialListSchematic materialList = new MaterialListSchematic(schematic, true);
                         DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
                         this.gui.mc.displayGuiScreen(new GuiMaterialList(materialList));
                     }
@@ -259,8 +258,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         @Override
         public boolean consume(Collection<String> strings)
         {
-            MaterialListSchematic materialList = new MaterialListSchematic(this.schematic, strings);
-            materialList.recreateMaterialList();
+            MaterialListSchematic materialList = new MaterialListSchematic(this.schematic, strings, true);
             DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
             Minecraft.getMinecraft().displayGuiScreen(new GuiMaterialList(materialList));
 
