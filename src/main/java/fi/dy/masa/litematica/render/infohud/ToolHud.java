@@ -98,8 +98,7 @@ public class ToolHud extends InfoHud
 
             if (version != null)
             {
-                lines.add(I18n.format("litematica.hud.schematic_projects.current_version_name", green + version.getName() + rst));
-                lines.add(I18n.format("litematica.hud.schematic_projects.current_version_number", green + version.getVersion() + rst, green + project.getVersionCount() + rst));
+                lines.add(I18n.format("litematica.hud.schematic_projects.current_version", green + version.getVersion() + rst, green + project.getVersionCount() + rst, green + version.getName() + rst));
                 DATE.setTime(version.getTimeStamp());
                 lines.add(I18n.format("litematica.hud.schematic_projects.current_version_date", green + SIMPLE_DATE_FORMAT.format(DATE) + rst));
                 BlockPos o = project.getOrigin();
@@ -109,6 +108,19 @@ public class ToolHud extends InfoHud
             else
             {
                 lines.add(I18n.format("litematica.hud.schematic_projects.no_versions"));
+            }
+
+            SelectionManager sm = DataManager.getSelectionManager();
+            AreaSelection selection = sm.getCurrentSelection();
+
+            if (selection != null && sm.getSelectionMode() == SelectionMode.NORMAL)
+            {
+                String subRegionName = selection.getCurrentSubRegionBoxName();
+
+                if (subRegionName != null)
+                {
+                    lines.add(I18n.format("litematica.hud.area_selection.selected_sub_region", green + subRegionName + rst));
+                }
             }
 
             str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
