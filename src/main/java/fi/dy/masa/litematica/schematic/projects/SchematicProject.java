@@ -114,8 +114,8 @@ public class SchematicProject
         offset = this.selectionSimple.getEffectiveOrigin().subtract(this.origin);
         this.selectionSimple.moveEntireSelectionTo(origin.add(offset), false);
 
-        offset = this.lastSeenArea.getEffectiveOrigin().subtract(this.origin);
-        this.lastSeenArea.moveEntireSelectionTo(origin.add(offset), false);
+        // Forget the old last seen area, it will be invalid after moving the entire project
+        this.lastSeenArea = new AreaSelection();
 
         this.origin = origin;
 
@@ -358,6 +358,7 @@ public class SchematicProject
         this.origin = BlockPos.ORIGIN;
         this.versions.clear();
         this.selection = new AreaSelection();
+        this.selectionSimple = new AreaSelectionSimple(true);
         this.lastSeenArea = new AreaSelection();
         this.lastCheckedOutVersion = -1;
         this.currentVersionId = -1;
