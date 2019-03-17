@@ -162,6 +162,12 @@ public class OverlayRenderer
 
                 if (origin != null)
                 {
+                    if (currentSelection.isOriginSelected())
+                    {
+                        Color4f colorTmp = Color4f.fromColor(this.colorAreaOrigin, 0.4f);
+                        RenderUtils.renderAreaSides(origin, origin, colorTmp, renderViewEntity, partialTicks);
+                    }
+
                     Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
                     RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
                 }
@@ -301,9 +307,6 @@ public class OverlayRenderer
         {
             if (pos1.equals(pos2) == false)
             {
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
-
                 RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
 
                 if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
@@ -314,6 +317,20 @@ public class OverlayRenderer
                 {
                     RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
                 }
+
+                if (box.getSelectedCorner() == Corner.CORNER_1)
+                {
+                    Color4f color = Color4f.fromColor(this.colorPos1, 0.4f);
+                    RenderUtils.renderAreaSides(pos1, pos1, color, renderViewEntity, partialTicks);
+                }
+                else if (box.getSelectedCorner() == Corner.CORNER_2)
+                {
+                    Color4f color = Color4f.fromColor(this.colorPos2, 0.4f);
+                    RenderUtils.renderAreaSides(pos2, pos2, color, renderViewEntity, partialTicks);
+                }
+
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
             }
             else
             {
