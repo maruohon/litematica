@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.util;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import com.google.common.base.Predicate;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -24,6 +25,15 @@ import net.minecraft.world.World;
 
 public class EntityUtils
 {
+    public static final Predicate<Entity> NOT_PLAYER = new Predicate<Entity>()
+    {
+        @Override
+        public boolean apply(@Nullable Entity entity)
+        {
+            return (entity instanceof EntityPlayer) == false;
+        }
+    };
+
     public static boolean hasToolItem(EntityLivingBase entity)
     {
         ItemStack toolItem = DataManager.getToolItem();

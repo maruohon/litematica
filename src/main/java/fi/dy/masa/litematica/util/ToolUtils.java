@@ -1,10 +1,11 @@
 package fi.dy.masa.litematica.util;
 
 import java.util.Collection;
-import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
@@ -15,13 +16,9 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -160,33 +157,6 @@ public class ToolUtils
         return true;
     }
 
-    public static void killEntitiesCommand(Collection<Box> boxes, Minecraft mc)
-    {
-        World world = mc.world;
-
-        if (world == null)
-        {
-            return;
-        }
-
-        for (Box box : boxes)
-        {
-            BlockPos posMin = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
-            BlockPos posMax = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
-            AxisAlignedBB bb = new AxisAlignedBB(posMin, posMax.add(1, 1, 1));
-            List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(mc.player, bb);
-
-            if (entities.size() > 0)
-            {
-                String cmd = String.format("/kill @e[type=!player,x=%d,y=%d,z=%d,dx=%d,dy=%d,dz=%d]",
-                        posMin.getX(), posMin.getY(), posMin.getZ(),
-                        posMax.getX() - posMin.getX() + 1, posMax.getY() - posMin.getY() + 1, posMax.getZ() - posMin.getZ() + 1);
-
-                mc.player.sendChatMessage(cmd);
-            }
-        }
-    }
-
     public static void deleteSelectionVolumes(boolean removeEntities, Minecraft mc)
     {
         AreaSelection area = null;
@@ -212,100 +182,30 @@ public class ToolUtils
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
-            if (area != null && area.getAllSubRegionBoxes().size() > 0)
+            if (area == null)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                return;
+            }
+
+            if (area.getAllSubRegionBoxes().size() > 0)
             {
                 Box currentBox = area.getSelectedSubRegionBox();
                 final ImmutableList<Box> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
 
-                if (mc.isSingleplayer())
-                {
-                    final int dimId = fi.dy.masa.malilib.util.WorldUtils.getDimensionId(mc.player.getEntityWorld());
-                    final WorldServer world = mc.getIntegratedServer().getWorld(dimId);
+                TaskDeleteArea task = new TaskDeleteArea(boxes, removeEntities);
+                TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
 
-                    world.addScheduledTask(new Runnable()
-                    {
-                        public void run()
-                        {
-                            if (deleteSelectionVolumes(world, boxes, removeEntities))
-                            {
-                                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
-                            }
-                            else
-                            {
-                                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.area_clear_fail");
-                            }
-                        }
-                    });
-
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
-                }
-                else if (fillSelectionVolumesCommand(boxes, Blocks.AIR.getDefaultState(), null, mc))
-                {
-                    killEntitiesCommand(boxes, mc);
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
-                }
-                else
-                {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.area_clear_fail");
-                }
+                InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.empty_area_selection");
             }
         }
         else
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
         }
-    }
-
-    public static boolean deleteSelectionVolumes(World world, Collection<Box> boxes, boolean removeEntities)
-    {
-        IBlockState air = Blocks.AIR.getDefaultState();
-        IBlockState barrier = Blocks.BARRIER.getDefaultState();
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-
-        for (Box box : boxes)
-        {
-            BlockPos posMin = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
-            BlockPos posMax = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
-
-            for (int z = posMin.getZ(); z <= posMax.getZ(); ++z)
-            {
-                for (int x = posMin.getX(); x <= posMax.getX(); ++x)
-                {
-                    for (int y = posMax.getY(); y >= posMin.getY(); --y)
-                    {
-                        posMutable.setPos(x, y, z);
-                        TileEntity te = world.getTileEntity(posMutable);
-
-                        if (te instanceof IInventory)
-                        {
-                            ((IInventory) te).clear();
-                            world.setBlockState(posMutable, barrier, 0x12);
-                        }
-
-                        world.setBlockState(posMutable, air, 0x12);
-                    }
-                }
-            }
-
-            if (removeEntities)
-            {
-                AxisAlignedBB bb = PositionUtils.createEnclosingAABB(posMin, posMax);
-                List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, bb);
-
-                for (Entity entity : entities)
-                {
-                    if ((entity instanceof EntityPlayer) == false)
-                    {
-                        entity.setDead();
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 }

@@ -13,12 +13,12 @@ import fi.dy.masa.litematica.scheduler.TaskTimer;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 
 public abstract class TaskBase implements ITask, IInfoHudRenderer
 {
@@ -72,8 +72,13 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     {
     }
 
-    protected boolean areSurroundingChunksLoaded(ChunkPos pos, World worldClient, int radius)
+    protected boolean areSurroundingChunksLoaded(ChunkPos pos, WorldClient world, int radius)
     {
+        if (radius <= 0)
+        {
+            return world.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z);
+        }
+
         int chunkX = pos.x;
         int chunkZ = pos.z;
 
@@ -81,7 +86,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
         {
             for (int cz = chunkZ - radius; cz <= chunkZ + radius; ++cz)
             {
-                if (worldClient.getChunkProvider().isChunkGeneratedAt(cx, cz) == false)
+                if (world.getChunkProvider().isChunkGeneratedAt(cx, cz) == false)
                 {
                     return false;
                 }

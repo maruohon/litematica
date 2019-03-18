@@ -174,7 +174,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         }
     }
 
-    protected boolean canProcessChunk(ChunkPos pos, World worldSchematic, World worldClient)
+    protected boolean canProcessChunk(ChunkPos pos, World worldSchematic, WorldClient worldClient)
     {
         if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z) == false)
         {

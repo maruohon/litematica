@@ -395,6 +395,8 @@ litematica.label.none_lower=none
 litematica.label.no=no
 litematica.label.yes=yes
 
+litematica.message.error.area_deletion_aborted=Area Deletion interrupted or aborted
+litematica.message.error.empty_area_selection=Empty Area Selection (no boxes)
 litematica.message.error.invalid_schematic_name=Invalid schematic name '%s'
 litematica.message.error.no_area_selected=§cNo area selected§r
 litematica.message.error.no_placement_selected=§cNo placement selected§r
