@@ -168,7 +168,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
     private boolean handleAttackKey(Minecraft mc)
     {
-        if (mc.player != null && KeybindMulti.getTriggeredCount() == 0)
+        if (mc.player != null && DataManager.getToolMode() == ToolMode.REBUILD && KeybindMulti.getTriggeredCount() == 0)
         {
             if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
             {
@@ -178,7 +178,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 return SchematicUtils.breakAllIdenticalSchematicBlocks(mc);
             }
-            else if (DataManager.getToolMode() == ToolMode.REBUILD)
+            else
             {
                 return SchematicUtils.breakSchematicBlock(mc);
             }
