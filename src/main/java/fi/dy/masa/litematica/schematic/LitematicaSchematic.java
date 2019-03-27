@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.mixin.IMixinDataFixer;
 import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -29,6 +30,7 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -57,6 +59,8 @@ public class LitematicaSchematic
 {
     public static final String FILE_EXTENSION = ".litematic";
     public static final int SCHEMATIC_VERSION = 4;
+    public static final int MINECRAFT_DATA_VERSION = ((IMixinDataFixer) Minecraft.getMinecraft().getDataFixer()).getVersion();
+
     private final Map<String, LitematicaBlockStateContainer> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, NBTTagCompound>> tileEntities = new HashMap<>();
     private final Map<String, Map<BlockPos, NextTickListEntry>> pendingBlockTicks = new HashMap<>();
@@ -1017,6 +1021,7 @@ public class LitematicaSchematic
         NBTTagCompound nbt = new NBTTagCompound();
 
         nbt.setInteger("Version", SCHEMATIC_VERSION);
+        nbt.setInteger("MinecraftDataVersion", MINECRAFT_DATA_VERSION);
         nbt.setTag("Metadata", this.metadata.writeToNBT());
         nbt.setTag("Regions", this.writeSubRegionsToNBT());
 
