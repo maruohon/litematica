@@ -65,7 +65,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
             if (this.type == ButtonType.SAVE)
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
-                String fileName = this.gui.textField.getText();
+                String fileName = this.gui.getTextFieldText();
 
                 if (dir.isDirectory() == false)
                 {
