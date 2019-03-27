@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.gui;
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
 import com.mumfrey.liteloader.client.overlays.IGuiTextField;
-import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;

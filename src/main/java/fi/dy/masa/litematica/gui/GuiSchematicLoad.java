@@ -5,7 +5,6 @@ import java.util.Collection;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.materials.MaterialListSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;

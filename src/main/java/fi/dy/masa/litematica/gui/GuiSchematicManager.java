@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.config.IConfigOptionList;

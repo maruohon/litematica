@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.gui.base;
+package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import javax.annotation.Nullable;
