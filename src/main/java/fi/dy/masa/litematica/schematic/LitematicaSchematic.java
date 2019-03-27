@@ -1138,14 +1138,25 @@ public class LitematicaSchematic
         this.subRegionPositions.clear();
         this.subRegionSizes.clear();
 
-        final int version = nbt.getInteger("Version");
-
-        if (version >= 1 && version <= SCHEMATIC_VERSION)
+        if (nbt.hasKey("Version", Constants.NBT.TAG_INT))
         {
-            this.metadata.readFromNBT(nbt.getCompoundTag("Metadata"));
-            this.readSubRegionsFromNBT(nbt.getCompoundTag("Regions"), version);
+            final int version = nbt.getInteger("Version");
 
-            return true;
+            if (version >= 1 && version <= SCHEMATIC_VERSION)
+            {
+                this.metadata.readFromNBT(nbt.getCompoundTag("Metadata"));
+                this.readSubRegionsFromNBT(nbt.getCompoundTag("Regions"), version);
+
+                return true;
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_schematic_version", version);
+            }
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_version_information");
         }
 
         return false;
