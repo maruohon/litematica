@@ -25,6 +25,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
@@ -177,6 +178,45 @@ public class SchematicUtils
         return false;
     }
 
+    public static boolean placeSchematicBlocksInDirection(Minecraft mc)
+    {
+        ReplacementInfo info = getTargetInfo(mc);
+
+        // The state can be null in 1.13+
+        if (info != null && info.stateNew != null)
+        {
+            EnumFacing playerFacingH = mc.player.getHorizontalFacing();
+            EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
+            BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
+
+            if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).getMaterial() == Material.AIR)
+            {
+                BlockPos posEnd = getReplacementBoxEndPos(posStart, direction);
+                return setSchematicBlockStates(posStart, posEnd, info.stateNew);
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean fillAirWithBlocks(Minecraft mc)
+    {
+        ReplacementInfo info = getTargetInfo(mc);
+
+        // The state can be null in 1.13+
+        if (info != null && info.stateNew != null)
+        {
+            BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
+
+            if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).getMaterial() == Material.AIR)
+            {
+                return setAllIdenticalSchematicBlockStates(posStart, Blocks.AIR.getDefaultState(), info.stateNew);
+            }
+        }
+
+        return false;
+    }
+
     @Nullable
     private static ReplacementInfo getTargetInfo(Minecraft mc)
     {
@@ -218,28 +258,30 @@ public class SchematicUtils
 
     private static BlockPos getReplacementBoxEndPos(BlockPos startPos, EnumFacing direction)
     {
+        return getReplacementBoxEndPos(startPos, direction, 10000);
+    }
+
+    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, EnumFacing direction, int maxBlocks)
+    {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-        IBlockState stateStart = world.getBlockState(startPos);
-        BlockPos posEnd = startPos;
-        int failsafe = 10000;
         LayerRange range = DataManager.getRenderLayerRange();
+        IBlockState stateStart = world.getBlockState(startPos);
+        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(startPos);
 
-        while (failsafe-- > 0)
+        while (maxBlocks-- > 0)
         {
-            BlockPos posTmp = posEnd.offset(direction);
+            posMutable.move(direction);
 
-            if (range.isPositionWithinRange(posTmp) == false)
+            if (range.isPositionWithinRange(posMutable) == false ||
+                world.getChunkProvider().isChunkGeneratedAt(posMutable.getX() >> 4, posMutable.getZ() >> 4) == false ||
+                world.getBlockState(posMutable) != stateStart)
             {
+                posMutable.move(direction.getOpposite());
                 break;
-            }
-
-            if (world.getBlockState(posTmp) == stateStart)
-            {
-                posEnd = posTmp;
             }
         }
 
-        return posEnd;
+        return posMutable.toImmutable();
     }
 
     public static boolean setTargetedSchematicBlockState(Minecraft mc, IBlockState state)

@@ -681,9 +681,34 @@ public class OverlayRenderer
         }
     }
 
-    public void renderBlockReplaceOverlay(float partialTicks)
+    public void renderSchematicRebuildTargetingOverlay(float partialTicks)
     {
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 10, true);
+        RayTraceWrapper traceWrapper = null;
+        Color4f color = null;
+        boolean direction = false;
+
+        if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
+        {
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
+        }
+        else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
+        {
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
+            direction = true;
+        }
+        else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
+        {
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
+        }
+        else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
+        {
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
+            direction = true;
+        }
 
         if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -698,13 +723,17 @@ public class OverlayRenderer
             //GlStateManager.pushMatrix();
             //GlStateManager.disableDepth();
             GlStateManager.disableTexture2D();
-            double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
-            double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
-            double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
-            Color4f color = Configs.Colors.SCHEMATIC_REBUILD_OVERLAY_COLOR.getColor();
 
-            fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
-                    entity, pos, trace.sideHit, trace.hitVec, dx, dy, dz, color);
+            if (direction)
+            {
+                fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlay(
+                        entity, pos, trace.sideHit, trace.hitVec, color, partialTicks);
+            }
+            else
+            {
+                fi.dy.masa.malilib.render.RenderUtils.renderBlockTargetingOverlaySimple(
+                        entity, pos, trace.sideHit, color, partialTicks);
+            }
 
             GlStateManager.enableTexture2D();
             //GlStateManager.enableDepth();

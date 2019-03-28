@@ -36,10 +36,9 @@ public class RenderHandler implements IRenderer
                 OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
             }
 
-            if (DataManager.getToolMode() == ToolMode.REBUILD &&
-                Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
+            if (DataManager.getToolMode() == ToolMode.REBUILD)
             {
-                OverlayRenderer.getInstance().renderBlockReplaceOverlay(partialTicks);
+                OverlayRenderer.getInstance().renderSchematicRebuildTargetingOverlay(partialTicks);
             }
         }
     }
