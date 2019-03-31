@@ -21,6 +21,7 @@ import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.BlockFlowerPot.EnumFlowerType;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockSnow;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
@@ -245,6 +246,10 @@ public class MaterialCache
         if (state.getBlock() instanceof BlockSlab && ((BlockSlab) state.getBlock()).isDouble())
         {
             stack.setCount(2);
+        }
+        else if (state.getBlock() == Blocks.SNOW_LAYER)
+        {
+            stack.setCount(state.getValue(BlockSnow.LAYERS));
         }
     }
 
