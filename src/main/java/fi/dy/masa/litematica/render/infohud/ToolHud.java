@@ -137,13 +137,6 @@ public class ToolHud extends InfoHud
             return;
         }
 
-        // The Status Info HUD renders as part of the Tool HUD renderer, so the main shouldRender()
-        // always retusn true, and we need to check here if the player actually has a tool
-        if (hasTool == false)
-        {
-            return;
-        }
-
         ToolMode mode = DataManager.getToolMode();
         String orange = GuiBase.TXT_GOLD;
         String red = GuiBase.TXT_RED;
@@ -151,13 +144,13 @@ public class ToolHud extends InfoHud
         String strYes = green + I18n.format("litematica.label.yes") + rst;
         String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
 
-        if (mode == ToolMode.DELETE)
+        if (hasTool && mode == ToolMode.DELETE)
         {
             String strp = ToolModeData.DELETE.getUsePlacement() ? "litematica.hud.delete.target_mode.placement" : "litematica.hud.delete.target_mode.area";
             lines.add(I18n.format("litematica.hud.delete.target_mode", green + I18n.format(strp) + rst));
         }
 
-        if (mode.getUsesAreaSelection())
+        if (hasTool && mode.getUsesAreaSelection())
         {
             SelectionManager sm = DataManager.getSelectionManager();
             AreaSelection selection = sm.getCurrentSelection();
@@ -238,7 +231,7 @@ public class ToolHud extends InfoHud
             str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
             lines.add(I18n.format("litematica.hud.area_selection.selection_corners_mode", str));
         }
-        else if (mode.getUsesSchematic())
+        else if ((hasTool || mode == ToolMode.REBUILD) && mode.getUsesSchematic())
         {
             SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -302,9 +295,19 @@ public class ToolHud extends InfoHud
             }
         }
 
-        str = I18n.format("litematica.hud.selected_mode");
-        lines.add(String.format("%s [%s%d%s/%s%d%s]: %s%s%s", str, green, mode.ordinal() + 1, white,
-                green, ToolMode.values().length, white, green, mode.getName(), rst));
+        if (hasTool || mode == ToolMode.REBUILD)
+        {
+            str = I18n.format("litematica.hud.selected_mode");
+            String modeName = mode.getName();
+
+            if (mode == ToolMode.REBUILD)
+            {
+                modeName = orange + modeName + rst;
+            }
+
+            lines.add(String.format("%s [%s%d%s/%s%d%s]: %s%s%s", str, green, mode.ordinal() + 1, white,
+                    green, ToolMode.values().length, white, green, modeName, rst));
+        }
     }
 
     protected String getBlockString(IBlockState state)
