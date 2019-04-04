@@ -540,6 +540,10 @@ public class KeyCallbacks
                 {
                     ToolModeData.DELETE.toggleUsePlacement();
                 }
+                else if (mode == ToolMode.PASTE_SCHEMATIC)
+                {
+                    Configs.Generic.PASTE_REPLACE_BEHAVIOR.setOptionListValue(Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue().cycle(false));
+                }
                 else if (mode.getUsesAreaSelection())
                 {
                     Configs.Generic.SELECTION_CORNERS_MODE.setOptionListValue(Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().cycle(false));

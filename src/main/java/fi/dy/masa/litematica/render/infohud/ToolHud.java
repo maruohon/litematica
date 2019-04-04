@@ -18,6 +18,7 @@ import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.BlockUtils;
@@ -145,6 +146,7 @@ public class ToolHud extends InfoHud
 
         ToolMode mode = DataManager.getToolMode();
         String orange = GuiBase.TXT_GOLD;
+        String red = GuiBase.TXT_RED;
         String white = GuiBase.TXT_WHITE;
         String strYes = green + I18n.format("litematica.label.yes") + rst;
         String strNo = GuiBase.TXT_RED + I18n.format("litematica.label.no") + rst;
@@ -273,6 +275,23 @@ public class ToolHud extends InfoHud
                     or = or.add(schematicPlacement.getOrigin());
                     str = String.format("%d, %d, %d", or.getX(), or.getY(), or.getZ());
                     lines.add(I18n.format("litematica.hud.schematic_placement.sub_region_origin", green + str + rst));
+                }
+
+                if (mode == ToolMode.PASTE_SCHEMATIC)
+                {
+                    ReplaceBehavior replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
+                    str = replace.getDisplayName();
+
+                    if (replace == ReplaceBehavior.NONE)
+                    {
+                        str = red + str + rst;
+                    }
+                    else
+                    {
+                        str = orange + str + rst;
+                    }
+
+                    lines.add(I18n.format("litematica.hud.misc.schematic_paste.replace_mode", str));
                 }
             }
             else

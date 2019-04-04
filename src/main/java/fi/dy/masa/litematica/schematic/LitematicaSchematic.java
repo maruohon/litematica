@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.mixin.IMixinDataFixer;
 import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
@@ -22,6 +23,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
@@ -29,6 +31,7 @@ import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -308,6 +311,7 @@ public class LitematicaSchematic
         final int sizeZ = Math.abs(regionSize.getZ());
         final IBlockState barrier = Blocks.BARRIER.getDefaultState();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        ReplaceBehavior replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
 
         final Rotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation());
         final Mirror mirrorMain = schematicPlacement.getMirror();
@@ -328,9 +332,13 @@ public class LitematicaSchematic
                 {
                     IBlockState state = container.get(x, y, z);
 
+                    if (state.getBlock() == Blocks.STRUCTURE_VOID)
+                    {
+                        continue;
+                    }
+
                     posMutable.setPos(x, y, z);
                     NBTTagCompound teNBT = tileMap.get(posMutable);
-
 
                     posMutable.setPos(  posMinRel.getX() + x - regionPos.getX(),
                                         posMinRel.getY() + y - regionPos.getY(),
@@ -339,28 +347,33 @@ public class LitematicaSchematic
                     BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
                     pos = pos.add(regionPosTransformed).add(origin);
 
-                    if (mirrorMain != Mirror.NONE) { state = state.withMirror(mirrorMain); }
-                    if (mirrorSub != Mirror.NONE)  { state = state.withMirror(mirrorSub); }
-                    if (rotationCombined != Rotation.NONE) { state = state.withRotation(rotationCombined); }
+                    IBlockState stateOld = world.getBlockState(pos).getActualState(world, pos);
 
-                    if (world.getBlockState(pos).getActualState(world, pos) == state)
+                    if ((replace == ReplaceBehavior.NONE && stateOld.getMaterial() != Material.AIR) ||
+                        (replace == ReplaceBehavior.WITH_NON_AIR && state.getMaterial() == Material.AIR))
                     {
                         continue;
                     }
 
-                    if (teNBT != null)
+                    if (mirrorMain != Mirror.NONE) { state = state.withMirror(mirrorMain); }
+                    if (mirrorSub != Mirror.NONE)  { state = state.withMirror(mirrorSub); }
+                    if (rotationCombined != Rotation.NONE) { state = state.withRotation(rotationCombined); }
+
+                    if (stateOld == state)
                     {
-                        TileEntity te = world.getTileEntity(pos);
+                        continue;
+                    }
 
-                        if (te != null)
+                    TileEntity teOld = world.getTileEntity(pos);
+
+                    if (teOld != null)
+                    {
+                        if (teOld instanceof IInventory)
                         {
-                            if (te instanceof IInventory)
-                            {
-                                ((IInventory) te).clear();
-                            }
-
-                            world.setBlockState(pos, barrier, 0x14);
+                            ((IInventory) teOld).clear();
                         }
+
+                        world.setBlockState(pos, barrier, 0x14);
                     }
 
                     if (world.setBlockState(pos, state, 0x12) && teNBT != null)
