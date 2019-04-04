@@ -212,29 +212,32 @@ public class SchematicPlacementManager
             {
                 InfoUtils.showGuiMessage(MessageType.SUCCESS, I18n.format("litematica.message.schematic_placement_created", placement.getName()));
 
-                LayerMode mode = DataManager.getRenderLayerRange().getLayerMode();
-
-                if (mode != LayerMode.ALL)
+                if (Configs.InfoOverlays.WARN_RENDER_LAYER_DISABLED_RENDER.getBooleanValue())
                 {
-                    InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, "litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
-                }
+                    LayerMode mode = DataManager.getRenderLayerRange().getLayerMode();
 
-                if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false)
-                {
-                    String hotkey = Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().getKeysDisplayString();
-                    InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.main_rendering_disabled", hotkey);
-                }
+                    if (mode != LayerMode.ALL)
+                    {
+                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, "litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
+                    }
 
-                if (Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false)
-                {
-                    String hotkey = Hotkeys.TOGGLE_SCHEMATIC_RENDERING.getKeybind().getKeysDisplayString();
-                    InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.schematic_rendering_disabled", hotkey);
-                }
+                    if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false)
+                    {
+                        String hotkey = Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().getKeysDisplayString();
+                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.main_rendering_disabled", hotkey);
+                    }
 
-                if (Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false)
-                {
-                    String hotkey = Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeybind().getKeysDisplayString();
-                    InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.schematic_blocks_rendering_disabled", hotkey);
+                    if (Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false)
+                    {
+                        String hotkey = Hotkeys.TOGGLE_SCHEMATIC_RENDERING.getKeybind().getKeysDisplayString();
+                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.schematic_rendering_disabled", hotkey);
+                    }
+
+                    if (Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false)
+                    {
+                        String hotkey = Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeybind().getKeysDisplayString();
+                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.schematic_blocks_rendering_disabled", hotkey);
+                    }
                 }
             }
         }

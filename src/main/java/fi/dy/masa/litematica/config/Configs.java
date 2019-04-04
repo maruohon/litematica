@@ -172,6 +172,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        TOOL_HUD_SCALE                      = new ConfigDouble( "toolHudScale", 1, 0.1, 4, "Scale factor for the Tool HUD text");
         public static final ConfigDouble        VERIFIER_ERROR_HILIGHT_ALPHA        = new ConfigDouble( "verifierErrorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
         public static final ConfigInteger       VERIFIER_ERROR_HILIGHT_MAX_POSITIONS = new ConfigInteger("verifierErrorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render\nat once in the Schematic Verifier overlay.");
+        public static final ConfigBoolean       WARN_RENDER_LAYER_DISABLED_RENDER   = new ConfigBoolean("warnRenderLayerDisabledRender", true, "Should the warning message about being in a layer mode\nor having some of the rendering options disabled\nbe shown when loading a new schematic");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ENABLE_BLOCK_INFO_OVERLAY_RENDERING,
@@ -179,6 +180,7 @@ public class Configs implements IConfigHandler
                 RENDER_BLOCK_INFO_LINES,
                 RENDER_BLOCK_INFO_OVERLAY,
                 STATUS_INFO_HUD,
+                WARN_RENDER_LAYER_DISABLED_RENDER,
 
                 BLOCK_INFO_LINES_ALIGNMENT,
                 BLOCK_INFO_OVERLAY_ALIGNMENT,
