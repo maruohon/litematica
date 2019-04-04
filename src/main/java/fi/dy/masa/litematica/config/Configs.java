@@ -47,7 +47,6 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       RENDER_MATERIALS_IN_GUI = new ConfigBoolean(    "renderMaterialListInGuis", true, "Whether or not the material list should\nbe rendered inside GUIs");
         public static final ConfigBoolean       RENDER_THREAD_NO_TIMEOUT = new ConfigBoolean(   "renderThreadNoTimeout", true, "Removes the timeout from the rendering worker threads.\nIf you get very stuttery rendering when moving around\nor dealing with large schematics, try disabling this. It will however make\nthe schematic rendering a lot slower in some cases.");
         public static final ConfigOptionList    SELECTION_CORNERS_MODE  = new ConfigOptionList( "selectionCornersMode", CornerSelectionMode.CORNERS, "The Area Selection corners mode to use (Corners, or Expand)");
-        public static final ConfigOptionList    TOOL_HUD_ALIGNMENT      = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
         public static final ConfigString        TOOL_ITEM               = new ConfigString(     "toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
         public static final ConfigBoolean       TOOL_ITEM_ENABLED       = new ConfigBoolean(    "toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.", "Tool Item Enabled");
 
@@ -68,7 +67,6 @@ public class Configs implements IConfigHandler
 
                 PASTE_REPLACE_BEHAVIOR,
                 SELECTION_CORNERS_MODE,
-                TOOL_HUD_ALIGNMENT,
 
                 PASTE_COMMAND_INTERVAL,
                 PASTE_COMMAND_LIMIT,
@@ -167,6 +165,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       RENDER_BLOCK_INFO_LINES             = new ConfigBoolean("renderBlockInfoLines", true, "If enabled, then MiniHUD-style block info overlay\nis rendered for the looked-at block");
         public static final ConfigBoolean       RENDER_BLOCK_INFO_OVERLAY           = new ConfigBoolean("renderBlockInfoOverlay", true, "If enabled, then an info overlay is rendered\nwhile looking at schematic blocks or schematic verifier\nerror markers, and holding the 'renderInfoOverlay' key");
         public static final ConfigBoolean       STATUS_INFO_HUD                     = new ConfigBoolean("statusInfoHudEnabled", true, "Enable a status info HUD renderer,\nwhich renders a few bits of status info, such as\nthe current layer mode and renderers enabled state");
+        public static final ConfigOptionList    TOOL_HUD_ALIGNMENT                  = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
         public static final ConfigInteger       TOOL_HUD_OFFSET_X                   = new ConfigInteger("toolHudOffsetX", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
         public static final ConfigInteger       TOOL_HUD_OFFSET_Y                   = new ConfigInteger("toolHudOffsetY", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
         public static final ConfigDouble        TOOL_HUD_SCALE                      = new ConfigDouble( "toolHudScale", 1, 0.1, 4, "Scale factor for the Tool HUD text");
@@ -185,6 +184,8 @@ public class Configs implements IConfigHandler
                 BLOCK_INFO_LINES_ALIGNMENT,
                 BLOCK_INFO_OVERLAY_ALIGNMENT,
                 INFO_HUD_ALIGNMENT,
+                TOOL_HUD_ALIGNMENT,
+
                 BLOCK_INFO_LINES_OFFSET_X,
                 BLOCK_INFO_LINES_OFFSET_Y,
                 BLOCK_INFO_OVERLAY_OFFSET_Y,

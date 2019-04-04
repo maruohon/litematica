@@ -59,7 +59,7 @@ public class ToolHud extends InfoHud
     @Override
     protected HudAlignment getHudAlignment()
     {
-        return (HudAlignment) Configs.Generic.TOOL_HUD_ALIGNMENT.getOptionListValue();
+        return (HudAlignment) Configs.InfoOverlays.TOOL_HUD_ALIGNMENT.getOptionListValue();
     }
 
     @Override
