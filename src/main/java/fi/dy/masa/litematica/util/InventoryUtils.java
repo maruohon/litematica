@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 public class InventoryUtils
 {
     private static final List<Integer> PICK_BLOCKABLE_SLOTS = new ArrayList<>();
+    private static int nextPickSlotIndex;
 
     public static void setPickBlockableSlots(String configStr)
     {
@@ -98,7 +99,24 @@ public class InventoryUtils
 
             if (slotNum == -1)
             {
-                slotNum = PICK_BLOCKABLE_SLOTS.get(0) - 1;
+                if (PICK_BLOCKABLE_SLOTS.contains(player.inventory.currentItem + 1))
+                {
+                    slotNum = player.inventory.currentItem;
+                }
+                else
+                {
+                    if (nextPickSlotIndex >= PICK_BLOCKABLE_SLOTS.size())
+                    {
+                        nextPickSlotIndex = 0;
+                    }
+
+                    slotNum = PICK_BLOCKABLE_SLOTS.get(nextPickSlotIndex) - 1;
+
+                    if (++nextPickSlotIndex >= PICK_BLOCKABLE_SLOTS.size())
+                    {
+                        nextPickSlotIndex = 0;
+                    }
+                }
             }
 
             if (slotNum != -1)
