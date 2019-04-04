@@ -402,13 +402,13 @@ public class RayTraceUtils
     }
 
     @Nullable
-    public static BlockPos getFurthestSchematicWorldTrace(World worldClient, Entity entity, double range)
+    public static BlockPos getFurthestSchematicWorldTrace(World worldClient, Entity entity, double maxRange)
     {
         Vec3d eyesPos = entity.getPositionEyes(1f);
-        Vec3d rangedLookRot = entity.getLook(1f).scale(range);
+        Vec3d rangedLookRot = entity.getLook(1f).scale(maxRange);
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
-        RayTraceResult traceVanilla = getRayTraceFromEntity(worldClient, entity, false, range);
+        RayTraceResult traceVanilla = getRayTraceFromEntity(worldClient, entity, false, maxRange);
 
         if (traceVanilla.typeOfHit != RayTraceResult.Type.BLOCK)
         {
@@ -453,8 +453,10 @@ public class RayTraceUtils
         if (furthestTrace == null)
         {
             BlockPos pos = closestVanillaPos.offset(traceVanilla.sideHit);
+            LayerRange layerRange = DataManager.getRenderLayerRange();
 
-            if (worldSchematic.getBlockState(pos).getMaterial() != Material.AIR &&
+            if (layerRange.isPositionWithinRange(pos) &&
+                worldSchematic.getBlockState(pos).getMaterial() != Material.AIR &&
                 worldClient.getBlockState(pos).getMaterial() == Material.AIR)
             {
                 return pos;
