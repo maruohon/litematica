@@ -5,16 +5,20 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import net.minecraft.client.renderer.EntityRenderer;
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer
 {
+    private boolean renderCollidingSchematicBlocks;
+
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/RenderGlobal;updateChunks(J)V", shift = Shift.AFTER))
     private void setupAndUpdate(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
+        this.renderCollidingSchematicBlocks = Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue();
         LitematicaRenderer.getInstance().piecewisePrepareAndUpdate(partialTicks);
     }
 
@@ -23,7 +27,7 @@ public abstract class MixinEntityRenderer
                      "Lnet/minecraft/util/BlockRenderLayer;DILnet/minecraft/entity/Entity;)I", ordinal = 0, shift = Shift.AFTER))
     private void renderSolid(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
-        LitematicaRenderer.getInstance().piecewiseRenderSolid(partialTicks);
+        LitematicaRenderer.getInstance().piecewiseRenderSolid(this.renderCollidingSchematicBlocks, partialTicks);
     }
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE",
@@ -31,7 +35,7 @@ public abstract class MixinEntityRenderer
                      "Lnet/minecraft/util/BlockRenderLayer;DILnet/minecraft/entity/Entity;)I", ordinal = 1, shift = Shift.AFTER))
     private void renderCutoutMipped(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
-        LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(partialTicks);
+        LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(this.renderCollidingSchematicBlocks, partialTicks);
     }
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE",
@@ -39,7 +43,7 @@ public abstract class MixinEntityRenderer
                      "Lnet/minecraft/util/BlockRenderLayer;DILnet/minecraft/entity/Entity;)I", ordinal = 2, shift = Shift.AFTER))
     private void renderCutout(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
-        LitematicaRenderer.getInstance().piecewiseRenderCutout(partialTicks);
+        LitematicaRenderer.getInstance().piecewiseRenderCutout(this.renderCollidingSchematicBlocks, partialTicks);
     }
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE",
@@ -47,7 +51,7 @@ public abstract class MixinEntityRenderer
                      "Lnet/minecraft/util/BlockRenderLayer;DILnet/minecraft/entity/Entity;)I", ordinal = 3, shift = Shift.AFTER))
     private void renderTranslucent(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
-        LitematicaRenderer.getInstance().piecewiseRenderTranslucent(partialTicks);
+        LitematicaRenderer.getInstance().piecewiseRenderTranslucent(this.renderCollidingSchematicBlocks, partialTicks);
     }
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE",
