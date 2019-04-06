@@ -12,9 +12,11 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityLockableLoot;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 public class InventoryUtils
 {
@@ -58,6 +60,12 @@ public class InventoryUtils
 
         if (te instanceof IInventory)
         {
+            // Prevent loot generation attempt from crashing due to NPEs
+            if (te instanceof TileEntityLockableLoot && (world instanceof WorldServer) == false)
+            {
+                ((TileEntityLockableLoot) te).setLootTable(null, 0);
+            }
+
             inv = (IInventory) te;
             Block block = world.getBlockState(pos).getBlock();
 
