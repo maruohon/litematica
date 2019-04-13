@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -185,8 +186,10 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
                 String name = entry.getMetadata().getName();
                 boolean enabled = GuiScreen.isShiftKeyDown() == false;
 
+                SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
                 SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name, enabled, enabled);
-                DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, true);
+                manager.addSchematicPlacement(placement, true);
+                manager.setSelectedSchematicPlacement(placement);
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {
