@@ -154,7 +154,6 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    BLOCK_INFO_OVERLAY_ALIGNMENT        = new ConfigOptionList("blockInfoOverlayAlignment", BlockInfoAlignment.CENTER, "The alignment of the Block Info Overlay");
         public static final ConfigInteger       BLOCK_INFO_OVERLAY_OFFSET_Y         = new ConfigInteger("blockInfoOverlayOffsetY", 6, -2000, 2000, "The y offset of the block info overlay from the selected edge");
         public static final ConfigBoolean       ENABLE_BLOCK_INFO_OVERLAY_RENDERING = new ConfigBoolean("enableBlockInfoOverlayRendering", true, "Enable Block Info Overlay rendering to show block info\nabout the looked-at block or verifier error marker", "Block Info Overlay Rendering");
-        public static final ConfigBoolean       ENABLE_VERIFIER_OVERLAY_RENDERING   = new ConfigBoolean("enableVerifierOverlayRendering", true, "Enable Schematic Verifier marker overlay rendering", "Verifier Overlay Rendering");
         public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList("infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"info HUD\",\nused for schematic verifier mismatch positions etc.");
         public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger("infoHudMaxLines", 10, 1, 128, "The maximum number of info lines to show on the HUD at once");
         public static final ConfigInteger       INFO_HUD_OFFSET_X                   = new ConfigInteger("infoHudOffsetX", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
@@ -172,14 +171,15 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        VERIFIER_ERROR_HILIGHT_ALPHA        = new ConfigDouble( "verifierErrorHilightAlpha", 0.2, 0, 1, "The alpha value of the error marker box sides");
         public static final ConfigInteger       VERIFIER_ERROR_HILIGHT_MAX_POSITIONS = new ConfigInteger("verifierErrorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render\nat once in the Schematic Verifier overlay.");
         public static final ConfigBoolean       WARN_RENDER_LAYER_DISABLED_RENDER   = new ConfigBoolean("warnRenderLayerDisabledRender", true, "Should the warning message about being in a layer mode\nor having some of the rendering options disabled\nbe shown when loading a new schematic");
+        public static final ConfigBoolean       VERIFIER_OVERLAY_ENABLED            = new ConfigBoolean(    "verifierOverlayEnabled", true, "Enable Schematic Verifier marker overlay rendering", "Verifier Overlay Rendering");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 ENABLE_BLOCK_INFO_OVERLAY_RENDERING,
-                ENABLE_VERIFIER_OVERLAY_RENDERING,
                 RENDER_BLOCK_INFO_LINES,
                 RENDER_BLOCK_INFO_OVERLAY,
                 STATUS_INFO_HUD,
                 WARN_RENDER_LAYER_DISABLED_RENDER,
+                VERIFIER_OVERLAY_ENABLED,
 
                 BLOCK_INFO_LINES_ALIGNMENT,
                 BLOCK_INFO_OVERLAY_ALIGNMENT,

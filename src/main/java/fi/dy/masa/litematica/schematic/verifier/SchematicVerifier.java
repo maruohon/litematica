@@ -101,7 +101,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     public boolean getShouldRenderText(RenderPhase phase)
     {
         return this.shouldRenderInfoHud && phase == RenderPhase.POST &&
-               Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue();
+               Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue();
     }
 
     public void toggleShouldRenderInfoHUD()

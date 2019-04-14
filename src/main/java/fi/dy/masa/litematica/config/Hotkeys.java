@@ -57,7 +57,6 @@ public class Hotkeys
     public static final ConfigHotkey TOGGLE_AREA_SELECTION_RENDERING    = new ConfigHotkey("toggleAreaSelectionBoxesRendering", "",     "Toggle Area Selection boxes rendering on/off");
     public static final ConfigHotkey TOGGLE_SCHEMATIC_RENDERING         = new ConfigHotkey("toggleSchematicRendering",          "M,G",  "Toggle schematic rendering (blocks & overlay) on/off");
     public static final ConfigHotkey TOGGLE_INFO_OVERLAY_RENDERING      = new ConfigHotkey("toggleInfoOverlayRendering",        "",     "Toggle the info overlay rendering (for hovered block info)");
-    public static final ConfigHotkey TOGGLE_MISMATCH_OVERLAY_RENDERING  = new ConfigHotkey("toggleMismatchOverlayRendering",    "",     "Toggle the mismatch overlay rendering (for Schematic Verifier)");
     public static final ConfigHotkey TOGGLE_OVERLAY_RENDERING           = new ConfigHotkey("toggleOverlayRendering",            "",     "Toggle the block overlay rendering on/off");
     public static final ConfigHotkey TOGGLE_OVERLAY_OUTLINE_RENDERING   = new ConfigHotkey("toggleOverlayOutlineRendering",     "",     "Toggle the block overlay outline rendering on/off");
     public static final ConfigHotkey TOGGLE_OVERLAY_SIDE_RENDERING      = new ConfigHotkey("toggleOverlaySideRendering",        "",     "Toggle the block overlay side rendering on/off");
@@ -65,6 +64,7 @@ public class Hotkeys
     public static final ConfigHotkey TOGGLE_PLACEMENT_RESTRICTION       = new ConfigHotkey("togglePlacementRestriction",        "",     "A hotkey to toggle the placement restriction mode");
     public static final ConfigHotkey TOGGLE_SCHEMATIC_BLOCK_RENDERING   = new ConfigHotkey("toggleSchematicBlockRendering",     "",     "Toggle schematic block rendering on/off");
     public static final ConfigHotkey TOGGLE_TRANSLUCENT_RENDERING       = new ConfigHotkey("toggleTranslucentRendering",        "",     "Toggle translucent vs. opaque ghost block rendering");
+    public static final ConfigHotkey TOGGLE_VERIFIER_OVERLAY_RENDERING  = new ConfigHotkey("toggleVerifierOverlayRendering",    "",     "Toggle the Schematic Verifier overlay rendering");
     public static final ConfigHotkey TOOL_ENABLED_TOGGLE                = new ConfigHotkey("toolEnabledToggle",                 "M,T",  "The keybind to toggle the \"tool\" item functionality on/off");
     public static final ConfigHotkey TOOL_PLACE_CORNER_1                = new ConfigHotkey("toolPlaceCorner1",                  "BUTTON0", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use while holding the \"tool\" item\nto place the primary/first corner");
     public static final ConfigHotkey TOOL_PLACE_CORNER_2                = new ConfigHotkey("toolPlaceCorner2",                  "BUTTON1", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use while holding the \"tool\" item\nto place the second corner");
@@ -122,7 +122,6 @@ public class Hotkeys
             TOGGLE_ALL_RENDERING,
             TOGGLE_AREA_SELECTION_RENDERING,
             TOGGLE_INFO_OVERLAY_RENDERING,
-            TOGGLE_MISMATCH_OVERLAY_RENDERING,
             TOGGLE_OVERLAY_RENDERING,
             TOGGLE_OVERLAY_OUTLINE_RENDERING,
             TOGGLE_OVERLAY_SIDE_RENDERING,
@@ -131,6 +130,7 @@ public class Hotkeys
             TOGGLE_SCHEMATIC_BLOCK_RENDERING,
             TOGGLE_SCHEMATIC_RENDERING,
             TOGGLE_TRANSLUCENT_RENDERING,
+            TOGGLE_VERIFIER_OVERLAY_RENDERING,
             TOOL_ENABLED_TOGGLE,
             TOOL_PLACE_CORNER_1,
             TOOL_PLACE_CORNER_2,

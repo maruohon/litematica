@@ -31,9 +31,9 @@ public class RenderHandler implements IRenderer
 
             OverlayRenderer.getInstance().renderBoxes(partialTicks);
 
-            if (Configs.InfoOverlays.ENABLE_VERIFIER_OVERLAY_RENDERING.getBooleanValue())
+            if (Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue())
             {
-                OverlayRenderer.getInstance().renderSchematicMismatches(partialTicks);
+                OverlayRenderer.getInstance().renderSchematicVerifierMismatches(partialTicks);
             }
 
             if (DataManager.getToolMode() == ToolMode.REBUILD)
