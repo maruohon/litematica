@@ -462,14 +462,14 @@ public class OverlayRenderer
             boolean verifierOverlayRendered = false;
 
             if (infoOverlayKeyActive &&
-                Configs.InfoOverlays.RENDER_BLOCK_INFO_OVERLAY.getBooleanValue())
                 Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue() &&
+                Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue())
             {
                 verifierOverlayRendered = this.renderVerifierOverlay(mc);
             }
 
-            boolean renderBlockInfoLines = Configs.InfoOverlays.RENDER_BLOCK_INFO_LINES.getBooleanValue();
-            boolean renderInfoOverlay = verifierOverlayRendered == false && infoOverlayKeyActive && Configs.InfoOverlays.ENABLE_BLOCK_INFO_OVERLAY_RENDERING.getBooleanValue();
+            boolean renderBlockInfoLines = Configs.InfoOverlays.BLOCK_INFO_LINES_ENABLED.getBooleanValue();
+            boolean renderInfoOverlay = verifierOverlayRendered == false && infoOverlayKeyActive && Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue();
             RayTraceWrapper traceWrapper = null;
 
             if (renderBlockInfoLines || renderInfoOverlay)

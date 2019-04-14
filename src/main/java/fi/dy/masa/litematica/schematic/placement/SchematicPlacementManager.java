@@ -212,7 +212,7 @@ public class SchematicPlacementManager
             {
                 InfoUtils.showGuiMessage(MessageType.SUCCESS, I18n.format("litematica.message.schematic_placement_created", placement.getName()));
 
-                if (Configs.InfoOverlays.WARN_RENDER_LAYER_DISABLED_RENDER.getBooleanValue())
+                if (Configs.InfoOverlays.WARN_DISABLED_RENDERING.getBooleanValue())
                 {
                     LayerMode mode = DataManager.getRenderLayerRange().getLayerMode();
 

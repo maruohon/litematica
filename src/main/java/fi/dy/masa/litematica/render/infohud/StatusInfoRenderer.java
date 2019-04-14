@@ -21,7 +21,7 @@ public class StatusInfoRenderer implements IInfoHudRenderer
     @Override
     public boolean getShouldRenderText(RenderPhase phase)
     {
-        return phase == RenderPhase.POST && Configs.InfoOverlays.STATUS_INFO_HUD.getBooleanValue();
+        return phase == RenderPhase.POST && Configs.InfoOverlays.STATUS_INFO_HUD_ENABLED.getBooleanValue();
     }
 
     @Override

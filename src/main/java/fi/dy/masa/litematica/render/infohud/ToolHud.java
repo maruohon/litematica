@@ -129,7 +129,7 @@ public class ToolHud extends InfoHud
 
             // The Projects Mode indicator gets rendered via the status info HUD, if it's enabled.
             // If it's not enabled, then it gets rendered here if the player is currently holding the tool
-            if (Configs.InfoOverlays.STATUS_INFO_HUD.getBooleanValue() == false)
+            if (Configs.InfoOverlays.STATUS_INFO_HUD_ENABLED.getBooleanValue() == false)
             {
                 lines.add(I18n.format("litematica.hud.schematic_projects_mode"));
             }
