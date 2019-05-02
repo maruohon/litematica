@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.Collection;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.Icons;
@@ -8,6 +10,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.client.Minecraft;
 
 public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
@@ -36,11 +39,17 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
     }
 
     @Override
-    protected boolean entryMatchesFilter(SchematicPlacement entry, String filterText)
+    protected List<String> getEntryStringsForFilter(SchematicPlacement entry)
     {
-        return entry.getName().toLowerCase().indexOf(filterText) != -1 ||
-               entry.getSchematic().getMetadata().getName().toLowerCase().indexOf(filterText) != -1 ||
-               (entry.getSchematic().getFile() != null && entry.getSchematic().getFile().getName().toLowerCase().indexOf(filterText) != -1);
+        if (entry.getSchematic().getFile() != null)
+        {
+            String fileName = FileUtils.getNameWithoutExtension(entry.getSchematic().getFile().getName().toLowerCase());
+            return ImmutableList.of(entry.getName().toLowerCase(), fileName);
+        }
+        else
+        {
+            return ImmutableList.of(entry.getName().toLowerCase());
+        }
     }
 
     @Override

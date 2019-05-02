@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.Collection;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
@@ -105,10 +107,9 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
     }
 
     @Override
-    protected boolean entryMatchesFilter(SchematicVersion entry, String filterText)
+    protected List<String> getEntryStringsForFilter(SchematicVersion entry)
     {
-        return entry.getName().toLowerCase().indexOf(filterText) != -1 ||
-               entry.getFileName().toLowerCase().indexOf(filterText) != -1;
+        return ImmutableList.of(entry.getName().toLowerCase(), entry.getFileName().toLowerCase());
     }
 
     @Override

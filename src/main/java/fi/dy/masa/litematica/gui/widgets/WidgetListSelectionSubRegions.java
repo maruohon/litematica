@@ -2,6 +2,8 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -47,9 +49,9 @@ public class WidgetListSelectionSubRegions extends WidgetListBase<String, Widget
     }
 
     @Override
-    protected boolean entryMatchesFilter(String entry, String filterText)
+    protected List<String> getEntryStringsForFilter(String entry)
     {
-        return entry.toLowerCase().indexOf(filterText) != -1;
+        return ImmutableList.of(entry.toLowerCase());
     }
 
     @Override

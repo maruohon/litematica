@@ -2,6 +2,8 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -45,9 +47,9 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
     }
 
     @Override
-    protected boolean entryMatchesFilter(SubRegionPlacement entry, String filterText)
+    protected List<String> getEntryStringsForFilter(SubRegionPlacement entry)
     {
-        return entry.getName().toLowerCase().indexOf(filterText) != -1;
+        return ImmutableList.of(entry.getName().toLowerCase());
     }
 
     @Override
