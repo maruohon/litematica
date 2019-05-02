@@ -222,16 +222,19 @@ litematica.gui.label.block_info.state_schematic=Schematic World Block State
 litematica.gui.label.block_info_list_type.all=All
 litematica.gui.label.block_info_list_type.render_layers=Render Layers
 
-litematica.gui.label.material_list.available=Available
-litematica.gui.label.material_list.item=Item
-litematica.gui.label.material_list.missing=Missing
+litematica.gui.label.material_list.abbr.shulker_box=SB
+litematica.gui.label.material_list.title.available=Available
+litematica.gui.label.material_list.title.item=Item
+litematica.gui.label.material_list.title.missing=Missing
+litematica.gui.label.material_list.title.total=Total
+
 litematica.gui.label.material_list.multiplier=Multiplier:
 litematica.gui.label.material_list.name=Name
 litematica.gui.label.material_list.progress=Progress: %s
 litematica.gui.label.material_list.progress.done=Done %s
 litematica.gui.label.material_list.progress.mismatch=Mismatched %s
 litematica.gui.label.material_list.progress.missing=Missing %s
-litematica.gui.label.material_list.total=Total
+litematica.gui.label.material_list.total=Total: %s items
 
 litematica.gui.label.missing_chunks=Missing Chunks (%d)
 litematica.gui.label.origin.auto=Auto

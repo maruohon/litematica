@@ -135,6 +135,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             double pctMissing = ((double) missing / (double) total) * 100;
             double pctMismatch = ((double) mismatch / (double) total) * 100;
             String strp;
+            String strt = I18n.format("litematica.gui.label.material_list.total", total);
 
             if (missing == 0 && mismatch == 0)
             {
@@ -148,7 +149,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                 strp = String.format("%s / %s / %s", str1, str2, str3);
             }
 
-            str = I18n.format("litematica.gui.label.material_list.progress", strp);
+            str = strt + " / " + I18n.format("litematica.gui.label.material_list.progress", strp);
             w = this.fontRenderer.getStringWidth(str);
             this.addLabel(12, this.height - 36, w, 12, 0xFFFFFFFF, str);
         }

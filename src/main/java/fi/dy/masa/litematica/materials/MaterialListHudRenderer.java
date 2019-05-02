@@ -219,7 +219,29 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
     protected String getFormattedCountString(int count, int maxStackSize)
     {
+        int stacks = count / maxStackSize;
+        int remainder = count % maxStackSize;
         double boxCount = (double) count / (27D * maxStackSize);
-        return String.format("%d (%.2f SB)", count, boxCount);
+
+        if (count > maxStackSize)
+        {
+            if (boxCount >= 1.0)
+            {
+                return String.format("%d (%.2f %s)", count, boxCount, I18n.format("litematica.gui.label.material_list.abbr.shulker_box"));
+            }
+            else if (remainder > 0)
+            {
+                return String.format("%d (%d x %d + %d)", count, stacks, maxStackSize, remainder);
+            }
+            else
+            {
+                return String.format("%d (%d x %d)", count, stacks, maxStackSize);
+            }
+        }
+        else
+        {
+            return String.format("%d", count);
+        }
+
     }
 }

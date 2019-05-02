@@ -22,10 +22,10 @@ import net.minecraft.item.ItemStack;
 public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialListEntry>
 {
     private static final String[] HEADERS = new String[] {
-            "litematica.gui.label.material_list.item",
-            "litematica.gui.label.material_list.total",
-            "litematica.gui.label.material_list.missing",
-            "litematica.gui.label.material_list.available" };
+            "litematica.gui.label.material_list.title.item",
+            "litematica.gui.label.material_list.title.total",
+            "litematica.gui.label.material_list.title.missing",
+            "litematica.gui.label.material_list.title.available" };
     private static int maxNameLength;
     private static int maxCountLength1;
     private static int maxCountLength2;
@@ -38,6 +38,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     @Nullable private final String header2;
     @Nullable private final String header3;
     @Nullable private final String header4;
+    private final String shulkerBoxAbbr;
     private final boolean isOdd;
 
     public WidgetMaterialListEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
@@ -50,6 +51,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         this.isOdd = isOdd;
         this.listWidget = listWidget;
         this.materialList = materialList;
+        this.shulkerBoxAbbr = I18n.format("litematica.gui.label.material_list.abbr.shulker_box");
 
         if (this.entry != null)
         {
@@ -266,9 +268,9 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             GlStateManager.translate(0, 0, 200);
 
             Minecraft mc = this.mc;
-            String header1 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.item");
-            String header2 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.total");
-            String header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.missing");
+            String header1 = GuiBase.TXT_BOLD + I18n.format(HEADERS[0]);
+            String header2 = GuiBase.TXT_BOLD + I18n.format(HEADERS[1]);
+            String header3 = GuiBase.TXT_BOLD + I18n.format(HEADERS[2]);
 
             ItemStack stack = this.entry.getStack();
             String stackName = stack.getDisplayName();
@@ -339,16 +341,16 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             {
                 if (remainder > 0)
                 {
-                    strCount = String.format("%d = %d x %d + %d = %.2f SB", total, stacks, maxStackSize, remainder, boxCount);
+                    strCount = String.format("%d = %d x %d + %d = %.2f %s", total, stacks, maxStackSize, remainder, boxCount, this.shulkerBoxAbbr);
                 }
                 else
                 {
-                    strCount = String.format("%d = %d x %d = %.2f SB", total, stacks, maxStackSize, boxCount);
+                    strCount = String.format("%d = %d x %d = %.2f %s", total, stacks, maxStackSize, boxCount, this.shulkerBoxAbbr);
                 }
             }
             else
             {
-                strCount = String.format("%d = %.2f SB", total, boxCount);
+                strCount = String.format("%d = %.2f %s", total, boxCount, this.shulkerBoxAbbr);
             }
         }
         else
