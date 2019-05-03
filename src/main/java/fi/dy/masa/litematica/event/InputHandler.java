@@ -61,6 +61,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 return this.handleUseKey(mc);
             }
+            else if (eventKey == mc.gameSettings.keyBindAttack.getKeyCode())
+            {
+                return this.handleAttackKey(mc);
+            }
             else if (eventKey == mc.gameSettings.keyBindScreenshot.getKeyCode() && GuiSchematicManager.hasPendingPreviewTask())
             {
                 return GuiSchematicManager.setPreviewImage();
