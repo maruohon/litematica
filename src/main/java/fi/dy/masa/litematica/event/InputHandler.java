@@ -78,7 +78,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
         // Tool enabled, and not in a GUI
         if (mc.currentScreen == null && mc.world != null && mc.player != null)
@@ -93,6 +92,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
 
             EntityPlayer player = mc.player;
+            boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
             if (toolEnabled == false || EntityUtils.hasToolItem(player) == false)
             {
