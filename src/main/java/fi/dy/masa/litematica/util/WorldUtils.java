@@ -692,7 +692,7 @@ public class WorldUtils
     {
         RayTraceResult trace = mc.objectMouseOver;
 
-        if (trace.typeOfHit == RayTraceResult.Type.BLOCK)
+        if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
             BlockPos pos = trace.getBlockPos();
             IBlockState stateClient = mc.world.getBlockState(pos);
