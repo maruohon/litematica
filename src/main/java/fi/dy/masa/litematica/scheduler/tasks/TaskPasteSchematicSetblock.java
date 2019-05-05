@@ -10,11 +10,13 @@ import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils.ChunkPosComparator;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -39,6 +41,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private final ChunkPosComparator comparator;
     private final int maxCommandsPerTick;
     private final boolean changedBlockOnly;
+    private final ReplaceBehavior replace;
     private int sentCommandsThisTick;
     private int sentCommandsTotal;
     private int currentX;
@@ -55,6 +58,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         this.maxCommandsPerTick = Configs.Generic.PASTE_COMMAND_LIMIT.getIntegerValue();
         this.comparator = new ChunkPosComparator();
         this.comparator.setClosestFirst(true);
+        this.replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
 
         Set<ChunkPos> touchedChunks = placement.getTouchedChunks();
 
@@ -225,12 +229,18 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
             if (stateSchematicOrig.getBlock() != Blocks.AIR || stateClient.getBlock() != Blocks.AIR)
             {
                 // Discard the non-meta state info, as it depends on neighbor blocks which will
-                // be synced with some delay from the server
+                // be synced with some delay from the server. TODO 1.13 remove this
                 @SuppressWarnings("deprecation")
                 IBlockState stateSchematic = stateSchematicOrig.getBlock().getStateFromMeta(stateSchematicOrig.getBlock().getMetaFromState(stateSchematicOrig));
 
                 if (this.changedBlockOnly == false || stateClient != stateSchematic)
                 {
+                    if ((this.replace == ReplaceBehavior.NONE && stateClient.getMaterial() != Material.AIR) ||
+                        (this.replace == ReplaceBehavior.WITH_NON_AIR && stateSchematicOrig.getMaterial() == Material.AIR))
+                    {
+                        continue;
+                    }
+
                     this.sendSetBlockCommand(posMutable.getX(), posMutable.getY(), posMutable.getZ(), stateSchematicOrig, player);
 
                     if (++this.sentCommandsThisTick >= this.maxCommandsPerTick)
