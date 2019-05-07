@@ -36,6 +36,7 @@ import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTrapDoor;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -62,6 +63,7 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 import net.minecraft.world.gen.structure.template.Template;
@@ -776,6 +778,130 @@ public class WorldUtils
         }
 
         return false;
+    }
+
+    /**
+     * Checks if the given one block thick slice has non-air blocks or not.
+     * NOTE: The axis is the perpendicular axis (that goes through the plane).
+     * @param axis
+     * @param pos1
+     * @param pos2
+     * @return
+     */
+    public static boolean isSliceEmpty(World world, EnumFacing.Axis axis, BlockPos pos1, BlockPos pos2)
+    {
+        switch (axis)
+        {
+            case Z:
+            {
+                int x1 = Math.min(pos1.getX(), pos2.getX());
+                int x2 = Math.max(pos1.getX(), pos2.getX());
+                int y1 = Math.min(pos1.getY(), pos2.getY());
+                int y2 = Math.max(pos1.getY(), pos2.getY());
+                int z = pos1.getZ();
+                int cxMin = (x1 >> 4);
+                int cxMax = (x2 >> 4);
+
+                for (int cx = cxMin; cx <= cxMax; ++cx)
+                {
+                    Chunk chunk = world.getChunk(cx, z >> 4);
+                    int xMin = Math.max(x1,  cx << 4      );
+                    int xMax = Math.min(x2, (cx << 4) + 15);
+                    int yMax = Math.min(y2, chunk.getTopFilledSegment() + 15);
+
+                    for (int x = xMin; x <= xMax; ++x)
+                    {
+                        for (int y = y1; y <= yMax; ++y)
+                        {
+                            if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                break;
+            }
+
+            case Y:
+            {
+                int x1 = Math.min(pos1.getX(), pos2.getX());
+                int x2 = Math.max(pos1.getX(), pos2.getX());
+                int y = pos1.getY();
+                int z1 = Math.min(pos1.getZ(), pos2.getZ());
+                int z2 = Math.max(pos1.getZ(), pos2.getZ());
+                int cxMin = (x1 >> 4);
+                int cxMax = (x2 >> 4);
+                int czMin = (z1 >> 4);
+                int czMax = (z2 >> 4);
+
+                for (int cz = czMin; cz <= czMax; ++cz)
+                {
+                    for (int cx = cxMin; cx <= cxMax; ++cx)
+                    {
+                        Chunk chunk = world.getChunk(cx, cz);
+
+                        if (y > chunk.getTopFilledSegment() + 15)
+                        {
+                            continue;
+                        }
+
+                        int xMin = Math.max(x1,  cx << 4      );
+                        int xMax = Math.min(x2, (cx << 4) + 15);
+                        int zMin = Math.max(z1,  cz << 4      );
+                        int zMax = Math.min(z2, (cz << 4) + 15);
+
+                        for (int z = zMin; z <= zMax; ++z)
+                        {
+                            for (int x = xMin; x <= xMax; ++x)
+                            {
+                                if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                break;
+            }
+
+            case X:
+            {
+                int x = pos1.getX();
+                int z1 = Math.min(pos1.getZ(), pos2.getZ());
+                int z2 = Math.max(pos1.getZ(), pos2.getZ());
+                int y1 = Math.min(pos1.getY(), pos2.getY());
+                int y2 = Math.max(pos1.getY(), pos2.getY());
+                int czMin = (z1 >> 4);
+                int czMax = (z2 >> 4);
+
+                for (int cz = czMin; cz <= czMax; ++cz)
+                {
+                    Chunk chunk = world.getChunk(x >> 4, cz);
+                    int zMin = Math.max(z1,  cz << 4      );
+                    int zMax = Math.min(z2, (cz << 4) + 15);
+                    int yMax = Math.min(y2, chunk.getTopFilledSegment() + 15);
+
+                    for (int z = zMin; z <= zMax; ++z)
+                    {
+                        for (int y = y1; y <= yMax; ++y)
+                        {
+                            if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return true;
     }
 
     public static boolean easyPlaceIsPositionCached(BlockPos pos)

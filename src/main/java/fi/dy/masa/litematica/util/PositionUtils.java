@@ -17,8 +17,12 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -462,6 +466,167 @@ public class PositionUtils
         }
 
         return 0;
+    }
+
+    public static Box growOrShrinkBox(Box box, int amount)
+    {
+        BlockPos pos1 = box.getPos1();
+        BlockPos pos2 = box.getPos2();
+
+        if (pos1 == null || pos2 == null)
+        {
+            if (pos1 == null && pos2 == null)
+            {
+                return box;
+            }
+            else if (pos2 == null)
+            {
+                pos2 = pos1;
+            }
+            else
+            {
+                pos1 = pos2;
+            }
+        }
+
+        Pair<Integer, Integer> x = growCoordinatePair(pos1.getX(), pos2.getX(), amount);
+        Pair<Integer, Integer> y = growCoordinatePair(pos1.getY(), pos2.getY(), amount);
+        Pair<Integer, Integer> z = growCoordinatePair(pos1.getZ(), pos2.getZ(), amount);
+
+        Box boxNew = box.copy();
+        boxNew.setPos1(new BlockPos(x.getLeft(), y.getLeft(), z.getLeft()));
+        boxNew.setPos2(new BlockPos(x.getRight(), y.getRight(), z.getRight()));
+
+        return boxNew;
+    }
+
+    private static Pair<Integer, Integer> growCoordinatePair(int v1, int v2, int amount)
+    {
+        if (v2 >= v1)
+        {
+            if (v2 + amount >= v1)
+            {
+                v2 += amount;
+            }
+
+            if (v1 - amount <= v2)
+            {
+                v1 -= amount;
+            }
+        }
+        else if (v1 > v2)
+        {
+            if (v1 + amount >= v2)
+            {
+                v1 += amount;
+            }
+
+            if (v2 - amount <= v1)
+            {
+                v2 -= amount;
+            }
+        }
+
+        return Pair.of(v1, v2);
+    }
+
+    public static void growOrShrinkCurrentSelection(boolean grow)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+        World world = Minecraft.getMinecraft().world;
+
+        if (area == null || world == null)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+            return;
+        }
+
+        Box box = area.getSelectedSubRegionBox();
+
+        if (box == null || (box.getPos1() == null && box.getPos2() == null))
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.grow.no_sub_region_selected");
+            return;
+        }
+
+        if (box != null && (box.getPos1() != null || box.getPos2() != null))
+        {
+            int amount = 1;
+            Box boxNew = box.copy();
+
+            for (int i = 0; i < 256; ++i)
+            {
+                if (grow)
+                {
+                    boxNew = growOrShrinkBox(boxNew, amount);
+                }
+
+                BlockPos pos1 = boxNew.getPos1();
+                BlockPos pos2 = boxNew.getPos2();
+                int xMin = Math.min(pos1.getX(), pos2.getX());
+                int yMin = Math.min(pos1.getY(), pos2.getY());
+                int zMin = Math.min(pos1.getZ(), pos2.getZ());
+                int xMax = Math.max(pos1.getX(), pos2.getX());
+                int yMax = Math.max(pos1.getY(), pos2.getY());
+                int zMax = Math.max(pos1.getZ(), pos2.getZ());
+                int emptySides = 0;
+
+                // Slices along the z axis
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.X, new BlockPos(xMin, yMin, zMin), new BlockPos(xMin, yMax, zMax)))
+                {
+                    xMin += amount;
+                    ++emptySides;
+                }
+
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.X, new BlockPos(xMax, yMin, zMin), new BlockPos(xMax, yMax, zMax)))
+                {
+                    xMax -= amount;
+                    ++emptySides;
+                }
+
+                // Slices along the x/z plane
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Y, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMin, zMax)))
+                {
+                    yMin += amount;
+                    ++emptySides;
+                }
+
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Y, new BlockPos(xMin, yMax, zMin), new BlockPos(xMax, yMax, zMax)))
+                {
+                    yMax -= amount;
+                    ++emptySides;
+                }
+
+                // Slices along the x axis
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Z, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMax, zMin)))
+                {
+                    zMin += amount;
+                    ++emptySides;
+                }
+
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Z, new BlockPos(xMin, yMin, zMax), new BlockPos(xMax, yMax, zMax)))
+                {
+                    zMax -= amount;
+                    ++emptySides;
+                }
+
+                boxNew.setPos1(new BlockPos(xMin, yMin, zMin));
+                boxNew.setPos2(new BlockPos(xMax, yMax, zMax));
+
+                if (grow && emptySides >= 6)
+                {
+                    break;
+                }
+                else if (grow == false && emptySides == 0)
+                {
+                    break;
+                }
+            }
+
+            area.setSelectedSubRegionCornerPos(boxNew.getPos1(), Corner.CORNER_1);
+            area.setSelectedSubRegionCornerPos(boxNew.getPos2(), Corner.CORNER_2);
+        }
     }
 
     /**

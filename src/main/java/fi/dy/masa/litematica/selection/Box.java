@@ -33,6 +33,13 @@ public class Box
         this.updateSize();
     }
 
+    public Box copy()
+    {
+        Box box = new Box(this.pos1, this.pos2, this.name);
+        box.setSelectedCorner(this.selectedCorner);
+        return box;
+    }
+
     @Nullable
     public BlockPos getPos1()
     {

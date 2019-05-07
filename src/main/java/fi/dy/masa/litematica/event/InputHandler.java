@@ -6,17 +6,22 @@ import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager;
 import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -125,16 +130,24 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                         }
                     }
                 }
-                else if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
+
+                if (Hotkeys.SELECTION_GROW_MODIFIER.getKeybind().isKeybindHeld())
+                {
+                    return this.growOrShrinkSelection(amount, mode);
+                }
+
+                if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
                 {
                     return nudgeSelection(amount, mode, player);
                 }
-                else if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
+
+                if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
                 {
                     DataManager.setToolMode(DataManager.getToolMode().cycle(player, amount < 0));
                     return true;
                 }
-                else if (Hotkeys.SCHEMATIC_VERSION_CYCLE_MODIFIER.getKeybind().isKeybindHeld())
+
+                if (Hotkeys.SCHEMATIC_VERSION_CYCLE_MODIFIER.getKeybind().isKeybindHeld())
                 {
                     if (DataManager.getSchematicProjectsManager().hasProjectOpen())
                     {
@@ -168,6 +181,37 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         }
 
         return false;
+    }
+
+    private boolean growOrShrinkSelection(int amount, ToolMode mode)
+    {
+        if (mode.getUsesAreaSelection())
+        {
+            SelectionManager sm = DataManager.getSelectionManager();
+            AreaSelection area = sm.getCurrentSelection();
+
+            if (area != null)
+            {
+                Box box = area.getSelectedSubRegionBox();
+
+                if (box != null)
+                {
+                    Box newBox = PositionUtils.growOrShrinkBox(box, amount);
+                    area.setSelectedSubRegionCornerPos(newBox.getPos1(), Corner.CORNER_1);
+                    area.setSelectedSubRegionCornerPos(newBox.getPos2(), Corner.CORNER_2);
+                }
+                else
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.grow.no_sub_region_selected");
+                }
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+            }
+        }
+
+        return true;
     }
 
     private boolean handleAttackKey(Minecraft mc)

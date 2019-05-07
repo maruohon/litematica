@@ -49,8 +49,11 @@ public class Hotkeys
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_NEXT       = new ConfigHotkey("schematicVersionCycleNext",         "",     "A hotkey to cycle to the next schematic version in the Version Control tool mode");
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_PREVIOUS   = new ConfigHotkey("schematicVersionCyclePrevious",     "",     "A hotkey to cycle to the next schematic version in the Version Control tool mode");
     public static final ConfigHotkey SELECTION_GRAB_MODIFIER            = new ConfigHotkey("selectionGrabModifier",             "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to \"grab\" a selection\nbox or corner for cursor moving.");
+    public static final ConfigHotkey SELECTION_GROW_HOTKEY              = new ConfigHotkey("selectionGrow",                     "",     "The action hotkey to auto-grow the selection box around\nany adjacent/diagonally connected blocks");
+    public static final ConfigHotkey SELECTION_GROW_MODIFIER            = new ConfigHotkey("selectionGrowModifier",             "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to grow or shrink\na selection box while scrolling");
     public static final ConfigHotkey SELECTION_NUDGE_MODIFIER           = new ConfigHotkey("selectionNudgeModifier",            "LMENU", KeybindSettings.MODIFIER_INGAME, "The modifier key to hold while scrolling\nto nudge the selected area or corner");
     public static final ConfigHotkey SELECTION_MODE_CYCLE               = new ConfigHotkey("selectionModeCycle",                "LCONTROL,M", "Change the mode between Corners and Cuboid\nin the Area Selection mode");
+    public static final ConfigHotkey SELECTION_SHRINK_HOTKEY            = new ConfigHotkey("selectionShrink",                   "",     "The action hotkey to shrink the selection box so that there\nisn't any empty space (empty layers) on any side");
     public static final ConfigHotkey SET_AREA_ORIGIN                    = new ConfigHotkey("setAreaOrigin",                     "",     "Set/move the origin point of the current\narea selection to the player's position");
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_1       = new ConfigHotkey("setSelectionBoxPosition1",          "",     "Set the first position of the currently selected\nbox to the player's position");
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_2       = new ConfigHotkey("setSelectionBoxPosition2",          "",     "Set the second position of the currently selected\nbox to the player's position");
@@ -116,8 +119,11 @@ public class Hotkeys
             SCHEMATIC_VERSION_CYCLE_NEXT,
             SCHEMATIC_VERSION_CYCLE_PREVIOUS,
             SELECTION_GRAB_MODIFIER,
+            SELECTION_GROW_HOTKEY,
+            SELECTION_GROW_MODIFIER,
             SELECTION_NUDGE_MODIFIER,
             SELECTION_MODE_CYCLE,
+            SELECTION_SHRINK_HOTKEY,
             SET_AREA_ORIGIN,
             SET_SELECTION_BOX_POSITION_1,
             SET_SELECTION_BOX_POSITION_2,
