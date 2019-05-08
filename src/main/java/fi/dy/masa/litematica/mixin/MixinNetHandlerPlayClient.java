@@ -11,7 +11,7 @@ import net.minecraft.network.play.server.SPacketChunkData;
 import net.minecraft.util.math.ChunkPos;
 
 @Mixin(NetHandlerPlayClient.class)
-public class MixinNetHandlerPlayClient
+public abstract class MixinNetHandlerPlayClient
 {
     @Inject(method = "handleChunkData", at = @At("RETURN"))
     private void onChunkData(SPacketChunkData packetIn, CallbackInfo ci)

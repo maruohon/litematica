@@ -11,7 +11,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.RenderGlobal;
 
 @Mixin(RenderGlobal.class)
-public class MixinRenderGlobal
+public abstract class MixinRenderGlobal
 {
     @Shadow
     private WorldClient world;

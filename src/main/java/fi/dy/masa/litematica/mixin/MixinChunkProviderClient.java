@@ -15,7 +15,7 @@ import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.world.chunk.Chunk;
 
 @Mixin(ChunkProviderClient.class)
-public class MixinChunkProviderClient implements IMixinChunkProviderClient
+public abstract class MixinChunkProviderClient implements IMixinChunkProviderClient
 {
     @Shadow
     @Final

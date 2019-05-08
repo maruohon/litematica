@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 @Mixin(Chunk.class)
-public class MixinChunk
+public abstract class MixinChunk
 {
     @Redirect(method = "setBlockState",
                 slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/Chunk;generateSkylightMap()V")),
