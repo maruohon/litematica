@@ -402,7 +402,7 @@ public class PositionUtils
 
     public static AxisAlignedBB createAABBFrom(StructureBoundingBox bb)
     {
-        return createAABB(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+        return createAABB(bb.minX, bb.minY, bb.minZ, bb.maxX + 1, bb.maxY + 1, bb.maxZ + 1);
     }
 
     /**
