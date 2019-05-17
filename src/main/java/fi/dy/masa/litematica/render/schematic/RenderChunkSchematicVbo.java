@@ -183,59 +183,59 @@ public class RenderChunkSchematicVbo extends RenderChunk
         synchronized (this.boxes)
         {
             if (this.boxes.isEmpty() == false &&
-                    (this.schematicWorldView.isEmpty() == false || this.clientWorldView.isEmpty() == false) &&
-                     range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
+                (this.schematicWorldView.isEmpty() == false || this.clientWorldView.isEmpty() == false) &&
+                 range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
+            {
+                ++schematicRenderChunksUpdated;
+
+                boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
+                BufferBuilderCache buffers = generator.getBufferCache();
+
+                for (StructureBoundingBox box : this.boxes)
                 {
-                    ++schematicRenderChunksUpdated;
+                    box = range.getClampedRenderBoundingBox(box);
 
-                    boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
-                    BufferBuilderCache buffers = generator.getBufferCache();
-
-                    for (StructureBoundingBox box : this.boxes)
+                    // The rendered layer(s) don't intersect this sub-volume
+                    if (box == null)
                     {
-                        box = range.getClampedRenderBoundingBox(box);
-
-                        // The rendered layer(s) don't intersect this sub-volume
-                        if (box == null)
-                        {
-                            continue;
-                        }
-
-                        BlockPos posFrom = new BlockPos(box.minX, box.minY, box.minZ);
-                        BlockPos posTo   = new BlockPos(box.maxX, box.maxY, box.maxZ);
-
-                        for (BlockPos.MutableBlockPos posMutable : BlockPos.getAllInBoxMutable(posFrom, posTo))
-                        {
-                            this.renderBlocksAndOverlay(posMutable, tileEntities, usedLayers, buffers);
-                        }
+                        continue;
                     }
 
-                    for (BlockRenderLayer layerTmp : BlockRenderLayer.values())
-                    {
-                        if (usedLayers[layerTmp.ordinal()])
-                        {
-                            ((IMixinCompiledChunk) this.compiledChunk).invokeSetLayerUsed(layerTmp);
-                        }
+                    BlockPos posFrom = new BlockPos(box.minX, box.minY, box.minZ);
+                    BlockPos posTo   = new BlockPos(box.maxX, box.maxY, box.maxZ);
 
-                        if (this.compiledChunk.isLayerStarted(layerTmp))
-                        {
-                            this.postRenderBlocks(layerTmp, x, y, z, buffers.getWorldRendererByLayer(layerTmp), this.compiledChunk);
-                        }
+                    for (BlockPos.MutableBlockPos posMutable : BlockPos.getAllInBoxMutable(posFrom, posTo))
+                    {
+                        this.renderBlocksAndOverlay(posMutable, tileEntities, usedLayers, buffers);
+                    }
+                }
+
+                for (BlockRenderLayer layerTmp : BlockRenderLayer.values())
+                {
+                    if (usedLayers[layerTmp.ordinal()])
+                    {
+                        ((IMixinCompiledChunk) this.compiledChunk).invokeSetLayerUsed(layerTmp);
                     }
 
-                    if (this.hasOverlay)
+                    if (this.compiledChunk.isLayerStarted(layerTmp))
                     {
-                        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
-                        for (OverlayRenderType type : this.existingOverlays)
+                        this.postRenderBlocks(layerTmp, x, y, z, buffers.getWorldRendererByLayer(layerTmp), this.compiledChunk);
+                    }
+                }
+
+                if (this.hasOverlay)
+                {
+                    //if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
+                    for (OverlayRenderType type : this.existingOverlays)
+                    {
+                        if (this.compiledChunk.isOverlayTypeStarted(type))
                         {
-                            if (this.compiledChunk.isOverlayTypeStarted(type))
-                            {
-                                this.compiledChunk.setOverlayTypeUsed(type);
-                                this.postRenderOverlay(type, x, y, z, buffers.getOverlayBuffer(type), this.compiledChunk);
-                            }
+                            this.compiledChunk.setOverlayTypeUsed(type);
+                            this.postRenderOverlay(type, x, y, z, buffers.getOverlayBuffer(type), this.compiledChunk);
                         }
                     }
                 }
+            }
         }
 
         this.getLockCompileTask().lock();
