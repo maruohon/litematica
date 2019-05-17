@@ -182,8 +182,9 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
         synchronized (this.boxes)
         {
-            if (this.schematicWorldView.isEmpty() == false && this.boxes.isEmpty() == false &&
-                    range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
+            if (this.boxes.isEmpty() == false &&
+                    (this.schematicWorldView.isEmpty() == false || this.clientWorldView.isEmpty() == false) &&
+                     range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
                 {
                     ++schematicRenderChunksUpdated;
 
