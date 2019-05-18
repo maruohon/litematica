@@ -18,6 +18,8 @@ import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.InputMappings;
+import net.minecraft.client.util.InputMappings.Input;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -176,8 +178,8 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
             else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
             {
-                int keyCode = ((IMixinKeyBinding) mc.gameSettings.keyBindUseItem).getInput().getKeyCode();
-                // FIXME 1.13
+                Input input = ((IMixinKeyBinding) mc.gameSettings.keyBindUseItem).getInput();
+                int keyCode = input.getType() == InputMappings.Type.MOUSE ? input.getKeyCode() - 100 : input.getKeyCode();
                 String keyStrUse = KeybindMulti.getStorageStringForKeyCode(keyCode);
                 String keyStrPick = Hotkeys.PICK_BLOCK_LAST.getKeybind().getStringValue();
 
