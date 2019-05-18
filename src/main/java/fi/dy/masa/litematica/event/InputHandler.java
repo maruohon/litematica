@@ -85,7 +85,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onMouseScroll(int mouseX, int mouseY, double scrollAmount)
+    public boolean onMouseScroll(int mouseX, int mouseY, double dWheel)
     {
         Minecraft mc = Minecraft.getInstance();
 
@@ -100,7 +100,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 return false;
             }
 
-            int dWheel = (int) scrollAmount;
             OperationMode mode = DataManager.getOperationMode();
 
             if (dWheel != 0)
