@@ -18,6 +18,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
@@ -140,6 +141,8 @@ public class SchematicPlacementManager
                     iter.remove();
                 }
             }
+
+            LitematicaRenderer.getInstance().getWorldRenderer().markNeedsUpdate();
 
             if (this.chunksToRebuild.isEmpty())
             {

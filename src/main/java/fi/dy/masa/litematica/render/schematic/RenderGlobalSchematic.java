@@ -123,6 +123,11 @@ public class RenderGlobalSchematic extends RenderGlobal
         this.fluidRenderer = ((IMixinBlockRendererDispatcher) dispatcher).getFluidRenderer();
     }
 
+    public void markNeedsUpdate()
+    {
+        this.displayListEntitiesDirty = true;
+    }
+
     @Override
     public String getDebugInfoRenders()
     {

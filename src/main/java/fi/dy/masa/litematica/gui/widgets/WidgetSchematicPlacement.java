@@ -215,7 +215,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {
-                this.widget.placement.setEnabled(! this.widget.placement.isEnabled());
+                this.widget.placement.toggleEnabled();
                 this.widget.parent.refreshEntries();
             }
         }
