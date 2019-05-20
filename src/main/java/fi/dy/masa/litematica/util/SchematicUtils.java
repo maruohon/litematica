@@ -37,6 +37,7 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -593,6 +594,7 @@ public class SchematicUtils
         final int startZ = boxMinRel.getZ();
         Vec3i size = container.getSize();
 
+        /*
         if (startX < 0 || startY < 0 || startZ < 0 || startX >= size.getX() || startY >= size.getY() || startZ >= size.getZ())
         {
             System.out.printf("DEBUG ============= OUT OF BOUNDS - region: %s, startX: %d, startY %s, startZ: %d - size x: %d y: %s z: %d =============\n",
@@ -601,6 +603,11 @@ public class SchematicUtils
         }
 
         return boxMinRel;
+        */
+
+        return new BlockPos(MathHelper.clamp(startX, 0, size.getX() - 1),
+                            MathHelper.clamp(startY, 0, size.getY() - 1),
+                            MathHelper.clamp(startZ, 0, size.getZ() - 1));
     }
 
     @Nullable
