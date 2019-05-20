@@ -627,19 +627,20 @@ public class SchematicPlacement
         }
     }
 
-    public void setAllSubRegionsEnabledState(boolean state, IMessageConsumer feedback)
+    public void setSubRegionsEnabledState(boolean state, Collection<SubRegionPlacement> subRegions, IMessageConsumer feedback)
     {
         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
         // Marks the currently touched chunks before doing the modification
         manager.onPrePlacementChange(this);
 
-        for (String regionName : this.relativeSubRegionPlacements.keySet())
+        for (SubRegionPlacement placement : subRegions)
         {
-            SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
+            // Check that the sub-region is actually from this placement
+            placement = this.relativeSubRegionPlacements.get(placement.getName());
 
-            if (placement.isEnabled() != state)
+            if (placement != null && placement.isEnabled() != state)
             {
-                this.relativeSubRegionPlacements.get(regionName).setEnabled(state);
+                placement.setEnabled(state);
             }
         }
 

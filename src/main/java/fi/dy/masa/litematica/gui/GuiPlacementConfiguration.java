@@ -423,7 +423,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 case TOGGLE_ALL_REGIONS_OFF:
                 {
                     boolean state = this.type == Type.TOGGLE_ALL_REGIONS_ON;
-                    this.placement.setAllSubRegionsEnabledState(state, this.parent);
+                    this.placement.setSubRegionsEnabledState(state, this.parent.getListWidget().getCurrentEntries(), this.parent);
                     break;
                 }
 
