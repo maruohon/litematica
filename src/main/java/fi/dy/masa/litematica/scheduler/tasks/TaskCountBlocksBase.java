@@ -24,9 +24,9 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
     protected final IMaterialList materialList;
     protected final LayerRange layerRange;
 
-    protected TaskCountBlocksBase(IMaterialList materialList)
+    protected TaskCountBlocksBase(IMaterialList materialList, String nameOnHud)
     {
-        super();
+        super(nameOnHud);
 
         this.materialList = materialList;
 

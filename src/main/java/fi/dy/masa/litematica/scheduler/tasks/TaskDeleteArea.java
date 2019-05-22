@@ -11,7 +11,7 @@ public class TaskDeleteArea extends TaskFillArea
 {
     public TaskDeleteArea(List<Box> boxes, boolean removeEntities)
     {
-        super(boxes, Blocks.AIR.getDefaultState(), null, removeEntities);
+        super(boxes, Blocks.AIR.getDefaultState(), null, removeEntities, "litematica.gui.label.task_name.delete");
     }
 
     @Override

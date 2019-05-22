@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
@@ -24,11 +25,12 @@ public abstract class TaskProcessChunkBase extends TaskBase
     protected final boolean isClientWorld;
     protected boolean finished;
 
-    protected TaskProcessChunkBase()
+    protected TaskProcessChunkBase(String nameOnHud)
     {
         this.worldClient = this.mc.world;
         this.world = WorldUtils.getBestWorld(this.mc);
         this.isClientWorld = (this.world == this.mc.world);
+        this.nameOnHud = I18n.format(nameOnHud);
 
         InfoHud.getInstance().addInfoHudRenderer(this, true);
     }

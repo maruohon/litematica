@@ -30,7 +30,12 @@ public class TaskFillArea extends TaskProcessChunkBase
 
     public TaskFillArea(List<Box> boxes, IBlockState fillState, @Nullable IBlockState replaceState, boolean removeEntities)
     {
-        super();
+        this(boxes, fillState, replaceState, removeEntities, "litematica.gui.label.task_name.fill");
+    }
+
+    protected TaskFillArea(List<Box> boxes, IBlockState fillState, @Nullable IBlockState replaceState, boolean removeEntities, String nameOnHud)
+    {
+        super(nameOnHud);
 
         this.fillState = fillState;
         this.replaceState = replaceState;

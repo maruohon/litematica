@@ -39,7 +39,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -68,14 +67,11 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     private final List<BlockPos> mismatchedStatesPositionsClosest = new ArrayList<>();
     private final Set<MismatchType> selectedCategories = new HashSet<>();
     private final HashMultimap<MismatchType, BlockMismatch> selectedEntries = HashMultimap.create();
-    private final List<String> infoLines = new ArrayList<>();
     private final Set<ChunkPos> requiredChunks = new HashSet<>();
     private final Set<BlockPos> recheckQueue = new HashSet<>();
     private WorldClient worldClient;
     private WorldSchematic worldSchematic;
     private SchematicPlacement schematicPlacement;
-    @Nullable
-    private ICompletionListener completionListener;
     private final List<MismatchRenderPos> mismatchPositionsForRender = new ArrayList<>();
     private final List<BlockPos> mismatchBlockPositionsForRender = new ArrayList<>();
     private SortCriteria sortCriteria = SortCriteria.NAME_EXPECTED;
@@ -88,6 +84,11 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     private int schematicBlocks;
     private int clientBlocks;
     private int correctStatesCount;
+
+    public SchematicVerifier()
+    {
+        this.nameOnHud = I18n.format("litematica.gui.label.schematic_verifier.verifier");
+    }
 
     public static void markVerifierBlockChanges(BlockPos pos)
     {
@@ -107,12 +108,6 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     public void toggleShouldRenderInfoHUD()
     {
         this.shouldRenderInfoHud = ! this.shouldRenderInfoHud;
-    }
-
-    @Override
-    public List<String> getText(RenderPhase phase)
-    {
-        return this.infoLines;
     }
 
     public boolean isActive()
@@ -268,7 +263,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     {
         this.mismatchPositionsForRender.clear();
         this.mismatchBlockPositionsForRender.clear();
-        this.infoLines.clear();
+        this.infoHudLines.clear();
     }
 
     public List<MismatchRenderPos> getSelectedMismatchPositionsForRender()
@@ -310,9 +305,9 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         this.worldSchematic = worldSchematic;
         this.schematicPlacement = schematicPlacement;
 
+        this.setCompletionListener(completionListener);
         this.requiredChunks.addAll(schematicPlacement.getTouchedChunks());
         this.totalRequiredChunks = this.requiredChunks.size();
-        this.completionListener = completionListener;
         this.verificationStarted = true;
 
         TaskScheduler.getInstanceClient().scheduleTask(this, 10);
@@ -896,60 +891,39 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
     private void updateMismatchPositionStringList(@Nullable MismatchType mismatchType, List<MismatchRenderPos> positionList)
     {
-        this.infoLines.clear();
+        List<String> hudLines = new ArrayList<>();
 
         if (positionList.isEmpty() == false)
         {
+            String rst = GuiBase.TXT_RST;
+
             if (mismatchType != null)
             {
-                this.infoLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), TextFormatting.RESET.toString()));
+                hudLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), rst));
             }
             else
             {
                 String title = I18n.format("litematica.gui.title.schematic_verifier_errors");
-                this.infoLines.add(String.format("%s%s%s", GuiBase.TXT_BOLD, title, GuiBase.TXT_RST));
+                hudLines.add(String.format("%s%s%s", GuiBase.TXT_BOLD, title, rst));
             }
 
             final int count = Math.min(positionList.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
-            String rst = GuiBase.TXT_RST;
 
             for (int i = 0; i < count; ++i)
             {
                 MismatchRenderPos entry = positionList.get(i);
                 BlockPos pos = entry.pos;
                 String pre = entry.type.getColorCode();
-                this.infoLines.add(String.format("%sx: %4d, y: %3d, z: %4d%s", pre, pos.getX(), pos.getY(), pos.getZ(), rst));
+                hudLines.add(String.format("%sx: %5d, y: %3d, z: %5d%s", pre, pos.getX(), pos.getY(), pos.getZ(), rst));
             }
         }
+
+        this.infoHudLines = hudLines;
     }
 
     public void updateRequiredChunksStringList()
     {
-        this.infoLines.clear();
-
-        EntityPlayer player = Minecraft.getMinecraft().player;
-
-        if (this.requiredChunks.isEmpty() == false && player != null)
-        {
-            String pre = TextFormatting.WHITE.toString() + TextFormatting.BOLD.toString();
-            String title = I18n.format("litematica.gui.label.missing_chunks", this.requiredChunks.size());
-            this.infoLines.add(String.format("%s%s%s", pre, title, TextFormatting.RESET.toString()));
-
-            List<ChunkPos> list = new ArrayList<>();
-            list.addAll(this.requiredChunks);
-
-            PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPositionVector()));
-            PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
-            Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
-
-            final int count = Math.min(list.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
-
-            for (int i = 0; i < count; ++i)
-            {
-                ChunkPos pos = list.get(i);
-                this.infoLines.add(String.format("cx: %5d, cz: %5d (x: %d, z: %d)", pos.x, pos.z, pos.x << 4, pos.z << 4));
-            }
-        }
+        this.updateInfoHudLinesMissingChunks(this.requiredChunks);
     }
 
     /**

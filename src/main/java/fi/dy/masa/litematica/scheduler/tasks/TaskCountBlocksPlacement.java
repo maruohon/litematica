@@ -18,7 +18,7 @@ public class TaskCountBlocksPlacement extends TaskCountBlocksBase
 
     public TaskCountBlocksPlacement(SchematicPlacement schematicPlacement, IMaterialList materialList)
     {
-        super(materialList);
+        super(materialList, "litematica.gui.label.task_name.material_list");
 
         this.worldSchematic = SchematicWorldHandler.getSchematicWorld();
         this.schematicPlacement = schematicPlacement;

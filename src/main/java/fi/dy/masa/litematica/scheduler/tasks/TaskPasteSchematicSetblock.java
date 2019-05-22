@@ -13,6 +13,7 @@ import fi.dy.masa.litematica.util.PositionUtils.ChunkPosComparator;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.Block;
@@ -28,7 +29,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
@@ -333,18 +333,20 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
     private void updateInfoHudLines()
     {
-        this.infoHudLines.clear();
+        List<String> hudLines = new ArrayList<>();
 
-        String pre = TextFormatting.WHITE.toString() + TextFormatting.BOLD.toString();
+        String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
         String title = I18n.format("litematica.gui.label.schematic_paste.missing_chunks", this.chunks.size());
-        this.infoHudLines.add(String.format("%s%s%s", pre, title, TextFormatting.RESET.toString()));
+        hudLines.add(String.format("%s%s%s", pre, title, GuiBase.TXT_RST));
 
         int maxLines = Math.min(this.chunks.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
 
         for (int i = 0; i < maxLines; ++i)
         {
             ChunkPos pos = this.chunks.get(i);
-            this.infoHudLines.add(String.format("cx: %5d, cz: %5d (x: %d, z: %d)", pos.x, pos.z, pos.x << 4, pos.z << 4));
+            hudLines.add(String.format("cx: %5d, cz: %5d (x: %d, z: %d)", pos.x, pos.z, pos.x << 4, pos.z << 4));
         }
+
+        this.infoHudLines = hudLines;
     }
 }

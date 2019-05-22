@@ -237,7 +237,7 @@ litematica.gui.label.material_list.progress.mismatch=Mismatched %s
 litematica.gui.label.material_list.progress.missing=Missing %s
 litematica.gui.label.material_list.total=Total: %s items
 
-litematica.gui.label.missing_chunks=Missing Chunks (%d)
+litematica.gui.label.missing_chunks=%s, missing chunks (%s)
 litematica.gui.label.origin.auto=Auto
 litematica.gui.label.origin.manual=Manual
 
@@ -303,6 +303,14 @@ litematica.gui.label.schematic_verifier_display_type.wrong_state=Wrong States
 litematica.gui.label.schematic_verifier.status.done_errors=Wrong: §cBlock: %s§r, §6State: %s§r, §bMissing: %s§r, §dExtra: %s§r
 litematica.gui.label.schematic_verifier.status.done_correct_total=§aCorrect: %s§r, Total: %s
 litematica.gui.label.schematic_verifier.status.verifying=Unseen Chunks: %s / %s
+litematica.gui.label.schematic_verifier.verifier=Schematic Verifier
+
+litematica.gui.label.task_name.area_analyzer=Area Analyzer
+litematica.gui.label.task_name.delete=Delete task
+litematica.gui.label.task_name.fill=Fill task
+litematica.gui.label.task_name.material_list=Material List
+litematica.gui.label.task_name.save_schematic=Save Schematic
+litematica.gui.label.task_name.verifier=Verifier
 
 litematica.gui.message.confirm_file_deletion=Do you want to delete the file '%s'?
 litematica.gui.message.schematic_projects.confirm_delete_area=Do you want to delete the "last affected" area?\nThis will delete whatever blocks and entities are within the area that the project manager last placed to the world, or last saved as a version. (Basically the "last seen affected area", such that if you were to cycle versions, it would not leave blocks behind from the previous version.)
@@ -348,7 +356,7 @@ litematica.gui.title.schematic_projects.confirm_place_to_world=Confirm Place to 
 litematica.gui.title.schematic_projects.save_new_version=Save new schematic version
 litematica.gui.title.schematic_projects_browser=Schematic Projects Browser
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
-litematica.gui.title.schematic_verifier_errors=Verifier errors
+litematica.gui.title.schematic_verifier_errors=Schematic Verifier errors
 
 litematica.hud.area_selection.box_count=Boxes: %s
 litematica.hud.area_selection.dimensions_position=Dim: %s - p1: %s, p2: %s
