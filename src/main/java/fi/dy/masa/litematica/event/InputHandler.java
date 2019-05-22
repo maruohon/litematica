@@ -269,9 +269,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
             else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
             {
-                int keyCodeUse = mc.gameSettings.keyBindUseItem.getKeyCode();
-
-                if (Hotkeys.PICK_BLOCK_LAST.getKeybind().matches(keyCodeUse))
+                if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, mc.gameSettings.keyBindUseItem))
                 {
                     WorldUtils.doSchematicWorldPickBlock(false, mc);
                 }
