@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -200,7 +201,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
         this.addButton(button, new ButtonListener(type, this.placement, this));
 
-        return button.getButtonWidth();
+        return button.getWidth();
     }
 
     private int createButton(int x, int y, int width, ButtonListener.Type type)
@@ -299,8 +300,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             enabled = false;
         }
 
-        this.buttonResetPlacement.displayString = label;
-        this.buttonResetPlacement.enabled = enabled;
+        this.buttonResetPlacement.setDisplayString(label);
+        this.buttonResetPlacement.setEnabled(enabled);
     }
 
     public SchematicPlacement getSchematicPlacement()
@@ -326,7 +327,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.zLevel, this);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final GuiPlacementConfiguration parent;
         private final SchematicPlacement placement;
@@ -340,12 +341,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             Minecraft mc = Minecraft.getMinecraft();
             int amount = mouseButton == 1 ? -1 : 1;

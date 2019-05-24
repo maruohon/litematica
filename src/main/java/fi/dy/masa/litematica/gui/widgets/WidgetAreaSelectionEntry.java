@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
@@ -132,7 +133,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final WidgetAreaSelectionEntry widget;
         private final SelectionManager selectionManager;
@@ -146,7 +147,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             String selectionId = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
 
@@ -191,12 +192,6 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
             }
 
             this.widget.parent.refreshEntries();
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum ButtonType

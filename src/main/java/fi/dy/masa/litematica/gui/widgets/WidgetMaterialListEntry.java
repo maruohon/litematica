@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListBase.SortCriteria;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
@@ -361,7 +362,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         return strCount;
     }
 
-    static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    static class ButtonListener implements IButtonActionListener
     {
         private final ButtonType type;
         private final MaterialListBase materialList;
@@ -377,19 +378,13 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == ButtonType.IGNORE)
             {
                 this.materialList.ignoreEntry(this.entry);
                 this.listWidget.refreshEntries();
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum ButtonType

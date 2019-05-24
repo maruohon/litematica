@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -70,7 +71,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         ButtonOnOff button = ButtonOnOff.createOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this));
 
-        return xRight - button.getButtonWidth() - 2;
+        return xRight - button.getWidth() - 2;
     }
 
     @Override
@@ -177,7 +178,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final WidgetSchematicPlacement.ButtonListener.ButtonType type;
         private final WidgetPlacementSubRegion widget;
@@ -189,7 +190,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE)
             {
@@ -202,12 +203,6 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
                 this.widget.schematicPlacement.toggleSubRegionEnabled(this.widget.placement.getName(), this.widget.parent.getParentGui());
                 this.widget.parent.refreshEntries();
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
     }
 }

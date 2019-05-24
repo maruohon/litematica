@@ -5,7 +5,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -43,12 +43,12 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
     }
 
     @Override
-    protected IButtonActionListener<ButtonGeneric> createButtonListener(ButtonType type)
+    protected IButtonActionListener createButtonListener(ButtonType type)
     {
         return new ButtonListener(type, this);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final GuiSchematicSaveImported gui;
         private final ButtonType type;
@@ -60,7 +60,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == ButtonType.SAVE)
             {
@@ -111,12 +111,6 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
 
                 this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", this.gui.inputFileName);
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
     }
 }

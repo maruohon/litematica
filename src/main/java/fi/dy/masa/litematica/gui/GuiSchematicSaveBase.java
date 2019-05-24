@@ -98,7 +98,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         return this.textField.getText();
     }
 
-    protected abstract IButtonActionListener<ButtonGeneric> createButtonListener(ButtonType type);
+    protected abstract IButtonActionListener createButtonListener(ButtonType type);
 
     private int createButton(int x, int y, ButtonType type)
     {

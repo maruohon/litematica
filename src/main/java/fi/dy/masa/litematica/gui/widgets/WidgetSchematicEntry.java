@@ -1,8 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -12,10 +10,10 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
-import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -28,21 +26,18 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
 {
     private final WidgetListLoadedSchematics parent;
     private final LitematicaSchematic schematic;
-    private final Minecraft mc;
-    private final List<ButtonWrapper<? extends ButtonGeneric>> buttons = new ArrayList<>();
     private final int typeIconX;
     private final int typeIconY;
     private final boolean isOdd;
     private final int buttonsStartX;
 
     public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            LitematicaSchematic schematic, int listIndex, WidgetListLoadedSchematics parent, Minecraft mc)
+            LitematicaSchematic schematic, int listIndex, WidgetListLoadedSchematics parent)
     {
         super(x, y, width, height, zLevel, schematic, listIndex);
 
         this.parent = parent;
         this.schematic = schematic;
-        this.mc = mc;
         this.isOdd = isOdd;
         y += 1;
 
@@ -52,19 +47,19 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         String text;
 
         text = I18n.format("litematica.gui.button.unload");
-        len = mc.fontRenderer.getStringWidth(text) + 10;
+        len = this.mc.fontRenderer.getStringWidth(text) + 10;
         posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.UNLOAD, this);
         this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
 
         text = I18n.format("litematica.gui.button.save_to_file");
-        len = mc.fontRenderer.getStringWidth(text) + 10;
+        len = this.mc.fontRenderer.getStringWidth(text) + 10;
         posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.SAVE_TO_FILE, this);
         this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
 
         text = I18n.format("litematica.gui.button.create_placement");
-        len = mc.fontRenderer.getStringWidth(text) + 10;
+        len = this.mc.fontRenderer.getStringWidth(text) + 10;
         posX -= (len + 2);
         String tip = I18n.format("litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled");
         listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
@@ -73,26 +68,6 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         this.buttonsStartX = posX;
         this.typeIconX = this.x + 2;
         this.typeIconY = y + 4;
-    }
-
-    protected <T extends ButtonGeneric> void addButton(T button, IButtonActionListener<T> listener)
-    {
-        this.buttons.add(new ButtonWrapper<>(button, listener));
-    }
-
-    @Override
-    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
-    {
-        for (ButtonWrapper<?> entry : this.buttons)
-        {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return true;
-            }
-        }
-
-        return true;
     }
 
     @Override
@@ -140,31 +115,18 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
 
         icon.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
 
-        for (int i = 0; i < this.buttons.size(); ++i)
-        {
-            this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-        }
+        this.drawSubWidgets(mouseX, mouseY);
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
         {
             RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(text));
         }
 
-        for (ButtonWrapper<? extends ButtonGeneric> entry : this.buttons)
-        {
-            ButtonGeneric button = entry.getButton();
-
-            if (button.hasHoverText() && button.isMouseOver())
-            {
-                RenderUtils.drawHoverText(mouseX, mouseY, button.getHoverStrings());
-            }
-        }
-
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final Type type;
         private final WidgetSchematicEntry widget;
@@ -176,7 +138,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == Type.CREATE_PLACEMENT)
             {
@@ -209,12 +171,6 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
                 SchematicHolder.getInstance().removeSchematic(this.widget.schematic);
                 this.widget.parent.refreshEntries();
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum Type

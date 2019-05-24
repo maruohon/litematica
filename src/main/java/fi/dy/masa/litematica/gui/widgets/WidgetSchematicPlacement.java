@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -69,7 +70,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
         ButtonOnOff button = ButtonOnOff.createOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
-        xRight -= button.getButtonWidth();
+        xRight -= button.getWidth();
         this.addButton(button, new ButtonListener(type, this));
 
         return xRight - 2;
@@ -181,7 +182,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         }
     }
 
-    static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    static class ButtonListener implements IButtonActionListener
     {
         private final ButtonType type;
         private final WidgetSchematicPlacement widget;
@@ -193,7 +194,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == ButtonType.CONFIGURE)
             {
@@ -218,12 +219,6 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
                 this.widget.placement.toggleEnabled();
                 this.widget.parent.refreshEntries();
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum ButtonType

@@ -6,6 +6,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import net.minecraft.client.Minecraft;
@@ -72,7 +73,7 @@ public class GuiMainMenu extends GuiBase
         if (type == ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER &&
             DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
-            button.enabled = false;
+            button.setEnabled(false);
             button.setHoverStrings("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
         }
 
@@ -97,7 +98,7 @@ public class GuiMainMenu extends GuiBase
         return width;
     }
 
-    public static class ButtonListenerChangeMenu implements IButtonActionListener<ButtonGeneric>
+    public static class ButtonListenerChangeMenu implements IButtonActionListener
     {
         private final ButtonType type;
         @Nullable
@@ -110,7 +111,7 @@ public class GuiMainMenu extends GuiBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             GuiBase gui = null;
 
@@ -150,12 +151,6 @@ public class GuiMainMenu extends GuiBase
                 gui.setParent(this.parent);
                 Minecraft.getMinecraft().displayGuiScreen(gui);
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum ButtonType
@@ -205,7 +200,7 @@ public class GuiMainMenu extends GuiBase
         }
     }
 
-    private static class ButtonListenerCycleToolMode implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListenerCycleToolMode implements IButtonActionListener
     {
         private final GuiMainMenu gui;
 
@@ -215,13 +210,7 @@ public class GuiMainMenu extends GuiBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-            this.actionPerformedWithButton(control, 0);
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             ToolMode mode = DataManager.getToolMode().cycle(Minecraft.getMinecraft().player, mouseButton == 0);
             DataManager.setToolMode(mode);
@@ -229,7 +218,7 @@ public class GuiMainMenu extends GuiBase
         }
     }
 
-    private static class ButtonListenerCycleAreaMode implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListenerCycleAreaMode implements IButtonActionListener
     {
         private final GuiMainMenu gui;
 
@@ -239,13 +228,7 @@ public class GuiMainMenu extends GuiBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-            this.actionPerformedWithButton(control, 0);
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             DataManager.getSelectionManager().switchSelectionMode();
             this.gui.initGui();

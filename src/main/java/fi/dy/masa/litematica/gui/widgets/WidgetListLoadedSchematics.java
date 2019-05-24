@@ -52,6 +52,6 @@ public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchemat
     protected WidgetSchematicEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, LitematicaSchematic entry)
     {
         return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                this.zLevel, isOdd, entry, listIndex, this, this.mc);
+                this.zLevel, isOdd, entry, listIndex, this);
     }
 }

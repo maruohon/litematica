@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.malilib.gui.GuiConfirmAction;
 import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -81,7 +82,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
 
         this.addButton(button, new ButtonListener(type, this));
 
-        return button.getButtonWidth() + 2;
+        return button.getWidth() + 2;
     }
 
     private void reCreateGuiElements()
@@ -122,7 +123,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         return new WidgetListSchematicVersions(listX, listY, this.getBrowserWidth() - 186, this.getBrowserHeight(), this.zLevel, this.project, this);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final Type type;
         private final GuiSchematicProjectManager gui;
@@ -134,12 +135,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == Type.OPEN_PROJECT_BROWSER)
             {

@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
@@ -135,7 +136,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final WidgetSelectionSubRegion widget;
         private final ButtonType type;
@@ -147,7 +148,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == ButtonType.RENAME)
             {
@@ -167,12 +168,6 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
                 gui.setParent(this.widget.mc.currentScreen);
                 this.widget.mc.displayGuiScreen(gui);
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum ButtonType

@@ -9,7 +9,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
@@ -63,7 +63,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     }
 
     @Override
-    protected IButtonActionListener<ButtonGeneric> createButtonListener(ButtonType type)
+    protected IButtonActionListener createButtonListener(ButtonType type)
     {
         return new ButtonListener(type, this.selectionManager, this);
     }
@@ -101,7 +101,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final GuiSchematicSave gui;
         private final SelectionManager selectionManager;
@@ -115,7 +115,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == ButtonType.SAVE)
             {
@@ -181,12 +181,6 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                     }
                 }
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
     }
 

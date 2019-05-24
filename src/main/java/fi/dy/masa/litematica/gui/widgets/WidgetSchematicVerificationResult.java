@@ -13,6 +13,7 @@ import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.SortCriteria;
 import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
@@ -136,10 +137,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
     private ButtonGeneric createButton(int x, int y, ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getLabelKey());
-        int buttonWidth = mc.fontRenderer.getStringWidth(label) + 10;
-        x -= buttonWidth;
-        ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+        ButtonGeneric button = ButtonGeneric.createGeneric(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(type, this.mismatchEntry, this.guiSchematicVerifier));
 
         return button;
@@ -213,7 +211,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     @Override
     public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
     {
-        return (this.buttonIgnore == null || mouseX < this.buttonIgnore.x) && super.canSelectAt(mouseX, mouseY, mouseButton);
+        return (this.buttonIgnore == null || mouseX < this.buttonIgnore.getX()) && super.canSelectAt(mouseX, mouseY, mouseButton);
     }
 
     protected boolean shouldRenderAsSelected()
@@ -346,7 +344,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.x)
+        if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.getX())
         {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0f, 0f, 200f);
@@ -529,7 +527,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final ButtonType type;
         private final GuiSchematicVerifier guiSchematicVerifier;
@@ -543,7 +541,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == ButtonType.IGNORE_MISMATCH)
             {
@@ -552,26 +550,20 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             }
         }
 
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
-        }
-
         public enum ButtonType
         {
             IGNORE_MISMATCH ("litematica.gui.button.schematic_verifier.ignore");
 
-            private final String labelKey;
+            private final String translationKey;
 
-            private ButtonType(String labelKey)
+            private ButtonType(String translationKey)
             {
-                this.labelKey = labelKey;
+                this.translationKey = translationKey;
             }
 
-            public String getLabelKey()
+            public String getDisplayName()
             {
-                return this.labelKey;
+                return I18n.format(this.translationKey);
             }
         }
     }

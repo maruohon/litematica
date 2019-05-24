@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -144,7 +145,7 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         ButtonOnOff button = ButtonOnOff.createOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this.schematicPlacement, this.placement, this));
-        return button.getButtonWidth();
+        return button.getWidth();
     }
 
     private void createButton(int x, int y, int width, ButtonListener.Type type)
@@ -212,11 +213,11 @@ public class GuiSubRegionConfiguration extends GuiBase
             label = TXT_GOLD + label + TXT_RST;
         }
 
-        this.buttonResetPlacement.displayString = label;
-        this.buttonResetPlacement.enabled = enabled;
+        this.buttonResetPlacement.setDisplayString(label);
+        this.buttonResetPlacement.setEnabled(enabled);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final GuiBase parent;
         private final SchematicPlacement schematicPlacement;
@@ -234,12 +235,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             Minecraft mc = Minecraft.getMinecraft();
             int amount = mouseButton == 1 ? -1 : 1;

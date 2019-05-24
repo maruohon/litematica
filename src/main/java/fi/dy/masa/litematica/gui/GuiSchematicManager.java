@@ -16,6 +16,7 @@ import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.gui.GuiConfirmAction;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -177,7 +178,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final Type type;
         private final GuiSchematicManager gui;
@@ -189,8 +190,19 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
+            if (this.type == Type.SET_PREVIEW && mouseButton == 1)
+            {
+                if (previewGenerator != null)
+                {
+                    previewGenerator = null;
+                    this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_preview_cancelled");
+                }
+
+                return;
+            }
+
             DirectoryEntry entry = this.gui.getListWidget().getLastSelectedEntry();
 
             if (entry == null)
@@ -252,23 +264,6 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
                 this.gui.mc.displayGuiScreen(null);
                 InfoUtils.showGuiAndInGameMessage(MessageType.INFO, "litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot");
-            }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            if (this.type == Type.SET_PREVIEW && mouseButton == 1)
-            {
-                if (previewGenerator != null)
-                {
-                    previewGenerator = null;
-                    this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_preview_cancelled");
-                }
-            }
-            else
-            {
-                this.actionPerformed(control);
             }
         }
 

@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
@@ -58,7 +59,7 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
         }
 
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
-        button.enabled = enabled;
+        button.setEnabled(enabled);
         this.addButton(button, listener);
 
         return width + 2;
@@ -84,7 +85,7 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
         return y;
     }
 
-    private static class ButtonListenerTab implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListenerTab implements IButtonActionListener
     {
         private final ConfigGuiTab tab;
 
@@ -94,12 +95,7 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             DataManager.setConfigGuiTab(this.tab);
             Minecraft.getMinecraft().displayGuiScreen(new GuiConfigs());

@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -150,7 +151,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
         String label = I18n.format(type.getLabelKey());
         button = new ButtonGeneric(x, y, -1, 20, label, type.getIcon());
-        x += this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent())).getButton().getButtonWidth() + 4;
+        x += this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent())).getWidth() + 4;
         this.createButton(x, y, -1, ButtonListener.Type.ANALYZE_AREA);
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
@@ -258,7 +259,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     {
         ButtonOnOff button = ButtonOnOff.createOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, null, null, this));
-        return button.getButtonWidth();
+        return button.getWidth();
     }
 
     protected int createButton(int x, int y, int width, ButtonListener.Type type)
@@ -393,7 +394,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
     }
 
-    protected static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    protected static class ButtonListener implements IButtonActionListener
     {
         private final GuiAreaSelectionEditorNormal parent;
         private final Type type;
@@ -409,12 +410,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             int amount = mouseButton == 1 ? -1 : 1;
             if (GuiScreen.isCtrlKeyDown()) { amount *= 100; }
