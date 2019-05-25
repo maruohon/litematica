@@ -927,6 +927,8 @@ public class PositionUtils
 
     public static float getRotatedYaw(float yaw, Rotation rotation)
     {
+        yaw = MathHelper.wrapDegrees(yaw);
+
         switch (rotation)
         {
             case CLOCKWISE_180:
@@ -941,11 +943,13 @@ public class PositionUtils
             default:
         }
 
-        return MathHelper.wrapDegrees(yaw);
+        return yaw;
     }
 
     public static float getMirroredYaw(float yaw, Mirror mirror)
     {
+        yaw = MathHelper.wrapDegrees(yaw);
+
         switch (mirror)
         {
             case LEFT_RIGHT:
@@ -957,7 +961,7 @@ public class PositionUtils
             default:
         }
 
-        return MathHelper.wrapDegrees(yaw);
+        return yaw;
     }
 
     public static class BlockPosComparator implements Comparator<BlockPos>

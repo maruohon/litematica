@@ -716,9 +716,9 @@ public class LitematicaSchematic
     {
         float rotationYaw = entity.rotationYaw;
 
-        if (mirrorMain != Mirror.NONE)          { rotationYaw = PositionUtils.getMirroredYaw(rotationYaw, mirrorMain); }
-        if (mirrorSub != Mirror.NONE)           { rotationYaw = PositionUtils.getMirroredYaw(rotationYaw, mirrorSub); }
-        if (rotationCombined != Rotation.NONE)  { rotationYaw = PositionUtils.getRotatedYaw(rotationYaw, rotationCombined); }
+        if (mirrorMain != Mirror.NONE)          { rotationYaw = entity.getMirroredYaw(mirrorMain); }
+        if (mirrorSub != Mirror.NONE)           { rotationYaw = entity.getMirroredYaw(mirrorSub); }
+        if (rotationCombined != Rotation.NONE)  { rotationYaw += entity.rotationYaw - entity.getRotatedYaw(rotationCombined); }
 
         entity.setLocationAndAngles(x, y, z, rotationYaw, entity.rotationPitch);
 
