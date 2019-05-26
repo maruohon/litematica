@@ -154,14 +154,14 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
             if (this.type == ButtonType.RENAME)
             {
                 String title = "litematica.gui.title.rename_area_selection";
-                AreaSelection selection = this.selectionManager.getSelection(selectionId);
+                AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
                 String name = selection != null ? selection.getName() : "<error>";
                 SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, false);
                 this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, name, this.widget.parent.getSelectionManagerGui(), renamer));
             }
             else if (this.type == ButtonType.COPY)
             {
-                AreaSelection selection = this.selectionManager.getSelection(selectionId);
+                AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
 
                 if (selection != null)
                 {
