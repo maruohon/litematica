@@ -32,6 +32,7 @@ import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigString;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -248,7 +249,15 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind())
             {
-                this.mc.displayGuiScreen(new GuiAreaSelectionManager());
+                if (DataManager.getSchematicProjectsManager().hasProjectOpen() == false)
+                {
+                    this.mc.displayGuiScreen(new GuiAreaSelectionManager());
+                }
+                else
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+                }
+
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind())

@@ -151,7 +151,15 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
         String label = I18n.format(type.getLabelKey());
         button = new ButtonGeneric(x, y, -1, 20, label, type.getIcon());
+
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+        {
+            button.setEnabled(false);
+            button.setHoverStrings("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+        }
+
         x += this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent())).getWidth() + 4;
+
         this.createButton(x, y, -1, ButtonListener.Type.ANALYZE_AREA);
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
