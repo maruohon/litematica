@@ -465,6 +465,7 @@ litematica.message.schematic_projects.project_created=Project '%s' created
 litematica.message.schematic_projects.project_loaded=Project '%s' loaded
 litematica.message.schematic_projects.version_saved=New version (#%s) saved as '%s'
 
+litematica.message.warn.area_selection.browser_open_in_simple_mode=Note: You are currently in the Simple Area Selection mode
 litematica.message.warn.layer_mode_currently_at=Note: You are currently in the '%s' render layer mode
 litematica.message.warn.main_rendering_disabled=Warning: The main rendering is currently disabled\n(Visuals -> enableRendering, or hotkey %s)
 litematica.message.warn.schematic_blocks_rendering_disabled=Warning: Schematic blocks rendering is currently disabled\n(Visuals -> enableSchematicBlocksRendering, or hotkey %s)

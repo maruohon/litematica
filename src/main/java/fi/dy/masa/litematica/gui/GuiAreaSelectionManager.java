@@ -6,6 +6,7 @@ import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetAreaSelectionBrowser;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
@@ -20,6 +21,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
@@ -54,6 +56,11 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         super.initGui();
 
         this.reCreateGuiElements();
+
+        if (this.selectionManager.getSelectionMode() == SelectionMode.SIMPLE)
+        {
+            InfoUtils.showGuiMessage(MessageType.WARNING, "litematica.message.warn.area_selection.browser_open_in_simple_mode");
+        }
     }
 
     protected void reCreateGuiElements()
