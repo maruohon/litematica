@@ -12,6 +12,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -55,6 +57,16 @@ public class AreaSelection
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    protected void markDirty()
+    {
+        this.calculatedOriginDirty = true;
+
+        if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
+        {
+            StatusInfoRenderer.startOverrideDelay();
+        }
     }
 
     @Nullable
@@ -224,7 +236,7 @@ public class AreaSelection
         if (replace || this.subRegionBoxes.containsKey(box.getName()) == false)
         {
             this.subRegionBoxes.put(box.getName(), box);
-            this.calculatedOriginDirty = true;
+            this.markDirty();
             return true;
         }
 
@@ -234,13 +246,13 @@ public class AreaSelection
     public void removeAllSubRegionBoxes()
     {
         this.subRegionBoxes.clear();
-        this.calculatedOriginDirty = true;
+        this.markDirty();
     }
 
     public boolean removeSubRegionBox(String name)
     {
         boolean success = this.subRegionBoxes.remove(name) != null;
-        this.calculatedOriginDirty = true;
+        this.markDirty();
 
         if (success && name.equals(this.currentBox))
         {
@@ -254,7 +266,7 @@ public class AreaSelection
     {
         boolean success = this.currentBox != null ? this.subRegionBoxes.remove(this.currentBox) != null : false;
         this.currentBox = null;
-        this.calculatedOriginDirty = true;
+        this.markDirty();
         return success;
     }
 
@@ -369,12 +381,12 @@ public class AreaSelection
         if (corner == Corner.CORNER_1)
         {
             box.setPos1(pos);
-            this.calculatedOriginDirty = true;
+            this.markDirty();
         }
         else if (corner == Corner.CORNER_2)
         {
             box.setPos2(pos);
-            this.calculatedOriginDirty = true;
+            this.markDirty();
         }
     }
 
@@ -383,7 +395,7 @@ public class AreaSelection
         if (box != null && corner != null && corner != Corner.NONE)
         {
             box.setCoordinate(value, corner, type);
-            this.calculatedOriginDirty = true;
+            this.markDirty();
         }
         else if (this.explicitOrigin != null)
         {

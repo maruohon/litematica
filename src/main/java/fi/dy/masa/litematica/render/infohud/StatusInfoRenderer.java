@@ -13,15 +13,32 @@ public class StatusInfoRenderer implements IInfoHudRenderer
 {
     private static final StatusInfoRenderer INSTANCE = new StatusInfoRenderer();
 
+    private boolean overrideEnabled;
+    private long lastOverrideTime;
+    private long overrideDelay;
+
     public static void init()
     {
         ToolHud.getInstance().addInfoHudRenderer(INSTANCE, true);
     }
 
+    public static void startOverrideDelay()
+    {
+        StatusInfoRenderer renderer = INSTANCE;
+
+        if (renderer.shouldOverrideShowStatusHud())
+        {
+            renderer.lastOverrideTime = System.currentTimeMillis();
+            renderer.overrideEnabled = true;
+            renderer.overrideDelay = 10000;
+        }
+    }
+
     @Override
     public boolean getShouldRenderText(RenderPhase phase)
     {
-        return phase == RenderPhase.POST && Configs.InfoOverlays.STATUS_INFO_HUD_ENABLED.getBooleanValue();
+        return phase == RenderPhase.POST &&
+               (this.overrideEnabled || Configs.InfoOverlays.STATUS_INFO_HUD_ENABLED.getBooleanValue());
     }
 
     @Override
@@ -71,6 +88,26 @@ public class StatusInfoRenderer implements IInfoHudRenderer
             lines.add(I18n.format("litematica.hud.schematic_projects_mode"));
         }
 
+        if (this.overrideEnabled && System.currentTimeMillis() - this.lastOverrideTime > this.overrideDelay)
+        {
+            this.overrideEnabled = false;
+        }
+
         return lines;
+    }
+
+    private boolean shouldOverrideShowStatusHud()
+    {
+        if (DataManager.getRenderLayerRange().getLayerMode() != LayerMode.ALL ||
+            Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false ||
+            Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false ||
+            Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false ||
+            Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue() == false ||
+            Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -20,6 +20,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
+import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -210,6 +211,7 @@ public class SchematicPlacementManager
         {
             this.schematicPlacements.add(placement);
             this.addTouchedChunksFor(placement);
+            StatusInfoRenderer.startOverrideDelay();
 
             if (printMessages)
             {
