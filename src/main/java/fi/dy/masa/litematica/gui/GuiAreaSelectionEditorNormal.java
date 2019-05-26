@@ -1,5 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -28,6 +30,7 @@ import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -135,18 +138,23 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
 
         x = 12;
-        y += 16;
+        y = this.getListY() - 12;
         String str = String.valueOf(this.selection.getAllSubRegionNames().size());
-        this.addLabel(x, this.getListY() - 12, -1, 16, 0xFFFFFFFF, TextFormatting.BOLD + I18n.format("litematica.gui.label.area_editor.sub_regions", str));
+        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, TextFormatting.BOLD + I18n.format("litematica.gui.label.area_editor.sub_regions", str));
 
         ButtonGeneric button;
 
-        y = this.height - 26;
-
         if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
         {
-            this.addLabel(16, y - 22, 120, 12, 0xFFFFAA00, I18n.format("litematica.warning.area_editor.area_rendering_disabled"));
+            str = I18n.format("litematica.warning.area_editor.area_rendering_disabled");
+            List<String> lines = new ArrayList<>();
+            int xTmp = 120;
+            int maxLineLength = this.width - xTmp - 20;
+            StringUtils.splitTextToLines(lines, str, maxLineLength, this.fontRenderer);
+            this.addLabel(xTmp, y + 2, maxLineLength, lines.size() * (this.fontRenderer.FONT_HEIGHT + 1), 0xFFFFAA00, lines.toArray(new String[0]));
         }
+
+        y = this.height - 26;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
         String label = I18n.format(type.getLabelKey());
