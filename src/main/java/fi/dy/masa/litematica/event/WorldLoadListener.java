@@ -2,9 +2,6 @@ package fi.dy.masa.litematica.event;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
 import net.minecraft.client.Minecraft;
@@ -33,9 +30,7 @@ public class WorldLoadListener implements IWorldLoadListener
         }
         else
         {
-            TaskScheduler.getInstanceClient().clearTasks();
-            SchematicHolder.getInstance().clearLoadedSchematics();
-            InfoHud.getInstance().reset(); // remove the line providers and clear the data
+            DataManager.clear();
         }
     }
 }

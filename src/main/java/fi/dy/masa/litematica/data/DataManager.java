@@ -17,8 +17,10 @@ import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.projects.SchematicProjectsManager;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -266,6 +268,19 @@ public class DataManager implements IDirectoryCache
         JsonUtils.writeJsonToFile(root, file);
 
         canSave = false;
+    }
+
+    public static void clear()
+    {
+        TaskScheduler.getInstanceClient().clearTasks();
+        SchematicVerifier.clearActiveVerifiers();
+
+        getSchematicPlacementManager().clear();
+        getSchematicProjectsManager().clear();
+        getSelectionManager().clear();
+        setMaterialList(null);
+
+        InfoHud.getInstance().reset(); // remove the line providers and clear the data
     }
 
     private void savePerDimensionData()

@@ -109,7 +109,6 @@ public class SchematicPlacement
         // regardless of where the defined origin point is in relation to the minimum corner.
         Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(schematic.getAreas().values());
         BlockPos originAdjusted = pair != null ? origin.subtract(pair.getLeft()) : origin;
-        System.out.printf("or1: %s, or2: %s\n", origin, originAdjusted);
         SchematicPlacement placement = new SchematicPlacement(schematic, originAdjusted, "?", true, true);
         placement.resetAllSubRegionsToSchematicValues(InfoUtils.INFO_MESSAGE_CONSUMER, false);
 
