@@ -1,12 +1,11 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -332,21 +331,22 @@ public class RenderGlobalSchematic extends RenderGlobal
             Entity.setRenderDistanceWeight(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
 
             Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
-            //List<SubChunkPos> positions = new ArrayList<>(256);
-            //positions.addAll(set);
+            List<SubChunkPos> positions = new ArrayList<>(set.size());
+            positions.addAll(set);
+            Collections.sort(positions, new SubChunkPos.DistanceComparator(viewSubChunk));
 
-            Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
-            queuePositions.addAll(set);
-            //Collections.sort(positions, new SubChunkPos.DistanceComparator(new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ)));
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("sorted positions: %s\n", positions);
+            //Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
+            //queuePositions.addAll(set);
+
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
             world.profiler.endStartSection("iteration");
 
-            while (queuePositions.isEmpty() == false)
-            //for (int i = 0; i < positions.size(); ++i)
+            //while (queuePositions.isEmpty() == false)
+            for (int i = 0; i < positions.size(); ++i)
             {
-                SubChunkPos subChunk = queuePositions.poll();
-                //SubChunkPos subChunk = positions.get(i);
+                //SubChunkPos subChunk = queuePositions.poll();
+                SubChunkPos subChunk = positions.get(i);
 
                 // Only render sub-chunks that are within the client's render distance, and that
                 // have been already properly loaded on the client
