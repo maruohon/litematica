@@ -28,8 +28,6 @@ import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
 {
-    private WidgetCheckBox checkboxCreatePlacementOnLoad;
-
     public GuiSchematicLoad()
     {
         super(12, 24);
@@ -64,15 +62,14 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         int y = this.height - 40;
         int buttonWidth;
         String label;
-        String str;
         ButtonGeneric button;
 
         label = I18n.format("litematica.gui.label.schematic_load.checkbox.create_placement");
-        str = I18n.format("litematica.gui.label.schematic_load.hoverinfo.create_placement");
-        this.checkboxCreatePlacementOnLoad = new WidgetCheckBox(x, y, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, this.mc, str);
-        this.checkboxCreatePlacementOnLoad.setListener(new CheckboxListener());
-        this.checkboxCreatePlacementOnLoad.setChecked(DataManager.getCreatePlacementOnLoad());
-        this.addWidget(this.checkboxCreatePlacementOnLoad);
+        String hover = I18n.format("litematica.gui.label.schematic_load.hoverinfo.create_placement");
+        WidgetCheckBox checkbox = new WidgetCheckBox(x, y, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, hover);
+        checkbox.setListener(new CheckboxListener());
+        checkbox.setChecked(DataManager.getCreatePlacementOnLoad(), false);
+        this.addWidget(checkbox);
 
         y = this.height - 26;
         x += this.createButton(x, y, -1, ButtonListener.Type.LOAD_SCHEMATIC) + 4;
@@ -80,13 +77,13 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
+        buttonWidth = this.getStringWidth(label) + 30;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
@@ -99,7 +96,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         if (width == -1)
         {
-            width = this.fontRenderer.getStringWidth(label) + 10;
+            width = this.getStringWidth(label) + 10;
         }
 
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
@@ -175,7 +172,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                     SchematicHolder.getInstance().addSchematic(schematic, true);
                     this.gui.addMessage(MessageType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
 
-                    if (this.gui.checkboxCreatePlacementOnLoad.isChecked())
+                    if (DataManager.getCreatePlacementOnLoad())
                     {
                         BlockPos pos = new BlockPos(this.gui.mc.player.getPositionVector());
                         String name = schematic.getMetadata().getName();

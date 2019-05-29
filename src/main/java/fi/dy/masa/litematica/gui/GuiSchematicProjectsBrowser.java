@@ -79,13 +79,13 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         String label = I18n.format(type.getLabelKey());
-        int buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        int buttonWidth = this.getStringWidth(label) + 20;
         this.addButton(new ButtonGeneric(this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
     }
 
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
     {
-        ButtonGeneric button = ButtonGeneric.createGeneric(x, y, -1, rightAlign, type.getTranslationKey());
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, rightAlign, type.getTranslationKey());
         String hover = type.getHoverText();
 
         if (hover != null)

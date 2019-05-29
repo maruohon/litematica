@@ -55,7 +55,7 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
 
         if (width < 0)
         {
-            width = this.mc.fontRenderer.getStringWidth(label) + 10;
+            width = this.getStringWidth(label) + 10;
         }
 
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
@@ -71,13 +71,13 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
         String label = I18n.format("litematica.gui.label.render_layers.hotkey");
         String hover = I18n.format("litematica.gui.label.render_layers.hover.hotkey");
 
-        WidgetCheckBox cb = new WidgetCheckBox(x, y + 4, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, this.mc, hover);
+        WidgetCheckBox cb = new WidgetCheckBox(x, y + 4, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, hover);
         cb.setChecked(layerRange.getMoveLayerRangeMax(), false);
         cb.setListener(new RangeHotkeyListener(layerRange, true));
         this.addWidget(cb);
 
         y += 23;
-        cb = new WidgetCheckBox(x, y + 4, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, this.mc, hover);
+        cb = new WidgetCheckBox(x, y + 4, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, hover);
         cb.setChecked(layerRange.getMoveLayerRangeMin(), false);
         cb.setListener(new RangeHotkeyListener(layerRange, false));
         this.addWidget(cb);

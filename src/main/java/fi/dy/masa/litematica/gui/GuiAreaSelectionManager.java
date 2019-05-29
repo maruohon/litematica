@@ -22,7 +22,6 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 
 public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetAreaSelectionBrowser> implements ISelectionListener<DirectoryEntry>
@@ -34,7 +33,6 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         super(10, 50);
 
         this.title = I18n.format("litematica.gui.title.area_selection_manager");
-        this.mc = Minecraft.getMinecraft();
         this.selectionManager = DataManager.getSelectionManager();
     }
 
@@ -90,7 +88,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             {
                 currentSelection = FileUtils.getNameWithoutExtension(currentSelection.substring(len + 1));
                 String str = I18n.format("litematica.gui.label.area_selection_manager.current_selection", currentSelection);
-                int w = this.mc.fontRenderer.getStringWidth(str);
+                int w = this.getStringWidth(str);
                 this.addLabel(10, this.height - 15, w, 14, 0xFFFFFFFF, str);
             }
         }
@@ -99,7 +97,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
         String label = I18n.format(type.getLabelKey());
-        int len = this.mc.fontRenderer.getStringWidth(label) + 10;
+        int len = this.getStringWidth(label) + 10;
         x -= (len + 2);
 
         ButtonGeneric button = new ButtonGeneric(x, y, len, 20, label);

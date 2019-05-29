@@ -42,10 +42,10 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     private final String shulkerBoxAbbr;
     private final boolean isOdd;
 
-    public WidgetMaterialListEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
+    public WidgetMaterialListEntry(int x, int y, int width, int height, boolean isOdd,
             MaterialListBase materialList, @Nullable MaterialListEntry entry, int listIndex, WidgetListMaterialList listWidget)
     {
-        super(x, y, width, height, zLevel, entry, listIndex);
+        super(x, y, width, height, entry, listIndex);
 
         this.columnCount = 4;
         this.entry = entry;
@@ -80,7 +80,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
         String label = I18n.format(type.getTranslationKey());
-        int len = this.mc.fontRenderer.getStringWidth(label) + 10;
+        int len = this.getStringWidth(label) + 10;
         xRight -= (len + 2);
         this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this.materialList, this.entry, this.listWidget));
 
@@ -201,7 +201,6 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
         }
 
-        Minecraft mc = this.mc;
         int x1 = this.getColumnPosX(0);
         int x2 = this.getColumnPosX(1);
         int x3 = this.getColumnPosX(2);
@@ -213,10 +212,10 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         {
             if (this.listWidget.getSearchBarWidget().isSearchOpen() == false)
             {
-                mc.fontRenderer.drawString(this.header1, x1, y, color);
-                mc.fontRenderer.drawString(this.header2, x2, y, color);
-                mc.fontRenderer.drawString(this.header3, x3, y, color);
-                mc.fontRenderer.drawString(this.header4, x4, y, color);
+                this.drawString(this.header1, x1, y, color);
+                this.drawString(this.header2, x2, y, color);
+                this.drawString(this.header3, x3, y, color);
+                this.drawString(this.header4, x4, y, color);
 
                 this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
             }
@@ -231,15 +230,15 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             String gold = GuiBase.TXT_GOLD;
             String red = GuiBase.TXT_RED;
             String pre;
-            mc.fontRenderer.drawString(this.entry.getStack().getDisplayName(), x1 + 20, y, color);
+            this.drawString(this.entry.getStack().getDisplayName(), x1 + 20, y, color);
 
-            mc.fontRenderer.drawString(String.valueOf(countTotal)          , x2, y, color);
+            this.drawString(String.valueOf(countTotal)          , x2, y, color);
 
             pre = countMissing == 0 ? green : (countAvailable >= countMissing ? gold : red);
-            mc.fontRenderer.drawString(pre + String.valueOf(countMissing)  , x3, y, color);
+            this.drawString(pre + String.valueOf(countMissing)  , x3, y, color);
 
             pre = countAvailable >= countMissing ? green : red;
-            mc.fontRenderer.drawString(pre + String.valueOf(countAvailable), x4, y, color);
+            this.drawString(pre + String.valueOf(countAvailable), x4, y, color);
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -248,7 +247,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             //mc.getRenderItem().zLevel -= 110;
             y = this.y + 3;
             Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.entry.getStack(), x1, y);
+            this.mc.getRenderItem().renderItemAndEffectIntoGUI(this.mc.player, this.entry.getStack(), x1, y);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
             //mc.getRenderItem().zLevel += 110;
 
@@ -268,7 +267,6 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, 0, 200);
 
-            Minecraft mc = this.mc;
             String header1 = GuiBase.TXT_BOLD + I18n.format(HEADERS[0]);
             String header2 = GuiBase.TXT_BOLD + I18n.format(HEADERS[1]);
             String header3 = GuiBase.TXT_BOLD + I18n.format(HEADERS[2]);
@@ -281,9 +279,8 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             String strCountTotal = this.getFormattedCountString(total, stack.getMaxStackSize());
             String strCountMissing = this.getFormattedCountString(missing, stack.getMaxStackSize());
 
-            FontRenderer fr = mc.fontRenderer;
-            int w1 = Math.max(fr.getStringWidth(header1), Math.max(fr.getStringWidth(header2), fr.getStringWidth(header3)));
-            int w2 = Math.max(fr.getStringWidth(stackName) + 20, Math.max(fr.getStringWidth(strCountTotal), fr.getStringWidth(strCountMissing)));
+            int w1 = Math.max(this.getStringWidth(header1)       , Math.max(this.getStringWidth(header2)      , this.getStringWidth(header3)));
+            int w2 = Math.max(this.getStringWidth(stackName) + 20, Math.max(this.getStringWidth(strCountTotal), this.getStringWidth(strCountMissing)));
             int totalWidth = w1 + w2 + 60;
 
             int x = mouseX + 10;
@@ -302,16 +299,16 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int y1 = y;
             y += 4;
 
-            mc.fontRenderer.drawString(header1,         x1     , y, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(stackName,       x2 + 20, y, 0xFFFFFFFF);
+            this.drawString(header1,         x1     , y, 0xFFFFFFFF);
+            this.drawString(stackName,       x2 + 20, y, 0xFFFFFFFF);
             y += 16;
 
-            mc.fontRenderer.drawString(header2,         x1, y, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(strCountTotal,   x2, y, 0xFFFFFFFF);
+            this.drawString(header2,         x1, y, 0xFFFFFFFF);
+            this.drawString(strCountTotal,   x2, y, 0xFFFFFFFF);
             y += 16;
 
-            mc.fontRenderer.drawString(header3,         x1, y, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(strCountMissing, x2, y, 0xFFFFFFFF);
+            this.drawString(header3,         x1, y, 0xFFFFFFFF);
+            this.drawString(strCountMissing, x2, y, 0xFFFFFFFF);
 
             Gui.drawRect(x2, y1, x2 + 16, y1 + 16, 0x20FFFFFF); // light background for the item
 
@@ -319,7 +316,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             RenderHelper.enableGUIStandardItemLighting();
 
             //mc.getRenderItem().zLevel += 100;
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, stack, x2, y1);
+            this.mc.getRenderItem().renderItemAndEffectIntoGUI(this.mc.player, stack, x2, y1);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
             //GlStateManager.disableBlend();

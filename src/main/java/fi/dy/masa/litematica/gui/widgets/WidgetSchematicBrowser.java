@@ -106,62 +106,62 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             int valueColor = 0xC0FFFFFF;
 
             String str = I18n.format("litematica.gui.label.schematic_info.name");
-            this.fontRenderer.drawString(str, x, y, textColor);
+            this.drawString(str, x, y, textColor);
             y += 12;
 
-            this.fontRenderer.drawString(meta.getName(), x + 4, y, valueColor);
+            this.drawString(meta.getName(), x + 4, y, valueColor);
             y += 12;
 
             str = I18n.format("litematica.gui.label.schematic_info.schematic_author", meta.getAuthor());
-            this.fontRenderer.drawString(str, x, y, textColor);
+            this.drawString(str, x, y, textColor);
             y += 12;
 
             String strDate = DATE_FORMAT.format(new Date(meta.getTimeCreated()));
             str = I18n.format("litematica.gui.label.schematic_info.time_created", strDate);
-            this.fontRenderer.drawString(str, x, y, textColor);
+            this.drawString(str, x, y, textColor);
             y += 12;
 
             if (meta.hasBeenModified())
             {
                 strDate = DATE_FORMAT.format(new Date(meta.getTimeModified()));
                 str = I18n.format("litematica.gui.label.schematic_info.time_modified", strDate);
-                this.fontRenderer.drawString(str, x, y, textColor);
+                this.drawString(str, x, y, textColor);
                 y += 12;
             }
 
             str = I18n.format("litematica.gui.label.schematic_info.region_count", meta.getRegionCount());
-            this.fontRenderer.drawString(str, x, y, textColor);
+            this.drawString(str, x, y, textColor);
             y += 12;
 
             if (this.parent.height >= 340)
             {
                 str = I18n.format("litematica.gui.label.schematic_info.total_volume", meta.getTotalVolume());
-                this.fontRenderer.drawString(str, x, y, textColor);
+                this.drawString(str, x, y, textColor);
                 y += 12;
 
                 str = I18n.format("litematica.gui.label.schematic_info.total_blocks", meta.getTotalBlocks());
-                this.fontRenderer.drawString(str, x, y, textColor);
+                this.drawString(str, x, y, textColor);
                 y += 12;
 
                 str = I18n.format("litematica.gui.label.schematic_info.enclosing_size");
-                this.fontRenderer.drawString(str, x, y, textColor);
+                this.drawString(str, x, y, textColor);
                 y += 12;
 
                 Vec3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
-                this.fontRenderer.drawString(tmp, x + 4, y, valueColor);
+                this.drawString(tmp, x + 4, y, valueColor);
                 y += 12;
             }
             else
             {
                 str = I18n.format("litematica.gui.label.schematic_info.total_blocks_and_volume", meta.getTotalBlocks(), meta.getTotalVolume());
-                this.fontRenderer.drawString(str, x, y, textColor);
+                this.drawString(str, x, y, textColor);
                 y += 12;
 
                 Vec3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
                 str = I18n.format("litematica.gui.label.schematic_info.enclosing_size_value", tmp);
-                this.fontRenderer.drawString(str, x, y, textColor);
+                this.drawString(str, x, y, textColor);
                 y += 12;
             }
 

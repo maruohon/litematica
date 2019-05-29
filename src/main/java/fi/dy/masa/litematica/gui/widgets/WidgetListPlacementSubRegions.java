@@ -11,19 +11,18 @@ import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.util.AlphaNumComparator;
-import net.minecraft.client.Minecraft;
 
 public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlacement, WidgetPlacementSubRegion>
 {
     private final GuiPlacementConfiguration parent;
 
-    public WidgetListPlacementSubRegions(int x, int y, int width, int height, float zLevel, GuiPlacementConfiguration parent)
+    public WidgetListPlacementSubRegions(int x, int y, int width, int height, GuiPlacementConfiguration parent)
     {
         super(x, y, width, height, parent);
 
         this.parent = parent;
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
         //this.widgetSearchBar.setSearchOpen(true);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
         this.shouldSortList = true;
@@ -56,7 +55,7 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
     protected WidgetPlacementSubRegion createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SubRegionPlacement entry)
     {
         return new WidgetPlacementSubRegion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                this.zLevel, isOdd, this.parent.getSchematicPlacement(), entry, listIndex, this, this.mc);
+                isOdd, this.parent.getSchematicPlacement(), entry, listIndex, this);
     }
 
     protected static class PlacementComparator extends AlphaNumComparator implements Comparator<SubRegionPlacement>

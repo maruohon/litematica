@@ -12,17 +12,16 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.util.FileUtils;
-import net.minecraft.client.Minecraft;
 
 public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchematic, WidgetSchematicEntry>
 {
-    public WidgetListLoadedSchematics(int x, int y, int width, int height, float zLevel,
+    public WidgetListLoadedSchematics(int x, int y, int width, int height,
             @Nullable ISelectionListener<LitematicaSchematic> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
     }
 
@@ -52,6 +51,6 @@ public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchemat
     protected WidgetSchematicEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, LitematicaSchematic entry)
     {
         return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                this.zLevel, isOdd, entry, listIndex, this);
+                isOdd, entry, listIndex, this);
     }
 }

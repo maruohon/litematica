@@ -18,7 +18,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -29,11 +28,11 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     private final WidgetAreaSelectionBrowser parent;
     private int buttonsStartX;
 
-    public WidgetAreaSelectionEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            DirectoryEntry entry, int listIndex, SelectionManager selectionManager, Minecraft mc,
+    public WidgetAreaSelectionEntry(int x, int y, int width, int height, boolean isOdd,
+            DirectoryEntry entry, int listIndex, SelectionManager selectionManager,
             WidgetAreaSelectionBrowser parent, IFileBrowserIconProvider iconProvider)
     {
-        super(x, y, width, height, zLevel, isOdd, entry, listIndex, mc, parent, iconProvider);
+        super(x, y, width, height, isOdd, entry, listIndex, parent, iconProvider);
 
         this.selectionManager = selectionManager;
         this.parent = parent;
@@ -57,7 +56,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
         String label = I18n.format(type.getLabelKey());
-        int len = Math.max(this.mc.fontRenderer.getStringWidth(label) + 10, 20);
+        int len = Math.max(this.getStringWidth(label) + 10, 20);
         x -= len;
         this.addButton(new ButtonGeneric(x, y, len, 20, label), new ButtonListener(type, this.selectionManager, this));
 

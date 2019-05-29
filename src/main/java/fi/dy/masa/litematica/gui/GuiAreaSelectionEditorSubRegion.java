@@ -36,7 +36,7 @@ public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimpl
         y += 13;
 
         int width = 202;
-        this.textFieldBoxName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.mc.fontRenderer);
+        this.textFieldBoxName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
         this.textFieldBoxName.setText(this.getBox().getName());
         this.addTextField(this.textFieldBoxName, new TextFieldListenerDummy());
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.SET_BOX_NAME);

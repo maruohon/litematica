@@ -13,7 +13,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 
@@ -32,8 +31,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         this.schematic = schematic;
 
-        Minecraft mc = Minecraft.getMinecraft();
-        this.textField = new GuiTextFieldGeneric(10, 32, 160, 20, mc.fontRenderer);
+        this.textField = new GuiTextFieldGeneric(10, 32, 160, 20, this.textRenderer);
         this.textField.setMaxStringLength(256);
         this.textField.setFocused(true);
     }
@@ -80,7 +78,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         int y = 32;
 
         String str = I18n.format("litematica.gui.label.schematic_save.checkbox.ignore_entities");
-        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, str, this.mc);
+        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, str);
         this.addWidget(this.checkboxIgnoreEntities);
 
         x = this.createButton(x, y, ButtonType.SAVE);
@@ -103,7 +101,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     private int createButton(int x, int y, ButtonType type)
     {
         String label = I18n.format(type.getLabelKey());
-        int width = this.mc.fontRenderer.getStringWidth(label) + 10;
+        int width = this.getStringWidth(label) + 10;
 
         ButtonGeneric button;
 

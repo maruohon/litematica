@@ -66,7 +66,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         int x = 12;
         int y = 22;
 
-        this.textFieldRename = new GuiTextFieldGeneric(x, y + 2, width, 16, this.mc.fontRenderer);
+        this.textFieldRename = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
         this.textFieldRename.setMaxStringLength(256);
         this.textFieldRename.setText(this.placement.getName());
         this.addTextField(this.textFieldRename, null);
@@ -136,7 +136,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
             type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
             label = I18n.format(type.getLabelKey());
-            int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
+            int buttonWidth = this.getStringWidth(label) + 10;
             ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         }
@@ -151,7 +151,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
             type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
             label = I18n.format(type.getLabelKey());
-            int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
+            int buttonWidth = this.getStringWidth(label) + 10;
             x = this.width - buttonWidth - 9;
             ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
@@ -164,7 +164,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     {
         String label = type.name() + ":";
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
-        int offset = this.mc.fontRenderer.getStringWidth(label) + 4;
+        int offset = this.getStringWidth(label) + 4;
 
         BlockPos pos = this.placement.getOrigin();
         String text = "";
@@ -176,14 +176,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             case Z: text = String.valueOf(pos.getZ()); break;
         }
 
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y + 2, width, 14, this.mc.fontRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y + 2, width, 14, this.textRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.placement, this);
         this.addTextField(textField, listener);
 
         String hover = I18n.format("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x = x + offset + width + 20;
-        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "", this.mc, hover);
+        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "", hover);
         cb.setChecked(this.placement.isCoordinateLocked(type), false);
         cb.setListener(new CoordinateLockListener(type, this.placement));
         this.addWidget(cb);
@@ -191,7 +191,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = ButtonOnOff.createOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         String hoverString = type.getHoverText();
 
         if (hoverString != null)
@@ -265,7 +265,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
         if (width == -1)
         {
-            width = this.fontRenderer.getStringWidth(label) + 10;
+            width = this.getStringWidth(label) + 10;
         }
 
         // These are right-aligned
@@ -324,7 +324,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     @Override
     protected WidgetListPlacementSubRegions createListWidget(int listX, int listY)
     {
-        return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.zLevel, this);
+        return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 
     private static class ButtonListener implements IButtonActionListener

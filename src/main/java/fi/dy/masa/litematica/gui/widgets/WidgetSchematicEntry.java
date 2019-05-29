@@ -31,10 +31,10 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
     private final boolean isOdd;
     private final int buttonsStartX;
 
-    public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
+    public WidgetSchematicEntry(int x, int y, int width, int height, boolean isOdd,
             LitematicaSchematic schematic, int listIndex, WidgetListLoadedSchematics parent)
     {
-        super(x, y, width, height, zLevel, schematic, listIndex);
+        super(x, y, width, height, schematic, listIndex);
 
         this.parent = parent;
         this.schematic = schematic;
@@ -47,19 +47,19 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         String text;
 
         text = I18n.format("litematica.gui.button.unload");
-        len = this.mc.fontRenderer.getStringWidth(text) + 10;
+        len = this.getStringWidth(text) + 10;
         posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.UNLOAD, this);
         this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
 
         text = I18n.format("litematica.gui.button.save_to_file");
-        len = this.mc.fontRenderer.getStringWidth(text) + 10;
+        len = this.getStringWidth(text) + 10;
         posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.SAVE_TO_FILE, this);
         this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
 
         text = I18n.format("litematica.gui.button.create_placement");
-        len = this.mc.fontRenderer.getStringWidth(text) + 10;
+        len = this.getStringWidth(text) + 10;
         posX -= (len + 2);
         String tip = I18n.format("litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled");
         listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
@@ -91,7 +91,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         }
 
         String schematicName = this.schematic.getMetadata().getName();
-        this.mc.fontRenderer.drawString(schematicName, this.x + 20, this.y + 7, 0xFFFFFFFF);
+        this.drawString(schematicName, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.disableBlend();

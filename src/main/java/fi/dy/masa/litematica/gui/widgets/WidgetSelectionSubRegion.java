@@ -14,7 +14,6 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -25,18 +24,16 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
     private final WidgetListSelectionSubRegions parent;
     private final AreaSelection selection;
     private final Box box;
-    private final Minecraft mc;
     private final boolean isOdd;
     private final int buttonsStartX;
 
-    public WidgetSelectionSubRegion(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            String entry, int listIndex, Minecraft mc, AreaSelection selection, WidgetListSelectionSubRegions parent)
+    public WidgetSelectionSubRegion(int x, int y, int width, int height, boolean isOdd,
+            String entry, int listIndex, AreaSelection selection, WidgetListSelectionSubRegions parent)
     {
-        super(x, y, width, height, zLevel, entry, listIndex);
+        super(x, y, width, height, entry, listIndex);
 
         this.selection = selection;
         this.box = selection.getSubRegionBox(entry);
-        this.mc = mc;
         this.isOdd = isOdd;
         this.parent = parent;
 
@@ -53,7 +50,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
     private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
         String label = I18n.format(type.getLabelKey());
-        int len = Math.max(this.mc.fontRenderer.getStringWidth(label) + 10, 20);
+        int len = Math.max(this.getStringWidth(label) + 10, 20);
         x -= len;
         this.addButton(new ButtonGeneric(x, y, len, 20, label), new ButtonListener(type, this));
 
@@ -93,7 +90,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0, 0.001f);
         }
 
-        this.mc.fontRenderer.drawString(this.entry, this.x + 2, this.y + 7, 0xFFFFFFFF);
+        this.drawString(this.entry, this.x + 2, this.y + 7, 0xFFFFFFFF);
 
         super.render(mouseX, mouseY, selected);
     }

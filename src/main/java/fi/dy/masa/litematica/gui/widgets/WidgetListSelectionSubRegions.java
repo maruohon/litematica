@@ -11,7 +11,6 @@ import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.util.AlphaNumComparator.AlphaNumStringComparator;
-import net.minecraft.client.Minecraft;
 
 public class WidgetListSelectionSubRegions extends WidgetListBase<String, WidgetSelectionSubRegion>
 {
@@ -26,7 +25,7 @@ public class WidgetListSelectionSubRegions extends WidgetListBase<String, Widget
         this.gui = gui;
         this.selection = selection;
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
         this.shouldSortList = true;
     }
@@ -58,6 +57,6 @@ public class WidgetListSelectionSubRegions extends WidgetListBase<String, Widget
     protected WidgetSelectionSubRegion createListEntryWidget(int x, int y, int listIndex, boolean isOdd, String entry)
     {
         return new WidgetSelectionSubRegion(x, y, this.browserEntryWidth, this.browserEntryHeight,
-                this.zLevel, isOdd, entry, listIndex, this.mc, this.selection, this);
+                isOdd, entry, listIndex, this.selection, this);
     }
 }

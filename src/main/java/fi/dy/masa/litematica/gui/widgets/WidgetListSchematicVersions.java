@@ -13,7 +13,6 @@ import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
@@ -22,14 +21,14 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
     private final SchematicProject project;
     protected final int infoWidth;
 
-    public WidgetListSchematicVersions(int x, int y, int width, int height, float zLevel, SchematicProject project, GuiSchematicProjectManager parent)
+    public WidgetListSchematicVersions(int x, int y, int width, int height, SchematicProject project, GuiSchematicProjectManager parent)
     {
         super(x, y, width, height, parent);
 
         this.project = project;
         this.browserEntryHeight = 16;
         this.infoWidth = 180;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, zLevel, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT, Minecraft.getMinecraft());
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
     }
 
@@ -57,14 +56,14 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
         RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
         str = I18n.format("litematica.gui.label.schematic_projects.project");
-        this.fontRenderer.drawString(str, x, y, color);
+        this.drawString(str, x, y, color);
         y += 12;
-        this.fontRenderer.drawString(w + this.project.getName() + r, x + 4, y, color);
+        this.drawString(w + this.project.getName() + r, x + 4, y, color);
         y += 12;
         int versionId = this.project.getCurrentVersionId();
         String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
         str = I18n.format("litematica.gui.label.schematic_projects.version", strVer, w + this.project.getVersionCount() + r);
-        this.fontRenderer.drawString(str, x, y, color);
+        this.drawString(str, x, y, color);
         y += 12;
         SchematicVersion version = this.project.getCurrentVersion();
 
@@ -73,21 +72,21 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
             ToolHud.DATE.setTime(version.getTimeStamp());
             str = ToolHud.SIMPLE_DATE_FORMAT.format(ToolHud.DATE);
             str = I18n.format("litematica.hud.schematic_projects.current_version_date", w + str + r);
-            this.fontRenderer.drawString(str, x, y, color);
+            this.drawString(str, x, y, color);
             y += 12;
 
             str = I18n.format("litematica.gui.label.schematic_projects.version_name");
-            this.fontRenderer.drawString(str, x, y, color);
+            this.drawString(str, x, y, color);
             y += 12;
-            this.fontRenderer.drawString(w + version.getName() + r, x + 4, y, color);
+            this.drawString(w + version.getName() + r, x + 4, y, color);
             y += 12;
             str = I18n.format("litematica.gui.label.schematic_projects.origin");
-            this.fontRenderer.drawString(str, x, y, color);
+            this.drawString(str, x, y, color);
             y += 12;
 
             BlockPos o = this.project.getOrigin();
             str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
-            this.fontRenderer.drawString(str, x, y, color);
+            this.drawString(str, x, y, color);
         }
     }
 
@@ -116,6 +115,6 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
     protected WidgetSchematicVersion createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SchematicVersion entry)
     {
         return new WidgetSchematicVersion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                this.zLevel, isOdd, entry, listIndex, this.project);
+                isOdd, entry, listIndex, this.project);
     }
 }

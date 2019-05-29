@@ -30,19 +30,17 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
     private final SchematicPlacementManager manager;
     private final WidgetListSchematicPlacements parent;
     private final SchematicPlacement placement;
-    private final Minecraft mc;
     private final boolean isOdd;
     private int buttonsStartX;
 
-    public WidgetSchematicPlacement(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent, Minecraft mc)
+    public WidgetSchematicPlacement(int x, int y, int width, int height, boolean isOdd,
+            SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent)
     {
-        super(x, y, width, height, zLevel, placement, listIndex);
+        super(x, y, width, height, placement, listIndex);
 
         this.parent = parent;
         this.placement = placement;
         this.isOdd = isOdd;
-        this.mc = mc;
         this.manager = DataManager.getSchematicPlacementManager();
 
         int posX = x + width - 2;
@@ -60,7 +58,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
         String label = I18n.format(type.getTranslationKey());
-        int len = this.mc.fontRenderer.getStringWidth(label) + 10;
+        int len = this.getStringWidth(label) + 10;
         xRight -= len;
         this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this));
 
@@ -69,7 +67,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
-        ButtonOnOff button = ButtonOnOff.createOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         xRight -= button.getWidth();
         this.addButton(button, new ButtonListener(type, this));
 
@@ -111,7 +109,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
         String name = this.placement.getName();
         String pre = this.placement.isEnabled() ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        this.mc.fontRenderer.drawString(pre + name, this.x + 20, this.y + 7, 0xFFFFFFFF);
+        this.drawString(pre + name, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
         Icons icon;
 
@@ -124,9 +122,6 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             icon = Icons.SCHEMATIC_TYPE_MEMORY;
         }
 
-        //GlStateManager.disableRescaleNormal();
-        //RenderHelper.disableStandardItemLighting();
-        //GlStateManager.disableLighting();
         GlStateManager.color(1, 1, 1, 1);
 
         this.parent.bindTexture(Icons.TEXTURE);

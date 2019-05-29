@@ -46,7 +46,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
         this.createButtonOnOff(this.xOrigin, 24, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED);
 
         int width = 202;
-        this.textFieldBoxName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.mc.fontRenderer);
+        this.textFieldBoxName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
         this.textFieldBoxName.setText(this.getBox().getName());
         this.addTextField(this.textFieldBoxName, new TextFieldListenerDummy());
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.SET_BOX_NAME);
@@ -76,8 +76,8 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
             List<String> lines = new ArrayList<>();
             int xTmp = 250;
             int maxLineLength = this.width - xTmp - 20;
-            StringUtils.splitTextToLines(lines, str, maxLineLength, this.fontRenderer);
-            this.addLabel(xTmp, 48, maxLineLength, lines.size() * (this.fontRenderer.FONT_HEIGHT + 1), 0xFFFFAA00, lines.toArray(new String[0]));
+            StringUtils.splitTextToLines(lines, str, maxLineLength, this.textRenderer);
+            this.addLabel(xTmp, 48, maxLineLength, lines.size() * (this.textRenderer.FONT_HEIGHT + 1), 0xFFFFAA00, lines.toArray(new String[0]));
 
             //this.addLabel(x, nextY, 120, 12, 0xFFFFAA00, I18n.format("litematica.warning.area_editor.area_rendering_disabled"));
         }

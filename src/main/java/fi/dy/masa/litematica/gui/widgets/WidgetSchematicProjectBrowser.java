@@ -86,26 +86,26 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
             int color = 0xFFB0B0B0;
 
             str = I18n.format("litematica.gui.label.schematic_projects.project");
-            this.fontRenderer.drawString(str, x, y, color);
+            this.drawString(str, x, y, color);
             y += 12;
-            this.fontRenderer.drawString(w + project.getName() + r, x + 8, y, color);
+            this.drawString(w + project.getName() + r, x + 8, y, color);
             y += 12;
             int versionId = project .getCurrentVersionId();
             String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
             str = I18n.format("litematica.gui.label.schematic_projects.version", strVer, w + project.getVersionCount() + r);
-            this.fontRenderer.drawString(str, x, y, color);
+            this.drawString(str, x, y, color);
             y += 12;
             SchematicVersion version = project.getCurrentVersion();
 
             if (version != null)
             {
                 str = I18n.format("litematica.gui.label.schematic_projects.origin");
-                this.fontRenderer.drawString(str, x, y, color);
+                this.drawString(str, x, y, color);
                 y += 12;
 
                 BlockPos o = project.getOrigin();
                 str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
-                this.fontRenderer.drawString(str, x + 8, y, color);
+                this.drawString(str, x + 8, y, color);
             }
         }
     }

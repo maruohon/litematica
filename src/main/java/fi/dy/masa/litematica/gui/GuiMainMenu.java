@@ -48,7 +48,7 @@ public class GuiMainMenu extends GuiBase
         this.addButton(button, new ButtonListenerCycleAreaMode(this));
 
         label = I18n.format("litematica.gui.button.tool_mode", DataManager.getToolMode().getName());
-        int width2 = this.mc.fontRenderer.getStringWidth(label) + 10;
+        int width2 = this.getStringWidth(label) + 10;
 
         y = this.height - 26;
         button = new ButtonGeneric(x, y, width2, 20, label);
@@ -86,13 +86,13 @@ public class GuiMainMenu extends GuiBase
 
         for (ButtonListenerChangeMenu.ButtonType type : ButtonListenerChangeMenu.ButtonType.values())
         {
-            width = Math.max(width, this.mc.fontRenderer.getStringWidth(type.getDisplayName()) + 30);
+            width = Math.max(width, this.getStringWidth(type.getDisplayName()) + 30);
         }
 
         for (SelectionMode mode : SelectionMode.values())
         {
             String label = I18n.format("litematica.gui.button.area_selection_mode", mode.getDisplayName());
-            width = Math.max(width, this.mc.fontRenderer.getStringWidth(label) + 10);
+            width = Math.max(width, this.getStringWidth(label) + 10);
         }
 
         return width;

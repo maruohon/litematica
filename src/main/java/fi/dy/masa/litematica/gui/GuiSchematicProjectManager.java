@@ -72,7 +72,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
 
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
     {
-        ButtonGeneric button = ButtonGeneric.createGeneric(x, y, -1, rightAlign, type.getTranslationKey());
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, rightAlign, type.getTranslationKey());
         String hover = type.getHoverText();
 
         if (hover != null)
@@ -120,7 +120,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
     @Override
     protected WidgetListSchematicVersions createListWidget(int listX, int listY)
     {
-        return new WidgetListSchematicVersions(listX, listY, this.getBrowserWidth() - 186, this.getBrowserHeight(), this.zLevel, this.project, this);
+        return new WidgetListSchematicVersions(listX, listY, this.getBrowserWidth() - 186, this.getBrowserHeight(), this.project, this);
     }
 
     private static class ButtonListener implements IButtonActionListener

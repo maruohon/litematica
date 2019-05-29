@@ -15,10 +15,10 @@ public class WidgetSchematicVersion extends WidgetListEntryBase<SchematicVersion
     private final SchematicProject project;
     private final boolean isOdd;
 
-    public WidgetSchematicVersion(int x, int y, int width, int height, float zLevel, boolean isOdd,
+    public WidgetSchematicVersion(int x, int y, int width, int height, boolean isOdd,
             SchematicVersion entry, int listIndex, SchematicProject project)
     {
-        super(x, y, width, height, zLevel, entry, listIndex);
+        super(x, y, width, height, entry, listIndex);
 
         this.project = project;
         this.isOdd = isOdd;
@@ -52,7 +52,7 @@ public class WidgetSchematicVersion extends WidgetListEntryBase<SchematicVersion
         }
 
         String str = I18n.format("litematica.gui.label.schematic_projects.version_entry", this.entry.getVersion(), this.entry.getName());
-        this.mc.fontRenderer.drawString(str, this.x + 4, this.y + 4, 0xFFFFFFFF);
+        this.drawString(str, this.x + 4, this.y + 4, 0xFFFFFFFF);
     }
 
     @Override

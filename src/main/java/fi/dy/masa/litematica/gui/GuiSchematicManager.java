@@ -95,7 +95,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         String label = I18n.format(type.getLabelKey());
-        int buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        int buttonWidth = this.getStringWidth(label) + 20;
         this.addButton(new ButtonGeneric(this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
     }
 
@@ -110,12 +110,12 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     {
         String label = type.getLabel();
         String hover = type.getHoverText();
-        int buttonWidth = this.mc.fontRenderer.getStringWidth(label) + 10;
+        int buttonWidth = this.getStringWidth(label) + 10;
         ButtonGeneric button;
 
         if (type == ButtonListener.Type.EXPORT_TYPE)
         {
-            buttonWidth = this.mc.fontRenderer.getStringWidth(this.exportType.getDisplayName()) + 10;
+            buttonWidth = this.getStringWidth(this.exportType.getDisplayName()) + 10;
             button = new ConfigButtonOptionList(x, y, buttonWidth, 20, new ConfigWrapper());
         }
         else if (hover != null)

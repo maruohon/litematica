@@ -92,7 +92,7 @@ public class GuiSubRegionConfiguration extends GuiBase
 
         y = this.height - 36;
         label = I18n.format("litematica.gui.button.placement_sub.placement_configuration");
-        int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
+        int buttonWidth = this.getStringWidth(label) + 10;
         x = 10;
         ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
@@ -100,7 +100,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
-        int menuButtonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        int menuButtonWidth = this.getStringWidth(label) + 20;
         x = sr.getScaledHeight() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
 
         button = new ButtonGeneric(x, y, menuButtonWidth, 20, label);
@@ -113,7 +113,7 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         String label = type.name() + ":";
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
-        int offset = this.mc.fontRenderer.getStringWidth(label) + 4;
+        int offset = this.getStringWidth(label) + 4;
 
         // The sub-region placements are relative
         BlockPos pos = this.placement.getPos();
@@ -128,14 +128,14 @@ public class GuiSubRegionConfiguration extends GuiBase
             case Z: text = String.valueOf(pos.getZ()); break;
         }
 
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y + 2, width, 14, this.mc.fontRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y + 2, width, 14, this.textRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
         this.addTextField(textField, listener);
 
         String hover = I18n.format("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x = x + offset + width + 20;
-        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, this.zLevel, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "", this.mc, hover);
+        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "", hover);
         cb.setChecked(this.placement.isCoordinateLocked(type), false);
         cb.setListener(new CoordinateLockListener(type, this.placement));
         this.addWidget(cb);
@@ -143,7 +143,7 @@ public class GuiSubRegionConfiguration extends GuiBase
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = ButtonOnOff.createOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this.schematicPlacement, this.placement, this));
         return button.getWidth();
     }

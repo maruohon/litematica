@@ -42,20 +42,20 @@ public class GuiSchematicLoadedList extends GuiListBase<LitematicaSchematic, Wid
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
+        buttonWidth = this.getStringWidth(label) + 30;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         x += buttonWidth + 4;
 
         type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
+        buttonWidth = this.getStringWidth(label) + 30;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
@@ -64,6 +64,6 @@ public class GuiSchematicLoadedList extends GuiListBase<LitematicaSchematic, Wid
     @Override
     protected WidgetListLoadedSchematics createListWidget(int listX, int listY)
     {
-        return new WidgetListLoadedSchematics(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this.zLevel, null);
+        return new WidgetListLoadedSchematics(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), null);
     }
 }

@@ -8,6 +8,7 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -37,17 +38,17 @@ public class BlockInfo
         ResourceLocation rl = Block.REGISTRY.getNameForObject(this.state.getBlock());
         this.blockRegistryname = rl != null ? rl.toString() : "<null>";
 
-        Minecraft mc = Minecraft.getMinecraft();
+        FontRenderer textRenderer = Minecraft.getMinecraft().fontRenderer;
         this.stackName = this.stack.getDisplayName();
 
-        int w = mc.fontRenderer.getStringWidth(this.stackName) + 20;
-        w = Math.max(w, mc.fontRenderer.getStringWidth(this.blockRegistryname));
-        w = Math.max(w, mc.fontRenderer.getStringWidth(this.title));
+        int w = textRenderer.getStringWidth(this.stackName) + 20;
+        w = Math.max(w, textRenderer.getStringWidth(this.blockRegistryname));
+        w = Math.max(w, textRenderer.getStringWidth(this.title));
         this.columnWidth = w;
 
         this.props = BlockUtils.getFormattedBlockStateProperties(this.state);
         this.totalWidth = this.columnWidth + 40;
-        this.totalHeight = this.props.size() * (mc.fontRenderer.FONT_HEIGHT + 2) + 60;
+        this.totalHeight = this.props.size() * (textRenderer.FONT_HEIGHT + 2) + 60;
     }
 
     public int getTotalWidth()
@@ -68,10 +69,11 @@ public class BlockInfo
 
             RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
+            FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;
             y += 4;
 
-            mc.fontRenderer.drawString(this.title, x1, y, 0xFFFFFFFF);
+            textRenderer.drawString(this.title, x1, y, 0xFFFFFFFF);
 
             y += 12;
 
@@ -81,19 +83,19 @@ public class BlockInfo
             //mc.getRenderItem().zLevel += 100;
             Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
             mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stack, x1, y);
-            mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.stack, x1, y, null);
+            mc.getRenderItem().renderItemOverlayIntoGUI(textRenderer, this.stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
 
             //GlStateManager.disableBlend();
             RenderHelper.disableStandardItemLighting();
 
-            mc.fontRenderer.drawString(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
+            textRenderer.drawString(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
 
             y += 20;
-            mc.fontRenderer.drawString(this.blockRegistryname, x1, y, 0xFF4060FF);
-            y += mc.fontRenderer.FONT_HEIGHT + 4;
+            textRenderer.drawString(this.blockRegistryname, x1, y, 0xFF4060FF);
+            y += textRenderer.FONT_HEIGHT + 4;
 
-            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props, mc.fontRenderer);
+            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props, textRenderer);
 
             GlStateManager.popMatrix();
         }
