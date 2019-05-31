@@ -237,11 +237,11 @@ public class Configs implements IConfigHandler
             {
                 JsonObject root = element.getAsJsonObject();
 
-                ConfigUtils.readConfigBase(root, "Generic", Generic.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Visuals", Visuals.OPTIONS);
-                ConfigUtils.readConfigBase(root, "InfoOverlays", InfoOverlays.OPTIONS);
                 ConfigUtils.readConfigBase(root, "Colors", Colors.OPTIONS);
-                ConfigUtils.readHotkeys(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
+                ConfigUtils.readConfigBase(root, "Generic", Generic.OPTIONS);
+                ConfigUtils.readConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
+                ConfigUtils.readConfigBase(root, "InfoOverlays", InfoOverlays.OPTIONS);
+                ConfigUtils.readConfigBase(root, "Visuals", Visuals.OPTIONS);
             }
         }
 
@@ -257,11 +257,11 @@ public class Configs implements IConfigHandler
         {
             JsonObject root = new JsonObject();
 
-            ConfigUtils.writeConfigBase(root, "Generic", Generic.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Visuals", Visuals.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "InfoOverlays", InfoOverlays.OPTIONS);
             ConfigUtils.writeConfigBase(root, "Colors", Colors.OPTIONS);
-            ConfigUtils.writeHotkeys(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
+            ConfigUtils.writeConfigBase(root, "Generic", Generic.OPTIONS);
+            ConfigUtils.writeConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
+            ConfigUtils.writeConfigBase(root, "InfoOverlays", InfoOverlays.OPTIONS);
+            ConfigUtils.writeConfigBase(root, "Visuals", Visuals.OPTIONS);
 
             JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
         }
