@@ -53,9 +53,9 @@ public class LiteModLitematica implements LiteMod, Configurable, InitCompleteLis
         Configs.loadFromFile();
         ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
 
-        InputEventHandler.getInstance().registerKeybindProvider(InputHandler.getInstance());
-        InputEventHandler.getInstance().registerKeyboardInputHandler(InputHandler.getInstance());
-        InputEventHandler.getInstance().registerMouseInputHandler(InputHandler.getInstance());
+        InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());
+        InputEventHandler.getInputManager().registerKeyboardInputHandler(InputHandler.getInstance());
+        InputEventHandler.getInputManager().registerMouseInputHandler(InputHandler.getInstance());
 
         IRenderer renderer = new RenderHandler();
         RenderEventHandler.getInstance().registerGameOverlayRenderer(renderer);
