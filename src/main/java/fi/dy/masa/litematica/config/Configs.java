@@ -268,9 +268,8 @@ public class Configs implements IConfigHandler
     }
 
     @Override
-    public void onConfigsChanged()
+    public void load()
     {
-        saveToFile();
         loadFromFile();
     }
 
