@@ -14,6 +14,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager.PlacementPart;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -56,7 +57,8 @@ public class SchematicUtils
             if (DataManager.getSchematicProjectsManager().hasProjectOpen())
             {
                 String title = "litematica.gui.title.schematic_projects.save_new_version";
-                GuiTextInput gui = new GuiTextInput(512, title, area.getName(), mc.currentScreen, new SchematicVersionCreator());
+                SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
+                GuiTextInput gui = new GuiTextInput(512, title, project.getCurrentVersionName(), mc.currentScreen, new SchematicVersionCreator());
                 mc.displayGuiScreen(gui);
             }
             else if (inMemoryOnly)

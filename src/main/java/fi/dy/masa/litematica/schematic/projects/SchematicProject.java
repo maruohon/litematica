@@ -44,8 +44,6 @@ public class SchematicProject
     private boolean saveInProgress;
     private boolean dirty;
     @Nullable
-    private SchematicVersion currentVersion;
-    @Nullable
     private SchematicPlacement currentPlacement;
 
     public SchematicProject(File directory, File projectFile)
@@ -72,6 +70,12 @@ public class SchematicProject
     public int getCurrentVersionId()
     {
         return this.currentVersionId;
+    }
+
+    public String getCurrentVersionName()
+    {
+        SchematicVersion currentVersion = this.getCurrentVersion();
+        return currentVersion != null ? currentVersion.getName() : this.getSelection().getName();
     }
 
     public void setName(String name)
@@ -118,10 +122,11 @@ public class SchematicProject
         this.lastSeenArea = new AreaSelection();
 
         this.origin = origin;
+        SchematicVersion currentVersion = this.getCurrentVersion();
 
-        if (this.currentVersion != null)
+        if (currentVersion != null)
         {
-            BlockPos areaPosition = this.origin.add(this.currentVersion.getAreaOffset());
+            BlockPos areaPosition = this.origin.add(currentVersion.getAreaOffset());
 
             if (this.currentPlacement != null)
             {
@@ -274,7 +279,6 @@ public class SchematicProject
         if (version != this.currentVersionId && version >= 0 && version < this.versions.size())
         {
             this.currentVersionId = version;
-            this.currentVersion = this.versions.get(this.currentVersionId);
             this.dirty = true;
 
             if (createPlacement)
