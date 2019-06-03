@@ -62,7 +62,9 @@ public class GuiMainMenu extends GuiBase
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_MANAGER);
         y += 44;
 
-        y += 44;
+        y += 22;
+        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.TASK_MANAGER);
+        y += 22;
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PROJECTS_MANAGER);
     }
 
@@ -141,6 +143,9 @@ public class GuiMainMenu extends GuiBase
                 case SCHEMATIC_PLACEMENTS:
                     gui = new GuiSchematicPlacementsList();
                     break;
+                case TASK_MANAGER:
+                    gui = new GuiTaskManager();
+                    break;
                 case SCHEMATIC_PROJECTS_MANAGER:
                     DataManager.getSchematicProjectsManager().openSchematicProjectsGui();
                     return;
@@ -167,6 +172,8 @@ public class GuiMainMenu extends GuiBase
             LOAD_SCHEMATICS             ("litematica.gui.button.change_menu.load_schematics_to_memory", ButtonIcons.SCHEMATIC_BROWSER),
             // Edit Schematics (description or icon), or convert between formats
             SCHEMATIC_MANAGER           ("litematica.gui.button.change_menu.schematic_manager", ButtonIcons.SCHEMATIC_MANAGER),
+            // Open the Task Manager
+            TASK_MANAGER                ("litematica.gui.button.change_menu.task_manager", ButtonIcons.TASK_MANAGER),
             // Open the Schematic Projects browser
             SCHEMATIC_PROJECTS_MANAGER  ("litematica.gui.button.change_menu.schematic_projects_manager", ButtonIcons.SCHEMATIC_PROJECTS),
             // In-game Configuration GUI

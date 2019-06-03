@@ -86,7 +86,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
     public SchematicVerifier()
     {
-        this.nameOnHud = I18n.format("litematica.gui.label.schematic_verifier.verifier");
+        this.name = I18n.format("litematica.gui.label.schematic_verifier.verifier");
     }
 
     public static void clearActiveVerifiers()

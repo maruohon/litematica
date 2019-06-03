@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 
 public class TaskScheduler
@@ -160,6 +161,11 @@ public class TaskScheduler
         }
     }
     */
+
+    public ImmutableList<ITask> getAllTasks()
+    {
+        return ImmutableList.copyOf(this.tasks);
+    }
 
     public boolean removeTask(ITask task)
     {

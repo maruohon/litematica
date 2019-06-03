@@ -97,6 +97,7 @@ litematica.gui.button.change_menu.schematic_projects_manager=Schematic Projects
 litematica.gui.button.change_menu.show_area_selections=Area Selection browser
 litematica.gui.button.change_menu.show_loaded_schematics=Loaded Schematics
 litematica.gui.button.change_menu.show_schematic_placements=Schematic Placements
+litematica.gui.button.change_menu.task_manager=Task Manager
 litematica.gui.button.change_menu.to_main_menu=Litematica menu
 
 litematica.gui.button.config_gui.colors=Colors
@@ -188,6 +189,7 @@ litematica.gui.button.load_schematic_to_memory=Load Schematic
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
 litematica.gui.button.ok=Ok
+litematica.gui.button.remove=Remove
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
 litematica.gui.button.rotation_value=Rotation: %s
@@ -309,6 +311,7 @@ litematica.gui.label.task_name.area_analyzer=Area Analyzer
 litematica.gui.label.task_name.delete=Delete task
 litematica.gui.label.task_name.fill=Fill task
 litematica.gui.label.task_name.material_list=Material List
+litematica.gui.label.task_name.paste=Paste Schematic
 litematica.gui.label.task_name.save_schematic=Save Schematic
 litematica.gui.label.task_name.verifier=Verifier
 
@@ -357,6 +360,7 @@ litematica.gui.title.schematic_projects.save_new_version=Save new schematic vers
 litematica.gui.title.schematic_projects_browser=Schematic Projects Browser
 litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
 litematica.gui.title.schematic_verifier_errors=Schematic Verifier errors
+litematica.gui.title.task_manager=Task Manager
 
 litematica.hud.area_selection.box_count=Boxes: %s
 litematica.hud.area_selection.dimensions_position=Dim: %s - p1: %s, p2: %s

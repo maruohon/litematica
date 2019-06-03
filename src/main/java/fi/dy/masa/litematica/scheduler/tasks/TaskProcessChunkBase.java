@@ -29,7 +29,7 @@ public abstract class TaskProcessChunkBase extends TaskBase
         this.worldClient = this.mc.world;
         this.world = WorldUtils.getBestWorld(this.mc);
         this.isClientWorld = (this.world == this.mc.world);
-        this.nameOnHud = I18n.format(nameOnHud);
+        this.name = I18n.format(nameOnHud);
 
         InfoHud.getInstance().addInfoHudRenderer(this, true);
     }
