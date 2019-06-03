@@ -95,7 +95,7 @@ public class SchematicProjectsManager
         {
             this.currentProject.saveToFile();
             this.removeCurrentPlacement();
-            this.currentProject = null;
+            this.clear();
         }
     }
 
@@ -191,12 +191,7 @@ public class SchematicProjectsManager
         if (JsonUtils.hasString(obj, "current_project"))
         {
             File file = new File(JsonUtils.getString(obj, "current_project"));
-            JsonElement el = JsonUtils.parseJsonFile(file);
-
-            if (el != null && el.isJsonObject())
-            {
-                this.currentProject = SchematicProject.fromJson(el.getAsJsonObject(), file, true);
-            }
+            this.currentProject = this.loadProjectFromFile(file, true);
         }
     }
 }

@@ -389,7 +389,6 @@ public class SchematicProject
     {
         JsonObject obj = new JsonObject();
 
-        obj.add("directory", new JsonPrimitive(this.directory.getAbsolutePath()));
         obj.add("name", new JsonPrimitive(this.projectName));
         obj.add("origin", JsonUtils.blockPosToJson(this.origin));
         obj.add("current_version_id", new JsonPrimitive(this.currentVersionId));
@@ -418,12 +417,10 @@ public class SchematicProject
     {
         BlockPos origin = JsonUtils.blockPosFromJson(obj, "origin");
 
-        if (JsonUtils.hasString(obj, "directory") &&
-            JsonUtils.hasString(obj, "name") &&
-            JsonUtils.hasInteger(obj, "current_version_id") &&
-            origin != null)
+        if (JsonUtils.hasString(obj, "name") && JsonUtils.hasInteger(obj, "current_version_id") && origin != null)
         {
-            SchematicProject project = new SchematicProject(new File(JsonUtils.getString(obj, "directory")), projectFile);
+            projectFile = fi.dy.masa.malilib.util.FileUtils.getCanonicalFileIfPossible(projectFile);
+            SchematicProject project = new SchematicProject(projectFile.getParentFile(), projectFile);
             project.projectName = JsonUtils.getString(obj, "name");
             project.origin = origin;
 
