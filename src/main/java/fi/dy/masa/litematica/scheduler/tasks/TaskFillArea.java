@@ -182,6 +182,20 @@ public class TaskFillArea extends TaskProcessChunkBase
     @Override
     protected void onStop()
     {
+        this.printCompletionMessage();
+
+        if (this.isClientWorld && this.mc.player != null)
+        {
+            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback true");
+        }
+
+        InfoHud.getInstance().removeInfoHudRenderer(this, false);
+
+        this.notifyListener();
+    }
+
+    protected void printCompletionMessage()
+    {
         if (this.finished)
         {
             InfoUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_filled");
@@ -190,12 +204,5 @@ public class TaskFillArea extends TaskProcessChunkBase
         {
             InfoUtils.showGuiMessage(MessageType.ERROR, "litematica.message.area_fill_fail");
         }
-
-        if (this.isClientWorld && this.mc.player != null)
-        {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback true");
-        }
-
-        InfoHud.getInstance().removeInfoHudRenderer(this, false);
     }
 }

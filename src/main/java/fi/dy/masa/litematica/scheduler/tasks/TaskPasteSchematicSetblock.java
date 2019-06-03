@@ -50,7 +50,6 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private int currentIndex;
     private int boxVolume;
     private boolean boxInProgress;
-    private boolean finished;
 
     public TaskPasteSchematicSetblock(SchematicPlacement placement, boolean changedBlocksOnly)
     {
@@ -329,6 +328,8 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         }
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
+
+        super.stop();
     }
 
     private void updateInfoHudLines()

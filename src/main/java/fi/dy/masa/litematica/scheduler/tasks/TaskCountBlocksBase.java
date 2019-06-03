@@ -96,5 +96,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
         }
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
+
+        this.notifyListener();
     }
 }

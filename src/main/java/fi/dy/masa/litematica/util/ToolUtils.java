@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -74,6 +75,12 @@ public class ToolUtils
 
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities, Minecraft mc)
     {
+        deleteSelectionVolumes(area, removeEntities, null, mc);
+    }
+
+    public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities,
+            @Nullable ICompletionListener listener, Minecraft mc)
+    {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
             if (area == null)
@@ -88,6 +95,12 @@ public class ToolUtils
                 final ImmutableList<Box> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
 
                 TaskDeleteArea task = new TaskDeleteArea(boxes, removeEntities);
+
+                if (listener != null)
+                {
+                    task.setCompletionListener(listener);
+                }
+
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
 
                 InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");

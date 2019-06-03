@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.List;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -15,7 +14,7 @@ public class TaskDeleteArea extends TaskFillArea
     }
 
     @Override
-    protected void onStop()
+    protected void printCompletionMessage()
     {
         if (this.finished)
         {
@@ -25,12 +24,5 @@ public class TaskDeleteArea extends TaskFillArea
         {
             InfoUtils.showGuiMessage(MessageType.ERROR, "litematica.message.error.area_deletion_aborted");
         }
-
-        if (this.isClientWorld && this.mc.player != null)
-        {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback true");
-        }
-
-        InfoHud.getInstance().removeInfoHudRenderer(this, false);
     }
 }

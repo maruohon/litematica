@@ -27,6 +27,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     protected final Minecraft mc;
     protected String nameOnHud = "";
     protected List<String> infoHudLines = new ArrayList<>();
+    protected boolean finished;
     @Nullable protected ICompletionListener completionListener;
 
     protected TaskBase()
@@ -71,6 +72,22 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     @Override
     public void stop()
     {
+        this.notifyListener();
+    }
+
+    protected void notifyListener()
+    {
+        if (this.completionListener != null)
+        {
+            if (this.finished)
+            {
+                this.completionListener.onTaskCompleted();
+            }
+            else
+            {
+                this.completionListener.onTaskAborted();
+            }
+        }
     }
 
     protected boolean areSurroundingChunksLoaded(ChunkPos pos, WorldClient world, int radius)
