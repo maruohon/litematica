@@ -42,6 +42,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 
 public class SchematicUtils
 {
@@ -227,23 +228,30 @@ public class SchematicUtils
 
         if (stack.isEmpty() == false && (stack.getItem() instanceof ItemBlock))
         {
-            WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
+            WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
 
-            if (world != null && traceWrapper != null &&
+            if (worldSchematic != null && traceWrapper != null &&
                 traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
             {
                 RayTraceResult trace = traceWrapper.getRayTraceResult();
                 EnumFacing side = trace.sideHit;
                 Vec3d hitVec = trace.hitVec;
                 BlockPos pos = trace.getBlockPos();
-                IBlockState stateOriginal = world.getBlockState(pos);
+                IBlockState stateOriginal = worldSchematic.getBlockState(pos);
                 IBlockState stateNew = Blocks.AIR.getDefaultState();
 
                 if (stack.getItem() instanceof ItemBlock)
                 {
+                    // Smuggle in a reference to the Schematic world to the use context
+                    World worldClient = mc.player.world;
+                    mc.player.world = worldSchematic;
+
                     BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(mc.player, stack,
                             pos.offset(side), side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z));
+
+                    mc.player.world = worldClient;
+
                     stateNew = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(ctx);
                 }
 
