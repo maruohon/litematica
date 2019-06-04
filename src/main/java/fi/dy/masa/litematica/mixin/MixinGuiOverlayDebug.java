@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
 import net.minecraft.client.gui.GuiOverlayDebug;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.util.text.TextFormatting;
 
 @Mixin(GuiOverlayDebug.class)
 public abstract class MixinGuiOverlayDebug
@@ -42,8 +42,8 @@ public abstract class MixinGuiOverlayDebug
 
         if (world != null)
         {
-            String pre = TextFormatting.GOLD.toString();
-            String rst = TextFormatting.RESET.toString();
+            String pre = GuiBase.TXT_GOLD;
+            String rst = GuiBase.TXT_RST;
 
             WorldRenderer renderer = LitematicaRenderer.getInstance().getWorldRenderer();
 

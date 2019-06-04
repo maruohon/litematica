@@ -5,23 +5,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.util.SubChunkPos;
-import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.server.SPacketChunkData;
+import net.minecraft.util.math.ChunkPos;
 
 @Mixin(NetHandlerPlayClient.class)
-public class MixinNetHandlerPlayClient
+public abstract class MixinNetHandlerPlayClient
 {
     @Inject(method = "handleChunkData", at = @At("RETURN"))
     private void onChunkData(SPacketChunkData packetIn, CallbackInfo ci)
     {
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue())
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+            Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
         {
-            for (int y = 0; y < 16; ++y)
-            {
-                WorldUtils.markSchematicChunkForRenderUpdate(new SubChunkPos(packetIn.getChunkX(), y, packetIn.getChunkZ()));
-            }
+            SchematicWorldRefresher.markSchematicChunksForRenderUpdate(new ChunkPos(packetIn.getChunkX(), packetIn.getChunkZ()));
         }
     }
 }

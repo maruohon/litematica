@@ -3,18 +3,16 @@ package fi.dy.masa.litematica.util;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import net.minecraft.client.resources.I18n;
 
-public enum LayerMode implements IConfigOptionListEntry
+public enum ReplaceBehavior implements IConfigOptionListEntry
 {
-    ALL             ("all",             "litematica.gui.label.layer_mode.all"),
-    SINGLE_LAYER    ("single_layer",    "litematica.gui.label.layer_mode.single_layer"),
-    LAYER_RANGE     ("layer_range",     "litematica.gui.label.layer_mode.layer_range"),
-    ALL_BELOW       ("all_below",       "litematica.gui.label.layer_mode.all_below"),
-    ALL_ABOVE       ("all_above",       "litematica.gui.label.layer_mode.all_above");
+    NONE            ("none",            "litematica.gui.label.replace_behavior.none"),
+    ALL             ("all",             "litematica.gui.label.replace_behavior.all"),
+    WITH_NON_AIR    ("with_non_air",    "litematica.gui.label.replace_behavior.with_non_air");
 
     private final String configString;
     private final String translationKey;
 
-    private LayerMode(String configString, String translationKey)
+    private ReplaceBehavior(String configString, String translationKey)
     {
         this.configString = configString;
         this.translationKey = translationKey;
@@ -56,21 +54,21 @@ public enum LayerMode implements IConfigOptionListEntry
     }
 
     @Override
-    public LayerMode fromString(String name)
+    public ReplaceBehavior fromString(String name)
     {
         return fromStringStatic(name);
     }
 
-    public static LayerMode fromStringStatic(String name)
+    public static ReplaceBehavior fromStringStatic(String name)
     {
-        for (LayerMode mode : LayerMode.values())
+        for (ReplaceBehavior val : ReplaceBehavior.values())
         {
-            if (mode.configString.equalsIgnoreCase(name))
+            if (val.configString.equalsIgnoreCase(name))
             {
-                return mode;
+                return val;
             }
         }
 
-        return LayerMode.ALL;
+        return ReplaceBehavior.NONE;
     }
 }

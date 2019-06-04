@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.Icons;
@@ -11,9 +10,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.gui.widgets.WidgetBase;
-import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
+import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -22,39 +19,40 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 
-public class WidgetMaterialListEntry extends WidgetBase
+public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialListEntry>
 {
     private static final String[] HEADERS = new String[] {
-            "litematica.gui.label.material_list.item",
-            "litematica.gui.label.material_list.total",
-            "litematica.gui.label.material_list.missing",
-            "litematica.gui.label.material_list.available" };
+            "litematica.gui.label.material_list.title.item",
+            "litematica.gui.label.material_list.title.total",
+            "litematica.gui.label.material_list.title.missing",
+            "litematica.gui.label.material_list.title.available" };
     private static int maxNameLength;
-    private static int maxCountLength;
+    private static int maxCountLength1;
+    private static int maxCountLength2;
+    private static int maxCountLength3;
 
     private final MaterialListBase materialList;
     private final WidgetListMaterialList listWidget;
-    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     @Nullable private final MaterialListEntry entry;
     @Nullable private final String header1;
     @Nullable private final String header2;
     @Nullable private final String header3;
     @Nullable private final String header4;
-    private final Minecraft mc;
+    private final String shulkerBoxAbbr;
     private final boolean isOdd;
 
-    public WidgetMaterialListEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            MaterialListBase materialList, @Nullable MaterialListEntry entry, WidgetListMaterialList listWidget)
+    public WidgetMaterialListEntry(int x, int y, int width, int height, boolean isOdd,
+            MaterialListBase materialList, @Nullable MaterialListEntry entry, int listIndex, WidgetListMaterialList listWidget)
     {
-        super(x, y, width, height, zLevel);
+        super(x, y, width, height, entry, listIndex);
 
-        this.mc = Minecraft.getInstance();
+        this.columnCount = 4;
         this.entry = entry;
         this.isOdd = isOdd;
         this.listWidget = listWidget;
         this.materialList = materialList;
+        this.shulkerBoxAbbr = I18n.format("litematica.gui.label.material_list.abbr.shulker_box");
 
         if (this.entry != null)
         {
@@ -62,9 +60,6 @@ public class WidgetMaterialListEntry extends WidgetBase
             this.header2 = null;
             this.header3 = null;
             this.header4 = null;
-
-            FontRenderer font = this.mc.fontRenderer;
-            maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName().getString()));
         }
         else
         {
@@ -85,32 +80,30 @@ public class WidgetMaterialListEntry extends WidgetBase
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
         String label = I18n.format(type.getTranslationKey());
-        int len = this.mc.fontRenderer.getStringWidth(label) + 10;
+        int len = this.getStringWidth(label) + 10;
         xRight -= (len + 2);
-        this.addButton(new ButtonGeneric(0, xRight, y, len, 20, label), new ButtonListener(type, this.materialList, this.entry, this.listWidget));
+        this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this.materialList, this.entry, this.listWidget));
 
         return xRight;
     }
 
-    private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
-    {
-        this.buttons.add(new ButtonWrapper<>(button, listener));
-    }
-
-    public static void setMaxNameLength(List<MaterialListEntry> materials, Minecraft mc)
+    public static void setMaxNameLength(List<MaterialListEntry> materials, int multiplier, Minecraft mc)
     {
         FontRenderer font = mc.fontRenderer;
-        maxNameLength = 60;
-        maxCountLength = 7 * font.getStringWidth("8");
+        maxNameLength = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[0]) + GuiBase.TXT_RST);
+        maxCountLength1 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[1]) + GuiBase.TXT_RST);
+        maxCountLength2 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[2]) + GuiBase.TXT_RST);
+        maxCountLength3 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[3]) + GuiBase.TXT_RST);
 
         for (MaterialListEntry entry : materials)
         {
-            maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName().getString()));
-        }
+            int countTotal = entry.getCountTotal() * multiplier;
+            int countMissing = multiplier == 1 ? entry.getCountMissing() : countTotal;
 
-        for (int i = 0; i < HEADERS.length; ++i)
-        {
-            maxCountLength = Math.max(maxCountLength, font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[i]) + GuiBase.TXT_RST));
+            maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName().getString()));
+            maxCountLength1 = Math.max(maxCountLength1, font.getStringWidth(String.valueOf(countTotal)));
+            maxCountLength2 = Math.max(maxCountLength2, font.getStringWidth(String.valueOf(countMissing)));
+            maxCountLength3 = Math.max(maxCountLength3, font.getStringWidth(String.valueOf(entry.getCountAvailable())));
         }
     }
 
@@ -120,31 +113,25 @@ public class WidgetMaterialListEntry extends WidgetBase
         return false;
     }
 
-    private int getMouseOverColumn(int mouseX, int mouseY)
+    @Override
+    protected int getCurrentSortColumn()
     {
-        int x1 = this.getColumnPosX(0);
-        int xEnd = this.getColumnPosX(4);
-
-        if (mouseY >= this.y && mouseY <= this.y + this.height && mouseX >= x1 && mouseX < xEnd)
-        {
-            for (int column = 1; column <= 4; ++column)
-            {
-                if (mouseX < this.getColumnPosX(column))
-                {
-                    return column - 1;
-                }
-            }
-        }
-
-        return -1;
+        return this.materialList.getSortCriteria().ordinal();
     }
 
-    private int getColumnPosX(int column)
+    @Override
+    protected boolean getSortInReverse()
+    {
+        return this.materialList.getSortInReverse();
+    }
+
+    @Override
+    protected int getColumnPosX(int column)
     {
         int x1 = this.x + 4;
         int x2 = x1 + maxNameLength + 40; // item icon plus offset
-        int x3 = x2 + maxCountLength + 20;
-        int x4 = x3 + maxCountLength + 20;
+        int x3 = x2 + maxCountLength1 + 20;
+        int x4 = x3 + maxCountLength2 + 20;
 
         switch (column)
         {
@@ -152,7 +139,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             case 1: return x2;
             case 2: return x3;
             case 3: return x4;
-            case 4: return x4 + maxCountLength + 20;
+            case 4: return x4 + maxCountLength3 + 20;
             default: return x1;
         }
     }
@@ -160,13 +147,9 @@ public class WidgetMaterialListEntry extends WidgetBase
     @Override
     protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
     {
-        for (ButtonWrapper<?> entry : this.buttons)
+        if (super.onMouseClickedImpl(mouseX, mouseY, mouseButton))
         {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return true;
-            }
+            return true;
         }
 
         if (this.entry != null)
@@ -218,7 +201,6 @@ public class WidgetMaterialListEntry extends WidgetBase
             GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
         }
 
-        Minecraft mc = this.mc;
         int x1 = this.getColumnPosX(0);
         int x2 = this.getColumnPosX(1);
         int x3 = this.getColumnPosX(2);
@@ -228,27 +210,14 @@ public class WidgetMaterialListEntry extends WidgetBase
 
         if (this.header1 != null)
         {
-            mc.fontRenderer.drawString(this.header1, x1, y, color);
-            mc.fontRenderer.drawString(this.header2, x2, y, color);
-            mc.fontRenderer.drawString(this.header3, x3, y, color);
-            mc.fontRenderer.drawString(this.header4, x4, y, color);
-
-            int mouseOverColumn = this.getMouseOverColumn(mouseX, mouseY);
-            int sortColumn = this.getCurrentSortColumn();
-            boolean reverse = this.materialList.getSortInReverse();
-            int iconX = this.getColumnPosX(sortColumn + 1) - 21; // align to the right edge
-
-            IGuiIcon icon = reverse ? Icons.ARROW_UP : Icons.ARROW_DOWN;
-            this.mc.getTextureManager().bindTexture(icon.getTexture());
-            icon.renderAt(iconX, this.y + 3, this.zLevel, true, sortColumn == mouseOverColumn);
-
-            for (int i = 0; i < 4; ++i)
+            if (this.listWidget.getSearchBarWidget().isSearchOpen() == false)
             {
-                int outlineColor = mouseOverColumn == i ? 0xFFFFFFFF : 0xC0707070;
-                int xStart = this.getColumnPosX(i);
-                int xEnd = this.getColumnPosX(i + 1);
+                this.drawString(this.header1, x1, y, color);
+                this.drawString(this.header2, x2, y, color);
+                this.drawString(this.header3, x3, y, color);
+                this.drawString(this.header4, x4, y, color);
 
-                RenderUtils.drawOutline(xStart - 3, this.y + 1, xEnd - xStart - 2, this.height - 2, outlineColor);
+                this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
             }
         }
         else if (this.entry != null)
@@ -257,11 +226,19 @@ public class WidgetMaterialListEntry extends WidgetBase
             int countTotal = this.entry.getCountTotal() * multiplier;
             int countMissing = multiplier == 1 ? this.entry.getCountMissing() : countTotal;
             int countAvailable = this.entry.getCountAvailable();
-            String pre = countAvailable >= countMissing ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-            mc.fontRenderer.drawString(this.entry.getStack().getDisplayName().getString(), x1 + 20, y, color);
-            mc.fontRenderer.drawString(String.valueOf(countTotal)          , x2, y, color);
-            mc.fontRenderer.drawString(pre + String.valueOf(countMissing)  , x3, y, color);
-            mc.fontRenderer.drawString(pre + String.valueOf(countAvailable), x4, y, color);
+            String green = GuiBase.TXT_GREEN;
+            String gold = GuiBase.TXT_GOLD;
+            String red = GuiBase.TXT_RED;
+            String pre;
+            this.drawString(this.entry.getStack().getDisplayName().getString(), x1 + 20, y, color);
+
+            this.drawString(String.valueOf(countTotal)          , x2, y, color);
+
+            pre = countMissing == 0 ? green : (countAvailable >= countMissing ? gold : red);
+            this.drawString(pre + String.valueOf(countMissing)  , x3, y, color);
+
+            pre = countAvailable >= countMissing ? green : red;
+            this.drawString(pre + String.valueOf(countAvailable), x4, y, color);
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -270,7 +247,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             //mc.getRenderItem().zLevel -= 110;
             y = this.y + 3;
             Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.entry.getStack(), x1, y);
+            this.mc.getItemRenderer().renderItemAndEffectIntoGUI(this.mc.player, this.entry.getStack(), x1, y);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
             //mc.getRenderItem().zLevel += 110;
 
@@ -278,16 +255,8 @@ public class WidgetMaterialListEntry extends WidgetBase
             RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
 
-            for (int i = 0; i < this.buttons.size(); ++i)
-            {
-                this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-            }
+            super.render(mouseX, mouseY, selected);
         }
-    }
-
-    private int getCurrentSortColumn()
-    {
-        return this.materialList.getSortCriteria().ordinal();
     }
 
     @Override
@@ -298,10 +267,9 @@ public class WidgetMaterialListEntry extends WidgetBase
             GlStateManager.pushMatrix();
             GlStateManager.translatef(0, 0, 200);
 
-            Minecraft mc = this.mc;
-            String header1 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.item");
-            String header2 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.total");
-            String header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.material_list.missing");
+            String header1 = GuiBase.TXT_BOLD + I18n.format(HEADERS[0]);
+            String header2 = GuiBase.TXT_BOLD + I18n.format(HEADERS[1]);
+            String header3 = GuiBase.TXT_BOLD + I18n.format(HEADERS[2]);
 
             ItemStack stack = this.entry.getStack();
             String stackName = stack.getDisplayName().getString();
@@ -311,9 +279,8 @@ public class WidgetMaterialListEntry extends WidgetBase
             String strCountTotal = this.getFormattedCountString(total, stack.getMaxStackSize());
             String strCountMissing = this.getFormattedCountString(missing, stack.getMaxStackSize());
 
-            FontRenderer fr = mc.fontRenderer;
-            int w1 = Math.max(fr.getStringWidth(header1), Math.max(fr.getStringWidth(header2), fr.getStringWidth(header3)));
-            int w2 = Math.max(fr.getStringWidth(stackName) + 20, Math.max(fr.getStringWidth(strCountTotal), fr.getStringWidth(strCountMissing)));
+            int w1 = Math.max(this.getStringWidth(header1)       , Math.max(this.getStringWidth(header2)      , this.getStringWidth(header3)));
+            int w2 = Math.max(this.getStringWidth(stackName) + 20, Math.max(this.getStringWidth(strCountTotal), this.getStringWidth(strCountMissing)));
             int totalWidth = w1 + w2 + 60;
 
             int x = mouseX + 10;
@@ -332,16 +299,16 @@ public class WidgetMaterialListEntry extends WidgetBase
             int y1 = y;
             y += 4;
 
-            mc.fontRenderer.drawString(header1,         x1     , y, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(stackName,       x2 + 20, y, 0xFFFFFFFF);
+            this.drawString(header1,         x1     , y, 0xFFFFFFFF);
+            this.drawString(stackName,       x2 + 20, y, 0xFFFFFFFF);
             y += 16;
 
-            mc.fontRenderer.drawString(header2,         x1, y, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(strCountTotal,   x2, y, 0xFFFFFFFF);
+            this.drawString(header2,         x1, y, 0xFFFFFFFF);
+            this.drawString(strCountTotal,   x2, y, 0xFFFFFFFF);
             y += 16;
 
-            mc.fontRenderer.drawString(header3,         x1, y, 0xFFFFFFFF);
-            mc.fontRenderer.drawString(strCountMissing, x2, y, 0xFFFFFFFF);
+            this.drawString(header3,         x1, y, 0xFFFFFFFF);
+            this.drawString(strCountMissing, x2, y, 0xFFFFFFFF);
 
             Gui.drawRect(x2, y1, x2 + 16, y1 + 16, 0x20FFFFFF); // light background for the item
 
@@ -349,7 +316,7 @@ public class WidgetMaterialListEntry extends WidgetBase
             RenderHelper.enableGUIStandardItemLighting();
 
             //mc.getRenderItem().zLevel += 100;
-            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, stack, x2, y1);
+            this.mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, stack, x2, y1);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
             //GlStateManager.disableBlend();
@@ -372,16 +339,16 @@ public class WidgetMaterialListEntry extends WidgetBase
             {
                 if (remainder > 0)
                 {
-                    strCount = String.format("%d = %d x %d + %d = %.2f SB", total, stacks, maxStackSize, remainder, boxCount);
+                    strCount = String.format("%d = %d x %d + %d = %.2f %s", total, stacks, maxStackSize, remainder, boxCount, this.shulkerBoxAbbr);
                 }
                 else
                 {
-                    strCount = String.format("%d = %d x %d = %.2f SB", total, stacks, maxStackSize, boxCount);
+                    strCount = String.format("%d = %d x %d = %.2f %s", total, stacks, maxStackSize, boxCount, this.shulkerBoxAbbr);
                 }
             }
             else
             {
-                strCount = String.format("%d = %.2f SB", total, boxCount);
+                strCount = String.format("%d = %.2f %s", total, boxCount, this.shulkerBoxAbbr);
             }
         }
         else
@@ -392,7 +359,7 @@ public class WidgetMaterialListEntry extends WidgetBase
         return strCount;
     }
 
-    static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    static class ButtonListener implements IButtonActionListener
     {
         private final ButtonType type;
         private final MaterialListBase materialList;
@@ -408,19 +375,13 @@ public class WidgetMaterialListEntry extends WidgetBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == ButtonType.IGNORE)
             {
                 this.materialList.ignoreEntry(this.entry);
                 this.listWidget.refreshEntries();
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum ButtonType

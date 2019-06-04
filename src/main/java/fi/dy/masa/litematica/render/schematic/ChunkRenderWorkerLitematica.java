@@ -10,7 +10,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import fi.dy.masa.litematica.Litematica;
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.crash.CrashReport;
@@ -147,7 +147,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                     }
                 }
 
-                for (OverlayType type : OverlayType.values())
+                for (OverlayRenderType type : OverlayRenderType.values())
                 {
                     if (compiledChunk.isOverlayTypeEmpty(type) == false)
                     {
@@ -162,11 +162,11 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 BufferBuilder buffer = buffers.getWorldRendererByLayer(BlockRenderLayer.TRANSLUCENT);
                 futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
 
-                if (compiledChunk.isOverlayTypeEmpty(OverlayType.QUAD) == false)
+                if (compiledChunk.isOverlayTypeEmpty(OverlayRenderType.QUAD) == false)
                 {
                     //if (GuiScreen.isCtrlKeyDown()) System.out.printf("RESORT_TRANSPARENCY pre uploadChunkOverlay()\n");
-                    buffer = buffers.getOverlayBuffer(OverlayType.QUAD);
-                    futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(OverlayType.QUAD, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
+                    buffer = buffers.getOverlayBuffer(OverlayRenderType.QUAD);
+                    futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(OverlayRenderType.QUAD, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                 }
             }
 

@@ -1,11 +1,20 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListSorter;
+import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.IRegistry;
 
 public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
 {
@@ -21,10 +30,12 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
 
         this.browserEntryHeight = 22;
         this.gui = parent;
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.RIGHT);
+        this.widgetSearchBar.setZLevel(1);
         this.sorter = new MaterialListSorter(parent.getMaterialList());
+        this.shouldSortList = true;
 
         this.setParent(parent);
-        this.refreshData();
     }
 
     @Override
@@ -41,36 +52,51 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
         lastScrollbarPosition = this.scrollBar.getValue();
     }
 
-    public void refreshData()
-    {
-        this.listContents.clear();
-        this.listContents.addAll(this.gui.getMaterialList().getMaterialsFiltered(true));
-        Collections.sort(this.listContents, this.sorter);
-    }
-
     @Override
-    protected int createAndAddHeaderWidget(int x, int y, int listIndexStart, int usableHeight, int usedHeight)
+    protected WidgetMaterialListEntry createHeaderWidget(int x, int y, int listIndexStart, int usableHeight, int usedHeight)
     {
-        listIndexStart++;
-        WidgetMaterialListEntry widget = this.createListEntryWidget(x, y, listIndexStart, true, null);
-        int height = widget.getHeight();
+        int height = this.browserEntryHeight;
 
         if ((usedHeight + height) > usableHeight)
         {
-            return -1;
+            return null;
         }
 
-        this.listWidgets.add(widget);
-        this.maxVisibleBrowserEntries++;
-
-        return height;
+        return this.createListEntryWidget(x, y, listIndexStart, true, null);
     }
 
     @Override
-    public void refreshEntries()
+    protected Collection<MaterialListEntry> getAllEntries()
     {
-        this.refreshData();
-        this.reCreateListEntryWidgets();
+        return this.gui.getMaterialList().getMaterialsFiltered(true);
+    }
+
+    @Override
+    protected Comparator<MaterialListEntry> getComparator()
+    {
+        return this.sorter;
+    }
+
+    @Override
+    protected List<String> getEntryStringsForFilter(MaterialListEntry entry)
+    {
+        ItemStack stack = entry.getStack();
+        ResourceLocation rl = IRegistry.ITEM.getKey(stack.getItem());
+
+        if (rl != null)
+        {
+            return ImmutableList.of(stack.getDisplayName().getString().toLowerCase(), rl.toString().toLowerCase());
+        }
+        else
+        {
+            return ImmutableList.of(stack.getDisplayName().getString().toLowerCase());
+        }
+    }
+
+    @Override
+    protected void refreshBrowserEntries()
+    {
+        super.refreshBrowserEntries();
 
         if (this.scrollbarRestored == false && lastScrollbarPosition <= this.scrollBar.getMaxValue())
         {
@@ -85,6 +111,6 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     protected WidgetMaterialListEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, @Nullable MaterialListEntry entry)
     {
         return new WidgetMaterialListEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                this.zLevel, isOdd, this.gui.getMaterialList(), entry, this);
+                isOdd, this.gui.getMaterialList(), entry, listIndex, this);
     }
 }

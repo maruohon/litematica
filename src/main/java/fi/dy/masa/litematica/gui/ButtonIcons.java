@@ -7,11 +7,15 @@ import net.minecraft.util.ResourceLocation;
 
 public enum ButtonIcons implements IGuiIcon
 {
+    AREA_EDITOR             (102,  70, 14, 14),
     AREA_SELECTION          (102,   0, 14, 14),
+    CONFIGURATION           (102,  84, 14, 14),
     LOADED_SCHEMATICS       (102,  14, 14, 14),
     SCHEMATIC_BROWSER       (102,  28, 14, 14),
     SCHEMATIC_MANAGER       (102,  56, 14, 14),
-    SCHEMATIC_PLACEMENTS    (102,  42, 14, 14);
+    SCHEMATIC_PLACEMENTS    (102,  42, 14, 14),
+    SCHEMATIC_PROJECTS      (102,  98, 14, 14),
+    TASK_MANAGER            (102, 112, 14, 14),;
 
     public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 

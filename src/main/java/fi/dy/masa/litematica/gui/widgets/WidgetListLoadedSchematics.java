@@ -1,44 +1,56 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import java.util.Collection;
+import java.util.List;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.util.FileUtils;
 
 public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchematic, WidgetSchematicEntry>
 {
-    private final IMessageConsumer messageConsumer;
-
     public WidgetListLoadedSchematics(int x, int y, int width, int height,
-            IMessageConsumer messageConsumer, @Nullable ISelectionListener<LitematicaSchematic> selectionListener)
+            @Nullable ISelectionListener<LitematicaSchematic> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
-        this.messageConsumer = messageConsumer;
         this.browserEntryHeight = 22;
-    }
-
-    public IMessageConsumer getMessageConsumer()
-    {
-        return this.messageConsumer;
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
+        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
     }
 
     @Override
-    public void refreshEntries()
+    protected Collection<LitematicaSchematic> getAllEntries()
     {
-        this.listContents.clear();
+        return SchematicHolder.getInstance().getAllSchematics();
+    }
 
-        SchematicHolder holder = SchematicHolder.getInstance();
-        this.listContents.addAll(holder.getAllSchematics());
+    @Override
+    protected List<String> getEntryStringsForFilter(LitematicaSchematic entry)
+    {
+        String metaName = entry.getMetadata().getName().toLowerCase();
 
-        this.reCreateListEntryWidgets();
+        if (entry.getFile() != null)
+        {
+            String fileName = FileUtils.getNameWithoutExtension(entry.getFile().getName().toLowerCase());
+            return ImmutableList.of(metaName, fileName);
+        }
+        else
+        {
+            return ImmutableList.of(metaName);
+        }
     }
 
     @Override
     protected WidgetSchematicEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, LitematicaSchematic entry)
     {
-        return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd, entry, this, this.mc);
+        return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
+                isOdd, entry, listIndex, this);
     }
 }

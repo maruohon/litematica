@@ -5,22 +5,22 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.config.IConfigOptionList;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.GuiConfirmAction;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ConfigButtonOptionList;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.resources.I18n;
@@ -29,11 +29,11 @@ import net.minecraft.util.ScreenShotHelper;
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
     private static PreviewGenerator previewGenerator;
-    private ExportType exportType = ExportType.SCHEMATICA;
+    private ExportType exportType = ExportType.SCHEMATIC;
 
     public GuiSchematicManager()
     {
-        super(10, 40);
+        super(10, 24);
 
         this.title = I18n.format("litematica.gui.title.schematic_manager");
     }
@@ -51,15 +51,25 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     }
 
     @Override
+    protected int getBrowserHeight()
+    {
+        return this.height - 60;
+    }
+
+    @Override
     public void initGui()
     {
         super.initGui();
 
-        int id = 0;
-        int x = 10;
-        int y = this.height - 36;
+        this.createButtons();
+    }
 
-        DirectoryEntry selected = this.getListWidget().getSelectedEntry();
+    private void createButtons()
+    {
+        int x = 10;
+        int y = this.height - 26;
+
+        DirectoryEntry selected = this.getListWidget().getLastSelectedEntry();
 
         if (selected != null)
         {
@@ -67,50 +77,51 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
             if (type == FileType.LITEMATICA_SCHEMATIC)
             {
-                x = this.createButton(id++, x, y, ButtonListener.Type.RENAME_SCHEMATIC);
-                x = this.createButton(id++, x, y, ButtonListener.Type.SET_PREVIEW);
-                x = this.createButton(id++, x, y, ButtonListener.Type.EXPORT_SCHEMATIC);
-                x = this.createButton(id++, x, y, ButtonListener.Type.EXPORT_TYPE);
+                x = this.createButton(x, y, ButtonListener.Type.RENAME_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.SET_PREVIEW);
+                x = this.createButton(x, y, ButtonListener.Type.EXPORT_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.EXPORT_TYPE);
+                x = this.createButton(x, y, ButtonListener.Type.DELETE_SCHEMATIC);
             }
             else if (type == FileType.SCHEMATICA_SCHEMATIC || type == FileType.VANILLA_STRUCTURE)
             {
-                x = this.createButton(id++, x, y, ButtonListener.Type.IMPORT_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.IMPORT_SCHEMATIC);
+                x = this.createButton(x, y, ButtonListener.Type.DELETE_SCHEMATIC);
             }
         }
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         String label = I18n.format(type.getLabelKey());
-        int buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
-        this.addButton(new ButtonGeneric(id++, this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
+        int buttonWidth = this.getStringWidth(label) + 20;
+        this.addButton(new ButtonGeneric(this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
     }
 
     @Override
     public void onSelectionChange(@Nullable DirectoryEntry entry)
     {
-        this.initGui();
+        this.clearButtons();
+        this.createButtons();
     }
 
-    private int createButton(int id, int x, int y, ButtonListener.Type type)
+    private int createButton(int x, int y, ButtonListener.Type type)
     {
         String label = type.getLabel();
         String hover = type.getHoverText();
-        int buttonWidth = this.mc.fontRenderer.getStringWidth(label) + 10;
+        int buttonWidth = this.getStringWidth(label) + 10;
         ButtonGeneric button;
 
         if (type == ButtonListener.Type.EXPORT_TYPE)
         {
-            int w1 = this.mc.fontRenderer.getStringWidth(ExportType.SCHEMATICA.getDisplayName()) + 10;
-            int w2 = this.mc.fontRenderer.getStringWidth(ExportType.VANILLA.getDisplayName()) + 10;
-            buttonWidth = Math.max(w1, w2);
-            button = new ConfigButtonOptionList(id, x, y, buttonWidth, 20, new ConfigWrapper());
+            buttonWidth = this.getStringWidth(this.exportType.getDisplayName()) + 10;
+            button = new ConfigButtonOptionList(x, y, buttonWidth, 20, new ConfigWrapper());
         }
         else if (hover != null)
         {
-            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label, hover);
+            button = new ButtonGeneric(x, y, buttonWidth, 20, label, hover);
         }
         else
         {
-            button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+            button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         }
 
         this.addButton(button, new ButtonListener(type, this));
@@ -136,6 +147,11 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         return false;
     }
 
+    public static boolean hasPendingPreviewTask()
+    {
+        return previewGenerator != null;
+    }
+
     private class ConfigWrapper implements IConfigOptionList
     {
         @Override
@@ -147,17 +163,19 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         @Override
         public IConfigOptionListEntry getDefaultOptionListValue()
         {
-            return ExportType.SCHEMATICA;
+            return ExportType.SCHEMATIC;
         }
 
         @Override
         public void setOptionListValue(IConfigOptionListEntry value)
         {
             GuiSchematicManager.this.exportType = (ExportType) value;
+            GuiSchematicManager.this.clearButtons();
+            GuiSchematicManager.this.createButtons();
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final Type type;
         private final GuiSchematicManager gui;
@@ -169,9 +187,20 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            DirectoryEntry entry = this.gui.getListWidget().getSelectedEntry();
+            if (this.type == Type.SET_PREVIEW && mouseButton == 1)
+            {
+                if (previewGenerator != null)
+                {
+                    previewGenerator = null;
+                    this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_preview_cancelled");
+                }
+
+                return;
+            }
+
+            DirectoryEntry entry = this.gui.getListWidget().getLastSelectedEntry();
 
             if (entry == null)
             {
@@ -193,6 +222,9 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             {
                 if (fileType == FileType.LITEMATICA_SCHEMATIC)
                 {
+                    GuiSchematicSaveExported gui = new GuiSchematicSaveExported(entry.getType(), entry.getDirectory(), entry.getName(), this.gui.exportType);
+                    gui.setParent(this.gui);
+                    this.gui.mc.displayGuiScreen(gui);
                 }
                 else
                 {
@@ -215,28 +247,20 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else if (this.type == Type.RENAME_SCHEMATIC)
             {
-                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this.gui);
+                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
                 String oldName = schematic != null ? schematic.getMetadata().getName() : "";
                 this.gui.mc.displayGuiScreen(new GuiTextInputFeedback(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), this.gui)));
+            }
+            else if (this.type == Type.DELETE_SCHEMATIC)
+            {
+                FileDeleter deleter = new FileDeleter(entry.getFullPath());
+                this.gui.mc.displayGuiScreen(new GuiConfirmAction(400, "litematica.gui.title.confirm_file_deletion", deleter, this.gui, "litematica.gui.message.confirm_file_deletion", entry.getName()));
             }
             else if (this.type == Type.SET_PREVIEW)
             {
                 previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
                 this.gui.mc.displayGuiScreen(null);
-                StringUtils.printActionbarMessage("litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot");
-            }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            if (this.type == Type.SET_PREVIEW && mouseButton == 1)
-            {
-                previewGenerator = null;
-            }
-            else
-            {
-                this.actionPerformed(control);
+                InfoUtils.showGuiAndInGameMessage(MessageType.INFO, "litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot");
             }
         }
 
@@ -245,6 +269,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             IMPORT_SCHEMATIC            ("litematica.gui.button.import"),
             EXPORT_SCHEMATIC            ("litematica.gui.button.schematic_manager.export_as"),
             RENAME_SCHEMATIC            ("litematica.gui.button.rename"),
+            DELETE_SCHEMATIC            ("litematica.gui.button.delete"),
             SET_PREVIEW                 ("litematica.gui.button.set_preview", "litematica.info.schematic_manager.preview.right_click_to_cancel"),
             EXPORT_TYPE                 ("");
 
@@ -292,14 +317,14 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         @Override
         public boolean setString(String string)
         {
-            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName, this.gui);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName);
 
             if (schematic != null)
             {
                 schematic.getMetadata().setName(string);
                 schematic.getMetadata().setTimeModified(System.currentTimeMillis());
 
-                if (schematic.writeToFile(this.dir, this.fileName, true, this.gui))
+                if (schematic.writeToFile(this.dir, this.fileName, true))
                 {
                     this.gui.getListWidget().clearSchematicMetadataCache();
                     return true;
@@ -308,6 +333,38 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             else
             {
                 this.gui.setString(I18n.format("litematica.error.schematic_rename.read_failed"));
+            }
+
+            return false;
+        }
+    }
+
+    public static class FileDeleter implements IConfirmationListener
+    {
+        protected final File file;
+
+        public FileDeleter(File file)
+        {
+           this.file = file;
+        }
+
+        @Override
+        public boolean onActionCancelled()
+        {
+            return false;
+        }
+
+        @Override
+        public boolean onActionConfirmed()
+        {
+            try
+            {
+                this.file.delete();
+                return true;
+            }
+            catch (Exception e)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.failed_to_delete_file", file.getAbsolutePath());
             }
 
             return false;
@@ -327,7 +384,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
         public void createAndSetPreviewImage()
         {
-            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName, InfoUtils.INFO_MESSAGE_CONSUMER);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(this.dir, this.fileName);
 
             if (schematic != null)
             {
@@ -349,9 +406,9 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                     schematic.getMetadata().setPreviewImagePixelData(pixels);
                     schematic.getMetadata().setTimeModified(System.currentTimeMillis());
 
-                    schematic.writeToFile(this.dir, this.fileName, true, InfoUtils.INFO_MESSAGE_CONSUMER);
+                    schematic.writeToFile(this.dir, this.fileName, true);
 
-                    InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiBase.TXT_GREEN + I18n.format("litematica.info.schematic_manager.preview.success"));
+                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
                 }
                 catch (Exception e)
                 {
@@ -360,15 +417,15 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else
             {
-                InfoUtils.INFO_MESSAGE_CONSUMER.setString(GuiBase.TXT_RED + I18n.format("litematica.error.schematic_rename.read_failed"));
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
             }
         }
     }
 
     public enum ExportType implements IConfigOptionListEntry
     {
-        SCHEMATICA  ("Schematica"),
-        VANILLA     ("Vanilla");
+        SCHEMATIC   ("Schematic"),
+        VANILLA     ("Vanilla Structure");
 
         private final String displayName;
 
@@ -428,7 +485,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 }
             }
 
-            return ExportType.SCHEMATICA;
+            return ExportType.SCHEMATIC;
         }
     }
 }

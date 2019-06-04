@@ -11,12 +11,14 @@ import com.google.common.collect.Sets;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
-import fi.dy.masa.litematica.mixin.IMixinRenderChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
-import fi.dy.masa.litematica.util.LayerRange;
-import fi.dy.masa.litematica.util.SubChunkPos;
+import fi.dy.masa.litematica.util.OverlayType;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -30,11 +32,14 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.fluid.IFluidState;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -43,15 +48,18 @@ public class RenderChunkSchematicVbo extends RenderChunk
     public static int schematicRenderChunksUpdated;
 
     private final WorldRendererSchematic worldRenderer;
-    private final VertexBufferSchematic[] vertexBufferOverlay = new VertexBufferSchematic[OverlayType.values().length];
+    private final VertexBuffer[] vertexBufferOverlay = new VertexBuffer[OverlayRenderType.values().length];
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private final List<MutableBoundingBox> boxes = new ArrayList<>();
-    private final EnumSet<OverlayType> existingOverlays = EnumSet.noneOf(OverlayType.class);
+    private final EnumSet<OverlayRenderType> existingOverlays = EnumSet.noneOf(OverlayRenderType.class);
     private boolean hasOverlay = false;
     private ChunkRenderTaskSchematic compileTask;
 
     private ChunkCacheSchematic schematicWorldView;
     private ChunkCacheSchematic clientWorldView;
+
+    private CompiledChunkSchematic compiledChunk;
+    private Color4f overlayColor;
 
     public RenderChunkSchematicVbo(World worldIn, WorldRenderer renderGlobalIn)
     {
@@ -61,22 +69,9 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
         if (OpenGlHelper.useVbo())
         {
-            // Delete the vanilla buffers and re-create them using our overridden class
-            VertexBuffer[] buffers = ((IMixinRenderChunk) this).getVertexBuffers();
-
-            for (int i = 0; i < buffers.length; ++i)
+            for (int i = 0; i < OverlayRenderType.values().length; ++i)
             {
-                if (buffers[i] != null)
-                {
-                    buffers[i].deleteGlBuffers();
-                }
-
-                buffers[i] = new VertexBufferSchematic(DefaultVertexFormats.BLOCK);
-            }
-
-            for (int i = 0; i < OverlayType.values().length; ++i)
-            {
-                this.vertexBufferOverlay[i] = new VertexBufferSchematic(DefaultVertexFormats.POSITION_COLOR);
+                this.vertexBufferOverlay[i] = new VertexBuffer(DefaultVertexFormats.POSITION_COLOR);
             }
         }
     }
@@ -86,12 +81,12 @@ public class RenderChunkSchematicVbo extends RenderChunk
         return this.hasOverlay;
     }
 
-    public EnumSet<OverlayType> getOverlayTypes()
+    public EnumSet<OverlayRenderType> getOverlayTypes()
     {
         return this.existingOverlays;
     }
 
-    public VertexBufferSchematic getOverlayVertexBuffer(OverlayType type)
+    public VertexBuffer getOverlayVertexBuffer(OverlayRenderType type)
     {
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("getOverlayVertexBuffer: type: %s, buf: %s\n", type, this.vertexBufferOverlay[type.ordinal()]);
         return this.vertexBufferOverlay[type.ordinal()];
@@ -143,9 +138,9 @@ public class RenderChunkSchematicVbo extends RenderChunk
         }
 
         //if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparency\n");
-        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue())
+        if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue())
         {
-            OverlayType type = OverlayType.QUAD;
+            OverlayRenderType type = OverlayRenderType.QUAD;
             bufferState = compiledChunk.getOverlayBufferState(type);
 
             if (bufferState != null && compiledChunk.isOverlayTypeEmpty(type) == false)
@@ -161,7 +156,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
     public void rebuildChunk(float x, float y, float z, ChunkRenderTaskSchematic generator)
     {
-        CompiledChunkSchematic compiledChunk = new CompiledChunkSchematic();
+        this.compiledChunk = new CompiledChunkSchematic();
         generator.getLock().lock();
 
         try
@@ -171,7 +166,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 return;
             }
 
-            generator.setCompiledChunk(compiledChunk);
+            generator.setCompiledChunk(this.compiledChunk);
         }
         finally
         {
@@ -188,213 +183,60 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
         synchronized (this.boxes)
         {
-            if (this.schematicWorldView.isEmpty() == false && this.boxes.isEmpty() == false &&
-                    range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
+            if (this.boxes.isEmpty() == false &&
+                (this.schematicWorldView.isEmpty() == false || this.clientWorldView.isEmpty() == false) &&
+                 range.intersects(new SubChunkPos(posChunk.getX() >> 4, posChunk.getY() >> 4, posChunk.getZ() >> 4)))
+            {
+                ++schematicRenderChunksUpdated;
+
+                boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
+                BufferBuilderCache buffers = generator.getBufferCache();
+
+                for (MutableBoundingBox box : this.boxes)
                 {
-                    ++schematicRenderChunksUpdated;
+                    box = range.getClampedRenderBoundingBox(box);
 
-                    final boolean renderColliding = Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue();
-                    final boolean translucent = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
-                    final boolean overlayEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_ENABLED.getBooleanValue();
-                    final boolean overlayOutlinesEnabled = overlayEnabled && Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue();
-                    final boolean overlaySidesEnabled = overlayEnabled && Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue();
-                    final boolean overlayOutlinesModel = Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue();
-                    final boolean overlaySidesModel = Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.getBooleanValue();
-                    final boolean overlayTypeMissing = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_MISSING.getBooleanValue();
-                    final boolean overlayTypeExtra = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_EXTRA.getBooleanValue();
-                    final boolean overlayTypeWrongBlock = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK.getBooleanValue();
-                    final boolean overlayTypeWrongState = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_STATE.getBooleanValue();
-                    final Color4f colorMissing = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
-                    final Color4f colorExtra = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_EXTRA.getColor();
-                    final Color4f colorWrongBlock = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK.getColor();
-                    final Color4f colorWrongState = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_STATE.getColor();
-                    boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
-                    BufferBuilderCache buffers = generator.getBufferCache();
-                    BufferBuilder bufferOverlayOutlines = buffers.getOverlayBuffer(OverlayType.OUTLINE);
-                    BufferBuilder bufferOverlayQuads    = buffers.getOverlayBuffer(OverlayType.QUAD);
-
-                    for (MutableBoundingBox box : this.boxes)
+                    // The rendered layer(s) don't intersect this sub-volume
+                    if (box == null)
                     {
-                        box = range.getClampedRenderBoundingBox(box);
-
-                        // The rendered layer(s) don't intersect this sub-volume
-                        if (box == null)
-                        {
-                            continue;
-                        }
-
-                        BlockPos posFrom = new BlockPos(box.minX, box.minY, box.minZ);
-                        BlockPos posTo   = new BlockPos(box.maxX, box.maxY, box.maxZ);
-
-                        for (BlockPos.MutableBlockPos posMutable : BlockPos.getAllInBoxMutable(posFrom, posTo))
-                        {
-                            IBlockState stateSchematic = this.schematicWorldView.getBlockState(posMutable);
-                            IBlockState stateClient    = this.clientWorldView.getBlockState(posMutable);
-                            Block blockSchematic = stateSchematic.getBlock();
-                            Block blockClient = stateClient.getBlock();
-                            Color4f overlayColor = null;
-                            boolean clientHasAir = stateClient.isAir();
-                            boolean schematicHasAir = stateSchematic.isAir();
-                            boolean missing = false;
-
-                            if (clientHasAir && schematicHasAir)
-                            {
-                                continue;
-                            }
-
-                            // Schematic has a block, client has air
-                            if (clientHasAir || (renderColliding && stateSchematic != stateClient))
-                            {
-                                if (blockSchematic.hasTileEntity())
-                                {
-                                    this.addTileEntity(posMutable, compiledChunk, tileEntities);
-                                }
-
-                                // TODO change when the fluids become separate
-                                IFluidState fluidState = stateSchematic.getFluidState();
-
-                                if (fluidState.isEmpty() == false)
-                                {
-                                    BlockRenderLayer layer = fluidState.getRenderLayer();
-                                    int layerIndex = layer.ordinal();
-                                    BufferBuilder bufferSchematic = buffers.getWorldRendererByLayerId(layerIndex);
-
-                                    if (compiledChunk.isLayerStarted(layer) == false)
-                                    {
-                                        compiledChunk.setLayerStarted(layer);
-                                        this.preRenderBlocks(bufferSchematic, this.getPosition());
-                                    }
-
-                                    usedLayers[layerIndex] |= this.worldRenderer.renderFluid(fluidState, posMutable, this.schematicWorldView, bufferSchematic);
-                                }
-
-                                if (stateSchematic.getRenderType() != EnumBlockRenderType.INVISIBLE)
-                                {
-                                    BlockRenderLayer layer = translucent ? BlockRenderLayer.TRANSLUCENT : blockSchematic.getRenderLayer();
-                                    int layerIndex = layer.ordinal();
-                                    BufferBuilder bufferSchematic = buffers.getWorldRendererByLayerId(layerIndex);
-
-                                    if (compiledChunk.isLayerStarted(layer) == false)
-                                    {
-                                        compiledChunk.setLayerStarted(layer);
-                                        this.preRenderBlocks(bufferSchematic, this.getPosition());
-                                    }
-
-                                    usedLayers[layerIndex] |= this.worldRenderer.renderBlock(stateSchematic, posMutable, this.schematicWorldView, bufferSchematic);
-
-                                    if (clientHasAir)
-                                    {
-                                        if (overlayTypeMissing)
-                                        {
-                                            overlayColor = colorMissing;
-                                        }
-
-                                        missing = true;
-                                    }
-                                }
-                            }
-
-                            if (clientHasAir == false && stateSchematic != stateClient)
-                            {
-                                // Extra block
-                                if (schematicHasAir)
-                                {
-                                    if (overlayTypeExtra)
-                                    {
-                                        overlayColor = colorExtra;
-                                    }
-                                }
-                                // Wrong block
-                                else if (blockClient != blockSchematic)
-                                {
-                                    if (overlayTypeWrongBlock)
-                                    {
-                                        overlayColor = colorWrongBlock;
-                                    }
-                                }
-                                // Wrong state
-                                else
-                                {
-                                    if (overlayTypeWrongState)
-                                    {
-                                        overlayColor = colorWrongState;
-                                    }
-                                }
-                            }
-
-                            if (overlayColor != null)
-                            {
-                                if (overlaySidesEnabled)
-                                {
-                                    if (compiledChunk.isOverlayTypeStarted(OverlayType.QUAD) == false)
-                                    {
-                                        compiledChunk.setOverlayTypeStarted(OverlayType.QUAD);
-                                        this.preRenderOverlay(bufferOverlayQuads, OverlayType.QUAD);
-                                    }
-
-                                    // Only render the model-based outlines or sides for missing blocks
-                                    if (missing && overlaySidesModel)
-                                    {
-                                        IBakedModel bakedModel = this.worldRenderer.getModelForState(stateSchematic);
-                                        RenderUtils.drawBlockModelQuadOverlayBatched(bakedModel, stateSchematic, posMutable, overlayColor, 0, bufferOverlayQuads);
-                                    }
-                                    else
-                                    {
-                                        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(posMutable, overlayColor, 0, bufferOverlayQuads);
-                                    }
-                                }
-
-                                if (overlayOutlinesEnabled)
-                                {
-                                    if (compiledChunk.isOverlayTypeStarted(OverlayType.OUTLINE) == false)
-                                    {
-                                        compiledChunk.setOverlayTypeStarted(OverlayType.OUTLINE);
-                                        this.preRenderOverlay(bufferOverlayOutlines, OverlayType.OUTLINE);
-                                    }
-
-                                    overlayColor = new Color4f(overlayColor.r, overlayColor.g, overlayColor.b, 1f);
-
-                                    // Only render the model-based outlines or sides for missing blocks
-                                    if (missing && overlayOutlinesModel)
-                                    {
-                                        IBakedModel bakedModel = this.worldRenderer.getModelForState(stateSchematic);
-                                        RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, posMutable, overlayColor, 0, bufferOverlayOutlines);
-                                    }
-                                    else
-                                    {
-                                        fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(posMutable, overlayColor, 0, bufferOverlayOutlines);
-                                    }
-                                }
-                            }
-                        }
+                        continue;
                     }
 
-                    for (BlockRenderLayer layerTmp : BlockRenderLayer.values())
-                    {
-                        if (usedLayers[layerTmp.ordinal()])
-                        {
-                            ((IMixinCompiledChunk) compiledChunk).invokeSetLayerUsed(layerTmp);
-                        }
+                    BlockPos posFrom = new BlockPos(box.minX, box.minY, box.minZ);
+                    BlockPos posTo   = new BlockPos(box.maxX, box.maxY, box.maxZ);
 
-                        if (compiledChunk.isLayerStarted(layerTmp))
-                        {
-                            this.postRenderBlocks(layerTmp, x, y, z, buffers.getWorldRendererByLayer(layerTmp), compiledChunk);
-                        }
+                    for (BlockPos.MutableBlockPos posMutable : BlockPos.getAllInBoxMutable(posFrom, posTo))
+                    {
+                        this.renderBlocksAndOverlay(posMutable, tileEntities, usedLayers, buffers);
+                    }
+                }
+
+                for (BlockRenderLayer layerTmp : BlockRenderLayer.values())
+                {
+                    if (usedLayers[layerTmp.ordinal()])
+                    {
+                        ((IMixinCompiledChunk) this.compiledChunk).invokeSetLayerUsed(layerTmp);
                     }
 
-                    if (this.hasOverlay)
+                    if (this.compiledChunk.isLayerStarted(layerTmp))
                     {
-                        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
-                        for (OverlayType type : this.existingOverlays)
+                        this.postRenderBlocks(layerTmp, x, y, z, buffers.getWorldRendererByLayer(layerTmp), this.compiledChunk);
+                    }
+                }
+
+                if (this.hasOverlay)
+                {
+                    //if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
+                    for (OverlayRenderType type : this.existingOverlays)
+                    {
+                        if (this.compiledChunk.isOverlayTypeStarted(type))
                         {
-                            if (compiledChunk.isOverlayTypeStarted(type))
-                            {
-                                compiledChunk.setOverlayTypeUsed(type);
-                                this.postRenderOverlay(type, x, y, z, buffers.getOverlayBuffer(type), compiledChunk);
-                            }
+                            this.compiledChunk.setOverlayTypeUsed(type);
+                            this.postRenderOverlay(type, x, y, z, buffers.getOverlayBuffer(type), this.compiledChunk);
                         }
                     }
                 }
+            }
         }
 
         this.getLockCompileTask().lock();
@@ -413,6 +255,371 @@ public class RenderChunkSchematicVbo extends RenderChunk
         {
             this.getLockCompileTask().unlock();
         }
+    }
+
+    protected void renderBlocksAndOverlay(BlockPos pos, Set<TileEntity> tileEntities, boolean[] usedLayers, BufferBuilderCache buffers)
+    {
+        IBlockState stateSchematic = this.schematicWorldView.getBlockState(pos);
+        IBlockState stateClient    = this.clientWorldView.getBlockState(pos);
+        Block blockSchematic = stateSchematic.getBlock();
+        boolean clientHasAir = stateClient.isAir();
+        boolean schematicHasAir = stateSchematic.isAir();
+        boolean missing = false;
+
+        if (clientHasAir && schematicHasAir)
+        {
+            return;
+        }
+
+        this.overlayColor = null;
+
+        // Schematic has a block, client has air
+        if (clientHasAir || (stateSchematic != stateClient && Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue()))
+        {
+            if (blockSchematic.hasTileEntity())
+            {
+                this.addTileEntity(pos, this.compiledChunk, tileEntities);
+            }
+
+            boolean translucent = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
+            // TODO change when the fluids become separate
+            IFluidState fluidState = stateSchematic.getFluidState();
+
+            if (fluidState.isEmpty() == false)
+            {
+                BlockRenderLayer layer = fluidState.getRenderLayer();
+                int layerIndex = layer.ordinal();
+                BufferBuilder bufferSchematic = buffers.getWorldRendererByLayerId(layerIndex);
+
+                if (this.compiledChunk.isLayerStarted(layer) == false)
+                {
+                    this.compiledChunk.setLayerStarted(layer);
+                    this.preRenderBlocks(bufferSchematic, this.getPosition());
+                }
+
+                usedLayers[layerIndex] |= this.worldRenderer.renderFluid(fluidState, pos, this.schematicWorldView, bufferSchematic);
+            }
+
+            if (stateSchematic.getRenderType() != EnumBlockRenderType.INVISIBLE)
+            {
+                BlockRenderLayer layer = translucent ? BlockRenderLayer.TRANSLUCENT : blockSchematic.getRenderLayer();
+                int layerIndex = layer.ordinal();
+                BufferBuilder bufferSchematic = buffers.getWorldRendererByLayerId(layerIndex);
+
+                if (this.compiledChunk.isLayerStarted(layer) == false)
+                {
+                    this.compiledChunk.setLayerStarted(layer);
+                    this.preRenderBlocks(bufferSchematic, this.getPosition());
+                }
+
+                usedLayers[layerIndex] |= this.worldRenderer.renderBlock(stateSchematic, pos, this.schematicWorldView, bufferSchematic);
+
+                if (clientHasAir)
+                {
+                    missing = true;
+                }
+            }
+        }
+
+        if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue())
+        {
+            OverlayType type = this.getOverlayType(stateSchematic, stateClient);
+
+            this.overlayColor = this.getOverlayColor(type);
+
+            if (this.overlayColor != null)
+            {
+                this.renderOverlay(type, pos, stateSchematic, missing, buffers);
+            }
+        }
+    }
+
+    protected void renderOverlay(OverlayType type, BlockPos pos, IBlockState stateSchematic, boolean missing, BufferBuilderCache buffers)
+    {
+        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue())
+        {
+            BufferBuilder bufferOverlayQuads = buffers.getOverlayBuffer(OverlayRenderType.QUAD);
+
+            if (this.compiledChunk.isOverlayTypeStarted(OverlayRenderType.QUAD) == false)
+            {
+                this.compiledChunk.setOverlayTypeStarted(OverlayRenderType.QUAD);
+                this.preRenderOverlay(bufferOverlayQuads, OverlayRenderType.QUAD);
+            }
+
+            if (Configs.Visuals.OVERLAY_REDUCED_INNER_SIDES.getBooleanValue())
+            {
+                BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
+
+                for (int i = 0; i < 6; ++i)
+                {
+                    EnumFacing side = PositionUtils.FACING_ALL[i];
+                    posMutable.setPos(pos.getX() + side.getXOffset(), pos.getY() + side.getYOffset(), pos.getZ() + side.getZOffset());
+                    IBlockState adjStateSchematic = this.schematicWorldView.getBlockState(posMutable);
+                    IBlockState adjStateClient    = this.clientWorldView.getBlockState(posMutable);
+
+                    OverlayType typeAdj = this.getOverlayType(adjStateSchematic, adjStateClient);
+
+                    // Only render the model-based outlines or sides for missing blocks
+                    if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.getBooleanValue())
+                    {
+                        IBakedModel bakedModel = this.worldRenderer.getModelForState(stateSchematic);
+
+                        if (type.getRenderPriority() > typeAdj.getRenderPriority() ||
+                            stateSchematic.getBlockFaceShape(this.schematicWorldView, pos, side) != BlockFaceShape.SOLID)
+                        {
+                            RenderUtils.drawBlockModelQuadOverlayBatched(bakedModel, stateSchematic, pos, side, this.overlayColor, 0, bufferOverlayQuads);
+                        }
+                    }
+                    else
+                    {
+                        if (type.getRenderPriority() > typeAdj.getRenderPriority())
+                        {
+                            RenderUtils.drawBlockBoxSideBatchedQuads(pos, side, this.overlayColor, 0, bufferOverlayQuads);
+                        }
+                    }
+                }
+
+                posMutable.close();
+            }
+            else
+            {
+                // Only render the model-based outlines or sides for missing blocks
+                if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.getBooleanValue())
+                {
+                    IBakedModel bakedModel = this.worldRenderer.getModelForState(stateSchematic);
+                    RenderUtils.drawBlockModelQuadOverlayBatched(bakedModel, stateSchematic, pos, this.overlayColor, 0, bufferOverlayQuads);
+                }
+                else
+                {
+                    fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(pos, this.overlayColor, 0, bufferOverlayQuads);
+                }
+            }
+        }
+
+        if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue())
+        {
+            BufferBuilder bufferOverlayOutlines = buffers.getOverlayBuffer(OverlayRenderType.OUTLINE);
+
+            if (this.compiledChunk.isOverlayTypeStarted(OverlayRenderType.OUTLINE) == false)
+            {
+                this.compiledChunk.setOverlayTypeStarted(OverlayRenderType.OUTLINE);
+                this.preRenderOverlay(bufferOverlayOutlines, OverlayRenderType.OUTLINE);
+            }
+
+            this.overlayColor = new Color4f(this.overlayColor.r, this.overlayColor.g, this.overlayColor.b, 1f);
+
+            if (Configs.Visuals.OVERLAY_REDUCED_INNER_SIDES.getBooleanValue())
+            {
+                OverlayType[][][] adjTypes = new OverlayType[3][3][3];
+                BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
+
+                for (int y = 0; y <= 2; ++y)
+                {
+                    for (int z = 0; z <= 2; ++z)
+                    {
+                        for (int x = 0; x <= 2; ++x)
+                        {
+                            if (x != 1 || y != 1 || z != 1)
+                            {
+                                posMutable.setPos(pos.getX() + x - 1, pos.getY() + y - 1, pos.getZ() + z - 1);
+                                IBlockState adjStateSchematic = this.schematicWorldView.getBlockState(posMutable);
+                                IBlockState adjStateClient    = this.clientWorldView.getBlockState(posMutable);
+                                adjTypes[x][y][z] = this.getOverlayType(adjStateSchematic, adjStateClient);
+                            }
+                            else
+                            {
+                                adjTypes[x][y][z] = type;
+                            }
+                        }
+                    }
+                }
+
+                posMutable.close();
+
+                // Only render the model-based outlines or sides for missing blocks
+                if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue())
+                {
+                    IBakedModel bakedModel = this.worldRenderer.getModelForState(stateSchematic);
+
+                    // FIXME: how to implement this correctly here... >_>
+                    if (stateSchematic.isFullCube())
+                    {
+                        this.renderOverlayReducedEdges(pos, adjTypes, type, bufferOverlayOutlines);
+                    }
+                    else
+                    {
+                        RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, pos, this.overlayColor, 0, bufferOverlayOutlines);
+                    }
+                }
+                else
+                {
+                    this.renderOverlayReducedEdges(pos, adjTypes, type, bufferOverlayOutlines);
+                }
+            }
+            else
+            {
+                // Only render the model-based outlines or sides for missing blocks
+                if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue())
+                {
+                    IBakedModel bakedModel = this.worldRenderer.getModelForState(stateSchematic);
+                    RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, pos, this.overlayColor, 0, bufferOverlayOutlines);
+                }
+                else
+                {
+                    fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(pos, this.overlayColor, 0, bufferOverlayOutlines);
+                }
+            }
+        }
+    }
+
+    protected void renderOverlayReducedEdges(BlockPos pos, OverlayType[][][] adjTypes, OverlayType typeSelf, BufferBuilder bufferOverlayOutlines)
+    {
+        OverlayType[] neighborTypes = new OverlayType[4];
+        Vec3i[] neighborPositions = new Vec3i[4];
+        int lines = 0;
+
+        for (EnumFacing.Axis axis : PositionUtils.AXES_ALL)
+        {
+            for (int corner = 0; corner < 4; ++corner)
+            {
+                Vec3i[] offsets = PositionUtils.getEdgeNeighborOffsets(axis, corner);
+                int index = -1;
+                boolean hasCurrent = false;
+
+                // Find the position(s) around a given edge line that have the shared greatest rendering priority
+                for (int i = 0; i < 4; ++i)
+                {
+                    Vec3i offset = offsets[i];
+                    OverlayType type = adjTypes[offset.getX() + 1][offset.getY() + 1][offset.getZ() + 1];
+
+                    // type NONE
+                    if (type == OverlayType.NONE)
+                    {
+                        continue;
+                    }
+
+                    // First entry, or sharing at least the current highest found priority
+                    if (index == -1 || type.getRenderPriority() >= neighborTypes[index - 1].getRenderPriority())
+                    {
+                        // Actually a new highest priority, add it as the first entry and rewind the index
+                        if (index < 0 || type.getRenderPriority() > neighborTypes[index - 1].getRenderPriority())
+                        {
+                            index = 0;
+                        }
+                        // else: Same priority as a previous entry, append this position
+
+                        //System.out.printf("plop 0 axis: %s, corner: %d, i: %d, index: %d, type: %s\n", axis, corner, i, index, type);
+                        neighborPositions[index] = new Vec3i(pos.getX() + offset.getX(), pos.getY() + offset.getY(), pos.getZ() + offset.getZ());
+                        neighborTypes[index] = type;
+                        // The self position is the first (offset = [0, 0, 0]) in the arrays
+                        hasCurrent |= (i == 0);
+                        ++index;
+                    }
+                }
+
+                //System.out.printf("plop 1 index: %d, pos: %s\n", index, pos);
+                // Found something to render, and the current block is among the highest priority for this edge
+                if (index > 0 && hasCurrent)
+                {
+                    Vec3i posTmp = new Vec3i(pos.getX(), pos.getY(), pos.getZ());
+                    int ind = -1;
+
+                    for (int i = 0; i < index; ++i)
+                    {
+                        Vec3i tmp = neighborPositions[i];
+                        //System.out.printf("posTmp: %s, tmp: %s\n", posTmp, tmp);
+
+                        // Just prioritize the position to render a shared highest priority edge by the coordinates
+                        if (tmp.getX() <= posTmp.getX() && tmp.getY() <= posTmp.getY() && tmp.getZ() <= posTmp.getZ())
+                        {
+                            posTmp = tmp;
+                            ind = i;
+                        }
+                    }
+
+                    // The current position is the one that should render this edge
+                    if (posTmp.getX() == pos.getX() && posTmp.getY() == pos.getY() && posTmp.getZ() == pos.getZ())
+                    {
+                        //System.out.printf("plop 2 index: %d, ind: %d, pos: %s, off: %s\n", index, ind, pos, posTmp);
+                        RenderUtils.drawBlockBoxEdgeBatchedLines(pos, axis, corner, this.overlayColor, bufferOverlayOutlines);
+                        lines++;
+                    }
+                }
+            }
+        }
+        //System.out.printf("typeSelf: %s, pos: %s, lines: %d\n", typeSelf, pos, lines);
+    }
+
+    protected OverlayType getOverlayType(IBlockState stateSchematic, IBlockState stateClient)
+    {
+        if (stateSchematic == stateClient)
+        {
+            return OverlayType.NONE;
+        }
+        else
+        {
+            boolean clientHasAir = stateClient.getBlock() == Blocks.AIR;
+            boolean schematicHasAir = stateSchematic.getBlock() == Blocks.AIR;
+
+            if (schematicHasAir)
+            {
+                return clientHasAir ? OverlayType.NONE : OverlayType.EXTRA;
+            }
+            else
+            {
+                if (clientHasAir)
+                {
+                    return OverlayType.MISSING;
+                }
+                // Wrong block
+                else if (stateSchematic.getBlock() != stateClient.getBlock())
+                {
+                    return OverlayType.WRONG_BLOCK;
+                }
+                // Wrong state
+                else
+                {
+                    return OverlayType.WRONG_STATE;
+                }
+            }
+        }
+    }
+
+    @Nullable
+    protected Color4f getOverlayColor(OverlayType overlayType)
+    {
+        Color4f overlayColor = null;
+
+        switch (overlayType)
+        {
+            case MISSING:
+                if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_MISSING.getBooleanValue())
+                {
+                    overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
+                }
+                break;
+            case EXTRA:
+                if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_EXTRA.getBooleanValue())
+                {
+                    overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_EXTRA.getColor();
+                }
+                break;
+            case WRONG_BLOCK:
+                if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK.getBooleanValue())
+                {
+                    overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK.getColor();
+                }
+                break;
+            case WRONG_STATE:
+                if (Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_STATE.getBooleanValue())
+                {
+                    overlayColor = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_STATE.getColor();
+                }
+                break;
+            default:
+        }
+
+        return overlayColor;
     }
 
     private void addTileEntity(BlockPos pos, CompiledChunk compiledChunk, Set<TileEntity> tileEntities)
@@ -452,7 +659,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         buffer.finishDrawing();
     }
 
-    private void preRenderOverlay(BufferBuilder buffer, OverlayType type)
+    private void preRenderOverlay(BufferBuilder buffer, OverlayRenderType type)
     {
         this.existingOverlays.add(type);
         this.hasOverlay = true;
@@ -469,9 +676,9 @@ public class RenderChunkSchematicVbo extends RenderChunk
         buffer.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
 
-    private void postRenderOverlay(OverlayType type, float x, float y, float z, BufferBuilder buffer, CompiledChunkSchematic compiledChunk)
+    private void postRenderOverlay(OverlayRenderType type, float x, float y, float z, BufferBuilder buffer, CompiledChunkSchematic compiledChunk)
     {
-        if (type == OverlayType.QUAD && compiledChunk.isOverlayTypeEmpty(type) == false)
+        if (type == OverlayRenderType.QUAD && compiledChunk.isOverlayTypeEmpty(type) == false)
         {
             buffer.sortVertexData(x, y, z);
             compiledChunk.setOverlayBufferState(type, buffer.getVertexState());
@@ -561,14 +768,14 @@ public class RenderChunkSchematicVbo extends RenderChunk
         }
     }
 
-    public enum OverlayType
+    public enum OverlayRenderType
     {
         OUTLINE     (GL11.GL_LINES),
         QUAD        (GL11.GL_QUADS);
 
         private final int glMode;
 
-        private OverlayType(int glMode)
+        private OverlayRenderType(int glMode)
         {
             this.glMode = glMode;
         }

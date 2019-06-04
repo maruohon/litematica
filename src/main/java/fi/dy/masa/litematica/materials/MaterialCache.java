@@ -1,4 +1,4 @@
-package fi.dy.masa.litematica.util;
+package fi.dy.masa.litematica.materials;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,15 +6,21 @@ import java.io.FileOutputStream;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockDoor;
+import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.block.BlockFlowerPot;
+import net.minecraft.block.BlockFlowingFluid;
 import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockSnowLayer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
@@ -31,6 +37,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.dimension.DimensionType;
@@ -43,6 +50,7 @@ public class MaterialCache
     protected final WorldSchematic tempWorld;
     protected final BlockPos checkPos;
     protected boolean hasReadFromFile;
+    protected boolean dirty;
 
     private MaterialCache()
     {
@@ -64,26 +72,36 @@ public class MaterialCache
         return INSTANCE;
     }
 
+    public void clearCache()
+    {
+        this.itemsForStates.clear();
+    }
+
     public ItemStack getItemForState(IBlockState state)
+    {
+        return this.getItemForState(state, this.tempWorld, this.checkPos);
+    }
+
+    public ItemStack getItemForState(IBlockState state, World world, BlockPos pos)
     {
         ItemStack stack = this.itemsForStates.get(state);
 
         if (stack == null)
         {
-            stack = this.getItemForStateFromWorld(state);
+            stack = this.getItemForStateFromWorld(state, world, pos);
         }
 
         return stack;
     }
 
-    protected ItemStack getItemForStateFromWorld(IBlockState state)
+    protected ItemStack getItemForStateFromWorld(IBlockState state, World world, BlockPos pos)
     {
         ItemStack stack = this.getStateToItemOverride(state);
 
         if (stack == null)
         {
-            this.tempWorld.setBlockState(this.checkPos, state, 0x14);
-            stack = state.getBlock().getItem(this.tempWorld, this.checkPos, state);
+            world.setBlockState(pos, state, 0x14);
+            stack = state.getBlock().getItem(world, pos, state);
         }
 
         if (stack == null || stack.isEmpty())
@@ -96,8 +114,38 @@ public class MaterialCache
         }
 
         this.itemsForStates.put(state, stack);
+        this.dirty = true;
 
         return stack;
+    }
+
+    public boolean requiresMultipleItems(IBlockState state)
+    {
+        Block block = state.getBlock();
+
+        if (block instanceof BlockFlowerPot && block != Blocks.FLOWER_POT)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public ImmutableList<ItemStack> getItems(IBlockState state)
+    {
+        return this.getItems(state, this.tempWorld, this.checkPos);
+    }
+
+    public ImmutableList<ItemStack> getItems(IBlockState state, World world, BlockPos pos)
+    {
+        Block block = state.getBlock();
+
+        if (block instanceof BlockFlowerPot && block != Blocks.FLOWER_POT)
+        {
+            return ImmutableList.of(new ItemStack(Blocks.FLOWER_POT), block.getItem(world, pos, state));
+        }
+
+        return ImmutableList.of(this.getItemForState(state, world, pos));
     }
 
     @Nullable
@@ -105,23 +153,57 @@ public class MaterialCache
     {
         Block block = state.getBlock();
 
-        if (block == Blocks.PISTON_HEAD || block == Blocks.NETHER_PORTAL || block == Blocks.END_PORTAL || block == Blocks.END_GATEWAY)
+        if (block == Blocks.PISTON_HEAD ||
+            block == Blocks.PISTON_HEAD ||
+            block == Blocks.NETHER_PORTAL ||
+            block == Blocks.END_PORTAL ||
+            block == Blocks.END_GATEWAY)
         {
             return ItemStack.EMPTY;
         }
+        else if (block == Blocks.FARMLAND)
+        {
+            return new ItemStack(Blocks.DIRT);
+        }
+        else if (block == Blocks.BROWN_MUSHROOM_BLOCK)
+        {
+            return new ItemStack(Blocks.BROWN_MUSHROOM_BLOCK);
+        }
+        else if (block == Blocks.RED_MUSHROOM_BLOCK)
+        {
+            return new ItemStack(Blocks.RED_MUSHROOM_BLOCK);
+        }
         else if (block == Blocks.LAVA)
         {
-            return new ItemStack(Items.LAVA_BUCKET);
+            if (state.get(BlockFlowingFluid.LEVEL) == 0)
+            {
+                return new ItemStack(Items.LAVA_BUCKET);
+            }
+            else
+            {
+                return ItemStack.EMPTY;
+            }
         }
         else if (block == Blocks.WATER)
         {
-            return new ItemStack(Items.WATER_BUCKET);
+            if (state.get(BlockFlowingFluid.LEVEL) == 0)
+            {
+                return new ItemStack(Items.WATER_BUCKET);
+            }
+            else
+            {
+                return ItemStack.EMPTY;
+            }
         }
         else if (block instanceof BlockDoor && state.get(BlockDoor.HALF) == DoubleBlockHalf.UPPER)
         {
             return ItemStack.EMPTY;
         }
         else if (block instanceof BlockBed && state.get(BlockBed.PART) == BedPart.HEAD)
+        {
+            return ItemStack.EMPTY;
+        }
+        else if (block instanceof BlockDoublePlant && state.get(BlockDoublePlant.HALF) == DoubleBlockHalf.UPPER)
         {
             return ItemStack.EMPTY;
         }
@@ -134,6 +216,10 @@ public class MaterialCache
         if (state.getBlock() instanceof BlockSlab && state.get(BlockSlab.TYPE) == SlabType.DOUBLE)
         {
             stack.setCount(2);
+        }
+        else if (state.getBlock() == Blocks.SNOW)
+        {
+            stack.setCount(state.get(BlockSnowLayer.LAYERS));
         }
     }
 
@@ -202,6 +288,11 @@ public class MaterialCache
 
     public boolean writeToFile()
     {
+        if (this.dirty == false)
+        {
+            return false;
+        }
+
         File dir = this.getCacheDir();
         File file = this.getCacheFile();
 
@@ -216,6 +307,7 @@ public class MaterialCache
             FileOutputStream os = new FileOutputStream(file);
             CompressedStreamTools.writeCompressed(this.writeToNBT(), os);
             os.close();
+            this.dirty = false;
 
             return true;
         }
@@ -246,6 +338,7 @@ public class MaterialCache
             {
                 this.readFromNBT(nbt);
                 this.hasReadFromFile = true;
+                this.dirty = false;
             }
         }
         catch (Exception e)

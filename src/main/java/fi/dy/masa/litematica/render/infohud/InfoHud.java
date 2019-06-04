@@ -13,7 +13,7 @@ public class InfoHud
     protected final Minecraft mc;
     protected final List<String> lineList = new ArrayList<>();
     protected final List<IInfoHudRenderer> renderers = new ArrayList<>();
-    protected boolean enabled;
+    protected boolean enabled = true;
 
     public static InfoHud getInstance()
     {
@@ -30,6 +30,11 @@ public class InfoHud
         return enabled;
     }
 
+    protected double getScaleFactor()
+    {
+        return Configs.InfoOverlays.INFO_HUD_SCALE.getDoubleValue();
+    }
+
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
@@ -41,52 +46,72 @@ public class InfoHud
         return this.enabled;
     }
 
+    protected int getOffsetX()
+    {
+        return Configs.InfoOverlays.INFO_HUD_OFFSET_X.getIntegerValue();
+    }
+
+    protected int getOffsetY()
+    {
+        return Configs.InfoOverlays.INFO_HUD_OFFSET_Y.getIntegerValue();
+    }
+
     public void renderHud()
     {
         if (this.mc.player != null && this.shouldRender())
         {
             this.lineList.clear();
 
-            this.updateHudText();
-
             final int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
-            int xOffset = 2;
-            int yOffset = 2;
-            int lineIndex = 0;
+            int xOffset = this.getOffsetX();
+            int yOffset = this.getOffsetY();
+            boolean isGui = this.mc.currentScreen != null;
+            double scale = Math.max(0.05, this.getScaleFactor());
 
-            if (this.renderers.isEmpty() == false)
-            {
-                for (IInfoHudRenderer renderer : this.renderers)
-                {
-                    if (renderer.getShouldRender())
-                    {
-                        List<String> lines = renderer.getText();
-
-                        for (int i = 0; i < lines.size() && lineIndex < maxLines; ++i, ++lineIndex)
-                        {
-                            this.lineList.add(lines.get(i));
-                        }
-
-                        if (this.lineList.size() >= maxLines)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
+            this.getLinesForPhase(RenderPhase.PRE, maxLines, isGui);
+            this.updateHudText();
+            this.getLinesForPhase(RenderPhase.POST, maxLines, isGui);
 
             if (this.lineList.isEmpty() == false)
             {
-                yOffset += fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, xOffset, yOffset, 1, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, xOffset, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                yOffset += (int) Math.ceil(ySize * scale);
             }
 
             if (this.renderers.isEmpty() == false)
             {
                 for (IInfoHudRenderer renderer : this.renderers)
                 {
-                    if (renderer.getShouldRender())
+                    if (renderer.getShouldRenderCustom() && (isGui == false || renderer.shouldRenderInGuis()))
                     {
+                        // FIXME: This is technically wrong, the yOffset should be separate per hud alignment
                         yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment());
+                    }
+                }
+            }
+        }
+    }
+
+    protected void getLinesForPhase(RenderPhase phase, int maxLines, boolean isGui)
+    {
+        if (this.renderers.isEmpty() == false)
+        {
+            for (int rendererIndex = 0; rendererIndex < this.renderers.size(); ++rendererIndex)
+            {
+                IInfoHudRenderer renderer = this.renderers.get(rendererIndex);
+
+                if (renderer.getShouldRenderText(phase) && (isGui == false || renderer.shouldRenderInGuis()))
+                {
+                    List<String> lines = renderer.getText(phase);
+
+                    for (int i = 0; i < lines.size() && this.lineList.size() < maxLines; ++i)
+                    {
+                        this.lineList.add(lines.get(i));
+                    }
+
+                    if (this.lineList.size() >= maxLines)
+                    {
+                        break;
                     }
                 }
             }

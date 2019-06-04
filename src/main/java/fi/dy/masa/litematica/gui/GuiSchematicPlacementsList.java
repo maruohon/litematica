@@ -12,14 +12,13 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import net.minecraft.client.resources.I18n;
 
-public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetListSchematicPlacements> implements ISelectionListener<SchematicPlacement>
+public class GuiSchematicPlacementsList extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetListSchematicPlacements> implements ISelectionListener<SchematicPlacement>
 {
     private final SchematicPlacementManager manager;
-    private int id;
 
-    public GuiPlacementManager()
+    public GuiSchematicPlacementsList()
     {
-        super(10, 40);
+        super(12, 30);
 
         this.title = I18n.format("litematica.gui.title.manage_schematic_placements");
         this.manager = DataManager.getSchematicPlacementManager();
@@ -34,7 +33,7 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
     @Override
     protected int getBrowserHeight()
     {
-        return this.height - 80;
+        return this.height - 64;
     }
 
     @Override
@@ -42,24 +41,23 @@ public class GuiPlacementManager extends GuiListBase<SchematicPlacement, WidgetS
     {
         super.initGui();
 
-        int x = 10;
-        int y = this.height - 36;
+        int x = 12;
+        int y = this.height - 26;
         int buttonWidth;
-        this.id = 0;
         String label;
         ButtonGeneric button;
 
-        ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.SHOW_LOADED;
+        ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 30;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label, type.getIcon());
+        buttonWidth = this.getStringWidth(label) + 30;
+        button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
-        buttonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
     }
 

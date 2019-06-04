@@ -10,18 +10,24 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
+import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSimple;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -32,27 +38,100 @@ import net.minecraft.world.World;
 
 public class SelectionManager
 {
+    private final Minecraft mc = Minecraft.getInstance();
     private final Map<String, AreaSelection> selections = new HashMap<>();
     private final Map<String, AreaSelection> readOnlySelections = new HashMap<>();
     @Nullable
     private String currentSelectionId;
     @Nullable
     private GrabbedElement grabbedElement;
+    private SelectionMode mode = SelectionMode.NORMAL;
+
+    public SelectionMode getSelectionMode()
+    {
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+        {
+            SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
+            return project != null ? project.getSelectionMode() : SelectionMode.SIMPLE;
+        }
+
+        return this.mode;
+    }
+
+    public void switchSelectionMode()
+    {
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+        {
+            SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
+
+            if (project != null)
+            {
+                project.switchSelectionMode();
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.error.schematic_projects.in_projects_mode_but_no_project_open");
+            }
+        }
+        else
+        {
+            this.mode = this.mode.cycle(true);
+        }
+    }
 
     @Nullable
     public String getCurrentSelectionId()
     {
+        return this.mode == SelectionMode.NORMAL ? this.currentSelectionId : null;
+    }
+
+    @Nullable
+    public String getCurrentNormalSelectionId()
+    {
         return this.currentSelectionId;
+    }
+
+    public boolean hasNormalSelection()
+    {
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+        {
+            return true;
+        }
+
+        return this.getNormalSelection(this.currentSelectionId) != null;
     }
 
     @Nullable
     public AreaSelection getCurrentSelection()
     {
+        SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
+
+        if (project != null)
+        {
+            return project.getSelection();
+        }
+
         return this.getSelection(this.currentSelectionId);
     }
 
     @Nullable
-    public AreaSelection getSelection(String selectionId)
+    public AreaSelection getSelection(@Nullable String selectionId)
+    {
+        if (this.mode == SelectionMode.SIMPLE)
+        {
+            return this.getSimpleSelection();
+        }
+
+        return this.getNormalSelection(selectionId);
+    }
+
+    protected AreaSelectionSimple getSimpleSelection()
+    {
+        return DataManager.getSimpleArea();
+    }
+
+    @Nullable
+    protected AreaSelection getNormalSelection(@Nullable String selectionId)
     {
         return selectionId != null ? this.selections.get(selectionId) : null;
     }
@@ -60,7 +139,7 @@ public class SelectionManager
     @Nullable
     public AreaSelection getOrLoadSelection(String selectionId)
     {
-        AreaSelection selection = this.getSelection(selectionId);
+        AreaSelection selection = this.getNormalSelection(selectionId);
 
         if (selection == null)
         {
@@ -78,7 +157,7 @@ public class SelectionManager
     @Nullable
     public AreaSelection getOrLoadSelectionReadOnly(String selectionId)
     {
-        AreaSelection selection = this.getSelection(selectionId);
+        AreaSelection selection = this.getNormalSelection(selectionId);
 
         if (selection == null)
         {
@@ -101,7 +180,12 @@ public class SelectionManager
     @Nullable
     private AreaSelection tryLoadSelectionFromFile(String selectionId)
     {
-        File file = new File(selectionId);
+        return tryLoadSelectionFromFile(new File(selectionId));
+    }
+
+    @Nullable
+    public static AreaSelection tryLoadSelectionFromFile(File file)
+    {
         JsonElement el = JsonUtils.parseJsonFile(file);
 
         if (el != null && el.isJsonObject())
@@ -129,38 +213,70 @@ public class SelectionManager
         return false;
     }
 
+    public boolean renameSelection(String selectionId, String newName, IMessageConsumer feedback)
+    {
+        File dir = new File(selectionId);
+        dir = dir.getParentFile();
+
+        return this.renameSelection(dir, selectionId, newName, feedback);
+    }
+
     public boolean renameSelection(File dir, String selectionId, String newName, IMessageConsumer feedback)
+    {
+        return this.renameSelection(dir, selectionId, newName, false, feedback);
+    }
+
+    public boolean renameSelection(File dir, String selectionId, String newName, boolean copy, IMessageConsumer feedback)
     {
         File file = new File(selectionId);
 
         if (file.exists() && file.isFile())
         {
             String newFileName = FileUtils.generateSafeFileName(newName);
+
+            if (newFileName.isEmpty())
+            {
+                feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.invalid_safe_file_name", newFileName);
+                return false;
+            }
+
             File newFile = new File(dir, newFileName + ".json");
 
-            if (newFile.exists() == false && file.renameTo(newFile))
+            if (newFile.exists() == false && (copy || file.renameTo(newFile)))
             {
-                AreaSelection selection = this.selections.remove(selectionId);
+                String newId = newFile.getAbsolutePath();
+                AreaSelection selection;
+
+                if (copy)
+                {
+                    try
+                    {
+                        org.apache.commons.io.FileUtils.copyFile(file, newFile);
+                    }
+                    catch (Exception e)
+                    {
+                        feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.copy_failed");
+                        Litematica.logger.warn("Copy failed", e);
+                        return false;
+                    }
+
+                    selection = this.getOrLoadSelection(newId);
+                }
+                else
+                {
+                    selection = this.selections.remove(selectionId);
+                }
 
                 if (selection != null)
                 {
-                    String oldName = selection.getName();
-                    String newId = newFile.getAbsolutePath();
+                    renameSubRegionBoxIfSingle(selection, newName);
                     selection.setName(newName);
+
                     this.selections.put(newId, selection);
 
                     if (selectionId.equals(this.currentSelectionId))
                     {
                         this.currentSelectionId = newId;
-                    }
-
-                    List<Box> boxes = selection.getAllSubRegionBoxes();
-
-                    // If the selection had only one box with the exact same name as the area selection itself,
-                    // then also rename that box to the new name.
-                    if (boxes.size() == 1 && boxes.get(0).getName().equals(oldName))
-                    {
-                        selection.renameSubRegionBox(oldName, newName);
                     }
 
                     return true;
@@ -175,46 +291,13 @@ public class SelectionManager
         return false;
     }
 
-    public boolean renameSelectedSubRegionBox(String newName)
-    {
-        String selectionId = this.getCurrentSelectionId();
-
-        if (selectionId != null)
-        {
-            return this.renameSelectedSubRegionBox(selectionId, newName);
-        }
-
-        return false;
-    }
-
-    public boolean renameSelectedSubRegionBox(String selectionId, String newName)
-    {
-        AreaSelection selection = this.getSelection(selectionId);
-
-        if (selection != null)
-        {
-            String oldName = selection.getCurrentSubRegionBoxName();
-
-            if (oldName != null)
-            {
-                return selection.renameSubRegionBox(oldName, newName);
-            }
-        }
-
-        return false;
-    }
-
-    public boolean renameSubRegionBox(String selectionId, String oldName, String newName)
-    {
-        AreaSelection selection = this.getSelection(selectionId);
-        return selection != null && selection.renameSubRegionBox(oldName, newName);
-    }
-
     public void setCurrentSelection(@Nullable String selectionId)
     {
-        if (selectionId == null || this.selections.containsKey(selectionId))
+        this.currentSelectionId = selectionId;
+
+        if (this.currentSelectionId != null)
         {
-            this.currentSelectionId = selectionId;
+            this.getOrLoadSelection(this.currentSelectionId);
         }
     }
 
@@ -225,20 +308,24 @@ public class SelectionManager
     public String createNewSelection(File dir, final String nameIn)
     {
         String name = nameIn;
-        File file = new File(dir, FileUtils.generateSafeFileName(name) + ".json");
+        String safeName = FileUtils.generateSafeFileName(name);
+        File file = new File(dir, safeName + ".json");
         String selectionId = file.getAbsolutePath();
         int i = 1;
 
-        while (this.selections.containsKey(selectionId) || file.exists())
+        while (i < 1000 && (safeName.isEmpty() || this.selections.containsKey(selectionId) || file.exists()))
         {
             name = nameIn + " " + i;
-            file = new File(dir, FileUtils.generateSafeFileName(name) + ".json");
+            safeName = FileUtils.generateSafeFileName(name);
+            file = new File(dir, safeName + ".json");
             selectionId = file.getAbsolutePath();
             i++;
         }
 
         AreaSelection selection = new AreaSelection();
         selection.setName(name);
+        BlockPos pos = new BlockPos(this.mc.player);
+        selection.createNewSubRegionBox(pos, name);
 
         this.selections.put(selectionId, selection);
         this.currentSelectionId = selectionId;
@@ -248,23 +335,86 @@ public class SelectionManager
         return this.currentSelectionId;
     }
 
-    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement)
+    public boolean createNewSubRegion(Minecraft mc, boolean printMessage)
     {
-        File file = new File(dir, FileUtils.generateSafeFileName(placement.getName()) + ".json");
-        String name = file.getAbsolutePath();
-        AreaSelection selection = this.getSelection(name);
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection selection = sm.getCurrentSelection();
+
+        if (selection != null && mc.player != null)
+        {
+            BlockPos pos = new BlockPos(mc.player.getPositionVector());
+
+            if (selection.createNewSubRegionBox(pos, selection.getName()) != null)
+            {
+                if (printMessage)
+                {
+                    String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean createNewSubRegionIfDoesntExist(String name, Minecraft mc, IMessageConsumer feedback)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection selection = sm.getCurrentSelection();
+
+        if (selection != null && mc.player != null)
+        {
+            if (selection.getSubRegionBox(name) != null)
+            {
+                feedback.addMessage(MessageType.ERROR, "litematica.error.area_editor.create_sub_region.exists", name);
+                return false;
+            }
+
+            BlockPos pos = new BlockPos(mc.player.getPositionVector());
+
+            if (selection.createNewSubRegionBox(pos, name) != null)
+            {
+                String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
+                feedback.addMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, String name, IMessageConsumer feedback)
+    {
+        String safeName = FileUtils.generateSafeFileName(name);
+
+        if (safeName.isEmpty())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.invalid_safe_file_name", safeName);
+            return false;
+        }
+
+        File file = new File(dir, safeName + ".json");
+        String selectionId = file.getAbsolutePath();
+        AreaSelection selection = this.getOrLoadSelectionReadOnly(selectionId);
 
         if (selection == null)
         {
             selection = AreaSelection.fromPlacement(placement);
+            renameSubRegionBoxIfSingle(selection, name);
+            selection.setName(name);
 
-            this.selections.put(name, selection);
-            this.currentSelectionId = name;
+            this.selections.put(selectionId, selection);
+            this.currentSelectionId = selectionId;
 
             JsonUtils.writeJsonToFile(selection.toJson(), file);
 
             return true;
         }
+
+        feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.create_failed", safeName);
 
         return false;
     }
@@ -273,7 +423,7 @@ public class SelectionManager
     {
         AreaSelection area = this.getCurrentSelection();
 
-        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        if (area != null)
         {
             RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
 
@@ -330,25 +480,7 @@ public class SelectionManager
 
         if (area != null)
         {
-            if (area.getSelectedSubRegionBox() != null)
-            {
-                Box box = area.getSelectedSubRegionBox();
-                Corner selectedCorner = box.getSelectedCorner();
-
-                if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_1) && box.getPos1() != null)
-                {
-                    box.setPos1(box.getPos1().offset(direction, amount));
-                }
-
-                if ((selectedCorner == Corner.NONE || selectedCorner == Corner.CORNER_2) && box.getPos2() != null)
-                {
-                    box.setPos2(box.getPos2().offset(direction, amount));
-                }
-            }
-            else if (area.isOriginSelected())
-            {
-                area.setOrigin(area.getOrigin().offset(direction, amount));
-            }
+            area.moveSelectedElement(direction, amount);
         }
     }
 
@@ -371,11 +503,12 @@ public class SelectionManager
             {
                 this.changeSelection(area, trace);
                 this.grabbedElement = new GrabbedElement(
+                        area,
                         trace.getHitSelectionBox(),
                         trace.getHitCorner(),
                         trace.getHitVec(),
                         entity.getEyePosition(1f).distanceTo(trace.getHitVec()));
-                StringUtils.printActionbarMessage("litematica.message.grabbed_element_for_moving");
+                InfoUtils.printActionbarMessage("litematica.message.grabbed_element_for_moving");
                 return true;
             }
         }
@@ -394,25 +527,25 @@ public class SelectionManager
 
             if (movingCorner || movingOrigin)
             {
-                BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance);
+                BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
                 if (pos == null)
                 {
                     return;
                 }
 
-                if (movingCorner)
+                if (movingOrigin)
                 {
-                    int cornerIndex = 1;
+                    this.moveSelectionOrigin(area, pos, moveEntireSelection);
+                }
+                // Moving a corner
+                else
+                {
+                    int cornerIndex = corner.ordinal();
 
-                    if (corner == Corner.CORNER_1)
+                    if (corner == Corner.CORNER_1 || corner == Corner.CORNER_2)
                     {
-                        area.getSelectedSubRegionBox().setPos1(pos);
-                    }
-                    else if (corner == Corner.CORNER_2)
-                    {
-                        area.getSelectedSubRegionBox().setPos2(pos);
-                        cornerIndex = 2;
+                        area.setSelectedSubRegionCornerPos(pos, corner);
                     }
 
                     if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
@@ -421,12 +554,7 @@ public class SelectionManager
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    StringUtils.printActionbarMessage("litematica.message.set_selection_box_point", cornerIndex, posStr);
-                }
-                // Moving the origin point
-                else
-                {
-                    this.moveSelectionOrigin(area, pos, moveEntireSelection);
+                    InfoUtils.printActionbarMessage("litematica.message.set_selection_box_point", cornerIndex, posStr);
                 }
             }
         }
@@ -440,12 +568,12 @@ public class SelectionManager
         }
         else
         {
-            BlockPos old = area.getOrigin();
-            area.setOrigin(newOrigin);
+            BlockPos old = area.getEffectiveOrigin();
+            area.setExplicitOrigin(newOrigin);
 
             String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            StringUtils.printActionbarMessage("litematica.message.moved_area_origin", posStrOld, posStrNew);
+            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_area_origin", posStrOld, posStrNew);
         }
     }
 
@@ -457,7 +585,7 @@ public class SelectionManager
         {
             if (selection.isOriginSelected())
             {
-                BlockPos newOrigin = this.getTargetedPosition(mc.world, mc.player, maxDistance);
+                BlockPos newOrigin = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
                 if (newOrigin != null)
                 {
@@ -479,16 +607,16 @@ public class SelectionManager
 
     private void resetSelectionToClickedPosition(Minecraft mc, double maxDistance)
     {
-        AreaSelection sel = this.getCurrentSelection();
+        AreaSelection area = this.getCurrentSelection();
 
-        if (sel != null && sel.getSelectedSubRegionBox() != null)
+        if (area != null && area.getSelectedSubRegionBox() != null)
         {
-            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance);
+            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
             if (pos != null)
             {
-                sel.getSelectedSubRegionBox().setPos1(pos);
-                sel.getSelectedSubRegionBox().setPos2(pos);
+                area.setSelectedSubRegionCornerPos(pos, Corner.CORNER_1);
+                area.setSelectedSubRegionCornerPos(pos, Corner.CORNER_2);
             }
         }
     }
@@ -499,7 +627,7 @@ public class SelectionManager
 
         if (sel != null && sel.getSelectedSubRegionBox() != null)
         {
-            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, false);
+            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
             if (pos != null)
             {
@@ -520,20 +648,26 @@ public class SelectionManager
                 BlockPos posMin = PositionUtils.getMinCorner(PositionUtils.getMinCorner(pos1, pos2), pos);
                 BlockPos posMax = PositionUtils.getMaxCorner(PositionUtils.getMaxCorner(pos1, pos2), pos);
 
-                box.setPos1(posMin);
-                box.setPos2(posMax);
+                sel.setSelectedSubRegionCornerPos(posMin, Corner.CORNER_1);
+                sel.setSelectedSubRegionCornerPos(posMax, Corner.CORNER_2);
             }
         }
     }
 
-    @Nullable
-    private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance)
+    public static void renameSubRegionBoxIfSingle(AreaSelection selection, String newName)
     {
-        return this.getTargetedPosition(world, player, maxDistance, true);
+        List<Box> boxes = selection.getAllSubRegionBoxes();
+
+        // If the selection had only one box with the exact same name as the area selection itself,
+        // then also rename that box to the new name.
+        if (boxes.size() == 1 && boxes.get(0).getName().equals(selection.getName()))
+        {
+            selection.renameSubRegionBox(selection.getName(), newName);
+        }
     }
 
     @Nullable
-    private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance, boolean sneakToInset)
+    private BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance, boolean sneakToOffset)
     {
         RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(world, player, false, maxDistance);
 
@@ -544,8 +678,8 @@ public class SelectionManager
 
         BlockPos pos = trace.getBlockPos();
 
-        // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
-        if (player.isSneaking() != sneakToInset)
+        // Sneaking puts the position adjacent the targeted block face, not sneaking puts it inside the targeted block
+        if (sneakToOffset && player.isSneaking())
         {
             pos = pos.offset(trace.sideHit);
         }
@@ -583,6 +717,40 @@ public class SelectionManager
         this.readOnlySelections.clear();
     }
 
+    @Nullable
+    public GuiBase getEditGui()
+    {
+        AreaSelection selection = this.getCurrentSelection();
+
+        if (this.getSelectionMode() == SelectionMode.NORMAL)
+        {
+            if (selection != null)
+            {
+                return new GuiAreaSelectionEditorNormal(selection);
+            }
+            else
+            {
+                InfoUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
+                return null;
+            }
+        }
+        else
+        {
+            return new GuiAreaSelectionEditorSimple(selection);
+        }
+    }
+
+    public void openEditGui(@Nullable GuiScreen parent)
+    {
+        GuiBase gui = this.getEditGui();
+
+        if (gui != null)
+        {
+            gui.setParent(parent);
+            this.mc.displayGuiScreen(gui);
+        }
+    }
+
     public void loadFromJson(JsonObject obj)
     {
         this.clear();
@@ -598,11 +766,18 @@ public class SelectionManager
                 this.setCurrentSelection(currentId);
             }
         }
+
+        if (JsonUtils.hasString(obj, "mode"))
+        {
+            this.mode = SelectionMode.fromString(obj.get("mode").getAsString());
+        }
     }
 
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
+
+        obj.add("mode", new JsonPrimitive(this.mode.name()));
 
         try
         {
@@ -633,21 +808,21 @@ public class SelectionManager
 
     private static class GrabbedElement
     {
+        private final AreaSelection area;
         public final Box grabbedBox;
         public final Box originalBox;
         public final Vec3d grabPosition;
         public final Corner grabbedCorner;
         public double grabDistance;
 
-        private GrabbedElement(Box box, Corner corner, Vec3d grabPosition, double grabDistance)
+        private GrabbedElement(AreaSelection area, Box box, Corner corner, Vec3d grabPosition, double grabDistance)
         {
+            this.area = area;
             this.grabbedBox = box;
             this.grabbedCorner = corner;
             this.grabPosition = grabPosition;
             this.grabDistance = grabDistance;
-            this.originalBox = new Box();
-            this.originalBox.setPos1(box.getPos1());
-            this.originalBox.setPos2(box.getPos2());
+            this.originalBox = new Box(box.getPos1(), box.getPos2(), "");
         }
 
         public void changeGrabDistance(double amount)
@@ -662,12 +837,14 @@ public class SelectionManager
 
             if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_1) && this.grabbedBox.getPos1() != null)
             {
-                this.grabbedBox.setPos1(this.originalBox.getPos1().add(change.x, change.y, change.z));
+                BlockPos pos = this.originalBox.getPos1().add(change.x, change.y, change.z);
+                this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_1, pos);
             }
 
             if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_2) && this.grabbedBox.getPos2() != null)
             {
-                this.grabbedBox.setPos2(this.originalBox.getPos2().add(change.x, change.y, change.z));
+                BlockPos pos = this.originalBox.getPos2().add(change.x, change.y, change.z);
+                this.area.setSubRegionCornerPos(this.grabbedBox, Corner.CORNER_2, pos);
             }
         }
     }

@@ -2,8 +2,6 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Collections;
-import java.util.List;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.Icons;
@@ -12,7 +10,8 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 
 public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
 {
-    protected static final FileFilter JSON_FILTER = new FileFilterJson();
+    public static final FileFilter JSON_FILTER = new FileFilterJson();
+
     private final GuiAreaSelectionManager guiAreaSelectionManager;
 
     public WidgetAreaSelectionBrowser(int x, int y, int width, int height,
@@ -23,16 +22,12 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
 
         this.browserEntryHeight = 22;
         this.guiAreaSelectionManager = parent;
+        this.allowKeyboardNavigation = false;
     }
 
     public GuiAreaSelectionManager getSelectionManagerGui()
     {
         return this.guiAreaSelectionManager;
-    }
-
-    @Override
-    protected void drawAdditionalContents(int mouseX, int mouseY)
-    {
     }
 
     @Override
@@ -42,21 +37,16 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected void addFileEntriesToList(File dir, List<DirectoryEntry> list)
+    protected FileFilter getFileFilter()
     {
-        for (File file : dir.listFiles(JSON_FILTER))
-        {
-            list.add(new DirectoryEntry(DirectoryEntryType.fromFile(file), dir, file.getName()));
-        }
-
-        Collections.sort(list);
+        return JSON_FILTER;
     }
 
     @Override
     protected WidgetAreaSelectionEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, DirectoryEntry entry)
     {
-        return new WidgetAreaSelectionEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd,
-                entry, this.guiAreaSelectionManager.getSelectionManager(), this.mc, this, this.iconProvider);
+        return new WidgetAreaSelectionEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), isOdd,
+                entry, listIndex, this.guiAreaSelectionManager.getSelectionManager(), this, this.iconProvider);
     }
 
     public static class FileFilterJson implements FileFilter

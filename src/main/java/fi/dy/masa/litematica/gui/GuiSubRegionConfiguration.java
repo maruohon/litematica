@@ -2,16 +2,20 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.button.ButtonOnOff;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -39,67 +43,67 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         super.initGui();
 
-        int id = 0;
         int width = 120;
         int x = this.width - width - 10;
-        int y = 22;
+        int y = 26;
 
         String label = I18n.format("litematica.gui.label.placement_sub.region_name", this.placement.getName());
         this.addLabel(20, y, -1, 16, 0xFFFFFFFF, label);
 
+        y = 10;
         this.createButtonOnOff(x, y, width - 22, this.placement.isEnabled(), ButtonListener.Type.TOGGLE_ENABLED);
         this.createButton(x + width - 20, y, 20, ButtonListener.Type.TOGGLE_RENDERING);
-        y += 22;
+        y += 21;
 
         this.createButtonOnOff(x, y, width, this.placement.ignoreEntities(), ButtonListener.Type.TOGGLE_ENTITIES);
-        y += 22;
+        y += 18;
 
         label = I18n.format("litematica.gui.label.placement_sub.region_position");
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
-        y += 20;
+        y += 14;
         x += 2;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
         this.createButton(x + 85, y + 1, -1, ButtonListener.Type.NUDGE_COORD_X);
-        y += 20;
+        y += 18;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Y);
         this.createButton(x + 85, y + 1, -1, ButtonListener.Type.NUDGE_COORD_Y);
-        y += 20;
+        y += 18;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.Z);
         this.createButton(x + 85, y + 1, -1, ButtonListener.Type.NUDGE_COORD_Z);
-        y += 22;
+        y += 21;
         x -= 2;
 
         this.createButton(x, y, width, ButtonListener.Type.MOVE_TO_PLAYER);
-        y += 22;
+        y += 21;
 
         this.createButton(x, y, width, ButtonListener.Type.ROTATE);
-        y += 22;
+        y += 21;
 
         this.createButton(x, y, width, ButtonListener.Type.MIRROR);
-        y += 22;
+        y += 21;
 
         this.createButton(x, y, width, ButtonListener.Type.RESET_PLACEMENT);
-        y += 22;
+        y += 21;
 
         this.createButton(x, y, width, ButtonListener.Type.SLICE_TYPE);
 
         y = this.height - 36;
         label = I18n.format("litematica.gui.button.placement_sub.placement_configuration");
-        int buttonWidth = this.fontRenderer.getStringWidth(label) + 10;
+        int buttonWidth = this.getStringWidth(label) + 10;
         x = 10;
-        ButtonGeneric button = new ButtonGeneric(id, x, y, buttonWidth, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
 
         MainWindow window = Minecraft.getInstance().mainWindow;
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = I18n.format(type.getLabelKey());
-        int menuButtonWidth = this.fontRenderer.getStringWidth(label) + 20;
+        int menuButtonWidth = this.getStringWidth(label) + 20;
         x = window.getScaledHeight() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
 
-        button = new ButtonGeneric(id, x, y, menuButtonWidth, 20, label);
+        button = new ButtonGeneric(x, y, menuButtonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         this.updateElements();
@@ -109,10 +113,12 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         String label = type.name() + ":";
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
-        int offset = this.mc.fontRenderer.getStringWidth(label) + 4;
+        int offset = this.getStringWidth(label) + 4;
 
         // The sub-region placements are relative
-        BlockPos pos = this.placement.getPos().add(this.schematicPlacement.getOrigin());
+        BlockPos pos = this.placement.getPos();
+        pos = PositionUtils.getTransformedBlockPos(pos, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
+        pos = pos.add(this.schematicPlacement.getOrigin());
         String text = "";
 
         switch (type)
@@ -122,15 +128,22 @@ public class GuiSubRegionConfiguration extends GuiBase
             case Z: text = String.valueOf(pos.getZ()); break;
         }
 
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(0, x + offset, y + 1, width, 16, this.mc.fontRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y + 2, width, 14, this.textRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
         this.addTextField(textField, listener);
+
+        String hover = I18n.format("litematica.hud.schematic_placement.hover_info.lock_coordinate");
+        x = x + offset + width + 20;
+        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "", hover);
+        cb.setChecked(this.placement.isCoordinateLocked(type), false);
+        cb.setListener(new CoordinateLockListener(type, this.placement));
+        this.addWidget(cb);
     }
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = ButtonOnOff.create(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this.schematicPlacement, this.placement, this));
         return button.getWidth();
     }
@@ -150,7 +163,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 String str = pre + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
                 String hover = I18n.format("litematica.gui.button.schematic_placement.hover.rendering", str);
 
-                this.addButton(new ButtonGeneric(0, x, y, width, 20, label, hover), listener);
+                this.addButton(new ButtonGeneric(x, y, width, 20, label, hover), listener);
                 break;
             }
 
@@ -159,7 +172,7 @@ public class GuiSubRegionConfiguration extends GuiBase
             case NUDGE_COORD_Z:
             {
                 String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
-                ButtonGeneric button = new ButtonGeneric(0, x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
+                ButtonGeneric button = new ButtonGeneric(x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return;
             }
@@ -181,7 +194,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 break;
         }
 
-        ButtonGeneric button = new ButtonGeneric(0, x, y, width, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
         this.addButton(button, listener);
 
         if (type == ButtonListener.Type.RESET_PLACEMENT)
@@ -200,11 +213,11 @@ public class GuiSubRegionConfiguration extends GuiBase
             label = TXT_GOLD + label + TXT_RST;
         }
 
-        this.buttonResetPlacement.displayString = label;
-        this.buttonResetPlacement.enabled = enabled;
+        this.buttonResetPlacement.setDisplayString(label);
+        this.buttonResetPlacement.setEnabled(enabled);
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final GuiBase parent;
         private final SchematicPlacement schematicPlacement;
@@ -222,12 +235,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
-        {
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             Minecraft mc = Minecraft.getInstance();
             int amount = mouseButton == 1 ? -1 : 1;
@@ -359,12 +367,6 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
 
         @Override
-        public boolean onGuiClosed(GuiTextField textField)
-        {
-            return this.onTextChange(textField);
-        }
-
-        @Override
         public boolean onTextChange(GuiTextField textField)
         {
             try
@@ -396,10 +398,21 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
     }
 
-    public enum CoordinateType
+    private static class CoordinateLockListener implements ISelectionListener<WidgetCheckBox>
     {
-        X,
-        Y,
-        Z
+        private final SubRegionPlacement placement;
+        private final CoordinateType type;
+
+        private CoordinateLockListener(CoordinateType type, SubRegionPlacement placement)
+        {
+            this.type = type;
+            this.placement = placement;
+        }
+
+        @Override
+        public void onSelectionChange(WidgetCheckBox entry)
+        {
+            this.placement.setCoordinateLocked(this.type, entry.isChecked());
+        }
     }
 }

@@ -41,6 +41,7 @@ import net.minecraft.world.gen.feature.template.Template;
 
 public class SchematicaSchematic
 {
+    public static final String FILE_EXTENSION = ".schematic";
     private LitematicaBlockStateContainer blocks;
     private Block[] palette;
     private Map<BlockPos, NBTTagCompound> tiles = new HashMap<>();
@@ -305,10 +306,6 @@ public class SchematicaSchematic
     {
         Mirror mirror = placement.getMirror();
         Rotation rotation = placement.getRotation();
-        BlockPos posEnd = posStart.add(PositionUtils.getRelativeEndPositionFromAreaSize(this.size));
-        BlockPos pos1 = PositionUtils.getMinCorner(posStart, posEnd);
-        BlockPos pos2 = PositionUtils.getMaxCorner(posStart, posEnd).add(1, 1, 1);
-        List<Entity> existingEntitiesInArea = world.getEntitiesInAABBexcluding(null, new AxisAlignedBB(pos1, pos2), null);
 
         for (NBTTagCompound tag : this.entities)
         {
@@ -319,8 +316,6 @@ public class SchematicaSchematic
 
             if (entity != null)
             {
-                EntityUtils.handleSchematicPlacementEntityUUIDCollision(world, entity, existingEntitiesInArea);
-
                 float rotationYaw = entity.getMirroredYaw(mirror);
                 rotationYaw = rotationYaw + (entity.rotationYaw - entity.getRotatedYaw(rotation));
                 entity.setLocationAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.rotationPitch);
@@ -421,12 +416,16 @@ public class SchematicaSchematic
         }
     }
 
-    public static SchematicaSchematic createFromWorld(World world, BlockPos posStart, BlockPos size)
+    public static SchematicaSchematic createFromWorld(World world, BlockPos posStart, BlockPos size, boolean ignoreEntities)
     {
         SchematicaSchematic schematic = new SchematicaSchematic();
 
         schematic.readBlocksFromWorld(world, posStart, size);
-        schematic.readEntitiesFromWorld(world, posStart, size);
+
+        if (ignoreEntities == false)
+        {
+            schematic.readEntitiesFromWorld(world, posStart, size);
+        }
 
         return schematic;
     }
@@ -878,19 +877,40 @@ public class SchematicaSchematic
         return nbt;
     }
 
-    public boolean writeToFile(File file)
+    public boolean writeToFile(File dir, String fileNameIn, boolean override, IStringConsumer feedback)
     {
+        String fileName = fileNameIn;
+
+        if (fileName.endsWith(FILE_EXTENSION) == false)
+        {
+            fileName = fileName + FILE_EXTENSION;
+        }
+
+        File fileSchematic = new File(dir, fileName);
+
         try
         {
-            FileOutputStream os = new FileOutputStream(file);
+            if (dir.exists() == false && dir.mkdirs() == false)
+            {
+                feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.directory_creation_failed", dir.getAbsolutePath()));
+                return false;
+            }
+
+            if (override == false && fileSchematic.exists())
+            {
+                feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.exists", fileSchematic.getAbsolutePath()));
+                return false;
+            }
+
+            FileOutputStream os = new FileOutputStream(fileSchematic);
             CompressedStreamTools.writeCompressed(this.writeToNBT(), os);
             os.close();
 
             return true;
         }
-        catch (IOException e)
+        catch (Exception e)
         {
-            LiteModLitematica.logger.error("SchematicaSchematic: Failed to write Schematic data to file '{}'", file.getAbsolutePath());
+            feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.exception", fileSchematic.getAbsolutePath()));
         }
 
         return false;

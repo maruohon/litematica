@@ -1,20 +1,20 @@
-package fi.dy.masa.litematica.selection;
+package fi.dy.masa.litematica.util;
 
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import net.minecraft.client.resources.I18n;
 
-public enum AreaSelectionMode implements IConfigOptionListEntry
+public enum BlockInfoAlignment implements IConfigOptionListEntry
 {
-    CORNERS     ("corners",     "litematica.hud.area_selection.mode.corners"),
-    CUBOID      ("cuboid",      "litematica.hud.area_selection.mode.cuboid");
+    CENTER      ("center",      "litematica.label.alignment.center"),
+    TOP_CENTER  ("top_center",  "litematica.label.alignment.top_center");
 
     private final String configString;
-    private final String translationKey;
+    private final String unlocName;
 
-    private AreaSelectionMode(String configString, String translationKey)
+    private BlockInfoAlignment(String configString, String unlocName)
     {
         this.configString = configString;
-        this.translationKey = translationKey;
+        this.unlocName = unlocName;
     }
 
     @Override
@@ -26,7 +26,7 @@ public enum AreaSelectionMode implements IConfigOptionListEntry
     @Override
     public String getDisplayName()
     {
-        return I18n.format(this.translationKey);
+        return I18n.format(this.unlocName);
     }
 
     @Override
@@ -53,21 +53,21 @@ public enum AreaSelectionMode implements IConfigOptionListEntry
     }
 
     @Override
-    public AreaSelectionMode fromString(String name)
+    public BlockInfoAlignment fromString(String name)
     {
         return fromStringStatic(name);
     }
 
-    public static AreaSelectionMode fromStringStatic(String name)
+    public static BlockInfoAlignment fromStringStatic(String name)
     {
-        for (AreaSelectionMode mode : AreaSelectionMode.values())
+        for (BlockInfoAlignment aligment : BlockInfoAlignment.values())
         {
-            if (mode.configString.equalsIgnoreCase(name))
+            if (aligment.configString.equalsIgnoreCase(name))
             {
-                return mode;
+                return aligment;
             }
         }
 
-        return AreaSelectionMode.CORNERS;
+        return BlockInfoAlignment.CENTER;
     }
 }

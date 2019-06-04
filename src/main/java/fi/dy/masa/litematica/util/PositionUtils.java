@@ -3,13 +3,26 @@ package fi.dy.masa.litematica.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -27,6 +40,42 @@ public class PositionUtils
 {
     public static final BlockPosComparator BLOCK_POS_COMPARATOR = new BlockPosComparator();
     public static final ChunkPosComparator CHUNK_POS_COMPARATOR = new ChunkPosComparator();
+
+    public static final EnumFacing.Axis[] AXES_ALL = new EnumFacing.Axis[] { EnumFacing.Axis.X, EnumFacing.Axis.Y, EnumFacing.Axis.Z };
+    public static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
+    public static final EnumFacing[] ADJACENT_SIDES_ZY = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH };
+    public static final EnumFacing[] ADJACENT_SIDES_XY = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.EAST, EnumFacing.WEST };
+    public static final EnumFacing[] ADJACENT_SIDES_XZ = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST };
+
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i(-1,  0, -1) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i( 1,  0, -1) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  0,  1), new Vec3i(-1,  0,  1) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  0,  1), new Vec3i( 1,  0,  1) };
+    private static final Vec3i[][] EDGE_NEIGHBOR_OFFSETS_Y = new Vec3i[][] { EDGE_NEIGHBOR_OFFSETS_XN_ZN, EDGE_NEIGHBOR_OFFSETS_XP_ZN, EDGE_NEIGHBOR_OFFSETS_XN_ZP, EDGE_NEIGHBOR_OFFSETS_XP_ZP };
+
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_YN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0, -1,  0), new Vec3i(-1, -1,  0) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_YN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0, -1,  0), new Vec3i( 1, -1,  0) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_YP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  1,  0), new Vec3i(-1,  1,  0) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_YP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  1,  0), new Vec3i( 1,  1,  0) };
+    private static final Vec3i[][] EDGE_NEIGHBOR_OFFSETS_Z = new Vec3i[][] { EDGE_NEIGHBOR_OFFSETS_XN_YN, EDGE_NEIGHBOR_OFFSETS_XP_YN, EDGE_NEIGHBOR_OFFSETS_XN_YP, EDGE_NEIGHBOR_OFFSETS_XP_YP };
+
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YN_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0, -1,  0), new Vec3i( 0,  0, -1), new Vec3i( 0, -1, -1) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YP_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0,  1,  0), new Vec3i( 0,  0, -1), new Vec3i( 0,  1, -1) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YN_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0, -1,  0), new Vec3i( 0,  0,  1), new Vec3i( 0, -1,  1) };
+    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YP_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0,  1,  0), new Vec3i( 0,  0,  1), new Vec3i( 0,  1,  1) };
+    private static final Vec3i[][] EDGE_NEIGHBOR_OFFSETS_X = new Vec3i[][] { EDGE_NEIGHBOR_OFFSETS_YN_ZN, EDGE_NEIGHBOR_OFFSETS_YP_ZN, EDGE_NEIGHBOR_OFFSETS_YN_ZP, EDGE_NEIGHBOR_OFFSETS_YP_ZP };
+
+    public static Vec3i[] getEdgeNeighborOffsets(EnumFacing.Axis axis, int cornerIndex)
+    {
+        switch (axis)
+        {
+            case X: return EDGE_NEIGHBOR_OFFSETS_X[cornerIndex];
+            case Y: return EDGE_NEIGHBOR_OFFSETS_Y[cornerIndex];
+            case Z: return EDGE_NEIGHBOR_OFFSETS_Z[cornerIndex];
+        }
+
+        return null;
+    }
 
     public static BlockPos getMinCorner(BlockPos pos1, BlockPos pos2)
     {
@@ -55,14 +104,59 @@ public class PositionUtils
 
     public static boolean arePositionsWithinWorld(World world, BlockPos pos1, BlockPos pos2)
     {
-        if (pos1.getY() >= 0 && pos1.getY() < 256 &&
-            pos2.getY() >= 0 && pos2.getY() < 256)
+        if (pos1.getY() >= LayerRange.WORLD_VERTICAL_SIZE_MIN && pos1.getY() <= LayerRange.WORLD_VERTICAL_SIZE_MAX &&
+            pos2.getY() >= LayerRange.WORLD_VERTICAL_SIZE_MIN && pos2.getY() <= LayerRange.WORLD_VERTICAL_SIZE_MAX)
         {
             WorldBorder border = world.getWorldBorder();
             return border.contains(pos1) && border.contains(pos2);
         }
 
         return false;
+    }
+
+    public static boolean isBoxWithinWorld(World world, Box box)
+    {
+        if (box.getPos1() != null && box.getPos2() != null)
+        {
+            return arePositionsWithinWorld(world, box.getPos1(), box.getPos2());
+        }
+
+        return false;
+    }
+
+    public static boolean isPlacementWithinWorld(World world, SchematicPlacement schematicPlacement, boolean respectRenderRange)
+    {
+        LayerRange range = DataManager.getRenderLayerRange();
+        BlockPos.MutableBlockPos posMutable1 = new BlockPos.MutableBlockPos();
+        BlockPos.MutableBlockPos posMutable2 = new BlockPos.MutableBlockPos();
+
+        for (Box box : schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values())
+        {
+            if (respectRenderRange)
+            {
+                if (range.intersectsBox(box.getPos1(), box.getPos2()))
+                {
+                    MutableBoundingBox bb = range.getClampedArea(box.getPos1(), box.getPos2());
+
+                    if (bb != null)
+                    {
+                        posMutable1.setPos(bb.minX, bb.minY, bb.minZ);
+                        posMutable2.setPos(bb.maxX, bb.maxY, bb.maxZ);
+
+                        if (arePositionsWithinWorld(world, posMutable1, posMutable2) == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            else if (isBoxWithinWorld(world, box) == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public static BlockPos getAreaSizeFromRelativeEndPosition(BlockPos posEndRelative)
@@ -198,6 +292,69 @@ public class PositionUtils
         return volume;
     }
 
+    public static ImmutableMap<String, MutableBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, ImmutableMap<String, Box> subRegions)
+    {
+        ImmutableMap.Builder<String, MutableBoundingBox> builder = new ImmutableMap.Builder<>();
+
+        for (Map.Entry<String, Box> entry : subRegions.entrySet())
+        {
+            Box box = entry.getValue();
+            MutableBoundingBox bb = box != null ? getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
+
+            if (bb != null)
+            {
+                builder.put(entry.getKey(), bb);
+            }
+        }
+
+        return builder.build();
+    }
+
+    public static ImmutableList<MutableBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<Box> boxes)
+    {
+        ImmutableList.Builder<MutableBoundingBox> builder = new ImmutableList.Builder<>();
+
+        for (Box box : boxes)
+        {
+            MutableBoundingBox bb = getBoundsWithinChunkForBox(box, chunkX, chunkZ);
+
+            if (bb != null)
+            {
+                builder.add(bb);
+            }
+        }
+
+        return builder.build();
+    }
+
+    public static Set<ChunkPos> getTouchedChunks(ImmutableMap<String, Box> boxes)
+    {
+        return getTouchedChunksForBoxes(boxes.values());
+    }
+
+    public static Set<ChunkPos> getTouchedChunksForBoxes(Collection<Box> boxes)
+    {
+        Set<ChunkPos> set = new HashSet<>();
+
+        for (Box box : boxes)
+        {
+            final int boxXMin = Math.min(box.getPos1().getX(), box.getPos2().getX()) >> 4;
+            final int boxZMin = Math.min(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
+            final int boxXMax = Math.max(box.getPos1().getX(), box.getPos2().getX()) >> 4;
+            final int boxZMax = Math.max(box.getPos1().getZ(), box.getPos2().getZ()) >> 4;
+
+            for (int cz = boxZMin; cz <= boxZMax; ++cz)
+            {
+                for (int cx = boxXMin; cx <= boxXMax; ++cx)
+                {
+                    set.add(new ChunkPos(cx, cz));
+                }
+            }
+        }
+
+        return set;
+    }
+
     @Nullable
     public static MutableBoundingBox getBoundsWithinChunkForBox(Box box, int chunkX, int chunkZ)
     {
@@ -243,6 +400,11 @@ public class PositionUtils
         return createAABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
+    public static AxisAlignedBB createAABBFrom(MutableBoundingBox bb)
+    {
+        return createAABB(bb.minX, bb.minY, bb.minZ, bb.maxX + 1, bb.maxY + 1, bb.maxZ + 1);
+    }
+
     /**
      * Creates an AABB for the given position
      */
@@ -265,6 +427,206 @@ public class PositionUtils
     public static AxisAlignedBB createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    /**
+     * Returns the given position adjusted such that the coordinate indicated by <b>type</b>
+     * is set to the value in <b>value</b>
+     * @param pos
+     * @param value
+     * @param type
+     * @return
+     */
+    public static BlockPos getModifiedPosition(BlockPos pos, int value, CoordinateType type)
+    {
+
+        switch (type)
+        {
+            case X:
+                pos = new BlockPos(     value, pos.getY(), pos.getZ());
+                break;
+            case Y:
+                pos = new BlockPos(pos.getX(),      value, pos.getZ());
+                break;
+            case Z:
+                pos = new BlockPos(pos.getX(), pos.getY(),      value);
+                break;
+        }
+
+        return pos;
+    }
+
+    public static int getCoordinate(BlockPos pos, CoordinateType type)
+    {
+        switch (type)
+        {
+            case X: return pos.getX();
+            case Y: return pos.getY();
+            case Z: return pos.getZ();
+        }
+
+        return 0;
+    }
+
+    public static Box growOrShrinkBox(Box box, int amount)
+    {
+        BlockPos pos1 = box.getPos1();
+        BlockPos pos2 = box.getPos2();
+
+        if (pos1 == null || pos2 == null)
+        {
+            if (pos1 == null && pos2 == null)
+            {
+                return box;
+            }
+            else if (pos2 == null)
+            {
+                pos2 = pos1;
+            }
+            else
+            {
+                pos1 = pos2;
+            }
+        }
+
+        Pair<Integer, Integer> x = growCoordinatePair(pos1.getX(), pos2.getX(), amount);
+        Pair<Integer, Integer> y = growCoordinatePair(pos1.getY(), pos2.getY(), amount);
+        Pair<Integer, Integer> z = growCoordinatePair(pos1.getZ(), pos2.getZ(), amount);
+
+        Box boxNew = box.copy();
+        boxNew.setPos1(new BlockPos(x.getLeft(), y.getLeft(), z.getLeft()));
+        boxNew.setPos2(new BlockPos(x.getRight(), y.getRight(), z.getRight()));
+
+        return boxNew;
+    }
+
+    private static Pair<Integer, Integer> growCoordinatePair(int v1, int v2, int amount)
+    {
+        if (v2 >= v1)
+        {
+            if (v2 + amount >= v1)
+            {
+                v2 += amount;
+            }
+
+            if (v1 - amount <= v2)
+            {
+                v1 -= amount;
+            }
+        }
+        else if (v1 > v2)
+        {
+            if (v1 + amount >= v2)
+            {
+                v1 += amount;
+            }
+
+            if (v2 - amount <= v1)
+            {
+                v2 -= amount;
+            }
+        }
+
+        return Pair.of(v1, v2);
+    }
+
+    public static void growOrShrinkCurrentSelection(boolean grow)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+        World world = Minecraft.getInstance().world;
+
+        if (area == null || world == null)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+            return;
+        }
+
+        Box box = area.getSelectedSubRegionBox();
+
+        if (box == null || (box.getPos1() == null && box.getPos2() == null))
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.grow.no_sub_region_selected");
+            return;
+        }
+
+        if (box != null && (box.getPos1() != null || box.getPos2() != null))
+        {
+            int amount = 1;
+            Box boxNew = box.copy();
+
+            for (int i = 0; i < 256; ++i)
+            {
+                if (grow)
+                {
+                    boxNew = growOrShrinkBox(boxNew, amount);
+                }
+
+                BlockPos pos1 = boxNew.getPos1();
+                BlockPos pos2 = boxNew.getPos2();
+                int xMin = Math.min(pos1.getX(), pos2.getX());
+                int yMin = Math.min(pos1.getY(), pos2.getY());
+                int zMin = Math.min(pos1.getZ(), pos2.getZ());
+                int xMax = Math.max(pos1.getX(), pos2.getX());
+                int yMax = Math.max(pos1.getY(), pos2.getY());
+                int zMax = Math.max(pos1.getZ(), pos2.getZ());
+                int emptySides = 0;
+
+                // Slices along the z axis
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.X, new BlockPos(xMin, yMin, zMin), new BlockPos(xMin, yMax, zMax)))
+                {
+                    xMin += amount;
+                    ++emptySides;
+                }
+
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.X, new BlockPos(xMax, yMin, zMin), new BlockPos(xMax, yMax, zMax)))
+                {
+                    xMax -= amount;
+                    ++emptySides;
+                }
+
+                // Slices along the x/z plane
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Y, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMin, zMax)))
+                {
+                    yMin += amount;
+                    ++emptySides;
+                }
+
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Y, new BlockPos(xMin, yMax, zMin), new BlockPos(xMax, yMax, zMax)))
+                {
+                    yMax -= amount;
+                    ++emptySides;
+                }
+
+                // Slices along the x axis
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Z, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMax, zMin)))
+                {
+                    zMin += amount;
+                    ++emptySides;
+                }
+
+                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Z, new BlockPos(xMin, yMin, zMax), new BlockPos(xMax, yMax, zMax)))
+                {
+                    zMax -= amount;
+                    ++emptySides;
+                }
+
+                boxNew.setPos1(new BlockPos(xMin, yMin, zMin));
+                boxNew.setPos2(new BlockPos(xMax, yMax, zMax));
+
+                if (grow && emptySides >= 6)
+                {
+                    break;
+                }
+                else if (grow == false && emptySides == 0)
+                {
+                    break;
+                }
+            }
+
+            area.setSelectedSubRegionCornerPos(boxNew.getPos1(), Corner.CORNER_1);
+            area.setSelectedSubRegionCornerPos(boxNew.getPos2(), Corner.CORNER_2);
+        }
     }
 
     /**
@@ -429,6 +791,50 @@ public class PositionUtils
         }
     }
 
+    public static Rotation getReverseRotation(Rotation rotationIn)
+    {
+        switch (rotationIn)
+        {
+            case COUNTERCLOCKWISE_90:
+                return Rotation.CLOCKWISE_90;
+            case CLOCKWISE_90:
+                return Rotation.COUNTERCLOCKWISE_90;
+            case CLOCKWISE_180:
+                return Rotation.CLOCKWISE_180;
+            default:
+                return rotationIn;
+        }
+    }
+
+    public static BlockPos getModifiedPartiallyLockedPosition(BlockPos posOriginal, BlockPos posNew, int lockMask)
+    {
+        if (lockMask != 0)
+        {
+            int x = posNew.getX();
+            int y = posNew.getY();
+            int z = posNew.getZ();
+
+            if ((lockMask & (0x1 << CoordinateType.X.ordinal())) != 0)
+            {
+                x = posOriginal.getX();
+            }
+
+            if ((lockMask & (0x1 << CoordinateType.Y.ordinal())) != 0)
+            {
+                y = posOriginal.getY();
+            }
+
+            if ((lockMask & (0x1 << CoordinateType.Z.ordinal())) != 0)
+            {
+                z = posOriginal.getZ();
+            }
+
+            posNew = new BlockPos(x, y, z);
+        }
+
+        return posNew;
+    }
+
     /**
      * Gets the "front" facing from the given positions,
      * so that pos1 is in the "front left" corner and pos2 is in the "back right" corner
@@ -521,6 +927,8 @@ public class PositionUtils
 
     public static float getRotatedYaw(float yaw, Rotation rotation)
     {
+        yaw = MathHelper.wrapDegrees(yaw);
+
         switch (rotation)
         {
             case CLOCKWISE_180:
@@ -535,11 +943,13 @@ public class PositionUtils
             default:
         }
 
-        return MathHelper.wrapDegrees(yaw);
+        return yaw;
     }
 
     public static float getMirroredYaw(float yaw, Mirror mirror)
     {
+        yaw = MathHelper.wrapDegrees(yaw);
+
         switch (mirror)
         {
             case LEFT_RIGHT:
@@ -551,7 +961,7 @@ public class PositionUtils
             default:
         }
 
-        return MathHelper.wrapDegrees(yaw);
+        return yaw;
     }
 
     public static class BlockPosComparator implements Comparator<BlockPos>
@@ -589,14 +999,16 @@ public class PositionUtils
         private BlockPos posReference = BlockPos.ORIGIN;
         private boolean closestFirst;
 
-        public void setClosestFirst(boolean closestFirst)
+        public ChunkPosComparator setClosestFirst(boolean closestFirst)
         {
             this.closestFirst = closestFirst;
+            return this;
         }
 
-        public void setReferencePosition(BlockPos pos)
+        public ChunkPosComparator setReferencePosition(BlockPos pos)
         {
             this.posReference = pos;
+            return this;
         }
 
         @Override

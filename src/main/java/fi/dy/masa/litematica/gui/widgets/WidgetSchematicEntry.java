@@ -1,8 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -10,11 +8,12 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetBase;
-import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
+import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -23,25 +22,22 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
-public class WidgetSchematicEntry extends WidgetBase
+public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchematic>
 {
     private final WidgetListLoadedSchematics parent;
     private final LitematicaSchematic schematic;
-    private final Minecraft mc;
-    private final List<ButtonWrapper<? extends ButtonGeneric>> buttons = new ArrayList<>();
     private final int typeIconX;
     private final int typeIconY;
     private final boolean isOdd;
     private final int buttonsStartX;
 
-    public WidgetSchematicEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            LitematicaSchematic schematic, WidgetListLoadedSchematics parent, Minecraft mc)
+    public WidgetSchematicEntry(int x, int y, int width, int height, boolean isOdd,
+            LitematicaSchematic schematic, int listIndex, WidgetListLoadedSchematics parent)
     {
-        super(x, y, width, height, zLevel);
+        super(x, y, width, height, schematic, listIndex);
 
         this.parent = parent;
         this.schematic = schematic;
-        this.mc = mc;
         this.isOdd = isOdd;
         y += 1;
 
@@ -51,47 +47,27 @@ public class WidgetSchematicEntry extends WidgetBase
         String text;
 
         text = I18n.format("litematica.gui.button.unload");
-        len = mc.fontRenderer.getStringWidth(text) + 10;
-        posX -= (len + 4);
+        len = this.getStringWidth(text) + 10;
+        posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.UNLOAD, this);
-        this.addButton(new ButtonGeneric(0, posX, y, len, 20, text), listener);
+        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
 
         text = I18n.format("litematica.gui.button.save_to_file");
-        len = mc.fontRenderer.getStringWidth(text) + 10;
-        posX -= (len + 4);
+        len = this.getStringWidth(text) + 10;
+        posX -= (len + 2);
         listener = new ButtonListener(ButtonListener.Type.SAVE_TO_FILE, this);
-        this.addButton(new ButtonGeneric(0, posX, y, len, 20, text), listener);
+        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
 
         text = I18n.format("litematica.gui.button.create_placement");
-        len = mc.fontRenderer.getStringWidth(text) + 10;
-        posX -= (len + 4);
+        len = this.getStringWidth(text) + 10;
+        posX -= (len + 2);
         String tip = I18n.format("litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled");
         listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
-        this.addButton(new ButtonGeneric(0, posX, y, len, 20, text, tip), listener);
+        this.addButton(new ButtonGeneric(posX, y, len, 20, text, tip), listener);
 
         this.buttonsStartX = posX;
         this.typeIconX = this.x + 2;
         this.typeIconY = y + 4;
-    }
-
-    protected <T extends ButtonGeneric> void addButton(T button, IButtonActionListener<T> listener)
-    {
-        this.buttons.add(new ButtonWrapper<>(button, listener));
-    }
-
-    @Override
-    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
-    {
-        for (ButtonWrapper<?> entry : this.buttons)
-        {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return true;
-            }
-        }
-
-        return true;
     }
 
     @Override
@@ -115,7 +91,7 @@ public class WidgetSchematicEntry extends WidgetBase
         }
 
         String schematicName = this.schematic.getMetadata().getName();
-        this.mc.fontRenderer.drawString(schematicName, this.x + 20, this.y + 7, 0xFFFFFFFF);
+        this.drawString(schematicName, this.x + 20, this.y + 7, 0xFFFFFFFF);
 
         GlStateManager.color4f(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();
@@ -139,31 +115,18 @@ public class WidgetSchematicEntry extends WidgetBase
 
         icon.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
 
-        for (int i = 0; i < this.buttons.size(); ++i)
-        {
-            this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-        }
+        this.drawSubWidgets(mouseX, mouseY);
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
         {
             RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(text));
         }
 
-        for (ButtonWrapper<? extends ButtonGeneric> entry : this.buttons)
-        {
-            ButtonGeneric button = entry.getButton();
-
-            if (button.hasHoverText() && button.isMouseOver())
-            {
-                RenderUtils.drawHoverText(mouseX, mouseY, button.getHoverStrings());
-            }
-        }
-
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final Type type;
         private final WidgetSchematicEntry widget;
@@ -175,7 +138,7 @@ public class WidgetSchematicEntry extends WidgetBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == Type.CREATE_PLACEMENT)
             {
@@ -185,8 +148,10 @@ public class WidgetSchematicEntry extends WidgetBase
                 String name = entry.getMetadata().getName();
                 boolean enabled = GuiScreen.isShiftKeyDown() == false;
 
+                SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
                 SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name, enabled, enabled);
-                DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, this.widget.parent.getMessageConsumer());
+                manager.addSchematicPlacement(placement, true);
+                manager.setSelectedSchematicPlacement(placement);
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {
@@ -206,12 +171,6 @@ public class WidgetSchematicEntry extends WidgetBase
                 SchematicHolder.getInstance().removeSchematic(this.widget.schematic);
                 this.widget.parent.refreshEntries();
             }
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
         }
 
         public enum Type

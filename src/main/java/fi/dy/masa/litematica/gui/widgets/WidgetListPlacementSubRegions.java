@@ -1,10 +1,16 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.util.AlphaNumComparator;
 
 public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlacement, WidgetPlacementSubRegion>
 {
@@ -16,6 +22,10 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
 
         this.parent = parent;
         this.browserEntryHeight = 22;
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
+        //this.widgetSearchBar.setSearchOpen(true);
+        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
+        this.shouldSortList = true;
     }
 
     public GuiPlacementConfiguration getParentGui()
@@ -24,162 +34,36 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
     }
 
     @Override
-    public void refreshEntries()
+    protected Collection<SubRegionPlacement> getAllEntries()
     {
-        this.listContents.clear();
-        this.listContents.addAll(this.parent.getSchematicPlacement().getAllSubRegionsPlacements());
-        Collections.sort(this.listContents, new AlphanumComparator());
+        return this.parent.getSchematicPlacement().getAllSubRegionsPlacements();
+    }
 
-        this.reCreateListEntryWidgets();
+    @Override
+    protected Comparator<SubRegionPlacement> getComparator()
+    {
+        return new PlacementComparator();
+    }
+
+    @Override
+    protected List<String> getEntryStringsForFilter(SubRegionPlacement entry)
+    {
+        return ImmutableList.of(entry.getName().toLowerCase());
     }
 
     @Override
     protected WidgetPlacementSubRegion createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SubRegionPlacement entry)
     {
-        return new WidgetPlacementSubRegion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), this.zLevel, isOdd,
-                this.parent.getSchematicPlacement(), entry, this, this.mc);
+        return new WidgetPlacementSubRegion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
+                isOdd, this.parent.getSchematicPlacement(), entry, listIndex, this);
     }
 
-    /*
-    private static class ListSorter implements Comparator<SubRegionPlacement>
+    protected static class PlacementComparator extends AlphaNumComparator implements Comparator<SubRegionPlacement>
     {
         @Override
-        public int compare(SubRegionPlacement entry1, SubRegionPlacement entry2)
+        public int compare(SubRegionPlacement placement1, SubRegionPlacement placement2)
         {
-            return entry1.getName().compareTo(entry2.getName());
-        }
-    }
-    */
-
-    /*
-     * The Alphanum Algorithm is an improved sorting algorithm for strings
-     * containing numbers.  Instead of sorting numbers in ASCII order like
-     * a standard sort, this algorithm sorts numbers in numeric order.
-     *
-     * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
-     *
-     * Released under the MIT License - https://opensource.org/licenses/MIT
-     *
-     * Copyright 2007-2017 David Koelle
-     *
-     * Permission is hereby granted, free of charge, to any person obtaining
-     * a copy of this software and associated documentation files (the "Software"),
-     * to deal in the Software without restriction, including without limitation
-     * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-     * and/or sell copies of the Software, and to permit persons to whom the
-     * Software is furnished to do so, subject to the following conditions:
-     *
-     * The above copyright notice and this permission notice shall be included
-     * in all copies or substantial portions of the Software.
-     *
-     * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-     * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-     * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-     * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-     * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-     * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-     * USE OR OTHER DEALINGS IN THE SOFTWARE.
-     */
-
-    /**
-     * This is an updated version with enhancements made by Daniel Migowski,
-     * Andre Bogus, and David Koelle. Updated by David Koelle in 2017.
-     *
-     * To use this class:
-     *   Use the static "sort" method from the java.util.Collections class:
-     *   Collections.sort(your list, new AlphanumComparator());
-     */
-    private static class AlphanumComparator implements Comparator<SubRegionPlacement>
-    {
-        private final boolean isDigit(char ch)
-        {
-            return ((ch >= 48) && (ch <= 57));
-        }
-
-        /** Length of string is passed in for improved efficiency (only need to calculate it once) **/
-        private final String getChunk(String s, int slength, int marker)
-        {
-            StringBuilder chunk = new StringBuilder();
-            char c = s.charAt(marker);
-            chunk.append(c);
-            marker++;
-            if (isDigit(c))
-            {
-                while (marker < slength)
-                {
-                    c = s.charAt(marker);
-                    if (!isDigit(c))
-                        break;
-                    chunk.append(c);
-                    marker++;
-                }
-            } else
-            {
-                while (marker < slength)
-                {
-                    c = s.charAt(marker);
-                    if (isDigit(c))
-                        break;
-                    chunk.append(c);
-                    marker++;
-                }
-            }
-            return chunk.toString();
-        }
-
-        public int compare(SubRegionPlacement entry1, SubRegionPlacement entry2)
-        {
-            String s1 = entry1.getName();
-            String s2 = entry2.getName();
-
-            if ((s1 == null) || (s2 == null))
-            {
-                return 0;
-            }
-
-            int thisMarker = 0;
-            int thatMarker = 0;
-            int s1Length = s1.length();
-            int s2Length = s2.length();
-
-            while (thisMarker < s1Length && thatMarker < s2Length)
-            {
-                String thisChunk = getChunk(s1, s1Length, thisMarker);
-                thisMarker += thisChunk.length();
-
-                String thatChunk = getChunk(s2, s2Length, thatMarker);
-                thatMarker += thatChunk.length();
-
-                // If both chunks contain numeric characters, sort them numerically
-                int result = 0;
-                if (isDigit(thisChunk.charAt(0)) && isDigit(thatChunk.charAt(0)))
-                {
-                    // Simple chunk comparison by length.
-                    int thisChunkLength = thisChunk.length();
-                    result = thisChunkLength - thatChunk.length();
-                    // If equal, the first different number counts
-                    if (result == 0)
-                    {
-                        for (int i = 0; i < thisChunkLength; i++)
-                        {
-                            result = thisChunk.charAt(i) - thatChunk.charAt(i);
-                            if (result != 0)
-                            {
-                                return result;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    result = thisChunk.compareTo(thatChunk);
-                }
-
-                if (result != 0)
-                    return result;
-            }
-
-            return s1Length - s2Length;
+            return this.compare(placement1.getName(), placement2.getName());
         }
     }
 }

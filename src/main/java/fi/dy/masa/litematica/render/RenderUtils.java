@@ -3,8 +3,13 @@ package fi.dy.masa.litematica.render;
 import java.util.List;
 import java.util.Random;
 import org.lwjgl.opengl.GL11;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.InventoryUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.LeftRight;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.Color4f;
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
@@ -17,12 +22,10 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryLargeChest;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ILockableContainer;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
 public class RenderUtils
@@ -50,33 +53,47 @@ public class RenderUtils
         WorldRenderer.drawSelectionBoundingBox(aabb, color.r, color.g, color.b, color.a);
     }
 
-    public static void renderBlockOutlineBatched(BlockPos pos, double expand,
-            Color4f color, Entity renderViewEntity, BufferBuilder buffer, float partialTicks)
+    public static void drawBlockBoundingBoxOutlinesBatchedLines(BlockPos pos, Color4f color, double expand, BufferBuilder buffer,
+            Entity renderViewEntity, float partialTicks)
     {
         double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
         double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
         double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+        double minX = pos.getX() - dx - expand;
+        double minY = pos.getY() - dy - expand;
+        double minZ = pos.getZ() - dz - expand;
+        double maxX = pos.getX() - dx + expand + 1;
+        double maxY = pos.getY() - dy + expand + 1;
+        double maxZ = pos.getZ() - dz + expand + 1;
 
-        WorldRenderer.drawBoundingBox(buffer,
-                pos.getX() - dx - expand,
-                pos.getY() - dy - expand,
-                pos.getZ() - dz - expand,
-                pos.getX() + 1 - dx + expand,
-                pos.getY() + 1 - dy + expand,
-                pos.getZ() + 1 - dz + expand,
-                color.r, color.g, color.b, color.a);
+        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 
-    public static void renderBlockOverlay(BlockPos pos, double expand, Color4f color, BufferBuilder buffer)
+    public static void drawConnectingLineBatchedLines(BlockPos pos1, BlockPos pos2, boolean center, Color4f color, BufferBuilder buffer,
+            Entity renderViewEntity, float partialTicks)
     {
-        WorldRenderer.drawBoundingBox(buffer,
-                pos.getX() - expand,
-                pos.getY() - expand,
-                pos.getZ() - expand,
-                pos.getX() + 1 + expand,
-                pos.getY() + 1 + expand,
-                pos.getZ() + 1 + expand,
-                color.r, color.g, color.b, color.a);
+        double dx = renderViewEntity.lastTickPosX + (renderViewEntity.posX - renderViewEntity.lastTickPosX) * partialTicks;
+        double dy = renderViewEntity.lastTickPosY + (renderViewEntity.posY - renderViewEntity.lastTickPosY) * partialTicks;
+        double dz = renderViewEntity.lastTickPosZ + (renderViewEntity.posZ - renderViewEntity.lastTickPosZ) * partialTicks;
+        double x1 = pos1.getX() - dx;
+        double y1 = pos1.getY() - dy;
+        double z1 = pos1.getZ() - dz;
+        double x2 = pos2.getX() - dx;
+        double y2 = pos2.getY() - dy;
+        double z2 = pos2.getZ() - dz;
+
+        if (center)
+        {
+            x1 += 0.5;
+            y1 += 0.5;
+            z1 += 0.5;
+            x2 += 0.5;
+            y2 += 0.5;
+            z2 += 0.5;
+        }
+
+        buffer.pos(x1, y1, z1).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(x2, y2, z2).color(color.r, color.g, color.b, color.a).endVertex();
     }
 
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
@@ -405,7 +422,7 @@ public class RenderUtils
      */
     public static void drawBlockModelOutlinesBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
-        for (final EnumFacing side : EnumFacing.values())
+        for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
             renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, RAND));
         }
@@ -454,12 +471,17 @@ public class RenderUtils
 
     public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
-        for (final EnumFacing side : EnumFacing.values())
+        for (final EnumFacing side : PositionUtils.FACING_ALL)
         {
             renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, RAND));
         }
 
         renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, RAND));
+    }
+
+    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, IBlockState state, BlockPos pos, EnumFacing side, Color4f color, double expand, BufferBuilder buffer)
+    {
+        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, RAND));
     }
 
     private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
@@ -489,51 +511,133 @@ public class RenderUtils
         }
     }
 
-    public static void renderInventoryOverlay(int xOffsetMult, World world, BlockPos pos, Minecraft mc)
+    /**
+     * Assumes a BufferBuilder in GL_QUADS mode has been initialized
+     */
+    public static void drawBlockBoxSideBatchedQuads(BlockPos pos, EnumFacing side, Color4f color, double expand, BufferBuilder buffer)
     {
-        IInventory inv = null;
-        TileEntity te = world.getTileEntity(pos);
+        double minX = pos.getX() - expand;
+        double minY = pos.getY() - expand;
+        double minZ = pos.getZ() - expand;
+        double maxX = pos.getX() + expand + 1;
+        double maxY = pos.getY() + expand + 1;
+        double maxZ = pos.getZ() + expand + 1;
 
-        if (te instanceof IInventory)
+        switch (side)
         {
-            inv = (IInventory) te;
-            IBlockState state = world.getBlockState(pos);
+            case DOWN:
+                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
 
-            if (state.getBlock() instanceof BlockChest)
-            {
-                ILockableContainer cont = ((BlockChest) state.getBlock()).getContainer(state, world, pos, true);
+            case UP:
+                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
 
-                if (cont instanceof InventoryLargeChest)
-                {
-                    inv = (InventoryLargeChest) cont;
-                }
-            }
+            case NORTH:
+                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case SOUTH:
+                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case WEST:
+                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
+
+            case EAST:
+                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+                break;
         }
+    }
+
+    public static void drawBlockBoxEdgeBatchedLines(BlockPos pos, EnumFacing.Axis axis, int cornerIndex, Color4f color, BufferBuilder buffer)
+    {
+        Vec3i offset = PositionUtils.getEdgeNeighborOffsets(axis, cornerIndex)[cornerIndex];
+
+        double minX = pos.getX() + offset.getX();
+        double minY = pos.getY() + offset.getY();
+        double minZ = pos.getZ() + offset.getZ();
+        double maxX = pos.getX() + offset.getX() + (axis == EnumFacing.Axis.X ? 1 : 0);
+        double maxY = pos.getY() + offset.getY() + (axis == EnumFacing.Axis.Y ? 1 : 0);
+        double maxZ = pos.getZ() + offset.getZ() + (axis == EnumFacing.Axis.Z ? 1 : 0);
+
+        //System.out.printf("pos: %s, axis: %s, ind: %d\n", pos, axis, cornerIndex);
+        buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
+        buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
+    }
+
+    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, Minecraft mc)
+    {
+        int heightSch = renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc);
+        int heightCli = renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc);
+
+        return Math.max(heightSch, heightCli);
+    }
+
+    public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
+            World world, BlockPos pos, Minecraft mc)
+    {
+        IInventory inv = InventoryUtils.getInventory(world, pos);
 
         if (inv != null)
         {
-            MainWindow window = mc.mainWindow;
-            final int xCenter = window.getScaledWidth() / 2;
-            final int yCenter = window.getScaledHeight() / 2;
+            final InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
+            final InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, inv.getSizeInventory());
 
-            final int totalSlots = inv.getSizeInventory();
-            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
-            final fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, totalSlots);
-            final int rows = (int) Math.ceil(totalSlots / props.slotsPerRow);
-
-            int xInv = xCenter - (props.width / 2) + (props.width / 2 + 4) * xOffsetMult;
-            int yInv = yCenter - 6 - props.height;
-
-            if (rows > 6)
-            {
-                yInv -= (rows - 6) * 18;
-            }
-
-            GlStateManager.color4f(1f, 1f, 1f, 1f);
-
-            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, totalSlots, mc);
-            fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);
+            return renderInventoryOverlay(align, side, offY, inv, type, props, mc);
         }
+
+        return 0;
+    }
+
+    public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
+            IInventory inv, InventoryRenderType type, InventoryProperties props, Minecraft mc)
+    {
+        MainWindow window = mc.mainWindow;
+
+        int xInv = 0;
+        int yInv = 0;
+
+        switch (align)
+        {
+            case CENTER:
+                xInv = window.getScaledWidth() / 2 - (props.width / 2);
+                yInv = window.getScaledHeight() / 2 - props.height - offY;
+                break;
+            case TOP_CENTER:
+                xInv = window.getScaledWidth() / 2 - (props.width / 2);
+                yInv = offY;
+                break;
+        }
+
+        if      (side == LeftRight.LEFT)  { xInv -= (props.width / 2 + 4); }
+        else if (side == LeftRight.RIGHT) { xInv += (props.width / 2 + 4); }
+
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
+
+        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, props.totalSlots, mc);
+        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);
+
+        return props.height;
     }
 
     /*

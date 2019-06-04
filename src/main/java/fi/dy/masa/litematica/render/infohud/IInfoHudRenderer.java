@@ -6,16 +6,34 @@ import fi.dy.masa.malilib.config.HudAlignment;
 public interface IInfoHudRenderer
 {
     /**
-     * Whether or not this renderer is currently enabled
+     * Return true if this renderer should render its text in the indicated phase
      * @return
      */
-    boolean getShouldRender();
+    boolean getShouldRenderText(RenderPhase phase);
+
+    /**
+     * Return true if this renderer should render its custom content via render()
+     * @return
+     */
+    default boolean getShouldRenderCustom()
+    {
+        return false;
+    }
+
+    /**
+     * Whether or not this renderer should also be rendered when GUIs are open
+     * @return
+     */
+    default boolean shouldRenderInGuis()
+    {
+        return false;
+    }
 
     /**
      * Returns the text lines rendered by the InfoHud, if any
      * @return
      */
-    List<String> getText();
+    List<String> getText(RenderPhase phase);
 
     /**
      * Render any custom content on the HUD.

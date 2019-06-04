@@ -6,29 +6,38 @@ import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.util.math.BlockPos;
 
 public class Box
 {
-    private BlockPos pos1;
-    private BlockPos pos2;
+    @Nullable private BlockPos pos1;
+    @Nullable private BlockPos pos2;
     private BlockPos size = BlockPos.ORIGIN;
     private String name = "Unnamed";
     private Corner selectedCorner = Corner.NONE;
 
     public Box()
     {
+        this.pos1 = BlockPos.ORIGIN;
+        this.pos2 = BlockPos.ORIGIN;
+        this.updateSize();
     }
 
-    public Box(BlockPos pos1, BlockPos pos2, String name)
+    public Box(@Nullable BlockPos pos1, @Nullable BlockPos pos2, String name)
     {
         this.pos1 = pos1;
         this.pos2 = pos2;
         this.name = name;
 
         this.updateSize();
+    }
+
+    public Box copy()
+    {
+        Box box = new Box(this.pos1, this.pos2, this.name);
+        box.setSelectedCorner(this.selectedCorner);
+        return box;
     }
 
     @Nullable
@@ -80,6 +89,7 @@ public class Box
         this.selectedCorner = corner;
     }
 
+    /*
     public void rotate(Rotation rotation)
     {
         BlockPos pos = PositionUtils.getTransformedBlockPos(this.getSize(), Mirror.NONE, rotation);
@@ -91,6 +101,7 @@ public class Box
         BlockPos pos = PositionUtils.getTransformedBlockPos(this.getSize(), mirror, Rotation.NONE);
         this.setPos2(this.getPos1().add(pos).add(-1, -1, -1));
     }
+    */
 
     private void updateSize()
     {
@@ -106,6 +117,44 @@ public class Box
         {
             this.size = new BlockPos(1, 1, 1);
         }
+    }
+
+    public BlockPos getPosition(Corner corner)
+    {
+        return corner == Corner.CORNER_1 ? this.getPos1() : this.getPos2();
+    }
+
+    public int getCoordinate(Corner corner, CoordinateType type)
+    {
+        BlockPos pos = this.getPosition(corner);
+
+        switch (type)
+        {
+            case X: return pos.getX();
+            case Y: return pos.getY();
+            case Z: return pos.getZ();
+        }
+
+        return 0;
+    }
+
+    protected void setPosition(BlockPos pos, Corner corner)
+    {
+        if (corner == Corner.CORNER_1)
+        {
+            this.setPos1(pos);
+        }
+        else if (corner == Corner.CORNER_2)
+        {
+            this.setPos2(pos);
+        }
+    }
+
+    public void setCoordinate(int value, Corner corner, CoordinateType type)
+    {
+        BlockPos pos = this.getPosition(corner);
+        pos = PositionUtils.getModifiedPosition(pos, value, type);
+        this.setPosition(pos, corner);
     }
 
     @Nullable

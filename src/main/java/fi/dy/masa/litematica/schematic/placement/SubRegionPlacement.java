@@ -5,7 +5,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -20,6 +22,7 @@ public class SubRegionPlacement
     private boolean enabled = true;
     private boolean renderingEnabled = true;
     private boolean ignoreEntities;
+    private int coordinateLockMask;
 
     public SubRegionPlacement(BlockPos pos, String name)
     {
@@ -41,6 +44,26 @@ public class SubRegionPlacement
     public boolean ignoreEntities()
     {
         return this.ignoreEntities;
+    }
+
+    public void setCoordinateLocked(CoordinateType coord, boolean locked)
+    {
+        int mask = 0x1 << coord.ordinal();
+
+        if (locked)
+        {
+            this.coordinateLockMask |= mask;
+        }
+        else
+        {
+            this.coordinateLockMask &= ~mask;
+        }
+    }
+
+    public boolean isCoordinateLocked(CoordinateType coord)
+    {
+        int mask = 0x1 << coord.ordinal();
+        return (this.coordinateLockMask & mask) != 0;
     }
 
     public boolean matchesRequirement(RequiredEnabled required)
@@ -105,7 +128,7 @@ public class SubRegionPlacement
 
     void setPos(BlockPos pos)
     {
-        this.pos = pos;
+        this.pos = PositionUtils.getModifiedPartiallyLockedPosition(this.pos, pos, this.coordinateLockMask);
     }
 
     void setRotation(Rotation rotation)
@@ -154,6 +177,7 @@ public class SubRegionPlacement
         obj.add("name", new JsonPrimitive(this.getName()));
         obj.add("rotation", new JsonPrimitive(this.rotation.name()));
         obj.add("mirror", new JsonPrimitive(this.mirror.name()));
+        obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
         obj.add("enabled", new JsonPrimitive(this.enabled));
         obj.add("rendering_enabled", new JsonPrimitive(this.renderingEnabled));
         obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities));
@@ -182,6 +206,7 @@ public class SubRegionPlacement
             placement.setEnabled(JsonUtils.getBoolean(obj, "enabled"));
             placement.setRenderingEnabled(JsonUtils.getBoolean(obj, "rendering_enabled"));
             placement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
+            placement.coordinateLockMask = JsonUtils.getInteger(obj, "locked_coords");
 
             try
             {

@@ -1,12 +1,11 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
@@ -14,9 +13,9 @@ import com.google.common.collect.Lists;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayType;
-import fi.dy.masa.litematica.util.LayerRange;
-import fi.dy.masa.litematica.util.SubChunkPos;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -124,6 +123,11 @@ public class WorldRendererSchematic extends WorldRenderer
         this.blockModelShapes = dispatcher.getBlockModelShapes();
         this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColors());
         this.fluidRenderer = ((IMixinBlockRendererDispatcher) dispatcher).getFluidRenderer();
+    }
+
+    public void markNeedsUpdate()
+    {
+        this.displayListEntitiesDirty = true;
     }
 
     @Override
@@ -264,13 +268,15 @@ public class WorldRendererSchematic extends WorldRenderer
     @Override
     public void setupTerrain(Entity viewEntity, float partialTicks, ICamera camera, int frameCount, boolean playerSpectator)
     {
+        World world = this.world;
+        world.profiler.startSection("setup_terrain");
+
         if (this.viewFrustum == null || this.mc.gameSettings.renderDistanceChunks != this.renderDistanceChunks)
         {
             this.loadRenderers();
         }
 
-        World worldClient = this.world;
-        worldClient.profiler.startSection("litematica_camera");
+        world.profiler.startSection("camera");
 
         double diffX = viewEntity.posX - this.frustumUpdatePosX;
         double diffY = viewEntity.posY - this.frustumUpdatePosY;
@@ -290,13 +296,13 @@ public class WorldRendererSchematic extends WorldRenderer
             this.viewFrustum.updateChunkPositions(viewEntity.posX, viewEntity.posZ);
         }
 
-        worldClient.profiler.endStartSection("litematica_renderlist_camera");
+        world.profiler.endStartSection("renderlist_camera");
         double x = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * partialTicks;
         double y = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks;
         double z = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks;
         this.renderContainer.initialize(x, y, z);
 
-        this.mc.profiler.endStartSection("litematica_culling");
+        world.profiler.endStartSection("culling");
         BlockPos viewPos = new BlockPos(x, y + (double) viewEntity.getEyeHeight(), z);
         final int centerChunkX = (viewPos.getX() >> 4);
         final int centerChunkZ = (viewPos.getZ() >> 4);
@@ -316,37 +322,40 @@ public class WorldRendererSchematic extends WorldRenderer
         this.lastViewEntityPitch = viewEntity.rotationPitch;
         this.lastViewEntityYaw = viewEntity.rotationYaw;
 
-        this.mc.profiler.endStartSection("litematica_update");
+        world.profiler.endStartSection("update");
 
         if (this.displayListEntitiesDirty)
         {
+            world.profiler.startSection("fetch");
+
             this.displayListEntitiesDirty = false;
             this.renderInfos.clear();
 
             Entity.setRenderDistanceWeight(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
 
             Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
-            //List<SubChunkPos> positions = new ArrayList<>(256);
-            //positions.addAll(set);
+            List<SubChunkPos> positions = new ArrayList<>(set.size());
+            positions.addAll(set);
+            Collections.sort(positions, new SubChunkPos.DistanceComparator(viewSubChunk));
 
-            Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
-            queuePositions.addAll(set);
-            //Collections.sort(positions, new SubChunkPos.DistanceComparator(new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ)));
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("sorted positions: %s\n", positions);
+            //Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
+            //queuePositions.addAll(set);
 
-            this.mc.profiler.startSection("litematica_iteration");
+            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
-            while (queuePositions.isEmpty() == false)
-            //for (int i = 0; i < positions.size(); ++i)
+            world.profiler.endStartSection("iteration");
+
+            //while (queuePositions.isEmpty() == false)
+            for (int i = 0; i < positions.size(); ++i)
             {
-                SubChunkPos subChunk = queuePositions.poll();
-                //SubChunkPos subChunk = positions.get(i);
+                //SubChunkPos subChunk = queuePositions.poll();
+                SubChunkPos subChunk = positions.get(i);
 
                 // Only render sub-chunks that are within the client's render distance, and that
                 // have been already properly loaded on the client
                 if (Math.abs(subChunk.getX() - centerChunkX) <= renderDistance &&
                     Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance &&
-                    worldClient.getChunkProvider().getChunk(subChunk.getX(), subChunk.getZ(), false, false) != null)
+                    world.getChunkProvider().getChunk(subChunk.getX(), subChunk.getZ(), false, false) != null)
                 {
                     BlockPos subChunkCornerPos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
                     RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) ((IMixinViewFrustum) this.viewFrustum).invokeGetRenderChunk(subChunkCornerPos);
@@ -367,10 +376,10 @@ public class WorldRendererSchematic extends WorldRenderer
                 }
             }
 
-            this.mc.profiler.endSection();
+            world.profiler.endSection();
         }
 
-        this.mc.profiler.endStartSection("litematica_rebuild_near");
+        world.profiler.endStartSection("rebuild_near");
         Set<RenderChunkSchematicVbo> set = this.chunksToUpdate;
         this.chunksToUpdate = new LinkedHashSet<>();
 
@@ -389,16 +398,20 @@ public class WorldRendererSchematic extends WorldRenderer
                 else
                 {
                     //if (GuiScreen.isCtrlKeyDown()) System.out.printf("====== update now\n");
-                    this.mc.profiler.startSection("litematica_build_near");
+                    world.profiler.startSection("build_near");
+
                     this.renderDispatcher.updateChunkNow(renderChunkTmp);
                     renderChunkTmp.clearNeedsUpdate();
-                    this.mc.profiler.endSection();
+
+                    world.profiler.endSection();
                 }
             }
         }
 
         this.chunksToUpdate.addAll(set);
-        this.mc.profiler.endSection();
+
+        world.profiler.endSection();
+        world.profiler.endSection();
     }
 
     @Override
@@ -444,11 +457,13 @@ public class WorldRendererSchematic extends WorldRenderer
     @Override
     public int renderBlockLayer(BlockRenderLayer blockLayerIn, double partialTicks, Entity entityIn)
     {
+        this.world.profiler.startSection("render_block_layer_" + blockLayerIn);
+
         RenderHelper.disableStandardItemLighting();
 
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
-            this.mc.profiler.startSection("litematica_translucent_sort");
+            this.world.profiler.startSection("translucent_sort");
             double diffX = entityIn.posX - this.prevRenderSortX;
             double diffY = entityIn.posY - this.prevRenderSortY;
             double diffZ = entityIn.posZ - this.prevRenderSortZ;
@@ -470,10 +485,10 @@ public class WorldRendererSchematic extends WorldRenderer
                 }
             }
 
-            this.mc.profiler.endSection();
+            this.world.profiler.endSection();
         }
 
-        this.mc.profiler.startSection("litematica_filter_empty");
+        this.world.profiler.startSection("filter_empty");
         boolean reverse = blockLayerIn == BlockRenderLayer.TRANSLUCENT;
         int startIndex = reverse ? this.renderInfos.size() - 1 : 0;
         int stopIndex = reverse ? -1 : this.renderInfos.size();
@@ -491,9 +506,12 @@ public class WorldRendererSchematic extends WorldRenderer
             }
         }
 
-        this.mc.profiler.endStartSection("litematica_render_" + blockLayerIn);
+        this.world.profiler.endStartSection("render");
+
         this.renderBlockLayer(blockLayerIn);
-        this.mc.profiler.endSection();
+
+        this.world.profiler.endSection();
+        this.world.profiler.endSection();
 
         return count;
     }
@@ -545,13 +563,14 @@ public class WorldRendererSchematic extends WorldRenderer
 
     public void renderBlockOverlays()
     {
-        this.renderBlockOverlay(OverlayType.OUTLINE);
-        this.renderBlockOverlay(OverlayType.QUAD);
+        this.renderBlockOverlay(OverlayRenderType.OUTLINE);
+        this.renderBlockOverlay(OverlayRenderType.QUAD);
     }
 
-    private void renderBlockOverlay(OverlayType type)
+    private void renderBlockOverlay(OverlayRenderType type)
     {
-        this.mc.profiler.startSection("litematica_overlay_filter_empty");
+        this.world.profiler.startSection("overlay_" + type.name());
+        this.world.profiler.startSection("filter_empty");
 
         for (int i = this.renderInfos.size() - 1; i >= 0; --i)
         {
@@ -568,14 +587,15 @@ public class WorldRendererSchematic extends WorldRenderer
             }
         }
 
-        this.mc.profiler.endStartSection("litematica_overlay_render");
+        this.world.profiler.endStartSection("render");
 
         this.renderBlockOverlayBuffers(type);
 
-        this.mc.profiler.endSection();
+        this.world.profiler.endSection();
+        this.world.profiler.endSection();
     }
 
-    private void renderBlockOverlayBuffers(OverlayType type)
+    private void renderBlockOverlayBuffers(OverlayRenderType type)
     {
         this.mc.gameRenderer.enableLightmap();
 
@@ -678,7 +698,7 @@ public class WorldRendererSchematic extends WorldRenderer
             double renderX = renderViewEntity.prevPosX + (renderViewEntity.posX - renderViewEntity.prevPosX) * (double)partialTicks;
             double renderY = renderViewEntity.prevPosY + (renderViewEntity.posY - renderViewEntity.prevPosY) * (double)partialTicks;
             double renderZ = renderViewEntity.prevPosZ + (renderViewEntity.posZ - renderViewEntity.prevPosZ) * (double)partialTicks;
-            this.world.profiler.startSection("litematica_prepare");
+            this.world.profiler.startSection("prepare");
             TileEntityRendererDispatcher.instance.prepare(this.world, this.mc.getTextureManager(), this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.objectMouseOver, partialTicks);
             this.renderManager.cacheActiveRenderInfo(this.world, this.mc.fontRenderer, this.mc.getRenderViewEntity(), this.mc.pointedEntity, this.mc.gameSettings, partialTicks);
             this.countEntitiesTotal = 0;
@@ -693,11 +713,11 @@ public class WorldRendererSchematic extends WorldRenderer
             TileEntityRendererDispatcher.staticPlayerY = entityY;
             TileEntityRendererDispatcher.staticPlayerZ = entityZ;
             this.renderManager.setRenderPosition(entityX, entityY, entityZ);
+
             this.mc.gameRenderer.enableLightmap();
-            this.world.profiler.endStartSection("litematica_global");
             this.countEntitiesTotal = this.world.func_212419_R();
 
-            this.world.profiler.endStartSection("litematica_entities");
+            this.world.profiler.endStartSection("regular_entities");
             List<Entity> entitiesOutlined = Lists.<Entity>newArrayList();
             List<Entity> entitiesMultipass = Lists.<Entity>newArrayList();
             BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
@@ -794,7 +814,7 @@ public class WorldRendererSchematic extends WorldRenderer
             }
             */
 
-            this.world.profiler.endStartSection("litematica_block_entities");
+            this.world.profiler.endStartSection("block_entities");
             RenderHelper.enableStandardItemLighting();
 
             for (RenderChunk renderChunk : this.renderInfos)
@@ -819,7 +839,7 @@ public class WorldRendererSchematic extends WorldRenderer
             }
 
             this.mc.gameRenderer.disableLightmap();
-            this.mc.profiler.endSection();
+            this.world.profiler.endSection();
         }
     }
 

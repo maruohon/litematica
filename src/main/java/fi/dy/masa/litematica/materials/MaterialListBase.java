@@ -4,31 +4,40 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.BlockInfoListType;
+import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.util.math.MathHelper;
 
-public abstract class MaterialListBase
+public abstract class MaterialListBase implements IMaterialList
 {
     protected final MaterialListHudRenderer hudRenderer = new MaterialListHudRenderer(this);
     protected final Set<MaterialListEntry> ignored = new HashSet<>();
     protected final List<MaterialListEntry> materialListPreFiltered = new ArrayList<>();
     protected final List<MaterialListEntry> materialListFiltered = new ArrayList<>();
     protected ImmutableList<MaterialListEntry> materialListAll = ImmutableList.of();
+    @Nullable protected ICompletionListener completionListener;
     protected SortCriteria sortCriteria = SortCriteria.COUNT_TOTAL;
     protected BlockInfoListType materialListType = BlockInfoListType.ALL;
     protected boolean reverse;
     protected boolean hideAvailable;
     protected int multiplier = 1;
-
-    protected abstract List<MaterialListEntry> createMaterialListEntries();
+    protected long countTotal;
+    protected long countMissing;
+    protected long countMismatched;
 
     public abstract String getName();
 
     public abstract String getTitle();
+
+    public boolean supportsRenderLayers()
+    {
+        return false;
+    }
 
     public MaterialListHudRenderer getHudRenderer()
     {
@@ -58,6 +67,11 @@ public abstract class MaterialListBase
         }
 
         return this.materialListFiltered;
+    }
+
+    public void setCompletionListener(ICompletionListener listener)
+    {
+        this.completionListener = listener;
     }
 
     public void recreateFilteredList()
@@ -98,12 +112,28 @@ public abstract class MaterialListBase
     }
 
     /**
-     * Re-creates the all materials list from the schematic or placement
+     * Re-creates the all-materials list from the schematic or placement or area
+     * by starting a new task, if applicable.
      */
-    public void recreateMaterialList()
+    public abstract void reCreateMaterialList();
+
+    @Override
+    public void setMaterialListEntries(List<MaterialListEntry> list)
     {
-        this.materialListAll = ImmutableList.copyOf(this.createMaterialListEntries());
+        this.materialListAll = ImmutableList.copyOf(list);
         this.refreshPreFilteredList();
+        this.updateCounts();
+
+        if (this.completionListener != null)
+        {
+            this.completionListener.onTaskCompleted();
+        }
+    }
+
+    @Override
+    public BlockInfoListType getMaterialListType()
+    {
+        return this.materialListType;
     }
 
     /**
@@ -145,7 +175,7 @@ public abstract class MaterialListBase
         else
         {
             this.sortCriteria = criteria;
-            this.reverse = false;
+            this.reverse = criteria == SortCriteria.NAME;
         }
     }
 
@@ -159,9 +189,33 @@ public abstract class MaterialListBase
         this.multiplier = MathHelper.clamp(multiplier, 1, Integer.MAX_VALUE);
     }
 
-    public BlockInfoListType getMaterialListType()
+    public void updateCounts()
     {
-        return this.materialListType;
+        this.countTotal = 0;
+        this.countMissing = 0;
+        this.countMismatched = 0;
+
+        for (MaterialListEntry entry : this.materialListAll)
+        {
+            this.countTotal += entry.getCountTotal();
+            this.countMissing += entry.getCountMissing();
+            this.countMismatched += entry.getCountMismatched();
+        }
+    }
+
+    public long getCountTotal()
+    {
+        return this.countTotal;
+    }
+
+    public long getCountMissing()
+    {
+        return this.countMissing;
+    }
+
+    public long getCountMismatched()
+    {
+        return this.countMismatched;
     }
 
     public void setMaterialListType(BlockInfoListType type)

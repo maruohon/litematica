@@ -2,11 +2,13 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
+import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
+import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
@@ -14,9 +16,8 @@ import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
-import net.minecraft.client.Minecraft;
+import fi.dy.masa.malilib.render.RenderUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -25,21 +26,18 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 {
     private final SelectionManager selectionManager;
     private final WidgetAreaSelectionBrowser parent;
-    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
-    private int id;
     private int buttonsStartX;
 
-    public WidgetAreaSelectionEntry(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            DirectoryEntry entry, SelectionManager selectionManager, Minecraft mc,
+    public WidgetAreaSelectionEntry(int x, int y, int width, int height, boolean isOdd,
+            DirectoryEntry entry, int listIndex, SelectionManager selectionManager,
             WidgetAreaSelectionBrowser parent, IFileBrowserIconProvider iconProvider)
     {
-        super(x, y, width, height, zLevel, isOdd, entry, mc, parent, iconProvider);
+        super(x, y, width, height, isOdd, entry, listIndex, parent, iconProvider);
 
         this.selectionManager = selectionManager;
         this.parent = parent;
-        this.id = 0;
 
-        int posX = x + width;
+        int posX = x + width - 2;
         int posY = y + 1;
 
         // Note: These are placed from right to left
@@ -47,8 +45,9 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         if (entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(entry.getFullPath()) == FileType.JSON)
         {
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
-            //posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.RENAME);
+            posX = this.createButton(posX, posY, ButtonListener.ButtonType.COPY);
+            posX = this.createButton(posX, posY, ButtonListener.ButtonType.CONFIGURE);
         }
 
         this.buttonsStartX = posX;
@@ -57,31 +56,11 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
         String label = I18n.format(type.getLabelKey());
-        int len = Math.max(this.mc.fontRenderer.getStringWidth(label) + 10, 20);
-        x -= (len + 2);
-        this.addButton(new ButtonGeneric(this.id++, x, y, len, 20, label), new ButtonListener(type, this.selectionManager, this));
+        int len = Math.max(this.getStringWidth(label) + 10, 20);
+        x -= len;
+        this.addButton(new ButtonGeneric(x, y, len, 20, label), new ButtonListener(type, this.selectionManager, this));
 
-        return x;
-    }
-
-    private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
-    {
-        this.buttons.add(new ButtonWrapper<>(button, listener));
-    }
-
-    @Override
-    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
-    {
-        for (ButtonWrapper<?> entry : this.buttons)
-        {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return true;
-            }
-        }
-
-        return super.onMouseClickedImpl(mouseX, mouseY, mouseButton);
+        return x - 2;
     }
 
     @Override
@@ -95,13 +74,8 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     {
         if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
         {
-            selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentSelectionId());
+            selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentNormalSelectionId());
             super.render(mouseX, mouseY, selected);
-
-            for (int i = 0; i < this.buttons.size(); ++i)
-            {
-                this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-            }
         }
         else
         {
@@ -115,7 +89,8 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
         {
             AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(this.getDirectoryEntry().getFullPath().getAbsolutePath());
-            return selection != null ? selection.getName() : "<error>";
+            String prefix = this.entry.getDisplayNamePrefix();
+            return selection != null ? (prefix != null ? prefix + selection.getName() : selection.getName()) : "<error>";
         }
 
         return super.getDisplayName();
@@ -125,12 +100,24 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
         List<String> text = new ArrayList<>();
-        AreaSelection selection = this.selectionManager.getOrLoadSelection(this.getDirectoryEntry().getFullPath().getAbsolutePath());
+        AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(this.getDirectoryEntry().getFullPath().getAbsolutePath());
 
         if (selection != null)
         {
-            BlockPos o = selection.getOrigin();
-            String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
+            String str;
+            BlockPos o = selection.getExplicitOrigin();
+
+            if (o == null)
+            {
+                o = selection.getEffectiveOrigin();
+                str = I18n.format("litematica.gui.label.origin.auto");
+            }
+            else
+            {
+                str = I18n.format("litematica.gui.label.origin.manual");
+            }
+
+            String strOrigin = String.format("x: %d, y: %d, z: %d (%s)", o.getX(), o.getY(), o.getZ(), str);
             text.add(I18n.format("litematica.gui.label.area_selection_origin", strOrigin));
 
             int count = selection.getAllSubRegionBoxes().size();
@@ -141,11 +128,11 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
-            this.parent.drawHoveringText(text, mouseX, mouseY);
+            RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final WidgetAreaSelectionEntry widget;
         private final SelectionManager selectionManager;
@@ -159,17 +146,32 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             String selectionId = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
 
             if (this.type == ButtonType.RENAME)
             {
                 String title = "litematica.gui.title.rename_area_selection";
-                AreaSelection selection = this.selectionManager.getSelection(selectionId);
+                AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
                 String name = selection != null ? selection.getName() : "<error>";
-                SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget);
+                SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, false);
                 this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, name, this.widget.parent.getSelectionManagerGui(), renamer));
+            }
+            else if (this.type == ButtonType.COPY)
+            {
+                AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
+
+                if (selection != null)
+                {
+                    String title = I18n.format("litematica.gui.title.copy_area_selection", selection.getName());
+                    SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, true);
+                    this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
+                }
+                else
+                {
+                    this.widget.parent.getSelectionManagerGui().addMessage(MessageType.ERROR, "litematica.error.area_selection.failed_to_load");
+                }
             }
             else if (this.type == ButtonType.REMOVE)
             {
@@ -177,20 +179,24 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
             }
             else if (this.type == ButtonType.CONFIGURE)
             {
+                AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
+
+                if (selection != null)
+                {
+                    GuiAreaSelectionEditorNormal gui = new GuiAreaSelectionEditorNormal(selection);
+                    gui.setParent(this.widget.mc.currentScreen);
+                    gui.setSelectionId(selectionId);
+                    this.widget.mc.displayGuiScreen(gui);
+                }
             }
 
             this.widget.parent.refreshEntries();
         }
 
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
-        }
-
         public enum ButtonType
         {
             RENAME          ("litematica.gui.button.rename"),
+            COPY            ("litematica.gui.button.copy"),
             CONFIGURE       ("litematica.gui.button.configure"),
             REMOVE          (TextFormatting.RED.toString() + "-");
 
@@ -212,18 +218,20 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     {
         private final WidgetAreaSelectionEntry widget;
         private final SelectionManager selectionManager;
+        private final boolean copy;
 
-        public SelectionRenamer(SelectionManager selectionManager, WidgetAreaSelectionEntry widget)
+        public SelectionRenamer(SelectionManager selectionManager, WidgetAreaSelectionEntry widget, boolean copy)
         {
             this.widget = widget;
             this.selectionManager = selectionManager;
+            this.copy = copy;
         }
 
         @Override
         public boolean setString(String string)
         {
-            String oldName = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
-            return this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), oldName, string, this.widget.parent.getSelectionManagerGui());
+            String selectionId = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
+            return this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), selectionId, string, this.copy, this.widget.parent.getSelectionManagerGui());
         }
     }
 }

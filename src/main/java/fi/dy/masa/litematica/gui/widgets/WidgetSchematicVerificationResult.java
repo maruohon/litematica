@@ -1,68 +1,86 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.data.SchematicVerifier.MismatchType;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
+import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.SortCriteria;
 import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetBase;
-import fi.dy.masa.malilib.gui.wrappers.ButtonWrapper;
+import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
 import fi.dy.masa.malilib.render.RenderUtils;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.IRegistry;
 
-public class WidgetSchematicVerificationResult extends WidgetBase
+public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<BlockMismatchEntry>
 {
+    public static final String HEADER_EXPECTED = "litematica.gui.label.schematic_verifier.expected";
+    public static final String HEADER_FOUND = "litematica.gui.label.schematic_verifier.found";
+    public static final String HEADER_COUNT = "litematica.gui.label.schematic_verifier.count";
+
     private static int maxNameLengthExpected;
     private static int maxNameLengthFound;
+    private static int maxCountLength;
 
+    private final BlockModelShapes blockModelShapes;
     private final GuiSchematicVerifier guiSchematicVerifier;
+    private final WidgetListSchematicVerificationResults listWidget;
+    private final SchematicVerifier verifier;
     private final BlockMismatchEntry mismatchEntry;
     @Nullable private final String header1;
     @Nullable private final String header2;
     @Nullable private final String header3;
     @Nullable private final BlockMismatchInfo mismatchInfo;
-    private final Minecraft mc;
     private final int count;
     private final boolean isOdd;
-    private final List<ButtonWrapper<?>> buttons = new ArrayList<>();
     @Nullable private final ButtonGeneric buttonIgnore;
-    private int id;
 
-    public WidgetSchematicVerificationResult(int x, int y, int width, int height, float zLevel, boolean isOdd,
-            BlockMismatchEntry entry, GuiSchematicVerifier guiSchematicVerifier)
+    public WidgetSchematicVerificationResult(int x, int y, int width, int height, boolean isOdd,
+            WidgetListSchematicVerificationResults listWidget, GuiSchematicVerifier guiSchematicVerifier,
+            BlockMismatchEntry entry, int listIndex)
     {
-        super(x, y, width, height, zLevel);
+        super(x, y, width, height, entry, listIndex);
 
-        this.mc = Minecraft.getInstance();
+        this.columnCount = 3;
+        this.blockModelShapes = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
         this.mismatchEntry = entry;
         this.guiSchematicVerifier = guiSchematicVerifier;
+        this.listWidget = listWidget;
+        this.verifier = guiSchematicVerifier.getPlacement().getSchematicVerifier();
         this.isOdd = isOdd;
 
+        // Main header
         if (entry.header1 != null && entry.header2 != null)
         {
             this.header1 = entry.header1;
             this.header2 = entry.header2;
-            this.header3 = GuiBase.TXT_BOLD + I18n.format("litematica.gui.label.schematic_verifier.count");
+            this.header3 = GuiBase.TXT_BOLD + I18n.format(HEADER_COUNT) + GuiBase.TXT_RST;
             this.mismatchInfo = null;
             this.count = 0;
             this.buttonIgnore = null;
         }
+        // Category title
         else if (entry.header1 != null)
         {
             this.header1 = entry.header1;
@@ -72,6 +90,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.count = 0;
             this.buttonIgnore = null;
         }
+        // Mismatch entry
         else
         {
             this.header1 = null;
@@ -79,8 +98,6 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.header3 = null;
             this.mismatchInfo = new BlockMismatchInfo(entry.blockMismatch.stateExpected, entry.blockMismatch.stateFound);
             this.count = entry.blockMismatch.count;
-
-            FontRenderer font = this.mc.fontRenderer;
 
             if (entry.mismatchType != MismatchType.CORRECT_STATE)
             {
@@ -90,137 +107,240 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             {
                 this.buttonIgnore = null;
             }
-
-            maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(this.mismatchInfo.stackExpected.getDisplayName().getString()));
-            maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(this.mismatchInfo.stackFound.getDisplayName().getString()));
         }
     }
 
-    public static void resetNameLengths()
+    public static void setMaxNameLengths(List<BlockMismatch> mismatches, Minecraft mc)
     {
-        maxNameLengthExpected = 60;
-        maxNameLengthFound = 60;
+        FontRenderer font = mc.fontRenderer;
+        maxNameLengthExpected = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADER_EXPECTED) + GuiBase.TXT_RST);
+        maxNameLengthFound = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADER_FOUND) + GuiBase.TXT_RST);
+        maxCountLength = 7 * font.getStringWidth("8");
+
+        for (BlockMismatch entry : mismatches)
+        {
+            ItemStack stack = ItemUtils.getItemForState(entry.stateExpected);
+            String name = BlockMismatchInfo.getDisplayName(entry.stateExpected, stack);
+            maxNameLengthExpected = Math.max(maxNameLengthExpected, font.getStringWidth(name));
+
+            stack = ItemUtils.getItemForState(entry.stateFound);
+            name = BlockMismatchInfo.getDisplayName(entry.stateFound, stack);
+            maxNameLengthFound = Math.max(maxNameLengthFound, font.getStringWidth(name));
+        }
+
+        maxCountLength = Math.max(maxCountLength, font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADER_COUNT) + GuiBase.TXT_RST));
     }
 
     private ButtonGeneric createButton(int x, int y, ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getLabelKey());
-        int buttonWidth = mc.fontRenderer.getStringWidth(label) + 10;
-        x -= buttonWidth;
-        ButtonGeneric button = new ButtonGeneric(this.id++, x, y, buttonWidth, 20, label);
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
         this.addButton(button, new ButtonListener(type, this.mismatchEntry, this.guiSchematicVerifier));
 
         return button;
     }
 
-    private <T extends ButtonBase> void addButton(T button, IButtonActionListener<T> listener)
+    @Override
+    protected int getCurrentSortColumn()
     {
-        this.buttons.add(new ButtonWrapper<>(button, listener));
+        return this.verifier.getSortCriteria().ordinal();
     }
 
     @Override
-    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    protected boolean getSortInReverse()
     {
-        return (this.buttonIgnore == null || mouseX < this.buttonIgnore.x) && super.canSelectAt(mouseX, mouseY, mouseButton);
+        return this.verifier.getSortInReverse();
+    }
+
+    @Override
+    protected int getColumnPosX(int column)
+    {
+        int x1 = this.x + 4;
+        int x2 = x1 + maxNameLengthExpected + 40; // including item icon
+        int x3 = x2 + maxNameLengthFound + 40;
+
+        switch (column)
+        {
+            case 0: return x1;
+            case 1: return x2;
+            case 2: return x3;
+            case 3: return x3 + maxCountLength + 20;
+            default: return x1;
+        }
     }
 
     @Override
     protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
     {
-        for (ButtonWrapper<?> entry : this.buttons)
+        if (super.onMouseClickedImpl(mouseX, mouseY, mouseButton))
         {
-            if (entry.mousePressed(this.mc, mouseX, mouseY, mouseButton))
-            {
-                // Don't call super if the button press got handled
-                return true;
-            }
+            return true;
         }
+
+        if (this.mismatchEntry.type != BlockMismatchEntry.Type.HEADER)
+        {
+            return false;
+        }
+
+        int column = this.getMouseOverColumn(mouseX, mouseY);
+
+        switch (column)
+        {
+            case 0:
+                this.verifier.setSortCriteria(SortCriteria.NAME_EXPECTED);
+                break;
+            case 1:
+                this.verifier.setSortCriteria(SortCriteria.NAME_FOUND);
+                break;
+            case 2:
+                this.verifier.setSortCriteria(SortCriteria.COUNT);
+                break;
+            default:
+                return false;
+        }
+
+        // Re-create the widgets
+        this.listWidget.refreshEntries();
 
         return true;
     }
 
     @Override
+    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    {
+        return (this.buttonIgnore == null || mouseX < this.buttonIgnore.getX()) && super.canSelectAt(mouseX, mouseY, mouseButton);
+    }
+
+    protected boolean shouldRenderAsSelected()
+    {
+        if (this.mismatchEntry.type == BlockMismatchEntry.Type.CATEGORY_TITLE)
+        {
+            return this.verifier.isMismatchCategorySelected(this.mismatchEntry.mismatchType);
+        }
+        else if (this.mismatchEntry.type == BlockMismatchEntry.Type.DATA)
+        {
+            return this.verifier.isMismatchEntrySelected(this.mismatchEntry.blockMismatch);
+        }
+
+        return false;
+    }
+
+    @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
+        selected = this.shouldRenderAsSelected();
+
+        // Default color for even entries
+        int color = 0xA0303030;
+
         // Draw a lighter background for the hovered and the selected entry
-        if (selected || this.isMouseOver(mouseX, mouseY))
+        if (selected)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
+            color = 0xA0707070;
         }
+        else if (this.isMouseOver(mouseX, mouseY))
+        {
+            color = 0xA0505050;
+        }
+        // Draw a slightly darker background for odd entries
         else if (this.isOdd)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
+            color = 0xA0101010;
         }
-        // Draw a slightly lighter background for even entries
-        else
+
+        GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, color);
+
+        if (selected)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
+            RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
         }
 
         Minecraft mc = this.mc;
-        int x1 = this.x + 4;
-        int x2 = this.x + maxNameLengthExpected + 50;
-        int x3 = x2 + maxNameLengthFound + 50;
+        int x1 = this.getColumnPosX(0);
+        int x2 = this.getColumnPosX(1);
+        int x3 = this.getColumnPosX(2);
         int y = this.y + 7;
-        int color = 0xFFFFFFFF;
+        color = 0xFFFFFFFF;
 
         if (this.header1 != null && this.header2 != null)
         {
-            mc.fontRenderer.drawString(this.header1, x1, y, color);
-            mc.fontRenderer.drawString(this.header2, x2, y, color);
-            mc.fontRenderer.drawString(this.header3, x3, y, color);
+            this.drawString(this.header1, x1, y, color);
+            this.drawString(this.header2, x2, y, color);
+            this.drawString(this.header3, x3, y, color);
+
+            this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
         }
         else if (this.header1 != null)
         {
-            mc.fontRenderer.drawString(this.header1, this.x + 4, this.y + 7, color);
+            this.drawString(this.header1, this.x + 4, this.y + 7, color);
         }
         else if (this.mismatchInfo != null &&
                 (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE ||
                  this.mismatchEntry.blockMismatch.stateExpected.isAir() == false)) 
         {
-            mc.fontRenderer.drawString(this.mismatchInfo.stackExpected.getDisplayName().getString(), x1 + 20, y, color);
+            this.drawString(this.mismatchInfo.nameExpected, x1 + 20, y, color);
 
             if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
             {
-                mc.fontRenderer.drawString(this.mismatchInfo.stackFound.getDisplayName().getString(), x2 + 20, y, color);
+                this.drawString(this.mismatchInfo.nameFound, x2 + 20, y, color);
             }
 
-            mc.fontRenderer.drawString(String.valueOf(this.count), x3, y, color);
+            this.drawString(String.valueOf(this.count), x3, y, color);
+
+            y = this.y + 3;
+            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
+
+            boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
+            boolean hasModelExpected = this.mismatchInfo.stateExpected.getRenderType() == EnumBlockRenderType.MODEL;
+            boolean hasModelFound    = this.mismatchInfo.stateFound.getRenderType() == EnumBlockRenderType.MODEL;
+            boolean isAirItemExpected = this.mismatchInfo.stackExpected.isEmpty();
+            boolean isAirItemFound    = this.mismatchInfo.stackExpected.isEmpty();
+            boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.mismatchInfo.stateExpected.getBlock() == Blocks.FLOWER_POT);
+            boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.mismatchInfo.stateFound.getBlock() == Blocks.FLOWER_POT);
 
             GlStateManager.pushMatrix();
-            GlStateManager.disableLighting();
             RenderHelper.enableGUIStandardItemLighting();
 
-            //mc.getRenderItem().zLevel -= 110;
-            y = this.y + 3;
-            Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackExpected, x1, y);
-            mc.getItemRenderer().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackExpected, x1, y, null);
+            IBakedModel model;
+
+            if (useBlockModelExpected)
+            {
+                model = this.blockModelShapes.getModel(this.mismatchInfo.stateExpected);
+                RenderUtils.renderModelInGui(x1, y, model, this.mismatchInfo.stateExpected, 1);
+            }
+            else
+            {
+                mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackExpected, x1, y);
+                mc.getItemRenderer().renderItemOverlayIntoGUI(this.textRenderer, this.mismatchInfo.stackExpected, x1, y, null);
+            }
 
             if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
             {
-                Gui.drawRect(x2, y, x2 + 16, y + 16, 0x20FFFFFF); // light background for the item
-                mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackFound, x2, y);
-                mc.getItemRenderer().renderItemOverlayIntoGUI(mc.fontRenderer, this.mismatchInfo.stackFound, x2, y, null);
-            }
+                RenderUtils.drawRect(x2, y, 16, 16, 0x20FFFFFF); // light background for the item
 
-            //mc.getRenderItem().zLevel += 110;
+                if (useBlockModelFound)
+                {
+                    model = this.blockModelShapes.getModel(this.mismatchInfo.stateFound);
+                    RenderUtils.renderModelInGui(x2, y, model, this.mismatchInfo.stateFound, 1);
+                }
+                else
+                {
+                    mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.mismatchInfo.stackFound, x2, y);
+                    mc.getItemRenderer().renderItemOverlayIntoGUI(this.textRenderer, this.mismatchInfo.stackFound, x2, y, null);
+                }
+            }
 
             GlStateManager.disableBlend();
             RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
         }
 
-        for (int i = 0; i < this.buttons.size(); ++i)
-        {
-            this.buttons.get(i).draw(this.mc, mouseX, mouseY, 0);
-        }
+        super.render(mouseX, mouseY, selected);
     }
 
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.x)
+        if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.getX())
         {
             GlStateManager.pushMatrix();
             GlStateManager.translatef(0f, 0f, 200f);
@@ -254,8 +374,8 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         private final ItemStack stackFound;
         private final String blockRegistrynameExpected;
         private final String blockRegistrynameFound;
-        private final String stackNameExpected;
-        private final String stackNameFound;
+        private final String nameExpected;
+        private final String nameFound;
         private final int totalWidth;
         private final int totalHeight;
         private final int columnWidthExpected;
@@ -268,25 +388,40 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             this.stackExpected = ItemUtils.getItemForState(this.stateExpected);
             this.stackFound = ItemUtils.getItemForState(this.stateFound);
 
-            ResourceLocation rl1 = IRegistry.BLOCK.getKey(this.stateExpected.getBlock());
-            ResourceLocation rl2 = IRegistry.BLOCK.getKey(this.stateFound.getBlock());
+            Block blockExpected = this.stateExpected.getBlock();
+            Block blockFound = this.stateFound.getBlock();
+            ResourceLocation rl1 = IRegistry.BLOCK.getKey(blockExpected);
+            ResourceLocation rl2 = IRegistry.BLOCK.getKey(blockFound);
+
             this.blockRegistrynameExpected = rl1 != null ? rl1.toString() : "<null>";
             this.blockRegistrynameFound = rl2 != null ? rl2.toString() : "<null>";
 
-            Minecraft mc = Minecraft.getInstance();
-            this.stackNameExpected = this.stackExpected.getDisplayName().getString();
-            this.stackNameFound = this.stackFound.getDisplayName().getString();
+            this.nameExpected = getDisplayName(stateExpected, this.stackExpected);
+            this.nameFound =    getDisplayName(stateFound,    this.stackFound);
+
             List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
             List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
 
-            int w1 = Math.max(mc.fontRenderer.getStringWidth(this.stackNameExpected) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameExpected));
-            int w2 = Math.max(mc.fontRenderer.getStringWidth(this.stackNameFound) + 20, mc.fontRenderer.getStringWidth(this.blockRegistrynameFound));
+            Minecraft mc = Minecraft.getInstance();
+            FontRenderer textRenderer = mc.fontRenderer;
+            int w1 = Math.max(textRenderer.getStringWidth(this.nameExpected) + 20, textRenderer.getStringWidth(this.blockRegistrynameExpected));
+            int w2 = Math.max(textRenderer.getStringWidth(this.nameFound) + 20, textRenderer.getStringWidth(this.blockRegistrynameFound));
             w1 = Math.max(w1, fi.dy.masa.litematica.render.RenderUtils.getMaxStringRenderLength(propsExpected, mc));
             w2 = Math.max(w2, fi.dy.masa.litematica.render.RenderUtils.getMaxStringRenderLength(propsFound, mc));
 
             this.columnWidthExpected = w1;
             this.totalWidth = this.columnWidthExpected + w2 + 40;
-            this.totalHeight = Math.max(propsExpected.size(), propsFound.size()) * (mc.fontRenderer.FONT_HEIGHT + 2) + 60;
+            this.totalHeight = Math.max(propsExpected.size(), propsFound.size()) * (textRenderer.FONT_HEIGHT + 2) + 60;
+        }
+
+        public static String getDisplayName(IBlockState state, ItemStack stack)
+        {
+            Block block = state.getBlock();
+            String key = block.getTranslationKey() + ".name";
+            String name = I18n.format(key);
+            name = key.equals(name) == false ? name : stack.getDisplayName().getString();
+
+            return name;
         }
 
         public int getTotalWidth()
@@ -311,49 +446,79 @@ public class WidgetSchematicVerificationResult extends WidgetBase
                 int x2 = x + this.columnWidthExpected + 30;
                 y += 4;
 
+                FontRenderer textRenderer = mc.fontRenderer;
                 String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
                 String strExpected = pre + I18n.format("litematica.gui.label.schematic_verifier.expected") + GuiBase.TXT_RST;
                 String strFound =    pre + I18n.format("litematica.gui.label.schematic_verifier.found") + GuiBase.TXT_RST;
-                mc.fontRenderer.drawString(strExpected, x1, y, 0xFFFFFFFF);
-                mc.fontRenderer.drawString(strFound,    x2, y, 0xFFFFFFFF);
+                textRenderer.drawString(strExpected, x1, y, 0xFFFFFFFF);
+                textRenderer.drawString(strFound,    x2, y, 0xFFFFFFFF);
 
                 y += 12;
 
                 GlStateManager.disableLighting();
                 RenderHelper.enableGUIStandardItemLighting();
 
-                //mc.getRenderItem().zLevel += 100;
-                Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
-                mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.stackExpected, x1, y);
-                mc.getItemRenderer().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackExpected, x1, y, null);
+                boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
+                boolean hasModelExpected = this.stateExpected.getRenderType() == EnumBlockRenderType.MODEL;
+                boolean hasModelFound    = this.stateFound.getRenderType() == EnumBlockRenderType.MODEL;
+                boolean isAirItemExpected = this.stackExpected.isEmpty();
+                boolean isAirItemFound    = this.stackExpected.isEmpty();
+                boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.stateExpected.getBlock() == Blocks.FLOWER_POT);
+                boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.stateFound.getBlock() == Blocks.FLOWER_POT);
+                BlockModelShapes blockModelShapes = mc.getBlockRendererDispatcher().getBlockModelShapes();
 
-                Gui.drawRect(x2, y, x2 + 16, y + 16, 0x20FFFFFF); // light background for the item
-                mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.stackFound, x2, y);
-                mc.getItemRenderer().renderItemOverlayIntoGUI(mc.fontRenderer, this.stackFound, x2, y, null);
+                //mc.getRenderItem().zLevel += 100;
+                RenderUtils.drawRect(x1, y, 16, 16, 0x50C0C0C0); // light background for the item
+                RenderUtils.drawRect(x2, y, 16, 16, 0x50C0C0C0); // light background for the item
+
+                IBakedModel model;
+
+                if (useBlockModelExpected)
+                {
+                    model = blockModelShapes.getModel(this.stateExpected);
+                    RenderUtils.renderModelInGui(x1, y, model, this.stateExpected, 1);
+                }
+                else
+                {
+                    mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.stackExpected, x1, y);
+                    mc.getItemRenderer().renderItemOverlayIntoGUI(textRenderer, this.stackExpected, x1, y, null);
+                }
+
+                if (useBlockModelFound)
+                {
+                    model = blockModelShapes.getModel(this.stateFound);
+                    RenderUtils.renderModelInGui(x2, y, model, this.stateFound, 1);
+                }
+                else
+                {
+                    mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.stackFound, x2, y);
+                    mc.getItemRenderer().renderItemOverlayIntoGUI(textRenderer, this.stackFound, x2, y, null);
+                }
+
                 //mc.getRenderItem().zLevel -= 100;
 
                 //GlStateManager.disableBlend();
                 RenderHelper.disableStandardItemLighting();
 
-                mc.fontRenderer.drawString(this.stackNameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
-                mc.fontRenderer.drawString(this.stackNameFound,    x2 + 20, y + 4, 0xFFFFFFFF);
+                textRenderer.drawString(this.nameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
+                textRenderer.drawString(this.nameFound,    x2 + 20, y + 4, 0xFFFFFFFF);
 
                 y += 20;
-                mc.fontRenderer.drawString(this.blockRegistrynameExpected, x1, y, 0xFF4060FF);
-                mc.fontRenderer.drawString(this.blockRegistrynameFound,    x2, y, 0xFF4060FF);
-                y += mc.fontRenderer.FONT_HEIGHT + 4;
+                textRenderer.drawString(this.blockRegistrynameExpected, x1, y, 0xFF4060FF);
+                textRenderer.drawString(this.blockRegistrynameFound,    x2, y, 0xFF4060FF);
+                y += textRenderer.FONT_HEIGHT + 4;
 
                 List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected);
                 List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound);
-                RenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected, mc.fontRenderer);
-                RenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound, mc.fontRenderer);
+                RenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected, textRenderer);
+                RenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound, textRenderer);
 
                 GlStateManager.popMatrix();
             }
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener<ButtonGeneric>
+    private static class ButtonListener implements IButtonActionListener
     {
         private final ButtonType type;
         private final GuiSchematicVerifier guiSchematicVerifier;
@@ -367,7 +532,7 @@ public class WidgetSchematicVerificationResult extends WidgetBase
         }
 
         @Override
-        public void actionPerformed(ButtonGeneric control)
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             if (this.type == ButtonType.IGNORE_MISMATCH)
             {
@@ -376,26 +541,20 @@ public class WidgetSchematicVerificationResult extends WidgetBase
             }
         }
 
-        @Override
-        public void actionPerformedWithButton(ButtonGeneric control, int mouseButton)
-        {
-            this.actionPerformed(control);
-        }
-
         public enum ButtonType
         {
             IGNORE_MISMATCH ("litematica.gui.button.schematic_verifier.ignore");
 
-            private final String labelKey;
+            private final String translationKey;
 
-            private ButtonType(String labelKey)
+            private ButtonType(String translationKey)
             {
-                this.labelKey = labelKey;
+                this.translationKey = translationKey;
             }
 
-            public String getLabelKey()
+            public String getDisplayName()
             {
-                return this.labelKey;
+                return I18n.format(this.translationKey);
             }
         }
     }

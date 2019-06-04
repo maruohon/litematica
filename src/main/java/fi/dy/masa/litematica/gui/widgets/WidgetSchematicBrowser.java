@@ -1,18 +1,17 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
-import java.util.Collections;
+import java.io.FileFilter;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.gui.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.gui.base.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -28,6 +27,8 @@ import net.minecraft.util.math.Vec3i;
 
 public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 {
+    protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
+
     protected final Map<File, SchematicMetadata> cachedMetadata = new HashMap<>();
     protected final Map<File, Pair<ResourceLocation, DynamicTexture>> cachedPreviewImages = new HashMap<>();
     protected final GuiSchematicBrowserBase parent;
@@ -41,7 +42,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
         this.title = I18n.format("litematica.gui.title.schematic_browser");
         this.infoWidth = 170;
-        this.infoHeight = 280;
+        this.infoHeight = 290;
         this.parent = parent;
     }
 
@@ -74,28 +75,24 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected void addFileEntriesToList(File dir, List<DirectoryEntry> list)
+    protected FileFilter getFileFilter()
     {
-        for (File file : dir.listFiles(SCHEMATIC_FILTER))
-        {
-            list.add(new DirectoryEntry(DirectoryEntryType.fromFile(file), dir, file.getName()));
-        }
-
-        Collections.sort(list);
+        return SCHEMATIC_FILTER;
     }
 
     @Override
     protected void drawAdditionalContents(int mouseX, int mouseY)
     {
-        this.drawSelectedSchematicInfo(this.getSelectedEntry());
+        this.drawSelectedSchematicInfo(this.getLastSelectedEntry());
     }
 
     protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry)
     {
         int x = this.posX + this.totalWidth - this.infoWidth;
         int y = this.posY;
+        int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, this.infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
         if (entry == null)
         {
@@ -112,65 +109,91 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             int valueColor = 0xC0FFFFFF;
 
             String str = I18n.format("litematica.gui.label.schematic_info.name");
-            this.fontRenderer.drawString(str, x, y, textColor);
+            this.drawString(str, x, y, textColor);
             y += 12;
 
-            this.fontRenderer.drawString(meta.getName(), x + 4, y, valueColor);
+            this.drawString(meta.getName(), x + 4, y, valueColor);
             y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_info.author", meta.getAuthor());
-            this.fontRenderer.drawString(str, x, y, textColor);
+            str = I18n.format("litematica.gui.label.schematic_info.schematic_author", meta.getAuthor());
+            this.drawString(str, x, y, textColor);
             y += 12;
 
             String strDate = DATE_FORMAT.format(new Date(meta.getTimeCreated()));
             str = I18n.format("litematica.gui.label.schematic_info.time_created", strDate);
-            this.fontRenderer.drawString(str, x, y, textColor);
+            this.drawString(str, x, y, textColor);
             y += 12;
 
             if (meta.hasBeenModified())
             {
                 strDate = DATE_FORMAT.format(new Date(meta.getTimeModified()));
                 str = I18n.format("litematica.gui.label.schematic_info.time_modified", strDate);
-                this.fontRenderer.drawString(str, x, y, textColor);
+                this.drawString(str, x, y, textColor);
                 y += 12;
             }
 
             str = I18n.format("litematica.gui.label.schematic_info.region_count", meta.getRegionCount());
-            this.fontRenderer.drawString(str, x, y, textColor);
+            this.drawString(str, x, y, textColor);
             y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_info.total_volume", meta.getTotalVolume());
-            this.fontRenderer.drawString(str, x, y, textColor);
-            y += 12;
+            if (this.parent.height >= 340)
+            {
+                str = I18n.format("litematica.gui.label.schematic_info.total_volume", meta.getTotalVolume());
+                this.drawString(str, x, y, textColor);
+                y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_info.total_blocks", meta.getTotalBlocks());
-            this.fontRenderer.drawString(str, x, y, textColor);
-            y += 12;
+                str = I18n.format("litematica.gui.label.schematic_info.total_blocks", meta.getTotalBlocks());
+                this.drawString(str, x, y, textColor);
+                y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_info.enclosing_size");
-            this.fontRenderer.drawString(str, x, y, textColor);
-            y += 12;
+                str = I18n.format("litematica.gui.label.schematic_info.enclosing_size");
+                this.drawString(str, x, y, textColor);
+                y += 12;
 
-            Vec3i areaSize = meta.getEnclosingSize();
-            String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
-            this.fontRenderer.drawString(tmp, x + 4, y, valueColor);
-            y += 12;
+                Vec3i areaSize = meta.getEnclosingSize();
+                String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
+                this.drawString(tmp, x + 4, y, valueColor);
+                y += 12;
+            }
+            else
+            {
+                str = I18n.format("litematica.gui.label.schematic_info.total_blocks_and_volume", meta.getTotalBlocks(), meta.getTotalVolume());
+                this.drawString(str, x, y, textColor);
+                y += 12;
+
+                Vec3i areaSize = meta.getEnclosingSize();
+                String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
+                str = I18n.format("litematica.gui.label.schematic_info.enclosing_size_value", tmp);
+                this.drawString(str, x, y, textColor);
+                y += 12;
+            }
 
             /*
             str = I18n.format("litematica.gui.label.schematic_info.description");
             this.fontRenderer.drawString(str, x, y, textColor);
             */
-            y += 12;
+            //y += 12;
 
             Pair<ResourceLocation, DynamicTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
 
             if (pair != null)
             {
-                GlStateManager.color4f(1f, 1f, 1f, 1f);
-                this.bindTexture(pair.getLeft());
+                y += 14;
 
                 int iconSize = pair.getRight().getTextureData().getWidth();
-                Gui.drawModalRectWithCustomSizedTexture(x + 10, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+                boolean needsScaling = height < this.infoHeight;
+
+                GlStateManager.color4f(1f, 1f, 1f, 1f);
+
+                if (needsScaling)
+                {
+                    iconSize = height - y + this.posY - 6;
+                }
+
+                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
+
+                this.bindTexture(pair.getLeft());
+                Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
     }
@@ -188,16 +211,20 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
         File file = new File(entry.getDirectory(), entry.getName());
         SchematicMetadata meta = this.cachedMetadata.get(file);
 
-        if (meta == null)
+        if (meta == null && this.cachedMetadata.containsKey(file) == false)
         {
-            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName(), this);
-
-            if (schematic != null)
+            if (entry.getName().endsWith(LitematicaSchematic.FILE_EXTENSION))
             {
-                meta = schematic.getMetadata();
-                this.cachedMetadata.put(file, meta);
-                this.createPreviewImage(file, meta);
+                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
+
+                if (schematic != null)
+                {
+                    meta = schematic.getMetadata();
+                    this.createPreviewImage(file, meta);
+                }
             }
+
+            this.cachedMetadata.put(file, meta);
         }
 
         return meta;
@@ -238,6 +265,18 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             {
                 Litematica.logger.warn("Failed to create a preview image", e);
             }
+        }
+    }
+
+    public static class FileFilterSchematics implements FileFilter
+    {
+        @Override
+        public boolean accept(File pathName)
+        {
+            String name = pathName.getName();
+            return  name.endsWith(".litematic") ||
+                    name.endsWith(".schematic") ||
+                    name.endsWith(".nbt");
         }
     }
 }

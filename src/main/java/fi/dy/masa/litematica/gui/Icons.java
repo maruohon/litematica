@@ -21,9 +21,12 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
     FILE_ICON_SCHEMATIC     (144,  12, 12, 12),
     FILE_ICON_VANILLA       (144,  24, 12, 12),
     FILE_ICON_JSON          (144,  36, 12, 12),
+    FILE_ICON_SPONGE_SCH    (144,  48, 12, 12),
     FILE_ICON_DIR           (156,   0, 12, 12),
     FILE_ICON_DIR_UP        (156,  12, 12, 12),
     FILE_ICON_DIR_ROOT      (156,  24, 12, 12),
+    FILE_ICON_SEARCH        (156,  36, 12, 12),
+    FILE_ICON_CREATE_DIR    (156,  48, 12, 12),
     SCHEMATIC_TYPE_FILE     (144,   0, 12, 12),
     SCHEMATIC_TYPE_MEMORY   (186,   0, 12, 12),
     INFO_11                 (168,  18, 11, 11),
@@ -95,6 +98,18 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
     public IGuiIcon getIconUp()
     {
         return FILE_ICON_DIR_UP;
+    }
+
+    @Override
+    public IGuiIcon getIconCreateDirectory()
+    {
+        return FILE_ICON_CREATE_DIR;
+    }
+
+    @Override
+    public IGuiIcon getIconSearch()
+    {
+        return FILE_ICON_SEARCH;
     }
 
     @Override
