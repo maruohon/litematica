@@ -33,7 +33,7 @@ public abstract class MixinWorldClient extends World
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
             Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
         {
-            SchematicWorldRefresher.markSchematicChunkForRenderUpdate(pos);
+            SchematicWorldRefresher.INSTANCE.markSchematicChunkForRenderUpdate(pos);
         }
     }
 }

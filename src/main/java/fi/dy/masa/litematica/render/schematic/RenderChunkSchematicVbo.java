@@ -10,7 +10,6 @@ import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.util.OverlayType;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -215,7 +214,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 {
                     if (usedLayers[layerTmp.ordinal()])
                     {
-                        ((IMixinCompiledChunk) this.compiledChunk).invokeSetLayerUsed(layerTmp);
+                        this.compiledChunk.setLayerUsed(layerTmp);
                     }
 
                     if (this.compiledChunk.isLayerStarted(layerTmp))
@@ -255,6 +254,9 @@ public class RenderChunkSchematicVbo extends RenderChunk
         {
             this.getLockCompileTask().unlock();
         }
+
+
+        this.compiledChunk.setTimeBuilt(this.getWorld().getGameTime());
     }
 
     protected void renderBlocksAndOverlay(BlockPos pos, Set<TileEntity> tileEntities, boolean[] usedLayers, BufferBuilderCache buffers)

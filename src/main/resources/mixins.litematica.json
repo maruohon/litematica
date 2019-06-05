@@ -5,10 +5,8 @@
     "minVersion": "0.6",
     "client": [
         "IMixinBlockRendererDispatcher",
-        "IMixinCompiledChunk",
         "IMixinNBTTagLongArray",
         "IMixinViewFrustum",
-        "IMixinWorldClient",
         "MixinBlockRail",
         "MixinChunk",
         "MixinChunkProviderClient",

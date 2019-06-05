@@ -177,9 +177,9 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         }
     }
 
-    protected boolean canProcessChunk(ChunkPos pos, World worldSchematic, WorldClient worldClient)
+    protected boolean canProcessChunk(ChunkPos pos, WorldSchematic worldSchematic, WorldClient worldClient)
     {
-        if (worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false) == null)
+        if (worldSchematic.getChunkProvider().isChunkLoaded(pos.x, pos.z) == false)
         {
             return false;
         }
@@ -192,7 +192,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
             WorldSchematic worldSchematic, WorldClient worldClient, EntityPlayerSP player)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-        Chunk chunkSchematic = worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false);
+        Chunk chunkSchematic = worldSchematic.getChunkProvider().getChunk(pos.x, pos.z);
         Chunk chunkClient = worldClient.getChunkProvider().getChunk(pos.x, pos.z, false, false);
 
         if (this.boxInProgress == false)

@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.world;
 
-import fi.dy.masa.litematica.mixin.IMixinWorldClient;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
@@ -19,26 +19,28 @@ import net.minecraft.world.dimension.DimensionType;
 
 public class WorldSchematic extends WorldClient
 {
+    private final Minecraft mc;
+    private ChunkProviderSchematic chunkProviderSchematic;
+
     public WorldSchematic(NetHandlerPlayClient netHandler, WorldSettings settings, DimensionType dimType,
             EnumDifficulty difficulty, Profiler profilerIn)
     {
         super(netHandler, settings, dimType, difficulty, profilerIn);
+
+        this.mc = Minecraft.getInstance();
     }
 
     @Override
     protected IChunkProvider createChunkProvider()
     {
-        ChunkProviderSchematic provider = new ChunkProviderSchematic(this);
-
-        ((IMixinWorldClient) (Object) this).setClientChunkProvider(provider);
-
-        return provider;
+        this.chunkProviderSchematic = new ChunkProviderSchematic(this);
+        return this.chunkProviderSchematic;
     }
 
     @Override
     public ChunkProviderSchematic getChunkProvider()
     {
-        return (ChunkProviderSchematic) super.getChunkProvider();
+        return this.chunkProviderSchematic;
     }
 
     @Override
@@ -90,6 +92,12 @@ public class WorldSchematic extends WorldClient
             this.onEntityAdded(entityIn);
             return true;
         }
+    }
+
+    @Override
+    public long getGameTime()
+    {
+        return this.mc.world != null ? this.mc.world.getGameTime() : 0;
     }
 
     @Override

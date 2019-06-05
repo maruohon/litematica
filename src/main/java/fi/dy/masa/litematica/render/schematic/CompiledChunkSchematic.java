@@ -12,6 +12,13 @@ public class CompiledChunkSchematic extends CompiledChunk
     private final BufferBuilder.State[] blockBufferStates = new BufferBuilder.State[BlockRenderLayer.values().length];
     private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.values().length];
     private boolean overlayEmpty = true;
+    private long timeBuilt;
+
+    @Override
+    public void setLayerUsed(BlockRenderLayer layer)
+    {
+        super.setLayerUsed(layer);
+    }
 
     public boolean isOverlayEmpty()
     {
@@ -57,5 +64,15 @@ public class CompiledChunkSchematic extends CompiledChunk
     public void setOverlayBufferState(OverlayRenderType type, BufferBuilder.State state)
     {
         this.overlayBufferStates[type.ordinal()] = state;
+    }
+
+    public long getTimeBuilt()
+    {
+        return this.timeBuilt;
+    }
+
+    public void setTimeBuilt(long time)
+    {
+        this.timeBuilt = time;
     }
 }

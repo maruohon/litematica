@@ -19,7 +19,7 @@ public abstract class MixinNetHandlerPlayClient
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
             Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
         {
-            SchematicWorldRefresher.markSchematicChunksForRenderUpdate(new ChunkPos(packetIn.getChunkX(), packetIn.getChunkZ()));
+            SchematicWorldRefresher.INSTANCE.markSchematicChunksForRenderUpdate(new ChunkPos(packetIn.getChunkX(), packetIn.getChunkZ()));
         }
     }
 }

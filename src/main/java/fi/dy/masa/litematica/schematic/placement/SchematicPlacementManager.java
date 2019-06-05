@@ -110,17 +110,13 @@ public class SchematicPlacementManager
                     worldClient.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
                 {
                     // Wipe the old chunk if it exists
-                    if (worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
-                    {
-                        //System.out.printf("wiping chunk at %s\n", pos);
-                        this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
-                    }
+                    this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
 
                     //System.out.printf("loading chunk at %s\n", pos);
                     worldSchematic.getChunkProvider().loadChunk(pos.x, pos.z);
                 }
 
-                if (worldSchematic.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
+                if (worldSchematic.getChunkProvider().isChunkLoaded(pos.x, pos.z))
                 {
                     //System.out.printf("placing at %s\n", pos);
                     Collection<SchematicPlacement> placements = this.schematicsTouchingChunk.get(pos);
@@ -135,7 +131,8 @@ public class SchematicPlacementManager
                             }
                         }
 
-                        worldSchematic.markBlockRangeForRenderUpdate(pos.x << 4, 0, pos.z << 4, (pos.x << 4) + 15, 256, (pos.z << 4) + 15);
+                        int maxY = worldSchematic.getChunkProvider().getChunk(pos.x, pos.z).getTopFilledSegment() + 15;
+                        worldSchematic.markBlockRangeForRenderUpdate(pos.x << 4, 0, pos.z << 4, (pos.x << 4) + 15, maxY, (pos.z << 4) + 15);
                     }
 
                     iter.remove();
@@ -169,10 +166,10 @@ public class SchematicPlacementManager
 
     private void unloadSchematicChunk(WorldSchematic worldSchematic, int chunkX, int chunkZ)
     {
-        if (worldSchematic.getChunkProvider().getChunk(chunkX, chunkZ, false, false) != null)
+        if (worldSchematic.getChunkProvider().isChunkLoaded(chunkX, chunkZ))
         {
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
-            worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4) - 1, 0, (chunkZ << 4) - 1, (chunkX << 4) + 16, 256, (chunkZ << 4) + 16);
+            worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4), 0, (chunkZ << 4), (chunkX << 4) + 15, 255, (chunkZ << 4) + 15);
             worldSchematic.getChunkProvider().unloadChunk(chunkX, chunkZ);
         }
     }

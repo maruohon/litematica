@@ -7,8 +7,8 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import fi.dy.masa.litematica.render.shader.ShaderProgram;
+import fi.dy.masa.litematica.world.WorldSchematic;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
@@ -66,7 +66,7 @@ public class LitematicaRenderer
         this.getWorldRenderer().loadRenderers();
     }
 
-    public void onSchematicWorldChanged(@Nullable WorldClient worldClient)
+    public void onSchematicWorldChanged(@Nullable WorldSchematic worldClient)
     {
         this.getWorldRenderer().setWorldAndLoadRenderers(worldClient);
     }
