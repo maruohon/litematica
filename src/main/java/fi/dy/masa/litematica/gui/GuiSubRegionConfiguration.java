@@ -16,11 +16,9 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -35,7 +33,7 @@ public class GuiSubRegionConfiguration extends GuiBase
     {
         this.schematicPlacement = schematicPlacement;
         this.placement = placement;
-        this.title = I18n.format("litematica.gui.title.configure_schematic_sub_region");
+        this.title = StringUtils.translate("litematica.gui.title.configure_schematic_sub_region");
     }
 
     @Override
@@ -47,7 +45,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         int x = this.width - width - 10;
         int y = 26;
 
-        String label = I18n.format("litematica.gui.label.placement_sub.region_name", this.placement.getName());
+        String label = StringUtils.translate("litematica.gui.label.placement_sub.region_name", this.placement.getName());
         this.addLabel(20, y, -1, 16, 0xFFFFFFFF, label);
 
         y = 10;
@@ -58,7 +56,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         this.createButtonOnOff(x, y, width, this.placement.ignoreEntities(), ButtonListener.Type.TOGGLE_ENTITIES);
         y += 18;
 
-        label = I18n.format("litematica.gui.label.placement_sub.region_position");
+        label = StringUtils.translate("litematica.gui.label.placement_sub.region_position");
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
         y += 14;
         x += 2;
@@ -91,7 +89,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         this.createButton(x, y, width, ButtonListener.Type.SLICE_TYPE);
 
         y = this.height - 36;
-        label = I18n.format("litematica.gui.button.placement_sub.placement_configuration");
+        label = StringUtils.translate("litematica.gui.button.placement_sub.placement_configuration");
         int buttonWidth = this.getStringWidth(label) + 10;
         x = 10;
         ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
@@ -99,7 +97,7 @@ public class GuiSubRegionConfiguration extends GuiBase
 
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        label = I18n.format(type.getLabelKey());
+        label = StringUtils.translate(type.getLabelKey());
         int menuButtonWidth = this.getStringWidth(label) + 20;
         x = sr.getScaledHeight() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
 
@@ -133,7 +131,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
         this.addTextField(textField, listener);
 
-        String hover = I18n.format("litematica.hud.schematic_placement.hover_info.lock_coordinate");
+        String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x = x + offset + width + 20;
         WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "", hover);
         cb.setChecked(this.placement.isCoordinateLocked(type), false);
@@ -160,8 +158,8 @@ public class GuiSubRegionConfiguration extends GuiBase
                 boolean enabled = this.placement.isRenderingEnabled();
                 String pre = enabled ? TXT_GREEN : TXT_RED;
                 label = pre + type.getDisplayName() + TXT_RST;
-                String str = pre + I18n.format("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
-                String hover = I18n.format("litematica.gui.button.schematic_placement.hover.rendering", str);
+                String str = pre + StringUtils.translate("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
+                String hover = StringUtils.translate("litematica.gui.button.schematic_placement.hover.rendering", str);
 
                 this.addButton(new ButtonGeneric(x, y, width, 20, label, hover), listener);
                 break;
@@ -171,7 +169,7 @@ public class GuiSubRegionConfiguration extends GuiBase
             case NUDGE_COORD_Y:
             case NUDGE_COORD_Z:
             {
-                String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip");
+                String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
                 ButtonGeneric button = new ButtonGeneric(x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return;
@@ -205,7 +203,7 @@ public class GuiSubRegionConfiguration extends GuiBase
 
     private void updateElements()
     {
-        String label = I18n.format("litematica.gui.button.placement_sub.reset_sub_region_placement");
+        String label = StringUtils.translate("litematica.gui.button.placement_sub.reset_sub_region_placement");
         boolean enabled = this.placement.isRegionPlacementModifiedFromDefault();
 
         if (enabled)
@@ -237,10 +235,9 @@ public class GuiSubRegionConfiguration extends GuiBase
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            Minecraft mc = Minecraft.getMinecraft();
             int amount = mouseButton == 1 ? -1 : 1;
-            if (GuiScreen.isShiftKeyDown()) { amount *= 8; }
-            if (GuiScreen.isAltKeyDown()) { amount *= 4; }
+            if (GuiBase.isShiftDown()) { amount *= 8; }
+            if (GuiBase.isAltDown()) { amount *= 4; }
 
             // The sub-region placements are relative (but the setter below uses the
             // absolute position and subtracts the placement origin internally)
@@ -252,7 +249,7 @@ public class GuiSubRegionConfiguration extends GuiBase
             switch (this.type)
             {
                 case PLACEMENT_CONFIGURATION:
-                    mc.displayGuiScreen(new GuiPlacementConfiguration(this.schematicPlacement));
+                    GuiBase.openGui(new GuiPlacementConfiguration(this.schematicPlacement));
                     break;
 
                 case ROTATE:
@@ -272,7 +269,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 }
 
                 case MOVE_TO_PLAYER:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(mc.player.getPositionVector()), this.parent);
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(this.parent.mc.player.getPositionVector()), this.parent);
                     break;
 
                 case NUDGE_COORD_X:
@@ -346,12 +343,12 @@ public class GuiSubRegionConfiguration extends GuiBase
 
             public String getDisplayName(Object... args)
             {
-                return I18n.format(this.translationKey, args);
+                return StringUtils.translate(this.translationKey, args);
             }
         }
     }
 
-    private static class TextFieldListener implements ITextFieldListener<GuiTextField>
+    private static class TextFieldListener implements ITextFieldListener<GuiTextFieldInteger>
     {
         private final GuiSubRegionConfiguration parent;
         private final SchematicPlacement schematicPlacement;
@@ -367,7 +364,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
 
         @Override
-        public boolean onTextChange(GuiTextField textField)
+        public boolean onTextChange(GuiTextFieldInteger textField)
         {
             try
             {

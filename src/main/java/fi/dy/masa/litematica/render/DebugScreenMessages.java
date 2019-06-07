@@ -4,9 +4,9 @@ import com.mumfrey.liteloader.util.debug.DebugMessage;
 import com.mumfrey.liteloader.util.debug.DebugMessage.Position;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.util.text.TextFormatting;
 
 public class DebugScreenMessages
 {
@@ -24,8 +24,8 @@ public class DebugScreenMessages
             {
                 RenderGlobal render = LitematicaRenderer.getInstance().getWorldRenderer();
 
-                String pre = TextFormatting.GOLD.toString();
-                String rst = TextFormatting.RESET.toString();
+                String pre = GuiBase.TXT_GOLD;
+                String rst = GuiBase.TXT_RST;
 
                 MESSAGE_RENDERER.setMessage(String.format("%s[Litematica]%s %s", pre, rst, render.getDebugInfoRenders()));
 

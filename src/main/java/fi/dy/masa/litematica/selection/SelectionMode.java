@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.selection;
 
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public enum SelectionMode
 {
@@ -21,7 +21,7 @@ public enum SelectionMode
 
     public String getDisplayName()
     {
-        return I18n.format(this.translationKey);
+        return StringUtils.translate(this.translationKey);
     }
 
     public SelectionMode cycle(boolean forward)

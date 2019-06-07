@@ -12,12 +12,8 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
 public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialListEntry>
@@ -52,7 +48,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         this.isOdd = isOdd;
         this.listWidget = listWidget;
         this.materialList = materialList;
-        this.shulkerBoxAbbr = I18n.format("litematica.gui.label.material_list.abbr.shulker_box");
+        this.shulkerBoxAbbr = StringUtils.translate("litematica.gui.label.material_list.abbr.shulker_box");
 
         if (this.entry != null)
         {
@@ -63,10 +59,10 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         }
         else
         {
-            this.header1 = GuiBase.TXT_BOLD + I18n.format(HEADERS[0]) + GuiBase.TXT_RST;
-            this.header2 = GuiBase.TXT_BOLD + I18n.format(HEADERS[1]) + GuiBase.TXT_RST;
-            this.header3 = GuiBase.TXT_BOLD + I18n.format(HEADERS[2]) + GuiBase.TXT_RST;
-            this.header4 = GuiBase.TXT_BOLD + I18n.format(HEADERS[3]) + GuiBase.TXT_RST;
+            this.header1 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]) + GuiBase.TXT_RST;
+            this.header2 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]) + GuiBase.TXT_RST;
+            this.header3 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[2]) + GuiBase.TXT_RST;
+            this.header4 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[3]) + GuiBase.TXT_RST;
         }
 
         int posX = x + width;
@@ -79,31 +75,27 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
 
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getTranslationKey());
-        int len = this.getStringWidth(label) + 10;
-        xRight -= (len + 2);
-        this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this.materialList, this.entry, this.listWidget));
-
-        return xRight;
+        String label = type.getDisplayName();
+        ButtonListener listener = new ButtonListener(type, this.materialList, this.entry, this.listWidget);
+        return this.addButton(new ButtonGeneric(xRight, y, -1, true, label), listener).getX();
     }
 
-    public static void setMaxNameLength(List<MaterialListEntry> materials, int multiplier, Minecraft mc)
+    public static void setMaxNameLength(List<MaterialListEntry> materials, int multiplier)
     {
-        FontRenderer font = mc.fontRenderer;
-        maxNameLength = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[0]) + GuiBase.TXT_RST);
-        maxCountLength1 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[1]) + GuiBase.TXT_RST);
-        maxCountLength2 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[2]) + GuiBase.TXT_RST);
-        maxCountLength3 = font.getStringWidth(GuiBase.TXT_BOLD + I18n.format(HEADERS[3]) + GuiBase.TXT_RST);
+        maxNameLength   = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]) + GuiBase.TXT_RST);
+        maxCountLength1 = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]) + GuiBase.TXT_RST);
+        maxCountLength2 = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[2]) + GuiBase.TXT_RST);
+        maxCountLength3 = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[3]) + GuiBase.TXT_RST);
 
         for (MaterialListEntry entry : materials)
         {
             int countTotal = entry.getCountTotal() * multiplier;
             int countMissing = multiplier == 1 ? entry.getCountMissing() : countTotal;
 
-            maxNameLength = Math.max(maxNameLength, font.getStringWidth(entry.getStack().getDisplayName()));
-            maxCountLength1 = Math.max(maxCountLength1, font.getStringWidth(String.valueOf(countTotal)));
-            maxCountLength2 = Math.max(maxCountLength2, font.getStringWidth(String.valueOf(countMissing)));
-            maxCountLength3 = Math.max(maxCountLength3, font.getStringWidth(String.valueOf(entry.getCountAvailable())));
+            maxNameLength   = Math.max(maxNameLength,   StringUtils.getStringWidth(entry.getStack().getDisplayName()));
+            maxCountLength1 = Math.max(maxCountLength1, StringUtils.getStringWidth(String.valueOf(countTotal)));
+            maxCountLength2 = Math.max(maxCountLength2, StringUtils.getStringWidth(String.valueOf(countMissing)));
+            maxCountLength3 = Math.max(maxCountLength3, StringUtils.getStringWidth(String.valueOf(entry.getCountAvailable())));
         }
     }
 
@@ -189,16 +181,16 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         // Draw a lighter background for the hovered and the selected entry
         if (this.header1 == null && (selected || this.isMouseOver(mouseX, mouseY)))
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0303030);
         }
 
         int x1 = this.getColumnPosX(0);
@@ -212,10 +204,10 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         {
             if (this.listWidget.getSearchBarWidget().isSearchOpen() == false)
             {
-                this.drawString(this.header1, x1, y, color);
-                this.drawString(this.header2, x2, y, color);
-                this.drawString(this.header3, x3, y, color);
-                this.drawString(this.header4, x4, y, color);
+                this.drawString(x1, y, color, this.header1);
+                this.drawString(x2, y, color, this.header2);
+                this.drawString(x3, y, color, this.header3);
+                this.drawString(x4, y, color, this.header4);
 
                 this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
             }
@@ -230,29 +222,29 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             String gold = GuiBase.TXT_GOLD;
             String red = GuiBase.TXT_RED;
             String pre;
-            this.drawString(this.entry.getStack().getDisplayName(), x1 + 20, y, color);
+            this.drawString(x1 + 20, y, color, this.entry.getStack().getDisplayName());
 
-            this.drawString(String.valueOf(countTotal)          , x2, y, color);
+            this.drawString(x2, y, color, String.valueOf(countTotal));
 
             pre = countMissing == 0 ? green : (countAvailable >= countMissing ? gold : red);
-            this.drawString(pre + String.valueOf(countMissing)  , x3, y, color);
+            this.drawString(x3, y, color, pre + String.valueOf(countMissing));
 
             pre = countAvailable >= countMissing ? green : red;
-            this.drawString(pre + String.valueOf(countAvailable), x4, y, color);
+            this.drawString(x4, y, color, pre + String.valueOf(countAvailable));
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
-            RenderHelper.enableGUIStandardItemLighting();
+            RenderUtils.enableGuiItemLighting();
 
             //mc.getRenderItem().zLevel -= 110;
             y = this.y + 3;
-            Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
+            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
             this.mc.getRenderItem().renderItemAndEffectIntoGUI(this.mc.player, this.entry.getStack(), x1, y);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
             //mc.getRenderItem().zLevel += 110;
 
             GlStateManager.disableBlend();
-            RenderHelper.disableStandardItemLighting();
+            RenderUtils.disableItemLighting();
             GlStateManager.popMatrix();
 
             super.render(mouseX, mouseY, selected);
@@ -267,9 +259,9 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, 0, 200);
 
-            String header1 = GuiBase.TXT_BOLD + I18n.format(HEADERS[0]);
-            String header2 = GuiBase.TXT_BOLD + I18n.format(HEADERS[1]);
-            String header3 = GuiBase.TXT_BOLD + I18n.format(HEADERS[2]);
+            String header1 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]);
+            String header2 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]);
+            String header3 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[2]);
 
             ItemStack stack = this.entry.getStack();
             String stackName = stack.getDisplayName();
@@ -299,21 +291,21 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int y1 = y;
             y += 4;
 
-            this.drawString(header1,         x1     , y, 0xFFFFFFFF);
-            this.drawString(stackName,       x2 + 20, y, 0xFFFFFFFF);
+            this.drawString(x1     , y, 0xFFFFFFFF, header1);
+            this.drawString(x2 + 20, y, 0xFFFFFFFF, stackName);
             y += 16;
 
-            this.drawString(header2,         x1, y, 0xFFFFFFFF);
-            this.drawString(strCountTotal,   x2, y, 0xFFFFFFFF);
+            this.drawString(x1, y, 0xFFFFFFFF, header2);
+            this.drawString(x2, y, 0xFFFFFFFF, strCountTotal);
             y += 16;
 
-            this.drawString(header3,         x1, y, 0xFFFFFFFF);
-            this.drawString(strCountMissing, x2, y, 0xFFFFFFFF);
+            this.drawString(x1, y, 0xFFFFFFFF, header3);
+            this.drawString(x2, y, 0xFFFFFFFF, strCountMissing);
 
-            Gui.drawRect(x2, y1, x2 + 16, y1 + 16, 0x20FFFFFF); // light background for the item
+            RenderUtils.drawRect(x2, y1, 16, 16, 0x20FFFFFF); // light background for the item
 
             GlStateManager.disableLighting();
-            RenderHelper.enableGUIStandardItemLighting();
+            RenderUtils.enableGuiItemLighting();
 
             //mc.getRenderItem().zLevel += 100;
             this.mc.getRenderItem().renderItemAndEffectIntoGUI(this.mc.player, stack, x2, y1);
@@ -321,7 +313,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             //mc.getRenderItem().zLevel -= 100;
             //GlStateManager.disableBlend();
 
-            RenderHelper.disableStandardItemLighting();
+            RenderUtils.disableItemLighting();
             GlStateManager.popMatrix();
         }
     }
@@ -395,9 +387,9 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
                 this.translationKey = translationKey;
             }
 
-            public String getTranslationKey()
+            public String getDisplayName()
             {
-                return this.translationKey;
+                return StringUtils.translate(this.translationKey);
             }
         }
     }

@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.materials;
 import java.util.Collection;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListSchematic extends MaterialListBase
 {
@@ -45,6 +45,6 @@ public class MaterialListSchematic extends MaterialListBase
     @Override
     public String getTitle()
     {
-        return I18n.format("litematica.gui.title.material_list.schematic", this.getName(), this.regions.size(), this.schematic.getAreas().size());
+        return StringUtils.translate("litematica.gui.title.material_list.schematic", this.getName(), this.regions.size(), this.schematic.getAreas().size());
     }
 }

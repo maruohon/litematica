@@ -18,10 +18,10 @@ public class LitematicaConfigPanel extends ConfigPanelBase
     protected void createSubPanels()
     {
         String modId = Reference.MOD_ID;
-        this.addSubPanel((new GuiModConfigs(modId, "Generic", Configs.Generic.OPTIONS)).setConfigWidth(160));
-        this.addSubPanel((new GuiModConfigs(modId, "Info Overlays", Configs.InfoOverlays.OPTIONS)).setConfigWidth(160));
-        this.addSubPanel((new GuiModConfigs(modId, "Visuals", Configs.Visuals.OPTIONS)).setConfigWidth(120));
-        this.addSubPanel((new GuiModConfigs(modId, "Colors", Configs.Colors.OPTIONS)).setConfigWidth(100));
-        this.addSubPanel((new GuiModConfigs(modId, "Generic Hotkeys", Hotkeys.HOTKEY_LIST)).setConfigWidth(210));
+        this.addSubPanel((new GuiModConfigs(modId, Configs.Generic.OPTIONS, "litematica.gui.button.config_gui.generic")).setConfigWidth(160));
+        this.addSubPanel((new GuiModConfigs(modId, Configs.InfoOverlays.OPTIONS, "litematica.gui.button.config_gui.info_overlays")).setConfigWidth(160));
+        this.addSubPanel((new GuiModConfigs(modId, Configs.Visuals.OPTIONS, "litematica.gui.button.config_gui.visuals")).setConfigWidth(120));
+        this.addSubPanel((new GuiModConfigs(modId, Configs.Colors.OPTIONS, "litematica.gui.button.config_gui.colors")).setConfigWidth(100));
+        this.addSubPanel((new GuiModConfigs(modId, Hotkeys.HOTKEY_LIST, "litematica.gui.button.config_gui.hotkeys")).setConfigWidth(210));
     }
 }

@@ -13,9 +13,9 @@ import fi.dy.masa.litematica.scheduler.TaskTimer;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -134,7 +134,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
             Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
 
             String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
-            String title = I18n.format("litematica.gui.label.missing_chunks", this.name, requiredChunks.size());
+            String title = StringUtils.translate("litematica.gui.label.missing_chunks", this.name, requiredChunks.size());
             hudLines.add(String.format("%s%s%s", pre, title, GuiBase.TXT_RST));
 
             int maxLines = Math.min(list.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());

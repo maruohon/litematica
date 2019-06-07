@@ -13,7 +13,6 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
@@ -26,11 +25,11 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
-            this.title = I18n.format("litematica.gui.title.area_editor_normal_schematic_projects");
+            this.title = StringUtils.translate("litematica.gui.title.area_editor_normal_schematic_projects");
         }
         else
         {
-            this.title = I18n.format("litematica.gui.title.area_editor_simple");
+            this.title = StringUtils.translate("litematica.gui.title.area_editor_simple");
         }
     }
 
@@ -38,7 +37,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     protected int addSubRegionFields(int x, int y)
     {
         x = 12;
-        String label = I18n.format("litematica.gui.label.area_editor.box_name");
+        String label = StringUtils.translate("litematica.gui.label.area_editor.box_name");
         this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
         y += 13;
 
@@ -72,14 +71,14 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
 
         if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
         {
-            String str = I18n.format("litematica.warning.area_editor.area_rendering_disabled");
+            String str = StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled");
             List<String> lines = new ArrayList<>();
             int xTmp = 250;
             int maxLineLength = this.width - xTmp - 20;
-            StringUtils.splitTextToLines(lines, str, maxLineLength, this.textRenderer);
-            this.addLabel(xTmp, 48, maxLineLength, lines.size() * (this.textRenderer.FONT_HEIGHT + 1), 0xFFFFAA00, lines.toArray(new String[0]));
+            StringUtils.splitTextToLines(lines, str, maxLineLength);
+            this.addLabel(xTmp, 48, maxLineLength, lines.size() * (StringUtils.getFontHeight() + 1), 0xFFFFAA00, lines.toArray(new String[0]));
 
-            //this.addLabel(x, nextY, 120, 12, 0xFFFFAA00, I18n.format("litematica.warning.area_editor.area_rendering_disabled"));
+            //this.addLabel(x, nextY, 120, 12, 0xFFFFAA00, StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled"));
         }
 
         return y;

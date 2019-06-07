@@ -24,8 +24,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetListSchematicVerificationResults>
                                     implements ISelectionListener<BlockMismatchEntry>, ICompletionListener
@@ -41,7 +40,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     {
         super(10, 60);
 
-        this.title = I18n.format("litematica.gui.title.schematic_verifier", placement.getName());
+        this.title = StringUtils.translate("litematica.gui.title.schematic_verifier", placement.getName());
         this.placement = placement;
         this.verifier = placement.getSchematicVerifier();
 
@@ -49,8 +48,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
         if (verifier != verifierLast)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-            WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined(), mc);
+            WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined());
             verifierLast = verifier;
         }
     }
@@ -98,7 +96,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
         if (this.verifier.isActive())
         {
-            String str = I18n.format("litematica.gui.label.schematic_verifier.status.verifying", this.verifier.getUnseenChunks(), this.verifier.getTotalChunks());
+            String str = StringUtils.translate("litematica.gui.label.schematic_verifier.status.verifying", this.verifier.getUnseenChunks(), this.verifier.getTotalChunks());
             this.addLabel(12, y, 100, 12, 0xFFF0F0F0, str);
         }
         else if (this.verifier.isFinished())
@@ -109,14 +107,14 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             Integer e = this.verifier.getExtraBlocks();
             Integer c = this.verifier.getCorrectStatesCount();
             Integer t = this.verifier.getSchematicTotalBlocks();
-            String str = I18n.format("litematica.gui.label.schematic_verifier.status.done_errors", wb, ws, m, e);
+            String str = StringUtils.translate("litematica.gui.label.schematic_verifier.status.done_errors", wb, ws, m, e);
             this.addLabel(12, y, 100, 12, 0xFFF0F0F0, str);
-            str = I18n.format("litematica.gui.label.schematic_verifier.status.done_correct_total", c, t);
+            str = StringUtils.translate("litematica.gui.label.schematic_verifier.status.done_correct_total", c, t);
             this.addLabel(12, y + 14, 100, 12, 0xFFF0F0F0, str);
         }
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        label = I18n.format(type.getLabelKey());
+        label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label);
@@ -164,23 +162,23 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             case START:
                 if (this.verifier.isPaused())
                 {
-                    label = I18n.format("litematica.gui.button.schematic_verifier.resume");
+                    label = StringUtils.translate("litematica.gui.button.schematic_verifier.resume");
                 }
                 else
                 {
-                    label = I18n.format("litematica.gui.button.schematic_verifier.start");
+                    label = StringUtils.translate("litematica.gui.button.schematic_verifier.start");
                     enabled = this.verifier.isActive() == false;
                 }
                 break;
 
             case STOP:
-                label = I18n.format("litematica.gui.button.schematic_verifier.stop");
+                label = StringUtils.translate("litematica.gui.button.schematic_verifier.stop");
                 enabled = this.verifier.isActive();
                 break;
 
             case RESET_VERIFIER:
             {
-                label = I18n.format("litematica.gui.button.schematic_verifier.reset_verifier");
+                label = StringUtils.translate("litematica.gui.button.schematic_verifier.reset_verifier");
                 enabled = this.verifier.isActive() || this.verifier.isPaused() || this.verifier.isFinished();
                 break;
             }
@@ -188,20 +186,20 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             case SET_LIST_TYPE:
             {
                 String str = this.placement.getSchematicVerifierType().getDisplayName();
-                label = I18n.format("litematica.gui.button.schematic_verifier.range_type", str);
+                label = StringUtils.translate("litematica.gui.button.schematic_verifier.range_type", str);
                 break;
             }
 
             case RESET_IGNORED:
-                label = I18n.format("litematica.gui.button.schematic_verifier.reset_ignored");
+                label = StringUtils.translate("litematica.gui.button.schematic_verifier.reset_ignored");
                 enabled = this.verifier.getIgnoredMismatches().size() > 0;
                 break;
 
             case TOGGLE_INFO_HUD:
             {
                 boolean val = InfoHud.getInstance().isEnabled() && this.verifier.getShouldRenderText(RenderPhase.POST);
-                String str = (val ? TXT_GREEN : TXT_RED) + I18n.format("litematica.message.value." + (val ? "on" : "off")) + TXT_RST;
-                label = I18n.format("litematica.gui.button.schematic_verifier.toggle_info_hud", str);
+                String str = (val ? TXT_GREEN : TXT_RED) + StringUtils.translate("litematica.message.value." + (val ? "on" : "off")) + TXT_RST;
+                label = StringUtils.translate("litematica.gui.button.schematic_verifier.toggle_info_hud", str);
                 break;
             }
 
@@ -241,7 +239,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         if (this.mc.currentScreen == this)
         {
             SchematicVerifier verifier = this.verifier;
-            WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined(), this.mc);
+            WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined());
             this.initGui();
         }
     }
@@ -401,8 +399,6 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            Minecraft mc = Minecraft.getMinecraft();
-
             switch (this.type)
             {
                 case SET_RESULT_MODE_ALL:
@@ -442,7 +438,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
                         }
                         else
                         {
-                            verifier.startVerification(mc.world, world, this.parent.placement, this.parent);
+                            verifier.startVerification(this.parent.mc.world, world, this.parent.placement, this.parent);
                         }
                     }
                     else

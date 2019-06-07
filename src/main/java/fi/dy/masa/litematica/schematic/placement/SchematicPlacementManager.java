@@ -35,11 +35,11 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerMode;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -215,7 +215,7 @@ public class SchematicPlacementManager
 
             if (printMessages)
             {
-                InfoUtils.showGuiMessage(MessageType.SUCCESS, I18n.format("litematica.message.schematic_placement_created", placement.getName()));
+                InfoUtils.showGuiMessage(MessageType.SUCCESS, StringUtils.translate("litematica.message.schematic_placement_created", placement.getName()));
 
                 if (Configs.InfoOverlays.WARN_DISABLED_RENDERING.getBooleanValue())
                 {

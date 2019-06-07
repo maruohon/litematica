@@ -14,6 +14,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
 import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
+import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
@@ -26,7 +27,6 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
@@ -338,7 +338,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             //Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
             //queuePositions.addAll(set);
 
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("sorted positions: %d\n", positions.size());
+            //if (GuiBase.isCtrlDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
             world.profiler.endStartSection("iteration");
 
@@ -361,7 +361,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                     {
                         if (renderChunk.setFrameIndex(frameCount) && camera.isBoundingBoxInFrustum(renderChunk.boundingBox))
                         {
-                            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("add @ %s\n", subChunk);
+                            //if (GuiBase.isCtrlDown()) System.out.printf("add @ %s\n", subChunk);
                             if (renderChunk.needsUpdate() && subChunkCornerPos.equals(viewPosSubChunk))
                             {
                                 renderChunk.setNeedsUpdate(true);
@@ -394,7 +394,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                 }
                 else
                 {
-                    //if (GuiScreen.isCtrlKeyDown()) System.out.printf("====== update now\n");
+                    //if (GuiBase.isCtrlDown()) System.out.printf("====== update now\n");
                     world.profiler.startSection("build_near");
 
                     this.renderDispatcher.updateChunkNow(renderChunkTmp);
@@ -455,7 +455,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     {
         this.world.profiler.startSection("render_block_layer_" + blockLayerIn);
 
-        RenderHelper.disableStandardItemLighting();
+        RenderUtils.disableItemLighting();
 
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
@@ -769,7 +769,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                     GlStateManager.depthFunc(519);
                     GlStateManager.disableFog();
                     this.entityOutlineFramebuffer.bindFramebuffer(false);
-                    RenderHelper.disableStandardItemLighting();
+                    RenderUtils.disableItemLighting();
                     this.renderManager.setRenderOutlines(true);
 
                     for (int i = 0; i < entitiesOutlined.size(); ++i)
@@ -778,7 +778,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                     }
 
                     this.renderManager.setRenderOutlines(false);
-                    RenderHelper.enableStandardItemLighting();
+                    RenderUtils.enableItemLighting();
                     GlStateManager.depthMask(false);
 
                     this.entityOutlineShader.render(partialTicks);
@@ -798,7 +798,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             */
 
             this.world.profiler.endStartSection("block_entities");
-            RenderHelper.enableStandardItemLighting();
+            fi.dy.masa.malilib.render.RenderUtils.enableItemLighting();
 
             for (RenderChunk renderChunk : this.renderInfos)
             {

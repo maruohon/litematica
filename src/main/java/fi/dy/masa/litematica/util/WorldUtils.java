@@ -23,12 +23,14 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
@@ -40,9 +42,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -276,13 +276,13 @@ public class WorldUtils
         {
             if (dir.exists() == false && dir.mkdirs() == false)
             {
-                feedback.setString(I18n.format("litematica.error.schematic_write_to_file_failed.directory_creation_failed", dir.getAbsolutePath()));
+                feedback.setString(StringUtils.translate("litematica.error.schematic_write_to_file_failed.directory_creation_failed", dir.getAbsolutePath()));
                 return false;
             }
 
             if (override == false && file.exists())
             {
-                feedback.setString(I18n.format("litematica.error.structure_write_to_file_failed.exists", file.getAbsolutePath()));
+                feedback.setString(StringUtils.translate("litematica.error.structure_write_to_file_failed.exists", file.getAbsolutePath()));
                 return false;
             }
 
@@ -295,7 +295,7 @@ public class WorldUtils
         }
         catch (Exception e)
         {
-            feedback.setString(I18n.format("litematica.error.structure_write_to_file_failed.exception", file.getAbsolutePath()));
+            feedback.setString(StringUtils.translate("litematica.error.structure_write_to_file_failed.exception", file.getAbsolutePath()));
         }
 
         return false;
@@ -386,7 +386,7 @@ public class WorldUtils
                     // The creative mode pick block with NBT only works correctly
                     // if the server world doesn't have a TileEntity in that position.
                     // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (GuiScreen.isCtrlKeyDown() && te != null && mc.world.isAirBlock(pos))
+                    if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
                     {
                         ItemUtils.storeTEInStack(stack, te);
                     }

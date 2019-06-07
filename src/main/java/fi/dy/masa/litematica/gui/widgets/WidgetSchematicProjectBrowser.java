@@ -12,7 +12,7 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
 
 public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>
@@ -85,21 +85,21 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
             String r = GuiBase.TXT_RST;
             int color = 0xFFB0B0B0;
 
-            str = I18n.format("litematica.gui.label.schematic_projects.project");
+            str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
             this.drawString(str, x, y, color);
             y += 12;
             this.drawString(w + project.getName() + r, x + 8, y, color);
             y += 12;
             int versionId = project .getCurrentVersionId();
             String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
-            str = I18n.format("litematica.gui.label.schematic_projects.version", strVer, w + project.getVersionCount() + r);
+            str = StringUtils.translate("litematica.gui.label.schematic_projects.version", strVer, w + project.getVersionCount() + r);
             this.drawString(str, x, y, color);
             y += 12;
             SchematicVersion version = project.getCurrentVersion();
 
             if (version != null)
             {
-                str = I18n.format("litematica.gui.label.schematic_projects.origin");
+                str = StringUtils.translate("litematica.gui.label.schematic_projects.origin");
                 this.drawString(str, x, y, color);
                 y += 12;
 

@@ -5,13 +5,13 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager.ExportType;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicSaveExported extends GuiSchematicSaveBase
 {
@@ -29,7 +29,7 @@ public class GuiSchematicSaveExported extends GuiSchematicSaveBase
         this.dirSource = dirSource;
         this.inputFileName = inputFileName;
         this.defaultText = FileUtils.getNameWithoutExtension(inputFileName);
-        this.title = I18n.format("litematica.gui.title.save_exported_schematic", exportType.getDisplayName(), inputFileName);
+        this.title = StringUtils.translate("litematica.gui.title.save_exported_schematic", exportType.getDisplayName(), inputFileName);
         this.useTitleHierarchy = false;
     }
 
@@ -86,7 +86,7 @@ public class GuiSchematicSaveExported extends GuiSchematicSaveBase
                 {
                     File inDir = this.gui.dirSource;
                     String inFile = this.gui.inputFileName;
-                    boolean override = GuiScreen.isShiftKeyDown();
+                    boolean override = GuiBase.isShiftDown();
                     boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
                     FileType fileType = FileType.fromFile(new File(inDir, inFile));
 

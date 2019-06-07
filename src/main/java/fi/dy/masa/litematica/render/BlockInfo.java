@@ -1,18 +1,16 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
-import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -31,24 +29,23 @@ public class BlockInfo
     public BlockInfo(IBlockState state, String titleKey)
     {
         String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
-        this.title = pre + I18n.format(titleKey) + GuiBase.TXT_RST;
+        this.title = pre + StringUtils.translate(titleKey) + GuiBase.TXT_RST;
         this.state = state;
         this.stack = ItemUtils.getItemForState(this.state);
 
         ResourceLocation rl = Block.REGISTRY.getNameForObject(this.state.getBlock());
         this.blockRegistryname = rl != null ? rl.toString() : "<null>";
 
-        FontRenderer textRenderer = Minecraft.getMinecraft().fontRenderer;
         this.stackName = this.stack.getDisplayName();
 
-        int w = textRenderer.getStringWidth(this.stackName) + 20;
-        w = Math.max(w, textRenderer.getStringWidth(this.blockRegistryname));
-        w = Math.max(w, textRenderer.getStringWidth(this.title));
+        int w = StringUtils.getStringWidth(this.stackName) + 20;
+        w = Math.max(w, StringUtils.getStringWidth(this.blockRegistryname));
+        w = Math.max(w, StringUtils.getStringWidth(this.title));
         this.columnWidth = w;
 
-        this.props = BlockUtils.getFormattedBlockStateProperties(this.state);
+        this.props = BlockUtils.getFormattedBlockStateProperties(this.state, " = ");
         this.totalWidth = this.columnWidth + 40;
-        this.totalHeight = this.props.size() * (textRenderer.FONT_HEIGHT + 2) + 60;
+        this.totalHeight = this.props.size() * (StringUtils.getFontHeight() + 2) + 60;
     }
 
     public int getTotalWidth()
@@ -78,16 +75,16 @@ public class BlockInfo
             y += 12;
 
             GlStateManager.disableLighting();
-            RenderHelper.enableGUIStandardItemLighting();
+            RenderUtils.enableGuiItemLighting();
 
             //mc.getRenderItem().zLevel += 100;
-            Gui.drawRect(x1, y, x1 + 16, y + 16, 0x20FFFFFF); // light background for the item
+            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
             mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stack, x1, y);
             mc.getRenderItem().renderItemOverlayIntoGUI(textRenderer, this.stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
 
             //GlStateManager.disableBlend();
-            RenderHelper.disableStandardItemLighting();
+            RenderUtils.disableItemLighting();
 
             textRenderer.drawString(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
 
@@ -95,7 +92,7 @@ public class BlockInfo
             textRenderer.drawString(this.blockRegistryname, x1, y, 0xFF4060FF);
             y += textRenderer.FONT_HEIGHT + 4;
 
-            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props, textRenderer);
+            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props);
 
             GlStateManager.popMatrix();
         }

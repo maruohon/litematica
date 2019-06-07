@@ -32,6 +32,7 @@ import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigString;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
@@ -239,19 +240,19 @@ public class KeyCallbacks
 
             if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
-                this.mc.displayGuiScreen(new GuiMainMenu());
+                GuiBase.openGui(new GuiMainMenu());
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_LOADED_SCHEMATICS.getKeybind())
             {
-                this.mc.displayGuiScreen(new GuiSchematicLoadedList());
+                GuiBase.openGui(new GuiSchematicLoadedList());
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind())
             {
                 if (DataManager.getSchematicProjectsManager().hasProjectOpen() == false)
                 {
-                    this.mc.displayGuiScreen(new GuiAreaSelectionManager());
+                    GuiBase.openGui(new GuiAreaSelectionManager());
                 }
                 else
                 {
@@ -262,7 +263,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind())
             {
-                this.mc.displayGuiScreen(new GuiSchematicPlacementsList());
+                GuiBase.openGui(new GuiSchematicPlacementsList());
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeybind())
@@ -274,11 +275,11 @@ public class KeyCallbacks
             {
                 if (DataManager.getConfigGuiTab() == ConfigGuiTab.RENDER_LAYERS)
                 {
-                    this.mc.displayGuiScreen(new GuiRenderLayer());
+                    GuiBase.openGui(new GuiRenderLayer());
                 }
                 else
                 {
-                    this.mc.displayGuiScreen(new GuiConfigs());
+                    GuiBase.openGui(new GuiConfigs());
                 }
 
                 return true;
@@ -293,11 +294,11 @@ public class KeyCallbacks
 
                     if (placement != null)
                     {
-                        this.mc.displayGuiScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
+                        GuiBase.openGui(new GuiSubRegionConfiguration(schematicPlacement, placement));
                     }
                     else
                     {
-                        this.mc.displayGuiScreen(new GuiPlacementConfiguration(schematicPlacement));
+                        GuiBase.openGui(new GuiPlacementConfiguration(schematicPlacement));
                     }
                 }
                 else
@@ -313,7 +314,7 @@ public class KeyCallbacks
 
                 if (schematicPlacement != null)
                 {
-                    this.mc.displayGuiScreen(new GuiSchematicVerifier(schematicPlacement));
+                    GuiBase.openGui(new GuiSchematicVerifier(schematicPlacement));
                 }
                 else
                 {
@@ -344,7 +345,7 @@ public class KeyCallbacks
 
                 if (materialList != null)
                 {
-                    this.mc.displayGuiScreen(new GuiMaterialList(materialList));
+                    GuiBase.openGui(new GuiMaterialList(materialList));
                 }
 
                 return true;

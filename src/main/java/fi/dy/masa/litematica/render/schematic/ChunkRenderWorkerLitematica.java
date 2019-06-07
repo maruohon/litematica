@@ -136,12 +136,12 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
             if (generatorType == ChunkCompileTaskGeneratorSchematic.Type.REBUILD_CHUNK)
             {
-                //if (GuiScreen.isCtrlKeyDown()) System.out.printf("pre uploadChunk()\n");
+                //if (GuiBase.isCtrlDown()) System.out.printf("pre uploadChunk()\n");
                 for (BlockRenderLayer layer : BlockRenderLayer.values())
                 {
                     if (compiledChunk.isLayerEmpty(layer) == false)
                     {
-                        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkBlocks()\n");
+                        //if (GuiBase.isCtrlDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkBlocks()\n");
                         BufferBuilder buffer = buffers.getWorldRendererByLayer(layer);
                         futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(layer, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                     }
@@ -151,7 +151,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 {
                     if (compiledChunk.isOverlayTypeEmpty(type) == false)
                     {
-                        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkOverlay()\n");
+                        //if (GuiBase.isCtrlDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkOverlay()\n");
                         BufferBuilder buffer = buffers.getOverlayBuffer(type);
                         futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(type, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                     }
@@ -164,7 +164,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
                 if (compiledChunk.isOverlayTypeEmpty(OverlayRenderType.QUAD) == false)
                 {
-                    //if (GuiScreen.isCtrlKeyDown()) System.out.printf("RESORT_TRANSPARENCY pre uploadChunkOverlay()\n");
+                    //if (GuiBase.isCtrlDown()) System.out.printf("RESORT_TRANSPARENCY pre uploadChunkOverlay()\n");
                     buffer = buffers.getOverlayBuffer(OverlayRenderType.QUAD);
                     futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(OverlayRenderType.QUAD, buffer, renderChunk, compiledChunk, generator.getDistanceSq()));
                 }

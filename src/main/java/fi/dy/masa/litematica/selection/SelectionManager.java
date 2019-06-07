@@ -746,7 +746,7 @@ public class SelectionManager
         if (gui != null)
         {
             gui.setParent(parent);
-            Minecraft.getMinecraft().displayGuiScreen(gui);
+            GuiBase.openGui(gui);
         }
     }
 

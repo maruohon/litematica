@@ -7,7 +7,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.LayerRange;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class StatusInfoRenderer implements IInfoHudRenderer
 {
@@ -52,11 +52,11 @@ public class StatusInfoRenderer implements IInfoHudRenderer
 
         if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue())
         {
-            lines.add(I18n.format("litematica.hud.misc.easy_place_mode_enabled"));
+            lines.add(StringUtils.translate("litematica.hud.misc.easy_place_mode_enabled"));
         }
         else if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
         {
-            lines.add(I18n.format("litematica.hud.misc.placement_restriction_mode_enabled"));
+            lines.add(StringUtils.translate("litematica.hud.misc.placement_restriction_mode_enabled"));
         }
 
         LayerRange range = DataManager.getRenderLayerRange();
@@ -66,26 +66,26 @@ public class StatusInfoRenderer implements IInfoHudRenderer
 
         if (range.getLayerMode() == LayerMode.ALL)
         {
-            lines.add(I18n.format("litematica.hud.misc.render_layer_mode_all", g + strMode + rst));
+            lines.add(StringUtils.translate("litematica.hud.misc.render_layer_mode_all", g + strMode + rst));
         }
         else
         {
             String strVal = String.format("%s%s = %s%s", g, axisName, val, rst);
-            lines.add(I18n.format("litematica.hud.misc.render_layer_mode", g + strMode + rst, g + strVal + rst));
+            lines.add(StringUtils.translate("litematica.hud.misc.render_layer_mode", g + strMode + rst, g + strVal + rst));
         }
 
-        String strOn = g + I18n.format("litematica.message.value.on") + rst;
-        String strOff = red + I18n.format("litematica.message.value.off") + rst;
+        String strOn = g + StringUtils.translate("litematica.message.value.on") + rst;
+        String strOff = red + StringUtils.translate("litematica.message.value.off") + rst;
         String strAll = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() ? strOn : strOff;
         String strSch = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() ? strOn : strOff;
         String strBlk = Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() ? strOn : strOff;
         String strOvl = Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue() ? strOn : strOff;
         String strSel = Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() ? strOn : strOff;
-        lines.add(I18n.format("litematica.hud.misc.renderer_status", strAll, strSch, strBlk, strOvl, strSel));
+        lines.add(StringUtils.translate("litematica.hud.misc.renderer_status", strAll, strSch, strBlk, strOvl, strSel));
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
-            lines.add(I18n.format("litematica.hud.schematic_projects_mode"));
+            lines.add(StringUtils.translate("litematica.hud.schematic_projects_mode"));
         }
 
         if (this.overrideEnabled && System.currentTimeMillis() - this.lastOverrideTime > this.overrideDelay)

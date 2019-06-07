@@ -16,12 +16,12 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.init.Blocks;
@@ -58,7 +58,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         this.comparator = new ChunkPosComparator();
         this.comparator.setClosestFirst(true);
         this.replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
-        this.name = I18n.format("litematica.gui.label.task_name.paste");
+        this.name = StringUtils.translate("litematica.gui.label.task_name.paste");
 
         Set<ChunkPos> touchedChunks = placement.getTouchedChunks();
 
@@ -338,7 +338,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         List<String> hudLines = new ArrayList<>();
 
         String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
-        String title = I18n.format("litematica.gui.label.schematic_paste.missing_chunks", this.chunks.size());
+        String title = StringUtils.translate("litematica.gui.label.schematic_paste.missing_chunks", this.chunks.size());
         hudLines.add(String.format("%s%s%s", pre, title, GuiBase.TXT_RST));
 
         int maxLines = Math.min(this.chunks.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
