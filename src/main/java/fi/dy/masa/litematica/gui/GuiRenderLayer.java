@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -9,8 +10,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.LayerRange;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiRenderLayer extends GuiRenderLayerEditBase
 {
@@ -68,8 +68,8 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
     @Override
     protected int createHotkeyCheckBoxes(int x, int y, LayerRange layerRange)
     {
-        String label = I18n.format("litematica.gui.label.render_layers.hotkey");
-        String hover = I18n.format("litematica.gui.label.render_layers.hover.hotkey");
+        String label = StringUtils.translate("litematica.gui.label.render_layers.hotkey");
+        String hover = StringUtils.translate("litematica.gui.label.render_layers.hover.hotkey");
 
         WidgetCheckBox cb = new WidgetCheckBox(x, y + 4, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, hover);
         cb.setChecked(layerRange.getMoveLayerRangeMax(), false);
@@ -98,7 +98,7 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             DataManager.setConfigGuiTab(this.tab);
-            Minecraft.getInstance().displayGuiScreen(new GuiConfigs());
+            GuiBase.openGui(new GuiConfigs());
         }
     }
 }

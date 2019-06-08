@@ -124,7 +124,7 @@ public class ChunkRenderDispatcherLitematica
 
     public boolean updateChunkLater(RenderChunkSchematicVbo renderChunk)
     {
-        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateChunkLater()\n");
+        //if (GuiBase.isCtrlDown()) System.out.printf("updateChunkLater()\n");
         renderChunk.getLockCompileTask().lock();
         boolean flag1;
 
@@ -159,7 +159,7 @@ public class ChunkRenderDispatcherLitematica
 
     public boolean updateChunkNow(RenderChunkSchematicVbo chunkRenderer)
     {
-        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateChunkNow()\n");
+        //if (GuiBase.isCtrlDown()) System.out.printf("updateChunkNow()\n");
         chunkRenderer.getLockCompileTask().lock();
         boolean flag;
 
@@ -223,7 +223,7 @@ public class ChunkRenderDispatcherLitematica
 
     public boolean updateTransparencyLater(RenderChunkSchematicVbo renderChunk)
     {
-        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("updateTransparencyLater()\n");
+        //if (GuiBase.isCtrlDown()) System.out.printf("updateTransparencyLater()\n");
         renderChunk.getLockCompileTask().lock();
         boolean flag;
 
@@ -260,7 +260,7 @@ public class ChunkRenderDispatcherLitematica
     {
         if (Minecraft.getInstance().isCallingFromMinecraftThread())
         {
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunkBlocks()\n");
+            //if (GuiBase.isCtrlDown()) System.out.printf("uploadChunkBlocks()\n");
             if (OpenGlHelper.useVbo())
             {
                 this.uploadVertexBuffer(buffer, renderChunk.getVertexBufferByLayer(layer.ordinal()));
@@ -298,7 +298,7 @@ public class ChunkRenderDispatcherLitematica
     {
         if (Minecraft.getInstance().isCallingFromMinecraftThread())
         {
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("uploadChunkOverlay()\n");
+            //if (GuiBase.isCtrlDown()) System.out.printf("uploadChunkOverlay()\n");
             if (OpenGlHelper.useVbo())
             {
                 this.uploadVertexBuffer(buffer, renderChunk.getOverlayVertexBuffer(type));

@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.FileType;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -22,7 +23,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetAreaSelectionBrowser> implements ISelectionListener<DirectoryEntry>
 {
@@ -32,7 +33,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     {
         super(10, 50);
 
-        this.title = I18n.format("litematica.gui.title.area_selection_manager");
+        this.title = StringUtils.translate("litematica.gui.title.area_selection_manager");
         this.selectionManager = DataManager.getSelectionManager();
     }
 
@@ -70,7 +71,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         int y = 24;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_EDITOR;
-        ButtonGeneric button = new ButtonGeneric(10, y, -1, 20, I18n.format(type.getLabelKey()), type.getIcon());
+        ButtonGeneric button = new ButtonGeneric(10, y, -1, 20, StringUtils.translate(type.getLabelKey()), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this));
 
         // These are placed from right to left
@@ -87,7 +88,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             if (currentSelection.length() > len + 1)
             {
                 currentSelection = FileUtils.getNameWithoutExtension(currentSelection.substring(len + 1));
-                String str = I18n.format("litematica.gui.label.area_selection_manager.current_selection", currentSelection);
+                String str = StringUtils.translate("litematica.gui.label.area_selection_manager.current_selection", currentSelection);
                 int w = this.getStringWidth(str);
                 this.addLabel(10, this.height - 15, w, 14, 0xFFFFFFFF, str);
             }
@@ -96,7 +97,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
 
     private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getLabelKey());
+        String label = StringUtils.translate(type.getLabelKey());
         int len = this.getStringWidth(label) + 10;
         x -= (len + 2);
 
@@ -185,7 +186,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_area_selection";
-                this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, "", this.gui, new SelectionCreator(dir, this.gui)));
+                GuiBase.openGui(new GuiTextInput(256, title, "", this.gui, new SelectionCreator(dir, this.gui)));
             }
             else if (this.type == ButtonType.FROM_PLACEMENT)
             {
@@ -195,7 +196,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
                 {
                     File dir = this.gui.getListWidget().getCurrentDirectory();
                     String title = "litematica.gui.title.create_area_selection_from_placement";
-                    this.gui.mc.displayGuiScreen(new GuiTextInput(256, title, placement.getName(), this.gui, new SelectionCreatorPlacement(placement, dir, this.gui)));
+                    GuiBase.openGui(new GuiTextInput(256, title, placement.getName(), this.gui, new SelectionCreatorPlacement(placement, dir, this.gui)));
                 }
                 else
                 {

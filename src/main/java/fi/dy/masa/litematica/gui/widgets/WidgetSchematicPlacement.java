@@ -17,13 +17,9 @@ import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.text.TextFormatting;
 
 public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlacement>
 {
@@ -57,21 +53,13 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getTranslationKey());
-        int len = this.getStringWidth(label) + 10;
-        xRight -= len;
-        this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this));
-
-        return xRight - 2;
+        return this.addButton(new ButtonGeneric(xRight, y, -1, true, type.getDisplayName()), new ButtonListener(type, this)).getX() - 1;
     }
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
         ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
-        xRight -= button.getWidth();
-        this.addButton(button, new ButtonListener(type, this));
-
-        return xRight - 2;
+        return this.addButton(button, new ButtonListener(type, this)).getX() - 2;
     }
 
     @Override
@@ -83,23 +71,23 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        GlStateManager.color4f(1f, 1f, 1f, 1f);
+        RenderUtils.color(1f, 1f, 1f, 1f);
 
         boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || placementSelected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0303030);
         }
 
         if (placementSelected)
@@ -108,8 +96,8 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         }
 
         String name = this.placement.getName();
-        String pre = this.placement.isEnabled() ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-        this.drawString(pre + name, this.x + 20, this.y + 7, 0xFFFFFFFF);
+        String pre = this.placement.isEnabled() ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+        this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name);
 
         Icons icon;
 
@@ -122,7 +110,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             icon = Icons.SCHEMATIC_TYPE_MEMORY;
         }
 
-        GlStateManager.color4f(1f, 1f, 1f, 1f);
+        RenderUtils.color(1, 1, 1, 1);
 
         this.parent.bindTexture(Icons.TEXTURE);
         icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
@@ -146,32 +134,32 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
         if (this.placement.isLocked() &&
-                 GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 38, this.y + 6, 11, 11))
+            GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 38, this.y + 6, 11, 11))
         {
-            String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_locked");
+            String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_locked");
             RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
         }
         else if (this.placement.isRegionPlacementModified() &&
                  GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 25, this.y + 6, 11, 11))
         {
-            String str = I18n.format("litematica.hud.schematic_placement.hover_info.placement_modified");
+            String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_modified");
             RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
         }
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 18, this.height))
         {
             File schematicFile = this.placement.getSchematic().getFile();
-            String fileName = schematicFile != null ? schematicFile.getName() : I18n.format("litematica.gui.label.schematic_placement.in_memory");
+            String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.in_memory");
             List<String> text = new ArrayList<>();
-            text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
-            text.add(I18n.format("litematica.gui.label.schematic_placement.schematic_file", fileName));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_file", fileName));
             BlockPos o = this.placement.getOrigin();
             String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
-            text.add(I18n.format("litematica.gui.label.schematic_placement.origin", strOrigin));
-            text.add(I18n.format("litematica.gui.label.schematic_placement.sub_region_count", String.valueOf(this.placement.getSubRegionCount())));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.origin", strOrigin));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.sub_region_count", String.valueOf(this.placement.getSubRegionCount())));
 
             Vec3i size = this.placement.getSchematic().getTotalSize();
             String strSize = String.format("%d x %d x %d", size.getX(), size.getY(), size.getZ());
-            text.add(I18n.format("litematica.gui.label.schematic_placement.enclosing_size", strSize));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.enclosing_size", strSize));
 
             RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
@@ -195,11 +183,11 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             {
                 GuiPlacementConfiguration gui = new GuiPlacementConfiguration(this.widget.placement);
                 gui.setParent(this.widget.parent.getParentGui());
-                Minecraft.getInstance().displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
             else if (this.type == ButtonType.REMOVE)
             {
-                if (this.widget.placement.isLocked() && GuiScreen.isShiftKeyDown() == false)
+                if (this.widget.placement.isLocked() && GuiBase.isShiftDown() == false)
                 {
                     this.widget.parent.getParentGui().addMessage(MessageType.ERROR, "litematica.error.schematic_placements.remove_fail_locked");
                 }
@@ -232,6 +220,11 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             public String getTranslationKey()
             {
                 return this.translationKey;
+            }
+
+            public String getDisplayName()
+            {
+                return StringUtils.translate(this.translationKey);
             }
         }
     }

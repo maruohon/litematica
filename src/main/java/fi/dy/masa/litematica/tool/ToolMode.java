@@ -2,8 +2,8 @@ package fi.dy.masa.litematica.tool;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 
 public enum ToolMode
@@ -89,7 +89,7 @@ public enum ToolMode
 
     public String getName()
     {
-        return I18n.format(this.unlocName);
+        return StringUtils.translate(this.unlocName);
     }
 
     public ToolMode cycle(EntityPlayer player, boolean forward)

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
@@ -29,7 +28,9 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.LeftRight;
+import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.block.state.IBlockState;
@@ -43,13 +44,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.registry.IRegistry;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 public class OverlayRenderer
@@ -141,8 +139,8 @@ public class OverlayRenderer
             GlStateManager.disableLighting();
             GlStateManager.disableTexture2D();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
-            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
             GlStateManager.pushMatrix();
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
             if (renderAreas)
             {
@@ -512,7 +510,7 @@ public class OverlayRenderer
         boolean useBackground = true;
         boolean useShadow = false;
 
-        fi.dy.masa.malilib.render.RenderUtils.renderText(mc, x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
+        fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
     }
 
     private boolean renderVerifierOverlay(Minecraft mc)
@@ -625,7 +623,7 @@ public class OverlayRenderer
 
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-        String ul = TextFormatting.UNDERLINE.toString();
+        String ul = GuiBase.TXT_UNDERLINE;
 
         if (stateSchematic != stateClient && stateClient.isAir() == false && stateSchematic.isAir() == false)
         {
@@ -643,35 +641,13 @@ public class OverlayRenderer
         }
     }
 
-    @SuppressWarnings("unchecked")
     private <T extends Comparable<T>> void addBlockInfoLines(IBlockState state)
     {
         this.blockInfoLines.add(String.valueOf(IRegistry.BLOCK.getKey(state.getBlock())));
 
-        for (Entry <IProperty<?>, Comparable<?>> entry : state.getValues().entrySet())
+        for (String line : BlockUtils.getFormattedBlockStateProperties(state))
         {
-            IProperty<T> property = (IProperty<T>) entry.getKey();
-            T value = (T) entry.getValue();
-            String valueName = property.getName(value);
-
-            if (property instanceof DirectionProperty)
-            {
-                valueName = TextFormatting.GOLD + valueName;
-            }
-            else if (Boolean.TRUE.equals(value))
-            {
-                valueName = TextFormatting.GREEN + valueName;
-            }
-            else if (Boolean.FALSE.equals(value))
-            {
-                valueName = TextFormatting.RED + valueName;
-            }
-            else if (Integer.class.equals(property.getValueClass()))
-            {
-                valueName = TextFormatting.GREEN + valueName;
-            }
-
-            this.blockInfoLines.add(property.getName() + ": " + valueName);
+            this.blockInfoLines.add(line);
         }
     }
 
@@ -713,10 +689,8 @@ public class OverlayRenderer
             GlStateManager.depthMask(false);
             GlStateManager.disableLighting();
             GlStateManager.disableCull();
-            GlStateManager.enableBlend();
-            //GlStateManager.pushMatrix();
-            //GlStateManager.disableDepth();
             GlStateManager.disableTexture2D();
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
             if (direction)
             {
@@ -731,7 +705,6 @@ public class OverlayRenderer
 
             GlStateManager.enableTexture2D();
             //GlStateManager.enableDepth();
-            //GlStateManager.popMatrix();
             GlStateManager.disableBlend();
             GlStateManager.enableCull();
             GlStateManager.depthMask(true);

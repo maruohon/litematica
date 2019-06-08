@@ -32,19 +32,18 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.registry.IRegistry;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.chunk.Chunk;
 
 public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
@@ -87,7 +86,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
     public SchematicVerifier()
     {
-        this.name = I18n.format("litematica.gui.label.schematic_verifier.verifier");
+        this.name = StringUtils.translate("litematica.gui.label.schematic_verifier.verifier");
     }
 
     public static void clearActiveVerifiers()
@@ -908,7 +907,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             }
             else
             {
-                String title = I18n.format("litematica.gui.title.schematic_verifier_errors");
+                String title = StringUtils.translate("litematica.gui.title.schematic_verifier_errors");
                 hudLines.add(String.format("%s%s%s", GuiBase.TXT_BOLD, title, rst));
             }
 
@@ -1048,7 +1047,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     {
         ALL             (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.all", GuiBase.TXT_WHITE),
         MISSING         (0x00FFFF, "litematica.gui.label.schematic_verifier_display_type.missing", GuiBase.TXT_AQUA),
-        EXTRA           (0xFF00CF, "litematica.gui.label.schematic_verifier_display_type.extra", TextFormatting.LIGHT_PURPLE.toString()),
+        EXTRA           (0xFF00CF, "litematica.gui.label.schematic_verifier_display_type.extra", GuiBase.TXT_LIGHT_PURPLE),
         WRONG_BLOCK     (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.wrong_blocks", GuiBase.TXT_RED),
         WRONG_STATE     (0xFFAF00, "litematica.gui.label.schematic_verifier_display_type.wrong_state", GuiBase.TXT_GOLD),
         CORRECT_STATE   (0x11FF11, "litematica.gui.label.schematic_verifier_display_type.correct_state", GuiBase.TXT_GREEN);
@@ -1071,7 +1070,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
         public String getDisplayname()
         {
-            return I18n.format(this.unlocName);
+            return StringUtils.translate(this.unlocName);
         }
 
         public String getColorCode()

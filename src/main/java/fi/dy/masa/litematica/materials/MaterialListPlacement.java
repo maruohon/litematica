@@ -5,7 +5,7 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListPlacement extends MaterialListBase
 {
@@ -43,7 +43,7 @@ public class MaterialListPlacement extends MaterialListBase
     @Override
     public String getTitle()
     {
-        return I18n.format("litematica.gui.title.material_list.placement", this.getName());
+        return StringUtils.translate("litematica.gui.title.material_list.placement", this.getName());
     }
 
     @Override

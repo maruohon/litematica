@@ -6,7 +6,7 @@ import fi.dy.masa.litematica.gui.widgets.WidgetTaskEntry;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiTaskManager extends GuiListBase<ITask, WidgetTaskEntry, WidgetListTasks>
 {
@@ -14,7 +14,7 @@ public class GuiTaskManager extends GuiListBase<ITask, WidgetTaskEntry, WidgetLi
     {
         super(12, 30);
 
-        this.title = I18n.format("litematica.gui.title.task_manager");
+        this.title = StringUtils.translate("litematica.gui.title.task_manager");
     }
 
     @Override
@@ -37,7 +37,7 @@ public class GuiTaskManager extends GuiListBase<ITask, WidgetTaskEntry, WidgetLi
         int y = this.height - 26;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        ButtonGeneric button = new ButtonGeneric(this.width - 10, y, -1, true, I18n.format(type.getLabelKey()));
+        ButtonGeneric button = new ButtonGeneric(this.width - 10, y, -1, true, StringUtils.translate(type.getLabelKey()));
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
     }
 

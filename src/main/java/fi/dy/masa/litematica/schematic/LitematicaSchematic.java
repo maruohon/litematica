@@ -29,10 +29,10 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.fluid.Fluid;
@@ -169,7 +169,7 @@ public class LitematicaSchematic
 
         if (boxes.isEmpty())
         {
-            feedback.setString(I18n.format("litematica.error.schematic.create.no_selections"));
+            feedback.setString(StringUtils.translate("litematica.error.schematic.create.no_selections"));
             return null;
         }
 
@@ -213,7 +213,7 @@ public class LitematicaSchematic
 
         if (boxes.isEmpty())
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, I18n.format("litematica.error.schematic.create.no_selections"));
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, StringUtils.translate("litematica.error.schematic.create.no_selections"));
             return null;
         }
 

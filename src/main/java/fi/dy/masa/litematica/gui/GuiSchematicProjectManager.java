@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.SchematicUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiConfirmAction;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -16,8 +17,8 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IConfirmationListener;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>
@@ -30,7 +31,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         super(10, 24);
 
         this.project = project;
-        this.title = I18n.format("litematica.gui.title.schematic_project_manager");
+        this.title = StringUtils.translate("litematica.gui.title.schematic_project_manager");
     }
 
     @Override
@@ -140,7 +141,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
             if (this.type == Type.OPEN_PROJECT_BROWSER)
             {
                 GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
-                this.gui.mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
             else if (this.type == Type.SAVE_VERSION)
             {
@@ -161,7 +162,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
                 String title = "litematica.gui.title.schematic_projects.confirm_place_to_world";
                 String msg = "litematica.gui.message.schematic_projects.confirm_place_to_world";
                 GuiConfirmAction gui = new GuiConfirmAction(320, title, executor, this.gui, msg);
-                this.gui.mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
             else if (this.type == Type.DELETE_AREA)
             {
@@ -169,7 +170,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
                 String title = "litematica.gui.title.schematic_projects.confirm_delete_area";
                 String msg = "litematica.gui.message.schematic_projects.confirm_delete_area";
                 GuiConfirmAction gui = new GuiConfirmAction(320, title, executor, this.gui, msg);
-                this.gui.mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
             else if (this.type == Type.MOVE_ORIGIN)
             {
@@ -185,7 +186,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
             {
                 DataManager.getSchematicProjectsManager().closeCurrentProject();
                 GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
-                this.gui.mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
         }
 
@@ -221,7 +222,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
             @Nullable
             public String getHoverText()
             {
-                return this.hoverText != null ? I18n.format(this.hoverText) : null;
+                return this.hoverText != null ? StringUtils.translate(this.hoverText) : null;
             }
         }
     }

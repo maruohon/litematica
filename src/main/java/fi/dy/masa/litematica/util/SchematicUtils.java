@@ -19,6 +19,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
@@ -60,19 +61,19 @@ public class SchematicUtils
                 String title = "litematica.gui.title.schematic_projects.save_new_version";
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
                 GuiTextInput gui = new GuiTextInput(512, title, project.getCurrentVersionName(), mc.currentScreen, new SchematicVersionCreator());
-                mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
             else if (inMemoryOnly)
             {
                 String title = "litematica.gui.title.create_in_memory_schematic";
                 GuiTextInput gui = new GuiTextInput(512, title, area.getName(), mc.currentScreen, new InMemorySchematicCreator(area));
-                mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
             else
             {
                 GuiSchematicSave gui = new GuiSchematicSave();
                 gui.setParent(mc.currentScreen);
-                mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
 
             return true;

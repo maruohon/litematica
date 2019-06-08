@@ -10,6 +10,7 @@ import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
@@ -32,13 +33,13 @@ public class RenderUtils
 {
     private static final Random RAND = new Random();
 
-    public static int getMaxStringRenderLength(List<String> list, Minecraft mc)
+    public static int getMaxStringRenderLength(List<String> list)
     {
         int length = 0;
 
         for (String str : list)
         {
-            length = Math.max(length, mc.fontRenderer.getStringWidth(str));
+            length = Math.max(length, StringUtils.getStringWidth(str));
         }
 
         return length;
@@ -632,7 +633,7 @@ public class RenderUtils
         if      (side == LeftRight.LEFT)  { xInv -= (props.width / 2 + 4); }
         else if (side == LeftRight.RIGHT) { xInv += (props.width / 2 + 4); }
 
-        GlStateManager.color4f(1f, 1f, 1f, 1f);
+        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
         fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, props.totalSlots, mc);
         fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);

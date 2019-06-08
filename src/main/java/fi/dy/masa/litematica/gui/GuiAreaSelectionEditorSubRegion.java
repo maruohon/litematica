@@ -6,7 +6,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimple
 {
@@ -17,7 +17,7 @@ public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimpl
         super(selection);
 
         this.box = box;
-        this.title = I18n.format("litematica.gui.title.area_editor_sub_region");
+        this.title = StringUtils.translate("litematica.gui.title.area_editor_sub_region");
     }
 
     @Override
@@ -31,7 +31,7 @@ public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimpl
     {
         x = 12;
         y = 24;
-        String label = I18n.format("litematica.gui.label.area_editor.box_name");
+        String label = StringUtils.translate("litematica.gui.label.area_editor.box_name");
         this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
         y += 13;
 

@@ -9,16 +9,16 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 
 public class GuiMainMenu extends GuiBase
 {
     public GuiMainMenu()
     {
         String version = String.format("v%s", Reference.MOD_VERSION);
-        this.title = I18n.format("litematica.gui.title.litematica_main_menu", version);
+        this.title = StringUtils.translate("litematica.gui.title.litematica_main_menu", version);
     }
 
     @Override
@@ -43,11 +43,11 @@ public class GuiMainMenu extends GuiBase
         y += 22;
 
         SelectionMode mode = DataManager.getSelectionManager().getSelectionMode();
-        String label = I18n.format("litematica.gui.button.area_selection_mode", mode.getDisplayName());
+        String label = StringUtils.translate("litematica.gui.button.area_selection_mode", mode.getDisplayName());
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
         this.addButton(button, new ButtonListenerCycleAreaMode(this));
 
-        label = I18n.format("litematica.gui.button.tool_mode", DataManager.getToolMode().getName());
+        label = StringUtils.translate("litematica.gui.button.tool_mode", DataManager.getToolMode().getName());
         int width2 = this.getStringWidth(label) + 10;
 
         y = this.height - 26;
@@ -93,7 +93,7 @@ public class GuiMainMenu extends GuiBase
 
         for (SelectionMode mode : SelectionMode.values())
         {
-            String label = I18n.format("litematica.gui.button.area_selection_mode", mode.getDisplayName());
+            String label = StringUtils.translate("litematica.gui.button.area_selection_mode", mode.getDisplayName());
             width = Math.max(width, this.getStringWidth(label) + 10);
         }
 
@@ -126,7 +126,7 @@ public class GuiMainMenu extends GuiBase
                     gui = new GuiAreaSelectionManager();
                     break;
                 case CONFIGURATION:
-                    Minecraft.getInstance().displayGuiScreen(new GuiConfigs());
+                    GuiBase.openGui(new GuiConfigs());
                     return;
                 case LOAD_SCHEMATICS:
                     gui = new GuiSchematicLoad();
@@ -154,7 +154,7 @@ public class GuiMainMenu extends GuiBase
             if (gui != null)
             {
                 gui.setParent(this.parent);
-                Minecraft.getInstance().displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
         }
 
@@ -197,7 +197,7 @@ public class GuiMainMenu extends GuiBase
 
             public String getDisplayName()
             {
-                return I18n.format(this.getLabelKey());
+                return StringUtils.translate(this.getLabelKey());
             }
 
             public ButtonIcons getIcon()

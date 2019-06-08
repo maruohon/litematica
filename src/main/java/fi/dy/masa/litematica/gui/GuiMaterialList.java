@@ -18,6 +18,7 @@ import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.data.DataDump;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -30,7 +31,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.resources.I18n;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
                              implements ICompletionListener
@@ -47,7 +47,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         this.useTitleHierarchy = false;
 
         MaterialListUtils.updateAvailableCounts(this.materialList.getMaterialsAll(), this.mc.player);
-        WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), materialList.getMultiplier(), this.mc);
+        WidgetMaterialListEntry.setMaxNameLength(materialList.getMaterialsAll(), materialList.getMultiplier());
 
         // Remember the last opened material list, for the hotkey
         if (DataManager.getMaterialList() == null)
@@ -81,7 +81,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         String label;
         ButtonGeneric button;
 
-        String str = I18n.format("litematica.gui.label.material_list.multiplier");
+        String str = StringUtils.translate("litematica.gui.label.material_list.multiplier");
         int w = this.getStringWidth(str);
         this.addLabel(this.width - w - 56, y + 5, w, 12, 0xFFFFFFFF, str);
 
@@ -116,7 +116,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         y = this.height - 36;
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        label = I18n.format(type.getLabelKey());
+        label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label);
@@ -133,21 +133,21 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             double pctMissing = ((double) missing / (double) total) * 100;
             double pctMismatch = ((double) mismatch / (double) total) * 100;
             String strp;
-            String strt = I18n.format("litematica.gui.label.material_list.total", total);
+            String strt = StringUtils.translate("litematica.gui.label.material_list.total", total);
 
             if (missing == 0 && mismatch == 0)
             {
-                strp = I18n.format("litematica.gui.label.material_list.progress.done", String.format("%.0f %%%%", pctDone));
+                strp = StringUtils.translate("litematica.gui.label.material_list.progress.done", String.format("%.0f %%%%", pctDone));
             }
             else
             {
-                String str1 = I18n.format("litematica.gui.label.material_list.progress.done", String.format("%.1f %%%%", pctDone));
-                String str2 = I18n.format("litematica.gui.label.material_list.progress.missing", String.format("%.1f %%%%", pctMissing));
-                String str3 = I18n.format("litematica.gui.label.material_list.progress.mismatch", String.format("%.1f %%%%", pctMismatch));
+                String str1 = StringUtils.translate("litematica.gui.label.material_list.progress.done", String.format("%.1f %%%%", pctDone));
+                String str2 = StringUtils.translate("litematica.gui.label.material_list.progress.missing", String.format("%.1f %%%%", pctMissing));
+                String str3 = StringUtils.translate("litematica.gui.label.material_list.progress.mismatch", String.format("%.1f %%%%", pctMismatch));
                 strp = String.format("%s / %s / %s", str1, str2, str3);
             }
 
-            str = strt + " / " + I18n.format("litematica.gui.label.material_list.progress", strp);
+            str = strt + " / " + StringUtils.translate("litematica.gui.label.material_list.progress", strp);
             w = this.getStringWidth(str);
             this.addLabel(12, this.height - 36, w, 12, 0xFFFFFFFF, str);
         }
@@ -194,7 +194,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         width += this.getStringWidth(ButtonListener.Type.WRITE_TO_FILE.getDisplayName());
         width += (new ButtonOnOff(0, 0, -1, false, ButtonListener.Type.HIDE_AVAILABLE.getTranslationKey(), false)).getWidth();
         width += (new ButtonOnOff(0, 0, -1, false, ButtonListener.Type.TOGGLE_INFO_HUD.getTranslationKey(), false)).getWidth();
-        width += this.getStringWidth(I18n.format("litematica.gui.label.material_list.multiplier"));
+        width += this.getStringWidth(StringUtils.translate("litematica.gui.label.material_list.multiplier"));
         width += 130;
 
         return width;
@@ -218,7 +218,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         // re-create the list widgets when a material list task finishes
         if (this.mc.currentScreen == this)
         {
-            WidgetMaterialListEntry.setMaxNameLength(this.materialList.getMaterialsAll(), this.materialList.getMultiplier(), this.mc);
+            WidgetMaterialListEntry.setMaxNameLength(this.materialList.getMaterialsAll(), this.materialList.getMultiplier());
             this.initGui();
         }
     }
@@ -289,7 +289,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
                 case WRITE_TO_FILE:
                     File dir = new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
-                    boolean csv = isShiftKeyDown();
+                    boolean csv = GuiBase.isShiftDown();
                     String ext = csv ? ".csv" : ".txt";
                     File file = DataDump.dumpDataToFile(dir, "material_list", ext, this.getMaterialListDump(materialList, csv).getLines());
 
@@ -358,7 +358,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
             public String getDisplayName(Object... args)
             {
-                return I18n.format(this.translationKey, args);
+                return StringUtils.translate(this.translationKey, args);
             }
         }
     }

@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicProjectBrowser;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.util.FileType;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -19,7 +20,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicProjectBrowser>
                                         implements ISelectionListener<DirectoryEntry>
@@ -28,7 +29,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
     {
         super(10, 30);
 
-        this.title = I18n.format("litematica.gui.title.schematic_projects_browser");
+        this.title = StringUtils.translate("litematica.gui.title.schematic_projects_browser");
     }
 
     @Override
@@ -78,7 +79,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
         }
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        String label = I18n.format(type.getLabelKey());
+        String label = StringUtils.translate(type.getLabelKey());
         int buttonWidth = this.getStringWidth(label) + 20;
         this.addButton(new ButtonGeneric(this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
     }
@@ -153,7 +154,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
                         if (project != null)
                         {
                             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
-                            this.gui.mc.displayGuiScreen(gui);
+                            GuiBase.openGui(gui);
                             String name = project.getName();
                             InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
                         }
@@ -168,7 +169,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
             {
                 ProjectCreator creator = new ProjectCreator(this.gui.getListWidget().getCurrentDirectory(), this.gui);
                 GuiTextInput gui = new GuiTextInput(256, "litematica.gui.title.create_schematic_project", "", this.gui.mc.currentScreen, creator);
-                this.gui.mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
             else if (this.type == Type.CLOSE_PROJECT)
             {
@@ -182,7 +183,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
                 if (project != null)
                 {
                     GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
-                    this.gui.mc.displayGuiScreen(gui);
+                    GuiBase.openGui(gui);
                 }
             }
         }
@@ -217,7 +218,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
             @Nullable
             public String getHoverText()
             {
-                return this.hoverText != null ? I18n.format(this.hoverText) : null;
+                return this.hoverText != null ? StringUtils.translate(this.hoverText) : null;
             }
         }
     }

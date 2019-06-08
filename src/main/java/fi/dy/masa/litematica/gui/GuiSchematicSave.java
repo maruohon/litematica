@@ -8,15 +8,15 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
@@ -33,11 +33,11 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
 
         if (schematic != null)
         {
-            this.title = I18n.format("litematica.gui.title.save_schematic_from_memory");
+            this.title = StringUtils.translate("litematica.gui.title.save_schematic_from_memory");
         }
         else
         {
-            this.title = I18n.format("litematica.gui.title.create_schematic_from_selection");
+            this.title = StringUtils.translate("litematica.gui.title.create_schematic_from_selection");
         }
 
         this.selectionManager = DataManager.getSelectionManager();
@@ -71,15 +71,13 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     @Override
     public void onTaskCompleted()
     {
-        Minecraft mc = Minecraft.getInstance();
-
-        if (mc.isCallingFromMinecraftThread())
+        if (this.mc.isCallingFromMinecraftThread())
         {
             this.refreshList();
         }
         else
         {
-            mc.addScheduledTask(new Runnable()
+            this.mc.addScheduledTask(new Runnable()
             {
                 @Override
                 public void run()
@@ -92,9 +90,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
 
     private void refreshList()
     {
-        GuiScreen gui = this.mc.currentScreen;
-
-        if (gui == this)
+        if (this.mc.currentScreen == this)
         {
             this.getListWidget().refreshEntries();
             this.getListWidget().clearSchematicMetadataCache();
@@ -140,7 +136,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                     LitematicaSchematic schematic = this.gui.schematic;
                     schematic.getMetadata().setTimeModified(System.currentTimeMillis());
 
-                    if (schematic.writeToFile(dir, fileName, GuiScreen.isShiftKeyDown()))
+                    if (schematic.writeToFile(dir, fileName, GuiBase.isShiftDown()))
                     {
                         this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                         this.gui.getListWidget().refreshEntries();
@@ -152,7 +148,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
 
                     if (area != null)
                     {
-                        boolean overwrite = GuiScreen.isShiftKeyDown();
+                        boolean overwrite = GuiBase.isShiftDown();
                         String fileNameTmp = fileName;
 
                         // The file name extension gets added in the schematic write method, so need to add it here for the check

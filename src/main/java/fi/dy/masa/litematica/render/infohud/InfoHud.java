@@ -74,7 +74,7 @@ public class InfoHud
 
             if (this.lineList.isEmpty() == false)
             {
-                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(this.mc, xOffset, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(xOffset, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
                 yOffset += (int) Math.ceil(ySize * scale);
             }
 

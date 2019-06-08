@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiStringListSelection;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -21,9 +22,7 @@ import fi.dy.masa.malilib.gui.interfaces.IStringListConsumer;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
@@ -32,7 +31,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
     {
         super(12, 24);
 
-        this.title = I18n.format("litematica.gui.title.load_schematic");
+        this.title = StringUtils.translate("litematica.gui.title.load_schematic");
     }
 
     @Override
@@ -64,8 +63,8 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         String label;
         ButtonGeneric button;
 
-        label = I18n.format("litematica.gui.label.schematic_load.checkbox.create_placement");
-        String hover = I18n.format("litematica.gui.label.schematic_load.hoverinfo.create_placement");
+        label = StringUtils.translate("litematica.gui.label.schematic_load.checkbox.create_placement");
+        String hover = StringUtils.translate("litematica.gui.label.schematic_load.hoverinfo.create_placement");
         WidgetCheckBox checkbox = new WidgetCheckBox(x, y, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, hover);
         checkbox.setListener(new CheckboxListener());
         checkbox.setChecked(DataManager.getCreatePlacementOnLoad(), false);
@@ -76,13 +75,13 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         x += this.createButton(x, y, -1, ButtonListener.Type.MATERIAL_LIST) + 4;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS;
-        label = I18n.format(type.getLabelKey());
+        label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 30;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        label = I18n.format(type.getLabelKey());
+        label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label);
@@ -92,7 +91,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
     private int createButton(int x, int y, int width, ButtonListener.Type type)
     {
         ButtonListener listener = new ButtonListener(type, this);
-        String label = I18n.format(type.getTranslationKey());
+        String label = StringUtils.translate(type.getTranslationKey());
 
         if (width == -1)
         {
@@ -103,7 +102,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         if (type == ButtonListener.Type.MATERIAL_LIST)
         {
-            button.setHoverStrings(I18n.format("litematica.gui.button.hover.material_list_shift_to_select_sub_regions"));
+            button.setHoverStrings(StringUtils.translate("litematica.gui.button.hover.material_list_shift_to_select_sub_regions"));
         }
 
         this.addButton(button, listener);
@@ -176,7 +175,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                     {
                         BlockPos pos = new BlockPos(this.gui.mc.player.getPositionVector());
                         String name = schematic.getMetadata().getName();
-                        boolean enabled = GuiScreen.isShiftKeyDown() == false;
+                        boolean enabled = GuiBase.isShiftDown() == false;
 
                         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
                         SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, enabled, enabled);
@@ -186,19 +185,19 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                 }
                 else if (this.type == Type.MATERIAL_LIST)
                 {
-                    if (isShiftKeyDown())
+                    if (GuiBase.isShiftDown())
                     {
                         MaterialListCreator creator = new MaterialListCreator(schematic);
                         GuiStringListSelection gui = new GuiStringListSelection(schematic.getAreas().keySet(), creator);
-                        gui.setTitle(I18n.format("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
+                        gui.setTitle(StringUtils.translate("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
                         gui.setParent(this.gui.mc.currentScreen);
-                        this.gui.mc.displayGuiScreen(gui);
+                        GuiBase.openGui(gui);
                     }
                     else
                     {
                         MaterialListSchematic materialList = new MaterialListSchematic(schematic, true);
                         DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-                        this.gui.mc.displayGuiScreen(new GuiMaterialList(materialList));
+                        GuiBase.openGui(new GuiMaterialList(materialList));
                     }
                 }
 
@@ -251,7 +250,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         {
             MaterialListSchematic materialList = new MaterialListSchematic(this.schematic, strings, true);
             DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-            Minecraft.getInstance().displayGuiScreen(new GuiMaterialList(materialList));
+            GuiBase.openGui(new GuiMaterialList(materialList));
 
             return true;
         }

@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectsBrowser;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -27,13 +28,13 @@ public class SchematicProjectsManager
         {
             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(this.currentProject);
             gui.setParent(this.mc.currentScreen);
-            this.mc.displayGuiScreen(gui);
+            GuiBase.openGui(gui);
         }
         else
         {
             GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
             gui.setParent(this.mc.currentScreen);
-            this.mc.displayGuiScreen(gui);
+            GuiBase.openGui(gui);
         }
     }
 

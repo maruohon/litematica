@@ -18,9 +18,8 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 
 public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 {
@@ -55,7 +54,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
     private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getLabelKey());
+        String label = StringUtils.translate(type.getLabelKey());
         int len = Math.max(this.getStringWidth(label) + 10, 20);
         x -= len;
         this.addButton(new ButtonGeneric(x, y, len, 20, label), new ButtonListener(type, this.selectionManager, this));
@@ -110,18 +109,18 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
             if (o == null)
             {
                 o = selection.getEffectiveOrigin();
-                str = I18n.format("litematica.gui.label.origin.auto");
+                str = StringUtils.translate("litematica.gui.label.origin.auto");
             }
             else
             {
-                str = I18n.format("litematica.gui.label.origin.manual");
+                str = StringUtils.translate("litematica.gui.label.origin.manual");
             }
 
             String strOrigin = String.format("x: %d, y: %d, z: %d (%s)", o.getX(), o.getY(), o.getZ(), str);
-            text.add(I18n.format("litematica.gui.label.area_selection_origin", strOrigin));
+            text.add(StringUtils.translate("litematica.gui.label.area_selection_origin", strOrigin));
 
             int count = selection.getAllSubRegionBoxes().size();
-            text.add(I18n.format("litematica.gui.label.area_selection_box_count", count));
+            text.add(StringUtils.translate("litematica.gui.label.area_selection_box_count", count));
         }
 
         int offset = 12;
@@ -156,7 +155,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
                 String name = selection != null ? selection.getName() : "<error>";
                 SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, false);
-                this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, name, this.widget.parent.getSelectionManagerGui(), renamer));
+                GuiBase.openGui(new GuiTextInputFeedback(160, title, name, this.widget.parent.getSelectionManagerGui(), renamer));
             }
             else if (this.type == ButtonType.COPY)
             {
@@ -164,9 +163,9 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
                 if (selection != null)
                 {
-                    String title = I18n.format("litematica.gui.title.copy_area_selection", selection.getName());
+                    String title = StringUtils.translate("litematica.gui.title.copy_area_selection", selection.getName());
                     SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, true);
-                    this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
+                    GuiBase.openGui(new GuiTextInputFeedback(160, title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
                 }
                 else
                 {
@@ -186,7 +185,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                     GuiAreaSelectionEditorNormal gui = new GuiAreaSelectionEditorNormal(selection);
                     gui.setParent(this.widget.mc.currentScreen);
                     gui.setSelectionId(selectionId);
-                    this.widget.mc.displayGuiScreen(gui);
+                    GuiBase.openGui(gui);
                 }
             }
 
@@ -198,7 +197,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
             RENAME          ("litematica.gui.button.rename"),
             COPY            ("litematica.gui.button.copy"),
             CONFIGURE       ("litematica.gui.button.configure"),
-            REMOVE          (TextFormatting.RED.toString() + "-");
+            REMOVE          (GuiBase.TXT_RED + "-");
 
             private final String labelKey;
 

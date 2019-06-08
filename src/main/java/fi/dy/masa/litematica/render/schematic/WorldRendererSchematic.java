@@ -16,6 +16,7 @@ import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.world.ChunkSchematic;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
@@ -26,7 +27,6 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
@@ -337,7 +337,7 @@ public class WorldRendererSchematic extends WorldRenderer
             //Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
             //queuePositions.addAll(set);
 
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("sorted positions: %d\n", positions.size());
+            //if (GuiBase.isCtrlDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
             this.world.profiler.endStartSection("iteration");
 
@@ -360,7 +360,7 @@ public class WorldRendererSchematic extends WorldRenderer
                     {
                         if (renderChunk.setFrameIndex(frameCount) && camera.isBoundingBoxInFrustum(renderChunk.boundingBox))
                         {
-                            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("add @ %s\n", subChunk);
+                            //if (GuiBase.isCtrlDown()) System.out.printf("add @ %s\n", subChunk);
                             if (renderChunk.needsUpdate() && subChunkCornerPos.equals(viewPosSubChunk))
                             {
                                 renderChunk.setNeedsUpdate(true);
@@ -393,7 +393,7 @@ public class WorldRendererSchematic extends WorldRenderer
                 }
                 else
                 {
-                    //if (GuiScreen.isCtrlKeyDown()) System.out.printf("====== update now\n");
+                    //if (GuiBase.isCtrlDown()) System.out.printf("====== update now\n");
                     this.world.profiler.startSection("build_near");
 
                     this.renderDispatcher.updateChunkNow(renderChunkTmp);
@@ -455,7 +455,7 @@ public class WorldRendererSchematic extends WorldRenderer
     {
         this.world.profiler.startSection("render_block_layer_" + blockLayerIn);
 
-        RenderHelper.disableStandardItemLighting();
+        RenderUtils.disableItemLighting();
 
         if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
         {
@@ -782,7 +782,7 @@ public class WorldRendererSchematic extends WorldRenderer
                     GlStateManager.depthFunc(519);
                     GlStateManager.disableFog();
                     this.entityOutlineFramebuffer.bindFramebuffer(false);
-                    RenderHelper.disableStandardItemLighting();
+                    RenderUtils.disableItemLighting();
                     this.renderManager.setRenderOutlines(true);
 
                     for (int i = 0; i < entitiesOutlined.size(); ++i)
@@ -791,7 +791,7 @@ public class WorldRendererSchematic extends WorldRenderer
                     }
 
                     this.renderManager.setRenderOutlines(false);
-                    RenderHelper.enableStandardItemLighting();
+                    RenderUtils.enableItemLighting();
                     GlStateManager.depthMask(false);
 
                     this.entityOutlineShader.render(partialTicks);
@@ -811,7 +811,7 @@ public class WorldRendererSchematic extends WorldRenderer
             */
 
             this.world.profiler.endStartSection("block_entities");
-            RenderHelper.enableStandardItemLighting();
+            fi.dy.masa.malilib.render.RenderUtils.enableItemLighting();
 
             for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
             {

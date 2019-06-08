@@ -747,7 +747,7 @@ public class SelectionManager
         if (gui != null)
         {
             gui.setParent(parent);
-            this.mc.displayGuiScreen(gui);
+            GuiBase.openGui(gui);
         }
     }
 

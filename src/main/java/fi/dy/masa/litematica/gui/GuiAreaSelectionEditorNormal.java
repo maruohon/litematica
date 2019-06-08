@@ -16,6 +16,7 @@ import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.SchematicUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
@@ -31,12 +32,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 
 public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
                                           implements ISelectionListener<String>
@@ -61,11 +57,11 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
-            this.title = I18n.format("litematica.gui.title.area_editor_normal_schematic_projects");
+            this.title = StringUtils.translate("litematica.gui.title.area_editor_normal_schematic_projects");
         }
         else
         {
-            this.title = I18n.format("litematica.gui.title.area_editor_normal");
+            this.title = StringUtils.translate("litematica.gui.title.area_editor_normal");
         }
     }
 
@@ -87,7 +83,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
         else
         {
-            this.addLabel(20, 30, 120, 12, 0xFFFFAA00, I18n.format("litematica.error.area_editor.no_selection"));
+            this.addLabel(20, 30, 120, 12, 0xFFFFAA00, StringUtils.translate("litematica.error.area_editor.no_selection"));
         }
     }
 
@@ -104,7 +100,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         x = xLeft;
         y += 20;
 
-        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, I18n.format("litematica.gui.label.area_editor.selection_name"));
+        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, StringUtils.translate("litematica.gui.label.area_editor.selection_name"));
         y += 13;
 
         int width = 202;
@@ -140,24 +136,24 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         x = 12;
         y = this.getListY() - 12;
         String str = String.valueOf(this.selection.getAllSubRegionNames().size());
-        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, TextFormatting.BOLD + I18n.format("litematica.gui.label.area_editor.sub_regions", str));
+        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.label.area_editor.sub_regions", str));
 
         ButtonGeneric button;
 
         if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
         {
-            str = I18n.format("litematica.warning.area_editor.area_rendering_disabled");
+            str = StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled");
             List<String> lines = new ArrayList<>();
             int xTmp = 120;
             int maxLineLength = this.width - xTmp - 20;
-            StringUtils.splitTextToLines(lines, str, maxLineLength, this.textRenderer);
-            this.addLabel(xTmp, y + 2, maxLineLength, lines.size() * (this.textRenderer.FONT_HEIGHT + 1), 0xFFFFAA00, lines.toArray(new String[0]));
+            StringUtils.splitTextToLines(lines, str, maxLineLength);
+            this.addLabel(xTmp, y + 2, maxLineLength, lines.size() * (StringUtils.getFontHeight() + 1), 0xFFFFAA00, lines.toArray(new String[0]));
         }
 
         y = this.height - 26;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
-        String label = I18n.format(type.getLabelKey());
+        String label = StringUtils.translate(type.getLabelKey());
         button = new ButtonGeneric(x, y, -1, 20, label, type.getIcon());
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
@@ -171,7 +167,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.createButton(x, y, -1, ButtonListener.Type.ANALYZE_AREA);
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        label = I18n.format(type.getLabelKey());
+        label = StringUtils.translate(type.getLabelKey());
         int buttonWidth = this.getStringWidth(label) + 10;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label);
@@ -198,17 +194,17 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         switch (corner)
         {
             case CORNER_1:
-                label = I18n.format("litematica.gui.label.area_editor.corner_1");
+                label = StringUtils.translate("litematica.gui.label.area_editor.corner_1");
                 widget = new WidgetCheckBox(x, y + 3, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label);
                 this.checkBoxCorner1 = widget;
                 break;
             case CORNER_2:
-                label = I18n.format("litematica.gui.label.area_editor.corner_2");
+                label = StringUtils.translate("litematica.gui.label.area_editor.corner_2");
                 widget = new WidgetCheckBox(x, y + 3, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label);
                 this.checkBoxCorner2 = widget;
                 break;
             case NONE:
-                label = I18n.format("litematica.gui.label.area_editor.origin");
+                label = StringUtils.translate("litematica.gui.label.area_editor.origin");
                 widget = new WidgetCheckBox(x, y + 3, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label);
                 this.checkBoxOrigin = widget;
                 break;
@@ -300,7 +296,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
         else if (type == ButtonListener.Type.CREATE_SCHEMATIC && projectsMode)
         {
-            label = I18n.format("litematica.gui.button.save_new_schematic_version");
+            label = StringUtils.translate("litematica.gui.button.save_new_schematic_version");
         }
         else
         {
@@ -326,7 +322,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
     protected void createCoordinateButton(int x, int y, Corner corner, CoordinateType coordType, ButtonListener.Type type)
     {
-        String hover = I18n.format("litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift");
+        String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift");
         ButtonGeneric button = new ButtonGeneric(x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
         ButtonListener listener = new ButtonListener(type, corner, coordType, this);
         this.addButton(button, listener);
@@ -429,9 +425,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
             int amount = mouseButton == 1 ? -1 : 1;
-            if (GuiScreen.isCtrlKeyDown()) { amount *= 100; }
-            if (GuiScreen.isShiftKeyDown()) { amount *= 10; }
-            if (GuiScreen.isAltKeyDown()) { amount *= 5; }
+            if (GuiBase.isCtrlDown()) { amount *= 100; }
+            if (GuiBase.isShiftDown()) { amount *= 10; }
+            if (GuiBase.isAltDown()) { amount *= 5; }
 
             this.parent.setNextMessageType(MessageType.ERROR);
 
@@ -471,7 +467,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     break;
 
                 case CREATE_SCHEMATIC:
-                    SchematicUtils.saveSchematic(GuiScreen.isShiftKeyDown());
+                    SchematicUtils.saveSchematic(GuiBase.isShiftDown());
                     break;
 
                 case ANALYZE_AREA:
@@ -479,7 +475,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     MaterialListAreaAnalyzer list = new MaterialListAreaAnalyzer(this.parent.selection);
                     DataManager.setMaterialList(list);
                     GuiMaterialList gui = new GuiMaterialList(list);
-                    Minecraft.getInstance().displayGuiScreen(gui);
+                    GuiBase.openGui(gui);
                     list.reCreateMaterialList(); // This is after changing the GUI, so that the task message goes to the new GUI
                     return;
                 }
@@ -488,7 +484,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                 {
                     GuiTextInput gui = new GuiTextInput(512, "litematica.gui.title.area_editor.sub_region_name", "", null, new SubRegionCreator(this.parent));
                     gui.setParent(this.parent);
-                    Minecraft.getInstance().displayGuiScreen(gui);
+                    GuiBase.openGui(gui);
                     break;
                 }
 
@@ -573,12 +569,12 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
             public String getDisplayName(Object... args)
             {
-                return I18n.format(this.translationKey, args);
+                return StringUtils.translate(this.translationKey, args);
             }
         }
     }
 
-    protected static class TextFieldListener implements ITextFieldListener<GuiTextField>
+    protected static class TextFieldListener implements ITextFieldListener<GuiTextFieldGeneric>
     {
         private final GuiAreaSelectionEditorNormal parent;
         private final CoordinateType type;
@@ -592,17 +588,17 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
 
         @Override
-        public boolean onTextChange(GuiTextField textField)
+        public boolean onTextChange(GuiTextFieldGeneric textField)
         {
             this.parent.updatePosition(textField.getText(), this.corner, this.type);
             return false;
         }
     }
 
-    public static class TextFieldListenerDummy implements ITextFieldListener<GuiTextField>
+    public static class TextFieldListenerDummy implements ITextFieldListener<GuiTextFieldGeneric>
     {
         @Override
-        public boolean onTextChange(GuiTextField textField)
+        public boolean onTextChange(GuiTextFieldGeneric textField)
         {
             return false;
         }

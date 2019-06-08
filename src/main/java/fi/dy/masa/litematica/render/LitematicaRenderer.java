@@ -11,7 +11,6 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -121,7 +120,7 @@ public class LitematicaRenderer
 
         this.mc.profiler.endStartSection("prepare_terrain");
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        RenderHelper.disableStandardItemLighting();
+        fi.dy.masa.malilib.render.RenderUtils.disableItemLighting();
         WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
         this.mc.profiler.endStartSection("terrain_setup");
@@ -133,7 +132,6 @@ public class LitematicaRenderer
         this.mc.profiler.endStartSection("terrain");
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.disableAlphaTest();
-        GlStateManager.enableBlend();
 
         if (Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue())
         {
@@ -147,7 +145,8 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+
             worldRenderer.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, entity);
 
             worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, partialTicks, entity);
@@ -172,15 +171,15 @@ public class LitematicaRenderer
             this.mc.profiler.endStartSection("entities");
 
             GlStateManager.pushMatrix();
-            RenderHelper.enableStandardItemLighting();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+
+            fi.dy.masa.malilib.render.RenderUtils.enableItemLighting();
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
             worldRenderer.renderEntities(entity, icamera, partialTicks);
 
             GlStateManager.disableFog(); // Fixes Structure Blocks breaking all rendering
             GlStateManager.disableBlend();
-            RenderHelper.disableStandardItemLighting();
+            fi.dy.masa.malilib.render.RenderUtils.disableItemLighting();
 
             GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.popMatrix();
@@ -194,8 +193,8 @@ public class LitematicaRenderer
             GlStateManager.depthMask(false);
 
             GlStateManager.pushMatrix();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
             worldRenderer.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, entity);
 
@@ -231,10 +230,9 @@ public class LitematicaRenderer
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.001F);
             GlStateManager.enablePolygonOffset();
             GlStateManager.polygonOffset(-0.4f, -0.8f);
-            GlStateManager.enableBlend();
-            GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             GlStateManager.lineWidth(lineWidth);
-            GlStateManager.color4f(1f, 1f, 1f, 1f);
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             OpenGlHelper.glMultiTexCoord2f(OpenGlHelper.GL_TEXTURE1, 240, 240);
 
             if (renderThrough)
@@ -438,8 +436,7 @@ public class LitematicaRenderer
         {
             this.mc.profiler.startSection("litematica_entities");
 
-            GlStateManager.enableBlend();
-            GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
             this.startShaderIfEnabled();
 

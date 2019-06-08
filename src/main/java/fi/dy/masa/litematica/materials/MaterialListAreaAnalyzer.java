@@ -5,7 +5,7 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksArea;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListAreaAnalyzer extends MaterialListBase
 {
@@ -27,7 +27,7 @@ public class MaterialListAreaAnalyzer extends MaterialListBase
     @Override
     public String getTitle()
     {
-        return I18n.format("litematica.gui.title.material_list.area_analyzer", this.getName());
+        return StringUtils.translate("litematica.gui.title.material_list.area_analyzer", this.getName());
     }
 
     @Override

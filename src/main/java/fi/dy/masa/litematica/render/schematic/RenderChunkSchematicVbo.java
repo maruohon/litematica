@@ -87,7 +87,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
     public VertexBuffer getOverlayVertexBuffer(OverlayRenderType type)
     {
-        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("getOverlayVertexBuffer: type: %s, buf: %s\n", type, this.vertexBufferOverlay[type.ordinal()]);
+        //if (GuiBase.isCtrlDown()) System.out.printf("getOverlayVertexBuffer: type: %s, buf: %s\n", type, this.vertexBufferOverlay[type.ordinal()]);
         return this.vertexBufferOverlay[type.ordinal()];
     }
 
@@ -136,7 +136,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
             }
         }
 
-        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("resortTransparency\n");
+        //if (GuiBase.isCtrlDown()) System.out.printf("resortTransparency\n");
         if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue())
         {
             OverlayRenderType type = OverlayRenderType.QUAD;
@@ -172,7 +172,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
             generator.getLock().unlock();
         }
 
-        //if (GuiScreen.isCtrlKeyDown()) System.out.printf("rebuildChunk pos: %s gen: %s\n", this.getPosition(), generator);
+        //if (GuiBase.isCtrlDown()) System.out.printf("rebuildChunk pos: %s gen: %s\n", this.getPosition(), generator);
         Set<TileEntity> tileEntities = new HashSet<>();
         BlockPos posChunk = this.getPosition();
         LayerRange range = DataManager.getRenderLayerRange();
@@ -225,7 +225,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
                 if (this.hasOverlay)
                 {
-                    //if (GuiScreen.isCtrlKeyDown()) System.out.printf("postRenderOverlays\n");
+                    //if (GuiBase.isCtrlDown()) System.out.printf("postRenderOverlays\n");
                     for (OverlayRenderType type : this.existingOverlays)
                     {
                         if (this.compiledChunk.isOverlayTypeStarted(type))
@@ -696,7 +696,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
         try
         {
-            //if (GuiScreen.isCtrlKeyDown()) System.out.printf("makeCompileTaskChunk()\n");
+            //if (GuiBase.isCtrlDown()) System.out.printf("makeCompileTaskChunk()\n");
             this.finishCompileTask();
             this.compileTask = new ChunkRenderTaskSchematic(this, ChunkRenderTaskSchematic.Type.REBUILD_CHUNK, this.getDistanceSq());
             this.rebuildWorldView();

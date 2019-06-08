@@ -10,7 +10,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicPlacementsList extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetListSchematicPlacements> implements ISelectionListener<SchematicPlacement>
 {
@@ -20,7 +20,7 @@ public class GuiSchematicPlacementsList extends GuiListBase<SchematicPlacement, 
     {
         super(12, 30);
 
-        this.title = I18n.format("litematica.gui.title.manage_schematic_placements");
+        this.title = StringUtils.translate("litematica.gui.title.manage_schematic_placements");
         this.manager = DataManager.getSchematicPlacementManager();
     }
 
@@ -48,13 +48,13 @@ public class GuiSchematicPlacementsList extends GuiListBase<SchematicPlacement, 
         ButtonGeneric button;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS;
-        label = I18n.format(type.getLabelKey());
+        label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 30;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        label = I18n.format(type.getLabelKey());
+        label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
         button = new ButtonGeneric(x, y, buttonWidth, 20, label);

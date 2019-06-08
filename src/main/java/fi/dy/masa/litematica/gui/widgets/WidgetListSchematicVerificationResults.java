@@ -11,10 +11,10 @@ import fi.dy.masa.litematica.schematic.verifier.VerifierResultSorter;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.util.ItemType;
+import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 
 public class WidgetListSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
@@ -61,12 +61,12 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
         }
 
         MismatchType type = this.guiSchematicVerifier.getResultMode();
-        String strExpected = TXT_BOLD + I18n.format(WidgetSchematicVerificationResult.HEADER_EXPECTED) + TXT_RST;
+        String strExpected = TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_EXPECTED) + TXT_RST;
         BlockMismatchEntry entry;
 
         if (type != MismatchType.CORRECT_STATE)
         {
-            String strFound = TXT_WHITE + TXT_BOLD + I18n.format(WidgetSchematicVerificationResult.HEADER_FOUND) + TXT_RST;
+            String strFound = TXT_WHITE + TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_FOUND) + TXT_RST;
             entry = new BlockMismatchEntry(strExpected, strFound);
         }
         else

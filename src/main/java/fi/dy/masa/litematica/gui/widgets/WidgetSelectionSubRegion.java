@@ -14,10 +14,8 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 
 public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 {
@@ -49,12 +47,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
     private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
-        String label = I18n.format(type.getLabelKey());
-        int len = Math.max(this.getStringWidth(label) + 10, 20);
-        x -= len;
-        this.addButton(new ButtonGeneric(x, y, len, 20, label), new ButtonListener(type, this));
-
-        return x - 2;
+        return this.addButton(new ButtonGeneric(x, y, -1, true, type.getDisplayName()), new ButtonListener(type, this)).getX() - 1;
     }
 
     @Override
@@ -66,23 +59,23 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        GlStateManager.color4f(1f, 1f, 1f, 1f);
+        RenderUtils.color(1f, 1f, 1f, 1f);
 
         selected = this.entry.equals(this.selection.getCurrentSubRegionBoxName());
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0707070);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0101010);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            GuiBase.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0xA0303030);
+            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0303030);
         }
 
         if (selected)
@@ -90,7 +83,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0, 0.001f);
         }
 
-        this.drawString(this.entry, this.x + 2, this.y + 7, 0xFFFFFFFF);
+        this.drawString(this.x + 2, this.y + 7, 0xFFFFFFFF, this.entry);
 
         super.render(mouseX, mouseY, selected);
     }
@@ -107,19 +100,19 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
             if (pos1 != null)
             {
-                String str = I18n.format("litematica.gui.label.area_editor.pos1");
+                String str = StringUtils.translate("litematica.gui.label.area_editor.pos1");
                 text.add(String.format("%s: x: %d, y: %d, z: %d", str, pos1.getX(), pos1.getY(), pos1.getZ()));
             }
 
             if (pos2 != null)
             {
-                String str = I18n.format("litematica.gui.label.area_editor.pos2");
+                String str = StringUtils.translate("litematica.gui.label.area_editor.pos2");
                 text.add(String.format("%s: x: %d, y: %d, z: %d", str, pos2.getX(), pos2.getY(), pos2.getZ()));
             }
 
             if (pos1 != null && pos2 != null)
             {
-                String str = I18n.format("litematica.gui.label.area_editor.dimensions");
+                String str = StringUtils.translate("litematica.gui.label.area_editor.dimensions");
                 BlockPos size = PositionUtils.getAreaSizeFromRelativeEndPosition(pos2.subtract(pos1));
                 text.add(String.format("%s: %d x %d x %d", str, Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ())));
             }
@@ -152,7 +145,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
                 String title = "litematica.gui.title.rename_area_sub_region";
                 String name = this.widget.box != null ? this.widget.box.getName() : "<error>";
                 BoxRenamer renamer = new BoxRenamer(this.widget.selection, this.widget);
-                this.widget.mc.displayGuiScreen(new GuiTextInputFeedback(160, title, name, this.widget.parent.getEditorGui(), renamer));
+                GuiBase.openGui(new GuiTextInputFeedback(160, title, name, this.widget.parent.getEditorGui(), renamer));
             }
             else if (this.type == ButtonType.REMOVE)
             {
@@ -163,7 +156,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             {
                 GuiAreaSelectionEditorSubRegion gui = new GuiAreaSelectionEditorSubRegion(this.widget.selection, this.widget.box);
                 gui.setParent(this.widget.mc.currentScreen);
-                this.widget.mc.displayGuiScreen(gui);
+                GuiBase.openGui(gui);
             }
         }
 
@@ -171,7 +164,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         {
             RENAME          ("litematica.gui.button.rename"),
             CONFIGURE       ("litematica.gui.button.configure"),
-            REMOVE          (TextFormatting.RED.toString() + "-");
+            REMOVE          (GuiBase.TXT_RED + "-");
 
             private final String labelKey;
 
@@ -180,9 +173,9 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
                 this.labelKey = labelKey;
             }
 
-            public String getLabelKey()
+            public String getDisplayName()
             {
-                return this.labelKey;
+                return StringUtils.translate(this.labelKey);
             }
         }
     }

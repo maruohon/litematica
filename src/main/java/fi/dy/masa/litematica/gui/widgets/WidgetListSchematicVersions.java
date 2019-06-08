@@ -13,7 +13,7 @@ import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.client.resources.I18n;
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
 
 public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion, WidgetSchematicVersion>
@@ -55,14 +55,14 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
 
         RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
-        str = I18n.format("litematica.gui.label.schematic_projects.project");
+        str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
         this.drawString(str, x, y, color);
         y += 12;
         this.drawString(w + this.project.getName() + r, x + 4, y, color);
         y += 12;
         int versionId = this.project.getCurrentVersionId();
         String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
-        str = I18n.format("litematica.gui.label.schematic_projects.version", strVer, w + this.project.getVersionCount() + r);
+        str = StringUtils.translate("litematica.gui.label.schematic_projects.version", strVer, w + this.project.getVersionCount() + r);
         this.drawString(str, x, y, color);
         y += 12;
         SchematicVersion version = this.project.getCurrentVersion();
@@ -71,16 +71,16 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
         {
             ToolHud.DATE.setTime(version.getTimeStamp());
             str = ToolHud.SIMPLE_DATE_FORMAT.format(ToolHud.DATE);
-            str = I18n.format("litematica.hud.schematic_projects.current_version_date", w + str + r);
+            str = StringUtils.translate("litematica.hud.schematic_projects.current_version_date", w + str + r);
             this.drawString(str, x, y, color);
             y += 12;
 
-            str = I18n.format("litematica.gui.label.schematic_projects.version_name");
+            str = StringUtils.translate("litematica.gui.label.schematic_projects.version_name");
             this.drawString(str, x, y, color);
             y += 12;
             this.drawString(w + version.getName() + r, x + 4, y, color);
             y += 12;
-            str = I18n.format("litematica.gui.label.schematic_projects.origin");
+            str = StringUtils.translate("litematica.gui.label.schematic_projects.origin");
             this.drawString(str, x, y, color);
             y += 12;
 
