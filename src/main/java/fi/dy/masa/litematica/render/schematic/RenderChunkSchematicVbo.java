@@ -31,7 +31,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.fluid.IFluidState;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -560,8 +559,8 @@ public class RenderChunkSchematicVbo extends RenderChunk
         }
         else
         {
-            boolean clientHasAir = stateClient.getBlock() == Blocks.AIR;
-            boolean schematicHasAir = stateSchematic.getBlock() == Blocks.AIR;
+            boolean clientHasAir = stateClient.isAir();
+            boolean schematicHasAir = stateSchematic.isAir();
 
             if (schematicHasAir)
             {

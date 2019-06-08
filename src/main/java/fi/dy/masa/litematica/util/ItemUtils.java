@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.util;
 import java.util.IdentityHashMap;
 import net.minecraft.block.BlockAbstractSkull;
 import net.minecraft.block.BlockSlab;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -49,7 +48,7 @@ public class ItemUtils
             }
         }
 
-        if (state.getMaterial() == Material.AIR)
+        if (state.isAir())
         {
             return ItemStack.EMPTY;
         }

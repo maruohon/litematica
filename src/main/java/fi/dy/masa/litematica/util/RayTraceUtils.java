@@ -460,8 +460,8 @@ public class RayTraceUtils
             LayerRange layerRange = DataManager.getRenderLayerRange();
 
             if (layerRange.isPositionWithinRange(pos) &&
-                worldSchematic.getBlockState(pos).getMaterial() != Material.AIR &&
-                worldClient.getBlockState(pos).getMaterial() == Material.AIR)
+                worldSchematic.getBlockState(pos).isAir() == false &&
+                worldClient.getBlockState(pos).isAir())
             {
                 return pos;
             }

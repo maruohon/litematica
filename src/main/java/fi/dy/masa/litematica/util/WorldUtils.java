@@ -38,7 +38,6 @@ import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTrapDoor;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -814,7 +813,7 @@ public class WorldUtils
                     {
                         for (int y = y1; y <= yMax; ++y)
                         {
-                            if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
+                            if (chunk.getBlockState(x, y, z).isAir() == false)
                             {
                                 return false;
                             }
@@ -857,7 +856,7 @@ public class WorldUtils
                         {
                             for (int x = xMin; x <= xMax; ++x)
                             {
-                                if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
+                                if (chunk.getBlockState(x, y, z).isAir() == false)
                                 {
                                     return false;
                                 }
@@ -890,7 +889,7 @@ public class WorldUtils
                     {
                         for (int y = y1; y <= yMax; ++y)
                         {
-                            if (chunk.getBlockState(x, y, z).getMaterial() != Material.AIR)
+                            if (chunk.getBlockState(x, y, z).isAir() == false)
                             {
                                 return false;
                             }

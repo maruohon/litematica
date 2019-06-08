@@ -38,7 +38,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -50,7 +49,6 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 {
     private static final MutablePair<IBlockState, IBlockState> MUTABLE_PAIR = new MutablePair<>();
     private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
-    private static final IBlockState AIR = Blocks.AIR.getDefaultState();
     private static final List<SchematicVerifier> ACTIVE_VERIFIERS = new ArrayList<>();
 
     private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> missingBlocksPositions = ArrayListMultimap.create();
@@ -717,7 +715,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     {
         BlockPos pos = new BlockPos(x, y, z);
 
-        if (stateClient != stateSchematic)
+        if (stateClient != stateSchematic && (stateClient.isAir() == false || stateSchematic.isAir() == false))
         {
             MUTABLE_PAIR.setLeft(stateSchematic);
             MUTABLE_PAIR.setRight(stateClient);
@@ -764,7 +762,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             ItemUtils.setItemForBlock(this.worldClient, pos, stateClient);
             this.correctStateCounts.addTo(stateClient, 1);
 
-            if (stateSchematic != AIR)
+            if (stateSchematic.isAir() == false)
             {
                 ++this.correctStatesCount;
             }

@@ -26,7 +26,6 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
@@ -194,7 +193,7 @@ public class SchematicUtils
             EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
             BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
 
-            if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).getMaterial() == Material.AIR)
+            if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).isAir())
             {
                 BlockPos posEnd = getReplacementBoxEndPos(posStart, direction);
                 return setSchematicBlockStates(posStart, posEnd, info.stateNew);
@@ -213,7 +212,7 @@ public class SchematicUtils
         {
             BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
 
-            if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).getMaterial() == Material.AIR)
+            if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).isAir())
             {
                 return setAllIdenticalSchematicBlockStates(posStart, Blocks.AIR.getDefaultState(), info.stateNew);
             }
@@ -334,13 +333,13 @@ public class SchematicUtils
                             int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
                             int increment = 0;
 
-                            if (stateOriginal.getBlock() != Blocks.AIR)
+                            if (stateOriginal.isAir() == false)
                             {
-                                increment = state.getBlock() != Blocks.AIR ? 0 : -1;
+                                increment = state.isAir() == false ? 0 : -1;
                             }
                             else
                             {
-                                increment = state.getBlock() != Blocks.AIR ? 1 : 0;
+                                increment = state.isAir() == false ? 1 : 0;
                             }
 
                             totalBlocks += increment;
@@ -405,13 +404,13 @@ public class SchematicUtils
                                     {
                                         IBlockState stateOriginal = container.get(x, y, z);
 
-                                        if (stateOriginal.getBlock() != Blocks.AIR)
+                                        if (stateOriginal.isAir() == false)
                                         {
-                                            increment = state.getBlock() != Blocks.AIR ? 0 : -1;
+                                            increment = state.isAir() == false ? 0 : -1;
                                         }
                                         else
                                         {
-                                            increment = state.getBlock() != Blocks.AIR ? 1 : 0;
+                                            increment = state.isAir() == false ? 1 : 0;
                                         }
 
                                         totalBlocks += increment;
@@ -494,13 +493,13 @@ public class SchematicUtils
         int totalBlocks = schematicPlacement.getSchematic().getMetadata().getTotalBlocks();
         int increment = 0;
 
-        if (stateOriginalIn.getBlock() != Blocks.AIR)
+        if (stateOriginalIn.isAir() == false)
         {
-            increment = stateNewIn.getBlock() != Blocks.AIR ? 0 : -1;
+            increment = stateNewIn.isAir() == false ? 0 : -1;
         }
         else
         {
-            increment = stateNewIn.getBlock() != Blocks.AIR ? 1 : 0;
+            increment = stateNewIn.isAir() == false ? 1 : 0;
         }
 
         for (String regionName : regions)

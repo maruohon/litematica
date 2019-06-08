@@ -31,7 +31,6 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -355,8 +354,8 @@ public class LitematicaSchematic
 
                     IBlockState stateOld = world.getBlockState(pos);
 
-                    if ((replace == ReplaceBehavior.NONE && stateOld.getMaterial() != Material.AIR) ||
-                        (replace == ReplaceBehavior.WITH_NON_AIR && state.getMaterial() == Material.AIR))
+                    if ((replace == ReplaceBehavior.NONE && stateOld.isAir() == false) ||
+                        (replace == ReplaceBehavior.WITH_NON_AIR && state.isAir()))
                     {
                         continue;
                     }
@@ -605,7 +604,7 @@ public class LitematicaSchematic
                 {
                     IBlockState state = container.get(x, y, z);
 
-                    if (state.getBlock() == Blocks.AIR)
+                    if (state.isAir())
                     {
                         continue;
                     }
@@ -857,7 +856,7 @@ public class LitematicaSchematic
                         IBlockState state = world.getBlockState(posMutable);
                         container.set(x, y, z, state);
 
-                        if (state.getBlock() != Blocks.AIR)
+                        if (state.isAir() == false)
                         {
                             this.totalBlocks++;
                         }
@@ -983,7 +982,7 @@ public class LitematicaSchematic
                         IBlockState state = world.getBlockState(posMutable);
                         container.set(x, y, z, state);
 
-                        if (state.getBlock() != Blocks.AIR)
+                        if (state.isAir() == false)
                         {
                             this.totalBlocks++;
                         }
