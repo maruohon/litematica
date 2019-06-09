@@ -21,6 +21,7 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.IStringListConsumer;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
@@ -190,7 +191,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                         MaterialListCreator creator = new MaterialListCreator(schematic);
                         GuiStringListSelection gui = new GuiStringListSelection(schematic.getAreas().keySet(), creator);
                         gui.setTitle(StringUtils.translate("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
-                        gui.setParent(this.gui.mc.currentScreen);
+                        gui.setParent(GuiUtils.getCurrentScreen());
                         GuiBase.openGui(gui);
                     }
                     else

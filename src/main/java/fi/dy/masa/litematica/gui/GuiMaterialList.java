@@ -30,6 +30,7 @@ import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
@@ -216,7 +217,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     public void onTaskCompleted()
     {
         // re-create the list widgets when a material list task finishes
-        if (this.mc.currentScreen == this)
+        if (GuiUtils.getCurrentScreen() == this)
         {
             WidgetMaterialListEntry.setMaxNameLength(this.materialList.getMaterialsAll(), this.materialList.getMultiplier());
             this.initGui();

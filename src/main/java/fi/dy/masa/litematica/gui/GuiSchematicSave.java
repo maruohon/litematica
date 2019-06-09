@@ -15,6 +15,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 
@@ -90,7 +91,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
 
     private void refreshList()
     {
-        if (this.mc.currentScreen == this)
+        if (GuiUtils.getCurrentScreen() == this)
         {
             this.getListWidget().refreshEntries();
             this.getListWidget().clearSchematicMetadataCache();

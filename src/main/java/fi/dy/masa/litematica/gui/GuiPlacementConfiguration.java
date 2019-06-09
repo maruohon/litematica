@@ -21,9 +21,9 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -60,8 +60,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     {
         super.initGui();
 
-        MainWindow window = Minecraft.getInstance().mainWindow;
-        int width = Math.min(300, window.getScaledWidth() - 200);
+        int scaledWidth = GuiUtils.getScaledWindowWidth();
+        int width = Math.min(300, scaledWidth - 200);
         int x = 12;
         int y = 22;
 
@@ -74,7 +74,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         String label = StringUtils.translate("litematica.gui.label.schematic_placement.sub_regions", this.placement.getSubRegionCount());
         this.addLabel(x + 2, y + 26, -1, 20, 0xFFFFFFFF, label);
 
-        x = window.getScaledWidth() - 154;
+        x = scaledWidth - 154;
         x -= this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_OFF) + 2;
         this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_ON);
 
@@ -125,7 +125,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
         // Move these buttons to the bottom (left) of the screen, if the height isn't enough for them
         // to fit below the other buttons
-        if (window.getScaledHeight() < 328)
+        if (GuiUtils.getScaledWindowHeight() < 328)
         {
             x = 10;
             y = this.height - 22;

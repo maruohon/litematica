@@ -67,7 +67,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         this.clearButtons();
         this.clearWidgets();
 
-        int x = this.mc.currentScreen.width - 13;
+        int x = this.width - 13;
         int y = 24;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_EDITOR;

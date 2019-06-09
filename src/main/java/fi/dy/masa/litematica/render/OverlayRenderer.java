@@ -32,9 +32,9 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -530,8 +530,7 @@ public class OverlayRenderer
                 if (mismatch != null)
                 {
                     BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                    MainWindow window = mc.mainWindow;
-                    info.render(window.getScaledWidth() / 2 - info.getTotalWidth() / 2, window.getScaledHeight() / 2 + 6, mc);
+                    info.render(GuiUtils.getScaledWindowWidth() / 2 - info.getTotalWidth() / 2, GuiUtils.getScaledWindowHeight() / 2 + 6, mc);
                     return true;
                 }
             }
@@ -598,17 +597,16 @@ public class OverlayRenderer
 
     protected void getOverlayPosition(int width, int height, int offY, int invHeight, Minecraft mc)
     {
-        MainWindow window = mc.mainWindow;
         BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
 
         switch (align)
         {
             case CENTER:
-                this.blockInfoX = window.getScaledWidth() / 2 - width / 2;
-                this.blockInfoY = window.getScaledHeight() / 2 + offY;
+                this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
+                this.blockInfoY = GuiUtils.getScaledWindowHeight() / 2 + offY;
                 break;
             case TOP_CENTER:
-                this.blockInfoX = window.getScaledWidth() / 2 - width / 2;
+                this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
                 this.blockInfoY = invHeight + offY + (invHeight > 0 ? offY : 0);
                 break;
         }
@@ -713,9 +711,8 @@ public class OverlayRenderer
 
     public void renderPreviewFrame(Minecraft mc)
     {
-        MainWindow window = mc.mainWindow;
-        int width = window.getScaledWidth();
-        int height = window.getScaledHeight();
+        int width = GuiUtils.getScaledWindowWidth();
+        int height = GuiUtils.getScaledWindowHeight();
         int x = width >= height ? (width - height) / 2 : 0;
         int y = height >= width ? (height - width) / 2 : 0;
         int longerSide = Math.min(width, height);

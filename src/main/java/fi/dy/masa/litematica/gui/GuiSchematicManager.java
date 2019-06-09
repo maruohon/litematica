@@ -21,6 +21,7 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
@@ -392,7 +393,9 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 try
                 {
                     Minecraft mc = Minecraft.getInstance();
-                    NativeImage screenshot = ScreenShotHelper.createScreenshot(mc.mainWindow.getWidth(), mc.mainWindow.getHeight(), mc.getFramebuffer());
+                    int screenWidth = GuiUtils.getDisplayWidth();
+                    int screenHeight = GuiUtils.getDisplayHeight();
+                    NativeImage screenshot = ScreenShotHelper.createScreenshot(screenWidth, screenHeight, mc.getFramebuffer());
 
                     int x = screenshot.getWidth() >= screenshot.getHeight() ? (screenshot.getWidth() - screenshot.getHeight()) / 2 : 0;
                     int y = screenshot.getHeight() >= screenshot.getWidth() ? (screenshot.getHeight() - screenshot.getWidth()) / 2 : 0;

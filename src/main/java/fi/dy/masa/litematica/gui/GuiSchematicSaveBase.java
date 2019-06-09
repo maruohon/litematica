@@ -13,16 +13,14 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.KeyCodes;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.gui.GuiTextField;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
-    @Nullable
-    protected final LitematicaSchematic schematic;
-    protected GuiTextField textField;
+    protected GuiTextFieldGeneric textField;
     protected WidgetCheckBox checkboxIgnoreEntities;
     protected String lastText = "";
     protected String defaultText = "";
+    @Nullable protected final LitematicaSchematic schematic;
 
     public GuiSchematicSaveBase(@Nullable LitematicaSchematic schematic)
     {

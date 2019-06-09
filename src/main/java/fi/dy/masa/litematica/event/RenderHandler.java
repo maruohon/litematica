@@ -10,6 +10,7 @@ import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.interfaces.IRenderer;
+import fi.dy.masa.malilib.util.GuiUtils;
 import net.minecraft.client.Minecraft;
 
 public class RenderHandler implements IRenderer
@@ -53,7 +54,7 @@ public class RenderHandler implements IRenderer
             // The Info HUD renderers can decide if they want to be rendered in GUIs
             InfoHud.getInstance().renderHud();
 
-            if (mc.currentScreen == null)
+            if (GuiUtils.getCurrentScreen() == null)
             {
                 ToolHud.getInstance().renderHud();
                 OverlayRenderer.getInstance().renderHoverInfo(mc);

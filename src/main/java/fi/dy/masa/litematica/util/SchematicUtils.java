@@ -23,6 +23,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
@@ -53,25 +54,23 @@ public class SchematicUtils
 
         if (area != null)
         {
-            Minecraft mc = Minecraft.getInstance();
-
             if (DataManager.getSchematicProjectsManager().hasProjectOpen())
             {
                 String title = "litematica.gui.title.schematic_projects.save_new_version";
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-                GuiTextInput gui = new GuiTextInput(512, title, project.getCurrentVersionName(), mc.currentScreen, new SchematicVersionCreator());
+                GuiTextInput gui = new GuiTextInput(512, title, project.getCurrentVersionName(), GuiUtils.getCurrentScreen(), new SchematicVersionCreator());
                 GuiBase.openGui(gui);
             }
             else if (inMemoryOnly)
             {
                 String title = "litematica.gui.title.create_in_memory_schematic";
-                GuiTextInput gui = new GuiTextInput(512, title, area.getName(), mc.currentScreen, new InMemorySchematicCreator(area));
+                GuiTextInput gui = new GuiTextInput(512, title, area.getName(), GuiUtils.getCurrentScreen(), new InMemorySchematicCreator(area));
                 GuiBase.openGui(gui);
             }
             else
             {
                 GuiSchematicSave gui = new GuiSchematicSave();
-                gui.setParent(mc.currentScreen);
+                gui.setParent(GuiUtils.getCurrentScreen());
                 GuiBase.openGui(gui);
             }
 

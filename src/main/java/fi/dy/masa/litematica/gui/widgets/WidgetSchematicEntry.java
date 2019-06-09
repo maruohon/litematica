@@ -15,6 +15,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.BlockPos;
@@ -154,7 +155,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
             {
                 LitematicaSchematic entry = this.widget.schematic;
                 GuiSchematicSave gui = new GuiSchematicSave(entry);
-                gui.setParent(this.widget.mc.currentScreen);
+                gui.setParent(GuiUtils.getCurrentScreen());
                 GuiBase.openGui(gui);
             }
             else if (this.type == Type.UNLOAD)

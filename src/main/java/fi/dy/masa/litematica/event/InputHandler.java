@@ -21,6 +21,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -84,7 +85,8 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         Minecraft mc = Minecraft.getInstance();
 
-        if (mc.currentScreen == null && mc.world != null && mc.player != null && eventButtonState)
+        // Tool enabled, and not in a GUI
+        if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null && eventButtonState)
         {
             if (eventButtonState && mc.gameSettings.keyBindUseItem.func_197984_a(eventButton))
             {
@@ -105,7 +107,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         Minecraft mc = Minecraft.getInstance();
 
         // Not in a GUI
-        if (mc.currentScreen == null && mc.world != null && mc.player != null)
+        if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null)
         {
             EntityPlayer player = mc.player;
             boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();

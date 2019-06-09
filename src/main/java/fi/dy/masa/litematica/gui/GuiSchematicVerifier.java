@@ -23,6 +23,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -236,7 +237,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     @Override
     public void onTaskCompleted()
     {
-        if (this.mc.currentScreen == this)
+        if (GuiUtils.getCurrentScreen() == this)
         {
             SchematicVerifier verifier = this.verifier;
             WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined());
