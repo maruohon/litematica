@@ -21,6 +21,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -85,7 +86,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         Minecraft mc = Minecraft.getMinecraft();
 
         // Tool enabled, and not in a GUI
-        if (mc.currentScreen == null && mc.world != null && mc.player != null)
+        if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null)
         {
             if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode() + 100)
             {

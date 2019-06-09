@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFlowerPot;
@@ -346,12 +347,12 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             int width = this.mismatchInfo.getTotalWidth();
             int height = this.mismatchInfo.getTotalHeight();
 
-            if (x + width > this.mc.currentScreen.width)
+            if (x + width > GuiUtils.getCurrentScreen().width)
             {
                 x = mouseX - width - 10;
             }
 
-            if (y + height > this.mc.currentScreen.height)
+            if (y + height > GuiUtils.getCurrentScreen().height)
             {
                 y = mouseY - height - 2;
             }

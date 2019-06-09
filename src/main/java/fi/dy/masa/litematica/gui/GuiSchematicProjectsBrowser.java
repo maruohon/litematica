@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -168,7 +169,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
             else if (this.type == Type.CREATE_PROJECT)
             {
                 ProjectCreator creator = new ProjectCreator(this.gui.getListWidget().getCurrentDirectory(), this.gui);
-                GuiTextInput gui = new GuiTextInput(256, "litematica.gui.title.create_schematic_project", "", this.gui.mc.currentScreen, creator);
+                GuiTextInput gui = new GuiTextInput(256, "litematica.gui.title.create_schematic_project", "", GuiUtils.getCurrentScreen(), creator);
                 GuiBase.openGui(gui);
             }
             else if (this.type == Type.CLOSE_PROJECT)

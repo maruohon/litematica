@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
-import com.mumfrey.liteloader.client.overlays.IGuiTextField;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -14,16 +13,14 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.gui.GuiTextField;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
-    protected final GuiTextField textField;
-    @Nullable
-    protected final LitematicaSchematic schematic;
+    protected GuiTextFieldGeneric textField;
     protected WidgetCheckBox checkboxIgnoreEntities;
     protected String lastText = "";
     protected String defaultText = "";
+    @Nullable protected final LitematicaSchematic schematic;
 
     public GuiSchematicSaveBase(@Nullable LitematicaSchematic schematic)
     {
@@ -53,7 +50,14 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         super.initGui();
 
-        ((IGuiTextField) this.textField).setInternalWidth(this.width - 196);
+        boolean focused = this.textField.isFocused();
+        String text = this.textField.getText();
+        int pos = this.textField.getCursorPosition();
+        this.textField = new GuiTextFieldGeneric(10, 32, this.width - 196, 20, this.textRenderer);
+        this.textField.setText(text);
+        this.textField.setCursorPosition(pos);
+        this.textField.setFocused(focused);
+
         DirectoryEntry entry = this.getListWidget().getLastSelectedEntry();
 
         // Only set the text field contents if it hasn't been set already.

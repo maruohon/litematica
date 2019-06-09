@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectsBrowser;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.client.Minecraft;
@@ -27,13 +28,13 @@ public class SchematicProjectsManager
         if (this.currentProject != null)
         {
             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(this.currentProject);
-            gui.setParent(this.mc.currentScreen);
+            gui.setParent(GuiUtils.getCurrentScreen());
             GuiBase.openGui(gui);
         }
         else
         {
             GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
-            gui.setParent(this.mc.currentScreen);
+            gui.setParent(GuiUtils.getCurrentScreen());
             GuiBase.openGui(gui);
         }
     }

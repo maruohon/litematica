@@ -9,10 +9,10 @@ import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -616,19 +616,17 @@ public class RenderUtils
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
             IInventory inv, InventoryRenderType type, InventoryProperties props, Minecraft mc)
     {
-        ScaledResolution res = new ScaledResolution(mc);
-
         int xInv = 0;
         int yInv = 0;
 
         switch (align)
         {
             case CENTER:
-                xInv = res.getScaledWidth() / 2 - (props.width / 2);
-                yInv = res.getScaledHeight() / 2 - props.height - offY;
+                xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
+                yInv = GuiUtils.getScaledWindowHeight() / 2 - props.height - offY;
                 break;
             case TOP_CENTER:
-                xInv = res.getScaledWidth() / 2 - (props.width / 2);
+                xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
                 yInv = offY;
                 break;
         }

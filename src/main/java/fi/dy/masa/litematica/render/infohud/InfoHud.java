@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.config.HudAlignment;
+import fi.dy.masa.malilib.util.GuiUtils;
 import net.minecraft.client.Minecraft;
 
 public class InfoHud
@@ -65,7 +66,7 @@ public class InfoHud
             final int maxLines = Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue();
             int xOffset = this.getOffsetX();
             int yOffset = this.getOffsetY();
-            boolean isGui = this.mc.currentScreen != null;
+            boolean isGui = GuiUtils.getCurrentScreen() != null;
             double scale = Math.max(0.05, this.getScaleFactor());
 
             this.getLinesForPhase(RenderPhase.PRE, maxLines, isGui);

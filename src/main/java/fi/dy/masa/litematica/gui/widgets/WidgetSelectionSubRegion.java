@@ -14,6 +14,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
 
@@ -155,7 +156,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             else if (this.type == ButtonType.CONFIGURE)
             {
                 GuiAreaSelectionEditorSubRegion gui = new GuiAreaSelectionEditorSubRegion(this.widget.selection, this.widget.box);
-                gui.setParent(this.widget.mc.currentScreen);
+                gui.setParent(GuiUtils.getCurrentScreen());
                 GuiBase.openGui(gui);
             }
         }

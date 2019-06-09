@@ -8,10 +8,10 @@ import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 
 public class MaterialListHudRenderer implements IInfoHudRenderer
@@ -80,7 +80,6 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             return 0;
         }
 
-        ScaledResolution res = new ScaledResolution(mc);
         FontRenderer font = mc.fontRenderer;
         final double scale = Configs.InfoOverlays.MATERIAL_LIST_HUD_SCALE.getDoubleValue();
         final int maxLines = Configs.InfoOverlays.MATERIAL_LIST_HUD_MAX_LINES.getIntegerValue();
@@ -120,10 +119,10 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         {
             case TOP_RIGHT:
             case BOTTOM_RIGHT:
-                posX = (int) ((res.getScaledWidth() / scale) - maxLineLength - xOffset - bgMargin);
+                posX = (int) ((GuiUtils.getScaledWindowWidth() / scale) - maxLineLength - xOffset - bgMargin);
                 break;
             case CENTER:
-                posX = (int) ((res.getScaledWidth() / scale / 2) - (maxLineLength / 2) - xOffset);
+                posX = (int) ((GuiUtils.getScaledWindowWidth() / scale / 2) - (maxLineLength / 2) - xOffset);
                 break;
             default:
         }

@@ -17,6 +17,7 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IConfirmationListener;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
@@ -153,7 +154,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
 
                 if (manager.getCurrentSelection() != null)
                 {
-                    manager.openEditGui(this.gui.mc.currentScreen);
+                    manager.openEditGui(GuiUtils.getCurrentScreen());
                 }
             }
             else if (this.type == Type.PLACE_TO_WORLD)

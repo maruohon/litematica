@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
 
@@ -183,7 +184,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 if (selection != null)
                 {
                     GuiAreaSelectionEditorNormal gui = new GuiAreaSelectionEditorNormal(selection);
-                    gui.setParent(this.widget.mc.currentScreen);
+                    gui.setParent(GuiUtils.getCurrentScreen());
                     gui.setSelectionId(selectionId);
                     GuiBase.openGui(gui);
                 }
