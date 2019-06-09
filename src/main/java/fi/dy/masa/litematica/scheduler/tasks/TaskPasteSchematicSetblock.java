@@ -19,16 +19,14 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.command.arguments.BlockStateParser;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.IRegistry;
 import net.minecraft.world.chunk.Chunk;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
@@ -287,17 +285,8 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
     private void sendSetBlockCommand(int x, int y, int z, IBlockState state, EntityPlayerSP player)
     {
-        Block block = state.getBlock();
-        ResourceLocation rl = IRegistry.BLOCK.getKey(block);
-
-        if (rl == null)
-        {
-            return;
-        }
-
-        String blockName = rl.toString();
         String cmdName = Configs.Generic.PASTE_COMMAND_SETBLOCK.getStringValue();
-        String blockString = blockName; // FIXME 1.13: state/properties
+        String blockString = BlockStateParser.toString(state, null);
         String strCommand = String.format("/%s %d %d %d %s", cmdName, x, y, z, blockString);
 
         player.sendChatMessage(strCommand);
