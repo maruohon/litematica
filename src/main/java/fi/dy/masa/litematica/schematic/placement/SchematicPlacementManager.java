@@ -33,6 +33,7 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -47,7 +48,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class SchematicPlacementManager
 {
@@ -183,9 +183,9 @@ public class SchematicPlacementManager
         return this.schematicPlacements;
     }
 
-    public List<StructureBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
+    public List<IntBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
     {
-        List<StructureBoundingBox> list = new ArrayList<>();
+        List<IntBoundingBox> list = new ArrayList<>();
 
         for (PlacementPart part : this.touchedVolumesInSubChunk.get(subChunk))
         {
@@ -425,11 +425,11 @@ public class SchematicPlacementManager
             {
                 if (placement.matchesRequirement(RequiredEnabled.RENDERING_ENABLED))
                 {
-                    Map<String, StructureBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
+                    Map<String, IntBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
 
-                    for (Map.Entry<String, StructureBoundingBox> entry : boxMap.entrySet())
+                    for (Map.Entry<String, IntBoundingBox> entry : boxMap.entrySet())
                     {
-                        StructureBoundingBox bbOrig = entry.getValue();
+                        IntBoundingBox bbOrig = entry.getValue();
                         final int startCY = (bbOrig.minY >> 4);
                         final int endCY = (bbOrig.maxY >> 4);
 
@@ -438,7 +438,7 @@ public class SchematicPlacementManager
                             int y1 = Math.max((cy << 4)     , bbOrig.minY);
                             int y2 = Math.min((cy << 4) + 15, bbOrig.maxY);
 
-                            StructureBoundingBox bbSub = new StructureBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
+                            IntBoundingBox bbSub = new IntBoundingBox(bbOrig.minX, y1, bbOrig.minZ, bbOrig.maxX, y2, bbOrig.maxZ);
                             PlacementPart part = new PlacementPart(placement, entry.getKey(), bbSub);
                             this.touchedVolumesInSubChunk.put(new SubChunkPos(pos.x, cy, pos.z), part);
                             //System.out.printf("updateTouchedBoxesInChunk box at %d, %d, %d: %s\n", pos.x, cy, pos.z, bbSub);
@@ -782,9 +782,9 @@ public class SchematicPlacementManager
     {
         private final SchematicPlacement placement;
         private final String subRegionName;
-        private final StructureBoundingBox bb;
+        private final IntBoundingBox bb;
 
-        public PlacementPart(SchematicPlacement placement, String subRegionName, StructureBoundingBox bb)
+        public PlacementPart(SchematicPlacement placement, String subRegionName, IntBoundingBox bb)
         {
             this.placement = placement;
             this.subRegionName = subRegionName;
@@ -801,7 +801,7 @@ public class SchematicPlacementManager
             return this.subRegionName;
         }
 
-        public StructureBoundingBox getBox()
+        public IntBoundingBox getBox()
         {
             return this.bb;
         }

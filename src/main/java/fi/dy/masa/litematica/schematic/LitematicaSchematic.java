@@ -29,6 +29,7 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.NBTUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
@@ -56,7 +57,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class LitematicaSchematic
 {
@@ -514,7 +514,7 @@ public class LitematicaSchematic
             SchematicPlacement schematicPlacement, SubRegionPlacement placement,
             LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
     {
-        StructureBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
+        IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
 
         if (bounds == null)
         {
@@ -761,10 +761,10 @@ public class LitematicaSchematic
     }
 
     public void takeEntitiesFromWorldWithinChunk(World world, int chunkX, int chunkZ,
-            ImmutableMap<String, StructureBoundingBox> volumes, ImmutableMap<String, Box> boxes,
+            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, Box> boxes,
             Set<UUID> existingEntities, BlockPos origin)
     {
-        for (Map.Entry<String, StructureBoundingBox> entry : volumes.entrySet())
+        for (Map.Entry<String, IntBoundingBox> entry : volumes.entrySet())
         {
             String regionName = entry.getKey();
             List<EntityInfo> list = this.entities.get(regionName);
@@ -859,10 +859,10 @@ public class LitematicaSchematic
 
             if (world instanceof WorldServer)
             {
-                StructureBoundingBox structureBB = StructureBoundingBox.createProper(
+                IntBoundingBox structureBB = IntBoundingBox.createProper(
                         startX,         startY,         startZ,
                         startX + sizeX, startY + sizeY, startZ + sizeZ);
-                List<NextTickListEntry> pendingTicks = ((WorldServer) world).getPendingBlockUpdates(structureBB, false);
+                List<NextTickListEntry> pendingTicks = ((WorldServer) world).getPendingBlockUpdates(structureBB.toVanillaBox(), false);
 
                 if (pendingTicks != null)
                 {
@@ -898,14 +898,14 @@ public class LitematicaSchematic
     }
 
     public void takeBlocksFromWorldWithinChunk(World world, int chunkX, int chunkZ,
-            ImmutableMap<String, StructureBoundingBox> volumes, ImmutableMap<String, Box> boxes)
+            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, Box> boxes)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
 
-        for (Map.Entry<String, StructureBoundingBox> volumeEntry : volumes.entrySet())
+        for (Map.Entry<String, IntBoundingBox> volumeEntry : volumes.entrySet())
         {
             String regionName = volumeEntry.getKey();
-            StructureBoundingBox bb = volumeEntry.getValue();
+            IntBoundingBox bb = volumeEntry.getValue();
             Box box = boxes.get(regionName);
 
             if (box == null)
@@ -973,10 +973,10 @@ public class LitematicaSchematic
 
             if (world instanceof WorldServer)
             {
-                StructureBoundingBox structureBB = StructureBoundingBox.createProper(
+                IntBoundingBox structureBB = IntBoundingBox.createProper(
                         offsetX + startX  , offsetY + startY  , offsetZ + startZ  ,
                         offsetX + endX + 1, offsetY + endY + 1, offsetZ + endZ + 1);
-                List<NextTickListEntry> pendingTicks = ((WorldServer) world).getPendingBlockUpdates(structureBB, false);
+                List<NextTickListEntry> pendingTicks = ((WorldServer) world).getPendingBlockUpdates(structureBB.toVanillaBox(), false);
 
                 if (pendingTicks != null)
                 {

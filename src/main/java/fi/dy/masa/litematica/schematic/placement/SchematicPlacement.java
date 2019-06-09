@@ -30,6 +30,7 @@ import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.init.Blocks;
@@ -37,7 +38,6 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 
 public class SchematicPlacement
@@ -512,14 +512,14 @@ public class SchematicPlacement
         return set;
     }
 
-    public ImmutableMap<String, StructureBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
+    public ImmutableMap<String, IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ)
     {
         ImmutableMap<String, Box> subRegions = this.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
         return PositionUtils.getBoxesWithinChunk(chunkX, chunkZ, subRegions);
     }
 
     @Nullable
-    public StructureBoundingBox getBoxWithinChunkForRegion(String regionName, int chunkX, int chunkZ)
+    public IntBoundingBox getBoxWithinChunkForRegion(String regionName, int chunkX, int chunkZ)
     {
         Box box = this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED).get(regionName);
         return box != null ? PositionUtils.getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;

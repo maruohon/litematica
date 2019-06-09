@@ -9,16 +9,16 @@ import com.google.common.collect.ArrayListMultimap;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public abstract class TaskProcessChunkBase extends TaskBase
 {
-    protected final ArrayListMultimap<ChunkPos, StructureBoundingBox> boxesInChunks = ArrayListMultimap.create();
+    protected final ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks = ArrayListMultimap.create();
     protected final Set<ChunkPos> requiredChunks = new HashSet<>();
     protected final WorldClient worldClient;
     protected final World world;
@@ -109,7 +109,7 @@ public abstract class TaskProcessChunkBase extends TaskBase
         }
     }
 
-    protected List<StructureBoundingBox> getBoxesInChunk(ChunkPos pos)
+    protected List<IntBoundingBox> getBoxesInChunk(ChunkPos pos)
     {
         return this.boxesInChunks.get(pos);
     }

@@ -29,6 +29,7 @@ import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
@@ -64,7 +65,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 import net.minecraft.world.gen.structure.template.Template;
 
@@ -760,11 +760,11 @@ public class WorldUtils
             {
                 for (int cx = minCX; cx <= maxCX; ++cx)
                 {
-                    List<StructureBoundingBox> boxes = manager.getTouchedBoxesInSubChunk(new SubChunkPos(cx, cy, cz));
+                    List<IntBoundingBox> boxes = manager.getTouchedBoxesInSubChunk(new SubChunkPos(cx, cy, cz));
 
                     for (int i = 0; i < boxes.size(); ++i)
                     {
-                        StructureBoundingBox box = boxes.get(i);
+                        IntBoundingBox box = boxes.get(i);
 
                         if (x >= box.minX - range && x <= box.maxX + range &&
                             y >= box.minY - range && y <= box.maxY + range &&

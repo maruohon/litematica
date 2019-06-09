@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -18,7 +19,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class TaskFillArea extends TaskProcessChunkBase
 {
@@ -95,7 +95,7 @@ public class TaskFillArea extends TaskProcessChunkBase
             this.mc.player.sendChatMessage("/gamerule sendCommandFeedback false");
         }
 
-        for (StructureBoundingBox box : this.getBoxesInChunk(pos))
+        for (IntBoundingBox box : this.getBoxesInChunk(pos))
         {
             if (this.isClientWorld)
             {
@@ -112,7 +112,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         return true;
     }
 
-    protected void fillBoxDirect(StructureBoundingBox box, boolean removeEntities)
+    protected void fillBoxDirect(IntBoundingBox box, boolean removeEntities)
     {
         if (removeEntities)
         {
@@ -157,7 +157,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         }
     }
 
-    protected void fillBoxCommands(StructureBoundingBox box, boolean removeEntities)
+    protected void fillBoxCommands(IntBoundingBox box, boolean removeEntities)
     {
         if (removeEntities)
         {

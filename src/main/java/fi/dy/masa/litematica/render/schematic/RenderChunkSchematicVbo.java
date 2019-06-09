@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.util.OverlayType;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.Block;
@@ -40,7 +41,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 public class RenderChunkSchematicVbo extends RenderChunk
 {
@@ -49,7 +49,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     private final RenderGlobalSchematic renderGlobal;
     private final VertexBuffer[] vertexBufferOverlay = new VertexBuffer[OverlayRenderType.values().length];
     private final Set<TileEntity> setTileEntities = new HashSet<>();
-    private final List<StructureBoundingBox> boxes = new ArrayList<>();
+    private final List<IntBoundingBox> boxes = new ArrayList<>();
     private final EnumSet<OverlayRenderType> existingOverlays = EnumSet.noneOf(OverlayRenderType.class);
     private boolean hasOverlay = false;
     private ChunkCompileTaskGeneratorSchematic compileTask;
@@ -191,7 +191,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 boolean[] usedLayers = new boolean[BlockRenderLayer.values().length];
                 BufferBuilderCache buffers = generator.getBufferCache();
 
-                for (StructureBoundingBox box : this.boxes)
+                for (IntBoundingBox box : this.boxes)
                 {
                     box = range.getClampedRenderBoundingBox(box);
 
