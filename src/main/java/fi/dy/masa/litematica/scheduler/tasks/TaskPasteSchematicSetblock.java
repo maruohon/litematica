@@ -298,7 +298,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         String blockName = rl.toString();
         String cmdName = Configs.Generic.PASTE_COMMAND_SETBLOCK.getStringValue();
         String blockString = blockName; // FIXME 1.13: state/properties
-        String strCommand = String.format("/%s %d %d %d %s %d", cmdName, x, y, z, blockString);
+        String strCommand = String.format("/%s %d %d %d %s", cmdName, x, y, z, blockString);
 
         player.sendChatMessage(strCommand);
         ++this.sentCommandsTotal;
