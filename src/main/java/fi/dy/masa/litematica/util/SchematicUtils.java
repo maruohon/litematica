@@ -315,7 +315,7 @@ public class SchematicUtils
             {
                 for (PlacementPart part : list)
                 {
-                    if (part.getBox().isVecInside(pos))
+                    if (part.getBox().containsPos(pos))
                     {
                         SchematicPlacement placement = part.getPlacement();
                         String regionName = part.getSubRegionName();
@@ -370,7 +370,7 @@ public class SchematicUtils
             {
                 for (PlacementPart part : list)
                 {
-                    if (part.getBox().isVecInside(posStart))
+                    if (part.getBox().containsPos(posStart))
                     {
                         SchematicPlacement placement = part.getPlacement();
                         String regionName = part.getSubRegionName();
@@ -446,7 +446,7 @@ public class SchematicUtils
             {
                 for (PlacementPart part : list)
                 {
-                    if (part.getBox().isVecInside(posStart))
+                    if (part.getBox().containsPos(posStart))
                     {
                         if (replaceAllIdenticalBlocks(manager, part, stateOriginal, stateNew))
                         {

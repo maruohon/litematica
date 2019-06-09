@@ -29,6 +29,7 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
@@ -56,7 +57,6 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -760,11 +760,11 @@ public class WorldUtils
             {
                 for (int cx = minCX; cx <= maxCX; ++cx)
                 {
-                    List<MutableBoundingBox> boxes = manager.getTouchedBoxesInSubChunk(new SubChunkPos(cx, cy, cz));
+                    List<IntBoundingBox> boxes = manager.getTouchedBoxesInSubChunk(new SubChunkPos(cx, cy, cz));
 
                     for (int i = 0; i < boxes.size(); ++i)
                     {
-                        MutableBoundingBox box = boxes.get(i);
+                        IntBoundingBox box = boxes.get(i);
 
                         if (x >= box.minX - range && x <= box.maxX + range &&
                             y >= box.minY - range && y <= box.maxY + range &&

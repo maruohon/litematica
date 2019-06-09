@@ -17,6 +17,7 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -27,14 +28,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.world.chunk.Chunk;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
 {
-    private final ArrayListMultimap<ChunkPos, MutableBoundingBox> boxesInChunks = ArrayListMultimap.create();
-    private final List<MutableBoundingBox> boxesInCurrentChunk = new ArrayList<>();
+    private final ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks = ArrayListMultimap.create();
+    private final List<IntBoundingBox> boxesInCurrentChunk = new ArrayList<>();
     private final List<ChunkPos> chunks = new ArrayList<>();
     private final ChunkPosComparator comparator;
     private final int maxCommandsPerTick;
@@ -116,7 +116,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
             while (this.boxesInCurrentChunk.isEmpty() == false)
             {
-                MutableBoundingBox box = this.boxesInCurrentChunk.get(0);
+                IntBoundingBox box = this.boxesInCurrentChunk.get(0);
 
                 if (this.processBox(pos, box, worldSchematic, worldClient, this.mc.player))
                 {
@@ -187,7 +187,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         return this.areSurroundingChunksLoaded(pos, worldClient, 1);
     }
 
-    protected boolean processBox(ChunkPos pos, MutableBoundingBox box,
+    protected boolean processBox(ChunkPos pos, IntBoundingBox box,
             WorldSchematic worldSchematic, WorldClient worldClient, EntityPlayerSP player)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
@@ -255,7 +255,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         return false;
     }
 
-    private void summonEntities(MutableBoundingBox box, WorldSchematic worldSchematic, EntityPlayerSP player)
+    private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, EntityPlayerSP player)
     {
         AxisAlignedBB bb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
         List<Entity> entities = worldSchematic.getEntitiesWithinAABBExcludingEntity(null, bb);

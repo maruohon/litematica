@@ -28,6 +28,7 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.NBTUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
@@ -50,7 +51,6 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.IRegistry;
@@ -534,7 +534,7 @@ public class LitematicaSchematic
             SchematicPlacement schematicPlacement, SubRegionPlacement placement,
             LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
     {
-        MutableBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
+        IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
 
         if (bounds == null)
         {
@@ -781,10 +781,10 @@ public class LitematicaSchematic
     }
 
     public void takeEntitiesFromWorldWithinChunk(World world, int chunkX, int chunkZ,
-            ImmutableMap<String, MutableBoundingBox> volumes, ImmutableMap<String, Box> boxes,
+            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, Box> boxes,
             Set<UUID> existingEntities, BlockPos origin)
     {
-        for (Map.Entry<String, MutableBoundingBox> entry : volumes.entrySet())
+        for (Map.Entry<String, IntBoundingBox> entry : volumes.entrySet())
         {
             String regionName = entry.getKey();
             List<EntityInfo> list = this.entities.get(regionName);
@@ -880,17 +880,17 @@ public class LitematicaSchematic
 
             if (world instanceof WorldServer)
             {
-                MutableBoundingBox tickBox = MutableBoundingBox.createProper(
+                IntBoundingBox tickBox = IntBoundingBox.createProper(
                         startX,         startY,         startZ,
                         startX + sizeX, startY + sizeY, startZ + sizeZ);
-                List<NextTickListEntry<Block>> blockTicks = ((WorldServer) world).getPendingBlockTicks().getPending(tickBox, false);
+                List<NextTickListEntry<Block>> blockTicks = ((WorldServer) world).getPendingBlockTicks().getPending(tickBox.toVanillaBox(), false);
 
                 if (blockTicks != null)
                 {
                     this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getGameTime());
                 }
 
-                List<NextTickListEntry<Fluid>> fluidTicks = ((WorldServer) world).getPendingFluidTicks().getPending(tickBox, false);
+                List<NextTickListEntry<Fluid>> fluidTicks = ((WorldServer) world).getPendingFluidTicks().getPending(tickBox.toVanillaBox(), false);
 
                 if (fluidTicks != null)
                 {
@@ -930,14 +930,14 @@ public class LitematicaSchematic
     }
 
     public void takeBlocksFromWorldWithinChunk(World world, int chunkX, int chunkZ,
-            ImmutableMap<String, MutableBoundingBox> volumes, ImmutableMap<String, Box> boxes)
+            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, Box> boxes)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
 
-        for (Map.Entry<String, MutableBoundingBox> volumeEntry : volumes.entrySet())
+        for (Map.Entry<String, IntBoundingBox> volumeEntry : volumes.entrySet())
         {
             String regionName = volumeEntry.getKey();
-            MutableBoundingBox bb = volumeEntry.getValue();
+            IntBoundingBox bb = volumeEntry.getValue();
             Box box = boxes.get(regionName);
 
             if (box == null)
@@ -1006,17 +1006,17 @@ public class LitematicaSchematic
 
             if (world instanceof WorldServer)
             {
-                MutableBoundingBox tickBox = MutableBoundingBox.createProper(
+                IntBoundingBox tickBox = IntBoundingBox.createProper(
                         offsetX + startX  , offsetY + startY  , offsetZ + startZ  ,
                         offsetX + endX + 1, offsetY + endY + 1, offsetZ + endZ + 1);
-                List<NextTickListEntry<Block>> blockTicks = ((WorldServer) world).getPendingBlockTicks().getPending(tickBox, false);
+                List<NextTickListEntry<Block>> blockTicks = ((WorldServer) world).getPendingBlockTicks().getPending(tickBox.toVanillaBox(), false);
 
                 if (blockTicks != null)
                 {
                     this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getGameTime());
                 }
 
-                List<NextTickListEntry<Fluid>> fluidTicks = ((WorldServer) world).getPendingFluidTicks().getPending(tickBox, false);
+                List<NextTickListEntry<Fluid>> fluidTicks = ((WorldServer) world).getPendingFluidTicks().getPending(tickBox.toVanillaBox(), false);
 
                 if (fluidTicks != null)
                 {

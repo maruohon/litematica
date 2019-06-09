@@ -20,6 +20,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.client.Minecraft;
@@ -30,7 +31,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -136,7 +136,7 @@ public class PositionUtils
             {
                 if (range.intersectsBox(box.getPos1(), box.getPos2()))
                 {
-                    MutableBoundingBox bb = range.getClampedArea(box.getPos1(), box.getPos2());
+                    IntBoundingBox bb = range.getClampedArea(box.getPos1(), box.getPos2());
 
                     if (bb != null)
                     {
@@ -292,14 +292,14 @@ public class PositionUtils
         return volume;
     }
 
-    public static ImmutableMap<String, MutableBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, ImmutableMap<String, Box> subRegions)
+    public static ImmutableMap<String, IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, ImmutableMap<String, Box> subRegions)
     {
-        ImmutableMap.Builder<String, MutableBoundingBox> builder = new ImmutableMap.Builder<>();
+        ImmutableMap.Builder<String, IntBoundingBox> builder = new ImmutableMap.Builder<>();
 
         for (Map.Entry<String, Box> entry : subRegions.entrySet())
         {
             Box box = entry.getValue();
-            MutableBoundingBox bb = box != null ? getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
+            IntBoundingBox bb = box != null ? getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
 
             if (bb != null)
             {
@@ -310,13 +310,13 @@ public class PositionUtils
         return builder.build();
     }
 
-    public static ImmutableList<MutableBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<Box> boxes)
+    public static ImmutableList<IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<Box> boxes)
     {
-        ImmutableList.Builder<MutableBoundingBox> builder = new ImmutableList.Builder<>();
+        ImmutableList.Builder<IntBoundingBox> builder = new ImmutableList.Builder<>();
 
         for (Box box : boxes)
         {
-            MutableBoundingBox bb = getBoundsWithinChunkForBox(box, chunkX, chunkZ);
+            IntBoundingBox bb = getBoundsWithinChunkForBox(box, chunkX, chunkZ);
 
             if (bb != null)
             {
@@ -356,7 +356,7 @@ public class PositionUtils
     }
 
     @Nullable
-    public static MutableBoundingBox getBoundsWithinChunkForBox(Box box, int chunkX, int chunkZ)
+    public static IntBoundingBox getBoundsWithinChunkForBox(Box box, int chunkX, int chunkZ)
     {
         final int chunkXMin = chunkX << 4;
         final int chunkZMin = chunkZ << 4;
@@ -379,7 +379,7 @@ public class PositionUtils
             final int yMax = Math.max(box.getPos1().getY(), box.getPos2().getY());
             final int zMax = Math.min(chunkZMax, boxZMax);
 
-            return new MutableBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax);
+            return new IntBoundingBox(xMin, yMin, zMin, xMax, yMax, zMax);
         }
 
         return null;
@@ -400,7 +400,7 @@ public class PositionUtils
         return createAABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public static AxisAlignedBB createAABBFrom(MutableBoundingBox bb)
+    public static AxisAlignedBB createAABBFrom(IntBoundingBox bb)
     {
         return createAABB(bb.minX, bb.minY, bb.minZ, bb.maxX + 1, bb.maxY + 1, bb.maxZ + 1);
     }

@@ -8,13 +8,13 @@ import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
 
 public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
 {
@@ -60,7 +60,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
         EnumFacing.Axis axis = range.getAxis();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
-        for (MutableBoundingBox bb : this.getBoxesInChunk(pos))
+        for (IntBoundingBox bb : this.getBoxesInChunk(pos))
         {
             final int startX = axis == EnumFacing.Axis.X ? Math.max(bb.minX, range.getLayerMin()) : bb.minX;
             final int startY = axis == EnumFacing.Axis.Y ? Math.max(bb.minY, range.getLayerMin()) : bb.minY;
