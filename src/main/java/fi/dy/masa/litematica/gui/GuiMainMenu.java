@@ -10,8 +10,8 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Screen;
 
 public class GuiMainMenu extends GuiBase
 {
@@ -104,9 +104,9 @@ public class GuiMainMenu extends GuiBase
     {
         private final ButtonType type;
         @Nullable
-        private final GuiScreen parent;
+        private final Screen parent;
 
-        public ButtonListenerChangeMenu(ButtonType type, @Nullable GuiScreen parent)
+        public ButtonListenerChangeMenu(ButtonType type, @Nullable Screen parent)
         {
             this.type = type;
             this.parent = parent;
@@ -219,7 +219,7 @@ public class GuiMainMenu extends GuiBase
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            ToolMode mode = DataManager.getToolMode().cycle(Minecraft.getInstance().player, mouseButton == 0);
+            ToolMode mode = DataManager.getToolMode().cycle(MinecraftClient.getInstance().player, mouseButton == 0);
             DataManager.setToolMode(mode);
             this.gui.initGui();
         }

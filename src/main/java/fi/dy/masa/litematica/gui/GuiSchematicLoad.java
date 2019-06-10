@@ -174,7 +174,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
                     if (DataManager.getCreatePlacementOnLoad())
                     {
-                        BlockPos pos = new BlockPos(this.gui.mc.player.getPositionVector());
+                        BlockPos pos = new BlockPos(this.gui.mc.player.getPos());
                         String name = schematic.getMetadata().getName();
                         boolean enabled = GuiBase.isShiftDown() == false;
 

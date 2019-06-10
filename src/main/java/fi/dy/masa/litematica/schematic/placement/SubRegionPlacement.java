@@ -8,8 +8,8 @@ import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 
 public class SubRegionPlacement
@@ -17,8 +17,8 @@ public class SubRegionPlacement
     private final String name;
     private final BlockPos defaultPos;
     private BlockPos pos;
-    private Rotation rotation = Rotation.NONE;
-    private Mirror mirror = Mirror.NONE;
+    private BlockRotation rotation = BlockRotation.ROT_0;
+    private BlockMirror mirror = BlockMirror.NONE;
     private boolean enabled = true;
     private boolean renderingEnabled = true;
     private boolean ignoreEntities;
@@ -91,12 +91,12 @@ public class SubRegionPlacement
         return this.pos;
     }
 
-    public Rotation getRotation()
+    public BlockRotation getRotation()
     {
         return this.rotation;
     }
 
-    public Mirror getMirror()
+    public BlockMirror getMirror()
     {
         return this.mirror;
     }
@@ -131,12 +131,12 @@ public class SubRegionPlacement
         this.pos = PositionUtils.getModifiedPartiallyLockedPosition(this.pos, pos, this.coordinateLockMask);
     }
 
-    void setRotation(Rotation rotation)
+    void setRotation(BlockRotation rotation)
     {
         this.rotation = rotation;
     }
 
-    void setMirror(Mirror mirror)
+    void setMirror(BlockMirror mirror)
     {
         this.mirror = mirror;
     }
@@ -144,8 +144,8 @@ public class SubRegionPlacement
     void resetToOriginalValues()
     {
         this.pos = this.defaultPos;
-        this.rotation = Rotation.NONE;
-        this.mirror = Mirror.NONE;
+        this.rotation = BlockRotation.ROT_0;
+        this.mirror = BlockMirror.NONE;
         this.enabled = true;
         this.ignoreEntities = false;
     }
@@ -159,8 +159,8 @@ public class SubRegionPlacement
     {
         return this.isEnabled() == false ||
                this.ignoreEntities() ||
-               this.getMirror() != Mirror.NONE ||
-               this.getRotation() != Rotation.NONE ||
+               this.getMirror() != BlockMirror.NONE ||
+               this.getRotation() != BlockRotation.ROT_0 ||
                this.getPos().equals(originalPosition) == false;
     }
 
@@ -210,8 +210,8 @@ public class SubRegionPlacement
 
             try
             {
-                Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
-                Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
+                BlockRotation rotation = BlockRotation.valueOf(obj.get("rotation").getAsString());
+                BlockMirror mirror = BlockMirror.valueOf(obj.get("mirror").getAsString());
 
                 placement.setRotation(rotation);
                 placement.setMirror(mirror);

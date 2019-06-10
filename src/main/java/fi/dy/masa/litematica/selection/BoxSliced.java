@@ -1,15 +1,15 @@
 package fi.dy.masa.litematica.selection;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.Direction;
 
 public class BoxSliced extends Box
 {
-    private EnumFacing sliceDirection = EnumFacing.EAST;
+    private Direction sliceDirection = Direction.EAST;
     private int sliceStart = 0;
     private int sliceEnd = 1;
     private int sliceCount;
 
-    public EnumFacing getSliceDirection()
+    public Direction getSliceDirection()
     {
         return sliceDirection;
     }
@@ -48,7 +48,7 @@ public class BoxSliced extends Box
         }
     }
 
-    public void setSliceDirection(EnumFacing sliceDirection)
+    public void setSliceDirection(Direction sliceDirection)
     {
         this.sliceDirection = sliceDirection;
     }

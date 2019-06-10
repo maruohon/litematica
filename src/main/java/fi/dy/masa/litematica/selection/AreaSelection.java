@@ -23,8 +23,8 @@ import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
 public class AreaSelection
 {
@@ -337,7 +337,7 @@ public class AreaSelection
         }
     }
 
-    public void moveSelectedElement(EnumFacing direction, int amount)
+    public void moveSelectedElement(Direction direction, int amount)
     {
         Box box = this.getSelectedSubRegionBox();
 

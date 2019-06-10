@@ -11,14 +11,14 @@ import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.util.GuiUtils;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 
 public class RenderHandler implements IRenderer
 {
     @Override
     public void onRenderWorldLast(float partialTicks)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
@@ -47,7 +47,7 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderGameOverlayPost(float partialTicks)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {

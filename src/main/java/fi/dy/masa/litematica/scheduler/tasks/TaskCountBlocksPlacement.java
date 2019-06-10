@@ -7,7 +7,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 public class TaskCountBlocksPlacement extends TaskCountBlocksBase
@@ -35,11 +35,11 @@ public class TaskCountBlocksPlacement extends TaskCountBlocksBase
 
     protected void countAtPosition(BlockPos pos)
     {
-        IBlockState stateSchematic = this.worldSchematic.getBlockState(pos);
+        BlockState stateSchematic = this.worldSchematic.getBlockState(pos);
 
         if (stateSchematic.isAir() == false)
         {
-            IBlockState stateClient = this.worldClient.getBlockState(pos);
+            BlockState stateClient = this.worldClient.getBlockState(pos);
 
             this.countsTotal.addTo(stateSchematic, 1);
 

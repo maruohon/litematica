@@ -29,7 +29,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         this.schematic = schematic;
 
         this.textField = new GuiTextFieldGeneric(10, 32, 160, 20, this.textRenderer);
-        this.textField.setMaxStringLength(256);
+        this.textField.setMaxLength(256);
         this.textField.setFocused(true);
     }
 
@@ -78,7 +78,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
             }
         }
 
-        int x = this.textField.x + this.textField.getWidth() + 12;
+        int x = this.textField.getX() + this.textField.getWidth() + 12;
         int y = 32;
 
         String str = StringUtils.translate("litematica.gui.label.schematic_save.checkbox.ignore_entities");
@@ -135,7 +135,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         super.drawContents(mouseX, mouseY, partialTicks);
 
-        this.textField.drawTextField(mouseX, mouseY, partialTicks);
+        this.textField.render(mouseX, mouseY, partialTicks);
     }
 
     @Override

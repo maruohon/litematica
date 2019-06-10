@@ -5,13 +5,13 @@ import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.util.GuiUtils;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 
 public class InfoHud
 {
     private static final InfoHud INSTANCE = new InfoHud();
 
-    protected final Minecraft mc;
+    protected final MinecraftClient mc;
     protected final List<String> lineList = new ArrayList<>();
     protected final List<IInfoHudRenderer> renderers = new ArrayList<>();
     protected boolean enabled = true;
@@ -23,7 +23,7 @@ public class InfoHud
 
     protected InfoHud()
     {
-        this.mc = Minecraft.getInstance();
+        this.mc = MinecraftClient.getInstance();
     }
 
     public boolean isEnabled()

@@ -11,20 +11,21 @@ import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskTimer;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.ChunkPos;
 
 public abstract class TaskBase implements ITask, IInfoHudRenderer
 {
     private TaskTimer timer = new TaskTimer(1);
 
-    protected final Minecraft mc;
+    protected final MinecraftClient mc;
     protected String name = "";
     protected List<String> infoHudLines = new ArrayList<>();
     protected boolean finished;
@@ -32,7 +33,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
 
     protected TaskBase()
     {
-        this.mc = Minecraft.getInstance();
+        this.mc = MinecraftClient.getInstance();
     }
 
     @Override
@@ -96,11 +97,11 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
         }
     }
 
-    protected boolean areSurroundingChunksLoaded(ChunkPos pos, WorldClient world, int radius)
+    protected boolean areSurroundingChunksLoaded(ChunkPos pos, ClientWorld world, int radius)
     {
         if (radius <= 0)
         {
-            return world.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null;
+            return WorldUtils.isClientChunkLoaded(world, pos.x, pos.z);
         }
 
         int chunkX = pos.x;
@@ -110,7 +111,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
         {
             for (int cz = chunkZ - radius; cz <= chunkZ + radius; ++cz)
             {
-                if (world.getChunkProvider().getChunk(cx, cz, false, false) == null)
+                if (WorldUtils.isClientChunkLoaded(world, cx, cz) == false)
                 {
                     return false;
                 }
@@ -123,13 +124,13 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     protected void updateInfoHudLinesMissingChunks(Set<ChunkPos> requiredChunks)
     {
         List<String> hudLines = new ArrayList<>();
-        EntityPlayer player = this.mc.player;
+        PlayerEntity player = this.mc.player;
 
         if (player != null && requiredChunks.isEmpty() == false)
         {
             List<ChunkPos> list = new ArrayList<>();
             list.addAll(requiredChunks);
-            PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPositionVector()));
+            PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPos()));
             PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
             Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
 

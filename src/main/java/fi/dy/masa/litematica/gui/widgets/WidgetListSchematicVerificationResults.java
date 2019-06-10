@@ -14,7 +14,7 @@ import fi.dy.masa.malilib.util.ItemType;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 
 public class WidgetListSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
@@ -115,11 +115,11 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
 
         if (type == MismatchType.CORRECT_STATE)
         {
-            Object2IntOpenHashMap<IBlockState> counts = this.guiSchematicVerifier.getPlacement().getSchematicVerifier().getCorrectStates();
+            Object2IntOpenHashMap<BlockState> counts = this.guiSchematicVerifier.getPlacement().getSchematicVerifier().getCorrectStates();
             Object2IntOpenHashMap<ItemType> itemCounts = new Object2IntOpenHashMap<>();
-            Object2ObjectOpenHashMap<ItemType, IBlockState> states = new Object2ObjectOpenHashMap<>();
+            Object2ObjectOpenHashMap<ItemType, BlockState> states = new Object2ObjectOpenHashMap<>();
 
-            for (IBlockState state : counts.keySet())
+            for (BlockState state : counts.keySet())
             {
                 if (state.isAir())
                 {
@@ -141,7 +141,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
 
             for (ItemType itemType : itemCounts.keySet())
             {
-                IBlockState state = states.get(itemType);
+                BlockState state = states.get(itemType);
                 BlockMismatch mismatch = new BlockMismatch(MismatchType.CORRECT_STATE, state, state, itemCounts.getInt(itemType));
                 list.add(mismatch);
             }

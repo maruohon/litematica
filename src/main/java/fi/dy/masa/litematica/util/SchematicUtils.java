@@ -27,23 +27,24 @@ import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class SchematicUtils
 {
@@ -80,12 +81,12 @@ public class SchematicUtils
         return false;
     }
 
-    public static boolean breakSchematicBlock(Minecraft mc)
+    public static boolean breakSchematicBlock(MinecraftClient mc)
     {
         return setTargetedSchematicBlockState(mc, Blocks.AIR.getDefaultState());
     }
 
-    public static boolean placeSchematicBlock(Minecraft mc)
+    public static boolean placeSchematicBlock(MinecraftClient mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -103,15 +104,15 @@ public class SchematicUtils
         return false;
     }
 
-    public static boolean replaceSchematicBlocksInDirection(Minecraft mc)
+    public static boolean replaceSchematicBlocksInDirection(MinecraftClient mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            EnumFacing playerFacingH = mc.player.getHorizontalFacing();
-            EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
+            Direction playerFacingH = mc.player.getHorizontalFacing();
+            Direction direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
 
             // Center region
             if (direction == info.side)
@@ -126,7 +127,7 @@ public class SchematicUtils
         return false;
     }
 
-    public static boolean replaceAllIdenticalSchematicBlocks(Minecraft mc)
+    public static boolean replaceAllIdenticalSchematicBlocks(MinecraftClient mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -139,19 +140,19 @@ public class SchematicUtils
         return false;
     }
 
-    public static boolean breakSchematicBlocks(Minecraft mc)
+    public static boolean breakSchematicBlocks(MinecraftClient mc)
     {
         RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
 
-        if (wrapper != null)
+        if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            RayTraceResult trace = wrapper.getRayTraceResult();
+            BlockHitResult trace = wrapper.getBlockHitResult();
             BlockPos pos = trace.getBlockPos();
-            EnumFacing playerFacingH = mc.player.getHorizontalFacing();
-            EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(trace.sideHit, playerFacingH, pos, trace.hitVec);
+            Direction playerFacingH = mc.player.getHorizontalFacing();
+            Direction direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(trace.getSide(), playerFacingH, pos, trace.getPos());
 
             // Center region
-            if (direction == trace.sideHit)
+            if (direction == trace.getSide())
             {
                 direction = direction.getOpposite();
             }
@@ -164,16 +165,15 @@ public class SchematicUtils
         return false;
     }
 
-    public static boolean breakAllIdenticalSchematicBlocks(Minecraft mc)
+    public static boolean breakAllIdenticalSchematicBlocks(MinecraftClient mc)
     {
         RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
 
-        // The state can be null in 1.13+
-        if (wrapper != null)
+        if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            RayTraceResult trace = wrapper.getRayTraceResult();
+            BlockHitResult trace = wrapper.getBlockHitResult();
             BlockPos pos = trace.getBlockPos();
-            IBlockState stateOriginal = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+            BlockState stateOriginal = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
 
             return setAllIdenticalSchematicBlockStates(pos, stateOriginal, Blocks.AIR.getDefaultState());
         }
@@ -181,15 +181,15 @@ public class SchematicUtils
         return false;
     }
 
-    public static boolean placeSchematicBlocksInDirection(Minecraft mc)
+    public static boolean placeSchematicBlocksInDirection(MinecraftClient mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            EnumFacing playerFacingH = mc.player.getHorizontalFacing();
-            EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
+            Direction playerFacingH = mc.player.getHorizontalFacing();
+            Direction direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
             BlockPos posStart = info.pos.offset(info.side); // offset to the adjacent air block
 
             if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).isAir())
@@ -202,7 +202,7 @@ public class SchematicUtils
         return false;
     }
 
-    public static boolean fillAirWithBlocks(Minecraft mc)
+    public static boolean fillAirWithBlocks(MinecraftClient mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -221,11 +221,11 @@ public class SchematicUtils
     }
 
     @Nullable
-    private static ReplacementInfo getTargetInfo(Minecraft mc)
+    private static ReplacementInfo getTargetInfo(MinecraftClient mc)
     {
-        ItemStack stack = mc.player.getHeldItemMainhand();
+        ItemStack stack = mc.player.getMainHandStack();
 
-        if (stack.isEmpty() == false && (stack.getItem() instanceof ItemBlock))
+        if (stack.isEmpty() == false && (stack.getItem() instanceof BlockItem))
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
@@ -233,25 +233,25 @@ public class SchematicUtils
             if (worldSchematic != null && traceWrapper != null &&
                 traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
             {
-                RayTraceResult trace = traceWrapper.getRayTraceResult();
-                EnumFacing side = trace.sideHit;
-                Vec3d hitVec = trace.hitVec;
+                BlockHitResult trace = traceWrapper.getBlockHitResult();
+                Direction side = trace.getSide();
+                Vec3d hitVec = trace.getPos();
                 BlockPos pos = trace.getBlockPos();
-                IBlockState stateOriginal = worldSchematic.getBlockState(pos);
-                IBlockState stateNew = Blocks.AIR.getDefaultState();
+                BlockState stateOriginal = worldSchematic.getBlockState(pos);
+                BlockState stateNew = Blocks.AIR.getDefaultState();
 
-                if (stack.getItem() instanceof ItemBlock)
+                if (stack.getItem() instanceof BlockItem)
                 {
                     // Smuggle in a reference to the Schematic world to the use context
                     World worldClient = mc.player.world;
                     mc.player.world = worldSchematic;
 
-                    BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(mc.player, stack,
-                            pos.offset(side), side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z));
+                    BlockHitResult hit = new BlockHitResult(trace.getPos(), side, pos.offset(side), false);
+                    ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN, hit));
 
                     mc.player.world = worldClient;
 
-                    stateNew = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(ctx);
+                    stateNew = ((BlockItem) stack.getItem()).getBlock().getPlacementState(ctx);
                 }
 
                 return new ReplacementInfo(pos, side, hitVec, stateOriginal, stateNew);
@@ -261,27 +261,27 @@ public class SchematicUtils
         return null;
     }
 
-    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, EnumFacing direction)
+    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, Direction direction)
     {
         return getReplacementBoxEndPos(startPos, direction, 10000);
     }
 
-    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, EnumFacing direction, int maxBlocks)
+    private static BlockPos getReplacementBoxEndPos(BlockPos startPos, Direction direction, int maxBlocks)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
         LayerRange range = DataManager.getRenderLayerRange();
-        IBlockState stateStart = world.getBlockState(startPos);
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(startPos);
+        BlockState stateStart = world.getBlockState(startPos);
+        BlockPos.Mutable posMutable = new BlockPos.Mutable(startPos);
 
         while (maxBlocks-- > 0)
         {
-            posMutable.move(direction);
+            posMutable.setOffset(direction);
 
             if (range.isPositionWithinRange(posMutable) == false ||
                 world.getChunkProvider().isChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4) == false ||
                 world.getBlockState(posMutable) != stateStart)
             {
-                posMutable.move(direction.getOpposite());
+                posMutable.setOffset(direction.getOpposite());
                 break;
             }
         }
@@ -289,14 +289,14 @@ public class SchematicUtils
         return posMutable.toImmutable();
     }
 
-    public static boolean setTargetedSchematicBlockState(Minecraft mc, IBlockState state)
+    public static boolean setTargetedSchematicBlockState(MinecraftClient mc, BlockState state)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
         RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            RayTraceResult trace = traceWrapper.getRayTraceResult();
+            BlockHitResult trace = traceWrapper.getBlockHitResult();
             BlockPos pos = trace.getBlockPos();
             return setTargetedSchematicBlockState(pos, state);
         }
@@ -304,7 +304,7 @@ public class SchematicUtils
         return false;
     }
 
-    private static boolean setTargetedSchematicBlockState(BlockPos pos, IBlockState state)
+    private static boolean setTargetedSchematicBlockState(BlockPos pos, BlockState state)
     {
         if (pos != null)
         {
@@ -327,7 +327,7 @@ public class SchematicUtils
                         {
                             state = getUntransformedBlockState(state, placement, regionName);
 
-                            IBlockState stateOriginal = container.get(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ());
+                            BlockState stateOriginal = container.get(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ());
 
                             int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
                             int increment = 0;
@@ -359,7 +359,7 @@ public class SchematicUtils
         return false;
     }
 
-    private static boolean setSchematicBlockStates(BlockPos posStart, BlockPos posEnd, IBlockState state)
+    private static boolean setSchematicBlockStates(BlockPos posStart, BlockPos posEnd, BlockState state)
     {
         if (posStart != null && posEnd != null)
         {
@@ -401,7 +401,7 @@ public class SchematicUtils
                                 {
                                     for (int x = minX; x <= maxX; ++x)
                                     {
-                                        IBlockState stateOriginal = container.get(x, y, z);
+                                        BlockState stateOriginal = container.get(x, y, z);
 
                                         if (stateOriginal.isAir() == false)
                                         {
@@ -434,7 +434,7 @@ public class SchematicUtils
         return false;
     }
 
-    private static boolean setAllIdenticalSchematicBlockStates(BlockPos posStart, IBlockState stateOriginal, IBlockState stateNew)
+    private static boolean setAllIdenticalSchematicBlockStates(BlockPos posStart, BlockState stateOriginal, BlockState stateNew)
     {
         if (posStart != null)
         {
@@ -464,7 +464,7 @@ public class SchematicUtils
     }
 
     private static boolean replaceAllIdenticalBlocks(SchematicPlacementManager manager, PlacementPart part,
-            IBlockState stateOriginalIn, IBlockState stateNewIn)
+            BlockState stateOriginalIn, BlockState stateNewIn)
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
         String selected = schematicPlacement.getSelectedSubRegionName();
@@ -511,12 +511,12 @@ public class SchematicUtils
                 continue;
             }
 
-            int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
-            int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
-            int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
-            int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
-            int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
-            int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
+            int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.X), Direction.Axis.X);
+            int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.Y), Direction.Axis.Y);
+            int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.Z), Direction.Axis.Z);
+            int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.X), Direction.Axis.X);
+            int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.Y), Direction.Axis.Y);
+            int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.Z), Direction.Axis.Z);
 
             BlockPos posStart = new BlockPos(minX, minY, minZ);
             BlockPos posEnd = new BlockPos(maxX, maxY, maxZ);
@@ -558,8 +558,8 @@ public class SchematicUtils
             //System.out.printf("DEBUG == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
             //        regionName, startX, startY, startZ, endX, endY, endZ, size.getX(), size.getY(), size.getZ());
 
-            IBlockState stateOriginal = getUntransformedBlockState(stateOriginalIn, schematicPlacement, regionName);
-            IBlockState stateNew = getUntransformedBlockState(stateNewIn, schematicPlacement, regionName);
+            BlockState stateOriginal = getUntransformedBlockState(stateOriginalIn, schematicPlacement, regionName);
+            BlockState stateNew = getUntransformedBlockState(stateNewIn, schematicPlacement, regionName);
 
             for (int y = startY; y <= endY; ++y)
             {
@@ -650,34 +650,34 @@ public class SchematicUtils
         return relPos;
     }
 
-    public static IBlockState getUntransformedBlockState(IBlockState state, SchematicPlacement schematicPlacement, String subRegionName)
+    public static BlockState getUntransformedBlockState(BlockState state, SchematicPlacement schematicPlacement, String subRegionName)
     {
         SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(subRegionName);
 
         if (placement != null)
         {
-            final Rotation rotationCombined = PositionUtils.getReverseRotation(schematicPlacement.getRotation().add(placement.getRotation()));
-            final Mirror mirrorMain = schematicPlacement.getMirror();
-            Mirror mirrorSub = placement.getMirror();
+            final BlockRotation rotationCombined = PositionUtils.getReverseRotation(schematicPlacement.getRotation().rotate(placement.getRotation()));
+            final BlockMirror mirrorMain = schematicPlacement.getMirror();
+            BlockMirror mirrorSub = placement.getMirror();
 
-            if (mirrorSub != Mirror.NONE &&
-                (schematicPlacement.getRotation() == Rotation.CLOCKWISE_90 ||
-                 schematicPlacement.getRotation() == Rotation.COUNTERCLOCKWISE_90))
+            if (mirrorSub != BlockMirror.NONE &&
+                (schematicPlacement.getRotation() == BlockRotation.ROT_90 ||
+                 schematicPlacement.getRotation() == BlockRotation.ROT_270))
             {
-                mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
+                mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
             }
 
-            if (rotationCombined != Rotation.NONE)
+            if (rotationCombined != BlockRotation.ROT_0)
             {
                 state = state.rotate(rotationCombined);
             }
 
-            if (mirrorSub != Mirror.NONE)
+            if (mirrorSub != BlockMirror.NONE)
             {
                 state = state.mirror(mirrorSub);
             }
 
-            if (mirrorMain != Mirror.NONE)
+            if (mirrorMain != BlockMirror.NONE)
             {
                 state = state.mirror(mirrorMain);
             }
@@ -689,12 +689,12 @@ public class SchematicUtils
     private static class ReplacementInfo
     {
         public final BlockPos pos;
-        public final EnumFacing side;
+        public final Direction side;
         public final Vec3d hitVec;
-        public final IBlockState stateOriginal;
-        public final IBlockState stateNew;
+        public final BlockState stateOriginal;
+        public final BlockState stateNew;
 
-        public ReplacementInfo(BlockPos pos, EnumFacing side, Vec3d hitVec, IBlockState stateOriginal, IBlockState stateNew)
+        public ReplacementInfo(BlockPos pos, Direction side, Vec3d hitVec, BlockState stateOriginal, BlockState stateNew)
         {
             this.pos = pos;
             this.side = side;

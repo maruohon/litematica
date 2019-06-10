@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.materials;
 
 import java.util.Collections;
 import java.util.List;
+import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
@@ -10,9 +11,8 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 
 public class MaterialListHudRenderer implements IInfoHudRenderer
 {
@@ -59,7 +59,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     @Override
     public int render(int xOffset, int yOffset, HudAlignment alignment)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
         long currentTime = System.currentTimeMillis();
         List<MaterialListEntry> list;
 
@@ -80,7 +80,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             return 0;
         }
 
-        FontRenderer font = mc.fontRenderer;
+        TextRenderer font = mc.textRenderer;
         final double scale = Configs.InfoOverlays.MATERIAL_LIST_HUD_SCALE.getDoubleValue();
         final int maxLines = Configs.InfoOverlays.MATERIAL_LIST_HUD_MAX_LINES.getIntegerValue();
         int bgMargin = 2;
@@ -109,7 +109,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             int multiplier = this.materialList.getMultiplier();
             int count = multiplier == 1 ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
             count *= multiplier;
-            String strCount = GuiBase.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + GuiBase.TXT_RST;
+            String strCount = GuiBase.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxAmount()) + GuiBase.TXT_RST;
             maxCountLength = Math.max(maxCountLength, font.getStringWidth(strCount));
         }
 
@@ -151,11 +151,11 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         if (useShadow)
         {
-            font.drawStringWithShadow(title, posX + 2, posY + 2, textColor);
+            font.drawWithShadow(title, posX + 2, posY + 2, textColor);
         }
         else
         {
-            font.drawString(title, posX + 2, posY + 2, textColor);
+            font.draw(title, posX + 2, posY + 2, textColor);
         }
 
         posY += 12;
@@ -170,19 +170,19 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             int multiplier = this.materialList.getMultiplier();
             int count = multiplier == 1 ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
             count *= multiplier;
-            String strCount = this.getFormattedCountString(count, entry.getStack().getMaxStackSize());
+            String strCount = this.getFormattedCountString(count, entry.getStack().getMaxAmount());
             int cntLen = font.getStringWidth(strCount);
             int cntPosX = posX + maxLineLength - cntLen - 2;
 
             if (useShadow)
             {
-                font.drawStringWithShadow(text, x, y, textColor);
-                font.drawStringWithShadow(strCount, cntPosX, y, itemCountTextColor);
+                font.drawWithShadow(text, x, y, textColor);
+                font.drawWithShadow(strCount, cntPosX, y, itemCountTextColor);
             }
             else
             {
-                font.drawString(text, x, y, textColor);
-                font.drawString(strCount, cntPosX, y, itemCountTextColor);
+                font.draw(text, x, y, textColor);
+                font.draw(strCount, cntPosX, y, itemCountTextColor);
             }
 
             y += lineHeight;
@@ -197,7 +197,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         for (int i = 0; i < size; ++i)
         {
-            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, list.get(i).getStack(), x, y);
+            mc.getItemRenderer().renderGuiItem(mc.player, list.get(i).getStack(), x, y);
             y += lineHeight;
         }
 

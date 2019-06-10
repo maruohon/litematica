@@ -17,7 +17,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
@@ -72,13 +72,13 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     @Override
     public void onTaskCompleted()
     {
-        if (this.mc.isCallingFromMinecraftThread())
+        if (this.mc.isOnThread())
         {
             this.refreshList();
         }
         else
         {
-            this.mc.addScheduledTask(new Runnable()
+            this.mc.execute(new Runnable()
             {
                 @Override
                 public void run()
@@ -184,12 +184,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     public static class InMemorySchematicCreator implements IStringConsumer
     {
         private final AreaSelection area;
-        private final Minecraft mc;
+        private final MinecraftClient mc;
 
         public InMemorySchematicCreator(AreaSelection area)
         {
             this.area = area;
-            this.mc = Minecraft.getInstance();
+            this.mc = MinecraftClient.getInstance();
         }
 
         @Override

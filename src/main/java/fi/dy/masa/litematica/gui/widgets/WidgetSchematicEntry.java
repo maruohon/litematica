@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
@@ -17,7 +18,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.BlockPos;
 
 public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchematic>
@@ -141,7 +141,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         {
             if (this.type == Type.CREATE_PLACEMENT)
             {
-                BlockPos pos = new BlockPos(this.widget.mc.player.getPositionVector());
+                BlockPos pos = new BlockPos(this.widget.mc.player.getPos());
                 LitematicaSchematic entry = this.widget.schematic;
                 String name = entry.getMetadata().getName();
                 boolean enabled = GuiBase.isShiftDown() == false;

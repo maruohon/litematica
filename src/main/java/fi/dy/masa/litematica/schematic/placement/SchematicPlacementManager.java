@@ -29,6 +29,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -38,15 +39,18 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerTask;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class SchematicPlacementManager
 {
@@ -80,7 +84,7 @@ public class SchematicPlacementManager
         //System.out.printf("processQueuedChunks, size: %d\n", this.chunksToRebuild.size());
         if (this.chunksToRebuild.isEmpty() == false)
         {
-            WorldClient worldClient = Minecraft.getInstance().world;
+            ClientWorld worldClient = MinecraftClient.getInstance().world;
 
             if (worldClient == null)
             {
@@ -107,7 +111,7 @@ public class SchematicPlacementManager
                 }
 
                 if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() ||
-                    worldClient.getChunkProvider().getChunk(pos.x, pos.z, false, false) != null)
+                    WorldUtils.isClientChunkLoaded(worldClient, pos.x, pos.z))
                 {
                     // Wipe the old chunk if it exists
                     this.unloadSchematicChunk(worldSchematic, pos.x, pos.z);
@@ -131,8 +135,8 @@ public class SchematicPlacementManager
                             }
                         }
 
-                        int maxY = worldSchematic.getChunkProvider().getChunk(pos.x, pos.z).getTopFilledSegment() + 15;
-                        worldSchematic.markBlockRangeForRenderUpdate(pos.x << 4, 0, pos.z << 4, (pos.x << 4) + 15, maxY, (pos.z << 4) + 15);
+                        worldSchematic.scheduleChunkRenders( pos.x << 4      ,   0,  pos.z << 4      ,
+                                                            (pos.x << 4) + 15, 255, (pos.z << 4) + 15);
                     }
 
                     iter.remove();
@@ -169,7 +173,7 @@ public class SchematicPlacementManager
         if (worldSchematic.getChunkProvider().isChunkLoaded(chunkX, chunkZ))
         {
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
-            worldSchematic.markBlockRangeForRenderUpdate((chunkX << 4), 0, (chunkZ << 4), (chunkX << 4) + 15, 255, (chunkZ << 4) + 15);
+            worldSchematic.scheduleChunkRenders((chunkX << 4), 0, (chunkZ << 4), (chunkX << 4) + 15, 255, (chunkZ << 4) + 15);
             worldSchematic.getChunkProvider().unloadChunk(chunkX, chunkZ);
         }
     }
@@ -518,32 +522,32 @@ public class SchematicPlacementManager
         return false;
     }
 
-    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, double maxDistance)
+    public void setPositionOfCurrentSelectionToRayTrace(MinecraftClient mc, double maxDistance)
     {
         SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
         if (schematicPlacement != null)
         {
-            RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
+            HitResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
 
-            if (trace.type != RayTraceResult.Type.BLOCK)
+            if (trace.getType() != HitResult.Type.BLOCK)
             {
                 return;
             }
 
-            BlockPos pos = trace.getBlockPos();
+            BlockPos pos = ((BlockHitResult) trace).getBlockPos();
 
             // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
             if (mc.player.isSneaking() == false)
             {
-                pos = pos.offset(trace.sideHit);
+                pos = pos.offset(((BlockHitResult) trace).getSide());
             }
 
             this.setPositionOfCurrentSelectionTo(pos, mc);
         }
     }
 
-    public void setPositionOfCurrentSelectionTo(BlockPos pos, Minecraft mc)
+    public void setPositionOfCurrentSelectionTo(BlockPos pos, MinecraftClient mc)
     {
         SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
@@ -580,7 +584,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void nudgePositionOfCurrentSelection(EnumFacing direction, int amount)
+    public void nudgePositionOfCurrentSelection(Direction direction, int amount)
     {
         SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
@@ -612,19 +616,19 @@ public class SchematicPlacementManager
         }
     }
 
-    public void pasteCurrentPlacementToWorld(Minecraft mc)
+    public void pasteCurrentPlacementToWorld(MinecraftClient mc)
     {
         this.pastePlacementToWorld(this.getSelectedSchematicPlacement(), mc);
     }
 
-    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, Minecraft mc)
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, MinecraftClient mc)
     {
         this.pastePlacementToWorld(schematicPlacement, true, mc);
     }
 
-    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, Minecraft mc)
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, MinecraftClient mc)
     {
-        if (mc.player != null && mc.player.abilities.isCreativeMode)
+        if (mc.player != null && mc.player.abilities.creativeMode)
         {
             if (schematicPlacement != null)
             {
@@ -634,25 +638,23 @@ public class SchematicPlacementManager
                     return;
                 }
 
-                if (mc.isSingleplayer())
+                if (mc.isIntegratedServerRunning())
                 {
-                    final WorldServer world = mc.getIntegratedServer().getWorld(mc.player.getEntityWorld().dimension.getType());
+                    final ServerWorld world = mc.getServer().getWorld(mc.player.getEntityWorld().dimension.getType());
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
 
-                    world.addScheduledTask(new Runnable()
+                    MinecraftServer server = mc.getServer();
+                    server.method_18858(new ServerTask(server.getTicks(), () ->
                     {
-                        public void run()
+                        if (schematic.placeToWorld(world, schematicPlacement, false))
                         {
-                            if (schematic.placeToWorld(world, schematicPlacement, false))
-                            {
-                                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
-                            }
-                            else
-                            {
-                                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
-                            }
+                            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
                         }
-                    });
+                        else
+                        {
+                            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
+                        }
+                    }));
 
                     InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }

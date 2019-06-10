@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.tool;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 
 public enum ToolMode
 {
@@ -23,8 +23,8 @@ public enum ToolMode
     private final boolean usesBlockPrimary;
     private final boolean usesBlockSecondary;
 
-    @Nullable private IBlockState blockPrimary;
-    @Nullable private IBlockState blockSecondary;
+    @Nullable private BlockState blockPrimary;
+    @Nullable private BlockState blockSecondary;
 
     private ToolMode(String unlocName, boolean creativeOnly, boolean usesSchematic)
     {
@@ -66,23 +66,23 @@ public enum ToolMode
     }
 
     @Nullable
-    public IBlockState getPrimaryBlock()
+    public BlockState getPrimaryBlock()
     {
         return this.blockPrimary;
     }
 
     @Nullable
-    public IBlockState getSecondaryBlock()
+    public BlockState getSecondaryBlock()
     {
         return this.blockSecondary;
     }
 
-    public void setPrimaryBlock(@Nullable IBlockState state)
+    public void setPrimaryBlock(@Nullable BlockState state)
     {
         this.blockPrimary = state;
     }
 
-    public void setSecondaryBlock(@Nullable IBlockState state)
+    public void setSecondaryBlock(@Nullable BlockState state)
     {
         this.blockSecondary = state;
     }
@@ -92,10 +92,10 @@ public enum ToolMode
         return StringUtils.translate(this.unlocName);
     }
 
-    public ToolMode cycle(EntityPlayer player, boolean forward)
+    public ToolMode cycle(PlayerEntity player, boolean forward)
     {
         ToolMode[] values = ToolMode.values();
-        final boolean isCreative = player.abilities.isCreativeMode;
+        final boolean isCreative = player.abilities.creativeMode;
         final int numModes = values.length;
         final int inc = forward ? 1 : -1;
         int nextId = this.ordinal() + inc;

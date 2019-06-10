@@ -24,9 +24,9 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
@@ -66,7 +66,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         int y = 22;
 
         this.textFieldRename = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
-        this.textFieldRename.setMaxStringLength(256);
+        this.textFieldRename.setMaxLength(256);
         this.textFieldRename.setText(this.placement.getName());
         this.addTextField(this.textFieldRename, null);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
@@ -342,7 +342,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            Minecraft mc = Minecraft.getInstance();
+            MinecraftClient mc = MinecraftClient.getInstance();
             int amount = mouseButton == 1 ? -1 : 1;
             if (GuiBase.isShiftDown()) { amount *= 8; }
             if (GuiBase.isAltDown()) { amount *= 4; }
@@ -358,7 +358,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
-                    Rotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
+                    BlockRotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
                     this.placement.setRotation(rotation, this.parent);
                     break;
                 }
@@ -366,14 +366,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 case MIRROR:
                 {
                     boolean reverse = mouseButton == 1;
-                    Mirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
+                    BlockMirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
                     this.placement.setMirror(mirror, this.parent);
                     break;
                 }
 
                 case MOVE_TO_PLAYER:
                 {
-                    BlockPos pos = new BlockPos(mc.player.getPositionVector());
+                    BlockPos pos = new BlockPos(mc.player.getPos());
                     this.placement.setOrigin(pos, this.parent);
                     break;
                 }

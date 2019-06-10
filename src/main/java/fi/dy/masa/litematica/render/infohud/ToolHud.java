@@ -23,10 +23,10 @@ import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
 public class ToolHud extends InfoHud
 {
@@ -210,7 +210,7 @@ public class ToolHud extends InfoHud
 
             if (mode.getUsesBlockPrimary())
             {
-                IBlockState state = mode.getPrimaryBlock();
+                BlockState state = mode.getPrimaryBlock();
 
                 if (state != null)
                 {
@@ -220,7 +220,7 @@ public class ToolHud extends InfoHud
 
             if (mode.getUsesBlockSecondary())
             {
-                IBlockState state = mode.getSecondaryBlock();
+                BlockState state = mode.getSecondaryBlock();
 
                 if (state != null)
                 {
@@ -310,7 +310,7 @@ public class ToolHud extends InfoHud
         }
     }
 
-    protected String getBlockString(IBlockState state)
+    protected String getBlockString(BlockState state)
     {
         ItemStack stack = MaterialCache.getInstance().getItemForState(state);
         String strBlock;
@@ -319,7 +319,7 @@ public class ToolHud extends InfoHud
         String rst = GuiBase.TXT_RST;
 
         strBlock = green + stack.getDisplayName() + rst;
-        EnumFacing facing = BlockUtils.getFirstPropertyFacingValue(state);
+        Direction facing = BlockUtils.getFirstPropertyFacingValue(state);
 
         if (facing != null)
         {

@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListBase.SortCriteria;
@@ -13,7 +14,6 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 
 public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialListEntry>
@@ -239,7 +239,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             //mc.getRenderItem().zLevel -= 110;
             y = this.y + 3;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
-            this.mc.getItemRenderer().renderItemAndEffectIntoGUI(this.mc.player, this.entry.getStack(), x1, y);
+            this.mc.getItemRenderer().renderGuiItem(this.mc.player, this.entry.getStack(), x1, y);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
             //mc.getRenderItem().zLevel += 110;
 
@@ -268,8 +268,8 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int multiplier = this.materialList.getMultiplier();
             int total = this.entry.getCountTotal() * multiplier;
             int missing = multiplier == 1 ? this.entry.getCountMissing() : total;
-            String strCountTotal = this.getFormattedCountString(total, stack.getMaxStackSize());
-            String strCountMissing = this.getFormattedCountString(missing, stack.getMaxStackSize());
+            String strCountTotal = this.getFormattedCountString(total, stack.getMaxAmount());
+            String strCountMissing = this.getFormattedCountString(missing, stack.getMaxAmount());
 
             int w1 = Math.max(this.getStringWidth(header1)       , Math.max(this.getStringWidth(header2)      , this.getStringWidth(header3)));
             int w2 = Math.max(this.getStringWidth(stackName) + 20, Math.max(this.getStringWidth(strCountTotal), this.getStringWidth(strCountMissing)));
@@ -308,7 +308,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             RenderUtils.enableGuiItemLighting();
 
             //mc.getRenderItem().zLevel += 100;
-            this.mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, stack, x2, y1);
+            this.mc.getItemRenderer().renderGuiItem(mc.player, stack, x2, y1);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
             //GlStateManager.disableBlend();

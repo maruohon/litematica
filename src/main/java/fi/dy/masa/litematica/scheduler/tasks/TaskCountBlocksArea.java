@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.scheduler.tasks;
 
 import fi.dy.masa.litematica.materials.IMaterialList;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 public class TaskCountBlocksArea extends TaskCountBlocksBase
@@ -20,7 +20,7 @@ public class TaskCountBlocksArea extends TaskCountBlocksBase
 
     protected void countAtPosition(BlockPos pos)
     {
-        IBlockState stateClient = this.worldClient.getBlockState(pos);
+        BlockState stateClient = this.worldClient.getBlockState(pos);
         this.countsTotal.addTo(stateClient, 1);
     }
 }

@@ -18,10 +18,10 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 
 public class WidgetSchematicBrowser extends WidgetFileBrowserBase
@@ -29,7 +29,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
 
     protected final Map<File, SchematicMetadata> cachedMetadata = new HashMap<>();
-    protected final Map<File, Pair<ResourceLocation, DynamicTexture>> cachedPreviewImages = new HashMap<>();
+    protected final Map<File, Pair<Identifier, NativeImageBackedTexture>> cachedPreviewImages = new HashMap<>();
     protected final GuiSchematicBrowserBase parent;
     protected final int infoWidth;
     protected final int infoHeight;
@@ -52,18 +52,18 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    public void onGuiClosed()
+    public void onClose()
     {
-        super.onGuiClosed();
+        super.onClose();
 
         this.clearPreviewImages();
     }
 
     private void clearPreviewImages()
     {
-        for (Pair<ResourceLocation, DynamicTexture> pair : this.cachedPreviewImages.values())
+        for (Pair<Identifier, NativeImageBackedTexture> pair : this.cachedPreviewImages.values())
         {
-            this.mc.getTextureManager().deleteTexture(pair.getLeft());
+            this.mc.getTextureManager().destroyTexture(pair.getLeft());
         }
     }
 
@@ -173,13 +173,13 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             */
             //y += 12;
 
-            Pair<ResourceLocation, DynamicTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
+            Pair<Identifier, NativeImageBackedTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
 
             if (pair != null)
             {
                 y += 14;
 
-                int iconSize = pair.getRight().getTextureData().getWidth();
+                int iconSize = pair.getRight().getImage().getWidth();
                 boolean needsScaling = height < this.infoHeight;
 
                 RenderUtils.color(1f, 1f, 1f, 1f);
@@ -192,7 +192,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
                 this.bindTexture(pair.getLeft());
-                Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+                DrawableHelper.blit(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
     }
@@ -242,9 +242,9 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 if (size * size == previewImageData.length)
                 {
                     NativeImage image = new NativeImage(size, size, false);
-                    DynamicTexture tex = new DynamicTexture(image);
-                    ResourceLocation rl = new ResourceLocation("litematica", DigestUtils.sha1Hex(file.getAbsolutePath()));
-                    this.mc.getTextureManager().loadTexture(rl, tex);
+                    NativeImageBackedTexture tex = new NativeImageBackedTexture(image);
+                    Identifier rl = new Identifier("litematica", DigestUtils.sha1Hex(file.getAbsolutePath()));
+                    this.mc.getTextureManager().registerTexture(rl, tex);
 
                     for (int y = 0, i = 0; y < size; ++y)
                     {
@@ -255,7 +255,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                         }
                     }
 
-                    tex.updateDynamicTexture();
+                    tex.upload();
 
                     this.cachedPreviewImages.put(file, Pair.of(rl, tex));
                 }

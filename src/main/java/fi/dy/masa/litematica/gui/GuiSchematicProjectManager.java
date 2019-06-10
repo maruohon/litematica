@@ -19,7 +19,7 @@ import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>
@@ -249,7 +249,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         @Override
         public boolean onActionConfirmed()
         {
-            DataManager.getSchematicProjectsManager().deleteLastSeenArea(Minecraft.getInstance());
+            DataManager.getSchematicProjectsManager().deleteLastSeenArea(MinecraftClient.getInstance());
             return true;
         }
 

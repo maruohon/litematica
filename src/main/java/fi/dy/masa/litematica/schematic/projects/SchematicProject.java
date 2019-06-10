@@ -25,7 +25,7 @@ import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
 public class SchematicProject
@@ -232,9 +232,9 @@ public class SchematicProject
     {
         if (this.currentPlacement != null)
         {
-            Minecraft mc = Minecraft.getInstance();
+            MinecraftClient mc = MinecraftClient.getInstance();
 
-            if (mc.player == null || mc.player.abilities.isCreativeMode == false)
+            if (mc.player == null || mc.player.abilities.creativeMode == false)
             {
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
                 return;
@@ -246,12 +246,12 @@ public class SchematicProject
         }
     }
 
-    private void pastePlacement(Minecraft mc)
+    private void pastePlacement(MinecraftClient mc)
     {
         DataManager.getSchematicPlacementManager().pastePlacementToWorld(this.currentPlacement, false, mc);
     }
 
-    public void deleteLastSeenArea(Minecraft mc)
+    public void deleteLastSeenArea(MinecraftClient mc)
     {
         ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, mc);
     }
@@ -317,7 +317,7 @@ public class SchematicProject
     {
         if (this.checkCanSaveOrPrintError())
         {
-            Minecraft mc = Minecraft.getInstance();
+            MinecraftClient mc = MinecraftClient.getInstance();
             String author = mc.player.getName().getString();
             String fileName = this.getNextFileName();
 
@@ -506,7 +506,7 @@ public class SchematicProject
             return false;
         }
 
-        if (Minecraft.getInstance().player == null)
+        if (MinecraftClient.getInstance().player == null)
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.null_player");
             return false;
@@ -533,15 +533,15 @@ public class SchematicProject
         @Override
         public void onTaskCompleted()
         {
-            Minecraft mc = Minecraft.getInstance();
+            MinecraftClient mc = MinecraftClient.getInstance();
 
-            if (mc.isCallingFromMinecraftThread())
+            if (mc.isOnThread())
             {
                 this.saveVersion();
             }
             else
             {
-                mc.addScheduledTask(new Runnable()
+                mc.execute(new Runnable()
                 {
                     @Override
                     public void run()

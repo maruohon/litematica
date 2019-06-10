@@ -4,7 +4,7 @@ import java.util.Comparator;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.SortCriteria;
 import fi.dy.masa.litematica.util.ItemUtils;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 
 public class VerifierResultSorter implements Comparator<BlockMismatch>
 {
@@ -37,7 +37,7 @@ public class VerifierResultSorter implements Comparator<BlockMismatch>
         }
         else
         {
-            IBlockState state1_1, state1_2, state2_1, state2_2;
+            BlockState state1_1, state1_2, state2_1, state2_2;
 
             if (sortCriteria == SortCriteria.NAME_EXPECTED)
             {

@@ -1,23 +1,23 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
+import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.IRegistry;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class BlockInfo
 {
     private final String title;
-    private final IBlockState state;
+    private final BlockState state;
     private final ItemStack stack;
     private final String blockRegistryname;
     private final String stackName;
@@ -26,14 +26,14 @@ public class BlockInfo
     private final int totalHeight;
     private final int columnWidth;
 
-    public BlockInfo(IBlockState state, String titleKey)
+    public BlockInfo(BlockState state, String titleKey)
     {
         String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
         this.title = pre + StringUtils.translate(titleKey) + GuiBase.TXT_RST;
         this.state = state;
         this.stack = ItemUtils.getItemForState(this.state);
 
-        ResourceLocation rl = IRegistry.BLOCK.getKey(this.state.getBlock());
+        Identifier rl = Registry.BLOCK.getId(this.state.getBlock());
         this.blockRegistryname = rl != null ? rl.toString() : "<null>";
 
         this.stackName = this.stack.getDisplayName().getString();
@@ -58,7 +58,7 @@ public class BlockInfo
         return this.totalHeight;
     }
 
-    public void render(int x, int y, Minecraft mc)
+    public void render(int x, int y, MinecraftClient mc)
     {
         if (this.state != null)
         {
@@ -66,11 +66,11 @@ public class BlockInfo
 
             RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
-            FontRenderer textRenderer = mc.fontRenderer;
+            TextRenderer textRenderer = mc.textRenderer;
             int x1 = x + 10;
             y += 4;
 
-            textRenderer.drawString(this.title, x1, y, 0xFFFFFFFF);
+            textRenderer.draw(this.title, x1, y, 0xFFFFFFFF);
 
             y += 12;
 
@@ -79,18 +79,18 @@ public class BlockInfo
 
             //mc.getRenderItem().zLevel += 100;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
-            mc.getItemRenderer().renderItemAndEffectIntoGUI(mc.player, this.stack, x1, y);
-            mc.getItemRenderer().renderItemOverlayIntoGUI(textRenderer, this.stack, x1, y, null);
+            mc.getItemRenderer().renderGuiItem(mc.player, this.stack, x1, y);
+            mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
 
             //GlStateManager.disableBlend();
             RenderUtils.disableItemLighting();
 
-            textRenderer.drawString(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
+            textRenderer.draw(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
 
             y += 20;
-            textRenderer.drawString(this.blockRegistryname, x1, y, 0xFF4060FF);
-            y += textRenderer.FONT_HEIGHT + 4;
+            textRenderer.draw(this.blockRegistryname, x1, y, 0xFF4060FF);
+            y += textRenderer.fontHeight + 4;
 
             RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props);
 

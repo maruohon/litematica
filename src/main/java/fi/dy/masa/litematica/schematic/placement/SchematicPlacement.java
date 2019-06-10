@@ -33,12 +33,11 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
+import net.minecraft.structure.StructurePlacementData;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.feature.template.PlacementSettings;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class SchematicPlacement
 {
@@ -51,8 +50,8 @@ public class SchematicPlacement
     private LitematicaSchematic schematic;
     private BlockPos origin;
     private String name;
-    private Rotation rotation = Rotation.NONE;
-    private Mirror mirror = Mirror.NONE;
+    private BlockRotation rotation = BlockRotation.ROT_0;
+    private BlockMirror mirror = BlockMirror.NONE;
     private BlockInfoListType verifierType = BlockInfoListType.ALL;
     private boolean ignoreEntities;
     private boolean enabled;
@@ -258,12 +257,12 @@ public class SchematicPlacement
         return origin;
     }
 
-    public Rotation getRotation()
+    public BlockRotation getRotation()
     {
         return rotation;
     }
 
-    public Mirror getMirror()
+    public BlockMirror getMirror()
     {
         return mirror;
     }
@@ -313,14 +312,13 @@ public class SchematicPlacement
         return this.verifier;
     }
 
-    public PlacementSettings getPlacementSettings()
+    public StructurePlacementData getPlacementSettings()
     {
-        PlacementSettings placement = new PlacementSettings();
+        StructurePlacementData placement = new StructurePlacementData();
 
-        placement.setMirror(this.mirror);
+        placement.setMirrored(this.mirror);
         placement.setRotation(this.rotation);
         placement.setIgnoreEntities(this.ignoreEntities);
-        placement.setReplacedBlock(Blocks.STRUCTURE_VOID);
 
         return placement;
     }
@@ -588,7 +586,7 @@ public class SchematicPlacement
         }
     }
 
-    public void setSubRegionRotation(String regionName, Rotation rotation, IMessageConsumer feedback)
+    public void setSubRegionRotation(String regionName, BlockRotation rotation, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
@@ -607,7 +605,7 @@ public class SchematicPlacement
         }
     }
 
-    public void setSubRegionMirror(String regionName, Mirror mirror, IMessageConsumer feedback)
+    public void setSubRegionMirror(String regionName, BlockMirror mirror, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
@@ -794,7 +792,7 @@ public class SchematicPlacement
         return this;
     }
 
-    public SchematicPlacement setRotation(Rotation rotation, IMessageConsumer feedback)
+    public SchematicPlacement setRotation(BlockRotation rotation, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
@@ -815,7 +813,7 @@ public class SchematicPlacement
         return this;
     }
 
-    public SchematicPlacement setMirror(Mirror mirror, IMessageConsumer feedback)
+    public SchematicPlacement setMirror(BlockMirror mirror, IMessageConsumer feedback)
     {
         if (this.isLocked())
         {
@@ -954,8 +952,8 @@ public class SchematicPlacement
 
             String name = obj.get("name").getAsString();
             BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
-            Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
-            Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
+            BlockRotation rotation = BlockRotation.valueOf(obj.get("rotation").getAsString());
+            BlockMirror mirror = BlockMirror.valueOf(obj.get("mirror").getAsString());
             boolean enabled = JsonUtils.getBoolean(obj, "enabled");
             boolean enableRender = JsonUtils.getBoolean(obj, "enable_render");
 

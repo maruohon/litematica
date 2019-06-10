@@ -12,13 +12,13 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
 public class SchematicProjectsManager
 {
     //private static final Pattern PATTERN_NAME_NUMBER = Pattern.compile("(.*)([0-9]+)$");
-    private final Minecraft mc = Minecraft.getInstance();
+    private final MinecraftClient mc = MinecraftClient.getInstance();
 
     @Nullable
     private SchematicProject currentProject;
@@ -163,7 +163,7 @@ public class SchematicProjectsManager
         return false;
     }
 
-    public boolean deleteLastSeenArea(Minecraft mc)
+    public boolean deleteLastSeenArea(MinecraftClient mc)
     {
         SchematicProject project = this.getCurrentProject();
 

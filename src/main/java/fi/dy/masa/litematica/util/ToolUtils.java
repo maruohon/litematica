@@ -14,14 +14,14 @@ import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 
 public class ToolUtils
 {
-    public static void fillSelectionVolumes(Minecraft mc, IBlockState state, @Nullable IBlockState stateToReplace)
+    public static void fillSelectionVolumes(MinecraftClient mc, BlockState state, @Nullable BlockState stateToReplace)
     {
-        if (mc.player != null && mc.player.abilities.isCreativeMode)
+        if (mc.player != null && mc.player.abilities.creativeMode)
         {
             final AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
 
@@ -52,7 +52,7 @@ public class ToolUtils
         }
     }
 
-    public static void deleteSelectionVolumes(boolean removeEntities, Minecraft mc)
+    public static void deleteSelectionVolumes(boolean removeEntities, MinecraftClient mc)
     {
         AreaSelection area = null;
 
@@ -73,15 +73,15 @@ public class ToolUtils
         deleteSelectionVolumes(area, removeEntities, mc);
     }
 
-    public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities, Minecraft mc)
+    public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities, MinecraftClient mc)
     {
         deleteSelectionVolumes(area, removeEntities, null, mc);
     }
 
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities,
-            @Nullable ICompletionListener listener, Minecraft mc)
+            @Nullable ICompletionListener listener, MinecraftClient mc)
     {
-        if (mc.player != null && mc.player.abilities.isCreativeMode)
+        if (mc.player != null && mc.player.abilities.creativeMode)
         {
             if (area == null)
             {

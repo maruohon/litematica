@@ -42,12 +42,12 @@ import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerMode;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
 public class KeyCallbacks
 {
-    public static void init(Minecraft mc)
+    public static void init(MinecraftClient mc)
     {
         IHotkeyCallback callbackHotkeys = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
@@ -147,9 +147,9 @@ public class KeyCallbacks
 
     private static class KeyCallbackHotkeys implements IHotkeyCallback
     {
-        private final Minecraft mc;
+        private final MinecraftClient mc;
 
-        public KeyCallbackHotkeys(Minecraft mc)
+        public KeyCallbackHotkeys(MinecraftClient mc)
         {
             this.mc = mc;
         }
@@ -410,7 +410,7 @@ public class KeyCallbacks
                 {
                     // Only do the pick block here, if it's not bound to the use button.
                     // If it's bound to the use button, then it will be done from the input handling.
-                    if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, this.mc.gameSettings.keyBindUseItem) == false)
+                    if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, this.mc.options.keyUse) == false)
                     {
                         WorldUtils.doSchematicWorldPickBlock(false, this.mc);
                     }
@@ -501,9 +501,9 @@ public class KeyCallbacks
 
     private static class KeyCallbackToggleMessage implements IHotkeyCallback
     {
-        private final Minecraft mc;
+        private final MinecraftClient mc;
 
-        public KeyCallbackToggleMessage(Minecraft mc)
+        public KeyCallbackToggleMessage(MinecraftClient mc)
         {
             this.mc = mc;
         }
@@ -557,14 +557,14 @@ public class KeyCallbacks
 
                     if (selection != null)
                     {
-                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        BlockPos pos = new BlockPos(this.mc.player.getPos());
                         selection.moveEntireSelectionTo(pos, true);
                         return true;
                     }
                 }
                 else if (mode.getUsesSchematic())
                 {
-                    BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                    BlockPos pos = new BlockPos(this.mc.player.getPos());
                     DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
                     return true;
                 }
@@ -595,7 +595,7 @@ public class KeyCallbacks
 
                     if (area != null)
                     {
-                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        BlockPos pos = new BlockPos(this.mc.player.getPos());
                         area.setExplicitOrigin(pos);
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         InfoUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
@@ -613,7 +613,7 @@ public class KeyCallbacks
 
                     if (area != null && area.getSelectedSubRegionBox() != null)
                     {
-                        BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                        BlockPos pos = new BlockPos(this.mc.player.getPos());
                         Corner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? Corner.CORNER_1 : Corner.CORNER_2;
                         area.setSelectedSubRegionCornerPos(pos, corner);
 

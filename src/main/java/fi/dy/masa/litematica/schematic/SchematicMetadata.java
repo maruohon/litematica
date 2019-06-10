@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.schematic;
 import javax.annotation.Nullable;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Vec3i;
 
 public class SchematicMetadata
@@ -11,7 +11,7 @@ public class SchematicMetadata
     private String name = "?";
     private String author = "Unknown";
     private String description = "";
-    private Vec3i enclosingSize = Vec3i.NULL_VECTOR;
+    private Vec3i enclosingSize = Vec3i.ZERO;
     private long timeCreated;
     private long timeModified;
     private int regionCount;
@@ -125,9 +125,9 @@ public class SchematicMetadata
         this.timeModified = timeModified;
     }
 
-    public NBTTagCompound writeToNBT()
+    public CompoundTag writeToNBT()
     {
-        NBTTagCompound nbt = new NBTTagCompound();
+        CompoundTag nbt = new CompoundTag();
 
         nbt.putString("Name", this.name);
         nbt.putString("Author", this.author);
@@ -147,7 +147,7 @@ public class SchematicMetadata
         return nbt;
     }
 
-    public void readFromNBT(NBTTagCompound nbt)
+    public void readFromNBT(CompoundTag nbt)
     {
         this.name = nbt.getString("Name");
         this.author = nbt.getString("Author");
@@ -165,7 +165,7 @@ public class SchematicMetadata
             this.enclosingSize = size;
         }
 
-        if (nbt.contains("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
+        if (nbt.containsKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
         {
             this.thumbnailPixelData = nbt.getIntArray("PreviewImageData");
         }

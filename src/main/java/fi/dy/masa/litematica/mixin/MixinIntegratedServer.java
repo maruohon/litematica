@@ -11,22 +11,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+import com.mojang.datafixers.DataFixer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import net.minecraft.command.Commands;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.WorldGenerationProgressListenerFactory;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.management.PlayerProfileCache;
+import net.minecraft.util.UserCache;
 
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer extends MinecraftServer
 {
-    public MixinIntegratedServer(File anvilFileIn, Proxy serverProxyIn, com.mojang.datafixers.DataFixer dataFixerIn,
-            Commands commandManagerIn, YggdrasilAuthenticationService authServiceIn,
-            MinecraftSessionService sessionServiceIn, GameProfileRepository profileRepoIn,
-            PlayerProfileCache profileCacheIn)
+    public MixinIntegratedServer(File file_1, Proxy proxy_1, DataFixer dataFixer_1, CommandManager commandManager_1,
+            YggdrasilAuthenticationService yggdrasilAuthenticationService_1,
+            MinecraftSessionService minecraftSessionService_1, GameProfileRepository gameProfileRepository_1,
+            UserCache userCache_1, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory_1,
+            String string_1)
     {
-        super(anvilFileIn, serverProxyIn, dataFixerIn, commandManagerIn, authServiceIn, sessionServiceIn, profileRepoIn,
-                profileCacheIn);
+        super(file_1, proxy_1, dataFixer_1, commandManager_1, yggdrasilAuthenticationService_1, minecraftSessionService_1,
+                gameProfileRepository_1, userCache_1, worldGenerationProgressListenerFactory_1, string_1);
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", shift = Shift.AFTER,

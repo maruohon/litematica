@@ -2,22 +2,10 @@ package fi.dy.masa.litematica.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryLargeChest;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityLockableLoot;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ILockableContainer;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 
 public class InventoryUtils
 {
@@ -35,7 +23,7 @@ public class InventoryUtils
             {
                 int slotNum = Integer.parseInt(str);
 
-                if (InventoryPlayer.isHotbar(slotNum) && PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
+                if (PlayerInventory.isValidHotbarIndex(slotNum) && PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
                 {
                     PICK_BLOCKABLE_SLOTS.add(slotNum);
                 }
@@ -46,54 +34,15 @@ public class InventoryUtils
         }
     }
 
-    /**
-     * Returns the inventory at the requested location, if any.
-     * If the target is a double chest, then the combined inventory is returned.
-     * @param world
-     * @param pos
-     * @return
-     */
-    @Nullable
-    public static IInventory getInventory(World world, BlockPos pos)
+    public static void setPickedItemToHand(ItemStack stack, MinecraftClient mc)
     {
-        IInventory inv = null;
-        TileEntity te = world.getTileEntity(pos);
+        PlayerEntity player = mc.player;
+        PlayerInventory inventory = player.inventory;
+        int slotNum = inventory.getSlotWithStack(stack);
 
-        if (te instanceof IInventory)
+        if (PlayerInventory.isValidHotbarIndex(slotNum))
         {
-            // Prevent loot generation attempt from crashing due to NPEs
-            if (te instanceof TileEntityLockableLoot && (world instanceof WorldServer) == false)
-            {
-                ((TileEntityLockableLoot) te).setLootTable(null, 0);
-            }
-
-            inv = (IInventory) te;
-            IBlockState state = world.getBlockState(pos);
-            Block block = state.getBlock();
-
-            if (block instanceof BlockChest)
-            {
-                ILockableContainer cont = ((BlockChest) block).getContainer(state, world, pos, true);
-
-                if (cont instanceof InventoryLargeChest)
-                {
-                    inv = (InventoryLargeChest) cont;
-                }
-            }
-        }
-
-        return inv;
-    }
-
-    public static void setPickedItemToHand(ItemStack stack, Minecraft mc)
-    {
-        EntityPlayer player = mc.player;
-        InventoryPlayer inventory = player.inventory;
-        int slotNum = inventory.getSlotFor(stack);
-
-        if (InventoryPlayer.isHotbar(slotNum))
-        {
-            player.inventory.currentItem = slotNum;
+            player.inventory.selectedSlot = slotNum;
         }
         else
         {
@@ -102,16 +51,16 @@ public class InventoryUtils
                 return;
             }
 
-            if (slotNum == -1 || InventoryPlayer.isHotbar(slotNum) == false)
+            if (slotNum == -1 || PlayerInventory.isValidHotbarIndex(slotNum) == false)
             {
                 slotNum = getEmptyPickBlockableHotbarSlot(inventory);
             }
 
             if (slotNum == -1)
             {
-                if (PICK_BLOCKABLE_SLOTS.contains(player.inventory.currentItem + 1))
+                if (PICK_BLOCKABLE_SLOTS.contains(player.inventory.selectedSlot + 1))
                 {
-                    slotNum = player.inventory.currentItem;
+                    slotNum = player.inventory.selectedSlot;
                 }
                 else
                 {
@@ -131,11 +80,11 @@ public class InventoryUtils
 
             if (slotNum != -1)
             {
-                inventory.currentItem = slotNum;
+                inventory.selectedSlot = slotNum;
 
-                if (player.abilities.isCreativeMode)
+                if (player.abilities.creativeMode)
                 {
-                    inventory.mainInventory.set(slotNum, stack.copy());
+                    inventory.main.set(slotNum, stack.copy());
                 }
                 else
                 {
@@ -145,15 +94,15 @@ public class InventoryUtils
         }
     }
 
-    private static int getEmptyPickBlockableHotbarSlot(InventoryPlayer inventory)
+    private static int getEmptyPickBlockableHotbarSlot(PlayerInventory inventory)
     {
         for (int i = 0; i < PICK_BLOCKABLE_SLOTS.size(); ++i)
         {
             int slotNum = PICK_BLOCKABLE_SLOTS.get(i) - 1;
 
-            if (slotNum >= 0 && slotNum < inventory.mainInventory.size())
+            if (slotNum >= 0 && slotNum < inventory.main.size())
             {
-                ItemStack stack = inventory.mainInventory.get(slotNum);
+                ItemStack stack = inventory.main.get(slotNum);
 
                 if (stack.isEmpty())
                 {

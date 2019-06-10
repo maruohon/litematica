@@ -23,29 +23,29 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class PositionUtils
 {
     public static final BlockPosComparator BLOCK_POS_COMPARATOR = new BlockPosComparator();
     public static final ChunkPosComparator CHUNK_POS_COMPARATOR = new ChunkPosComparator();
 
-    public static final EnumFacing.Axis[] AXES_ALL = new EnumFacing.Axis[] { EnumFacing.Axis.X, EnumFacing.Axis.Y, EnumFacing.Axis.Z };
-    public static final EnumFacing[] FACING_ALL = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
-    public static final EnumFacing[] ADJACENT_SIDES_ZY = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH };
-    public static final EnumFacing[] ADJACENT_SIDES_XY = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.EAST, EnumFacing.WEST };
-    public static final EnumFacing[] ADJACENT_SIDES_XZ = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST };
+    public static final Direction.Axis[] AXES_ALL = new Direction.Axis[] { Direction.Axis.X, Direction.Axis.Y, Direction.Axis.Z };
+    public static final Direction[] FACING_ALL = new Direction[] { Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
+    public static final Direction[] ADJACENT_SIDES_ZY = new Direction[] { Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH };
+    public static final Direction[] ADJACENT_SIDES_XY = new Direction[] { Direction.DOWN, Direction.UP, Direction.EAST, Direction.WEST };
+    public static final Direction[] ADJACENT_SIDES_XZ = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
 
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i(-1,  0, -1) };
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i( 1,  0, -1) };
@@ -65,7 +65,7 @@ public class PositionUtils
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YP_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0,  1,  0), new Vec3i( 0,  0,  1), new Vec3i( 0,  1,  1) };
     private static final Vec3i[][] EDGE_NEIGHBOR_OFFSETS_X = new Vec3i[][] { EDGE_NEIGHBOR_OFFSETS_YN_ZN, EDGE_NEIGHBOR_OFFSETS_YP_ZN, EDGE_NEIGHBOR_OFFSETS_YN_ZP, EDGE_NEIGHBOR_OFFSETS_YP_ZP };
 
-    public static Vec3i[] getEdgeNeighborOffsets(EnumFacing.Axis axis, int cornerIndex)
+    public static Vec3i[] getEdgeNeighborOffsets(Direction.Axis axis, int cornerIndex)
     {
         switch (axis)
         {
@@ -127,8 +127,8 @@ public class PositionUtils
     public static boolean isPlacementWithinWorld(World world, SchematicPlacement schematicPlacement, boolean respectRenderRange)
     {
         LayerRange range = DataManager.getRenderLayerRange();
-        BlockPos.MutableBlockPos posMutable1 = new BlockPos.MutableBlockPos();
-        BlockPos.MutableBlockPos posMutable2 = new BlockPos.MutableBlockPos();
+        BlockPos.Mutable posMutable1 = new BlockPos.Mutable();
+        BlockPos.Mutable posMutable2 = new BlockPos.Mutable();
 
         for (Box box : schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values())
         {
@@ -140,8 +140,8 @@ public class PositionUtils
 
                     if (bb != null)
                     {
-                        posMutable1.setPos(bb.minX, bb.minY, bb.minZ);
-                        posMutable2.setPos(bb.maxX, bb.maxY, bb.maxZ);
+                        posMutable1.set(bb.minX, bb.minY, bb.minZ);
+                        posMutable2.set(bb.maxX, bb.maxY, bb.maxZ);
 
                         if (arePositionsWithinWorld(world, posMutable1, posMutable2) == false)
                         {
@@ -244,8 +244,8 @@ public class PositionUtils
             return null;
         }
 
-        BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos( 60000000,  60000000,  60000000);
-        BlockPos.MutableBlockPos posMax = new BlockPos.MutableBlockPos(-60000000, -60000000, -60000000);
+        BlockPos.Mutable posMin = new BlockPos.Mutable( 60000000,  60000000,  60000000);
+        BlockPos.Mutable posMax = new BlockPos.Mutable(-60000000, -60000000, -60000000);
 
         for (Box box : boxes)
         {
@@ -256,17 +256,17 @@ public class PositionUtils
         return Pair.of(posMin.toImmutable(), posMax.toImmutable());
     }
 
-    private static void getMinMaxCoords(BlockPos.MutableBlockPos posMin, BlockPos.MutableBlockPos posMax, @Nullable BlockPos posToCheck)
+    private static void getMinMaxCoords(BlockPos.Mutable posMin, BlockPos.Mutable posMax, @Nullable BlockPos posToCheck)
     {
         if (posToCheck != null)
         {
-            posMin.setPos(  Math.min(posMin.getX(), posToCheck.getX()),
-                            Math.min(posMin.getY(), posToCheck.getY()),
-                            Math.min(posMin.getZ(), posToCheck.getZ()));
+            posMin.set( Math.min(posMin.getX(), posToCheck.getX()),
+                        Math.min(posMin.getY(), posToCheck.getY()),
+                        Math.min(posMin.getZ(), posToCheck.getZ()));
 
-            posMax.setPos(  Math.max(posMax.getX(), posToCheck.getX()),
-                            Math.max(posMax.getY(), posToCheck.getY()),
-                            Math.max(posMax.getZ(), posToCheck.getZ()));
+            posMax.set( Math.max(posMax.getX(), posToCheck.getX()),
+                        Math.max(posMax.getY(), posToCheck.getY()),
+                        Math.max(posMax.getZ(), posToCheck.getZ()));
         }
     }
 
@@ -388,7 +388,7 @@ public class PositionUtils
     /**
      * Creates an enclosing AABB around the given positions. They will both be inside the box.
      */
-    public static AxisAlignedBB createEnclosingAABB(BlockPos pos1, BlockPos pos2)
+    public static BoundingBox createEnclosingAABB(BlockPos pos1, BlockPos pos2)
     {
         int minX = Math.min(pos1.getX(), pos2.getX());
         int minY = Math.min(pos1.getY(), pos2.getY());
@@ -400,7 +400,7 @@ public class PositionUtils
         return createAABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public static AxisAlignedBB createAABBFrom(IntBoundingBox bb)
+    public static BoundingBox createAABBFrom(IntBoundingBox bb)
     {
         return createAABB(bb.minX, bb.minY, bb.minZ, bb.maxX + 1, bb.maxY + 1, bb.maxZ + 1);
     }
@@ -408,7 +408,7 @@ public class PositionUtils
     /**
      * Creates an AABB for the given position
      */
-    public static AxisAlignedBB createAABBForPosition(BlockPos pos)
+    public static BoundingBox createAABBForPosition(BlockPos pos)
     {
         return createAABBForPosition(pos.getX(), pos.getY(), pos.getZ());
     }
@@ -416,7 +416,7 @@ public class PositionUtils
     /**
      * Creates an AABB for the given position
      */
-    public static AxisAlignedBB createAABBForPosition(int x, int y, int z)
+    public static BoundingBox createAABBForPosition(int x, int y, int z)
     {
         return createAABB(x, y, z, x + 1, y + 1, z + 1);
     }
@@ -424,9 +424,9 @@ public class PositionUtils
     /**
      * Creates an AABB with the given bounds
      */
-    public static AxisAlignedBB createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
+    public static BoundingBox createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
-        return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**
@@ -534,7 +534,7 @@ public class PositionUtils
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
-        World world = Minecraft.getInstance().world;
+        World world = MinecraftClient.getInstance().world;
 
         if (area == null || world == null)
         {
@@ -573,39 +573,39 @@ public class PositionUtils
                 int emptySides = 0;
 
                 // Slices along the z axis
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.X, new BlockPos(xMin, yMin, zMin), new BlockPos(xMin, yMax, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.X, new BlockPos(xMin, yMin, zMin), new BlockPos(xMin, yMax, zMax)))
                 {
                     xMin += amount;
                     ++emptySides;
                 }
 
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.X, new BlockPos(xMax, yMin, zMin), new BlockPos(xMax, yMax, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.X, new BlockPos(xMax, yMin, zMin), new BlockPos(xMax, yMax, zMax)))
                 {
                     xMax -= amount;
                     ++emptySides;
                 }
 
                 // Slices along the x/z plane
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Y, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMin, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.Y, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMin, zMax)))
                 {
                     yMin += amount;
                     ++emptySides;
                 }
 
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Y, new BlockPos(xMin, yMax, zMin), new BlockPos(xMax, yMax, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.Y, new BlockPos(xMin, yMax, zMin), new BlockPos(xMax, yMax, zMax)))
                 {
                     yMax -= amount;
                     ++emptySides;
                 }
 
                 // Slices along the x axis
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Z, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMax, zMin)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.Z, new BlockPos(xMin, yMin, zMin), new BlockPos(xMax, yMax, zMin)))
                 {
                     zMin += amount;
                     ++emptySides;
                 }
 
-                if (WorldUtils.isSliceEmpty(world, EnumFacing.Axis.Z, new BlockPos(xMin, yMin, zMax), new BlockPos(xMax, yMax, zMax)))
+                if (WorldUtils.isSliceEmpty(world, Direction.Axis.Z, new BlockPos(xMin, yMin, zMax), new BlockPos(xMax, yMax, zMax)))
                 {
                     zMax -= amount;
                     ++emptySides;
@@ -632,7 +632,7 @@ public class PositionUtils
     /**
      * Mirrors and then rotates the given position around the origin
      */
-    public static BlockPos getTransformedBlockPos(BlockPos pos, Mirror mirror, Rotation rotation)
+    public static BlockPos getTransformedBlockPos(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -655,18 +655,18 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case CLOCKWISE_90:
+            case ROT_90:
                 return new BlockPos(-z, y,  x);
-            case COUNTERCLOCKWISE_90:
+            case ROT_270:
                 return new BlockPos( z, y, -x);
-            case CLOCKWISE_180:
+            case ROT_180:
                 return new BlockPos(-x, y, -z);
             default:
                 return isMirrored ? new BlockPos(x, y, z) : pos;
         }
     }
 
-    public static BlockPos getReverseTransformedBlockPos(BlockPos pos, Mirror mirror, Rotation rotation)
+    public static BlockPos getReverseTransformedBlockPos(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -676,15 +676,15 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case CLOCKWISE_90:
+            case ROT_90:
                 x = z;
                 z = -tmp;
                 break;
-            case COUNTERCLOCKWISE_90:
+            case ROT_270:
                 x = -z;
                 z = tmp;
                 break;
-            case CLOCKWISE_180:
+            case ROT_180:
                 x = -x;
                 z = -z;
                 break;
@@ -716,7 +716,7 @@ public class PositionUtils
      * Does the opposite transform from getTransformedBlockPos(), to return the original,
      * non-transformed position from the transformed position.
      */
-    public static BlockPos getOriginalPositionFromTransformed(BlockPos pos, Mirror mirror, Rotation rotation)
+    public static BlockPos getOriginalPositionFromTransformed(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -726,15 +726,15 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case CLOCKWISE_90:
+            case ROT_90:
                 tmp = x;
                 x = -z;
                 z = tmp;
-            case COUNTERCLOCKWISE_90:
+            case ROT_270:
                 tmp = x;
                 x = z;
                 z = -tmp;
-            case CLOCKWISE_180:
+            case ROT_180:
                 x = -x;
                 z = -z;
             default:
@@ -759,7 +759,7 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
-    public static Vec3d getTransformedPosition(Vec3d originalPos, Mirror mirror, Rotation rotation)
+    public static Vec3d getTransformedPosition(Vec3d originalPos, BlockMirror mirror, BlockRotation rotation)
     {
         double x = originalPos.x;
         double y = originalPos.y;
@@ -780,27 +780,27 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case COUNTERCLOCKWISE_90:
+            case ROT_270:
                 return new Vec3d(z, y, 1.0D - x);
-            case CLOCKWISE_90:
+            case ROT_90:
                 return new Vec3d(1.0D - z, y, x);
-            case CLOCKWISE_180:
+            case ROT_180:
                 return new Vec3d(1.0D - x, y, 1.0D - z);
             default:
                 return transformed ? new Vec3d(x, y, z) : originalPos;
         }
     }
 
-    public static Rotation getReverseRotation(Rotation rotationIn)
+    public static BlockRotation getReverseRotation(BlockRotation rotationIn)
     {
         switch (rotationIn)
         {
-            case COUNTERCLOCKWISE_90:
-                return Rotation.CLOCKWISE_90;
-            case CLOCKWISE_90:
-                return Rotation.COUNTERCLOCKWISE_90;
-            case CLOCKWISE_180:
-                return Rotation.CLOCKWISE_180;
+            case ROT_270:
+                return BlockRotation.ROT_90;
+            case ROT_90:
+                return BlockRotation.ROT_270;
+            case ROT_180:
+                return BlockRotation.ROT_180;
             default:
                 return rotationIn;
         }
@@ -840,7 +840,7 @@ public class PositionUtils
      * so that pos1 is in the "front left" corner and pos2 is in the "back right" corner
      * of the area, when looking at the "front" face of the area.
      */
-    public static EnumFacing getFacingFromPositions(BlockPos pos1, BlockPos pos2)
+    public static Direction getFacingFromPositions(BlockPos pos1, BlockPos pos2)
     {
         if (pos1 == null || pos2 == null)
         {
@@ -850,71 +850,71 @@ public class PositionUtils
         return getFacingFromPositions(pos1.getX(), pos1.getZ(), pos2.getX(), pos2.getZ());
     }
 
-    private static EnumFacing getFacingFromPositions(int x1, int z1, int x2, int z2)
+    private static Direction getFacingFromPositions(int x1, int z1, int x2, int z2)
     {
         if (x2 == x1)
         {
-            return z2 > z1 ? EnumFacing.SOUTH : EnumFacing.NORTH;
+            return z2 > z1 ? Direction.SOUTH : Direction.NORTH;
         }
 
         if (z2 == z1)
         {
-            return x2 > x1 ? EnumFacing.EAST : EnumFacing.WEST;
+            return x2 > x1 ? Direction.EAST : Direction.WEST;
         }
 
         if (x2 > x1)
         {
-            return z2 > z1 ? EnumFacing.EAST : EnumFacing.NORTH;
+            return z2 > z1 ? Direction.EAST : Direction.NORTH;
         }
 
-        return z2 > z1 ? EnumFacing.SOUTH : EnumFacing.WEST;
+        return z2 > z1 ? Direction.SOUTH : Direction.WEST;
     }
 
-    public static Rotation cycleRotation(Rotation rotation, boolean reverse)
+    public static BlockRotation cycleRotation(BlockRotation rotation, boolean reverse)
     {
         int ordinal = rotation.ordinal();
 
         if (reverse)
         {
-            ordinal = ordinal == 0 ? Rotation.values().length - 1 : ordinal - 1;
+            ordinal = ordinal == 0 ? BlockRotation.values().length - 1 : ordinal - 1;
         }
         else
         {
-            ordinal = ordinal >= Rotation.values().length - 1 ? 0 : ordinal + 1;
+            ordinal = ordinal >= BlockRotation.values().length - 1 ? 0 : ordinal + 1;
         }
 
-        return Rotation.values()[ordinal];
+        return BlockRotation.values()[ordinal];
     }
 
-    public static Mirror cycleMirror(Mirror mirror, boolean reverse)
+    public static BlockMirror cycleMirror(BlockMirror mirror, boolean reverse)
     {
         int ordinal = mirror.ordinal();
 
         if (reverse)
         {
-            ordinal = ordinal == 0 ? Mirror.values().length - 1 : ordinal - 1;
+            ordinal = ordinal == 0 ? BlockMirror.values().length - 1 : ordinal - 1;
         }
         else
         {
-            ordinal = ordinal >= Mirror.values().length - 1 ? 0 : ordinal + 1;
+            ordinal = ordinal >= BlockMirror.values().length - 1 ? 0 : ordinal + 1;
         }
 
-        return Mirror.values()[ordinal];
+        return BlockMirror.values()[ordinal];
     }
 
-    public static String getRotationNameShort(Rotation rotation)
+    public static String getRotationNameShort(BlockRotation rotation)
     {
         switch (rotation)
         {
-            case CLOCKWISE_90:          return "CW_90";
-            case CLOCKWISE_180:         return "CW_180";
-            case COUNTERCLOCKWISE_90:   return "CCW_90";
-            case NONE:
-            default:                    return "NONE";
+            case ROT_90:    return "CW_90";
+            case ROT_180:   return "CW_180";
+            case ROT_270:   return "CCW_90";
+            case ROT_0:
+            default:        return "NONE";
         }
     }
 
-    public static String getMirrorName(Mirror mirror)
+    public static String getMirrorName(BlockMirror mirror)
     {
         switch (mirror)
         {
@@ -925,19 +925,19 @@ public class PositionUtils
         }
     }
 
-    public static float getRotatedYaw(float yaw, Rotation rotation)
+    public static float getRotatedYaw(float yaw, BlockRotation rotation)
     {
         yaw = MathHelper.wrapDegrees(yaw);
 
         switch (rotation)
         {
-            case CLOCKWISE_180:
+            case ROT_180:
                 yaw += 180.0F;
                 break;
-            case COUNTERCLOCKWISE_90:
+            case ROT_270:
                 yaw += 270.0F;
                 break;
-            case CLOCKWISE_90:
+            case ROT_90:
                 yaw += 90.0F;
                 break;
             default:
@@ -946,7 +946,7 @@ public class PositionUtils
         return yaw;
     }
 
-    public static float getMirroredYaw(float yaw, Mirror mirror)
+    public static float getMirroredYaw(float yaw, BlockMirror mirror)
     {
         yaw = MathHelper.wrapDegrees(yaw);
 
@@ -982,8 +982,8 @@ public class PositionUtils
         @Override
         public int compare(BlockPos pos1, BlockPos pos2)
         {
-            double dist1 = pos1.distanceSq(this.posReference);
-            double dist2 = pos2.distanceSq(this.posReference);
+            double dist1 = pos1.getSquaredDistance(this.posReference);
+            double dist2 = pos2.getSquaredDistance(this.posReference);
 
             if (dist1 == dist2)
             {

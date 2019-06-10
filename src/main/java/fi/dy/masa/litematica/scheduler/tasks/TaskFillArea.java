@@ -8,32 +8,32 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.IRegistry;
+import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class TaskFillArea extends TaskProcessChunkBase
 {
-    protected final IBlockState fillState;
-    @Nullable protected final IBlockState replaceState;
+    protected final BlockState fillState;
+    @Nullable protected final BlockState replaceState;
     protected final String blockString;
     protected final boolean removeEntities;
     protected int chunkCount;
 
-    public TaskFillArea(List<Box> boxes, IBlockState fillState, @Nullable IBlockState replaceState, boolean removeEntities)
+    public TaskFillArea(List<Box> boxes, BlockState fillState, @Nullable BlockState replaceState, boolean removeEntities)
     {
         this(boxes, fillState, replaceState, removeEntities, "litematica.gui.label.task_name.fill");
     }
 
-    protected TaskFillArea(List<Box> boxes, IBlockState fillState, @Nullable IBlockState replaceState, boolean removeEntities, String nameOnHud)
+    protected TaskFillArea(List<Box> boxes, BlockState fillState, @Nullable BlockState replaceState, boolean removeEntities, String nameOnHud)
     {
         super(nameOnHud);
 
@@ -41,7 +41,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         this.replaceState = replaceState;
         this.removeEntities = removeEntities;
 
-        ResourceLocation rl = IRegistry.BLOCK.getKey(fillState.getBlock());
+        Identifier rl = Registry.BLOCK.getId(fillState.getBlock());
         String blockString = null;
 
         if (rl != null)
@@ -51,7 +51,7 @@ public class TaskFillArea extends TaskProcessChunkBase
 
             if (replaceState != null)
             {
-                rl = IRegistry.BLOCK.getKey(replaceState.getBlock());
+                rl = Registry.BLOCK.getId(replaceState.getBlock());
 
                 if (rl != null)
                 {
@@ -117,20 +117,20 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (removeEntities)
         {
-            AxisAlignedBB aabb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
-            List<Entity> entities = this.world.getEntitiesInAABBexcluding(this.mc.player, aabb, EntityUtils.NOT_PLAYER);
+            BoundingBox aabb = new BoundingBox(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+            List<Entity> entities = this.world.getEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER);
 
             for (Entity entity : entities)
             {
-                if ((entity instanceof EntityPlayer) == false)
+                if ((entity instanceof PlayerEntity) == false)
                 {
                     entity.remove();
                 }
             }
         }
 
-        IBlockState barrier = Blocks.BARRIER.getDefaultState();
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockState barrier = Blocks.BARRIER.getDefaultState();
+        BlockPos.Mutable posMutable = new BlockPos.Mutable();
 
         for (int z = box.minZ; z <= box.maxZ; ++z)
         {
@@ -138,16 +138,16 @@ public class TaskFillArea extends TaskProcessChunkBase
             {
                 for (int y = box.maxY; y >= box.minY; --y)
                 {
-                    posMutable.setPos(x, y, z);
-                    IBlockState oldState = this.world.getBlockState(posMutable);
+                    posMutable.set(x, y, z);
+                    BlockState oldState = this.world.getBlockState(posMutable);
 
                     if ((this.replaceState == null && oldState != this.fillState) || oldState == this.replaceState)
                     {
-                        TileEntity te = this.world.getTileEntity(posMutable);
+                        BlockEntity te = this.world.getBlockEntity(posMutable);
 
-                        if (te instanceof IInventory)
+                        if (te instanceof Inventory)
                         {
-                            ((IInventory) te).clear();
+                            ((Inventory) te).clear();
                             this.world.setBlockState(posMutable, barrier, 0x12);
                         }
 
@@ -162,9 +162,9 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (removeEntities)
         {
-            AxisAlignedBB aabb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+            BoundingBox aabb = new BoundingBox(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
 
-            if (this.world.getEntitiesInAABBexcluding(this.mc.player, aabb, EntityUtils.NOT_PLAYER).size() > 0)
+            if (this.world.getEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER).size() > 0)
             {
                 String killCmd = String.format("/kill @e[type=!player,x=%d,y=%d,z=%d,dx=%d,dy=%d,dz=%d]",
                         box.minX               , box.minY               , box.minZ,

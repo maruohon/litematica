@@ -1,34 +1,34 @@
 package fi.dy.masa.litematica.util;
 
 import java.util.IdentityHashMap;
-import net.minecraft.block.BlockAbstractSkull;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.block.AbstractSkullBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.enums.SlabType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.state.properties.SlabType;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.IRegistry;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class ItemUtils
 {
-    private static final IdentityHashMap<IBlockState, ItemStack> ITEMS_FOR_STATES = new IdentityHashMap<>();
+    private static final IdentityHashMap<BlockState, ItemStack> ITEMS_FOR_STATES = new IdentityHashMap<>();
 
-    public static ItemStack getItemForState(IBlockState state)
+    public static ItemStack getItemForState(BlockState state)
     {
         ItemStack stack = ITEMS_FOR_STATES.get(state);
         return stack != null ? stack : ItemStack.EMPTY;
     }
 
-    public static void setItemForBlock(World world, BlockPos pos, IBlockState state)
+    public static void setItemForBlock(World world, BlockPos pos, BlockState state)
     {
         if (ITEMS_FOR_STATES.containsKey(state) == false)
         {
@@ -36,7 +36,7 @@ public class ItemUtils
         }
     }
 
-    public static ItemStack getItemForBlock(World world, BlockPos pos, IBlockState state, boolean checkCache)
+    public static ItemStack getItemForBlock(World world, BlockPos pos, BlockState state, boolean checkCache)
     {
         if (checkCache)
         {
@@ -57,7 +57,7 @@ public class ItemUtils
 
         if (stack.isEmpty())
         {
-            stack = state.getBlock().getItem(world, pos, state);
+            stack = state.getBlock().getPickStack(world, pos, state);
         }
 
         if (stack.isEmpty())
@@ -74,7 +74,7 @@ public class ItemUtils
         return stack;
     }
 
-    public static ItemStack getStateToItemOverride(IBlockState state)
+    public static ItemStack getStateToItemOverride(BlockState state)
     {
         if (state.getBlock() == Blocks.LAVA)
         {
@@ -88,23 +88,23 @@ public class ItemUtils
         return ItemStack.EMPTY;
     }
 
-    private static void overrideStackSize(IBlockState state, ItemStack stack)
+    private static void overrideStackSize(BlockState state, ItemStack stack)
     {
-        if (state.getBlock() instanceof BlockSlab && state.get(BlockSlab.TYPE) == SlabType.DOUBLE)
+        if (state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE) == SlabType.DOUBLE)
         {
-            stack.setCount(2);
+            stack.setAmount(2);
         }
     }
 
-    public static ItemStack storeTEInStack(ItemStack stack, TileEntity te)
+    public static ItemStack storeTEInStack(ItemStack stack, BlockEntity te)
     {
-        NBTTagCompound nbt = te.write(new NBTTagCompound());
+        CompoundTag nbt = te.toTag(new CompoundTag());
 
-        if (nbt.contains("Owner") && stack.getItem() instanceof ItemBlock &&
-            ((ItemBlock) stack.getItem()).getBlock() instanceof BlockAbstractSkull)
+        if (nbt.containsKey("Owner") && stack.getItem() instanceof BlockItem &&
+            ((BlockItem) stack.getItem()).getBlock() instanceof AbstractSkullBlock)
         {
-            NBTTagCompound tagOwner = nbt.getCompound("Owner");
-            NBTTagCompound tagSkull = new NBTTagCompound();
+            CompoundTag tagOwner = nbt.getCompound("Owner");
+            CompoundTag tagSkull = new CompoundTag();
 
             tagSkull.put("SkullOwner", tagOwner);
             stack.setTag(tagSkull);
@@ -113,13 +113,13 @@ public class ItemUtils
         }
         else
         {
-            NBTTagCompound tagLore = new NBTTagCompound();
-            NBTTagList tagList = new NBTTagList();
+            CompoundTag tagLore = new CompoundTag();
+            ListTag tagList = new ListTag();
 
-            tagList.add(new NBTTagString("(+NBT)"));
+            tagList.add(new StringTag("(+NBT)"));
             tagLore.put("Lore", tagList);
-            stack.setTagInfo("display", tagLore);
-            stack.setTagInfo("BlockEntityTag", nbt);
+            stack.setChildTag("display", tagLore);
+            stack.setChildTag("BlockEntityTag", nbt);
 
             return stack;
         }
@@ -129,7 +129,7 @@ public class ItemUtils
     {
         if (stack.isEmpty() == false)
         {
-            ResourceLocation rl = IRegistry.ITEM.getKey(stack.getItem());
+            Identifier rl = Registry.ITEM.getId(stack.getItem());
 
             return String.format("[%s - display: %s - NBT: %s] (%s)",
                     rl != null ? rl.toString() : "null", stack.getDisplayName().getString(),

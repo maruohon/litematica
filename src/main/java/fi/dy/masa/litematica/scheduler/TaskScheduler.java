@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.scheduler;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 
 public class TaskScheduler
 {
@@ -29,10 +29,10 @@ public class TaskScheduler
 
     public static TaskScheduler getServerInstanceIfExistsOrClient()
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
         // Yes this is actually correct despite the naming - in single player we want to
         // schedule stuff to the integrated server's thread in some cases
-        return mc.isSingleplayer() ? INSTANCE_SERVER : INSTANCE_CLIENT;
+        return mc.isIntegratedServerRunning() ? INSTANCE_SERVER : INSTANCE_CLIENT;
     }
 
     public void scheduleTask(ITask task, int interval)

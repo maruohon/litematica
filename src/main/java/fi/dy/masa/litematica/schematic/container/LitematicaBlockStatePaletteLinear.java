@@ -1,27 +1,27 @@
 package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.util.TagHelper;
 
 public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStatePalette
 {
-    private final IBlockState[] states;
+    private final BlockState[] states;
     private final ILitematicaBlockStatePaletteResizer resizeHandler;
     private final int bits;
     private int currentSize;
 
     public LitematicaBlockStatePaletteLinear(int bitsIn, ILitematicaBlockStatePaletteResizer resizeHandler)
     {
-        this.states = new IBlockState[1 << bitsIn];
+        this.states = new BlockState[1 << bitsIn];
         this.bits = bitsIn;
         this.resizeHandler = resizeHandler;
     }
 
     @Override
-    public int idFor(IBlockState state)
+    public int idFor(BlockState state)
     {
         for (int i = 0; i < this.currentSize; ++i)
         {
@@ -47,7 +47,7 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
 
     @Override
     @Nullable
-    public IBlockState getBlockState(int indexKey)
+    public BlockState getBlockState(int indexKey)
     {
         return indexKey >= 0 && indexKey < this.currentSize ? this.states[indexKey] : null;
     }
@@ -58,7 +58,7 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
         return this.currentSize;
     }
 
-    private void requestNewId(IBlockState state)
+    private void requestNewId(BlockState state)
     {
         final int size = this.currentSize;
 
@@ -80,14 +80,14 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
     }
 
     @Override
-    public void readFromNBT(NBTTagList tagList)
+    public void readFromNBT(ListTag tagList)
     {
         final int size = tagList.size();
 
         for (int i = 0; i < size; ++i)
         {
-            NBTTagCompound tag = tagList.getCompound(i);
-            IBlockState state = NBTUtil.readBlockState(tag);
+            CompoundTag tag = tagList.getCompoundTag(i);
+            BlockState state = TagHelper.deserializeBlockState(tag);
 
             if (i > 0 || state != LitematicaBlockStateContainer.AIR_BLOCK_STATE)
             {
@@ -97,13 +97,13 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
     }
 
     @Override
-    public NBTTagList writeToNBT()
+    public ListTag writeToNBT()
     {
-        NBTTagList tagList = new NBTTagList();
+        ListTag tagList = new ListTag();
 
         for (int id = 0; id < this.currentSize; ++id)
         {
-            NBTTagCompound tag = NBTUtil.writeBlockState(this.states[id]);
+            CompoundTag tag = TagHelper.serializeBlockState(this.states[id]);
             tagList.add(tag);
         }
 

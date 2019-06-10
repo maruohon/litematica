@@ -26,6 +26,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -36,28 +37,28 @@ import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.IRegistry;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 {
-    private static final MutablePair<IBlockState, IBlockState> MUTABLE_PAIR = new MutablePair<>();
-    private static final BlockPos.MutableBlockPos MUTABLE_POS = new BlockPos.MutableBlockPos();
+    private static final MutablePair<BlockState, BlockState> MUTABLE_PAIR = new MutablePair<>();
+    private static final BlockPos.Mutable MUTABLE_POS = new BlockPos.Mutable();
     private static final List<SchematicVerifier> ACTIVE_VERIFIERS = new ArrayList<>();
 
-    private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> missingBlocksPositions = ArrayListMultimap.create();
-    private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> extraBlocksPositions = ArrayListMultimap.create();
-    private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> wrongBlocksPositions = ArrayListMultimap.create();
-    private final ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> wrongStatesPositions = ArrayListMultimap.create();
-    private final Object2IntOpenHashMap<IBlockState> correctStateCounts = new Object2IntOpenHashMap<>();
+    private final ArrayListMultimap<Pair<BlockState, BlockState>, BlockPos> missingBlocksPositions = ArrayListMultimap.create();
+    private final ArrayListMultimap<Pair<BlockState, BlockState>, BlockPos> extraBlocksPositions = ArrayListMultimap.create();
+    private final ArrayListMultimap<Pair<BlockState, BlockState>, BlockPos> wrongBlocksPositions = ArrayListMultimap.create();
+    private final ArrayListMultimap<Pair<BlockState, BlockState>, BlockPos> wrongStatesPositions = ArrayListMultimap.create();
+    private final Object2IntOpenHashMap<BlockState> correctStateCounts = new Object2IntOpenHashMap<>();
     private final Object2ObjectOpenHashMap<BlockPos, BlockMismatch> blockMismatches = new Object2ObjectOpenHashMap<>();
-    private final HashSet<Pair<IBlockState, IBlockState>> ignoredMismatches = new HashSet<>();
+    private final HashSet<Pair<BlockState, BlockState>> ignoredMismatches = new HashSet<>();
     private final List<BlockPos> missingBlocksPositionsClosest = new ArrayList<>();
     private final List<BlockPos> extraBlocksPositionsClosest = new ArrayList<>();
     private final List<BlockPos> mismatchedBlocksPositionsClosest = new ArrayList<>();
@@ -66,8 +67,8 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     private final HashMultimap<MismatchType, BlockMismatch> selectedEntries = HashMultimap.create();
     private final Set<ChunkPos> requiredChunks = new HashSet<>();
     private final Set<BlockPos> recheckQueue = new HashSet<>();
-    private final Minecraft mc = Minecraft.getInstance();
-    private WorldClient worldClient;
+    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private ClientWorld worldClient;
     private WorldSchematic worldSchematic;
     private SchematicPlacement schematicPlacement;
     private final List<MismatchRenderPos> mismatchPositionsForRender = new ArrayList<>();
@@ -304,7 +305,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         // Don't call notifyListeners
     }
 
-    public void startVerification(WorldClient worldClient, WorldSchematic worldSchematic,
+    public void startVerification(ClientWorld worldClient, WorldSchematic worldSchematic,
             SchematicPlacement schematicPlacement, ICompletionListener completionListener)
     {
         this.reset();
@@ -408,8 +409,8 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             {
                 BlockPos pos = iter.next();
 
-                if (this.worldClient.isAreaLoaded(pos, 1, false) &&
-                    this.worldSchematic.isBlockLoaded(pos, false))
+                if (this.worldClient.isBlockLoaded(pos) &&
+                    this.worldSchematic.isBlockLoaded(pos))
                 {
                     BlockMismatch mismatch = this.blockMismatches.get(pos);
 
@@ -417,7 +418,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                     {
                         this.blockMismatches.remove(pos);
 
-                        IBlockState stateFound = this.worldClient.getBlockState(pos);
+                        BlockState stateFound = this.worldClient.getBlockState(pos);
                         MUTABLE_PAIR.setLeft(mismatch.stateExpected);
                         MUTABLE_PAIR.setRight(mismatch.stateFound);
 
@@ -431,8 +432,8 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                     }
                     else
                     {
-                        IBlockState stateExpected = this.worldSchematic.getBlockState(pos);
-                        IBlockState stateFound = this.worldClient.getBlockState(pos);
+                        BlockState stateExpected = this.worldSchematic.getBlockState(pos);
+                        BlockState stateFound = this.worldClient.getBlockState(pos);
                         this.checkBlockStates(pos.getX(), pos.getY(), pos.getZ(), stateExpected, stateFound);
                     }
 
@@ -447,7 +448,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         }
     }
 
-    private ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> getMapForMismatchType(MismatchType mismatchType)
+    private ArrayListMultimap<Pair<BlockState, BlockState>, BlockPos> getMapForMismatchType(MismatchType mismatchType)
     {
         switch (mismatchType)
         {
@@ -485,7 +486,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                 {
                     for (int cz = pos.z - 1; cz <= pos.z + 1; ++cz)
                     {
-                        if (this.worldClient.getChunkProvider().getChunk(cx, cz, false, false) != null)
+                        if (WorldUtils.isClientChunkLoaded(this.worldClient, cx, cz))
                         {
                             ++count;
                         }
@@ -534,7 +535,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
     private void ignoreStateMismatch(BlockMismatch mismatch, boolean updateOverlay)
     {
-        Pair<IBlockState, IBlockState> ignore = Pair.of(mismatch.stateExpected, mismatch.stateFound);
+        Pair<BlockState, BlockState> ignore = Pair.of(mismatch.stateExpected, mismatch.stateFound);
 
         if (this.ignoredMismatches.contains(ignore) == false)
         {
@@ -575,12 +576,12 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         this.ignoredMismatches.clear();
     }
 
-    public Set<Pair<IBlockState, IBlockState>> getIgnoredMismatches()
+    public Set<Pair<BlockState, BlockState>> getIgnoredMismatches()
     {
         return this.ignoredMismatches;
     }
 
-    public Object2IntOpenHashMap<IBlockState> getCorrectStates()
+    public Object2IntOpenHashMap<BlockState> getCorrectStates()
     {
         return this.correctStateCounts;
     }
@@ -621,26 +622,26 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         return list;
     }
 
-    private void addCountFor(MismatchType mismatchType, ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> map, List<BlockMismatch> list)
+    private void addCountFor(MismatchType mismatchType, ArrayListMultimap<Pair<BlockState, BlockState>, BlockPos> map, List<BlockMismatch> list)
     {
-        for (Pair<IBlockState, IBlockState> pair : map.keySet())
+        for (Pair<BlockState, BlockState> pair : map.keySet())
         {
             list.add(new BlockMismatch(mismatchType, pair.getLeft(), pair.getRight(), map.get(pair).size()));
         }
     }
 
-    public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(GuiBase gui)
+    public List<Pair<BlockState, BlockState>> getIgnoredStateMismatchPairs(GuiBase gui)
     {
-        List<Pair<IBlockState, IBlockState>> list = Lists.newArrayList(this.ignoredMismatches);
+        List<Pair<BlockState, BlockState>> list = Lists.newArrayList(this.ignoredMismatches);
 
         try
         {
-            Collections.sort(list, new Comparator<Pair<IBlockState, IBlockState>>() {
+            Collections.sort(list, new Comparator<Pair<BlockState, BlockState>>() {
                 @Override
-                public int compare(Pair<IBlockState, IBlockState> o1, Pair<IBlockState, IBlockState> o2)
+                public int compare(Pair<BlockState, BlockState> o1, Pair<BlockState, BlockState> o2)
                 {
-                    String name1 = IRegistry.BLOCK.getKey(o1.getLeft().getBlock()).toString();
-                    String name2 = IRegistry.BLOCK.getKey(o2.getLeft().getBlock()).toString();
+                    String name1 = Registry.BLOCK.getId(o1.getLeft().getBlock()).toString();
+                    String name2 = Registry.BLOCK.getId(o2.getLeft().getBlock()).toString();
 
                     int val = name1.compareTo(name2);
 
@@ -654,8 +655,8 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                     }
                     else
                     {
-                        name1 = IRegistry.BLOCK.getKey(o1.getRight().getBlock()).toString();
-                        name2 = IRegistry.BLOCK.getKey(o2.getRight().getBlock()).toString();
+                        name1 = Registry.BLOCK.getId(o1.getRight().getBlock()).toString();
+                        name2 = Registry.BLOCK.getId(o2.getRight().getBlock()).toString();
 
                         return name1.compareTo(name2);
                     }
@@ -673,15 +674,15 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     private boolean verifyChunk(Chunk chunkClient, Chunk chunkSchematic, IntBoundingBox box)
     {
         LayerRange range = DataManager.getRenderLayerRange();
-        EnumFacing.Axis axis = range.getAxis();
+        Direction.Axis axis = range.getAxis();
         boolean ranged = this.schematicPlacement.getSchematicVerifierType() == BlockInfoListType.RENDER_LAYERS;
 
-        final int startX = ranged && axis == EnumFacing.Axis.X ? Math.max(box.minX, range.getLayerMin()) : box.minX;
-        final int startY = ranged && axis == EnumFacing.Axis.Y ? Math.max(box.minY, range.getLayerMin()) : box.minY;
-        final int startZ = ranged && axis == EnumFacing.Axis.Z ? Math.max(box.minZ, range.getLayerMin()) : box.minZ;
-        final int endX = ranged && axis == EnumFacing.Axis.X ? Math.min(box.maxX, range.getLayerMax()) : box.maxX;
-        final int endY = ranged && axis == EnumFacing.Axis.Y ? Math.min(box.maxY, range.getLayerMax()) : box.maxY;
-        final int endZ = ranged && axis == EnumFacing.Axis.Z ? Math.min(box.maxZ, range.getLayerMax()) : box.maxZ;
+        final int startX = ranged && axis == Direction.Axis.X ? Math.max(box.minX, range.getLayerMin()) : box.minX;
+        final int startY = ranged && axis == Direction.Axis.Y ? Math.max(box.minY, range.getLayerMin()) : box.minY;
+        final int startZ = ranged && axis == Direction.Axis.Z ? Math.max(box.minZ, range.getLayerMin()) : box.minZ;
+        final int endX = ranged && axis == Direction.Axis.X ? Math.min(box.maxX, range.getLayerMax()) : box.maxX;
+        final int endY = ranged && axis == Direction.Axis.Y ? Math.min(box.maxY, range.getLayerMax()) : box.maxY;
+        final int endZ = ranged && axis == Direction.Axis.Z ? Math.min(box.maxZ, range.getLayerMax()) : box.maxZ;
 
         for (int y = startY; y <= endY; ++y)
         {
@@ -689,9 +690,9 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             {
                 for (int x = startX; x <= endX; ++x)
                 {
-                    MUTABLE_POS.setPos(x, y, z);
-                    IBlockState stateClient = chunkClient.getBlockState(x, y, z);
-                    IBlockState stateSchematic = chunkSchematic.getBlockState(x, y, z);
+                    MUTABLE_POS.set(x, y, z);
+                    BlockState stateClient = chunkClient.getBlockState(MUTABLE_POS);
+                    BlockState stateSchematic = chunkSchematic.getBlockState(MUTABLE_POS);
 
                     this.checkBlockStates(x, y, z, stateSchematic, stateClient);
 
@@ -711,7 +712,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         return true;
     }
 
-    private void checkBlockStates(int x, int y, int z, IBlockState stateSchematic, IBlockState stateClient)
+    private void checkBlockStates(int x, int y, int z, BlockState stateSchematic, BlockState stateClient)
     {
         BlockPos pos = new BlockPos(x, y, z);
 
@@ -776,7 +777,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             int maxEntries = Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_MAX_POSITIONS.getIntegerValue();
 
             // This needs to happen first
-            BlockPos centerPos = new BlockPos(this.mc.player.getPositionVector());
+            BlockPos centerPos = new BlockPos(this.mc.player.getPos());
             this.updateClosestPositions(centerPos, maxEntries);
             this.combineClosestPositions(centerPos, maxEntries);
 
@@ -805,7 +806,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     }
 
     private void addAndSortPositions(MismatchType type,
-            ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> sourceMap,
+            ArrayListMultimap<Pair<BlockState, BlockState>, BlockPos> sourceMap,
             List<BlockPos> listOut, int maxEntries)
     {
         listOut.clear();
@@ -944,11 +945,11 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     public static class BlockMismatch implements Comparable<BlockMismatch>
     {
         public final MismatchType mismatchType;
-        public final IBlockState stateExpected;
-        public final IBlockState stateFound;
+        public final BlockState stateExpected;
+        public final BlockState stateFound;
         public final int count;
 
-        public BlockMismatch(MismatchType mismatchType, IBlockState stateExpected, IBlockState stateFound, int count)
+        public BlockMismatch(MismatchType mismatchType, BlockState stateExpected, BlockState stateFound, int count)
         {
             this.mismatchType = mismatchType;
             this.stateExpected = stateExpected;
@@ -1029,8 +1030,8 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         @Override
         public int compare(MismatchRenderPos pos1, MismatchRenderPos pos2)
         {
-            double dist1 = pos1.pos.distanceSq(this.posReference);
-            double dist2 = pos2.pos.distanceSq(this.posReference);
+            double dist1 = pos1.pos.getSquaredDistance(this.posReference);
+            double dist2 = pos2.pos.getSquaredDistance(this.posReference);
 
             if (dist1 == dist2)
             {

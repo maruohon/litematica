@@ -32,12 +32,12 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Items;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.IRegistry;
+import net.minecraft.item.Items;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class DataManager implements IDirectoryCache
 {
@@ -441,7 +441,7 @@ public class DataManager implements IDirectoryCache
 
     private static String getStorageFileName(boolean globalData)
     {
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
         String name = StringUtils.getWorldOrServerName();
 
         if (name != null)
@@ -473,7 +473,7 @@ public class DataManager implements IDirectoryCache
 
             if (matcher.matches())
             {
-                Item item = IRegistry.ITEM.get(new ResourceLocation(matcher.group("name")));
+                Item item = Registry.ITEM.get(new Identifier(matcher.group("name")));
 
                 if (item != null && item != Items.AIR)
                 {
@@ -488,6 +488,6 @@ public class DataManager implements IDirectoryCache
 
         // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
-        Configs.Generic.TOOL_ITEM.setValueFromString(IRegistry.ITEM.getKey(Items.STICK).toString());
+        Configs.Generic.TOOL_ITEM.setValueFromString(Registry.ITEM.getId(Items.STICK).toString());
     }
 }

@@ -18,8 +18,8 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiSubRegionConfiguration extends GuiBase
@@ -253,7 +253,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
-                    Rotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
+                    BlockRotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
                     this.schematicPlacement.setSubRegionRotation(this.subRegionName, rotation, this.parent);
                     break;
                 }
@@ -261,13 +261,13 @@ public class GuiSubRegionConfiguration extends GuiBase
                 case MIRROR:
                 {
                     boolean reverse = mouseButton == 1;
-                    Mirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
+                    BlockMirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
                     this.schematicPlacement.setSubRegionMirror(this.subRegionName, mirror, this.parent);
                     break;
                 }
 
                 case MOVE_TO_PLAYER:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(this.parent.mc.player.getPositionVector()), this.parent);
+                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(this.parent.mc.player.getPos()), this.parent);
                     break;
 
                 case NUDGE_COORD_X:

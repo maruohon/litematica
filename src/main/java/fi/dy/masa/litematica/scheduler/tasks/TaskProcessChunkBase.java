@@ -12,15 +12,15 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkPos;
 
 public abstract class TaskProcessChunkBase extends TaskBase
 {
     protected final ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks = ArrayListMultimap.create();
     protected final Set<ChunkPos> requiredChunks = new HashSet<>();
-    protected final WorldClient worldClient;
+    protected final ClientWorld worldClient;
     protected final World world;
     protected final boolean isClientWorld;
 
@@ -76,7 +76,7 @@ public abstract class TaskProcessChunkBase extends TaskBase
         // Single player, saving from the integrated server world
         else
         {
-            this.mc.addScheduledTask(new Runnable()
+            this.mc.execute(new Runnable()
             {
                 @Override
                 public void run()

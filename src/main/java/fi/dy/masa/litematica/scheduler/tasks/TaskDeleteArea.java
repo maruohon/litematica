@@ -4,7 +4,7 @@ import java.util.List;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 
 public class TaskDeleteArea extends TaskFillArea
 {

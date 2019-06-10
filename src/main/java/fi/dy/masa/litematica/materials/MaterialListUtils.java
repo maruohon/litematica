@@ -8,9 +8,9 @@ import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.ItemType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3i;
 
@@ -23,7 +23,7 @@ public class MaterialListUtils
 
     public static List<MaterialListEntry> createMaterialListFor(LitematicaSchematic schematic, Collection<String> subRegions)
     {
-        Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
+        Object2IntOpenHashMap<BlockState> countsTotal = new Object2IntOpenHashMap<>();
 
         for (String regionName : subRegions)
         {
@@ -42,7 +42,7 @@ public class MaterialListUtils
                     {
                         for (int x = 0; x < sizeX; ++x)
                         {
-                            IBlockState state = container.get(x, y, z);
+                            BlockState state = container.get(x, y, z);
                             countsTotal.addTo(state, 1);
                         }
                     }
@@ -50,16 +50,16 @@ public class MaterialListUtils
             }
         }
 
-        Minecraft mc = Minecraft.getInstance();
+        MinecraftClient mc = MinecraftClient.getInstance();
 
         return getMaterialList(countsTotal, countsTotal, new Object2IntOpenHashMap<>(), mc.player);
     }
 
     public static List<MaterialListEntry> getMaterialList(
-            Object2IntOpenHashMap<IBlockState> countsTotal,
-            Object2IntOpenHashMap<IBlockState> countsMissing,
-            Object2IntOpenHashMap<IBlockState> countsMismatch,
-            EntityPlayer player)
+            Object2IntOpenHashMap<BlockState> countsTotal,
+            Object2IntOpenHashMap<BlockState> countsMissing,
+            Object2IntOpenHashMap<BlockState> countsMismatch,
+            PlayerEntity player)
     {
         List<MaterialListEntry> list = new ArrayList<>();
 
@@ -90,19 +90,19 @@ public class MaterialListUtils
     }
 
     private static void convertStatesToStacks(
-            Object2IntOpenHashMap<IBlockState> blockStatesIn,
+            Object2IntOpenHashMap<BlockState> blockStatesIn,
             Object2IntOpenHashMap<ItemType> itemTypesOut,
             MaterialCache cache)
     {
         // Convert from counts per IBlockState to counts per different stacks
-        for (IBlockState state : blockStatesIn.keySet())
+        for (BlockState state : blockStatesIn.keySet())
         {
             if (cache.requiresMultipleItems(state))
             {
                 for (ItemStack stack : cache.getItems(state))
                 {
                     ItemType type = new ItemType(stack, false, true);
-                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
+                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getAmount());
                 }
             }
             else
@@ -112,13 +112,13 @@ public class MaterialListUtils
                 if (stack.isEmpty() == false)
                 {
                     ItemType type = new ItemType(stack, false, true);
-                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
+                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getAmount());
                 }
             }
         }
     }
 
-    public static void updateAvailableCounts(List<MaterialListEntry> list, EntityPlayer player)
+    public static void updateAvailableCounts(List<MaterialListEntry> list, PlayerEntity player)
     {
         Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.inventory);
 

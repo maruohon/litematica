@@ -13,8 +13,8 @@ import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.IRegistry;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
 {
@@ -81,7 +81,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     protected List<String> getEntryStringsForFilter(MaterialListEntry entry)
     {
         ItemStack stack = entry.getStack();
-        ResourceLocation rl = IRegistry.ITEM.getKey(stack.getItem());
+        Identifier rl = Registry.ITEM.getId(stack.getItem());
 
         if (rl != null)
         {

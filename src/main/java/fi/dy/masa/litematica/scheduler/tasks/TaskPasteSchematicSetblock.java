@@ -19,15 +19,15 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.command.arguments.BlockStateParser;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.command.arguments.BlockArgumentParser;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.BoundingBox;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkPos;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
 {
@@ -75,14 +75,14 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     {
         // Only use this command-based task in multiplayer
         return this.boxesInChunks.isEmpty() == false && this.mc.world != null &&
-               this.mc.player != null && this.mc.isSingleplayer() == false;
+               this.mc.player != null && this.mc.isIntegratedServerRunning() == false;
     }
 
     @Override
     public boolean execute()
     {
         WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        WorldClient worldClient = this.mc.world;
+        ClientWorld worldClient = this.mc.world;
         this.sentCommandsThisTick = 0;
         int processed = 0;
         int chunkAttempts = 0;
@@ -174,7 +174,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         }
     }
 
-    protected boolean canProcessChunk(ChunkPos pos, WorldSchematic worldSchematic, WorldClient worldClient)
+    protected boolean canProcessChunk(ChunkPos pos, WorldSchematic worldSchematic, ClientWorld worldClient)
     {
         if (worldSchematic.getChunkProvider().isChunkLoaded(pos.x, pos.z) == false)
         {
@@ -186,11 +186,11 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     }
 
     protected boolean processBox(ChunkPos pos, IntBoundingBox box,
-            WorldSchematic worldSchematic, WorldClient worldClient, EntityPlayerSP player)
+            WorldSchematic worldSchematic, ClientWorld worldClient, ClientPlayerEntity player)
     {
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+        BlockPos.Mutable posMutable = new BlockPos.Mutable();
         Chunk chunkSchematic = worldSchematic.getChunkProvider().getChunk(pos.x, pos.z);
-        Chunk chunkClient = worldClient.getChunkProvider().getChunk(pos.x, pos.z, false, false);
+        Chunk chunkClient = worldClient.getChunk(pos.x, pos.z);
 
         if (this.boxInProgress == false)
         {
@@ -204,7 +204,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
         while (this.currentIndex < this.boxVolume)
         {
-            posMutable.setPos(this.currentX, this.currentY, this.currentZ);
+            posMutable.set(this.currentX, this.currentY, this.currentZ);
 
             if (++this.currentY > box.maxY)
             {
@@ -219,8 +219,8 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
             ++this.currentIndex;
 
-            IBlockState stateSchematic = chunkSchematic.getBlockState(posMutable);
-            IBlockState stateClient = chunkClient.getBlockState(posMutable);
+            BlockState stateSchematic = chunkSchematic.getBlockState(posMutable);
+            BlockState stateClient = chunkClient.getBlockState(posMutable);
 
             if (stateSchematic.isAir() == false || stateClient.isAir() == false)
             {
@@ -253,10 +253,10 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         return false;
     }
 
-    private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, EntityPlayerSP player)
+    private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, ClientPlayerEntity player)
     {
-        AxisAlignedBB bb = new AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
-        List<Entity> entities = worldSchematic.getEntitiesWithinAABBExcludingEntity(null, bb);
+        BoundingBox bb = new BoundingBox(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+        List<Entity> entities = worldSchematic.getEntities((Entity) null, bb, null);
 
         for (Entity entity : entities)
         {
@@ -270,7 +270,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                 String nbtString = nbt.toString();
                 */
 
-                String strCommand = String.format("/summon %s %f %f %f", id, entity.posX, entity.posY, entity.posZ);
+                String strCommand = String.format("/summon %s %f %f %f", id, entity.x, entity.y, entity.z);
                 /*
                 String strCommand = String.format("/summon %s %f %f %f %s", entityName, entity.posX, entity.posY, entity.posZ, nbtString);
                 System.out.printf("entity: %s\n", entity);
@@ -283,10 +283,10 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         }
     }
 
-    private void sendSetBlockCommand(int x, int y, int z, IBlockState state, EntityPlayerSP player)
+    private void sendSetBlockCommand(int x, int y, int z, BlockState state, ClientPlayerEntity player)
     {
         String cmdName = Configs.Generic.PASTE_COMMAND_SETBLOCK.getStringValue();
-        String blockString = BlockStateParser.toString(state, null);
+        String blockString = BlockArgumentParser.stringifyBlockState(state);
         String strCommand = String.format("/%s %d %d %d %s", cmdName, x, y, z, blockString);
 
         player.sendChatMessage(strCommand);

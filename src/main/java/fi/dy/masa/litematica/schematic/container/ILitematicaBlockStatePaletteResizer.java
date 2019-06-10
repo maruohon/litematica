@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.schematic.container;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 
 public interface ILitematicaBlockStatePaletteResizer
 {
-    int onResize(int bits, IBlockState state);
+    int onResize(int bits, BlockState state);
 }
