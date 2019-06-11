@@ -9,16 +9,15 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.arguments.BlockStateParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.IRegistry;
 
 public class TaskFillArea extends TaskProcessChunkBase
 {
@@ -41,33 +40,11 @@ public class TaskFillArea extends TaskProcessChunkBase
         this.replaceState = replaceState;
         this.removeEntities = removeEntities;
 
-        ResourceLocation rl = IRegistry.BLOCK.getKey(fillState.getBlock());
-        String blockString = null;
+        String blockString = BlockStateParser.toString(fillState, null);
 
-        if (rl != null)
+        if (replaceState != null)
         {
-            String blockName = rl.toString();
-            blockString = blockName; // FIXME 1.13: state/properties
-
-            if (replaceState != null)
-            {
-                rl = IRegistry.BLOCK.getKey(replaceState.getBlock());
-
-                if (rl != null)
-                {
-                    // FIXME 1.13: state/properties
-                    blockString += " replace " + rl.toString();
-                }
-                else
-                {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica-message.error.invalid_block", replaceState.toString());
-                    blockString = null;
-                }
-            }
-        }
-        else
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica-message.error.invalid_block", fillState.toString());
+            blockString += " replace " + BlockStateParser.toString(replaceState, null);
         }
 
         this.blockString = blockString;
