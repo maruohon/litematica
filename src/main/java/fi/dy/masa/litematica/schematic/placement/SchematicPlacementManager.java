@@ -31,6 +31,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
@@ -207,7 +208,7 @@ public class SchematicPlacementManager
         {
             this.schematicPlacements.add(placement);
             this.addTouchedChunksFor(placement);
-            StatusInfoRenderer.startOverrideDelay();
+            StatusInfoRenderer.getInstance().startOverrideDelay();
 
             if (printMessages)
             {
@@ -224,20 +225,35 @@ public class SchematicPlacementManager
 
                     if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false)
                     {
-                        String hotkey = Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().getKeysDisplayString();
-                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.main_rendering_disabled", hotkey);
+                        ConfigHotkey hotkey = Hotkeys.TOGGLE_ALL_RENDERING;
+                        String configName = Configs.Visuals.ENABLE_RENDERING.getName();
+                        String hotkeyName = hotkey.getName();
+                        String hotkeyVal = hotkey.getKeybind().getKeysDisplayString();
+
+                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
+                                "litematica.message.warn.main_rendering_disabled", configName, hotkeyName, hotkeyVal);
                     }
 
                     if (Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false)
                     {
-                        String hotkey = Hotkeys.TOGGLE_SCHEMATIC_RENDERING.getKeybind().getKeysDisplayString();
-                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.schematic_rendering_disabled", hotkey);
+                        ConfigHotkey hotkey = Hotkeys.TOGGLE_SCHEMATIC_RENDERING;
+                        String configName = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getName();
+                        String hotkeyName = hotkey.getName();
+                        String hotkeyVal = hotkey.getKeybind().getKeysDisplayString();
+
+                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
+                                "litematica.message.warn.schematic_rendering_disabled", configName, hotkeyName, hotkeyVal);
                     }
 
                     if (Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false)
                     {
-                        String hotkey = Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeybind().getKeysDisplayString();
-                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000, "litematica.message.warn.schematic_blocks_rendering_disabled", hotkey);
+                        ConfigHotkey hotkey = Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING;
+                        String configName = Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getName();
+                        String hotkeyName = hotkey.getName();
+                        String hotkeyVal = hotkey.getKeybind().getKeysDisplayString();
+
+                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
+                                "litematica.message.warn.schematic_blocks_rendering_disabled", configName, hotkeyName, hotkeyVal);
                     }
                 }
             }

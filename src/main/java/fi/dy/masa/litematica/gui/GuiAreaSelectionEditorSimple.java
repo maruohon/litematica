@@ -1,9 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -69,17 +66,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
 
         x = this.createButton(22, nextY, -1, ButtonListener.Type.CREATE_SCHEMATIC) + 26;
 
-        if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
-        {
-            String str = StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled");
-            List<String> lines = new ArrayList<>();
-            int xTmp = 250;
-            int maxLineLength = this.width - xTmp - 20;
-            StringUtils.splitTextToLines(lines, str, maxLineLength);
-            this.addLabel(xTmp, 48, maxLineLength, lines.size() * (StringUtils.getFontHeight() + 1), 0xFFFFAA00, lines.toArray(new String[0]));
-
-            //this.addLabel(x, nextY, 120, 12, 0xFFFFAA00, StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled"));
-        }
+        this.addRenderingDisabledWarning(250, 48);
 
         return y;
     }
