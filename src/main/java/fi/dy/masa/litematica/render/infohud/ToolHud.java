@@ -318,7 +318,7 @@ public class ToolHud extends InfoHud
         String green = GuiBase.TXT_GREEN;
         String rst = GuiBase.TXT_RST;
 
-        strBlock = green + stack.getDisplayName() + rst;
+        strBlock = green + stack.getDisplayName().getString() + rst;
         EnumFacing facing = BlockUtils.getFirstPropertyFacingValue(state);
 
         if (facing != null)
