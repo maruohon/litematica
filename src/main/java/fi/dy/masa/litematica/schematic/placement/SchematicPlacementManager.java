@@ -212,7 +212,7 @@ public class SchematicPlacementManager
         {
             this.schematicPlacements.add(placement);
             this.addTouchedChunksFor(placement);
-            StatusInfoRenderer.startOverrideDelay();
+            StatusInfoRenderer.getInstance().startOverrideDelay();
 
             if (printMessages)
             {
