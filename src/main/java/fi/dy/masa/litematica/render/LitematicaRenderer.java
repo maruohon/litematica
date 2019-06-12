@@ -3,19 +3,19 @@ package fi.dy.masa.litematica.render;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.render.shader.ShaderProgram;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.culling.Frustum;
-import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.FrustumWithOrigin;
+import net.minecraft.client.render.VisibleRegion;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 
 public class LitematicaRenderer
 {
@@ -23,13 +23,11 @@ public class LitematicaRenderer
 
     private static final ShaderProgram SHADER_ALPHA = new ShaderProgram("litematica", null, "shaders/alpha.frag");
 
-    private Minecraft mc;
+    private MinecraftClient mc;
     private WorldRendererSchematic worldRenderer;
     private int frameCount;
     private long finishTimeNano;
 
-    private Entity entity;
-    private ICamera camera;
     private boolean renderPiecewise;
     private boolean renderPiecewiseSchematic;
     private boolean renderPiecewiseBlocks;
@@ -44,6 +42,10 @@ public class LitematicaRenderer
         GL20.glUseProgram(0);
     }
 
+    private LitematicaRenderer()
+    {
+    }
+
     public static LitematicaRenderer getInstance()
     {
         return INSTANCE;
@@ -53,7 +55,7 @@ public class LitematicaRenderer
     {
         if (this.worldRenderer == null)
         {
-            this.mc = Minecraft.getInstance();
+            this.mc = MinecraftClient.getInstance();
             this.worldRenderer = new WorldRendererSchematic(this.mc);
         }
 
@@ -72,8 +74,8 @@ public class LitematicaRenderer
 
     private void calculateFinishTime()
     {
-        long fpsLimit = this.mc.gameSettings.limitFramerate;
-        long fpsMin = Math.min(Minecraft.getDebugFPS(), fpsLimit);
+        long fpsLimit = this.mc.options.maxFps;
+        long fpsMin = Math.min(MinecraftClient.getCurrentFps(), fpsLimit);
         fpsMin = Math.max(fpsMin, 60L);
 
         if (Configs.Generic.RENDER_THREAD_NO_TIMEOUT.getBooleanValue())
@@ -88,13 +90,13 @@ public class LitematicaRenderer
 
     public void renderSchematicWorld(float partialTicks)
     {
-        if (this.mc.skipRenderWorld == false)
+        if (this.mc.skipGameRender == false)
         {
-            this.mc.profiler.startSection("litematica_schematic_world_render");
+            this.mc.getProfiler().push("litematica_schematic_world_render");
 
-            if (this.mc.getRenderViewEntity() == null)
+            if (this.mc.getCameraEntity() == null)
             {
-                this.mc.setRenderViewEntity(this.mc.player);
+                this.mc.setCameraEntity(this.mc.player);
             }
 
             GlStateManager.pushMatrix();
@@ -106,30 +108,32 @@ public class LitematicaRenderer
 
             GlStateManager.popMatrix();
 
-            this.mc.profiler.endSection();
+            this.mc.getProfiler().pop();
         }
     }
 
     private void renderWorld(float partialTicks, long finishTimeNano)
     {
-        this.mc.profiler.startSection("culling");
-        Entity entity = this.mc.getRenderViewEntity();
-        ICamera icamera = this.createCamera(entity, partialTicks);
+        this.mc.getProfiler().push("culling");
 
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        this.mc.profiler.endStartSection("prepare_terrain");
-        this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        Camera camera = this.getCamera();
+        VisibleRegion visibleRegion = new FrustumWithOrigin();
+        visibleRegion.setOrigin(camera.getPos().x, camera.getPos().y, camera.getPos().z);
+
+        this.mc.getProfiler().swap("prepare_terrain");
+        this.mc.getTextureManager().bindTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
         fi.dy.masa.malilib.render.RenderUtils.disableItemLighting();
         WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
-        this.mc.profiler.endStartSection("terrain_setup");
-        worldRenderer.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
+        this.mc.getProfiler().swap("terrain_setup");
+        worldRenderer.setupTerrain(camera, visibleRegion, this.frameCount++, this.mc.player.isSpectator());
 
-        this.mc.profiler.endStartSection("update_chunks");
+        this.mc.getProfiler().swap("update_chunks");
         worldRenderer.updateChunks(finishTimeNano);
 
-        this.mc.profiler.endStartSection("terrain");
+        this.mc.getProfiler().swap("terrain");
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.disableAlphaTest();
 
@@ -147,13 +151,13 @@ public class LitematicaRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
-            worldRenderer.renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, entity);
+            worldRenderer.renderBlockLayer(BlockRenderLayer.SOLID, camera);
 
-            worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, partialTicks, entity);
+            worldRenderer.renderBlockLayer(BlockRenderLayer.MIPPED_CUTOUT, camera);
 
-            this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-            worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT, partialTicks, entity);
-            this.mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+            this.mc.getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX).pushFilter(false, false);
+            worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT, camera);
+            this.mc.getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX).popFilter();
 
             if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
             {
@@ -168,14 +172,14 @@ public class LitematicaRenderer
             GlStateManager.matrixMode(GL11.GL_MODELVIEW);
             GlStateManager.popMatrix();
 
-            this.mc.profiler.endStartSection("entities");
+            this.mc.getProfiler().swap("entities");
 
             GlStateManager.pushMatrix();
 
             fi.dy.masa.malilib.render.RenderUtils.enableItemLighting();
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
-            worldRenderer.renderEntities(entity, icamera, partialTicks);
+            worldRenderer.renderEntities(camera, visibleRegion, partialTicks);
 
             GlStateManager.disableFog(); // Fixes Structure Blocks breaking all rendering
             GlStateManager.disableBlend();
@@ -186,24 +190,24 @@ public class LitematicaRenderer
 
             GlStateManager.enableCull();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-            this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            this.mc.getTextureManager().bindTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
             GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-            this.mc.profiler.endStartSection("translucent");
+            this.mc.getProfiler().swap("translucent");
             GlStateManager.depthMask(false);
 
             GlStateManager.pushMatrix();
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
-            worldRenderer.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, entity);
+            worldRenderer.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, camera);
 
             GlStateManager.popMatrix();
 
             this.disableShader();
         }
 
-        this.mc.profiler.endStartSection("overlay");
+        this.mc.getProfiler().swap("overlay");
         this.renderSchematicOverlay();
 
         GlStateManager.enableAlphaTest();
@@ -212,7 +216,7 @@ public class LitematicaRenderer
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableCull();
 
-        this.mc.profiler.endSection();
+        this.mc.getProfiler().pop();
     }
 
     public void renderSchematicOverlay()
@@ -225,7 +229,7 @@ public class LitematicaRenderer
             float lineWidth = (float) (renderThrough ? Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH.getDoubleValue() : Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
 
             GlStateManager.pushMatrix();
-            GlStateManager.disableTexture2D();
+            GlStateManager.disableTexture();
             GlStateManager.disableCull();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.001F);
             GlStateManager.enablePolygonOffset();
@@ -233,7 +237,7 @@ public class LitematicaRenderer
             GlStateManager.lineWidth(lineWidth);
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-            OpenGlHelper.glMultiTexCoord2f(OpenGlHelper.GL_TEXTURE1, 240, 240);
+            GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, 240.0F, 240.0F);
 
             if (renderThrough)
             {
@@ -245,14 +249,14 @@ public class LitematicaRenderer
             GlStateManager.enableDepthTest();
             GlStateManager.polygonOffset(0f, 0f);
             GlStateManager.disablePolygonOffset();
-            GlStateManager.enableTexture2D();
+            GlStateManager.enableTexture();
             GlStateManager.popMatrix();
         }
     }
 
     public void startShaderIfEnabled()
     {
-        this.translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && OpenGlHelper.shadersSupported;
+        this.translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && GLX.usePostProcess;
 
         if (this.translucentSchematic)
         {
@@ -270,11 +274,11 @@ public class LitematicaRenderer
         }
     }
 
-    public void piecewisePrepareAndUpdate(float partialTicks)
+    public void piecewisePrepareAndUpdate(VisibleRegion visibleRegion)
     {
         this.renderPiecewise = Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() &&
                                Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-                               this.mc.getRenderViewEntity() != null;
+                               this.mc.getCameraEntity() != null;
         this.renderPiecewisePrepared = false;
         this.renderPiecewiseBlocks = false;
 
@@ -284,21 +288,18 @@ public class LitematicaRenderer
             this.renderPiecewiseSchematic = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
             this.renderPiecewiseBlocks = this.renderPiecewiseSchematic && Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue();
 
-            this.mc.profiler.startSection("litematica_culling");
-
-            Entity entity = this.mc.getRenderViewEntity();
-            ICamera icamera = this.createCamera(entity, partialTicks);
+            this.mc.getProfiler().push("litematica_culling");
 
             this.calculateFinishTime();
             WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
-            this.mc.profiler.endStartSection("litematica_terrain_setup");
-            worldRenderer.setupTerrain(entity, partialTicks, icamera, this.frameCount++, this.mc.player.isSpectator());
+            this.mc.getProfiler().swap("litematica_terrain_setup");
+            worldRenderer.setupTerrain(this.getCamera(), visibleRegion, this.frameCount++, this.mc.player.isSpectator());
 
-            this.mc.profiler.endStartSection("litematica_update_chunks");
+            this.mc.getProfiler().swap("litematica_update_chunks");
             worldRenderer.updateChunks(this.finishTimeNano);
 
-            this.mc.profiler.endSection();
+            this.mc.getProfiler().pop();
 
             this.renderPiecewisePrepared = true;
         }
@@ -308,7 +309,7 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewiseBlocks)
         {
-            this.mc.profiler.startSection("litematica_blocks_solid");
+            this.mc.getProfiler().push("litematica_blocks_solid");
 
             if (renderColliding)
             {
@@ -318,7 +319,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.SOLID, partialTicks, this.entity);
+            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.SOLID, this.getCamera());
 
             this.disableShader();
 
@@ -328,7 +329,7 @@ public class LitematicaRenderer
                 GlStateManager.disablePolygonOffset();
             }
 
-            this.mc.profiler.endSection();
+            this.mc.getProfiler().pop();
         }
     }
 
@@ -336,7 +337,7 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewiseBlocks)
         {
-            this.mc.profiler.startSection("litematica_blocks_cutout_mipped");
+            this.mc.getProfiler().push("litematica_blocks_cutout_mipped");
 
             if (renderColliding)
             {
@@ -346,7 +347,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, partialTicks, this.entity);
+            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.MIPPED_CUTOUT, this.getCamera());
 
             this.disableShader();
 
@@ -356,7 +357,7 @@ public class LitematicaRenderer
                 GlStateManager.disablePolygonOffset();
             }
 
-            this.mc.profiler.endSection();
+            this.mc.getProfiler().pop();
         }
     }
 
@@ -364,7 +365,7 @@ public class LitematicaRenderer
     {
         if (this.renderPiecewiseBlocks)
         {
-            this.mc.profiler.startSection("litematica_blocks_cutout");
+            this.mc.getProfiler().push("litematica_blocks_cutout");
 
             if (renderColliding)
             {
@@ -374,7 +375,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.CUTOUT, partialTicks, this.entity);
+            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.CUTOUT, this.getCamera());
 
             this.disableShader();
 
@@ -384,7 +385,7 @@ public class LitematicaRenderer
                 GlStateManager.disablePolygonOffset();
             }
 
-            this.mc.profiler.endSection();
+            this.mc.getProfiler().pop();
         }
     }
 
@@ -394,7 +395,7 @@ public class LitematicaRenderer
         {
             if (this.renderPiecewiseBlocks)
             {
-                this.mc.profiler.startSection("litematica_translucent");
+                this.mc.getProfiler().push("litematica_translucent");
 
                 if (renderColliding)
                 {
@@ -404,7 +405,7 @@ public class LitematicaRenderer
 
                 this.startShaderIfEnabled();
 
-                this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.TRANSLUCENT, partialTicks, this.entity);
+                this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.TRANSLUCENT, this.getCamera());
 
                 this.disableShader();
 
@@ -414,59 +415,49 @@ public class LitematicaRenderer
                     GlStateManager.disablePolygonOffset();
                 }
 
-                this.mc.profiler.endSection();
+                this.mc.getProfiler().pop();
             }
 
             if (this.renderPiecewiseSchematic)
             {
-                this.mc.profiler.startSection("litematica_overlay");
+                this.mc.getProfiler().push("litematica_overlay");
 
                 this.renderSchematicOverlay();
 
-                this.mc.profiler.endSection();
+                this.mc.getProfiler().pop();
             }
 
             this.cleanup();
         }
     }
 
-    public void piecewiseRenderEntities(float partialTicks)
+    public void piecewiseRenderEntities(VisibleRegion visibleRegion, float partialTicks)
     {
         if (this.renderPiecewiseBlocks)
         {
-            this.mc.profiler.startSection("litematica_entities");
+            this.mc.getProfiler().push("litematica_entities");
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderEntities(this.entity, this.camera, partialTicks);
+            this.getWorldRenderer().renderEntities(this.getCamera(), visibleRegion, partialTicks);
 
             this.disableShader();
 
             GlStateManager.disableBlend();
 
-            this.mc.profiler.endSection();
+            this.mc.getProfiler().pop();
         }
     }
 
-    private ICamera createCamera(Entity entity, float partialTicks)
+    private Camera getCamera()
     {
-        double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double) partialTicks;
-        double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double) partialTicks;
-        double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double) partialTicks;
-
-        this.entity = entity;
-        this.camera = new Frustum();
-        this.camera.setPosition(x, y, z);
-
-        return this.camera;
+        return this.mc.gameRenderer.getCamera();
     }
 
     private void cleanup()
     {
-        this.entity = null;
-        this.camera = null;
         this.renderPiecewise = false;
         this.renderPiecewisePrepared = false;
         this.renderPiecewiseBlocks = false;

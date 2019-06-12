@@ -20,11 +20,11 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 
@@ -44,21 +44,21 @@ public class RenderUtils
         return length;
     }
 
-    public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth,
-            Color4f color, Entity renderViewEntity, float partialTicks)
+    public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth, Color4f color, MinecraftClient mc)
     {
         GlStateManager.lineWidth(lineWidth);
 
-        BoundingBox aabb = createAABB(pos.getX(), pos.getY(), pos.getZ(), expand, partialTicks, renderViewEntity);
+        BoundingBox aabb = createAABB(pos.getX(), pos.getY(), pos.getZ(), expand, mc);
         WorldRenderer.drawBoxOutline(aabb, color.r, color.g, color.b, color.a);
     }
 
-    public static void drawBlockBoundingBoxOutlinesBatchedLines(BlockPos pos, Color4f color, double expand, BufferBuilder buffer,
-            Entity renderViewEntity, float partialTicks)
+    public static void drawBlockBoundingBoxOutlinesBatchedLines(BlockPos pos, Color4f color,
+            double expand, BufferBuilder buffer, MinecraftClient mc)
     {
-        double dx = renderViewEntity.prevX + (renderViewEntity.x - renderViewEntity.prevX) * partialTicks;
-        double dy = renderViewEntity.prevY + (renderViewEntity.y - renderViewEntity.prevY) * partialTicks;
-        double dz = renderViewEntity.prevZ + (renderViewEntity.z - renderViewEntity.prevZ) * partialTicks;
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        final double dx = cameraPos.x;
+        final double dy = cameraPos.y;
+        final double dz = cameraPos.z;
         double minX = pos.getX() - dx - expand;
         double minY = pos.getY() - dy - expand;
         double minZ = pos.getZ() - dz - expand;
@@ -69,12 +69,13 @@ public class RenderUtils
         fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 
-    public static void drawConnectingLineBatchedLines(BlockPos pos1, BlockPos pos2, boolean center, Color4f color, BufferBuilder buffer,
-            Entity renderViewEntity, float partialTicks)
+    public static void drawConnectingLineBatchedLines(BlockPos pos1, BlockPos pos2, boolean center,
+            Color4f color, BufferBuilder buffer, MinecraftClient mc)
     {
-        double dx = renderViewEntity.prevX + (renderViewEntity.x - renderViewEntity.prevX) * partialTicks;
-        double dy = renderViewEntity.prevY + (renderViewEntity.y - renderViewEntity.prevY) * partialTicks;
-        double dz = renderViewEntity.prevZ + (renderViewEntity.z - renderViewEntity.prevZ) * partialTicks;
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        final double dx = cameraPos.x;
+        final double dy = cameraPos.y;
+        final double dz = cameraPos.z;
         double x1 = pos1.getX() - dx;
         double y1 = pos1.getY() - dy;
         double z1 = pos1.getZ() - dz;
@@ -97,11 +98,12 @@ public class RenderUtils
     }
 
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
-            Color4f color1, Color4f color2, Color4f color3, Entity renderViewEntity, float partialTicks)
+            Color4f color1, Color4f color2, Color4f color3, MinecraftClient mc)
     {
-        final double dx = renderViewEntity.prevX + (renderViewEntity.x - renderViewEntity.prevX) * partialTicks;
-        final double dy = renderViewEntity.prevY + (renderViewEntity.y - renderViewEntity.prevY) * partialTicks;
-        final double dz = renderViewEntity.prevZ + (renderViewEntity.z - renderViewEntity.prevZ) * partialTicks;
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        final double dx = cameraPos.x;
+        final double dy = cameraPos.y;
+        final double dz = cameraPos.z;
 
         final double minX = pos.getX() - dx - expand;
         final double minY = pos.getY() - dy - expand;
@@ -159,11 +161,11 @@ public class RenderUtils
     }
 
     public static void renderAreaOutline(BlockPos pos1, BlockPos pos2, float lineWidth,
-            Color4f colorX, Color4f colorY, Color4f colorZ, Entity renderViewEntity, float partialTicks)
+            Color4f colorX, Color4f colorY, Color4f colorZ, MinecraftClient mc)
     {
         GlStateManager.lineWidth(lineWidth);
 
-        BoundingBox aabb = createEnclosingAABB(pos1, pos2, renderViewEntity, partialTicks);
+        BoundingBox aabb = createEnclosingAABB(pos1, pos2, mc);
         drawBoundingBoxEdges(aabb, colorX, colorY, colorZ);
     }
 
@@ -230,7 +232,7 @@ public class RenderUtils
         buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
     }
 
-    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, Entity renderViewEntity, float partialTicks)
+    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, MinecraftClient mc)
     {
         GlStateManager.enableBlend();
         GlStateManager.disableCull();
@@ -239,7 +241,7 @@ public class RenderUtils
         BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
 
-        renderAreaSidesBatched(pos1, pos2, color, 0.002, renderViewEntity, partialTicks, buffer);
+        renderAreaSidesBatched(pos1, pos2, color, 0.002, buffer, mc);
 
         tessellator.draw();
 
@@ -250,12 +252,13 @@ public class RenderUtils
     /**
      * Assumes a BufferBuilder in GL_QUADS mode has been initialized
      */
-    public static void renderAreaSidesBatched(BlockPos pos1, BlockPos pos2, Color4f color, double expand,
-            Entity renderViewEntity, float partialTicks, BufferBuilder buffer)
+    public static void renderAreaSidesBatched(BlockPos pos1, BlockPos pos2, Color4f color,
+            double expand, BufferBuilder buffer, MinecraftClient mc)
     {
-        double dx = renderViewEntity.prevX + (renderViewEntity.x - renderViewEntity.prevX) * partialTicks;
-        double dy = renderViewEntity.prevY + (renderViewEntity.y - renderViewEntity.prevY) * partialTicks;
-        double dz = renderViewEntity.prevZ + (renderViewEntity.z - renderViewEntity.prevZ) * partialTicks;
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        final double dx = cameraPos.x;
+        final double dy = cameraPos.y;
+        final double dz = cameraPos.z;
         double minX = Math.min(pos1.getX(), pos2.getX()) - dx - expand;
         double minY = Math.min(pos1.getY(), pos2.getY()) - dy - expand;
         double minZ = Math.min(pos1.getZ(), pos2.getZ()) - dz - expand;
@@ -267,7 +270,7 @@ public class RenderUtils
     }
 
     public static void renderAreaOutlineNoCorners(BlockPos pos1, BlockPos pos2,
-            float lineWidth, Color4f colorX, Color4f colorY, Color4f colorZ, Entity renderViewEntity, float partialTicks)
+            float lineWidth, Color4f colorX, Color4f colorY, Color4f colorZ, MinecraftClient mc)
     {
         final int xMin = Math.min(pos1.getX(), pos2.getX());
         final int yMin = Math.min(pos1.getY(), pos2.getY());
@@ -277,9 +280,10 @@ public class RenderUtils
         final int zMax = Math.max(pos1.getZ(), pos2.getZ());
 
         final double expand = 0.001;
-        final double dx = renderViewEntity.prevX + (renderViewEntity.x - renderViewEntity.prevX) * partialTicks;
-        final double dy = renderViewEntity.prevY + (renderViewEntity.y - renderViewEntity.prevY) * partialTicks;
-        final double dz = renderViewEntity.prevZ + (renderViewEntity.z - renderViewEntity.prevZ) * partialTicks;
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        final double dx = cameraPos.x;
+        final double dy = cameraPos.y;
+        final double dz = cameraPos.z;
 
         final double dxMin = -dx - expand;
         final double dyMin = -dy - expand;
@@ -790,7 +794,7 @@ public class RenderUtils
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static BoundingBox createEnclosingAABB(BlockPos pos1, BlockPos pos2, Entity renderViewEntity, float partialTicks)
+    public static BoundingBox createEnclosingAABB(BlockPos pos1, BlockPos pos2, MinecraftClient mc)
     {
         int minX = Math.min(pos1.getX(), pos2.getX());
         int minY = Math.min(pos1.getY(), pos2.getY());
@@ -799,25 +803,26 @@ public class RenderUtils
         int maxY = Math.max(pos1.getY(), pos2.getY()) + 1;
         int maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1;
 
-        return createAABB(minX, minY, minZ, maxX, maxY, maxZ, 0, partialTicks, renderViewEntity);
+        return createAABB(minX, minY, minZ, maxX, maxY, maxZ, 0, mc);
     }
 
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static BoundingBox createAABB(int x, int y, int z, double expand, double partialTicks, Entity renderViewEntity)
+    public static BoundingBox createAABB(int x, int y, int z, double expand, MinecraftClient mc)
     {
-        return createAABB(x, y, z, x + 1, y + 1, z + 1, expand, partialTicks, renderViewEntity);
+        return createAABB(x, y, z, x + 1, y + 1, z + 1, expand, mc);
     }
 
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static BoundingBox createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, double expand, double partialTicks, Entity entity)
+    public static BoundingBox createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, double expand, MinecraftClient mc)
     {
-        double dx = entity.prevX + (entity.x - entity.prevX) * partialTicks;
-        double dy = entity.prevY + (entity.y - entity.prevY) * partialTicks;
-        double dz = entity.prevZ + (entity.z - entity.prevZ) * partialTicks;
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        final double dx = cameraPos.x;
+        final double dy = cameraPos.y;
+        final double dz = cameraPos.z;
 
         return new BoundingBox( minX - dx - expand, minY - dy - expand, minZ - dz - expand,
                                 maxX - dx + expand, maxY - dy + expand, maxZ - dz + expand);

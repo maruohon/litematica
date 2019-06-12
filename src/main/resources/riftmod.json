@@ -1,6 +1,0 @@
-{
-    "id": "litematica",
-    "name": "Litematica",
-    "authors": [ "masa" ],
-    "listeners": [ "fi.dy.masa.litematica.Litematica" ]
-}

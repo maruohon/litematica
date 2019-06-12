@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.mixin;
 
+import java.util.function.BiFunction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -7,26 +8,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.profiler.Profiler;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.storage.ISaveHandler;
-import net.minecraft.world.storage.WorldInfo;
-import net.minecraft.world.storage.WorldSavedDataStorage;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.level.LevelProperties;
 
-@Mixin(WorldClient.class)
-public abstract class MixinWorldClient extends World
+@Mixin(ClientWorld.class)
+public abstract class MixinClientWorld extends World
 {
-    protected MixinWorldClient(ISaveHandler saveHandler, WorldSavedDataStorage dataStorage, WorldInfo worldInfo, Dimension dimension, Profiler profiler, boolean isRemote)
+    protected MixinClientWorld(LevelProperties props, DimensionType dimType,
+            BiFunction<World, Dimension, ChunkManager> func, Profiler profiler, boolean isClient)
     {
-        super(saveHandler, dataStorage, worldInfo, dimension, profiler, isRemote);
+        super(props, dimType, func, profiler, isClient);
     }
 
-    @Inject(method = "invalidateRegionAndSetBlock", at = @At("HEAD"))
-    private void onInvalidateRegionAndSetBlock(BlockPos pos, IBlockState state, CallbackInfo ci)
+    @Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("HEAD"))
+    private void onInvalidateRegionAndSetBlock(BlockPos pos, BlockState state, CallbackInfo ci)
     {
         SchematicVerifier.markVerifierBlockChanges(pos);
 

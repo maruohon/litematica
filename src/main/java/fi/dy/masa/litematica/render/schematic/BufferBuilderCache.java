@@ -1,20 +1,20 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.util.BlockRenderLayer;
+import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
+import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.client.render.BufferBuilder;
 
 public class BufferBuilderCache
 {
-    private final BufferBuilder[] worldRenderers = new BufferBuilder[BlockRenderLayer.values().length];
+    private final BufferBuilder[] blockBufferBuilders = new BufferBuilder[BlockRenderLayer.values().length];
     private BufferBuilder[] overlayBufferBuilders;
 
     public BufferBuilderCache()
     {
-        this.worldRenderers[BlockRenderLayer.SOLID.ordinal()] = new BufferBuilder(2097152);
-        this.worldRenderers[BlockRenderLayer.CUTOUT.ordinal()] = new BufferBuilder(131072);
-        this.worldRenderers[BlockRenderLayer.CUTOUT_MIPPED.ordinal()] = new BufferBuilder(131072);
-        this.worldRenderers[BlockRenderLayer.TRANSLUCENT.ordinal()] = new BufferBuilder(262144);
+        this.blockBufferBuilders[BlockRenderLayer.SOLID.ordinal()] = new BufferBuilder(2097152);
+        this.blockBufferBuilders[BlockRenderLayer.CUTOUT.ordinal()] = new BufferBuilder(131072);
+        this.blockBufferBuilders[BlockRenderLayer.MIPPED_CUTOUT.ordinal()] = new BufferBuilder(131072);
+        this.blockBufferBuilders[BlockRenderLayer.TRANSLUCENT.ordinal()] = new BufferBuilder(262144);
 
         this.overlayBufferBuilders = new BufferBuilder[OverlayRenderType.values().length];
 
@@ -24,14 +24,14 @@ public class BufferBuilderCache
         }
     }
 
-    public BufferBuilder getWorldRendererByLayer(BlockRenderLayer layer)
+    public BufferBuilder getBlockBufferByLayer(BlockRenderLayer layer)
     {
-        return this.worldRenderers[layer.ordinal()];
+        return this.blockBufferBuilders[layer.ordinal()];
     }
 
-    public BufferBuilder getWorldRendererByLayerId(int id)
+    public BufferBuilder getBlockBufferByLayerId(int id)
     {
-        return this.worldRenderers[id];
+        return this.blockBufferBuilders[id];
     }
 
     public BufferBuilder getOverlayBuffer(OverlayRenderType type)

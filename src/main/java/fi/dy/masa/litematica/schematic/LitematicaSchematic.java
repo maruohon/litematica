@@ -729,7 +729,7 @@ public class LitematicaSchematic
                 if (x >= minX && x < maxX && z >= minZ && z < maxZ)
                 {
                     this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
-                    //System.out.printf("post: %.1f - rot: %s, mm: %s, ms: %s\n", rotationYaw, rotationCombined, mirrorMain, mirrorSub);
+                    //System.out.printf("post: %.1f - rot: %s, mm: %s, ms: %s\n", entity.yaw, rotationCombined, mirrorMain, mirrorSub);
                     EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
                 }
             }

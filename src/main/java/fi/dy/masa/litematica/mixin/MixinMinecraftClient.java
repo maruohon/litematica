@@ -7,25 +7,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.WorldUtils;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 
-@Mixin(Minecraft.class)
-public abstract class MixinMinecraft
+@Mixin(MinecraftClient.class)
+public abstract class MixinMinecraftClient
 {
-    @Inject(method = "rightClickMouse", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/item/ItemStack;getCount()I", ordinal = 0), cancellable = true)
+    @Inject(method = "doItemUse", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/item/ItemStack;getAmount()I", ordinal = 0), cancellable = true)
     private void handlePlacementRestriction(CallbackInfo ci)
     {
         if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
         {
-            if (WorldUtils.handlePlacementRestriction((Minecraft)(Object) this))
+            if (WorldUtils.handlePlacementRestriction((MinecraftClient)(Object) this))
             {
                 ci.cancel();
             }
         }
     }
 
-    @Inject(method = "runTick()V", at = @At("HEAD"))
+    @Inject(method = "tick()V", at = @At("HEAD"))
     private void onRunTickStart(CallbackInfo ci)
     {
         DataManager.onClientTickStart();

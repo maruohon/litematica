@@ -3,38 +3,37 @@ package fi.dy.masa.litematica.world;
 import javax.annotation.Nullable;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.client.multiplayer.ChunkProviderClient;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.client.world.ClientChunkManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.TypeFilterableList;
+import net.minecraft.world.chunk.ChunkPos;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.WorldChunk;
 
-public class ChunkProviderSchematic extends ChunkProviderClient
+public class ChunkProviderSchematic extends ClientChunkManager
 {
     private final WorldSchematic world;
     private final Long2ObjectMap<ChunkSchematic> loadedChunks = new Long2ObjectOpenHashMap<>(8192);
-    private final Chunk blankChunk;
+    private final ChunkSchematic blankChunk;
 
     public ChunkProviderSchematic(WorldSchematic world)
     {
-        super(world);
+        super(world, 1);
 
         this.world = world;
-        this.blankChunk = new EmptyChunk(world, 0, 0);
+        this.blankChunk = new ChunkSchematic(world, new ChunkPos(0, 0));
     }
 
     public ChunkSchematic loadChunk(int chunkX, int chunkZ)
     {
-        ChunkSchematic chunk = new ChunkSchematic(this.world, chunkX, chunkZ);
-
-        this.loadedChunks.put(ChunkPos.asLong(chunkX, chunkZ), chunk);
-        chunk.setLoaded(true);
-
+        ChunkSchematic chunk = new ChunkSchematic(this.world, new ChunkPos(chunkX, chunkZ));
+        this.loadedChunks.put(ChunkPos.toLong(chunkX, chunkZ), chunk);
         return chunk;
     }
 
     public boolean isChunkLoaded(int chunkX, int chunkZ)
     {
-        return this.loadedChunks.containsKey(ChunkPos.asLong(chunkX, chunkZ));
+        return this.loadedChunks.containsKey(ChunkPos.toLong(chunkX, chunkZ));
     }
 
     public Long2ObjectMap<ChunkSchematic> getLoadedChunks()
@@ -42,27 +41,35 @@ public class ChunkProviderSchematic extends ChunkProviderClient
         return this.loadedChunks;
     }
 
-    @Nullable
-    public ChunkSchematic getChunk(int chunkX, int chunkZ)
-    {
-        return this.loadedChunks.get(ChunkPos.asLong(chunkX, chunkZ));
-    }
-
     @Override
-    public Chunk getChunk(int chunkX, int chunkZ, boolean p_186025_3_, boolean fallbackToEmpty)
+    public WorldChunk method_2857(int chunkX, int chunkZ, ChunkStatus status, boolean fallbackToEmpty)
     {
         ChunkSchematic chunk = this.getChunk(chunkX, chunkZ);
         return chunk == null && fallbackToEmpty ? this.blankChunk : chunk;
     }
 
-    @Override
+    @Nullable
+    public ChunkSchematic getChunk(int chunkX, int chunkZ)
+    {
+        ChunkSchematic chunk = this.loadedChunks.get(ChunkPos.toLong(chunkX, chunkZ));
+        return chunk == null ? this.blankChunk : chunk;
+    }
+
     public void unloadChunk(int chunkX, int chunkZ)
     {
-        ChunkSchematic chunk = this.loadedChunks.remove(ChunkPos.asLong(chunkX, chunkZ));
+        ChunkSchematic chunk = this.loadedChunks.remove(ChunkPos.toLong(chunkX, chunkZ));
 
         if (chunk != null)
         {
-            chunk.onUnload();
+            this.world.unloadBlockEntities(chunk.getBlockEntities().values());
+
+            for (TypeFilterableList<Entity> list : chunk.getEntitySectionArray())
+            {
+                for (Entity entity : list.getAllOfType(Entity.class))
+                {
+                    this.world.removeEntity(entity.getEntityId());
+                }
+            }
         }
     }
 }

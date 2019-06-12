@@ -1,50 +1,89 @@
 package fi.dy.masa.litematica.world;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.network.NetHandlerPlayClient;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
+import javax.annotation.Nullable;
+import fi.dy.masa.litematica.render.LitematicaRenderer;
+import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.world.ClientChunkManager;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.profiler.Profiler;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleParameters;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.EnumLightType;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.util.profiler.Profiler;
+import net.minecraft.world.LightType;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkManager;
+import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.level.LevelInfo;
 
-public class WorldSchematic extends WorldClient
+public class WorldSchematic extends ClientWorld
 {
-    private final Minecraft mc;
+    private final MinecraftClient mc;
+    private final WorldRendererSchematic worldRenderer;
     private ChunkProviderSchematic chunkProviderSchematic;
+    private int nextEntityId;
 
-    public WorldSchematic(NetHandlerPlayClient netHandler, WorldSettings settings, DimensionType dimType,
-            EnumDifficulty difficulty, Profiler profilerIn)
+    public WorldSchematic(ClientPlayNetworkHandler netHandler, LevelInfo settings,
+            DimensionType dimType, Profiler profilerIn)
     {
-        super(netHandler, settings, dimType, difficulty, profilerIn);
+        super(netHandler, settings, dimType, 1, profilerIn, null);
 
-        this.mc = Minecraft.getInstance();
-    }
-
-    @Override
-    protected IChunkProvider createChunkProvider()
-    {
+        this.mc = MinecraftClient.getInstance();
+        this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
         this.chunkProviderSchematic = new ChunkProviderSchematic(this);
-        return this.chunkProviderSchematic;
     }
 
-    @Override
     public ChunkProviderSchematic getChunkProvider()
     {
         return this.chunkProviderSchematic;
     }
 
     @Override
-    public boolean setBlockState(BlockPos pos, IBlockState newState, int flags)
+    public ClientChunkManager method_2935()
+    {
+        return this.getChunkProvider();
+    }
+
+    @Override
+    public ChunkManager getChunkManager()
+    {
+        return this.getChunkProvider();
+    }
+
+    @Override
+    public WorldChunk getWorldChunk(BlockPos pos)
+    {
+        return this.method_8497(pos.getX() >> 4, pos.getZ() >> 4);
+    }
+
+    @Override
+    public WorldChunk method_8497(int chunkX, int chunkZ)
+    {
+        return this.chunkProviderSchematic.getChunk(chunkX, chunkZ);
+    }
+
+    @Override
+    public Chunk getChunk(int chunkX, int chunkZ, ChunkStatus status, boolean required)
+    {
+        return this.method_8497(chunkX, chunkZ);
+    }
+
+    @Override
+    public boolean setBlockState(BlockPos pos, BlockState newState, int flags)
     {
         if (pos.getY() < 0 || pos.getY() >= 256)
         {
@@ -56,8 +95,6 @@ public class WorldSchematic extends WorldClient
         }
     }
 
-    // This override is just to get rid of the annoying Minecart sounds >_>
-    @Override
     public boolean spawnEntity(Entity entityIn)
     {
         return this.spawnEntityBase(entityIn);
@@ -65,79 +102,172 @@ public class WorldSchematic extends WorldClient
 
     private boolean spawnEntityBase(Entity entityIn)
     {
-        int cx = MathHelper.floor(entityIn.posX / 16.0D);
-        int cy = MathHelper.floor(entityIn.posZ / 16.0D);
-        boolean forceSpawn = entityIn.forceSpawn;
+        int cx = MathHelper.floor(entityIn.x / 16.0D);
+        int cz = MathHelper.floor(entityIn.z / 16.0D);
 
-        if (entityIn instanceof EntityPlayer)
-        {
-            forceSpawn = true;
-        }
-
-        if (forceSpawn == false && this.isChunkLoaded(cx, cy, false) == false)
+        if (this.chunkProviderSchematic.isChunkLoaded(cx, cz) == false)
         {
             return false;
         }
         else
         {
-            if (entityIn instanceof EntityPlayer)
-            {
-                EntityPlayer entityplayer = (EntityPlayer)entityIn;
-                this.playerEntities.add(entityplayer);
-                this.updateAllPlayersSleepingFlag();
-            }
+            entityIn.setEntityId(this.nextEntityId++);
 
-            this.getChunk(cx, cy).addEntity(entityIn);
-            this.loadedEntityList.add(entityIn);
-            this.onEntityAdded(entityIn);
+            super.addEntity(entityIn.getEntityId(), entityIn);
+
             return true;
         }
     }
 
-    @Override
-    public long getGameTime()
+    public void unloadBlockEntities(Collection<BlockEntity> blockEntities)
     {
-        return this.mc.world != null ? this.mc.world.getGameTime() : 0;
+        Set<BlockEntity> remove = Collections.newSetFromMap(new IdentityHashMap<>());
+        remove.addAll(blockEntities);
+        this.tickingBlockEntities.removeAll(remove);
+        this.blockEntities.removeAll(remove);
     }
 
     @Override
-    public int getLight(BlockPos pos)
+    public long getTime()
+    {
+        return this.mc.world != null ? this.mc.world.getTime() : 0;
+    }
+
+    @Override
+    public void scheduleBlockRender(BlockPos pos)
+    {
+        this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+    }
+
+    @Override
+    public void scheduleBlockRenders(int chunkX, int chunkY, int chunkZ)
+    {
+        if (chunkY >= 0 && chunkY < 16)
+        {
+            ChunkSchematic chunk = this.getChunkProvider().getChunk(chunkX, chunkZ);
+
+            if (chunk != null)
+            {
+                ChunkSection[] sections = chunk.getSectionArray();
+
+                if (sections[chunkY] != null && sections[chunkY].isEmpty() == false)
+                {
+                    this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
+                }
+            }
+        }
+    }
+
+    public void scheduleChunkRenders(int chunkX, int chunkZ)
+    {
+        ChunkSchematic chunk = this.getChunkProvider().getChunk(chunkX, chunkZ);
+
+        if (chunk != null)
+        {
+            ChunkSection[] sections = chunk.getSectionArray();
+
+            for (int chunkY = 0; chunkY < 16; ++chunkY)
+            {
+                if (sections[chunkY] != null && sections[chunkY].isEmpty() == false)
+                {
+                    this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
+                }
+            }
+        }
+    }
+
+    public void scheduleChunkRenders(int minBlockX, int minBlockY, int minBlockZ, int maxBlockX, int maxBlockY, int maxBlockZ)
+    {
+        final int minChunkX = Math.min(minBlockX, maxBlockX) >> 4;
+        final int minChunkY = MathHelper.clamp(Math.min(minBlockY, maxBlockY) >> 4, 0, 15);
+        final int minChunkZ = Math.min(minBlockZ, maxBlockZ) >> 4;
+        final int maxChunkX = Math.max(minBlockX, maxBlockX) >> 4;
+        final int maxChunkY = MathHelper.clamp(Math.max(minBlockY, maxBlockY) >> 4, 0, 15);
+        final int maxChunkZ = Math.max(minBlockZ, maxBlockZ) >> 4;
+
+        for (int cz = minChunkZ; cz <= maxChunkZ; ++cz)
+        {
+            for (int cx = minChunkX; cx <= maxChunkX; ++cx)
+            {
+                ChunkSchematic chunk = this.getChunkProvider().getChunk(cx, cz);
+
+                if (chunk != null)
+                {
+                    ChunkSection[] sections = chunk.getSectionArray();
+
+                    for (int cy = minChunkY; cy <= maxChunkY; ++cy)
+                    {
+                        if (sections[cy] != null && sections[cy].isEmpty() == false)
+                        {
+                            this.worldRenderer.scheduleChunkRenders(cx, cy, cz);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public int getLightLevel(BlockPos pos)
     {
         return 15;
     }
 
     @Override
-    public int getLightFor(EnumLightType type, BlockPos pos)
+    public int getLightLevel(BlockPos pos, int foo)
     {
         return 15;
     }
 
     @Override
-    public int getLightFromNeighborsFor(EnumLightType type, BlockPos pos)
+    public int getLightLevel(LightType type, BlockPos pos)
     {
         return 15;
     }
 
     @Override
-    public boolean checkLight(BlockPos pos)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean checkLightFor(EnumLightType lightType, BlockPos pos)
-    {
-        return false;
-    }
-
-    @Override
-    public void playBroadcastSound(int id, BlockPos pos, int data)
+    public void updateListeners(BlockPos blockPos_1, BlockState blockState_1, BlockState blockState_2, int int_1)
     {
         // NO-OP
     }
 
     @Override
-    public void playRecord(BlockPos blockPositionIn, SoundEvent soundEventIn)
+    public void setBlockBreakingProgress(int int_1, BlockPos blockPos_1, int int_2)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void playGlobalEvent(int int_1, BlockPos blockPos_1, int int_2)
+    {
+        // NO-OP
+    }
+    
+    @Override
+    public void playLevelEvent(@Nullable PlayerEntity playerEntity_1, int int_1, BlockPos blockPos_1, int int_2)
+    {
+    }
+
+    @Override
+    public void addParticle(ParticleParameters particleParameters_1, double double_1, double double_2, double double_3, double double_4, double     double_5, double double_6)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void addParticle(ParticleParameters particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3, double   double_4, double double_5, double double_6)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void addImportantParticle(ParticleParameters particleParameters_1, double double_1, double double_2, double double_3, double double_4,   double double_5, double double_6)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void addImportantParticle(ParticleParameters particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3,     double double_4, double double_5, double double_6)
     {
         // NO-OP
     }
@@ -155,25 +285,13 @@ public class WorldSchematic extends WorldClient
     }
 
     @Override
-    public void playSound(EntityPlayer player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch)
+    public void playSound(PlayerEntity player, BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch)
     {
         // NO-OP
     }
 
     @Override
-    public void playSound(EntityPlayer player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch)
-    {
-        // NO-OP
-    }
-
-    @Override
-    public void playEvent(EntityPlayer player, int type, BlockPos pos, int data)
-    {
-        // NO-OP
-    }
-
-    @Override
-    public void playEvent(int type, BlockPos pos, int data)
+    public void playSound(PlayerEntity player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch)
     {
         // NO-OP
     }

@@ -1,50 +1,44 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.fluid.IFluidState;
-import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.EnumLightType;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.world.ExtendedBlockView;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.dimension.Dimension;
-import net.minecraft.world.gen.Heightmap.Type;
+import net.minecraft.world.chunk.WorldChunk;
 
-public class ChunkCacheSchematic implements IWorldReader
+public class ChunkCacheSchematic implements ExtendedBlockView
 {
-    private static final IBlockState AIR = Blocks.AIR.getDefaultState();
+    private static final BlockState AIR = Blocks.AIR.getDefaultState();
 
     protected int chunkStartX;
     protected int chunkStartZ;
-    protected Chunk[][] chunkArray;
+    protected WorldChunk[][] chunkArray;
     protected boolean empty;
     protected World world;
 
-    public ChunkCacheSchematic(World worldIn, BlockPos pos, int expand)
+    public ChunkCacheSchematic(ClientWorld worldIn, BlockPos pos, int expand)
     {
         this.world = worldIn;
         this.chunkStartX = (pos.getX() - expand) >> 4;
         this.chunkStartZ = (pos.getZ() - expand) >> 4;
         int chunkEndX = (pos.getX() + expand + 15) >> 4;
         int chunkEndZ = (pos.getZ() + expand + 15) >> 4;
-        this.chunkArray = new Chunk[chunkEndX - this.chunkStartX + 1][chunkEndZ - this.chunkStartZ + 1];
+        this.chunkArray = new WorldChunk[chunkEndX - this.chunkStartX + 1][chunkEndZ - this.chunkStartZ + 1];
         this.empty = true;
 
         for (int cx = this.chunkStartX; cx <= chunkEndX; ++cx)
         {
             for (int cz = this.chunkStartZ; cz <= chunkEndZ; ++cz)
             {
-                this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = worldIn.getChunk(cx, cz);
+                this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = (WorldChunk) worldIn.getChunk(cx, cz);
             }
         }
 
@@ -52,9 +46,9 @@ public class ChunkCacheSchematic implements IWorldReader
         {
             for (int cz = pos.getZ() >> 4; cz <= (pos.getZ() + 15) >> 4; ++cz)
             {
-                Chunk chunk = this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ];
+                WorldChunk chunk = this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ];
 
-                if (chunk != null && chunk.isEmptyBetween(pos.getY(), pos.getY() + 15) == false)
+                if (chunk != null && chunk.method_12228(pos.getY(), pos.getY() + 15) == false) // isEmptyBetween
                 {
                     this.empty = false;
                     break;
@@ -69,7 +63,7 @@ public class ChunkCacheSchematic implements IWorldReader
     }
 
     @Override
-    public IBlockState getBlockState(BlockPos pos)
+    public BlockState getBlockState(BlockPos pos)
     {
         if (pos.getY() >= 0 && pos.getY() < 256)
         {
@@ -102,121 +96,28 @@ public class ChunkCacheSchematic implements IWorldReader
 
     @Override
     @Nullable
-    public TileEntity getTileEntity(BlockPos pos)
+    public BlockEntity getBlockEntity(BlockPos pos)
     {
-        return this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
+        return this.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
     }
 
     @Nullable
-    public TileEntity getTileEntity(BlockPos pos, Chunk.EnumCreateEntityType type)
+    public BlockEntity getBlockEntity(BlockPos pos, WorldChunk.CreationType type)
     {
         int i = (pos.getX() >> 4) - this.chunkStartX;
         int j = (pos.getZ() >> 4) - this.chunkStartZ;
-        return this.chunkArray[i][j].getTileEntity(pos, type);
+
+        return this.chunkArray[i][j].getBlockEntity(pos, type);
     }
 
     @Override
-    public boolean isAirBlock(BlockPos pos)
-    {
-        return this.getBlockState(pos).isAir();
-    }
-
-    @Override
-    public int getCombinedLight(BlockPos pos, int lightValue)
-    {
-        int sky = 15;
-        int block = 0;
-
-        if (block < lightValue)
-        {
-            block = lightValue;
-        }
-
-        return sky << 20 | block << 4;
-    }
-
-    @Override
-    public int getStrongPower(BlockPos pos, EnumFacing direction)
-    {
-        return this.getBlockState(pos).getStrongPower(this, pos, direction);
-    }
-
-    @Override
-    public int getLightFor(EnumLightType type, BlockPos pos)
+    public int getLightLevel(LightType var1, BlockPos var2)
     {
         return 15;
     }
 
     @Override
-    public int getLightSubtracted(BlockPos pos, int amount)
-    {
-        return 15;
-    }
-
-    @Override
-    public boolean isChunkLoaded(int cx, int cz, boolean allowEmpty)
-    {
-        int x = cx - this.chunkStartX;
-        int z = cz - this.chunkStartZ;
-        return x >= 0 && x < this.chunkArray.length && z >= 0 && z < this.chunkArray[x].length;
-    }
-
-    @Override
-    public boolean canSeeSky(BlockPos pos)
-    {
-        return false;
-    }
-
-    @Override
-    public int getHeight(Type heightmapType, int x, int z)
-    {
-        return 0;
-    }
-
-    @Override
-    public EntityPlayer getClosestPlayer(double x, double y, double z, double distance, Predicate<Entity> predicate)
-    {
-        return null;
-    }
-
-    @Override
-    public int getSkylightSubtracted()
-    {
-        return 0;
-    }
-
-    @Override
-    public WorldBorder getWorldBorder()
-    {
-        return this.world.getWorldBorder();
-    }
-
-    @Override
-    public boolean checkNoEntityCollision(Entity entityIn, VoxelShape shape)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isRemote()
-    {
-        return false;
-    }
-
-    @Override
-    public int getSeaLevel()
-    {
-        return 0;
-    }
-
-    @Override
-    public Dimension getDimension()
-    {
-        return this.world.getDimension();
-    }
-
-    @Override
-    public IFluidState getFluidState(BlockPos pos)
+    public FluidState getFluidState(BlockPos pos)
     {
         // TODO change when fluids become separate
         return this.getBlockState(pos).getFluidState();

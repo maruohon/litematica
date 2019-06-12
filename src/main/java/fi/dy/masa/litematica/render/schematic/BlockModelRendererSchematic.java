@@ -7,36 +7,36 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockModelRenderer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.crash.ReportedException;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.block.BlockColorMap;
+import net.minecraft.client.render.block.BlockModelRenderer;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.util.crash.CrashException;
+import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.world.ExtendedBlockView;
 
 public class BlockModelRendererSchematic extends BlockModelRenderer
 {
-    private final BlockColors blockColors;
+    private final BlockColorMap blockColors;
     private final Random random = new Random();
 
-    public BlockModelRendererSchematic(BlockColors blockColorsIn)
+    public BlockModelRendererSchematic(BlockColorMap blockColorsIn)
     {
         super(blockColorsIn);
 
         this.blockColors = blockColorsIn;
     }
 
-    public boolean renderModel(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
+    public boolean renderModel(ExtendedBlockView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
     {
-        boolean ao = Minecraft.isAmbientOcclusionEnabled() && stateIn.getLightValue() == 0 && modelIn.isAmbientOcclusion();
+        boolean ao = MinecraftClient.isAmbientOcclusionEnabled() && stateIn.getLuminance() == 0 && modelIn.useAmbientOcclusion();
 
         try
         {
@@ -51,22 +51,22 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
         catch (Throwable throwable)
         {
-            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Tesselating block model");
-            CrashReportCategory crashreportcategory = crashreport.makeCategory("Block model being tesselated");
-            CrashReportCategory.addBlockInfo(crashreportcategory, posIn, stateIn);
-            crashreportcategory.addDetail("Using AO", Boolean.valueOf(ao));
-            throw new ReportedException(crashreport);
+            CrashReport crashreport = CrashReport.create(throwable, "Tesselating block model");
+            CrashReportSection crashreportcategory = crashreport.addElement("Block model being tesselated");
+            CrashReportSection.addBlockInfo(crashreportcategory, posIn, stateIn);
+            crashreportcategory.add("Using AO", Boolean.valueOf(ao));
+            throw new CrashException(crashreport);
         }
     }
 
-    public boolean renderModelSmooth(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
+    public boolean renderModelSmooth(ExtendedBlockView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
     {
         boolean renderedSomething = false;
-        float[] quadBounds = new float[EnumFacing.values().length * 2];
+        float[] quadBounds = new float[Direction.values().length * 2];
         BitSet bitset = new BitSet(3);
         AmbientOcclusionFace aoFace = new AmbientOcclusionFace();
 
-        for (EnumFacing side : EnumFacing.values())
+        for (Direction side : Direction.values())
         {
             random.setSeed(seedIn);
             List<BakedQuad> quads = modelIn.getQuads(stateIn, side, random);
@@ -82,7 +82,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
 
         random.setSeed(seedIn);
-        List<BakedQuad> quads = modelIn.getQuads(stateIn, (EnumFacing)null, random);
+        List<BakedQuad> quads = modelIn.getQuads(stateIn, (Direction) null, random);
 
         if (quads.isEmpty() == false)
         {
@@ -93,12 +93,12 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         return renderedSomething;
     }
 
-    public boolean renderModelFlat(IWorldReader worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
+    public boolean renderModelFlat(ExtendedBlockView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
     {
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
 
-        for (EnumFacing side : EnumFacing.values())
+        for (Direction side : Direction.values())
         {
             random.setSeed(seedIn);
             List<BakedQuad> quads = modelIn.getQuads(stateIn, side, random);
@@ -107,7 +107,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             {
                 if (this.shouldRenderModelSide(worldIn, stateIn, posIn, side))
                 {
-                    int lightMapCoords = stateIn.getPackedLightmapCoords(worldIn, posIn.offset(side));
+                    int lightMapCoords = stateIn.getBlockBrightness(worldIn, posIn.offset(side));
                     this.renderQuadsFlat(worldIn, stateIn, posIn, lightMapCoords, false, buffer, quads, bitset);
                     renderedSomething = true;
                 }
@@ -126,59 +126,58 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         return renderedSomething;
     }
 
-    @SuppressWarnings("deprecation")
-    private boolean shouldRenderModelSide(IWorldReader worldIn, IBlockState stateIn, BlockPos posIn, EnumFacing side)
+    private boolean shouldRenderModelSide(ExtendedBlockView worldIn, BlockState stateIn, BlockPos posIn, Direction side)
     {
         return DataManager.getRenderLayerRange().isPositionAtRenderEdgeOnSide(posIn, side) ||
                (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.getBooleanValue()) ||
-               Block.shouldSideBeRendered(stateIn, worldIn, posIn, side);
+               Block.shouldDrawSide(stateIn, worldIn, posIn, side);
     }
 
-    private void renderQuadsSmooth(IWorldReader world, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer, List<BakedQuad> list, float[] quadBounds, BitSet bitSet, AmbientOcclusionFace aoFace)
+    private void renderQuadsSmooth(ExtendedBlockView world, BlockState state, BlockPos pos, BufferBuilder buffer, List<BakedQuad> list, float[] quadBounds, BitSet bitSet, AmbientOcclusionFace aoFace)
     {
-        Vec3d vec3d = stateIn.getOffset(world, posIn);
-        double x = (double)posIn.getX() + vec3d.x;
-        double y = (double)posIn.getY() + vec3d.y;
-        double z = (double)posIn.getZ() + vec3d.z;
+        Vec3d vec3d = state.getOffsetPos(world, pos);
+        double x = (double) pos.getX() + vec3d.x;
+        double y = (double) pos.getY() + vec3d.y;
+        double z = (double) pos.getZ() + vec3d.z;
         int i = 0;
 
         for (int j = list.size(); i < j; ++i)
         {
             BakedQuad bakedquad = list.get(i);
-            this.fillQuadBounds(stateIn, bakedquad.getVertexData(), bakedquad.getFace(), quadBounds, bitSet);
-            aoFace.updateVertexBrightness(world, stateIn, posIn, bakedquad.getFace(), quadBounds, bitSet);
-            buffer.addVertexData(bakedquad.getVertexData());
-            buffer.putBrightness4(aoFace.vertexBrightness[0], aoFace.vertexBrightness[1], aoFace.vertexBrightness[2], aoFace.vertexBrightness[3]);
+            this.fillQuadBounds(world, state, pos, bakedquad.getVertexData(), bakedquad.getFace(), quadBounds, bitSet);
+            aoFace.updateVertexBrightness(world, state, pos, bakedquad.getFace(), quadBounds, bitSet);
+            buffer.putVertexData(bakedquad.getVertexData());
+            buffer.brightness(aoFace.vertexBrightness[0], aoFace.vertexBrightness[1], aoFace.vertexBrightness[2], aoFace.vertexBrightness[3]);
 
-            if (bakedquad.hasTintIndex())
+            if (bakedquad.hasColor())
             {
-                int k = this.blockColors.getColor(stateIn, world, posIn, bakedquad.getTintIndex());
+                int k = this.blockColors.getRenderColor(state, world, pos, bakedquad.getColorIndex());
                 float f = (float)(k >> 16 & 255) / 255.0F;
                 float f1 = (float)(k >> 8 & 255) / 255.0F;
                 float f2 = (float)(k & 255) / 255.0F;
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[0] * f, aoFace.vertexColorMultiplier[0] * f1, aoFace.vertexColorMultiplier[0] * f2, 4);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[1] * f, aoFace.vertexColorMultiplier[1] * f1, aoFace.vertexColorMultiplier[1] * f2, 3);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[2] * f, aoFace.vertexColorMultiplier[2] * f1, aoFace.vertexColorMultiplier[2] * f2, 2);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[3] * f, aoFace.vertexColorMultiplier[3] * f1, aoFace.vertexColorMultiplier[3] * f2, 1);
+                buffer.multiplyColor(aoFace.vertexColorMultiplier[0] * f, aoFace.vertexColorMultiplier[0] * f1, aoFace.vertexColorMultiplier[0] * f2, 4);
+                buffer.multiplyColor(aoFace.vertexColorMultiplier[1] * f, aoFace.vertexColorMultiplier[1] * f1, aoFace.vertexColorMultiplier[1] * f2, 3);
+                buffer.multiplyColor(aoFace.vertexColorMultiplier[2] * f, aoFace.vertexColorMultiplier[2] * f1, aoFace.vertexColorMultiplier[2] * f2, 2);
+                buffer.multiplyColor(aoFace.vertexColorMultiplier[3] * f, aoFace.vertexColorMultiplier[3] * f1, aoFace.vertexColorMultiplier[3] * f2, 1);
             }
             else
             {
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[0], aoFace.vertexColorMultiplier[0], aoFace.vertexColorMultiplier[0], 4);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[1], aoFace.vertexColorMultiplier[1], aoFace.vertexColorMultiplier[1], 3);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[2], aoFace.vertexColorMultiplier[2], aoFace.vertexColorMultiplier[2], 2);
-                buffer.putColorMultiplier(aoFace.vertexColorMultiplier[3], aoFace.vertexColorMultiplier[3], aoFace.vertexColorMultiplier[3], 1);
+                buffer.multiplyColor(aoFace.vertexColorMultiplier[0], aoFace.vertexColorMultiplier[0], aoFace.vertexColorMultiplier[0], 4);
+                buffer.multiplyColor(aoFace.vertexColorMultiplier[1], aoFace.vertexColorMultiplier[1], aoFace.vertexColorMultiplier[1], 3);
+                buffer.multiplyColor(aoFace.vertexColorMultiplier[2], aoFace.vertexColorMultiplier[2], aoFace.vertexColorMultiplier[2], 2);
+                buffer.multiplyColor(aoFace.vertexColorMultiplier[3], aoFace.vertexColorMultiplier[3], aoFace.vertexColorMultiplier[3], 1);
             }
 
-            buffer.putPosition(x, y, z);
+            buffer.postPosition(x, y, z);
         }
     }
 
-    private void renderQuadsFlat(IWorldReader world, IBlockState stateIn, BlockPos posIn, int brightnessIn, boolean ownBrightness, BufferBuilder buffer, List<BakedQuad> list, BitSet bitSet)
+    private void renderQuadsFlat(ExtendedBlockView world, BlockState state, BlockPos pos, int brightnessIn, boolean ownBrightness, BufferBuilder buffer, List<BakedQuad> list, BitSet bitSet)
     {
-        Vec3d vec3d = stateIn.getOffset(world, posIn);
-        double d0 = (double)posIn.getX() + vec3d.x;
-        double d1 = (double)posIn.getY() + vec3d.y;
-        double d2 = (double)posIn.getZ() + vec3d.z;
+        Vec3d vec3d = state.getOffsetPos(world, pos);
+        double d0 = (double)pos.getX() + vec3d.x;
+        double d1 = (double)pos.getY() + vec3d.y;
+        double d2 = (double)pos.getZ() + vec3d.z;
         int i = 0;
 
         for (int j = list.size(); i < j; ++i)
@@ -187,31 +186,31 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
             if (ownBrightness)
             {
-                this.fillQuadBounds(stateIn, bakedquad.getVertexData(), bakedquad.getFace(), (float[])null, bitSet);
-                BlockPos blockpos = bitSet.get(0) ? posIn.offset(bakedquad.getFace()) : posIn;
-                brightnessIn = stateIn.getPackedLightmapCoords(world, blockpos);
+                this.fillQuadBounds(world, state, pos, bakedquad.getVertexData(), bakedquad.getFace(), (float[]) null, bitSet);
+                BlockPos blockpos = bitSet.get(0) ? pos.offset(bakedquad.getFace()) : pos;
+                brightnessIn = state.getBlockBrightness(world, blockpos);
             }
 
-            buffer.addVertexData(bakedquad.getVertexData());
-            buffer.putBrightness4(brightnessIn, brightnessIn, brightnessIn, brightnessIn);
+            buffer.putVertexData(bakedquad.getVertexData());
+            buffer.brightness(brightnessIn, brightnessIn, brightnessIn, brightnessIn);
 
-            if (bakedquad.hasTintIndex())
+            if (bakedquad.hasColor())
             {
-                int k = this.blockColors.getColor(stateIn, world, posIn, bakedquad.getTintIndex());
+                int k = this.blockColors.getRenderColor(state, world, pos, bakedquad.getColorIndex());
                 float f = (float)(k >> 16 & 255) / 255.0F;
                 float f1 = (float)(k >> 8 & 255) / 255.0F;
                 float f2 = (float)(k & 255) / 255.0F;
-                buffer.putColorMultiplier(f, f1, f2, 4);
-                buffer.putColorMultiplier(f, f1, f2, 3);
-                buffer.putColorMultiplier(f, f1, f2, 2);
-                buffer.putColorMultiplier(f, f1, f2, 1);
+                buffer.multiplyColor(f, f1, f2, 4);
+                buffer.multiplyColor(f, f1, f2, 3);
+                buffer.multiplyColor(f, f1, f2, 2);
+                buffer.multiplyColor(f, f1, f2, 1);
             }
 
-            buffer.putPosition(d0, d1, d2);
+            buffer.postPosition(d0, d1, d2);
         }
     }
 
-    private void fillQuadBounds(IBlockState stateIn, int[] vertexData, EnumFacing face, @Nullable float[] quadBounds, BitSet boundsFlags)
+    private void fillQuadBounds(ExtendedBlockView world, BlockState stateIn, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] quadBounds, BitSet boundsFlags)
     {
         float f = 32.0F;
         float f1 = 32.0F;
@@ -235,46 +234,46 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
         if (quadBounds != null)
         {
-            quadBounds[EnumFacing.WEST.getIndex()] = f;
-            quadBounds[EnumFacing.EAST.getIndex()] = f3;
-            quadBounds[EnumFacing.DOWN.getIndex()] = f1;
-            quadBounds[EnumFacing.UP.getIndex()] = f4;
-            quadBounds[EnumFacing.NORTH.getIndex()] = f2;
-            quadBounds[EnumFacing.SOUTH.getIndex()] = f5;
-            int j = EnumFacing.values().length;
-            quadBounds[EnumFacing.WEST.getIndex() + j] = 1.0F - f;
-            quadBounds[EnumFacing.EAST.getIndex() + j] = 1.0F - f3;
-            quadBounds[EnumFacing.DOWN.getIndex() + j] = 1.0F - f1;
-            quadBounds[EnumFacing.UP.getIndex() + j] = 1.0F - f4;
-            quadBounds[EnumFacing.NORTH.getIndex() + j] = 1.0F - f2;
-            quadBounds[EnumFacing.SOUTH.getIndex() + j] = 1.0F - f5;
+            quadBounds[Direction.WEST.getId()] = f;
+            quadBounds[Direction.EAST.getId()] = f3;
+            quadBounds[Direction.DOWN.getId()] = f1;
+            quadBounds[Direction.UP.getId()] = f4;
+            quadBounds[Direction.NORTH.getId()] = f2;
+            quadBounds[Direction.SOUTH.getId()] = f5;
+            int j = Direction.values().length;
+            quadBounds[Direction.WEST.getId() + j] = 1.0F - f;
+            quadBounds[Direction.EAST.getId() + j] = 1.0F - f3;
+            quadBounds[Direction.DOWN.getId() + j] = 1.0F - f1;
+            quadBounds[Direction.UP.getId() + j] = 1.0F - f4;
+            quadBounds[Direction.NORTH.getId() + j] = 1.0F - f2;
+            quadBounds[Direction.SOUTH.getId() + j] = 1.0F - f5;
         }
 
         switch (face)
         {
             case DOWN:
                 boundsFlags.set(1, f >= 1.0E-4F || f2 >= 1.0E-4F || f3 <= 0.9999F || f5 <= 0.9999F);
-                boundsFlags.set(0, (f1 < 1.0E-4F || stateIn.isFullCube()) && f1 == f4);
+                boundsFlags.set(0, (f1 < 1.0E-4F || Block.isShapeFullCube(stateIn.getCollisionShape(world, pos))) && f1 == f4);
                 break;
             case UP:
                 boundsFlags.set(1, f >= 1.0E-4F || f2 >= 1.0E-4F || f3 <= 0.9999F || f5 <= 0.9999F);
-                boundsFlags.set(0, (f4 > 0.9999F || stateIn.isFullCube()) && f1 == f4);
+                boundsFlags.set(0, (f4 > 0.9999F || Block.isShapeFullCube(stateIn.getCollisionShape(world, pos))) && f1 == f4);
                 break;
             case NORTH:
                 boundsFlags.set(1, f >= 1.0E-4F || f1 >= 1.0E-4F || f3 <= 0.9999F || f4 <= 0.9999F);
-                boundsFlags.set(0, (f2 < 1.0E-4F || stateIn.isFullCube()) && f2 == f5);
+                boundsFlags.set(0, (f2 < 1.0E-4F || Block.isShapeFullCube(stateIn.getCollisionShape(world, pos))) && f2 == f5);
                 break;
             case SOUTH:
                 boundsFlags.set(1, f >= 1.0E-4F || f1 >= 1.0E-4F || f3 <= 0.9999F || f4 <= 0.9999F);
-                boundsFlags.set(0, (f5 > 0.9999F || stateIn.isFullCube()) && f2 == f5);
+                boundsFlags.set(0, (f5 > 0.9999F || Block.isShapeFullCube(stateIn.getCollisionShape(world, pos))) && f2 == f5);
                 break;
             case WEST:
                 boundsFlags.set(1, f1 >= 1.0E-4F || f2 >= 1.0E-4F || f4 <= 0.9999F || f5 <= 0.9999F);
-                boundsFlags.set(0, (f < 1.0E-4F || stateIn.isFullCube()) && f == f3);
+                boundsFlags.set(0, (f < 1.0E-4F || Block.isShapeFullCube(stateIn.getCollisionShape(world, pos))) && f == f3);
                 break;
             case EAST:
                 boundsFlags.set(1, f1 >= 1.0E-4F || f2 >= 1.0E-4F || f4 <= 0.9999F || f5 <= 0.9999F);
-                boundsFlags.set(0, (f3 > 0.9999F || stateIn.isFullCube()) && f == f3);
+                boundsFlags.set(0, (f3 > 0.9999F || Block.isShapeFullCube(stateIn.getCollisionShape(world, pos))) && f == f3);
         }
     }
 
@@ -283,7 +282,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         private final float[] vertexColorMultiplier = new float[4];
         private final int[] vertexBrightness = new int[4];
 
-        public void updateVertexBrightness(IWorldReader worldIn, IBlockState state, BlockPos centerPos, EnumFacing direction, float[] faceShape, BitSet shapeState)
+        public void updateVertexBrightness(ExtendedBlockView worldIn, BlockState state, BlockPos centerPos, Direction direction, float[] faceShape, BitSet shapeState)
         {
             /*
             BlockPos blockpos = shapeState.get(0) ? centerPos.offset(direction) : centerPos;
@@ -472,14 +471,14 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
     public static enum EnumNeighborInfo
     {
-        DOWN(new EnumFacing[]{EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH}, 0.5F, true, new Orientation[]{Orientation.FLIP_WEST, Orientation.SOUTH, Orientation.FLIP_WEST, Orientation.FLIP_SOUTH, Orientation.WEST, Orientation.FLIP_SOUTH, Orientation.WEST, Orientation.SOUTH}, new Orientation[]{Orientation.FLIP_WEST, Orientation.NORTH, Orientation.FLIP_WEST, Orientation.FLIP_NORTH, Orientation.WEST, Orientation.FLIP_NORTH, Orientation.WEST, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_EAST, Orientation.NORTH, Orientation.FLIP_EAST, Orientation.FLIP_NORTH, Orientation.EAST, Orientation.FLIP_NORTH, Orientation.EAST, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_EAST, Orientation.SOUTH, Orientation.FLIP_EAST, Orientation.FLIP_SOUTH, Orientation.EAST, Orientation.FLIP_SOUTH, Orientation.EAST, Orientation.SOUTH}),
-        UP(new EnumFacing[]{EnumFacing.EAST, EnumFacing.WEST, EnumFacing.NORTH, EnumFacing.SOUTH}, 1.0F, true, new Orientation[]{Orientation.EAST, Orientation.SOUTH, Orientation.EAST, Orientation.FLIP_SOUTH, Orientation.FLIP_EAST, Orientation.FLIP_SOUTH, Orientation.FLIP_EAST, Orientation.SOUTH}, new Orientation[]{Orientation.EAST, Orientation.NORTH, Orientation.EAST, Orientation.FLIP_NORTH, Orientation.FLIP_EAST, Orientation.FLIP_NORTH, Orientation.FLIP_EAST, Orientation.NORTH}, new Orientation[]{Orientation.WEST, Orientation.NORTH, Orientation.WEST, Orientation.FLIP_NORTH, Orientation.FLIP_WEST, Orientation.FLIP_NORTH, Orientation.FLIP_WEST, Orientation.NORTH}, new Orientation[]{Orientation.WEST, Orientation.SOUTH, Orientation.WEST, Orientation.FLIP_SOUTH, Orientation.FLIP_WEST, Orientation.FLIP_SOUTH, Orientation.FLIP_WEST, Orientation.SOUTH}),
-        NORTH(new EnumFacing[]{EnumFacing.UP, EnumFacing.DOWN, EnumFacing.EAST, EnumFacing.WEST}, 0.8F, true, new Orientation[]{Orientation.UP, Orientation.FLIP_WEST, Orientation.UP, Orientation.WEST, Orientation.FLIP_UP, Orientation.WEST, Orientation.FLIP_UP, Orientation.FLIP_WEST}, new Orientation[]{Orientation.UP, Orientation.FLIP_EAST, Orientation.UP, Orientation.EAST, Orientation.FLIP_UP, Orientation.EAST, Orientation.FLIP_UP, Orientation.FLIP_EAST}, new Orientation[]{Orientation.DOWN, Orientation.FLIP_EAST, Orientation.DOWN, Orientation.EAST, Orientation.FLIP_DOWN, Orientation.EAST, Orientation.FLIP_DOWN, Orientation.FLIP_EAST}, new Orientation[]{Orientation.DOWN, Orientation.FLIP_WEST, Orientation.DOWN, Orientation.WEST, Orientation.FLIP_DOWN, Orientation.WEST, Orientation.FLIP_DOWN, Orientation.FLIP_WEST}),
-        SOUTH(new EnumFacing[]{EnumFacing.WEST, EnumFacing.EAST, EnumFacing.DOWN, EnumFacing.UP}, 0.8F, true, new Orientation[]{Orientation.UP, Orientation.FLIP_WEST, Orientation.FLIP_UP, Orientation.FLIP_WEST, Orientation.FLIP_UP, Orientation.WEST, Orientation.UP, Orientation.WEST}, new Orientation[]{Orientation.DOWN, Orientation.FLIP_WEST, Orientation.FLIP_DOWN, Orientation.FLIP_WEST, Orientation.FLIP_DOWN, Orientation.WEST, Orientation.DOWN, Orientation.WEST}, new Orientation[]{Orientation.DOWN, Orientation.FLIP_EAST, Orientation.FLIP_DOWN, Orientation.FLIP_EAST, Orientation.FLIP_DOWN, Orientation.EAST, Orientation.DOWN, Orientation.EAST}, new Orientation[]{Orientation.UP, Orientation.FLIP_EAST, Orientation.FLIP_UP, Orientation.FLIP_EAST, Orientation.FLIP_UP, Orientation.EAST, Orientation.UP, Orientation.EAST}),
-        WEST(new EnumFacing[]{EnumFacing.UP, EnumFacing.DOWN, EnumFacing.NORTH, EnumFacing.SOUTH}, 0.6F, true, new Orientation[]{Orientation.UP, Orientation.SOUTH, Orientation.UP, Orientation.FLIP_SOUTH, Orientation.FLIP_UP, Orientation.FLIP_SOUTH, Orientation.FLIP_UP, Orientation.SOUTH}, new Orientation[]{Orientation.UP, Orientation.NORTH, Orientation.UP, Orientation.FLIP_NORTH, Orientation.FLIP_UP, Orientation.FLIP_NORTH, Orientation.FLIP_UP, Orientation.NORTH}, new Orientation[]{Orientation.DOWN, Orientation.NORTH, Orientation.DOWN, Orientation.FLIP_NORTH, Orientation.FLIP_DOWN, Orientation.FLIP_NORTH, Orientation.FLIP_DOWN, Orientation.NORTH}, new Orientation[]{Orientation.DOWN, Orientation.SOUTH, Orientation.DOWN, Orientation.FLIP_SOUTH, Orientation.FLIP_DOWN, Orientation.FLIP_SOUTH, Orientation.FLIP_DOWN, Orientation.SOUTH}),
-        EAST(new EnumFacing[]{EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH}, 0.6F, true, new Orientation[]{Orientation.FLIP_DOWN, Orientation.SOUTH, Orientation.FLIP_DOWN, Orientation.FLIP_SOUTH, Orientation.DOWN, Orientation.FLIP_SOUTH, Orientation.DOWN, Orientation.SOUTH}, new Orientation[]{Orientation.FLIP_DOWN, Orientation.NORTH, Orientation.FLIP_DOWN, Orientation.FLIP_NORTH, Orientation.DOWN, Orientation.FLIP_NORTH, Orientation.DOWN, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_UP, Orientation.NORTH, Orientation.FLIP_UP, Orientation.FLIP_NORTH, Orientation.UP, Orientation.FLIP_NORTH, Orientation.UP, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_UP, Orientation.SOUTH, Orientation.FLIP_UP, Orientation.FLIP_SOUTH, Orientation.UP, Orientation.FLIP_SOUTH, Orientation.UP, Orientation.SOUTH});
+        DOWN(new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH}, 0.5F, true, new Orientation[]{Orientation.FLIP_WEST, Orientation.SOUTH, Orientation.FLIP_WEST, Orientation.FLIP_SOUTH, Orientation.WEST, Orientation.FLIP_SOUTH, Orientation.WEST, Orientation.SOUTH}, new Orientation[]{Orientation.FLIP_WEST, Orientation.NORTH, Orientation.FLIP_WEST, Orientation.FLIP_NORTH, Orientation.WEST, Orientation.FLIP_NORTH, Orientation.WEST, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_EAST, Orientation.NORTH, Orientation.FLIP_EAST, Orientation.FLIP_NORTH, Orientation.EAST, Orientation.FLIP_NORTH, Orientation.EAST, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_EAST, Orientation.SOUTH, Orientation.FLIP_EAST, Orientation.FLIP_SOUTH, Orientation.EAST, Orientation.FLIP_SOUTH, Orientation.EAST, Orientation.SOUTH}),
+        UP(new Direction[]{Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH}, 1.0F, true, new Orientation[]{Orientation.EAST, Orientation.SOUTH, Orientation.EAST, Orientation.FLIP_SOUTH, Orientation.FLIP_EAST, Orientation.FLIP_SOUTH, Orientation.FLIP_EAST, Orientation.SOUTH}, new Orientation[]{Orientation.EAST, Orientation.NORTH, Orientation.EAST, Orientation.FLIP_NORTH, Orientation.FLIP_EAST, Orientation.FLIP_NORTH, Orientation.FLIP_EAST, Orientation.NORTH}, new Orientation[]{Orientation.WEST, Orientation.NORTH, Orientation.WEST, Orientation.FLIP_NORTH, Orientation.FLIP_WEST, Orientation.FLIP_NORTH, Orientation.FLIP_WEST, Orientation.NORTH}, new Orientation[]{Orientation.WEST, Orientation.SOUTH, Orientation.WEST, Orientation.FLIP_SOUTH, Orientation.FLIP_WEST, Orientation.FLIP_SOUTH, Orientation.FLIP_WEST, Orientation.SOUTH}),
+        NORTH(new Direction[]{Direction.UP, Direction.DOWN, Direction.EAST, Direction.WEST}, 0.8F, true, new Orientation[]{Orientation.UP, Orientation.FLIP_WEST, Orientation.UP, Orientation.WEST, Orientation.FLIP_UP, Orientation.WEST, Orientation.FLIP_UP, Orientation.FLIP_WEST}, new Orientation[]{Orientation.UP, Orientation.FLIP_EAST, Orientation.UP, Orientation.EAST, Orientation.FLIP_UP, Orientation.EAST, Orientation.FLIP_UP, Orientation.FLIP_EAST}, new Orientation[]{Orientation.DOWN, Orientation.FLIP_EAST, Orientation.DOWN, Orientation.EAST, Orientation.FLIP_DOWN, Orientation.EAST, Orientation.FLIP_DOWN, Orientation.FLIP_EAST}, new Orientation[]{Orientation.DOWN, Orientation.FLIP_WEST, Orientation.DOWN, Orientation.WEST, Orientation.FLIP_DOWN, Orientation.WEST, Orientation.FLIP_DOWN, Orientation.FLIP_WEST}),
+        SOUTH(new Direction[]{Direction.WEST, Direction.EAST, Direction.DOWN, Direction.UP}, 0.8F, true, new Orientation[]{Orientation.UP, Orientation.FLIP_WEST, Orientation.FLIP_UP, Orientation.FLIP_WEST, Orientation.FLIP_UP, Orientation.WEST, Orientation.UP, Orientation.WEST}, new Orientation[]{Orientation.DOWN, Orientation.FLIP_WEST, Orientation.FLIP_DOWN, Orientation.FLIP_WEST, Orientation.FLIP_DOWN, Orientation.WEST, Orientation.DOWN, Orientation.WEST}, new Orientation[]{Orientation.DOWN, Orientation.FLIP_EAST, Orientation.FLIP_DOWN, Orientation.FLIP_EAST, Orientation.FLIP_DOWN, Orientation.EAST, Orientation.DOWN, Orientation.EAST}, new Orientation[]{Orientation.UP, Orientation.FLIP_EAST, Orientation.FLIP_UP, Orientation.FLIP_EAST, Orientation.FLIP_UP, Orientation.EAST, Orientation.UP, Orientation.EAST}),
+        WEST(new Direction[]{Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH}, 0.6F, true, new Orientation[]{Orientation.UP, Orientation.SOUTH, Orientation.UP, Orientation.FLIP_SOUTH, Orientation.FLIP_UP, Orientation.FLIP_SOUTH, Orientation.FLIP_UP, Orientation.SOUTH}, new Orientation[]{Orientation.UP, Orientation.NORTH, Orientation.UP, Orientation.FLIP_NORTH, Orientation.FLIP_UP, Orientation.FLIP_NORTH, Orientation.FLIP_UP, Orientation.NORTH}, new Orientation[]{Orientation.DOWN, Orientation.NORTH, Orientation.DOWN, Orientation.FLIP_NORTH, Orientation.FLIP_DOWN, Orientation.FLIP_NORTH, Orientation.FLIP_DOWN, Orientation.NORTH}, new Orientation[]{Orientation.DOWN, Orientation.SOUTH, Orientation.DOWN, Orientation.FLIP_SOUTH, Orientation.FLIP_DOWN, Orientation.FLIP_SOUTH, Orientation.FLIP_DOWN, Orientation.SOUTH}),
+        EAST(new Direction[]{Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH}, 0.6F, true, new Orientation[]{Orientation.FLIP_DOWN, Orientation.SOUTH, Orientation.FLIP_DOWN, Orientation.FLIP_SOUTH, Orientation.DOWN, Orientation.FLIP_SOUTH, Orientation.DOWN, Orientation.SOUTH}, new Orientation[]{Orientation.FLIP_DOWN, Orientation.NORTH, Orientation.FLIP_DOWN, Orientation.FLIP_NORTH, Orientation.DOWN, Orientation.FLIP_NORTH, Orientation.DOWN, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_UP, Orientation.NORTH, Orientation.FLIP_UP, Orientation.FLIP_NORTH, Orientation.UP, Orientation.FLIP_NORTH, Orientation.UP, Orientation.NORTH}, new Orientation[]{Orientation.FLIP_UP, Orientation.SOUTH, Orientation.FLIP_UP, Orientation.FLIP_SOUTH, Orientation.UP, Orientation.FLIP_SOUTH, Orientation.UP, Orientation.SOUTH});
 
-        //private final EnumFacing[] corners;
+        //private final Direction[] corners;
         //private final float shadeWeight;
         private final boolean doNonCubicWeight;
         private final Orientation[] vert0Weights;
@@ -488,7 +487,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         private final Orientation[] vert3Weights;
         private static final EnumNeighborInfo[] VALUES = new EnumNeighborInfo[6];
 
-        private EnumNeighborInfo(EnumFacing[] p_i46236_3_, float p_i46236_4_, boolean p_i46236_5_, Orientation[] p_i46236_6_, Orientation[] p_i46236_7_, Orientation[] p_i46236_8_, Orientation[] p_i46236_9_)
+        private EnumNeighborInfo(Direction[] p_i46236_3_, float p_i46236_4_, boolean p_i46236_5_, Orientation[] p_i46236_6_, Orientation[] p_i46236_7_, Orientation[] p_i46236_8_, Orientation[] p_i46236_9_)
         {
             //this.corners = p_i46236_3_;
             //this.shadeWeight = p_i46236_4_;
@@ -499,42 +498,42 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             this.vert3Weights = p_i46236_9_;
         }
 
-        public static EnumNeighborInfo getNeighbourInfo(EnumFacing p_178273_0_)
+        public static EnumNeighborInfo getNeighbourInfo(Direction p_178273_0_)
         {
-            return VALUES[p_178273_0_.getIndex()];
+            return VALUES[p_178273_0_.getId()];
         }
 
         static
         {
-            VALUES[EnumFacing.DOWN.getIndex()] = DOWN;
-            VALUES[EnumFacing.UP.getIndex()] = UP;
-            VALUES[EnumFacing.NORTH.getIndex()] = NORTH;
-            VALUES[EnumFacing.SOUTH.getIndex()] = SOUTH;
-            VALUES[EnumFacing.WEST.getIndex()] = WEST;
-            VALUES[EnumFacing.EAST.getIndex()] = EAST;
+            VALUES[Direction.DOWN.getId()] = DOWN;
+            VALUES[Direction.UP.getId()] = UP;
+            VALUES[Direction.NORTH.getId()] = NORTH;
+            VALUES[Direction.SOUTH.getId()] = SOUTH;
+            VALUES[Direction.WEST.getId()] = WEST;
+            VALUES[Direction.EAST.getId()] = EAST;
         }
     }
 
     public static enum Orientation
     {
-        DOWN(EnumFacing.DOWN, false),
-        UP(EnumFacing.UP, false),
-        NORTH(EnumFacing.NORTH, false),
-        SOUTH(EnumFacing.SOUTH, false),
-        WEST(EnumFacing.WEST, false),
-        EAST(EnumFacing.EAST, false),
-        FLIP_DOWN(EnumFacing.DOWN, true),
-        FLIP_UP(EnumFacing.UP, true),
-        FLIP_NORTH(EnumFacing.NORTH, true),
-        FLIP_SOUTH(EnumFacing.SOUTH, true),
-        FLIP_WEST(EnumFacing.WEST, true),
-        FLIP_EAST(EnumFacing.EAST, true);
+        DOWN(Direction.DOWN, false),
+        UP(Direction.UP, false),
+        NORTH(Direction.NORTH, false),
+        SOUTH(Direction.SOUTH, false),
+        WEST(Direction.WEST, false),
+        EAST(Direction.EAST, false),
+        FLIP_DOWN(Direction.DOWN, true),
+        FLIP_UP(Direction.UP, true),
+        FLIP_NORTH(Direction.NORTH, true),
+        FLIP_SOUTH(Direction.SOUTH, true),
+        FLIP_WEST(Direction.WEST, true),
+        FLIP_EAST(Direction.EAST, true);
 
         private final int shape;
 
-        private Orientation(EnumFacing p_i46233_3_, boolean p_i46233_4_)
+        private Orientation(Direction p_i46233_3_, boolean p_i46233_4_)
         {
-            this.shape = p_i46233_3_.getIndex() + (p_i46233_4_ ? EnumFacing.values().length : 0);
+            this.shape = p_i46233_3_.getId() + (p_i46233_4_ ? Direction.values().length : 0);
         }
     }
 
@@ -561,19 +560,19 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             this.vert3 = p_i46234_6_;
         }
 
-        public static VertexTranslations getVertexTranslations(EnumFacing p_178184_0_)
+        public static VertexTranslations getVertexTranslations(Direction p_178184_0_)
         {
-            return VALUES[p_178184_0_.getIndex()];
+            return VALUES[p_178184_0_.getId()];
         }
 
         static
         {
-            VALUES[EnumFacing.DOWN.getIndex()] = DOWN;
-            VALUES[EnumFacing.UP.getIndex()] = UP;
-            VALUES[EnumFacing.NORTH.getIndex()] = NORTH;
-            VALUES[EnumFacing.SOUTH.getIndex()] = SOUTH;
-            VALUES[EnumFacing.WEST.getIndex()] = WEST;
-            VALUES[EnumFacing.EAST.getIndex()] = EAST;
+            VALUES[Direction.DOWN.getId()] = DOWN;
+            VALUES[Direction.UP.getId()] = UP;
+            VALUES[Direction.NORTH.getId()] = NORTH;
+            VALUES[Direction.SOUTH.getId()] = SOUTH;
+            VALUES[Direction.WEST.getId()] = WEST;
+            VALUES[Direction.EAST.getId()] = EAST;
         }
     }
 }

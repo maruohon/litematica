@@ -43,7 +43,6 @@ import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -124,7 +123,6 @@ public class OverlayRenderer
 
     public void renderBoxes(float partialTicks)
     {
-        Entity renderViewEntity = this.mc.getCameraEntity();
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         boolean renderAreas = currentSelection != null && Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue();
@@ -154,7 +152,7 @@ public class OverlayRenderer
                 for (Box box : currentSelection.getAllSubRegionBoxes())
                 {
                     BoxType type = box == currentBox ? BoxType.AREA_SELECTED : BoxType.AREA_UNSELECTED;
-                    this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
+                    this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, null);
                 }
 
                 BlockPos origin = currentSelection.getExplicitOrigin();
@@ -164,11 +162,11 @@ public class OverlayRenderer
                     if (currentSelection.isOriginSelected())
                     {
                         Color4f colorTmp = Color4f.fromColor(this.colorAreaOrigin, 0.4f);
-                        RenderUtils.renderAreaSides(origin, origin, colorTmp, renderViewEntity, partialTicks);
+                        RenderUtils.renderAreaSides(origin, origin, colorTmp, this.mc);
                     }
 
                     Color4f color = currentSelection.isOriginSelected() ? this.colorSelectedCorner : this.colorAreaOrigin;
-                    RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+                    RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, this.mc);
                 }
 
                 GlStateManager.depthMask(true);
@@ -192,11 +190,11 @@ public class OverlayRenderer
                         String boxName = entryBox.getKey();
                         boolean boxSelected = schematicPlacement == currentPlacement && (origin || boxName.equals(schematicPlacement.getSelectedSubRegionName()));
                         BoxType type = boxSelected ? BoxType.PLACEMENT_SELECTED : BoxType.PLACEMENT_UNSELECTED;
-                        this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, schematicPlacement);
+                        this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, schematicPlacement);
                     }
 
                     Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
-                    RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
+                    RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, this.mc);
 
                     if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX.getBooleanValue())
                     {
@@ -204,13 +202,13 @@ public class OverlayRenderer
 
                         if (schematicPlacement.shouldRenderEnclosingBox() && box != null)
                         {
-                            RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
+                            RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, this.mc);
 
                             if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())
                             {
                                 float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
                                 color = new Color4f(color.r, color.g, color.b, alpha);
-                                RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, renderViewEntity, partialTicks);
+                                RenderUtils.renderAreaSides(box.getPos1(), box.getPos2(), color, this.mc);
                             }
                         }
                     }
@@ -223,7 +221,7 @@ public class OverlayRenderer
 
                 if (project != null)
                 {
-                    RenderUtils.renderBlockOutline(project.getOrigin(), expand, 4f, this.colorOverlapping, renderViewEntity, partialTicks);
+                    RenderUtils.renderBlockOutline(project.getOrigin(), expand, 4f, this.colorOverlapping, this.mc);
                 }
             }
 
@@ -236,7 +234,7 @@ public class OverlayRenderer
     }
 
     public void renderSelectionBox(Box box, BoxType boxType, float expand,
-            float lineWidthBlockBox, float lineWidthArea, Entity renderViewEntity, float partialTicks, @Nullable SchematicPlacement placement)
+            float lineWidthBlockBox, float lineWidthArea, @Nullable SchematicPlacement placement)
     {
         BlockPos pos1 = box.getPos1();
         BlockPos pos2 = box.getPos2();
@@ -306,7 +304,7 @@ public class OverlayRenderer
         {
             if (pos1.equals(pos2) == false)
             {
-                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, renderViewEntity, partialTicks);
+                RenderUtils.renderAreaOutlineNoCorners(pos1, pos2, lineWidthArea, colorX, colorY, colorZ, this.mc);
 
                 if (((boxType == BoxType.AREA_SELECTED || boxType == BoxType.AREA_UNSELECTED) &&
                       Configs.Visuals.RENDER_AREA_SELECTION_BOX_SIDES.getBooleanValue())
@@ -314,38 +312,38 @@ public class OverlayRenderer
                      ((boxType == BoxType.PLACEMENT_SELECTED || boxType == BoxType.PLACEMENT_UNSELECTED) &&
                        Configs.Visuals.RENDER_PLACEMENT_BOX_SIDES.getBooleanValue()))
                 {
-                    RenderUtils.renderAreaSides(pos1, pos2, sideColor, renderViewEntity, partialTicks);
+                    RenderUtils.renderAreaSides(pos1, pos2, sideColor, this.mc);
                 }
 
                 if (box.getSelectedCorner() == Corner.CORNER_1)
                 {
                     Color4f color = Color4f.fromColor(this.colorPos1, 0.4f);
-                    RenderUtils.renderAreaSides(pos1, pos1, color, renderViewEntity, partialTicks);
+                    RenderUtils.renderAreaSides(pos1, pos1, color, this.mc);
                 }
                 else if (box.getSelectedCorner() == Corner.CORNER_2)
                 {
                     Color4f color = Color4f.fromColor(this.colorPos2, 0.4f);
-                    RenderUtils.renderAreaSides(pos2, pos2, color, renderViewEntity, partialTicks);
+                    RenderUtils.renderAreaSides(pos2, pos2, color, this.mc);
                 }
 
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, this.mc);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, this.mc);
             }
             else
             {
-                RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, color1, color2, this.colorOverlapping, renderViewEntity, partialTicks);
+                RenderUtils.renderBlockOutlineOverlapping(pos1, expand, lineWidthBlockBox, color1, color2, this.colorOverlapping, this.mc);
             }
         }
         else
         {
             if (pos1 != null)
             {
-                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, renderViewEntity, partialTicks);
+                RenderUtils.renderBlockOutline(pos1, expand, lineWidthBlockBox, color1, this.mc);
             }
 
             if (pos2 != null)
             {
-                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, renderViewEntity, partialTicks);
+                RenderUtils.renderBlockOutline(pos2, expand, lineWidthBlockBox, color2, this.mc);
             }
         }
     }
@@ -380,7 +378,6 @@ public class OverlayRenderer
 
         GlStateManager.lineWidth(2f);
 
-        PlayerEntity player = this.mc.player;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBufferBuilder();
         buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
@@ -394,7 +391,7 @@ public class OverlayRenderer
 
             if (entry.pos.equals(lookPos) == false)
             {
-                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.pos, color, 0.002, buffer, player, partialTicks);
+                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.pos, color, 0.002, buffer, this.mc);
             }
             else
             {
@@ -403,7 +400,7 @@ public class OverlayRenderer
 
             if (connections && prevEntry != null)
             {
-                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, entry.pos, false, color, buffer, player, partialTicks);
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, entry.pos, false, color, buffer, this.mc);
             }
 
             prevEntry = entry;
@@ -413,14 +410,14 @@ public class OverlayRenderer
         {
             if (connections && prevEntry != null)
             {
-                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, lookedEntry.pos, false, lookedEntry.type.getColor(), buffer, player, partialTicks);
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, lookedEntry.pos, false, lookedEntry.type.getColor(), buffer, this.mc);
             }
 
             tessellator.draw();
             buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
             GlStateManager.lineWidth(6f);
-            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, player, partialTicks);
+            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, this.mc);
         }
 
         tessellator.draw();
@@ -437,7 +434,7 @@ public class OverlayRenderer
             {
                 Color4f color = entry.type.getColor();
                 color = new Color4f(color.r, color.g, color.b, alpha);
-                RenderUtils.renderAreaSidesBatched(entry.pos, entry.pos, color, 0.002, this.mc.player, partialTicks, buffer);
+                RenderUtils.renderAreaSidesBatched(entry.pos, entry.pos, color, 0.002, buffer, this.mc);
             }
 
             tessellator.draw();

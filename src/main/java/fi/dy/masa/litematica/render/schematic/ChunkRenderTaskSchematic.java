@@ -4,23 +4,22 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
-import net.minecraft.client.renderer.chunk.CompiledChunk;
 
 public class ChunkRenderTaskSchematic implements Comparable<ChunkRenderTaskSchematic>
 {
-    private final RenderChunkSchematicVbo renderChunk;
-    private final ReentrantLock lock = new ReentrantLock();
-    private final List<Runnable> listFinishRunnables = Lists.<Runnable>newArrayList();
+    private final ChunkRendererSchematicVbo chunkRenderer;
     private final ChunkRenderTaskSchematic.Type type;
+    private final List<Runnable> listFinishRunnables = Lists.<Runnable>newArrayList();
+    private final ReentrantLock lock = new ReentrantLock();
     private final double distanceSq;
     private BufferBuilderCache bufferBuilderCache;
-    private CompiledChunk compiledChunk;
+    private ChunkRenderDataSchematic chunkRenderData;
     private ChunkRenderTaskSchematic.Status status = ChunkRenderTaskSchematic.Status.PENDING;
     private boolean finished;
 
-    public ChunkRenderTaskSchematic(RenderChunkSchematicVbo renderChunkIn, ChunkRenderTaskSchematic.Type typeIn, double distanceSqIn)
+    public ChunkRenderTaskSchematic(ChunkRendererSchematicVbo renderChunkIn, ChunkRenderTaskSchematic.Type typeIn, double distanceSqIn)
     {
-        this.renderChunk = renderChunkIn;
+        this.chunkRenderer = renderChunkIn;
         this.type = typeIn;
         this.distanceSq = distanceSqIn;
     }
@@ -30,19 +29,19 @@ public class ChunkRenderTaskSchematic implements Comparable<ChunkRenderTaskSchem
         return this.status;
     }
 
-    public RenderChunkSchematicVbo getRenderChunk()
+    public ChunkRendererSchematicVbo getRenderChunk()
     {
-        return this.renderChunk;
+        return this.chunkRenderer;
     }
 
-    public CompiledChunk getCompiledChunk()
+    public ChunkRenderDataSchematic getChunkRenderData()
     {
-        return this.compiledChunk;
+        return this.chunkRenderData;
     }
 
-    public void setCompiledChunk(CompiledChunk compiledChunkIn)
+    public void setChunkRenderData(ChunkRenderDataSchematic chunkRenderData)
     {
-        this.compiledChunk = compiledChunkIn;
+        this.chunkRenderData = chunkRenderData;
     }
 
     public BufferBuilderCache getBufferCache()
@@ -77,7 +76,7 @@ public class ChunkRenderTaskSchematic implements Comparable<ChunkRenderTaskSchem
         {
             if (this.type == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK && this.status != ChunkRenderTaskSchematic.Status.DONE)
             {
-                this.renderChunk.setNeedsUpdate(false);
+                this.chunkRenderer.setNeedsUpdate(false);
             }
 
             this.finished = true;

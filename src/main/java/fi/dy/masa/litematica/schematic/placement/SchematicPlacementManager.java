@@ -135,8 +135,7 @@ public class SchematicPlacementManager
                             }
                         }
 
-                        worldSchematic.scheduleChunkRenders( pos.x << 4      ,   0,  pos.z << 4      ,
-                                                            (pos.x << 4) + 15, 255, (pos.z << 4) + 15);
+                        worldSchematic.scheduleChunkRenders(pos.x, pos.z);
                     }
 
                     iter.remove();
@@ -173,7 +172,7 @@ public class SchematicPlacementManager
         if (worldSchematic.getChunkProvider().isChunkLoaded(chunkX, chunkZ))
         {
             //System.out.printf("unloading chunk at %d, %d\n", chunkX, chunkZ);
-            worldSchematic.scheduleChunkRenders((chunkX << 4), 0, (chunkZ << 4), (chunkX << 4) + 15, 255, (chunkZ << 4) + 15);
+            worldSchematic.scheduleChunkRenders(chunkX, chunkZ);
             worldSchematic.getChunkProvider().unloadChunk(chunkX, chunkZ);
         }
     }

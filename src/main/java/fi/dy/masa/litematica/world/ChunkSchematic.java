@@ -2,37 +2,34 @@ package fi.dy.masa.litematica.world;
 
 import java.util.Arrays;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Biomes;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.EnumLightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.chunk.ChunkPos;
 import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.chunk.WorldChunk;
 
-public class ChunkSchematic extends Chunk
+public class ChunkSchematic extends WorldChunk
 {
     private final long timeCreated;
+    private boolean isEmpty = true;
 
-    public ChunkSchematic(World worldIn, int x, int z)
+    public ChunkSchematic(World worldIn, ChunkPos pos)
     {
-        super(worldIn, x, z, new Biome[256]);
+        super(worldIn, pos, new Biome[256]);
 
-        this.timeCreated = worldIn.getGameTime();
-        Arrays.fill(this.getBiomes(), Biomes.PLAINS);
+        this.timeCreated = worldIn.getTime();
+        Arrays.fill(this.getBiomeArray(), Biomes.PLAINS);
     }
 
     @Override
-    public IBlockState setBlockState(BlockPos pos, IBlockState state, boolean isMoving)
+    public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving)
     {
-        int x = pos.getX() & 15;
-        int y = pos.getY();
-        int z = pos.getZ() & 15;
-
-        IBlockState stateOld = this.getBlockState(pos);
+        BlockState stateOld = this.getBlockState(pos);
 
         if (stateOld == state)
         {
@@ -40,9 +37,13 @@ public class ChunkSchematic extends Chunk
         }
         else
         {
+            int x = pos.getX() & 15;
+            int y = pos.getY();
+            int z = pos.getZ() & 15;
+
             Block blockNew = state.getBlock();
             Block blockOld = stateOld.getBlock();
-            ChunkSection section = this.getSections()[y >> 4];
+            ChunkSection section = this.getSectionArray()[y >> 4];
 
             if (section == EMPTY_SECTION)
             {
@@ -51,53 +52,51 @@ public class ChunkSchematic extends Chunk
                     return null;
                 }
 
-                section = new ChunkSection(y >> 4 << 4, false);
-                this.getSections()[y >> 4] = section;
+                section = new ChunkSection(y & 0xF0);
+                this.getSectionArray()[y >> 4] = section;
             }
 
-            section.set(x, y & 15, z, state);
+            if (state.isAir() == false)
+            {
+                this.isEmpty = false;
+            }
+
+            section.setBlockState(x, y & 0xF, z, state);
 
             if (blockOld != blockNew)
             {
-                this.getWorld().removeTileEntity(pos);
+                this.getWorld().removeBlockEntity(pos);
             }
 
-            if (section.get(x, y & 0xF, z).getBlock() != blockNew)
+            if (section.getBlockState(x, y & 0xF, z).getBlock() != blockNew)
             {
                 return null;
             }
             else
             {
-                if (blockOld instanceof ITileEntityProvider)
+                if (blockOld.hasBlockEntity())
                 {
-                    TileEntity tileentity = this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
+                    BlockEntity te = this.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
 
-                    if (tileentity != null)
+                    if (te != null)
                     {
-                        tileentity.updateContainingBlockInfo();
+                        te.resetBlock();
                     }
                 }
 
-                /*
-                if (this.getWorld().isRemote && blockOld != blockNew)
+                if (blockNew.hasBlockEntity() && blockNew instanceof BlockEntityProvider)
                 {
-                    blockNew.onBlockAdded(this.getWorld(), pos, state);
-                }
-                */
-
-                if (blockNew instanceof ITileEntityProvider)
-                {
-                    TileEntity te = this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
+                    BlockEntity te = this.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
 
                     if (te == null)
                     {
-                        te = ((ITileEntityProvider) blockNew).createNewTileEntity(this.getWorld());
-                        this.getWorld().setTileEntity(pos, te);
+                        te = ((BlockEntityProvider) blockNew).createBlockEntity(this.getWorld());
+                        this.getWorld().setBlockEntity(pos, te);
                     }
 
                     if (te != null)
                     {
-                        te.updateContainingBlockInfo();
+                        te.resetBlock();
                     }
                 }
 
@@ -114,38 +113,14 @@ public class ChunkSchematic extends Chunk
     }
 
     @Override
-    public int getLightFor(EnumLightType type, BlockPos pos)
+    public boolean isEmpty()
+    {
+        return this.isEmpty;
+    }
+
+    @Override
+    public int getLightLevel(BlockPos pos, int defaultValue)
     {
         return 15;
-    }
-
-    @Override
-    public int getLightSubtracted(BlockPos pos, int amount)
-    {
-        return 15;
-    }
-
-    @Override
-    public void setLightFor(EnumLightType type, BlockPos pos, int value)
-    {
-        // NO-OP
-    }
-
-    @Override
-    public void tick(boolean skipRecheckGaps)
-    {
-        // NO-OP
-    }
-
-    @Override
-    public void generateSkylightMap()
-    {
-        // NO-OP
-    }
-
-    @Override
-    public void enqueueRelightChecks()
-    {
-        // NO-OP
     }
 }

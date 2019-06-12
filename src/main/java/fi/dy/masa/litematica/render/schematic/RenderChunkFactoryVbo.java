@@ -1,15 +1,12 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.chunk.IRenderChunkFactory;
-import net.minecraft.client.renderer.chunk.RenderChunk;
-import net.minecraft.world.World;
+import fi.dy.masa.litematica.world.WorldSchematic;
 
-public class RenderChunkFactoryVbo implements IRenderChunkFactory
+public class RenderChunkFactoryVbo implements IChunkRendererFactory
 {
     @Override
-    public RenderChunk create(World worldIn, WorldRenderer worldRenderer)
+    public ChunkRendererSchematicVbo create(WorldSchematic worldIn, WorldRendererSchematic worldRenderer)
     {
-        return new RenderChunkSchematicVbo(worldIn, worldRenderer);
+        return new ChunkRendererSchematicVbo(worldIn, worldRenderer);
     }
 }

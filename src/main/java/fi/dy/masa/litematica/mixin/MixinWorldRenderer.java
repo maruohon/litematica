@@ -7,6 +7,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.VisibleRegion;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 
@@ -24,5 +26,17 @@ public abstract class MixinWorldRenderer
         {
             LitematicaRenderer.getInstance().loadRenderers();
         }
+    }
+
+    @Inject(method = "setUpTerrain", at = @At("HEAD"))
+    private void onPostSetupTerrain(Camera camera, VisibleRegion visibleRegion, int frame, boolean spectator, CallbackInfo ci)
+    {
+        LitematicaRenderer.getInstance().piecewisePrepareAndUpdate(visibleRegion);
+    }
+
+    @Inject(method = "renderEntities", at = @At("HEAD"))
+    private void onPostRenderEntities(Camera camera, VisibleRegion visibleRegion, float partialTicks, CallbackInfo ci)
+    {
+        LitematicaRenderer.getInstance().piecewiseRenderEntities(visibleRegion, partialTicks);
     }
 }

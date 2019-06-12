@@ -2,24 +2,26 @@ package fi.dy.masa.litematica.world;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.GameType;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.WorldType;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.world.GameMode;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.level.LevelGeneratorType;
+import net.minecraft.world.level.LevelInfo;
 
 public class SchematicWorldHandler
 {
-    private static final WorldSettings SETTINGS = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
-    private static final Minecraft MC = Minecraft.getInstance();
-    @Nullable
-    private static WorldSchematic world;
+    @Nullable private static WorldSchematic world;
 
     @Nullable
     public static WorldSchematic getSchematicWorld()
     {
         return world;
+    }
+
+    public static WorldSchematic createSchematicWorld()
+    {
+        LevelInfo info = new LevelInfo(0, GameMode.CREATIVE, false, false, LevelGeneratorType.FLAT);
+        return new WorldSchematic(null, info, DimensionType.THE_END, MinecraftClient.getInstance().getProfiler());
     }
 
     public static void recreateSchematicWorld(boolean remove)
@@ -31,7 +33,7 @@ public class SchematicWorldHandler
         else
         {
             // Note: The dimension used here must have no skylight, because the custom Chunks don't have those arrays
-            world = new WorldSchematic(null, SETTINGS, DimensionType.THE_END, EnumDifficulty.PEACEFUL, MC.profiler);
+            world = createSchematicWorld();
         }
 
         LitematicaRenderer.getInstance().onSchematicWorldChanged(world);

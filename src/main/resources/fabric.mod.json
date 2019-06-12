@@ -1,0 +1,33 @@
+{
+    "schemaVersion": 1,
+    "id": "litematica",
+    "name": "Litematica",
+    "version": "${mod_version}",
+
+    "description": "A modern schematic mod for LiteLoader, Rift, Fabric etc.",
+    "authors": [
+        "masa"
+    ],
+    "contact": {
+        "homepage": "https://minecraft.curseforge.com/projects/litematica",
+        "sources": "https://github.com/maruohon/litematica",
+        "twitter": "https://twitter.com/maruohon",
+        "discord": "https://discordapp.com/channels/211786369951989762/453662800460644354/"
+    },
+
+    "license": "LGPLv3",
+
+    "environment": "client",
+    "entrypoints": {
+        "main": [
+            "fi.dy.masa.litematica.Litematica"
+        ]
+    },
+    "mixins": [
+        "mixins.litematica.json"
+    ],
+
+    "depends": {
+        "malilib": "*"
+    }
+}
