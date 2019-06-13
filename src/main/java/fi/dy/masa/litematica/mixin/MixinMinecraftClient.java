@@ -8,11 +8,17 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.WorldUtils;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.NonBlockingThreadExecutor;
 
 @Mixin(MinecraftClient.class)
-public abstract class MixinMinecraftClient
+public abstract class MixinMinecraftClient extends NonBlockingThreadExecutor<Runnable>
 {
-    @Inject(method = "doItemUse", at = @At(value = "INVOKE",
+    public MixinMinecraftClient(String string_1)
+    {
+        super(string_1);
+    }
+
+    @Inject(method = "doItemUse()V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/item/ItemStack;getAmount()I", ordinal = 0), cancellable = true)
     private void handlePlacementRestriction(CallbackInfo ci)
     {

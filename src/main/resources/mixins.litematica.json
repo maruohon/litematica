@@ -1,8 +1,8 @@
 {
     "required": true,
     "package": "fi.dy.masa.litematica.mixin",
-    "refmap": "mixins.litematica.refmap.json",
-    "minVersion": "0.6",
+    "compatibilityLevel": "JAVA_8",
+    "minVersion": "0.7",
     "client": [
         "MixinClientPlayNetworkHandler",
         "MixinClientWorld",
