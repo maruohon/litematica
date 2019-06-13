@@ -11,13 +11,12 @@ import fi.dy.masa.malilib.util.IntBoundingBox;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.command.arguments.BlockArgumentParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BoundingBox;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.chunk.ChunkPos;
 
 public class TaskFillArea extends TaskProcessChunkBase
@@ -41,33 +40,11 @@ public class TaskFillArea extends TaskProcessChunkBase
         this.replaceState = replaceState;
         this.removeEntities = removeEntities;
 
-        Identifier rl = Registry.BLOCK.getId(fillState.getBlock());
-        String blockString = null;
+        String blockString = BlockArgumentParser.stringifyBlockState(fillState);
 
-        if (rl != null)
+        if (replaceState != null)
         {
-            String blockName = rl.toString();
-            blockString = blockName; // FIXME 1.13: state/properties
-
-            if (replaceState != null)
-            {
-                rl = Registry.BLOCK.getId(replaceState.getBlock());
-
-                if (rl != null)
-                {
-                    // FIXME 1.13: state/properties
-                    blockString += " replace " + rl.toString();
-                }
-                else
-                {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica-message.error.invalid_block", replaceState.toString());
-                    blockString = null;
-                }
-            }
-        }
-        else
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica-message.error.invalid_block", fillState.toString());
+            blockString += " replace " + BlockArgumentParser.stringifyBlockState(replaceState);
         }
 
         this.blockString = blockString;

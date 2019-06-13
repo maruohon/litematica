@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
@@ -16,6 +17,7 @@ import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.SchematicUtils;
+import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
@@ -138,23 +140,13 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         String str = String.valueOf(this.selection.getAllSubRegionNames().size());
         this.addLabel(x, y, -1, 16, 0xFFFFFFFF, GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.label.area_editor.sub_regions", str));
 
-        ButtonGeneric button;
-
-        if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
-        {
-            str = StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled");
-            List<String> lines = new ArrayList<>();
-            int xTmp = 120;
-            int maxLineLength = this.width - xTmp - 20;
-            StringUtils.splitTextToLines(lines, str, maxLineLength);
-            this.addLabel(xTmp, y + 2, maxLineLength, lines.size() * (StringUtils.getFontHeight() + 1), 0xFFFFAA00, lines.toArray(new String[0]));
-        }
+        this.addRenderingDisabledWarning(120, y + 2);
 
         y = this.height - 26;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
         String label = StringUtils.translate(type.getLabelKey());
-        button = new ButtonGeneric(x, y, -1, 20, label, type.getIcon());
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, 20, label, type.getIcon());
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
@@ -174,6 +166,22 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         return y;
+    }
+
+    protected void addRenderingDisabledWarning(int x, int y)
+    {
+        if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
+        {
+            ConfigHotkey hotkey = Hotkeys.TOGGLE_AREA_SELECTION_RENDERING;
+            String configName = Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getName();
+            String hotkeyName = hotkey.getName();
+            String hotkeyVal = hotkey.getKeybind().getKeysDisplayString();
+            String str = StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled", configName, hotkeyName, hotkeyVal);
+            List<String> lines = new ArrayList<>();
+            int maxLineLength = this.width - x - 20;
+            StringUtils.splitTextToLines(lines, str, maxLineLength);
+            this.addLabel(x, y, maxLineLength, lines.size() * (StringUtils.getFontHeight() + 1), 0xFFFFAA00, lines);
+        }
     }
 
     protected void renameSubRegion()

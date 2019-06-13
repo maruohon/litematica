@@ -26,6 +26,7 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -428,7 +429,7 @@ public class WorldUtils
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
             Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
             Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() &&
-            mc.options.keyUse.isPressed())
+            KeybindMulti.isKeyDown(KeybindMulti.getKeyCode(mc.options.keyUse)))
         {
             WorldUtils.doEasyPlaceAction(mc);
         }
@@ -707,41 +708,60 @@ public class WorldUtils
     {
         HitResult trace = mc.hitResult;
 
+        ItemStack stack = mc.player.getMainHandStack();
+
+        if (stack.isEmpty())
+        {
+            stack = mc.player.getOffHandStack();
+        }
+
+        if (stack.isEmpty())
+        {
+            return false;
+        }
+
         if (trace != null && trace.getType() == HitResult.Type.BLOCK)
         {
-            BlockHitResult hitResult = (BlockHitResult) trace;
-            BlockPos pos = hitResult.getBlockPos();
+            BlockHitResult blockHitResult = (BlockHitResult) trace;
+            BlockPos pos = blockHitResult.getBlockPos();
+            ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN, blockHitResult));
+
+            // Get the possibly offset position, if the targeted block is not replaceable
+            pos = ctx.getBlockPos();
+
+            BlockState stateClient = mc.world.getBlockState(pos);
 
             World worldSchematic = SchematicWorldHandler.getSchematicWorld();
             LayerRange range = DataManager.getRenderLayerRange();
+            boolean schematicHasAir = worldSchematic.isAir(pos);
 
             // The targeted position is outside the current render range
-            if (worldSchematic.isAir(pos) == false && range.isPositionWithinRange(pos) == false)
+            if (schematicHasAir == false && range.isPositionWithinRange(pos) == false)
             {
                 return true;
             }
 
             // There should not be anything in the targeted position,
             // and the position is within or close to a schematic sub-region
-            if (worldSchematic.isAir(pos) && isPositionWithinRangeOfSchematicRegions(pos, 2))
+            if (schematicHasAir && isPositionWithinRangeOfSchematicRegions(pos, 2))
+            {
+                return true;
+            }
+
+            blockHitResult = new BlockHitResult(blockHitResult.getPos(), blockHitResult.getSide(), pos, false);
+            ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN, (BlockHitResult) trace));
+
+            // Placement position is already occupied
+            if (stateClient.canReplace(ctx) == false)
             {
                 return true;
             }
 
             BlockState stateSchematic = worldSchematic.getBlockState(pos);
-            ItemStack stack = MaterialCache.getInstance().getItemForState(stateSchematic);
+            stack = MaterialCache.getInstance().getItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
             if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(mc.player, stack) == null)
-            {
-                return true;
-            }
-
-            ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN, hitResult));
-            BlockState stateClient = mc.world.getBlockState(pos);
-
-            // Placement position is not already occupied
-            if (stateClient.canReplace(ctx) == false)
             {
                 return true;
             }

@@ -59,14 +59,6 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
         this.clearPreviewImages();
     }
 
-    private void clearPreviewImages()
-    {
-        for (Pair<Identifier, NativeImageBackedTexture> pair : this.cachedPreviewImages.values())
-        {
-            this.mc.getTextureManager().destroyTexture(pair.getLeft());
-        }
-    }
-
     @Override
     protected File getRootDirectory()
     {
@@ -229,17 +221,25 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
         return meta;
     }
 
+    private void clearPreviewImages()
+    {
+        for (Pair<Identifier, NativeImageBackedTexture> pair : this.cachedPreviewImages.values())
+        {
+            this.mc.getTextureManager().destroyTexture(pair.getLeft());
+        }
+    }
+
     private void createPreviewImage(File file, SchematicMetadata meta)
     {
         int[] previewImageData = meta.getPreviewImagePixelData();
 
         if (previewImageData != null && previewImageData.length > 0)
         {
-            try
-            {
-                int size = (int) Math.sqrt(previewImageData.length);
+            int size = (int) Math.sqrt(previewImageData.length);
 
-                if (size * size == previewImageData.length)
+            if ((size * size) == previewImageData.length)
+            {
+                try
                 {
                     NativeImage image = new NativeImage(size, size, false);
                     NativeImageBackedTexture tex = new NativeImageBackedTexture(image);
@@ -251,6 +251,8 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                         for (int x = 0; x < size; ++x)
                         {
                             int val = previewImageData[i++];
+                            // Swap the color channels from ARGB to ABGR
+                            val = (val & 0xFF00FF00) | (val & 0xFF0000) >> 16 | (val & 0xFF) << 16;
                             image.setPixelRGBA(x, y, val);
                         }
                     }
@@ -259,10 +261,10 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
                     this.cachedPreviewImages.put(file, Pair.of(rl, tex));
                 }
-            }
-            catch (Exception e)
-            {
-                Litematica.logger.warn("Failed to create a preview image", e);
+                catch (Exception e)
+                {
+                    Litematica.logger.warn("Failed to create a preview image", e);
+                }
             }
         }
     }

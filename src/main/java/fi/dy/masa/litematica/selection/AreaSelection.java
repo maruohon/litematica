@@ -65,7 +65,7 @@ public class AreaSelection
 
         if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
         {
-            StatusInfoRenderer.startOverrideDelay();
+            StatusInfoRenderer.getInstance().startOverrideDelay();
         }
     }
 

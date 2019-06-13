@@ -22,23 +22,30 @@ public class StatusInfoRenderer implements IInfoHudRenderer
         ToolHud.getInstance().addInfoHudRenderer(INSTANCE, true);
     }
 
-    public static void startOverrideDelay()
+    public static StatusInfoRenderer getInstance()
     {
-        StatusInfoRenderer renderer = INSTANCE;
+        return INSTANCE;
+    }
 
-        if (renderer.shouldOverrideShowStatusHud())
+    public void startOverrideDelay()
+    {
+        if (this.shouldOverrideShowStatusHud())
         {
-            renderer.lastOverrideTime = System.currentTimeMillis();
-            renderer.overrideEnabled = true;
-            renderer.overrideDelay = 10000;
+            this.lastOverrideTime = System.currentTimeMillis();
+            this.overrideEnabled = true;
+            this.overrideDelay = 10000;
         }
+    }
+
+    public boolean shouldRenderStatusInfoHud()
+    {
+        return this.overrideEnabled || Configs.InfoOverlays.STATUS_INFO_HUD.getBooleanValue();
     }
 
     @Override
     public boolean getShouldRenderText(RenderPhase phase)
     {
-        return phase == RenderPhase.POST &&
-               (this.overrideEnabled || Configs.InfoOverlays.STATUS_INFO_HUD_ENABLED.getBooleanValue());
+        return phase == RenderPhase.POST && this.shouldRenderStatusInfoHud();
     }
 
     @Override
@@ -98,16 +105,16 @@ public class StatusInfoRenderer implements IInfoHudRenderer
 
     private boolean shouldOverrideShowStatusHud()
     {
-        if (DataManager.getRenderLayerRange().getLayerMode() != LayerMode.ALL ||
-            Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false ||
-            Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false ||
-            Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false ||
-            Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue() == false ||
-            Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
+        if (Configs.InfoOverlays.STATUS_INFO_HUD_AUTO.getBooleanValue() == false)
         {
-            return true;
+            return false;
         }
 
-        return false;
+        return  DataManager.getRenderLayerRange().getLayerMode() != LayerMode.ALL ||
+                Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false ||
+                Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false ||
+                Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false ||
+                Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue() == false ||
+                Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false;
     }
 }
