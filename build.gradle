@@ -52,6 +52,10 @@ version = project.minecraft.mod_version
 
 processResources
 {
+    // Exclude the GIMP image files
+    exclude '**/*.xcf'
+    exclude '**/xcf'
+
     // this will ensure that this task is redone when the versions change.
     //inputs.property "mod_version", project.minecraft.mod_version
     //inputs.property "minecraft_version", project.config.minecraft_version
