@@ -27,7 +27,7 @@ dependencies {
     compile "com.google.code.findbugs:jsr305:3.0.2"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modCompile "net.fabricmc:fabric:" + config.fabric_version
+    //modCompile "net.fabricmc:fabric:" + config.fabric_version
 
     modCompile "fi.dy.masa.malilib:malilib-fabric-" + config.minecraft_version_out + ":" + config.malilib_version
 }
@@ -73,31 +73,4 @@ processResources
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
-}
-
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-tasks.publish.dependsOn build
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId project.archivesBaseName
-
-            // add all the jars that should be included when publishing to maven
-            artifact(jar)           { builtBy remapJar }
-            artifact(sourcesJar)    { builtBy remapSourcesJar }
-        }
-    }
-
-    repositories {
-        maven {
-            url "$projectDir/../../CommonMaven"
-        }
-    }
 }
