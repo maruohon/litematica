@@ -28,13 +28,13 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.chunk.ChunkPos;
 
 public class PositionUtils
 {
@@ -655,11 +655,11 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case ROT_90:
+            case CLOCKWISE_90:
                 return new BlockPos(-z, y,  x);
-            case ROT_270:
+            case COUNTERCLOCKWISE_90:
                 return new BlockPos( z, y, -x);
-            case ROT_180:
+            case CLOCKWISE_180:
                 return new BlockPos(-x, y, -z);
             default:
                 return isMirrored ? new BlockPos(x, y, z) : pos;
@@ -676,15 +676,15 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case ROT_90:
+            case CLOCKWISE_90:
                 x = z;
                 z = -tmp;
                 break;
-            case ROT_270:
+            case COUNTERCLOCKWISE_90:
                 x = -z;
                 z = tmp;
                 break;
-            case ROT_180:
+            case CLOCKWISE_180:
                 x = -x;
                 z = -z;
                 break;
@@ -726,15 +726,15 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case ROT_90:
+            case CLOCKWISE_90:
                 tmp = x;
                 x = -z;
                 z = tmp;
-            case ROT_270:
+            case COUNTERCLOCKWISE_90:
                 tmp = x;
                 x = z;
                 z = -tmp;
-            case ROT_180:
+            case CLOCKWISE_180:
                 x = -x;
                 z = -z;
             default:
@@ -780,11 +780,11 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case ROT_270:
+            case COUNTERCLOCKWISE_90:
                 return new Vec3d(z, y, 1.0D - x);
-            case ROT_90:
+            case CLOCKWISE_90:
                 return new Vec3d(1.0D - z, y, x);
-            case ROT_180:
+            case CLOCKWISE_180:
                 return new Vec3d(1.0D - x, y, 1.0D - z);
             default:
                 return transformed ? new Vec3d(x, y, z) : originalPos;
@@ -795,12 +795,12 @@ public class PositionUtils
     {
         switch (rotationIn)
         {
-            case ROT_270:
-                return BlockRotation.ROT_90;
-            case ROT_90:
-                return BlockRotation.ROT_270;
-            case ROT_180:
-                return BlockRotation.ROT_180;
+            case COUNTERCLOCKWISE_90:
+                return BlockRotation.CLOCKWISE_90;
+            case CLOCKWISE_90:
+                return BlockRotation.COUNTERCLOCKWISE_90;
+            case CLOCKWISE_180:
+                return BlockRotation.CLOCKWISE_180;
             default:
                 return rotationIn;
         }
@@ -906,11 +906,11 @@ public class PositionUtils
     {
         switch (rotation)
         {
-            case ROT_90:    return "CW_90";
-            case ROT_180:   return "CW_180";
-            case ROT_270:   return "CCW_90";
-            case ROT_0:
-            default:        return "NONE";
+            case CLOCKWISE_90:          return "CW_90";
+            case CLOCKWISE_180:         return "CW_180";
+            case COUNTERCLOCKWISE_90:   return "CCW_90";
+            case NONE:
+            default:                    return "NONE";
         }
     }
 
@@ -931,13 +931,13 @@ public class PositionUtils
 
         switch (rotation)
         {
-            case ROT_180:
+            case CLOCKWISE_180:
                 yaw += 180.0F;
                 break;
-            case ROT_270:
+            case COUNTERCLOCKWISE_90:
                 yaw += 270.0F;
                 break;
-            case ROT_90:
+            case CLOCKWISE_90:
                 yaw += 90.0F;
                 break;
             default:

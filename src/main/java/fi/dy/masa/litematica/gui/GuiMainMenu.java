@@ -11,7 +11,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.screen.Screen;
 
 public class GuiMainMenu extends GuiBase
 {

@@ -398,7 +398,7 @@ public class WorldUtils
                     }
 
                     InventoryUtils.setPickedItemToHand(stack, mc);
-                    mc.interactionManager.clickCreativeStack(mc.player.getStackInHand(Hand.MAIN), 36 + inv.selectedSlot);
+                    mc.interactionManager.clickCreativeStack(mc.player.getStackInHand(Hand.MAIN_HAND), 36 + inv.selectedSlot);
 
                     //return true;
                 }
@@ -585,7 +585,7 @@ public class WorldUtils
         }
 
         BlockHitResult hitResult = (BlockHitResult) trace;
-        ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, Hand.MAIN, hitResult));
+        ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(player, Hand.MAIN_HAND, hitResult));
 
         if (stateClient.canReplace(ctx) == false)
         {
@@ -724,7 +724,7 @@ public class WorldUtils
         {
             BlockHitResult blockHitResult = (BlockHitResult) trace;
             BlockPos pos = blockHitResult.getBlockPos();
-            ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN, blockHitResult));
+            ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, blockHitResult));
 
             // Get the possibly offset position, if the targeted block is not replaceable
             pos = ctx.getBlockPos();
@@ -749,7 +749,7 @@ public class WorldUtils
             }
 
             blockHitResult = new BlockHitResult(blockHitResult.getPos(), blockHitResult.getSide(), pos, false);
-            ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN, (BlockHitResult) trace));
+            ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, (BlockHitResult) trace));
 
             // Placement position is already occupied
             if (stateClient.canReplace(ctx) == false)

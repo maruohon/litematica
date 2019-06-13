@@ -17,7 +17,7 @@ public class SubRegionPlacement
     private final String name;
     private final BlockPos defaultPos;
     private BlockPos pos;
-    private BlockRotation rotation = BlockRotation.ROT_0;
+    private BlockRotation rotation = BlockRotation.NONE;
     private BlockMirror mirror = BlockMirror.NONE;
     private boolean enabled = true;
     private boolean renderingEnabled = true;
@@ -144,7 +144,7 @@ public class SubRegionPlacement
     void resetToOriginalValues()
     {
         this.pos = this.defaultPos;
-        this.rotation = BlockRotation.ROT_0;
+        this.rotation = BlockRotation.NONE;
         this.mirror = BlockMirror.NONE;
         this.enabled = true;
         this.ignoreEntities = false;
@@ -160,7 +160,7 @@ public class SubRegionPlacement
         return this.isEnabled() == false ||
                this.ignoreEntities() ||
                this.getMirror() != BlockMirror.NONE ||
-               this.getRotation() != BlockRotation.ROT_0 ||
+               this.getRotation() != BlockRotation.NONE ||
                this.getPos().equals(originalPosition) == false;
     }
 

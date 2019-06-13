@@ -13,8 +13,8 @@ import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkPos;
 
 public abstract class TaskProcessChunkBase extends TaskBase
 {

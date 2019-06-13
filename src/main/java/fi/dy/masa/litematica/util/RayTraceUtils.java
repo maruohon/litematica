@@ -56,7 +56,7 @@ public class RayTraceUtils
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
         HitResult result = getRayTraceFromEntity(world, entity, false, range);
-        double closestVanilla = result.getType() != HitResult.Type.NONE ? result.getPos().distanceTo(eyesPos) : -1D;
+        double closestVanilla = result.getType() != HitResult.Type.MISS ? result.getPos().distanceTo(eyesPos) : -1D;
 
         AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
         RayTraceWrapper wrapper = null;

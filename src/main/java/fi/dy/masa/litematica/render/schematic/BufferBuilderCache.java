@@ -13,7 +13,7 @@ public class BufferBuilderCache
     {
         this.blockBufferBuilders[BlockRenderLayer.SOLID.ordinal()] = new BufferBuilder(2097152);
         this.blockBufferBuilders[BlockRenderLayer.CUTOUT.ordinal()] = new BufferBuilder(131072);
-        this.blockBufferBuilders[BlockRenderLayer.MIPPED_CUTOUT.ordinal()] = new BufferBuilder(131072);
+        this.blockBufferBuilders[BlockRenderLayer.CUTOUT_MIPPED.ordinal()] = new BufferBuilder(131072);
         this.blockBufferBuilders[BlockRenderLayer.TRANSLUCENT.ordinal()] = new BufferBuilder(262144);
 
         this.overlayBufferBuilders = new BufferBuilder[OverlayRenderType.values().length];

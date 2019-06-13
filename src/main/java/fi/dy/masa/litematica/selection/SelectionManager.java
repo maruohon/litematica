@@ -27,7 +27,7 @@ import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.BlockHitResult;

@@ -37,7 +37,7 @@ import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.ChunkPos;
+import net.minecraft.util.math.ChunkPos;
 
 public class SchematicPlacement
 {
@@ -50,7 +50,7 @@ public class SchematicPlacement
     private LitematicaSchematic schematic;
     private BlockPos origin;
     private String name;
-    private BlockRotation rotation = BlockRotation.ROT_0;
+    private BlockRotation rotation = BlockRotation.NONE;
     private BlockMirror mirror = BlockMirror.NONE;
     private BlockInfoListType verifierType = BlockInfoListType.ALL;
     private boolean ignoreEntities;

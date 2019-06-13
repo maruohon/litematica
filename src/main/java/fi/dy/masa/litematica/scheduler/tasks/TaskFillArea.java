@@ -17,7 +17,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BoundingBox;
-import net.minecraft.world.chunk.ChunkPos;
+import net.minecraft.util.math.ChunkPos;
 
 public class TaskFillArea extends TaskProcessChunkBase
 {

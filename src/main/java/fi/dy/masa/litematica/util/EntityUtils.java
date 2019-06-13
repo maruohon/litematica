@@ -86,12 +86,12 @@ public class EntityUtils
 
         if (InventoryUtils.areStacksEqual(player.getMainHandStack(), stack))
         {
-            hand = Hand.MAIN;
+            hand = Hand.MAIN_HAND;
         }
         else if (player.getMainHandStack().isEmpty() &&
                  InventoryUtils.areStacksEqual(player.getOffHandStack(), stack))
         {
-            hand = Hand.OFF;
+            hand = Hand.OFF_HAND;
         }
 
         return hand;

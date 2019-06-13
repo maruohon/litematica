@@ -517,7 +517,7 @@ public class ChunkRendererSchematicVbo
                     BakedModel bakedModel = this.worldRenderer.getModelForState(stateSchematic);
 
                     // FIXME: how to implement this correctly here... >_>
-                    if (stateSchematic.isFullBoundsCubeForCulling())
+                    if (stateSchematic.isOpaque())
                     {
                         this.renderOverlayReducedEdges(pos, adjTypes, type, bufferOverlayOutlines);
                     }

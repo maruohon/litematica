@@ -39,12 +39,12 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkPos;
 
 public class SchematicUtils
 {
@@ -247,7 +247,7 @@ public class SchematicUtils
                     mc.player.world = worldSchematic;
 
                     BlockHitResult hit = new BlockHitResult(trace.getPos(), side, pos.offset(side), false);
-                    ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN, hit));
+                    ItemPlacementContext ctx = new ItemPlacementContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, hit));
 
                     mc.player.world = worldClient;
 
@@ -661,13 +661,13 @@ public class SchematicUtils
             BlockMirror mirrorSub = placement.getMirror();
 
             if (mirrorSub != BlockMirror.NONE &&
-                (schematicPlacement.getRotation() == BlockRotation.ROT_90 ||
-                 schematicPlacement.getRotation() == BlockRotation.ROT_270))
+                (schematicPlacement.getRotation() == BlockRotation.CLOCKWISE_90 ||
+                 schematicPlacement.getRotation() == BlockRotation.COUNTERCLOCKWISE_90))
             {
                 mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
             }
 
-            if (rotationCombined != BlockRotation.ROT_0)
+            if (rotationCombined != BlockRotation.NONE)
             {
                 state = state.rotate(rotationCombined);
             }

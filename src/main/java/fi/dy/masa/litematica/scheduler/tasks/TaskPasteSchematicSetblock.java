@@ -26,8 +26,8 @@ import net.minecraft.command.arguments.BlockArgumentParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkPos;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
 {

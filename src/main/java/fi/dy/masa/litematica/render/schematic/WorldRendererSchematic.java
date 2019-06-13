@@ -706,7 +706,7 @@ public class WorldRendererSchematic
                             continue;
                         }
 
-                        boolean shouldRender = this.entityRenderDispatcher.method_3950(entityTmp, visibleRegion, cameraX, cameraY, cameraZ);
+                        boolean shouldRender = this.entityRenderDispatcher.shouldRender(entityTmp, visibleRegion, cameraX, cameraY, cameraZ);
 
                         if (shouldRender)
                         {

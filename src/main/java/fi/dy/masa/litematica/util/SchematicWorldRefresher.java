@@ -8,7 +8,7 @@ import fi.dy.masa.malilib.util.LayerRange;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.ChunkPos;
+import net.minecraft.util.math.ChunkPos;
 
 public class SchematicWorldRefresher implements IRangeChangeListener
 {

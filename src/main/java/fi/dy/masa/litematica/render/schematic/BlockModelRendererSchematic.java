@@ -9,8 +9,8 @@ import fi.dy.masa.litematica.data.DataManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.block.BlockColorMap;
 import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
@@ -24,10 +24,10 @@ import net.minecraft.world.ExtendedBlockView;
 
 public class BlockModelRendererSchematic extends BlockModelRenderer
 {
-    private final BlockColorMap blockColors;
+    private final BlockColors blockColors;
     private final Random random = new Random();
 
-    public BlockModelRendererSchematic(BlockColorMap blockColorsIn)
+    public BlockModelRendererSchematic(BlockColors blockColorsIn)
     {
         super(blockColorsIn);
 
@@ -151,7 +151,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
             if (bakedquad.hasColor())
             {
-                int k = this.blockColors.getRenderColor(state, world, pos, bakedquad.getColorIndex());
+                int k = this.blockColors.getColorMultiplier(state, world, pos, bakedquad.getColorIndex());
                 float f = (float)(k >> 16 & 255) / 255.0F;
                 float f1 = (float)(k >> 8 & 255) / 255.0F;
                 float f2 = (float)(k & 255) / 255.0F;
@@ -196,7 +196,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
             if (bakedquad.hasColor())
             {
-                int k = this.blockColors.getRenderColor(state, world, pos, bakedquad.getColorIndex());
+                int k = this.blockColors.getColorMultiplier(state, world, pos, bakedquad.getColorIndex());
                 float f = (float)(k >> 16 & 255) / 255.0F;
                 float f1 = (float)(k >> 8 & 255) / 255.0F;
                 float f2 = (float)(k & 255) / 255.0F;

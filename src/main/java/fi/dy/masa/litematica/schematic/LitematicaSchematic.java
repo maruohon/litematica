@@ -51,12 +51,12 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.TaskPriority;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BoundingBox;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkPos;
 
 public class LitematicaSchematic
 {
@@ -322,8 +322,8 @@ public class LitematicaSchematic
         BlockMirror mirrorSub = placement.getMirror();
 
         if (mirrorSub != BlockMirror.NONE &&
-            (schematicPlacement.getRotation() == BlockRotation.ROT_90 ||
-             schematicPlacement.getRotation() == BlockRotation.ROT_270))
+            (schematicPlacement.getRotation() == BlockRotation.CLOCKWISE_90 ||
+             schematicPlacement.getRotation() == BlockRotation.COUNTERCLOCKWISE_90))
         {
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
         }
@@ -361,7 +361,7 @@ public class LitematicaSchematic
 
                     if (mirrorMain != BlockMirror.NONE) { state = state.mirror(mirrorMain); }
                     if (mirrorSub != BlockMirror.NONE)  { state = state.mirror(mirrorSub); }
-                    if (rotationCombined != BlockRotation.ROT_0) { state = state.rotate(rotationCombined); }
+                    if (rotationCombined != BlockRotation.NONE) { state = state.rotate(rotationCombined); }
 
                     if (stateOld == state)
                     {
@@ -397,7 +397,7 @@ public class LitematicaSchematic
 
                                 if (mirrorMain != BlockMirror.NONE) { te.applyMirror(mirrorMain); }
                                 if (mirrorSub != BlockMirror.NONE)  { te.applyMirror(mirrorSub); }
-                                if (rotationCombined != BlockRotation.ROT_0) { te.applyRotation(rotationCombined); }
+                                if (rotationCombined != BlockRotation.NONE) { te.applyRotation(rotationCombined); }
                             }
                             catch (Exception e)
                             {
@@ -472,8 +472,8 @@ public class LitematicaSchematic
         BlockMirror mirrorSub = placement.getMirror();
 
         if (mirrorSub != BlockMirror.NONE &&
-            (schematicPlacement.getRotation() == BlockRotation.ROT_90 ||
-             schematicPlacement.getRotation() == BlockRotation.ROT_270))
+            (schematicPlacement.getRotation() == BlockRotation.CLOCKWISE_90 ||
+             schematicPlacement.getRotation() == BlockRotation.COUNTERCLOCKWISE_90))
         {
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
         }
@@ -594,8 +594,8 @@ public class LitematicaSchematic
         BlockMirror mirrorSub = placement.getMirror();
 
         if (mirrorSub != BlockMirror.NONE &&
-            (schematicPlacement.getRotation() == BlockRotation.ROT_90 ||
-             schematicPlacement.getRotation() == BlockRotation.ROT_270))
+            (schematicPlacement.getRotation() == BlockRotation.CLOCKWISE_90 ||
+             schematicPlacement.getRotation() == BlockRotation.COUNTERCLOCKWISE_90))
         {
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
         }
@@ -625,7 +625,7 @@ public class LitematicaSchematic
 
                     if (mirrorMain != BlockMirror.NONE) { state = state.mirror(mirrorMain); }
                     if (mirrorSub != BlockMirror.NONE)  { state = state.mirror(mirrorSub); }
-                    if (rotationCombined != BlockRotation.ROT_0) { state = state.rotate(rotationCombined); }
+                    if (rotationCombined != BlockRotation.NONE) { state = state.rotate(rotationCombined); }
 
                     if (teNBT != null)
                     {
@@ -659,7 +659,7 @@ public class LitematicaSchematic
 
                                 if (mirrorMain != BlockMirror.NONE) { te.applyMirror(mirrorMain); }
                                 if (mirrorSub != BlockMirror.NONE)  { te.applyMirror(mirrorSub); }
-                                if (rotationCombined != BlockRotation.ROT_0) { te.applyRotation(rotationCombined); }
+                                if (rotationCombined != BlockRotation.NONE) { te.applyRotation(rotationCombined); }
                             }
                             catch (Exception e)
                             {
@@ -707,8 +707,8 @@ public class LitematicaSchematic
         BlockMirror mirrorSub = placement.getMirror();
 
         if (mirrorSub != BlockMirror.NONE &&
-            (schematicPlacement.getRotation() == BlockRotation.ROT_90 ||
-             schematicPlacement.getRotation() == BlockRotation.ROT_270))
+            (schematicPlacement.getRotation() == BlockRotation.CLOCKWISE_90 ||
+             schematicPlacement.getRotation() == BlockRotation.COUNTERCLOCKWISE_90))
         {
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
         }
@@ -742,7 +742,7 @@ public class LitematicaSchematic
 
         if (mirrorMain != BlockMirror.NONE)         { rotationYaw = entity.applyMirror(mirrorMain); }
         if (mirrorSub != BlockMirror.NONE)          { rotationYaw = entity.applyMirror(mirrorSub); }
-        if (rotationCombined != BlockRotation.ROT_0){ rotationYaw += entity.yaw - entity.applyRotation(rotationCombined); }
+        if (rotationCombined != BlockRotation.NONE) { rotationYaw += entity.yaw - entity.applyRotation(rotationCombined); }
 
         entity.setPositionAndAngles(x, y, z, rotationYaw, entity.pitch);
 
@@ -887,14 +887,14 @@ public class LitematicaSchematic
                 IntBoundingBox tickBox = IntBoundingBox.createProper(
                         startX,         startY,         startZ,
                         startX + sizeX, startY + sizeY, startZ + sizeZ);
-                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).method_14196().getScheduledTicks(tickBox.toVanillaBox(), false);
+                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).method_14196().getScheduledTicks(tickBox.toVanillaBox(), false, false);
 
                 if (blockTicks != null)
                 {
                     this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getTime());
                 }
 
-                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).method_14179().getScheduledTicks(tickBox.toVanillaBox(), false);
+                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).method_14179().getScheduledTicks(tickBox.toVanillaBox(), false, false);
 
                 if (fluidTicks != null)
                 {
@@ -1013,14 +1013,14 @@ public class LitematicaSchematic
                 IntBoundingBox tickBox = IntBoundingBox.createProper(
                         offsetX + startX  , offsetY + startY  , offsetZ + startZ  ,
                         offsetX + endX + 1, offsetY + endY + 1, offsetZ + endZ + 1);
-                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).method_14196().getScheduledTicks(tickBox.toVanillaBox(), false);
+                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).method_14196().getScheduledTicks(tickBox.toVanillaBox(), false, false);
 
                 if (blockTicks != null)
                 {
                     this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getTime());
                 }
 
-                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).method_14179().getScheduledTicks(tickBox.toVanillaBox(), false);
+                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).method_14179().getScheduledTicks(tickBox.toVanillaBox(), false, false);
 
                 if (fluidTicks != null)
                 {

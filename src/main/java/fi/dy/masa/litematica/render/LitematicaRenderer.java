@@ -153,7 +153,7 @@ public class LitematicaRenderer
 
             worldRenderer.renderBlockLayer(BlockRenderLayer.SOLID, camera);
 
-            worldRenderer.renderBlockLayer(BlockRenderLayer.MIPPED_CUTOUT, camera);
+            worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, camera);
 
             this.mc.getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX).pushFilter(false, false);
             worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT, camera);
@@ -347,7 +347,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.MIPPED_CUTOUT, this.getCamera());
+            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, this.getCamera());
 
             this.disableShader();
 

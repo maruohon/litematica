@@ -15,7 +15,7 @@ import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleParameters;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -249,25 +249,25 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void addParticle(ParticleParameters particleParameters_1, double double_1, double double_2, double double_3, double double_4, double     double_5, double double_6)
+    public void addParticle(ParticleEffect particleParameters_1, double double_1, double double_2, double double_3, double double_4, double     double_5, double double_6)
     {
         // NO-OP
     }
 
     @Override
-    public void addParticle(ParticleParameters particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3, double   double_4, double double_5, double double_6)
+    public void addParticle(ParticleEffect particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3, double   double_4, double double_5, double double_6)
     {
         // NO-OP
     }
 
     @Override
-    public void addImportantParticle(ParticleParameters particleParameters_1, double double_1, double double_2, double double_3, double double_4,   double double_5, double double_6)
+    public void addImportantParticle(ParticleEffect particleParameters_1, double double_1, double double_2, double double_3, double double_4,   double double_5, double double_6)
     {
         // NO-OP
     }
 
     @Override
-    public void addImportantParticle(ParticleParameters particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3,     double double_4, double double_5, double double_6)
+    public void addImportantParticle(ParticleEffect particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3,     double double_4, double double_5, double double_6)
     {
         // NO-OP
     }
