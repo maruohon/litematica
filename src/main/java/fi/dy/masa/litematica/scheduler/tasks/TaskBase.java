@@ -28,6 +28,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     protected String name = "";
     protected List<String> infoHudLines = new ArrayList<>();
     protected boolean finished;
+    protected boolean printCompletionMessage = true;
     @Nullable protected ICompletionListener completionListener;
 
     protected TaskBase()
@@ -51,6 +52,11 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     public void createTimer(int interval)
     {
         this.timer = new TaskTimer(interval);
+    }
+
+    public void disableCompletionMessage()
+    {
+        this.printCompletionMessage = false;
     }
 
     public void setCompletionListener(@Nullable ICompletionListener listener)

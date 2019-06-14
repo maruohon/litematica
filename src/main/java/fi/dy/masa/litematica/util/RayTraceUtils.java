@@ -23,6 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -41,6 +42,27 @@ public class RayTraceUtils
     private static double closestCornerDistance;
     private static double closestOriginDistance;
     private static HitType originType;
+
+    @Nullable
+    public static BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance, boolean sneakToOffset)
+    {
+        RayTraceResult trace = getRayTraceFromEntity(world, player, false, maxDistance);
+
+        if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
+        {
+            return null;
+        }
+
+        BlockPos pos = trace.getBlockPos();
+
+        // Sneaking puts the position adjacent the targeted block face, not sneaking puts it inside the targeted block
+        if (sneakToOffset == player.isSneaking())
+        {
+            pos = pos.offset(trace.sideHit);
+        }
+
+        return pos;
+    }
 
     @Nonnull
     public static RayTraceWrapper getWrappedRayTraceFromEntity(World world, Entity entity, double range)

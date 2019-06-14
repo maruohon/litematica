@@ -644,6 +644,11 @@ public class SchematicPlacementManager
 
     public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, Minecraft mc)
     {
+        this.pastePlacementToWorld(schematicPlacement, changedBlocksOnly, true, mc);
+    }
+
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, boolean printMessage, Minecraft mc)
+    {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
             if (schematicPlacement != null)
@@ -665,7 +670,10 @@ public class SchematicPlacementManager
                         {
                             if (schematic.placeToWorld(world, schematicPlacement, false))
                             {
-                                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
+                                if (printMessage)
+                                {
+                                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
+                                }
                             }
                             else
                             {
@@ -674,13 +682,20 @@ public class SchematicPlacementManager
                         }
                     });
 
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                    if (printMessage)
+                    {
+                        InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                    }
                 }
                 else
                 {
                     TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblock(schematicPlacement, changedBlocksOnly);
                     TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+
+                    if (printMessage)
+                    {
+                        InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                    }
                 }
             }
             else

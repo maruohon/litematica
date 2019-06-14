@@ -26,6 +26,7 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.util.ToolUtils;
@@ -180,9 +181,19 @@ public class KeyCallbacks
                     if (mode.getUsesAreaSelection() || projectMode)
                     {
                         SelectionManager sm = DataManager.getSelectionManager();
-                        boolean moveEverything = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
+                        boolean grabModifier = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
+                        boolean moveEverything = grabModifier;
 
-                        if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
+                        if (grabModifier && mode == ToolMode.MOVE)
+                        {
+                            BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, this.mc.player, maxDistance, false);
+
+                            if (pos != null)
+                            {
+                                SchematicUtils.moveCurrentlySelectedWorldRegionTo(pos, mc);
+                            }
+                        }
+                        else if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
                         {
                             Corner corner = isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2;
                             sm.setPositionOfCurrentSelectionToRayTrace(this.mc, corner, moveEverything, maxDistance);
@@ -558,7 +569,16 @@ public class KeyCallbacks
                     if (selection != null)
                     {
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                        selection.moveEntireSelectionTo(pos, true);
+
+                        if (mode == ToolMode.MOVE)
+                        {
+                            SchematicUtils.moveCurrentlySelectedWorldRegionTo(pos, this.mc);
+                        }
+                        else
+                        {
+                            selection.moveEntireSelectionTo(pos, true);
+                        }
+
                         return true;
                     }
                 }

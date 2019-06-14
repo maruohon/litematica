@@ -4,9 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.mixin.IMixinItemBlockSpecial;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.TaskBase;
+import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicDirect;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -31,6 +38,7 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBlockSpecial;
@@ -47,6 +55,8 @@ import net.minecraft.util.math.Vec3i;
 
 public class SchematicUtils
 {
+    private static long areaMovedTime;
+
     public static boolean saveSchematic(boolean inMemoryOnly)
     {
         SelectionManager sm = DataManager.getSelectionManager();
@@ -578,6 +588,90 @@ public class SchematicUtils
         schematicPlacement.getSchematic().getMetadata().setTotalBlocks(totalBlocks);
 
         return true;
+    }
+
+    public static void moveCurrentlySelectedWorldRegionToLookingDirection(int amount, EntityPlayer player, Minecraft mc)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+
+        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        {
+            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(player), amount);
+            moveCurrentlySelectedWorldRegionTo(pos, mc);
+        }
+    }
+
+    public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos, Minecraft mc)
+    {
+        TaskScheduler scheduler = TaskScheduler.getServerInstanceIfExistsOrClient();
+        long currentTime = System.currentTimeMillis();
+
+        // Add a delay from the previous move operation, to allow time for
+        // server -> client chunk/block syncing, otherwise a subsequent move
+        // might wipe the area before the new blocks have arrived on the
+        // client and thus the new move schematic would just be air.
+        if ((currentTime - areaMovedTime) < 200 ||
+            scheduler.hasTask(TaskSaveSchematic.class) ||
+            scheduler.hasTask(TaskDeleteArea.class) ||
+            scheduler.hasTask(TaskPasteSchematicSetblock.class) ||
+            scheduler.hasTask(TaskPasteSchematicDirect.class))
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.move.pending_tasks");
+            return;
+        }
+
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+
+        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        {
+            LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, "");
+            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
+            taskSave.disableCompletionMessage();
+            areaMovedTime = System.currentTimeMillis();
+
+            taskSave.setCompletionListener(() ->
+            {
+                TaskDeleteArea taskDelete = new TaskDeleteArea(area.getAllSubRegionBoxes(), true);
+                taskDelete.disableCompletionMessage();
+                areaMovedTime = System.currentTimeMillis();
+
+                taskDelete.setCompletionListener(() ->
+                {
+                    SchematicPlacement placement = SchematicPlacement.createTemporary(schematic, pos);
+                    TaskBase taskPaste;
+
+                    if (mc.isSingleplayer())
+                    {
+                        taskPaste = new TaskPasteSchematicDirect(placement);
+                    }
+                    else
+                    {
+                        taskPaste = new TaskPasteSchematicSetblock(placement, true);
+                    }
+
+                    areaMovedTime = System.currentTimeMillis();
+                    taskPaste.disableCompletionMessage();
+                    taskPaste.setCompletionListener(() ->
+                    {
+                        SchematicHolder.getInstance().removeSchematic(schematic);
+                        area.moveEntireSelectionTo(pos, false);
+                        areaMovedTime = System.currentTimeMillis();
+                    });
+
+                    scheduler.scheduleTask(taskPaste, 1);
+                });
+
+                scheduler.scheduleTask(taskDelete, 1);
+            });
+
+            scheduler.scheduleTask(taskSave, 1);
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+        }
     }
 
     @Nullable

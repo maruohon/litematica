@@ -97,66 +97,77 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                 return this.handleAttackKey(mc);
             }
 
-            EntityPlayer player = mc.player;
-            boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
-
-            if (toolEnabled == false || EntityUtils.hasToolItem(player) == false)
-            {
-                return false;
-            }
-
-            ToolMode mode = DataManager.getToolMode();
-
             if (dWheel != 0)
             {
-                final int amount = dWheel > 0 ? 1 : -1;
+                return this.handleMouseScroll(dWheel, mc);
+            }
+        }
 
-                if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
+        return false;
+    }
+
+    private boolean handleMouseScroll(double dWheel, Minecraft mc)
+    {
+        EntityPlayer player = mc.player;
+        boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
+
+        if (toolEnabled == false || EntityUtils.hasToolItem(player) == false)
+        {
+            return false;
+        }
+
+        final int amount = dWheel > 0 ? 1 : -1;
+        ToolMode mode = DataManager.getToolMode();
+
+        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
+        {
+            if (mode.getUsesAreaSelection())
+            {
+                SelectionManager sm = DataManager.getSelectionManager();
+
+                if (sm.hasGrabbedElement())
                 {
-                    if (mode.getUsesAreaSelection())
-                    {
-                        SelectionManager sm = DataManager.getSelectionManager();
-
-                        if (sm.hasGrabbedElement())
-                        {
-                            sm.changeGrabDistance(player, amount);
-                            return true;
-                        }
-                        else if (sm.hasSelectedOrigin())
-                        {
-                            AreaSelection area = sm.getCurrentSelection();
-                            BlockPos old = area.getEffectiveOrigin();
-                            area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(player), amount), false);
-                            return true;
-                        }
-                    }
-                }
-
-                if (Hotkeys.SELECTION_GROW_MODIFIER.getKeybind().isKeybindHeld())
-                {
-                    return this.growOrShrinkSelection(amount, mode);
-                }
-
-                if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
-                {
-                    return nudgeSelection(amount, mode, player);
-                }
-
-                if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
-                {
-                    DataManager.setToolMode(DataManager.getToolMode().cycle(player, amount < 0));
+                    sm.changeGrabDistance(player, amount);
                     return true;
                 }
-
-                if (Hotkeys.SCHEMATIC_VERSION_CYCLE_MODIFIER.getKeybind().isKeybindHeld())
+                else if (sm.hasSelectedOrigin())
                 {
-                    if (DataManager.getSchematicProjectsManager().hasProjectOpen())
-                    {
-                        DataManager.getSchematicProjectsManager().cycleVersion(amount * -1);
-                    }
+                    AreaSelection area = sm.getCurrentSelection();
+                    BlockPos old = area.getEffectiveOrigin();
+                    area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(player), amount), false);
+                    return true;
+                }
+                else if (mode == ToolMode.MOVE)
+                {
+                    SchematicUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, player, mc);
                     return true;
                 }
             }
+        }
+
+        if (Hotkeys.SELECTION_GROW_MODIFIER.getKeybind().isKeybindHeld())
+        {
+            return this.growOrShrinkSelection(amount, mode);
+        }
+
+        if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
+        {
+            return nudgeSelection(amount, mode, player);
+        }
+
+        if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
+        {
+            DataManager.setToolMode(DataManager.getToolMode().cycle(player, amount < 0));
+            return true;
+        }
+
+        if (Hotkeys.SCHEMATIC_VERSION_CYCLE_MODIFIER.getKeybind().isKeybindHeld())
+        {
+            if (DataManager.getSchematicProjectsManager().hasProjectOpen())
+            {
+                DataManager.getSchematicProjectsManager().cycleVersion(amount * -1);
+            }
+            return true;
         }
 
         return false;
