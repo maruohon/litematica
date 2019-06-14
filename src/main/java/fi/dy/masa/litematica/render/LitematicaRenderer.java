@@ -282,7 +282,7 @@ public class LitematicaRenderer
         this.renderPiecewisePrepared = false;
         this.renderPiecewiseBlocks = false;
 
-        if (this.renderPiecewise)
+        if (this.renderPiecewise && visibleRegion != null)
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
             this.renderPiecewiseSchematic = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
