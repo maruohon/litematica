@@ -28,13 +28,13 @@ public abstract class MixinWorldRenderer
         }
     }
 
-    @Inject(method = "setUpTerrain", at = @At("HEAD"))
+    @Inject(method = "setUpTerrain", at = @At("TAIL"))
     private void onPostSetupTerrain(Camera camera, VisibleRegion visibleRegion, int frame, boolean spectator, CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewisePrepareAndUpdate(visibleRegion);
     }
 
-    @Inject(method = "renderEntities", at = @At("HEAD"))
+    @Inject(method = "renderEntities", at = @At("TAIL"))
     private void onPostRenderEntities(Camera camera, VisibleRegion visibleRegion, float partialTicks, CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewiseRenderEntities(visibleRegion, partialTicks);
