@@ -619,6 +619,12 @@ public class SchematicUtils
 
     public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos, Minecraft mc)
     {
+        if (mc.player == null || mc.player.capabilities.isCreativeMode == false)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+            return;
+        }
+
         TaskScheduler scheduler = TaskScheduler.getServerInstanceIfExistsOrClient();
         long currentTime = System.currentTimeMillis();
 
