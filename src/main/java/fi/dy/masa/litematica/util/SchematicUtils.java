@@ -91,6 +91,20 @@ public class SchematicUtils
         return false;
     }
 
+    public static void unloadCurrentlySelectedSchematic()
+    {
+        SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+        if (placement != null)
+        {
+            SchematicHolder.getInstance().removeSchematic(placement.getSchematic());
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+        }
+    }
+
     public static boolean breakSchematicBlock(Minecraft mc)
     {
         return setTargetedSchematicBlockState(mc, Blocks.AIR.getDefaultState());

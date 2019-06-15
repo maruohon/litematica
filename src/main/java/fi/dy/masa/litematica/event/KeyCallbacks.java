@@ -90,6 +90,7 @@ public class KeyCallbacks
         Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.UNLOAD_CURRENT_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
 
         Hotkeys.ADD_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
         Hotkeys.DELETE_SELECTION_BOX.getKeybind().setCallback(callbackMessage);
@@ -511,6 +512,11 @@ public class KeyCallbacks
                     PositionUtils.growOrShrinkCurrentSelection(false);
                     return true;
                 }
+            }
+            else if (key == Hotkeys.UNLOAD_CURRENT_SCHEMATIC.getKeybind())
+            {
+                SchematicUtils.unloadCurrentlySelectedSchematic();
+                return true;
             }
 
             return false;
