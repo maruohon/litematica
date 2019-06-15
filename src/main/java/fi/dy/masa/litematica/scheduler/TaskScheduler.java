@@ -93,15 +93,6 @@ public class TaskScheduler
         this.tasksToAdd.clear();
     }
 
-    /*
-    public boolean hasTasks()
-    {
-        synchronized (this)
-        {
-            return this.tasks.isEmpty() == false || this.tasksToAdd.isEmpty() == false;
-        }
-    }
-
     public boolean hasTask(Class <? extends ITask> clazz)
     {
         synchronized (this)
@@ -114,7 +105,24 @@ public class TaskScheduler
                 }
             }
 
+            for (ITask task : this.tasksToAdd)
+            {
+                if (clazz.equals(task.getClass()))
+                {
+                    return true;
+                }
+            }
+
             return false;
+        }
+    }
+
+    /*
+    public boolean hasTasks()
+    {
+        synchronized (this)
+        {
+            return this.tasks.isEmpty() == false || this.tasksToAdd.isEmpty() == false;
         }
     }
 

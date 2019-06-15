@@ -85,7 +85,10 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
             {
                 if (this.schematic.writeToFile(this.dir, this.fileName, this.overrideFile))
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", this.fileName);
+                    if (this.printCompletionMessage)
+                    {
+                        InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", this.fileName);
+                    }
                 }
                 else
                 {
@@ -97,7 +100,11 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
             {
                 String name = this.schematic.getMetadata().getName();
                 SchematicHolder.getInstance().addSchematic(this.schematic, true);
-                InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.in_memory_schematic_created", name);
+
+                if (this.printCompletionMessage)
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.in_memory_schematic_created", name);
+                }
             }
         }
         else
