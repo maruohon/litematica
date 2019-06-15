@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -180,7 +181,8 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
     protected boolean canProcessChunk(ChunkPos pos, World worldSchematic, WorldClient worldClient)
     {
-        if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z) == false)
+        if (worldSchematic.getChunkProvider().isChunkGeneratedAt(pos.x, pos.z) == false ||
+            DataManager.getSchematicPlacementManager().hasPendingRebuildFor(pos))
         {
             return false;
         }

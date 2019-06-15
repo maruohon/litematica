@@ -632,7 +632,7 @@ public class SchematicUtils
         // server -> client chunk/block syncing, otherwise a subsequent move
         // might wipe the area before the new blocks have arrived on the
         // client and thus the new move schematic would just be air.
-        if ((currentTime - areaMovedTime) < 200 ||
+        if ((currentTime - areaMovedTime) < 400 ||
             scheduler.hasTask(TaskSaveSchematic.class) ||
             scheduler.hasTask(TaskDeleteArea.class) ||
             scheduler.hasTask(TaskPasteSchematicSetblock.class) ||
@@ -654,13 +654,15 @@ public class SchematicUtils
 
             taskSave.setCompletionListener(() ->
             {
+                SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, "-", true, true);
+                DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, false);
+
                 TaskDeleteArea taskDelete = new TaskDeleteArea(area.getAllSubRegionBoxes(), true);
                 taskDelete.disableCompletionMessage();
                 areaMovedTime = System.currentTimeMillis();
 
                 taskDelete.setCompletionListener(() ->
                 {
-                    SchematicPlacement placement = SchematicPlacement.createTemporary(schematic, pos);
                     TaskBase taskPaste;
 
                     if (mc.isSingleplayer())
@@ -669,11 +671,12 @@ public class SchematicUtils
                     }
                     else
                     {
-                        taskPaste = new TaskPasteSchematicSetblock(placement, true);
+                        taskPaste = new TaskPasteSchematicSetblock(placement, false);
                     }
 
-                    areaMovedTime = System.currentTimeMillis();
                     taskPaste.disableCompletionMessage();
+                    areaMovedTime = System.currentTimeMillis();
+
                     taskPaste.setCompletionListener(() ->
                     {
                         SchematicHolder.getInstance().removeSchematic(schematic);

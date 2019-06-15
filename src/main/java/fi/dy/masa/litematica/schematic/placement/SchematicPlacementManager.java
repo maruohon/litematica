@@ -62,6 +62,16 @@ public class SchematicPlacementManager
     @Nullable
     private SchematicPlacement selectedPlacement;
 
+    public boolean hasPendingRebuilds()
+    {
+        return this.chunksToRebuild.isEmpty() == false;
+    }
+
+    public boolean hasPendingRebuildFor(ChunkPos pos)
+    {
+        return this.chunksToRebuild.contains(pos);
+    }
+
     public boolean processQueuedChunks()
     {
         if (this.chunksToUnload.isEmpty() == false)
