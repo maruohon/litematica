@@ -722,7 +722,10 @@ public class SchematicUtils
                 manager.addSchematicPlacement(placement, false);
                 manager.setSelectedSchematicPlacement(placement);
 
-                DataManager.setToolMode(ToolMode.PASTE_SCHEMATIC);
+                if (mc.player.capabilities.isCreativeMode)
+                {
+                    DataManager.setToolMode(ToolMode.PASTE_SCHEMATIC);
+                }
             });
 
             TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(taskSave, 10);
