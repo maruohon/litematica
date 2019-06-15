@@ -24,6 +24,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
@@ -671,6 +672,51 @@ public class SchematicUtils
         else
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+        }
+    }
+
+    public static void cloneSelectionArea(Minecraft mc)
+    {
+        if (mc.player != null && mc.player.capabilities.isCreativeMode)
+        {
+            SelectionManager sm = DataManager.getSelectionManager();
+            AreaSelection area = sm.getCurrentSelection();
+
+            if (area != null && area.getAllSubRegionBoxes().size() > 0)
+            {
+                LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, mc.player.getName());
+                TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
+                taskSave.disableCompletionMessage();
+
+                taskSave.setCompletionListener(() ->
+                {
+                    SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+                    String name = schematic.getMetadata().getName();
+                    BlockPos origin = RayTraceUtils.getTargetedPosition(mc.world, mc.player, 6, false);
+
+                    if (origin == null)
+                    {
+                        origin = new BlockPos(mc.player);
+                    }
+
+                    SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, true);
+
+                    manager.addSchematicPlacement(placement, false);
+                    manager.setSelectedSchematicPlacement(placement);
+
+                    DataManager.setToolMode(ToolMode.PASTE_SCHEMATIC);
+                });
+
+                TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(taskSave, 10);
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+            }
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
         }
     }
 

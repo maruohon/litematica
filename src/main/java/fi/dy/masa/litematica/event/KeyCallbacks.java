@@ -56,6 +56,7 @@ public class KeyCallbacks
 
         Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback(valueChangeCallback);
 
+        Hotkeys.CLONE_SELECTION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_MODE_NEXT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_MODE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
@@ -314,7 +315,7 @@ public class KeyCallbacks
                 }
                 else
                 {
-                    InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
                 }
 
                 return true;
@@ -329,7 +330,7 @@ public class KeyCallbacks
                 }
                 else
                 {
-                    InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
                 }
 
                 return true;
@@ -350,7 +351,7 @@ public class KeyCallbacks
                     }
                     else
                     {
-                        InfoUtils.printActionbarMessage("litematica.message.error.no_placement_selected");
+                        InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
                     }
                 }
 
@@ -371,8 +372,9 @@ public class KeyCallbacks
                 }
                 else
                 {
-                    InfoUtils.printActionbarMessage("litematica.message.error.no_area_selected");
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
                 }
+
                 return true;
             }
             else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
@@ -451,6 +453,11 @@ public class KeyCallbacks
                 {
                     DataManager.getSchematicProjectsManager().cycleVersion(-1);
                 }
+                return true;
+            }
+            else if (key == Hotkeys.CLONE_SELECTION.getKeybind())
+            {
+                SchematicUtils.cloneSelectionArea(this.mc);
                 return true;
             }
             else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && ((hasTool && toolEnabled) || Configs.Generic.EXECUTE_REQUIRE_TOOL.getBooleanValue() == false))
