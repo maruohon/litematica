@@ -29,7 +29,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     protected List<String> infoHudLines = new ArrayList<>();
     protected boolean finished;
     protected boolean printCompletionMessage = true;
-    @Nullable protected ICompletionListener completionListener;
+    @Nullable private ICompletionListener completionListener;
 
     protected TaskBase()
     {
@@ -91,14 +91,17 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     {
         if (this.completionListener != null)
         {
-            if (this.finished)
+            this.mc.addScheduledTask(() ->
             {
-                this.completionListener.onTaskCompleted();
-            }
-            else
-            {
-                this.completionListener.onTaskAborted();
-            }
+                if (this.finished)
+                {
+                    this.completionListener.onTaskCompleted();
+                }
+                else
+                {
+                    this.completionListener.onTaskAborted();
+                }
+            });
         }
     }
 

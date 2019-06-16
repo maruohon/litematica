@@ -674,21 +674,18 @@ public class SchematicPlacementManager
                     final WorldServer world = mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld()));
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
 
-                    world.addScheduledTask(new Runnable()
+                    world.addScheduledTask(() ->
                     {
-                        public void run()
+                        if (schematic.placeToWorld(world, schematicPlacement, false))
                         {
-                            if (schematic.placeToWorld(world, schematicPlacement, false))
+                            if (printMessage)
                             {
-                                if (printMessage)
-                                {
-                                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
-                                }
+                                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
                             }
-                            else
-                            {
-                                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
-                            }
+                        }
+                        else
+                        {
+                            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
                         }
                     });
 
