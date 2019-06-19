@@ -344,7 +344,7 @@ public class WorldRendererSchematic
 
                     if (chunkRenderer != null)
                     {
-                        if (visibleRegion.intersects(chunkRenderer.boundingBox))
+                        if (visibleRegion.intersects(chunkRenderer.getBoundingBox()))
                         {
                             //if (GuiBase.isCtrlDown()) System.out.printf("add @ %s\n", subChunk);
                             if (chunkRenderer.needsUpdate() && subChunkCornerPos.equals(viewPosSubChunk))

@@ -50,7 +50,7 @@ public class ChunkRendererSchematicVbo
     protected final ReentrantLock chunkRenderDataLock;
     protected final Set<BlockEntity> setBlockEntities = new HashSet<>();
     protected final BlockPos.Mutable position;
-    public BoundingBox boundingBox;
+    private BoundingBox boundingBox;
 
     protected final GlBuffer[] glBufferBlocks;
     protected final GlBuffer[] glBufferOverlay;
@@ -137,6 +137,19 @@ public class ChunkRendererSchematicVbo
     public BlockPos getPosition()
     {
         return this.position;
+    }
+
+    public BoundingBox getBoundingBox()
+    {
+        if (this.boundingBox == null)
+        {
+            int x = this.position.getX();
+            int y = this.position.getY();
+            int z = this.position.getZ();
+            this.boundingBox = new BoundingBox(x, y, z, x + 16, y + 16, z + 16);
+        }
+
+        return this.boundingBox;
     }
 
     public void setPosition(int x, int y, int z)
