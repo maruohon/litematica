@@ -107,7 +107,7 @@ public class MaterialListUtils
             }
             else
             {
-                ItemStack stack = cache.getItemForState(state);
+                ItemStack stack = cache.getRequiredBuildItemForState(state);
 
                 if (stack.isEmpty() == false)
                 {

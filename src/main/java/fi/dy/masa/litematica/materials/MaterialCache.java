@@ -41,7 +41,8 @@ public class MaterialCache
 {
     private static final MaterialCache INSTANCE = new MaterialCache();
 
-    protected final IdentityHashMap<BlockState, ItemStack> itemsForStates = new IdentityHashMap<>();
+    protected final IdentityHashMap<BlockState, ItemStack> buildItemsForStates = new IdentityHashMap<>();
+    protected final IdentityHashMap<BlockState, ItemStack> displayItemsForStates = new IdentityHashMap<>();
     protected final WorldSchematic tempWorld;
     protected final BlockPos checkPos;
     protected boolean hasReadFromFile;
@@ -67,29 +68,41 @@ public class MaterialCache
 
     public void clearCache()
     {
-        this.itemsForStates.clear();
+        this.buildItemsForStates.clear();
     }
 
-    public ItemStack getItemForState(BlockState state)
+    public ItemStack getRequiredBuildItemForState(BlockState state)
     {
-        return this.getItemForState(state, this.tempWorld, this.checkPos);
+        return this.getRequiredBuildItemForState(state, this.tempWorld, this.checkPos);
     }
 
-    public ItemStack getItemForState(BlockState state, World world, BlockPos pos)
+    public ItemStack getRequiredBuildItemForState(BlockState state, World world, BlockPos pos)
     {
-        ItemStack stack = this.itemsForStates.get(state);
+        ItemStack stack = this.buildItemsForStates.get(state);
 
         if (stack == null)
         {
-            stack = this.getItemForStateFromWorld(state, world, pos);
+            stack = this.getItemForStateFromWorld(state, world, pos, true);
         }
 
         return stack;
     }
 
-    protected ItemStack getItemForStateFromWorld(BlockState state, World world, BlockPos pos)
+    public ItemStack getItemForDisplayNameForState(BlockState state)
     {
-        ItemStack stack = this.getStateToItemOverride(state);
+        ItemStack stack = this.displayItemsForStates.get(state);
+
+        if (stack == null)
+        {
+            stack = this.getItemForStateFromWorld(state, this.tempWorld, this.checkPos, false);
+        }
+
+        return stack;
+    }
+
+    protected ItemStack getItemForStateFromWorld(BlockState state, World world, BlockPos pos, boolean isBuildItem)
+    {
+        ItemStack stack = isBuildItem ? this.getStateToItemOverride(state) : null;
 
         if (stack == null)
         {
@@ -106,7 +119,15 @@ public class MaterialCache
             this.overrideStackSize(state, stack);
         }
 
-        this.itemsForStates.put(state, stack);
+        if (isBuildItem)
+        {
+            this.buildItemsForStates.put(state, stack);
+        }
+        else
+        {
+            this.displayItemsForStates.put(state, stack);
+        }
+
         this.dirty = true;
 
         return stack;
@@ -138,7 +159,7 @@ public class MaterialCache
             return ImmutableList.of(new ItemStack(Blocks.FLOWER_POT), block.getPickStack(world, pos, state));
         }
 
-        return ImmutableList.of(this.getItemForState(state, world, pos));
+        return ImmutableList.of(this.getRequiredBuildItemForState(state, world, pos));
     }
 
     @Nullable
@@ -219,9 +240,18 @@ public class MaterialCache
     protected CompoundTag writeToNBT()
     {
         CompoundTag nbt = new CompoundTag();
+
+        nbt.put("MaterialCache", this.writeMapToNBT(this.buildItemsForStates));
+        nbt.put("DisplayMaterialCache", this.writeMapToNBT(this.displayItemsForStates));
+
+        return nbt;
+    }
+
+    protected ListTag writeMapToNBT(IdentityHashMap<BlockState, ItemStack> map)
+    {
         ListTag list = new ListTag();
 
-        for (Map.Entry<BlockState, ItemStack> entry : this.itemsForStates.entrySet())
+        for (Map.Entry<BlockState, ItemStack> entry : map.entrySet())
         {
             CompoundTag tag = new CompoundTag();
             CompoundTag stateTag = NbtHelper.fromBlockState(entry.getKey());
@@ -232,18 +262,23 @@ public class MaterialCache
             list.add(tag);
         }
 
-        nbt.put("MaterialCache", list);
-
-        return nbt;
+        return list;
     }
 
-    protected boolean readFromNBT(CompoundTag nbt)
+    protected void readFromNBT(CompoundTag nbt)
     {
-        this.itemsForStates.clear();
+        this.buildItemsForStates.clear();
+        this.displayItemsForStates.clear();
 
-        if (nbt.contains("MaterialCache", Constants.NBT.TAG_LIST))
+        this.readMapFromNBT(nbt, "MaterialCache", this.buildItemsForStates);
+        this.readMapFromNBT(nbt, "DisplayMaterialCache", this.displayItemsForStates);
+    }
+
+    protected void readMapFromNBT(CompoundTag nbt, String tagName, IdentityHashMap<BlockState, ItemStack> map)
+    {
+        if (nbt.contains(tagName, Constants.NBT.TAG_LIST))
         {
-            ListTag list = nbt.getList("MaterialCache", Constants.NBT.TAG_COMPOUND);
+            ListTag list = nbt.getList(tagName, Constants.NBT.TAG_COMPOUND);
             final int count = list.size();
 
             for (int i = 0; i < count; ++i)
@@ -258,15 +293,11 @@ public class MaterialCache
                     if (state != null)
                     {
                         ItemStack stack = ItemStack.fromTag(tag.getCompound("Item"));
-                        this.itemsForStates.put(state, stack);
+                        this.buildItemsForStates.put(state, stack);
                     }
                 }
             }
-
-            return true;
         }
-
-        return false;
     }
 
     protected File getCacheDir()
