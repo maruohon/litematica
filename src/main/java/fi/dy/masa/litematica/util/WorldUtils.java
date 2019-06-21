@@ -21,6 +21,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -331,13 +332,26 @@ public class WorldUtils
 
     public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
     {
-        RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, true, 6);
         IBlockState state = Blocks.AIR.getDefaultState();
+        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
 
-        if (trace != null &&
-            trace.typeOfHit == RayTraceResult.Type.BLOCK)
+        if (wrapper != null)
         {
-            state = mc.world.getBlockState(trace.getBlockPos());
+            RayTraceResult trace = wrapper.getRayTraceResult();
+
+            if (trace != null)
+            {
+                BlockPos pos = trace.getBlockPos();
+
+                if (wrapper.getHitType() == HitType.SCHEMATIC_BLOCK)
+                {
+                    state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+                }
+                else if (wrapper.getHitType() == HitType.VANILLA)
+                {
+                    state = mc.world.getBlockState(pos).getActualState(mc.world, pos);
+                }
+            }
         }
 
         if (primary)
@@ -373,7 +387,7 @@ public class WorldUtils
         {
             World world = SchematicWorldHandler.getSchematicWorld();
             IBlockState state = world.getBlockState(pos);
-            ItemStack stack = MaterialCache.getInstance().getItemForState(state, world, pos);
+            ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
 
             if (stack.isEmpty() == false)
             {
@@ -458,7 +472,7 @@ public class WorldUtils
             BlockPos pos = trace.getBlockPos();
             World world = SchematicWorldHandler.getSchematicWorld();
             IBlockState stateSchematic = world.getBlockState(pos);
-            ItemStack stack = MaterialCache.getInstance().getItemForState(stateSchematic);
+            ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // Already placed to that position, possible server sync delay
             if (easyPlaceIsPositionCached(pos))
@@ -729,7 +743,7 @@ public class WorldUtils
             }
 
             IBlockState stateSchematic = worldSchematic.getBlockState(pos);
-            ItemStack stack = MaterialCache.getInstance().getItemForState(stateSchematic);
+            ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
             if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(mc.player, stack) == null)

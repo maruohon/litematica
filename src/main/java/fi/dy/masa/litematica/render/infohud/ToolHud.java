@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
@@ -253,6 +252,15 @@ public class ToolHud extends InfoHud
 
                 lines.add(StringUtils.translate("litematica.hud.area_selection.origin", green + str + rst));
 
+                IBlockState state = mode.getPrimaryBlock();
+                ItemStack stack = this.mc.player.getHeldItemMainhand();
+
+                if (state != null && mode == ToolMode.REBUILD &&
+                    (stack.isEmpty() || EntityUtils.areStacksEqualIgnoreDurability(stack, DataManager.getToolItem())))
+                {
+                    lines.add(StringUtils.translate("litematica.tool_hud.block_1", this.getBlockString(state)));
+                }
+
                 SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
                 if (placement != null)
@@ -312,13 +320,12 @@ public class ToolHud extends InfoHud
 
     protected String getBlockString(IBlockState state)
     {
-        ItemStack stack = MaterialCache.getInstance().getItemForState(state);
         String strBlock;
 
         String green = GuiBase.TXT_GREEN;
         String rst = GuiBase.TXT_RST;
 
-        strBlock = green + stack.getDisplayName() + rst;
+        strBlock = green + state.getBlock().getLocalizedName() + rst;
         EnumFacing facing = BlockUtils.getFirstPropertyFacingValue(state);
 
         if (facing != null)
