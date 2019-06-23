@@ -9,6 +9,11 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
@@ -31,13 +36,6 @@ import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class DataManager implements IDirectoryCache
 {
@@ -436,27 +434,7 @@ public class DataManager implements IDirectoryCache
             Litematica.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
         }
 
-        return new File(dir, getStorageFileName(globalData));
-    }
-
-    private static String getStorageFileName(boolean globalData)
-    {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        String name = StringUtils.getWorldOrServerName();
-
-        if (name != null)
-        {
-            if (globalData)
-            {
-                return Reference.MOD_ID + "_" + name + ".json";
-            }
-            else
-            {
-                return Reference.MOD_ID + "_" + name + "_dim" + WorldUtils.getDimensionId(mc.world) + ".json";
-            }
-        }
-
-        return Reference.MOD_ID + "_default.json";
+        return new File(dir, StringUtils.getStorageFileName(globalData, Reference.MOD_ID + "_", ".json", "default"));
     }
 
     public static void setToolItem(String itemName)
