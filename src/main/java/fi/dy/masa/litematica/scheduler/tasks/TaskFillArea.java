@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
@@ -128,32 +129,41 @@ public class TaskFillArea extends TaskProcessChunkBase
             }
         }
 
-        IBlockState barrier = Blocks.BARRIER.getDefaultState();
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-
-        for (int z = box.minZ; z <= box.maxZ; ++z)
+        try
         {
-            for (int x = box.minX; x <= box.maxX; ++x)
+            WorldUtils.setShouldPreventOnBlockAdded(true);
+
+            IBlockState barrier = Blocks.BARRIER.getDefaultState();
+            BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
+
+            for (int z = box.minZ; z <= box.maxZ; ++z)
             {
-                for (int y = box.maxY; y >= box.minY; --y)
+                for (int x = box.minX; x <= box.maxX; ++x)
                 {
-                    posMutable.setPos(x, y, z);
-                    IBlockState oldState = this.world.getBlockState(posMutable).getActualState(this.world, posMutable);
-
-                    if ((this.replaceState == null && oldState != this.fillState) || oldState == this.replaceState)
+                    for (int y = box.maxY; y >= box.minY; --y)
                     {
-                        TileEntity te = this.world.getTileEntity(posMutable);
+                        posMutable.setPos(x, y, z);
+                        IBlockState oldState = this.world.getBlockState(posMutable).getActualState(this.world, posMutable);
 
-                        if (te instanceof IInventory)
+                        if ((this.replaceState == null && oldState != this.fillState) || oldState == this.replaceState)
                         {
-                            ((IInventory) te).clear();
-                            this.world.setBlockState(posMutable, barrier, 0x12);
-                        }
+                            TileEntity te = this.world.getTileEntity(posMutable);
 
-                        this.world.setBlockState(posMutable, this.fillState, 0x12);
+                            if (te instanceof IInventory)
+                            {
+                                ((IInventory) te).clear();
+                                this.world.setBlockState(posMutable, barrier, 0x12);
+                            }
+
+                            this.world.setBlockState(posMutable, this.fillState, 0x12);
+                        }
                     }
                 }
             }
+        }
+        finally
+        {
+            WorldUtils.setShouldPreventOnBlockAdded(false);
         }
     }
 
