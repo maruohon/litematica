@@ -10,16 +10,6 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.platform.GLX;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.render.RenderUtils;
-import fi.dy.masa.litematica.util.OverlayType;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.block.BlockRenderType;
@@ -35,10 +25,19 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.chunk.WorldChunk;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.render.RenderUtils;
+import fi.dy.masa.litematica.util.OverlayType;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class ChunkRendererSchematicVbo
 {
@@ -50,7 +49,7 @@ public class ChunkRendererSchematicVbo
     protected final ReentrantLock chunkRenderDataLock;
     protected final Set<BlockEntity> setBlockEntities = new HashSet<>();
     protected final BlockPos.Mutable position;
-    private BoundingBox boundingBox;
+    private net.minecraft.util.math.Box boundingBox;
 
     protected final GlBuffer[] glBufferBlocks;
     protected final GlBuffer[] glBufferOverlay;
@@ -139,14 +138,14 @@ public class ChunkRendererSchematicVbo
         return this.position;
     }
 
-    public BoundingBox getBoundingBox()
+    public net.minecraft.util.math.Box getBoundingBox()
     {
         if (this.boundingBox == null)
         {
             int x = this.position.getX();
             int y = this.position.getY();
             int z = this.position.getZ();
-            this.boundingBox = new BoundingBox(x, y, z, x + 16, y + 16, z + 16);
+            this.boundingBox = new net.minecraft.util.math.Box(x, y, z, x + 16, y + 16, z + 16);
         }
 
         return this.boundingBox;
@@ -158,7 +157,7 @@ public class ChunkRendererSchematicVbo
         {
             this.clear();
             this.position.set(x, y, z);
-            this.boundingBox = new BoundingBox(x, y, z, x + 16, y + 16, z + 16);
+            this.boundingBox = new net.minecraft.util.math.Box(x, y, z, x + 16, y + 16, z + 16);
         }
     }
 

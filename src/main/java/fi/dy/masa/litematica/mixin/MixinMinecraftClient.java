@@ -19,7 +19,7 @@ public abstract class MixinMinecraftClient extends NonBlockingThreadExecutor<Run
     }
 
     @Inject(method = "doItemUse()V", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/item/ItemStack;getAmount()I", ordinal = 0), cancellable = true)
+            target = "Lnet/minecraft/item/ItemStack;getCount()I", ordinal = 0), cancellable = true)
     private void handlePlacementRestriction(CallbackInfo ci)
     {
         if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())

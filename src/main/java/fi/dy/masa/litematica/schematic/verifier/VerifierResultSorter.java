@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.schematic.verifier;
 
 import java.util.Comparator;
+import net.minecraft.block.BlockState;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.SortCriteria;
 import fi.dy.masa.litematica.util.ItemUtils;
-import net.minecraft.block.BlockState;
 
 public class VerifierResultSorter implements Comparator<BlockMismatch>
 {
@@ -28,8 +28,8 @@ public class VerifierResultSorter implements Comparator<BlockMismatch>
 
             if (count1 == count2)
             {
-                String name1 = ItemUtils.getItemForState(entry1.stateExpected).getDisplayName().getString();
-                String name2 = ItemUtils.getItemForState(entry2.stateExpected).getDisplayName().getString();
+                String name1 = ItemUtils.getItemForState(entry1.stateExpected).getName().getString();
+                String name2 = ItemUtils.getItemForState(entry2.stateExpected).getName().getString();
                 return name1.compareTo(name2);
             }
 
@@ -54,8 +54,8 @@ public class VerifierResultSorter implements Comparator<BlockMismatch>
                 state1_2 = entry2.stateFound;
             }
 
-            String name1_1 = ItemUtils.getItemForState(state1_1).getDisplayName().getString();
-            String name1_2 = ItemUtils.getItemForState(state1_2).getDisplayName().getString();
+            String name1_1 = ItemUtils.getItemForState(state1_1).getName().getString();
+            String name1_2 = ItemUtils.getItemForState(state1_2).getName().getString();
             int res = name1_1.compareTo(name1_2);
 
             if (res != 0)
@@ -63,8 +63,8 @@ public class VerifierResultSorter implements Comparator<BlockMismatch>
                 return reverse == false ? res * -1 : res;
             }
 
-            String name2_1 = ItemUtils.getItemForState(state2_1).getDisplayName().getString();
-            String name2_2 = ItemUtils.getItemForState(state2_2).getDisplayName().getString();
+            String name2_1 = ItemUtils.getItemForState(state2_1).getName().getString();
+            String name2_2 = ItemUtils.getItemForState(state2_2).getName().getString();
             res = name2_1.compareTo(name2_2);
 
             return reverse == false ? res * -1 : res;

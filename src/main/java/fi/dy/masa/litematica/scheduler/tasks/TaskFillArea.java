@@ -2,12 +2,6 @@ package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,8 +10,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public class TaskFillArea extends TaskProcessChunkBase
 {
@@ -94,7 +93,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (removeEntities)
         {
-            BoundingBox aabb = new BoundingBox(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+            net.minecraft.util.math.Box aabb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
             List<Entity> entities = this.world.getEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER);
 
             for (Entity entity : entities)
@@ -139,7 +138,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (removeEntities)
         {
-            BoundingBox aabb = new BoundingBox(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+            net.minecraft.util.math.Box aabb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
 
             if (this.world.getEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER).size() > 0)
             {

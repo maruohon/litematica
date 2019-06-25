@@ -5,12 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InventoryUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -21,9 +15,14 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.InventoryUtils;
 
 public class EntityUtils
 {
@@ -99,7 +98,7 @@ public class EntityUtils
 
     public static boolean areStacksEqualIgnoreDurability(ItemStack stack1, ItemStack stack2)
     {
-        return ItemStack.areEqualIgnoreDurability(stack1, stack2) && ItemStack.areTagsEqual(stack1, stack2);
+        return ItemStack.areItemsEqualIgnoreDamage(stack1, stack2) && ItemStack.areTagsEqual(stack1, stack2);
     }
 
     public static Direction getHorizontalLookingDirection(Entity entity)
@@ -229,7 +228,7 @@ public class EntityUtils
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         BlockPos posEndAbs = PositionUtils.getTransformedPlacementPosition(regionSize.add(-1, -1, -1), schematicPlacement, placement).add(regionPosRelTransformed).add(origin);
         BlockPos regionPosAbs = regionPosRelTransformed.add(origin);
-        BoundingBox bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
+        net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
 
         return world.getEntities((Entity) null, bb, null);
     }

@@ -12,24 +12,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
-import fi.dy.masa.litematica.Litematica;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.util.ReplaceBehavior;
-import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.NBTUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -50,13 +32,30 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TaskPriority;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
+import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class LitematicaSchematic
 {
@@ -763,7 +762,7 @@ public class LitematicaSchematic
     {
         for (Box box : boxes)
         {
-            BoundingBox bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+            net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
             BlockPos regionPosAbs = box.getPos1();
             List<EntityInfo> list = new ArrayList<>();
             List<Entity> entities = world.getEntities((Entity) null, bb, null);
@@ -799,7 +798,7 @@ public class LitematicaSchematic
                 continue;
             }
 
-            BoundingBox bb = PositionUtils.createAABBFrom(entry.getValue());
+            net.minecraft.util.math.Box bb = PositionUtils.createAABBFrom(entry.getValue());
             List<Entity> entities = world.getEntities((Entity) null, bb, null);
             BlockPos regionPosAbs = box.getPos1();
 

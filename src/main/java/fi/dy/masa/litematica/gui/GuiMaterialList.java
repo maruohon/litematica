@@ -320,7 +320,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                 int total = entry.getCountTotal() * multiplier;
                 int missing = multiplier > 1 ? total : entry.getCountMissing();
                 int available = entry.getCountAvailable();
-                dump.addData(entry.getStack().getDisplayName().getString(), String.valueOf(total), String.valueOf(missing), String.valueOf(available));
+                dump.addData(entry.getStack().getName().getString(), String.valueOf(total), String.valueOf(missing), String.valueOf(available));
             }
 
             String titleTotal = multiplier > 1 ? String.format("Total (x%d)", multiplier) : "Total";

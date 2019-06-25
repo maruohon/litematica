@@ -5,6 +5,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.command.arguments.BlockArgumentParser;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -19,15 +27,6 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.command.arguments.BlockArgumentParser;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
 {
@@ -255,7 +254,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
     private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, ClientPlayerEntity player)
     {
-        BoundingBox bb = new BoundingBox(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+        net.minecraft.util.math.Box bb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
         List<Entity> entities = worldSchematic.getEntities((Entity) null, bb, null);
 
         for (Entity entity : entities)

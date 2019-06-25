@@ -36,7 +36,7 @@ public class BlockInfo
         Identifier rl = Registry.BLOCK.getId(this.state.getBlock());
         this.blockRegistryname = rl != null ? rl.toString() : "<null>";
 
-        this.stackName = this.stack.getDisplayName().getString();
+        this.stackName = this.stack.getName().getString();
 
         int w = StringUtils.getStringWidth(this.stackName) + 20;
         w = Math.max(w, StringUtils.getStringWidth(this.blockRegistryname));

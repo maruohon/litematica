@@ -9,13 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.Litematica;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.NBTUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -32,12 +25,18 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
+import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.NBTUtils;
 
 public class SchematicaSchematic
 {
@@ -392,7 +391,7 @@ public class SchematicaSchematic
     private void readEntitiesFromWorld(World world, BlockPos posStart, BlockPos size)
     {
         this.entities.clear();
-        List<Entity> entities = world.getEntities((Entity) null, new BoundingBox(posStart, posStart.add(size)));
+        List<Entity> entities = world.getEntities((Entity) null, new net.minecraft.util.math.Box(posStart, posStart.add(size)));
 
         for (Entity entity : entities)
         {

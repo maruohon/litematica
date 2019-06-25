@@ -92,7 +92,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int countTotal = entry.getCountTotal() * multiplier;
             int countMissing = multiplier == 1 ? entry.getCountMissing() : countTotal;
 
-            maxNameLength   = Math.max(maxNameLength,   StringUtils.getStringWidth(entry.getStack().getDisplayName().getString()));
+            maxNameLength   = Math.max(maxNameLength,   StringUtils.getStringWidth(entry.getStack().getName().getString()));
             maxCountLength1 = Math.max(maxCountLength1, StringUtils.getStringWidth(String.valueOf(countTotal)));
             maxCountLength2 = Math.max(maxCountLength2, StringUtils.getStringWidth(String.valueOf(countMissing)));
             maxCountLength3 = Math.max(maxCountLength3, StringUtils.getStringWidth(String.valueOf(entry.getCountAvailable())));
@@ -222,7 +222,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             String gold = GuiBase.TXT_GOLD;
             String red = GuiBase.TXT_RED;
             String pre;
-            this.drawString(x1 + 20, y, color, this.entry.getStack().getDisplayName().getString());
+            this.drawString(x1 + 20, y, color, this.entry.getStack().getName().getString());
 
             this.drawString(x2, y, color, String.valueOf(countTotal));
 
@@ -264,12 +264,12 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             String header3 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[2]);
 
             ItemStack stack = this.entry.getStack();
-            String stackName = stack.getDisplayName().getString();
+            String stackName = stack.getName().getString();
             int multiplier = this.materialList.getMultiplier();
             int total = this.entry.getCountTotal() * multiplier;
             int missing = multiplier == 1 ? this.entry.getCountMissing() : total;
-            String strCountTotal = this.getFormattedCountString(total, stack.getMaxAmount());
-            String strCountMissing = this.getFormattedCountString(missing, stack.getMaxAmount());
+            String strCountTotal = this.getFormattedCountString(total, stack.getMaxCount());
+            String strCountMissing = this.getFormattedCountString(missing, stack.getMaxCount());
 
             int w1 = Math.max(this.getStringWidth(header1)       , Math.max(this.getStringWidth(header2)      , this.getStringWidth(header3)));
             int w2 = Math.max(this.getStringWidth(stackName) + 20, Math.max(this.getStringWidth(strCountTotal), this.getStringWidth(strCountMissing)));

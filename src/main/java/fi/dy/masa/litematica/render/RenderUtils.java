@@ -4,14 +4,6 @@ import java.util.List;
 import java.util.Random;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.litematica.util.BlockInfoAlignment;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.LeftRight;
-import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
-import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
@@ -22,11 +14,18 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.LeftRight;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class RenderUtils
 {
@@ -48,7 +47,7 @@ public class RenderUtils
     {
         GlStateManager.lineWidth(lineWidth);
 
-        BoundingBox aabb = createAABB(pos.getX(), pos.getY(), pos.getZ(), expand, mc);
+        net.minecraft.util.math.Box aabb = createAABB(pos.getX(), pos.getY(), pos.getZ(), expand, mc);
         WorldRenderer.drawBoxOutline(aabb, color.r, color.g, color.b, color.a);
     }
 
@@ -165,11 +164,11 @@ public class RenderUtils
     {
         GlStateManager.lineWidth(lineWidth);
 
-        BoundingBox aabb = createEnclosingAABB(pos1, pos2, mc);
+        net.minecraft.util.math.Box aabb = createEnclosingAABB(pos1, pos2, mc);
         drawBoundingBoxEdges(aabb, colorX, colorY, colorZ);
     }
 
-    private static void drawBoundingBoxEdges(BoundingBox box, Color4f colorX, Color4f colorY, Color4f colorZ)
+    private static void drawBoundingBoxEdges(net.minecraft.util.math.Box box, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
         drawBoundingBoxEdges(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, colorX, colorY, colorZ);
     }
@@ -794,7 +793,7 @@ public class RenderUtils
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static BoundingBox createEnclosingAABB(BlockPos pos1, BlockPos pos2, MinecraftClient mc)
+    public static net.minecraft.util.math.Box createEnclosingAABB(BlockPos pos1, BlockPos pos2, MinecraftClient mc)
     {
         int minX = Math.min(pos1.getX(), pos2.getX());
         int minY = Math.min(pos1.getY(), pos2.getY());
@@ -809,7 +808,7 @@ public class RenderUtils
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static BoundingBox createAABB(int x, int y, int z, double expand, MinecraftClient mc)
+    public static net.minecraft.util.math.Box createAABB(int x, int y, int z, double expand, MinecraftClient mc)
     {
         return createAABB(x, y, z, x + 1, y + 1, z + 1, expand, mc);
     }
@@ -817,14 +816,14 @@ public class RenderUtils
     /**
      * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
      */
-    public static BoundingBox createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, double expand, MinecraftClient mc)
+    public static net.minecraft.util.math.Box createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, double expand, MinecraftClient mc)
     {
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
 
-        return new BoundingBox( minX - dx - expand, minY - dy - expand, minZ - dz - expand,
+        return new net.minecraft.util.math.Box( minX - dx - expand, minY - dy - expand, minZ - dz - expand,
                                 maxX - dx + expand, maxY - dy + expand, maxZ - dz + expand);
     }
 }

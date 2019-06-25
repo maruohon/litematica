@@ -208,11 +208,11 @@ public class MaterialCache
     {
         if (state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE) == SlabType.DOUBLE)
         {
-            stack.setAmount(2);
+            stack.setCount(2);
         }
         else if (state.getBlock() == Blocks.SNOW)
         {
-            stack.setAmount(state.get(SnowBlock.LAYERS));
+            stack.setCount(state.get(SnowBlock.LAYERS));
         }
     }
 

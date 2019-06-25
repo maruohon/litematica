@@ -11,6 +11,17 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -23,18 +34,6 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
-import net.minecraft.world.border.WorldBorder;
 
 public class PositionUtils
 {
@@ -388,7 +387,7 @@ public class PositionUtils
     /**
      * Creates an enclosing AABB around the given positions. They will both be inside the box.
      */
-    public static BoundingBox createEnclosingAABB(BlockPos pos1, BlockPos pos2)
+    public static net.minecraft.util.math.Box createEnclosingAABB(BlockPos pos1, BlockPos pos2)
     {
         int minX = Math.min(pos1.getX(), pos2.getX());
         int minY = Math.min(pos1.getY(), pos2.getY());
@@ -400,7 +399,7 @@ public class PositionUtils
         return createAABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public static BoundingBox createAABBFrom(IntBoundingBox bb)
+    public static net.minecraft.util.math.Box createAABBFrom(IntBoundingBox bb)
     {
         return createAABB(bb.minX, bb.minY, bb.minZ, bb.maxX + 1, bb.maxY + 1, bb.maxZ + 1);
     }
@@ -408,7 +407,7 @@ public class PositionUtils
     /**
      * Creates an AABB for the given position
      */
-    public static BoundingBox createAABBForPosition(BlockPos pos)
+    public static net.minecraft.util.math.Box createAABBForPosition(BlockPos pos)
     {
         return createAABBForPosition(pos.getX(), pos.getY(), pos.getZ());
     }
@@ -416,7 +415,7 @@ public class PositionUtils
     /**
      * Creates an AABB for the given position
      */
-    public static BoundingBox createAABBForPosition(int x, int y, int z)
+    public static net.minecraft.util.math.Box createAABBForPosition(int x, int y, int z)
     {
         return createAABB(x, y, z, x + 1, y + 1, z + 1);
     }
@@ -424,9 +423,9 @@ public class PositionUtils
     /**
      * Creates an AABB with the given bounds
      */
-    public static BoundingBox createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
+    public static net.minecraft.util.math.Box createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
-        return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        return new net.minecraft.util.math.Box(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**

@@ -8,6 +8,20 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -20,25 +34,10 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.LayerRange;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BoundingBox;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.RayTraceContext;
-import net.minecraft.world.World;
 
 public class RayTraceUtils
 {
-    private static final BoundingBox FULL_BLOCK_BOUNDS = new BoundingBox(0, 0, 0, 1, 1, 1);
+    private static final net.minecraft.util.math.Box FULL_BLOCK_BOUNDS = new net.minecraft.util.math.Box(0, 0, 0, 1, 1, 1);
 
     private static RayTraceWrapper closestBox;
     private static RayTraceWrapper closestCorner;
@@ -153,7 +152,7 @@ public class RayTraceUtils
 
         if (pos != null)
         {
-            BoundingBox bb = PositionUtils.createAABBForPosition(pos);
+            net.minecraft.util.math.Box bb = PositionUtils.createAABBForPosition(pos);
             Optional<Vec3d> optional = bb.rayTrace(start, end);
 
             if (optional.isPresent())
@@ -177,7 +176,7 @@ public class RayTraceUtils
     {
         if (box.getPos1() != null && box.getPos2() != null)
         {
-            BoundingBox bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+            net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
             Optional<Vec3d> optional = bb.rayTrace(start, end);
 
             if (optional.isPresent())
@@ -209,7 +208,7 @@ public class RayTraceUtils
 
             if (box.getPos1() != null && box.getPos2() != null)
             {
-                BoundingBox bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+                net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
                 Optional<Vec3d> optional = bb.rayTrace(start, end);
 
                 if (optional.isPresent())
@@ -233,7 +232,7 @@ public class RayTraceUtils
     {
         if (pos != null)
         {
-            BoundingBox bb = PositionUtils.createAABBForPosition(pos);
+            net.minecraft.util.math.Box bb = PositionUtils.createAABBForPosition(pos);
             Optional<Vec3d> optional = bb.rayTrace(start, end);
 
             if (optional.isPresent())
@@ -284,7 +283,7 @@ public class RayTraceUtils
         {
             if (pos != null)
             {
-                BlockHitResult hit = BoundingBox.rayTrace(ImmutableList.of(FULL_BLOCK_BOUNDS), eyesPos, lookEndPos, pos);
+                BlockHitResult hit = net.minecraft.util.math.Box.rayTrace(ImmutableList.of(FULL_BLOCK_BOUNDS), eyesPos, lookEndPos, pos);
 
                 if (hit != null)
                 {
@@ -484,7 +483,7 @@ public class RayTraceUtils
 
         HitResult result = rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, false, false, 1000);
 
-        BoundingBox bb = entity.getBoundingBox().expand(rangedLookRot.x, rangedLookRot.y, rangedLookRot.z).expand(1d, 1d, 1d);
+        net.minecraft.util.math.Box bb = entity.getBoundingBox().expand(rangedLookRot.x, rangedLookRot.y, rangedLookRot.z).expand(1d, 1d, 1d);
         List<Entity> list = world.getEntities(entity, bb);
 
         double closest = result != null && result.getType() == HitResult.Type.BLOCK ? eyesPos.distanceTo(result.getPos()) : Double.MAX_VALUE;

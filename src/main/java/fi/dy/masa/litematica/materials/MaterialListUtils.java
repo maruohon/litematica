@@ -102,7 +102,7 @@ public class MaterialListUtils
                 for (ItemStack stack : cache.getItems(state))
                 {
                     ItemType type = new ItemType(stack, false, true);
-                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getAmount());
+                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
                 }
             }
             else
@@ -112,7 +112,7 @@ public class MaterialListUtils
                 if (stack.isEmpty() == false)
                 {
                     ItemType type = new ItemType(stack, false, true);
-                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getAmount());
+                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
                 }
             }
         }

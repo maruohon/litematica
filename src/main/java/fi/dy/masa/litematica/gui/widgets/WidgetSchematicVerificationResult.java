@@ -413,7 +413,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             Block block = state.getBlock();
             String key = block.getTranslationKey() + ".name";
             String name = StringUtils.translate(key);
-            name = key.equals(name) == false ? name : stack.getDisplayName().getString();
+            name = key.equals(name) == false ? name : stack.getName().getString();
 
             return name;
         }

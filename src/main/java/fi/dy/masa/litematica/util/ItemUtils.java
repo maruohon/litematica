@@ -92,7 +92,7 @@ public class ItemUtils
     {
         if (state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE) == SlabType.DOUBLE)
         {
-            stack.setAmount(2);
+            stack.setCount(2);
         }
     }
 
@@ -118,8 +118,8 @@ public class ItemUtils
 
             tagList.add(new StringTag("(+NBT)"));
             tagLore.put("Lore", tagList);
-            stack.setChildTag("display", tagLore);
-            stack.setChildTag("BlockEntityTag", nbt);
+            stack.putSubTag("display", tagLore);
+            stack.putSubTag("BlockEntityTag", nbt);
 
             return stack;
         }
@@ -132,7 +132,7 @@ public class ItemUtils
             Identifier rl = Registry.ITEM.getId(stack.getItem());
 
             return String.format("[%s - display: %s - NBT: %s] (%s)",
-                    rl != null ? rl.toString() : "null", stack.getDisplayName().getString(),
+                    rl != null ? rl.toString() : "null", stack.getName().getString(),
                     stack.getTag() != null ? stack.getTag().toString() : "<no NBT>", stack.toString());
         }
 

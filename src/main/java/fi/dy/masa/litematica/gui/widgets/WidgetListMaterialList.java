@@ -85,11 +85,11 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
 
         if (rl != null)
         {
-            return ImmutableList.of(stack.getDisplayName().getString().toLowerCase(), rl.toString().toLowerCase());
+            return ImmutableList.of(stack.getName().getString().toLowerCase(), rl.toString().toLowerCase());
         }
         else
         {
-            return ImmutableList.of(stack.getDisplayName().getString().toLowerCase());
+            return ImmutableList.of(stack.getName().getString().toLowerCase());
         }
     }
 
