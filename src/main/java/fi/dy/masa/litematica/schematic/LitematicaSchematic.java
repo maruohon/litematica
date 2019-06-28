@@ -434,7 +434,7 @@ public class LitematicaSchematic
             {
                 BlockPos pos = entry.getKey().add(regionPosAbs);
                 NextTickListEntry<Block> tick = entry.getValue();
-                world.getPendingBlockTicks().scheduleTick(pos, world.getBlockState(pos).getBlock(), (int) tick.scheduledTime, tick.priority);
+                world.getPendingBlockTicks().scheduleTick(pos, tick.getTarget(), (int) tick.scheduledTime, tick.priority);
             }
         }
 
@@ -448,7 +448,7 @@ public class LitematicaSchematic
                 if (state.getFluidState().isEmpty() == false)
                 {
                     NextTickListEntry<Fluid> tick = entry.getValue();
-                    world.getPendingFluidTicks().scheduleTick(pos, state.getFluidState().getFluid(), (int) tick.scheduledTime, tick.priority);
+                    world.getPendingFluidTicks().scheduleTick(pos, tick.getTarget(), (int) tick.scheduledTime, tick.priority);
                 }
             }
         }
@@ -1320,28 +1320,34 @@ public class LitematicaSchematic
         {
             NBTTagCompound tag = tagList.getCompound(i);
 
-            if (tag.contains("Block", Constants.NBT.TAG_STRING) &&
-                tag.contains("Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
+            if (tag.contains("Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
             {
-                T target;
+                T target = null;
 
-                if (clazz.getClass() == Block.class)
+                // Don't crash on invalid ResourceLocation in 1.13+
+                try
                 {
-                    target = (T) IRegistry.BLOCK.get(new ResourceLocation(tag.getString("Block")));
-
-                    if (target == null || target == Blocks.AIR)
+                    if (clazz instanceof Block && tag.contains("Block", Constants.NBT.TAG_STRING))
                     {
-                        continue;
+                        target = (T) IRegistry.BLOCK.get(new ResourceLocation(tag.getString("Block")));
+
+                        if (target == null || target == Blocks.AIR)
+                        {
+                            continue;
+                        }
+                    }
+                    else if (clazz instanceof Fluid && tag.contains("Fluid", Constants.NBT.TAG_STRING))
+                    {
+                        target = (T) IRegistry.FLUID.get(new ResourceLocation(tag.getString("Fluid")));
+
+                        if (target == null || target == Fluids.EMPTY)
+                        {
+                            continue;
+                        }
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    target = (T) IRegistry.FLUID.get(new ResourceLocation(tag.getString("Fluid")));
-
-                    if (target == null || target == Fluids.EMPTY)
-                    {
-                        continue;
-                    }
                 }
 
                 if (target != null)
