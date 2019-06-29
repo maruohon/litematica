@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.render.LitematicaRenderer;
-import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -24,11 +22,12 @@ import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
-import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.level.LevelInfo;
+import fi.dy.masa.litematica.render.LitematicaRenderer;
+import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 
 public class WorldSchematic extends ClientWorld
 {
@@ -144,35 +143,15 @@ public class WorldSchematic extends ClientWorld
     {
         if (chunkY >= 0 && chunkY < 16)
         {
-            ChunkSchematic chunk = this.getChunkProvider().getChunk(chunkX, chunkZ);
-
-            if (chunk != null)
-            {
-                ChunkSection[] sections = chunk.getSectionArray();
-
-                if (sections[chunkY] != null && sections[chunkY].isEmpty() == false)
-                {
-                    this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
-                }
-            }
+            this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
         }
     }
 
     public void scheduleChunkRenders(int chunkX, int chunkZ)
     {
-        ChunkSchematic chunk = this.getChunkProvider().getChunk(chunkX, chunkZ);
-
-        if (chunk != null)
+        for (int chunkY = 0; chunkY < 16; ++chunkY)
         {
-            ChunkSection[] sections = chunk.getSectionArray();
-
-            for (int chunkY = 0; chunkY < 16; ++chunkY)
-            {
-                if (sections[chunkY] != null && sections[chunkY].isEmpty() == false)
-                {
-                    this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
-                }
-            }
+            this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
         }
     }
 
@@ -189,19 +168,9 @@ public class WorldSchematic extends ClientWorld
         {
             for (int cx = minChunkX; cx <= maxChunkX; ++cx)
             {
-                ChunkSchematic chunk = this.getChunkProvider().getChunk(cx, cz);
-
-                if (chunk != null)
+                for (int cy = minChunkY; cy <= maxChunkY; ++cy)
                 {
-                    ChunkSection[] sections = chunk.getSectionArray();
-
-                    for (int cy = minChunkY; cy <= maxChunkY; ++cy)
-                    {
-                        if (sections[cy] != null && sections[cy].isEmpty() == false)
-                        {
-                            this.worldRenderer.scheduleChunkRenders(cx, cy, cz);
-                        }
-                    }
+                    this.worldRenderer.scheduleChunkRenders(cx, cy, cz);
                 }
             }
         }
