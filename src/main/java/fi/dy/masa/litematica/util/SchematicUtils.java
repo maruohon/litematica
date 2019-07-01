@@ -118,14 +118,16 @@ public class SchematicUtils
         if (info != null && info.stateNew != null)
         {
             BlockPos pos = info.pos.offset(info.side);
+            WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
 
-            if (DataManager.getRenderLayerRange().isPositionWithinRange(pos))
+            if (DataManager.getRenderLayerRange().isPositionWithinRange(pos) &&
+                world != null && world.isAirBlock(pos))
             {
                 return setTargetedSchematicBlockState(pos, info.stateNew);
             }
         }
 
-        return false;
+        return true;
     }
 
     public static boolean replaceSchematicBlocksInDirection(Minecraft mc)
