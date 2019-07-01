@@ -218,13 +218,24 @@ public class SchematicPlacementManager
 
     public void addSchematicPlacement(SchematicPlacement placement, boolean printMessages)
     {
+        this.addSchematicPlacement(placement, printMessages, false);
+    }
+
+    private void addSchematicPlacement(SchematicPlacement placement, boolean printMessages, boolean isLoadFromFile)
+    {
         if (this.schematicPlacements.contains(placement) == false)
         {
             this.schematicPlacements.add(placement);
             this.addTouchedChunksFor(placement);
-            StatusInfoRenderer.getInstance().startOverrideDelay();
 
-            if (printMessages)
+            // Don't enable the overlay every time when switching dimensions via a portal or re-logging
+            // (and thus reading the placements from file).
+            if (isLoadFromFile == false)
+            {
+                StatusInfoRenderer.getInstance().startOverrideDelay();
+            }
+
+            if (printMessages && isLoadFromFile == false)
             {
                 InfoUtils.showGuiMessage(MessageType.SUCCESS, StringUtils.translate("litematica.message.schematic_placement_created", placement.getName()));
 
@@ -797,7 +808,7 @@ public class SchematicPlacementManager
 
                     if (placement != null)
                     {
-                        this.addSchematicPlacement(placement, false);
+                        this.addSchematicPlacement(placement, false, true);
                     }
                 }
                 else
