@@ -218,9 +218,30 @@ public class EntityUtils
     public static boolean shouldPickBlock(EntityPlayer player)
     {
         return Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() &&
-                (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() == false ||
-                hasToolItem(player) == false) &&
-                Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-                Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue();
+                areSchematicBlocksCurrentlyRendered() &&
+                (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() == false || hasToolItem(player) == false);
+    }
+
+    /**
+     * Returns true if the main rendering is on, and the schematic rendering is on,
+     * taking into account the invert rendering hotkey.
+     * This method does not check the schematic <i>block</i> rendering!
+     * @return
+     */
+    public static boolean isSchematicCurrentlyRendered()
+    {
+        return Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+               Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
+    }
+
+    /**
+     * Returns true if the main, schematic and block rendering are all on,
+     * taking into account the invert rendering hotkey.
+     * @return
+     */
+    public static boolean areSchematicBlocksCurrentlyRendered()
+    {
+        return isSchematicCurrentlyRendered() &&
+               Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue();
     }
 }
