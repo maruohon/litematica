@@ -5,6 +5,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -36,6 +37,14 @@ public class EntityUtils
 
     public static boolean hasToolItem(EntityLivingBase entity)
     {
+        return hasToolItemInHand(entity, EnumHand.MAIN_HAND) ||
+               hasToolItemInHand(entity, EnumHand.OFF_HAND);
+    }
+
+    public static boolean hasToolItemInHand(EntityLivingBase entity, EnumHand hand)
+    {
+        // If the configured tool item has NBT data, then the NBT is compared, otherwise it's ignored
+
         ItemStack toolItem = DataManager.getToolItem();
 
         if (toolItem.isEmpty())
@@ -43,31 +52,14 @@ public class EntityUtils
             return entity.getHeldItemMainhand().isEmpty();
         }
 
-        return isHoldingItem(entity, toolItem);
-    }
+        ItemStack stackHand = entity.getHeldItem(hand);
 
-    public static boolean isHoldingItem(EntityLivingBase entity, ItemStack stackReference)
-    {
-        return getHeldItemOfType(entity, stackReference).isEmpty() == false;
-    }
-
-    public static ItemStack getHeldItemOfType(EntityLivingBase entity, ItemStack stackReference)
-    {
-        ItemStack stack = entity.getHeldItemMainhand();
-
-        if (stack.isEmpty() == false && areStacksEqualIgnoreDurability(stack, stackReference))
+        if (ItemStack.areItemsEqualIgnoreDurability(toolItem, stackHand))
         {
-            return stack;
+            return toolItem.hasTagCompound() == false || ItemStack.areItemStackTagsEqual(toolItem, stackHand);
         }
 
-        stack = entity.getHeldItemOffhand();
-
-        if (stack.isEmpty() == false && areStacksEqualIgnoreDurability(stack, stackReference))
-        {
-            return stack;
-        }
-
-        return ItemStack.EMPTY;
+        return false;
     }
 
     /**

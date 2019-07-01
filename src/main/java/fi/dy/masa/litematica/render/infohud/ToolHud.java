@@ -256,7 +256,7 @@ public class ToolHud extends InfoHud
                 ItemStack stack = this.mc.player.getHeldItemMainhand();
 
                 if (state != null && mode == ToolMode.REBUILD &&
-                    (stack.isEmpty() || EntityUtils.areStacksEqualIgnoreDurability(stack, DataManager.getToolItem())))
+                    (stack.isEmpty() || EntityUtils.hasToolItem(this.mc.player)))
                 {
                     lines.add(StringUtils.translate("litematica.tool_hud.block_1", this.getBlockString(state)));
                 }

@@ -36,14 +36,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
 public class DataManager implements IDirectoryCache
 {
     private static final DataManager INSTANCE = new DataManager();
 
-    private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)(@(?<meta>[0-9]+))$");
-    private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
+    private static final Pattern PATTERN_ITEM_META_NBT = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)@(?<meta>[0-9]+)(?<nbt>\\{.*\\})$");
+    private static final Pattern PATTERN_ITEM_META = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)@(?<meta>[0-9]+)$");
+    private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)$");
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
@@ -459,9 +462,9 @@ public class DataManager implements IDirectoryCache
         return Reference.MOD_ID + "_default.json";
     }
 
-    public static void setToolItem(String itemName)
+    public static void setToolItem(String itemNameIn)
     {
-        if (itemName.isEmpty() || itemName.equals("empty"))
+        if (itemNameIn.isEmpty() || itemNameIn.equals("empty"))
         {
             toolItem = ItemStack.EMPTY;
             return;
@@ -469,28 +472,38 @@ public class DataManager implements IDirectoryCache
 
         try
         {
-            Matcher matcher = PATTERN_ITEM_META.matcher(itemName);
+            Matcher matcherNbt = PATTERN_ITEM_META_NBT.matcher(itemNameIn);
+            Matcher matcherMeta = PATTERN_ITEM_META.matcher(itemNameIn);
+            Matcher matcherBase = PATTERN_ITEM_BASE.matcher(itemNameIn);
 
-            if (matcher.matches())
+            String itemName = null;
+            int meta = 0;
+            NBTTagCompound nbt = null;
+
+            if (matcherNbt.matches())
             {
-                Item item = Item.REGISTRY.getObject(new ResourceLocation(matcher.group("name")));
-
-                if (item != null && item != Items.AIR)
-                {
-                    toolItem = new ItemStack(item, 1, Integer.parseInt(matcher.group("meta")));
-                    return;
-                }
+                itemName = matcherNbt.group("name");
+                meta = Integer.parseInt(matcherNbt.group("meta"));
+                nbt = JsonToNBT.getTagFromJson(matcherNbt.group("nbt"));
+            }
+            else if (matcherMeta.matches())
+            {
+                itemName = matcherMeta.group("name");
+                meta = Integer.parseInt(matcherMeta.group("meta"));
+            }
+            else if (matcherBase.matches())
+            {
+                itemName = matcherBase.group("name");
             }
 
-            matcher = PATTERN_ITEM_BASE.matcher(itemName);
-
-            if (matcher.matches())
+            if (itemName != null)
             {
-                Item item = Item.REGISTRY.getObject(new ResourceLocation(matcher.group("name")));
+                Item item = Item.REGISTRY.getObject(new ResourceLocation(itemName));
 
                 if (item != null && item != Items.AIR)
                 {
-                    toolItem = new ItemStack(item);
+                    toolItem = new ItemStack(item, 1, meta);
+                    toolItem.setTagCompound(nbt);
                     return;
                 }
             }
@@ -501,6 +514,7 @@ public class DataManager implements IDirectoryCache
 
         // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
+
         Configs.Generic.TOOL_ITEM.setValueFromString(Item.REGISTRY.getNameForObject(Items.STICK).toString());
     }
 }
