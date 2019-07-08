@@ -4,7 +4,9 @@
     "refmap": "mixins.litematica.refmap.json",
     "minVersion": "0.6",
     "client": [
+        "IMixinBlockRedstoneWire",
         "IMixinBlockRendererDispatcher",
+        "IMixinBlockStateFlatteningMap",
         "IMixinNBTTagLongArray",
         "IMixinViewFrustum",
         "MixinBlockRail",
