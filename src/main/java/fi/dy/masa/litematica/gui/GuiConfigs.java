@@ -19,7 +19,7 @@ public class GuiConfigs extends GuiConfigsBase
     public static final ConfigGuiTabBase VISUALS       = new ConfigGuiTabBase("litematica.gui.button.config_gui.visuals",        140, false, Configs.Visuals.OPTIONS);
     public static final ConfigGuiTabBase COLORS        = new ConfigGuiTabBase("litematica.gui.button.config_gui.colors",         100, false, Configs.Colors.OPTIONS);
     public static final ConfigGuiTabBase HOTKEYS       = new ConfigGuiTabBase("litematica.gui.button.config_gui.hotkeys",        204, true,  Hotkeys.HOTKEY_LIST);
-    public static final ConfigGuiTabBase RENDER_LAYERS = new ConfigGuiTabBase("render_layers", "litematica.gui.button.config_gui.render_layers",  204, false, Collections.emptyList(),
+    public static final ConfigGuiTabBase RENDER_LAYERS = new ConfigGuiTabBase("litematica.gui.button.config_gui.render_layers",  204, false, Collections.emptyList(),
             (tab, gui) -> (button, mouseButton) -> { GuiBase.openGui(new GuiRenderLayer()); });
 
     public static final ImmutableList<IConfigGuiTab> TABS = ImmutableList.of(
