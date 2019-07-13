@@ -7,10 +7,10 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.util.AlphaNumComparator;
+import fi.dy.masa.malilib.util.HorizontalAlignment;
 
 public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlacement, WidgetPlacementSubRegion>
 {
@@ -22,7 +22,7 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
 
         this.parent = parent;
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, HorizontalAlignment.LEFT);
         //this.widgetSearchBar.setSearchOpen(true);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
         this.shouldSortList = true;

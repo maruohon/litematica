@@ -5,11 +5,9 @@ import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiConfigs;
-import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
-import fi.dy.masa.litematica.gui.GuiRenderLayer;
 import fi.dy.masa.litematica.gui.GuiSchematicLoadedList;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
@@ -31,8 +29,8 @@ import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.config.IConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigString;
+import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
@@ -292,15 +290,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeybind())
             {
-                if (DataManager.getConfigGuiTab() == ConfigGuiTab.RENDER_LAYERS)
-                {
-                    GuiBase.openGui(new GuiRenderLayer());
-                }
-                else
-                {
-                    GuiBase.openGui(new GuiConfigs());
-                }
-
+                GuiBase.openGui(new GuiConfigs());
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())

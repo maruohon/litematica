@@ -5,11 +5,11 @@ import org.lwjgl.opengl.GL11;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
 import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.HorizontalAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -591,13 +591,13 @@ public class RenderUtils
 
     public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, Minecraft mc)
     {
-        int heightSch = renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc);
-        int heightCli = renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc);
+        int heightSch = renderInventoryOverlay(align, HorizontalAlignment.LEFT, offY, worldSchematic, pos, mc);
+        int heightCli = renderInventoryOverlay(align, HorizontalAlignment.RIGHT, offY, worldClient, pos, mc);
 
         return Math.max(heightSch, heightCli);
     }
 
-    public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
+    public static int renderInventoryOverlay(BlockInfoAlignment align, HorizontalAlignment side, int offY,
             World world, BlockPos pos, Minecraft mc)
     {
         IInventory inv = InventoryUtils.getInventory(world, pos);
@@ -613,7 +613,7 @@ public class RenderUtils
         return 0;
     }
 
-    public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
+    public static int renderInventoryOverlay(BlockInfoAlignment align, HorizontalAlignment side, int offY,
             IInventory inv, InventoryRenderType type, InventoryProperties props, Minecraft mc)
     {
         int xInv = 0;
@@ -631,8 +631,8 @@ public class RenderUtils
                 break;
         }
 
-        if      (side == LeftRight.LEFT)  { xInv -= (props.width / 2 + 4); }
-        else if (side == LeftRight.RIGHT) { xInv += (props.width / 2 + 4); }
+        if      (side == HorizontalAlignment.LEFT)  { xInv -= (props.width / 2 + 4); }
+        else if (side == HorizontalAlignment.RIGHT) { xInv += (props.width / 2 + 4); }
 
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 

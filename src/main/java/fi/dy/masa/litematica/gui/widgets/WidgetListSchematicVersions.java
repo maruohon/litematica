@@ -9,10 +9,10 @@ import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.HorizontalAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
 
@@ -28,7 +28,7 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
         this.project = project;
         this.browserEntryHeight = 16;
         this.infoWidth = 180;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, HorizontalAlignment.LEFT);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
     }
 

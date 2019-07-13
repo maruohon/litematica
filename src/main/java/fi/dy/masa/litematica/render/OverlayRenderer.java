@@ -27,12 +27,12 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.HudAlignment;
+import fi.dy.masa.malilib.util.HorizontalAlignment;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -569,7 +569,7 @@ public class OverlayRenderer
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
-            int invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.CENTER, offY, worldClient, pos, mc);
+            int invHeight = RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, offY, worldClient, pos, mc);
 
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
@@ -589,7 +589,7 @@ public class OverlayRenderer
             }
             else
             {
-                int invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.CENTER, offY, worldSchematic, pos, mc);
+                int invHeight = RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, offY, worldSchematic, pos, mc);
 
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);

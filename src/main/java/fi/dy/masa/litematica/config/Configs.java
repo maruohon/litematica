@@ -1,18 +1,15 @@
 package fi.dy.masa.litematica.config;
 
-import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
-import fi.dy.masa.malilib.config.ConfigUtils;
-import fi.dy.masa.malilib.config.HudAlignment;
-import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.IConfigHandler;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
@@ -20,13 +17,11 @@ import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.config.options.IConfigBase;
+import fi.dy.masa.malilib.util.HudAlignment;
 
 public class Configs implements IConfigHandler
 {
-    private static final String CONFIG_FILE_NAME = Reference.MOD_ID + ".json";
-
     public static class Generic
     {
         public static final ConfigBoolean       AREAS_PER_WORLD         = new ConfigBoolean(    "areaSelectionsPerWorld", true, "Use per-world or server root directories for the area selections\n§6NOTE: Don't switch this OFF while you are live streaming,\n§6as then the Area Selection browser will show the server IP\n§6in the navigation widget and also in the current selection name/path\n§6until you change the current directory and selection again");
@@ -227,57 +222,30 @@ public class Configs implements IConfigHandler
         );
     }
 
-    public static void loadFromFile()
+    @Override
+    public String getConfigFileName()
     {
-        File configFile = new File(FileUtils.getConfigDirectory(), CONFIG_FILE_NAME);
+        return Reference.MOD_ID + ".json";
+    }
 
-        if (configFile.exists() && configFile.isFile() && configFile.canRead())
-        {
-            JsonElement element = JsonUtils.parseJsonFile(configFile);
+    @Override
+    public Map<String, List<? extends IConfigBase>> getConfigsPerCategories()
+    {
+        Map<String, List<? extends IConfigBase>> map = new LinkedHashMap<>();
 
-            if (element != null && element.isJsonObject())
-            {
-                JsonObject root = element.getAsJsonObject();
+        map.put("Generic", Generic.OPTIONS);
+        map.put("InfoOverlays", InfoOverlays.OPTIONS);
+        map.put("Visuals", Visuals.OPTIONS);
+        map.put("Colors", Colors.OPTIONS);
+        map.put("Hotkeys", Hotkeys.HOTKEY_LIST);
 
-                ConfigUtils.readConfigBase(root, "Colors", Colors.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Generic", Generic.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
-                ConfigUtils.readConfigBase(root, "InfoOverlays", InfoOverlays.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Visuals", Visuals.OPTIONS);
-            }
-        }
+        return map;
+    }
 
+    @Override
+    public void onPostLoad()
+    {
         DataManager.setToolItem(Generic.TOOL_ITEM.getStringValue());
         InventoryUtils.setPickBlockableSlots(Generic.PICK_BLOCKABLE_SLOTS.getStringValue());
-    }
-
-    public static void saveToFile()
-    {
-        File dir = FileUtils.getConfigDirectory();
-
-        if (dir.exists() && dir.isDirectory())
-        {
-            JsonObject root = new JsonObject();
-
-            ConfigUtils.writeConfigBase(root, "Colors", Colors.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Generic", Generic.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
-            ConfigUtils.writeConfigBase(root, "InfoOverlays", InfoOverlays.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Visuals", Visuals.OPTIONS);
-
-            JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
-        }
-    }
-
-    @Override
-    public void load()
-    {
-        loadFromFile();
-    }
-
-    @Override
-    public void save()
-    {
-        saveToFile();
     }
 }

@@ -7,9 +7,9 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.util.HorizontalAlignment;
 import fi.dy.masa.malilib.util.AlphaNumComparator.AlphaNumStringComparator;
 
 public class WidgetListSelectionSubRegions extends WidgetListBase<String, WidgetSelectionSubRegion>
@@ -25,7 +25,7 @@ public class WidgetListSelectionSubRegions extends WidgetListBase<String, Widget
         this.gui = gui;
         this.selection = selection;
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, LeftRight.LEFT);
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, HorizontalAlignment.LEFT);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
         this.shouldSortList = true;
     }
