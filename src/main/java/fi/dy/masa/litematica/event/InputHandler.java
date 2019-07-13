@@ -1,5 +1,7 @@
 package fi.dy.masa.litematica.event;
 
+import java.util.List;
+import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -16,10 +18,10 @@ import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.hotkeys.IKeybindManager;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
 import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
+import fi.dy.masa.malilib.hotkeys.KeybindCategory;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -42,18 +44,15 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public void addKeysToMap(IKeybindManager manager)
+    public List<? extends IHotkey> getAllHotkeys()
     {
-        for (IHotkey hotkey : Hotkeys.HOTKEY_LIST)
-        {
-            manager.addKeybindToMap(hotkey.getKeybind());
-        }
+        return Hotkeys.HOTKEY_LIST;
     }
 
     @Override
-    public void addHotkeys(IKeybindManager manager)
+    public List<KeybindCategory> getHotkeyCategoriesForCombinedView()
     {
-        manager.addHotkeysForCategory(Reference.MOD_NAME, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST);
+        return ImmutableList.of(new KeybindCategory(Reference.MOD_NAME, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST));
     }
 
     @Override
