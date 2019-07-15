@@ -406,7 +406,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
             this.columnWidthExpected = w1;
             this.totalWidth = this.columnWidthExpected + w2 + 40;
-            this.totalHeight = Math.max(propsExpected.size(), propsFound.size()) * (StringUtils.getFontHeight() + 2) + 60;
+            this.totalHeight = Math.max(propsExpected.size(), propsFound.size()) * (StringUtils.getFontHeight() + 2) + 50;
         }
 
         public static String getDisplayName(IBlockState state, ItemStack stack)

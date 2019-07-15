@@ -45,7 +45,7 @@ public class BlockInfo
 
         this.props = BlockUtils.getFormattedBlockStateProperties(this.state, " = ");
         this.totalWidth = this.columnWidth + 40;
-        this.totalHeight = this.props.size() * (StringUtils.getFontHeight() + 2) + 60;
+        this.totalHeight = this.props.size() * (StringUtils.getFontHeight() + 2) + 50;
     }
 
     public int getTotalWidth()

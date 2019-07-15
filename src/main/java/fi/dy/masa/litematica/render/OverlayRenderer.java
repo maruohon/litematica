@@ -31,8 +31,8 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.malilib.util.HudAlignment;
 import fi.dy.masa.malilib.util.HorizontalAlignment;
+import fi.dy.masa.malilib.util.HudAlignment;
 import fi.dy.masa.malilib.util.WorldUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -96,6 +96,7 @@ public class OverlayRenderer
     private List<String> blockInfoLines = new ArrayList<>();
     private int blockInfoX;
     private int blockInfoY;
+    private int blockInfoInvOffY;
 
     private OverlayRenderer()
     {
@@ -561,19 +562,19 @@ public class OverlayRenderer
         // Not just a missing block
         if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
         {
-            int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
-
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
-            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
             info.render(this.blockInfoX, this.blockInfoY, mc);
+
+            RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
-            int invHeight = RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, offY, worldClient, pos, mc);
-
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
             info.render(this.blockInfoX, this.blockInfoY, mc);
+
+            RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldClient, pos, mc);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -581,24 +582,24 @@ public class OverlayRenderer
 
             if (te instanceof IInventory)
             {
-                int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
-
                 BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
                 info.render(this.blockInfoX, this.blockInfoY, mc);
+
+                RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
             }
             else
             {
-                int invHeight = RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, offY, worldSchematic, pos, mc);
-
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
-                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
                 info.render(this.blockInfoX, this.blockInfoY, mc);
+
+                RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldSchematic, pos, mc);
             }
         }
     }
 
-    protected void getOverlayPosition(int width, int height, int offY, int invHeight, Minecraft mc)
+    protected void getOverlayPosition(int width, int height, int offY, Minecraft mc)
     {
         BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
 
@@ -607,10 +608,12 @@ public class OverlayRenderer
             case CENTER:
                 this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
                 this.blockInfoY = GuiUtils.getScaledWindowHeight() / 2 + offY;
+                this.blockInfoInvOffY = 4;
                 break;
             case TOP_CENTER:
                 this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
-                this.blockInfoY = invHeight + offY + (invHeight > 0 ? offY : 0);
+                this.blockInfoY = offY;
+                this.blockInfoInvOffY = height + offY + 4;
                 break;
         }
     }
