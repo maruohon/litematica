@@ -653,6 +653,12 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                 else
                 {
                     this.gui.selection.setOriginSelected(false);
+
+                    if (this.gui.getBox() != null)
+                    {
+                        this.gui.selection.setSelectedSubRegionBox(this.gui.getBox().getName());
+                    }
+
                     this.gui.selection.setCurrentSelectedCorner(this.corner);
                 }
             }
