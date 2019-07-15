@@ -827,6 +827,11 @@ public class SchematicPlacement
         return this;
     }
 
+    public void rotateBy(Rotation rotation)
+    {
+        this.setRotation(this.rotation.add(rotation), InfoUtils.INGAME_MESSAGE_CONSUMER);
+    }
+
     public SchematicPlacement setMirror(Mirror mirror, IMessageConsumer feedback)
     {
         if (this.isLocked())

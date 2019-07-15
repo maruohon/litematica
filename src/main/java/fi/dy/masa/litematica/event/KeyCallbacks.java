@@ -42,6 +42,7 @@ import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class KeyCallbacks
@@ -77,6 +78,8 @@ public class KeyCallbacks
         Hotkeys.PICK_BLOCK_LAST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PICK_BLOCK_ENABLED));
         Hotkeys.RERENDER_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.ROTATE_PLACEMENT_CW.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.ROTATE_PLACEMENT_CCW.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeybind().setCallback(callbackHotkeys);
@@ -378,6 +381,28 @@ public class KeyCallbacks
             {
                 SchematicWorldRefresher.INSTANCE.updateAll();
                 InfoUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
+                return true;
+            }
+            else if (key == Hotkeys.ROTATE_PLACEMENT_CW.getKeybind())
+            {
+                SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                if (placement != null)
+                {
+                    placement.rotateBy(Rotation.CLOCKWISE_90);
+                }
+
+                return true;
+            }
+            else if (key == Hotkeys.ROTATE_PLACEMENT_CCW.getKeybind())
+            {
+                SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                if (placement != null)
+                {
+                    placement.rotateBy(Rotation.COUNTERCLOCKWISE_90);
+                }
+
                 return true;
             }
             else if (key == Hotkeys.LAYER_NEXT.getKeybind())
