@@ -86,6 +86,8 @@ public class KeyCallbacks
         Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SELECTION_GROW_HOTKEY.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SELECTION_SHRINK_HOTKEY.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.TOOL_MODE_CYCLE_FORWARD.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.TOOL_MODE_CYCLE_BACKWARD.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_1.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_2.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind().setCallback(callbackHotkeys);
@@ -516,6 +518,16 @@ public class KeyCallbacks
             {
                 int amount = key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind() ? 1 : -1;
                 InputHandler.nudgeSelection(amount, mode, this.mc.player);
+                return true;
+            }
+            else if (key == Hotkeys.TOOL_MODE_CYCLE_FORWARD.getKeybind())
+            {
+                DataManager.setToolMode(DataManager.getToolMode().cycle(this.mc.player, true));
+                return true;
+            }
+            else if (key == Hotkeys.TOOL_MODE_CYCLE_BACKWARD.getKeybind())
+            {
+                DataManager.setToolMode(DataManager.getToolMode().cycle(this.mc.player, false));
                 return true;
             }
             else if (key == Hotkeys.SELECTION_GROW_HOTKEY.getKeybind())

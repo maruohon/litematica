@@ -73,6 +73,8 @@ public class Hotkeys
     public static final ConfigHotkey TOGGLE_TRANSLUCENT_RENDERING       = new ConfigHotkey("toggleTranslucentRendering",        "",     "Toggle translucent vs. opaque ghost block rendering");
     public static final ConfigHotkey TOGGLE_VERIFIER_OVERLAY_RENDERING  = new ConfigHotkey("toggleVerifierOverlayRendering",    "",     "Toggle the Schematic Verifier overlay rendering");
     public static final ConfigHotkey TOOL_ENABLED_TOGGLE                = new ConfigHotkey("toolEnabledToggle",                 "M,T",  "The keybind to toggle the \"tool\" item functionality on/off");
+    public static final ConfigHotkey TOOL_MODE_CYCLE_FORWARD            = new ConfigHotkey("toolModeCycleForward",              "",  "Cycles the current tool mode forward");
+    public static final ConfigHotkey TOOL_MODE_CYCLE_BACKWARD           = new ConfigHotkey("toolModeCycleBackward",             "",  "Cycles the current tool mode backward");
     public static final ConfigHotkey TOOL_PLACE_CORNER_1                = new ConfigHotkey("toolPlaceCorner1",                  "BUTTON0", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use while holding the \"tool\" item\nto place the primary/first corner");
     public static final ConfigHotkey TOOL_PLACE_CORNER_2                = new ConfigHotkey("toolPlaceCorner2",                  "BUTTON1", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use while holding the \"tool\" item\nto place the second corner");
     public static final ConfigHotkey TOOL_SELECT_ELEMENTS               = new ConfigHotkey("toolSelectElements",                "BUTTON2", KeybindSettings.PRESS_ALLOWEXTRA, "The button to use to select corners or boxes\nwhile holding the \"tool\" item");
@@ -147,6 +149,8 @@ public class Hotkeys
             TOGGLE_TRANSLUCENT_RENDERING,
             TOGGLE_VERIFIER_OVERLAY_RENDERING,
             TOOL_ENABLED_TOGGLE,
+            TOOL_MODE_CYCLE_FORWARD,
+            TOOL_MODE_CYCLE_BACKWARD,
             TOOL_PLACE_CORNER_1,
             TOOL_PLACE_CORNER_2,
             TOOL_SELECT_ELEMENTS,
