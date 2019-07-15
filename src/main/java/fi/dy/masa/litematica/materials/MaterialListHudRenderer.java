@@ -225,18 +225,19 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             {
                 return String.format("%d (%.2f %s)", count, boxCount, StringUtils.translate("litematica.gui.label.material_list.abbr.shulker_box"));
             }
-            else if (remainder > 0)
+            else if (Configs.InfoOverlays.MATERIAL_LIST_HUD_STACKS.getBooleanValue())
             {
-                return String.format("%d (%d x %d + %d)", count, stacks, maxStackSize, remainder);
-            }
-            else
-            {
-                return String.format("%d (%d x %d)", count, stacks, maxStackSize);
+                if (remainder > 0)
+                {
+                    return String.format("%d (%d x %d + %d)", count, stacks, maxStackSize, remainder);
+                }
+                else
+                {
+                    return String.format("%d (%d x %d)", count, stacks, maxStackSize);
+                }
             }
         }
-        else
-        {
-            return String.format("%d", count);
-        }
+
+        return String.format("%d", count);
     }
 }

@@ -157,6 +157,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        INFO_HUD_SCALE                      = new ConfigDouble(     "infoHudScale", 1, 0.1, 4, "Scale factor for the generic Info HUD text");
         public static final ConfigInteger       MATERIAL_LIST_HUD_MAX_LINES         = new ConfigInteger(    "materialListHudMaxLines", 10, 1, 128, "The maximum number of items to show on\nthe Material List Info HUD at once");
         public static final ConfigDouble        MATERIAL_LIST_HUD_SCALE             = new ConfigDouble(     "materialListHudScale", 1, 0.1, 4, "Scale factor for the Material List Info HUD");
+        public static final ConfigBoolean       MATERIAL_LIST_HUD_STACKS            = new ConfigBoolean(    "materialListHudStacks", true, "Whether or not the number of stacks should be shown\non the Material List HUD, or only the total count");
         public static final ConfigBoolean       STATUS_INFO_HUD                     = new ConfigBoolean(    "statusInfoHud", false, "Enable a status info HUD renderer,\nwhich renders a few bits of status info, such as\nthe current layer mode and renderers enabled state");
         public static final ConfigBoolean       STATUS_INFO_HUD_AUTO                = new ConfigBoolean(    "statusInfoHudAuto", true, "Allow automatically momentarily enabling the status info HUD \"when needed\",\nfor example when creating a placement and having rendering disabled");
         public static final ConfigOptionList    TOOL_HUD_ALIGNMENT                  = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
@@ -172,6 +173,7 @@ public class Configs implements IConfigHandler
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 BLOCK_INFO_LINES_ENABLED,
                 BLOCK_INFO_OVERLAY_ENABLED,
+                MATERIAL_LIST_HUD_STACKS,
                 STATUS_INFO_HUD,
                 STATUS_INFO_HUD_AUTO,
                 TOOL_HUD_ALWAYS_VISIBLE,
