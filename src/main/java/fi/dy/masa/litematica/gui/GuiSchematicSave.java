@@ -10,8 +10,6 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -64,12 +62,6 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     }
 
     @Override
-    protected IButtonActionListener createButtonListener(ButtonType type)
-    {
-        return new ButtonListener(type, this.selectionManager, this);
-    }
-
-    @Override
     public void onTaskCompleted()
     {
         if (this.mc.isCallingFromMinecraftThread())
@@ -98,85 +90,68 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    @Override
+    protected void saveSchematic()
     {
-        private final GuiSchematicSave gui;
-        private final SelectionManager selectionManager;
-        private final ButtonType type;
+        File dir = this.getListWidget().getCurrentDirectory();
+        String fileName = this.getTextFieldText();
 
-        public ButtonListener(ButtonType type, SelectionManager selectionManager, GuiSchematicSave gui)
+        if (dir.isDirectory() == false)
         {
-            this.type = type;
-            this.selectionManager = selectionManager;
-            this.gui = gui;
+            this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
+            return;
         }
 
-        @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        if (fileName.isEmpty())
         {
-            if (this.type == ButtonType.SAVE)
+            this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
+            return;
+        }
+
+        // Saving a schematic from memory
+        if (this.schematic != null)
+        {
+            LitematicaSchematic schematic = this.schematic;
+            schematic.getMetadata().setTimeModified(System.currentTimeMillis());
+
+            if (schematic.writeToFile(dir, fileName, GuiBase.isShiftDown()))
             {
-                File dir = this.gui.getListWidget().getCurrentDirectory();
-                String fileName = this.gui.getTextFieldText();
+                this.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
+                this.getListWidget().refreshEntries();
+            }
+        }
+        else
+        {
+            AreaSelection area = this.selectionManager.getCurrentSelection();
 
-                if (dir.isDirectory() == false)
+            if (area != null)
+            {
+                boolean overwrite = GuiBase.isShiftDown();
+                String fileNameTmp = fileName;
+
+                // The file name extension gets added in the schematic write method, so need to add it here for the check
+                if (fileNameTmp.endsWith(LitematicaSchematic.FILE_EXTENSION) == false)
                 {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
+                    fileNameTmp += LitematicaSchematic.FILE_EXTENSION;
+                }
+
+                if (FileUtils.canWriteToFile(dir, fileNameTmp, overwrite) == false)
+                {
+                    this.addMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", fileNameTmp);
                     return;
                 }
 
-                if (fileName.isEmpty())
-                {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
-                    return;
-                }
-
-                // Saving a schematic from memory
-                if (this.gui.schematic != null)
-                {
-                    LitematicaSchematic schematic = this.gui.schematic;
-                    schematic.getMetadata().setTimeModified(System.currentTimeMillis());
-
-                    if (schematic.writeToFile(dir, fileName, GuiBase.isShiftDown()))
-                    {
-                        this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
-                        this.gui.getListWidget().refreshEntries();
-                    }
-                }
-                else
-                {
-                    AreaSelection area = this.selectionManager.getCurrentSelection();
-
-                    if (area != null)
-                    {
-                        boolean overwrite = GuiBase.isShiftDown();
-                        String fileNameTmp = fileName;
-
-                        // The file name extension gets added in the schematic write method, so need to add it here for the check
-                        if (fileNameTmp.endsWith(LitematicaSchematic.FILE_EXTENSION) == false)
-                        {
-                            fileNameTmp += LitematicaSchematic.FILE_EXTENSION;
-                        }
-
-                        if (FileUtils.canWriteToFile(dir, fileNameTmp, overwrite) == false)
-                        {
-                            this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", fileNameTmp);
-                            return;
-                        }
-
-                        String author = this.gui.mc.player.getName();
-                        boolean takeEntities = this.gui.checkboxIgnoreEntities.isChecked() == false;
-                        LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
-                        TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
-                        task.setCompletionListener(this.gui);
-                        TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
-                        this.gui.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
-                    }
-                    else
-                    {
-                        this.gui.addMessage(MessageType.ERROR, "litematica.message.error.schematic_save_no_area_selected");
-                    }
-                }
+                String author = this.mc.player.getName();
+                boolean takeEntities = this.checkboxIgnoreEntities.isChecked() == false;
+                LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
+                TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
+                task.setCompletionListener(this);
+                TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
+                this.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
+            }
+            else
+            {
+                this.addMessage(MessageType.ERROR, "litematica.message.error.schematic_save_no_area_selected");
             }
         }
     }

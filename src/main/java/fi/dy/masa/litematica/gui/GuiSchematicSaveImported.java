@@ -6,8 +6,6 @@ import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -43,74 +41,53 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
     }
 
     @Override
-    protected IButtonActionListener createButtonListener(ButtonType type)
+    protected void saveSchematic()
     {
-        return new ButtonListener(type, this);
-    }
+        File dir = this.getListWidget().getCurrentDirectory();
+        String fileName = this.getTextFieldText();
 
-    private static class ButtonListener implements IButtonActionListener
-    {
-        private final GuiSchematicSaveImported gui;
-        private final ButtonType type;
-
-        public ButtonListener(ButtonType type, GuiSchematicSaveImported gui)
+        if (dir.isDirectory() == false)
         {
-            this.type = type;
-            this.gui = gui;
+            this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
+            return;
         }
 
-        @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        if (fileName.isEmpty())
         {
-            if (this.type == ButtonType.SAVE)
+            this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
+            return;
+        }
+
+        if (this.type == DirectoryEntryType.FILE)
+        {
+            File inDir = this.dirSource;
+            String inFile = this.inputFileName;
+            boolean override = GuiBase.isShiftDown();
+            boolean ignoreEntities = this.checkboxIgnoreEntities.isChecked();
+            FileType fileType = FileType.fromFile(new File(inDir, inFile));
+
+            if (fileType == FileType.SCHEMATICA_SCHEMATIC)
             {
-                File dir = this.gui.getListWidget().getCurrentDirectory();
-                String fileName = this.gui.getTextFieldText();
-
-                if (dir.isDirectory() == false)
+                if (WorldUtils.convertSchematicaSchematicToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this))
                 {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
-                    return;
+                    this.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
+                    this.getListWidget().refreshEntries();
                 }
 
-                if (fileName.isEmpty())
+                return;
+            }
+            else if (fileType == FileType.VANILLA_STRUCTURE)
+            {
+                if (WorldUtils.convertStructureToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this))
                 {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
-                    return;
+                    this.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
+                    this.getListWidget().refreshEntries();
                 }
 
-                if (this.gui.type == DirectoryEntryType.FILE)
-                {
-                    File inDir = this.gui.dirSource;
-                    String inFile = this.gui.inputFileName;
-                    boolean override = GuiBase.isShiftDown();
-                    boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
-                    FileType fileType = FileType.fromFile(new File(inDir, inFile));
-
-                    if (fileType == FileType.SCHEMATICA_SCHEMATIC)
-                    {
-                        if (WorldUtils.convertSchematicaSchematicToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
-                        {
-                            this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
-                            this.gui.getListWidget().refreshEntries();
-                        }
-
-                        return;
-                    }
-                    else if (fileType == FileType.VANILLA_STRUCTURE)
-                    {
-                        if (WorldUtils.convertStructureToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this.gui))
-                        {
-                            this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
-                            this.gui.getListWidget().refreshEntries();
-                        }
-
-                        return;
-                    }
-                }
-
-                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", this.gui.inputFileName);
+                return;
             }
         }
+
+        this.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", this.inputFileName);
     }
 }

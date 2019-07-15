@@ -5,6 +5,7 @@ import org.lwjgl.input.Keyboard;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -100,7 +101,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         return this.textField.getText();
     }
 
-    protected abstract IButtonActionListener createButtonListener(ButtonType type);
+    protected abstract void saveSchematic();
 
     private int createButton(int x, int y, ButtonType type)
     {
@@ -118,7 +119,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
             button = new ButtonGeneric(x, y, width, 20, label);
         }
 
-        this.addButton(button, this.createButtonListener(type));
+        this.addButton(button, new ButtonListenerSave(this));
 
         return x + width + 4;
     }
@@ -167,7 +168,12 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     @Override
     public boolean onKeyTyped(char typedChar, int keyCode)
     {
-        if (this.textField.textboxKeyTyped(typedChar, keyCode))
+        if (this.textField.isFocused() && keyCode == Keyboard.KEY_RETURN)
+        {
+            this.saveSchematic();
+            return true;
+        }
+        else if (this.textField.textboxKeyTyped(typedChar, keyCode))
         {
             this.getListWidget().clearSelection();
             return true;
@@ -179,6 +185,22 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         }
 
         return super.onKeyTyped(typedChar, keyCode);
+    }
+
+    private static class ButtonListenerSave implements IButtonActionListener
+    {
+        protected final GuiSchematicSaveBase gui;
+
+        public ButtonListenerSave(GuiSchematicSaveBase gui)
+        {
+            this.gui = gui;
+        }
+
+        @Override
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        {
+            this.gui.saveSchematic();
+        }
     }
 
     public enum ButtonType
