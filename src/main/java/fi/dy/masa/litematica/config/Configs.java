@@ -160,6 +160,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       STATUS_INFO_HUD                     = new ConfigBoolean(    "statusInfoHud", false, "Enable a status info HUD renderer,\nwhich renders a few bits of status info, such as\nthe current layer mode and renderers enabled state");
         public static final ConfigBoolean       STATUS_INFO_HUD_AUTO                = new ConfigBoolean(    "statusInfoHudAuto", true, "Allow automatically momentarily enabling the status info HUD \"when needed\",\nfor example when creating a placement and having rendering disabled");
         public static final ConfigOptionList    TOOL_HUD_ALIGNMENT                  = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
+        public static final ConfigBoolean       TOOL_HUD_ALWAYS_VISIBLE             = new ConfigBoolean(    "toolHudAlwaysVisible", false, "Whether or not the tool HUD should always be rendered,\neven when not holding the tool item");
         public static final ConfigInteger       TOOL_HUD_OFFSET_X                   = new ConfigInteger(    "toolHudOffsetX", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
         public static final ConfigInteger       TOOL_HUD_OFFSET_Y                   = new ConfigInteger(    "toolHudOffsetY", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
         public static final ConfigDouble        TOOL_HUD_SCALE                      = new ConfigDouble(     "toolHudScale", 1, 0.1, 4, "Scale factor for the Tool HUD text");
@@ -173,6 +174,7 @@ public class Configs implements IConfigHandler
                 BLOCK_INFO_OVERLAY_ENABLED,
                 STATUS_INFO_HUD,
                 STATUS_INFO_HUD_AUTO,
+                TOOL_HUD_ALWAYS_VISIBLE,
                 VERIFIER_OVERLAY_ENABLED,
                 WARN_DISABLED_RENDERING,
 

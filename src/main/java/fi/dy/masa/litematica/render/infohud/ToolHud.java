@@ -52,7 +52,8 @@ public class ToolHud extends InfoHud
 
     protected boolean hasEnabledTool()
     {
-        return Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() && EntityUtils.hasToolItem(this.mc.player);
+        return Configs.InfoOverlays.TOOL_HUD_ALWAYS_VISIBLE.getBooleanValue() ||
+               (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() && EntityUtils.hasToolItem(this.mc.player));
     }
 
     @Override
