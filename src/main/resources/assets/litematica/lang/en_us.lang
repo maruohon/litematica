@@ -225,6 +225,8 @@ litematica.gui.label.block_info.state_schematic=Schematic World Block State
 litematica.gui.label.block_info_list_type.all=All
 litematica.gui.label.block_info_list_type.render_layers=Render Layers
 
+litematica.gui.label.loaded_schematic.modified_on=§6Modified on %s§r
+
 litematica.gui.label.material_list.abbr.shulker_box=SB
 litematica.gui.label.material_list.title.available=Available
 litematica.gui.label.material_list.title.item=Item

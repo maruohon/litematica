@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicDirect;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
@@ -374,7 +375,12 @@ public class SchematicUtils
                             totalBlocks += increment;
 
                             container.set(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ(), state);
-                            part.getPlacement().getSchematic().getMetadata().setTotalBlocks(totalBlocks);
+
+                            SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
+                            metadata.setTotalBlocks(totalBlocks);
+                            metadata.setTimeModifiedToNow();
+                            metadata.setModifiedSinceSaved();
+
                             DataManager.getSchematicPlacementManager().markChunkForRebuild(new ChunkPos(cpos.getX(), cpos.getZ()));
 
                             return true;
@@ -449,7 +455,11 @@ public class SchematicUtils
                                 }
                             }
 
-                            part.getPlacement().getSchematic().getMetadata().setTotalBlocks(totalBlocks);
+                            SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
+                            metadata.setTotalBlocks(totalBlocks);
+                            metadata.setTimeModifiedToNow();
+                            metadata.setModifiedSinceSaved();
+
                             DataManager.getSchematicPlacementManager().markAllPlacementsOfSchematicForRebuild(placement.getSchematic());
 
                             return true;
@@ -607,7 +617,10 @@ public class SchematicUtils
             }
         }
 
-        schematicPlacement.getSchematic().getMetadata().setTotalBlocks(totalBlocks);
+        SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
+        metadata.setTotalBlocks(totalBlocks);
+        metadata.setTimeModifiedToNow();
+        metadata.setModifiedSinceSaved();
 
         return true;
     }

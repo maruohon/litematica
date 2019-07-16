@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +170,7 @@ public class LitematicaSchematic
         }
 
         LitematicaSchematic schematic = new LitematicaSchematic(null);
-        long time = (new Date()).getTime();
+        long time = System.currentTimeMillis();
 
         BlockPos origin = area.getEffectiveOrigin();
         schematic.setSubRegionPositions(boxes, origin);

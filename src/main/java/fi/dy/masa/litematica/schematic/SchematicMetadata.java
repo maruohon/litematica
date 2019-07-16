@@ -18,6 +18,7 @@ public class SchematicMetadata
     private int totalVolume;
     private int totalBlocks;
     private int[] thumbnailPixelData;
+    private boolean modifiedSinceSaved;
 
     public String getName()
     {
@@ -75,6 +76,21 @@ public class SchematicMetadata
         return this.timeCreated != this.timeModified;
     }
 
+    public boolean wasModifiedSinceSaved()
+    {
+        return this.modifiedSinceSaved;
+    }
+
+    public void setModifiedSinceSaved()
+    {
+        this.modifiedSinceSaved = true;
+    }
+
+    public void clearModifiedSinceSaved()
+    {
+        this.modifiedSinceSaved = false;
+    }
+
     public void setName(String name)
     {
         this.name = name;
@@ -123,6 +139,11 @@ public class SchematicMetadata
     public void setTimeModified(long timeModified)
     {
         this.timeModified = timeModified;
+    }
+
+    public void setTimeModifiedToNow()
+    {
+        this.timeModified = System.currentTimeMillis();
     }
 
     public NBTTagCompound writeToNBT()

@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.io.File;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -76,7 +75,7 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
     {
         if (this.finished)
         {
-            long time = (new Date()).getTime();
+            long time = System.currentTimeMillis();
             this.schematic.getMetadata().setTimeCreated(time);
             this.schematic.getMetadata().setTimeModified(time);
             this.schematic.getMetadata().setTotalBlocks(this.schematic.getTotalBlocks());
