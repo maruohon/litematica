@@ -96,6 +96,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         File dir = this.getListWidget().getCurrentDirectory();
         String fileName = this.getTextFieldText();
 
+        if (FileUtils.doesFilenameContainIllegalCharacters(fileName))
+        {
+            this.addMessage(MessageType.ERROR, "litematica.error.illegal_characters_in_file_name", fileName);
+            return;
+        }
+
         if (dir.isDirectory() == false)
         {
             this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());

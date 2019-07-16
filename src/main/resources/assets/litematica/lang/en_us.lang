@@ -23,11 +23,15 @@ litematica.error.area_editor.open_gui.no_selection=Currently in Selection Mode: 
 litematica.error.area_editor.rename_sub_region.exists=Failed to rename the sub-region:\nA sub-region already exists by the name '%s'
 litematica.error.area_editor.switch_mode.no_selection=Can't switch to Selection Mode: Normal, because there is currently no area selected.\nSelect an area or create a new selection in the Area Selection browser
 
+litematica.error.illegal_characters_in_file_name=Invalid characters in the given file name '%s'.\nFor example slashes are not allowed, and on Windows also\nmany other special characters are not valid for file names!
+
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=Failed to create the Litematica schematic
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
 litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the Structure to a Litematica Schematic
 
 litematica.error.schematic.create.no_selections=No valid selection regions!
+
+litematica.error.schematic_file_rename.read_failed=Failed to read the file '%s'
 
 litematica.error.schematic_load.cant_read_file=Can't read the schematic file '%s' (doesn't exist or permission issue)
 litematica.error.schematic_load.no_schematic_selected=No Schematic file selected!
@@ -39,6 +43,7 @@ litematica.error.schematic_manager.schematic_export.unsupported_type=Only Litema
 litematica.error.schematic_manager.schematic_import.unsupported_type=The selected schematic type isn't supported for import!
 
 litematica.error.schematic_placements.remove_fail_locked=The placement is locked!\n- Hold Shift to force remove it
+litematica.error.schematic_rename.read_failed=Failed to read the schematic from file '%s'
 
 litematica.error.schematic_save.directory_doesnt_exist=No such directory: '%s'
 litematica.error.schematic_save.file_already_exists=File '%s' already exists
@@ -192,6 +197,8 @@ litematica.gui.button.ok=Ok
 litematica.gui.button.remove=Remove
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
+litematica.gui.button.rename_file=Rename File
+litematica.gui.button.rename_schematic=Rename Schematic
 litematica.gui.button.rotation_value=Rotation: %s
 litematica.gui.button.save_new_schematic_version=Save Version
 litematica.gui.button.save_schematic=Save Schematic
