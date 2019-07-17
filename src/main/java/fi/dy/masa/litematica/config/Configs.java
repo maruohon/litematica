@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.config.options.ConfigOptionList;
 import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.config.options.IConfigBase;
 import fi.dy.masa.malilib.util.HudAlignment;
+import fi.dy.masa.malilib.util.InfoType;
 
 public class Configs implements IConfigHandler
 {
@@ -152,6 +153,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    BLOCK_INFO_OVERLAY_ALIGNMENT        = new ConfigOptionList( "blockInfoOverlayAlignment", BlockInfoAlignment.TOP_CENTER, "The alignment of the Block Info Overlay");
         public static final ConfigInteger       BLOCK_INFO_OVERLAY_OFFSET_Y         = new ConfigInteger(    "blockInfoOverlayOffsetY", 6, -2000, 2000, "The y offset of the block info overlay from the selected edge");
         public static final ConfigBoolean       BLOCK_INFO_OVERLAY_ENABLED          = new ConfigBoolean(    "blockInfoOverlayEnabled", true, "Enable Block Info Overlay rendering to show info\nabout the looked-at block or verifier error marker,\nwhile holding the 'renderInfoOverlay' key", "Block Info Overlay Rendering");
+        public static final ConfigOptionList    EASY_PLACE_WARNINGS                 = new ConfigOptionList( "easyPlaceWarnings", InfoType.MESSAGE_OVERLAY, "Whether to show the \"Action prevented by *\"\nwarnings for the Easy Place and Placement Restriction modes");
         public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"Info HUD\",\nused for the Material List, Schematic Verifier mismatch positions etc.");
         public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger(    "infoHudMaxLines", 10, 1, 128, "The maximum number of info lines to show on the HUD at once");
         public static final ConfigInteger       INFO_HUD_OFFSET_X                   = new ConfigInteger(    "infoHudOffsetX", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
@@ -184,6 +186,7 @@ public class Configs implements IConfigHandler
 
                 BLOCK_INFO_LINES_ALIGNMENT,
                 BLOCK_INFO_OVERLAY_ALIGNMENT,
+                EASY_PLACE_WARNINGS,
                 INFO_HUD_ALIGNMENT,
                 TOOL_HUD_ALIGNMENT,
 
