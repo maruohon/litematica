@@ -133,7 +133,7 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void scheduleBlockRender(BlockPos pos)
+    public void scheduleBlockRender(BlockPos pos, BlockState stateOld, BlockState stateNew)
     {
         this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
     }

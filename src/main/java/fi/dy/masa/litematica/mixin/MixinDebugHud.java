@@ -19,13 +19,13 @@ public abstract class MixinDebugHud extends DrawableHelper
 {
     private boolean captureNextCall = false;
 
-    @Inject(method = "drawLeftText()V", at = @At(value = "HEAD"))
+    @Inject(method = "renderLeftText()V", at = @At(value = "HEAD"))
     private void onRenderDebugInfoLeft(CallbackInfo ci)
     {
         this.captureNextCall = true;
     }
 
-    @Redirect(method = "drawLeftText()V", require = 0,
+    @Redirect(method = "renderLeftText()V", require = 0,
               at = @At(value = "INVOKE", remap = false,
                        target = "Ljava/util/List;size()I"))
     private int getSize(List<String> list)

@@ -28,7 +28,7 @@ public abstract class MixinClientWorld extends World
     }
 
     @Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("HEAD"))
-    private void onInvalidateRegionAndSetBlock(BlockPos pos, BlockState state, CallbackInfo ci)
+    private void onSetBlockStateWithoutNeighborUpdates(BlockPos pos, BlockState state, CallbackInfo ci)
     {
         SchematicVerifier.markVerifierBlockChanges(pos);
 
