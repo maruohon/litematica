@@ -24,8 +24,13 @@ repositories {
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.liteloader'
+apply plugin: 'java'
+apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
+
+repositories {
+    maven { url = "http://repo.spongepowered.org/maven" }
+}
 
 ext.configFile = file "build.properties"
 
@@ -35,8 +40,15 @@ configFile.withReader {
     project.ext.config = new ConfigSlurper().parse prop
 }
 
+sourceCompatibility = targetCompatibility = 1.8
+
+compileJava {
+    sourceCompatibility = targetCompatibility = 1.8
+    options.encoding = 'UTF-8'
+}
+
 minecraft {
-    version = config.minecraft_version
+    version = config.minecraft_version + "-" + config.forge_version
     mappings = config.mappings_version
     runDir = 'minecraft'
     makeObfSourceJar = false
@@ -49,10 +61,18 @@ minecraft {
 
     replaceIn "Reference.java"
     replace "@MOD_VERSION@", mod_version
-}
 
-dependencies {
-    deobfCompile "fi.dy.masa.malilib:malilib-" + config.minecraft_version_out + ":" + config.malilib_version + ":deobf"
+    def args = [
+            "-Dfml.coreMods.load=fi.dy.masa.litematica.core.LitematicaCore",
+            "-Dmixin.checks.interfaces=true"
+    ]
+
+    clientJvmArgs.addAll(args)
+    serverJvmArgs.addAll(args)
+
+    if (project.hasProperty("signJarKeyStore")) {
+        replace "@FINGERPRINT@", signJarFingerprint
+    }
 }
 
 sourceSets {
@@ -61,54 +81,47 @@ sourceSets {
     }
 }
 
-group = config.group + "." + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = config.mod_id + '-' + config.minecraft_version_out
-version = project.minecraft.mod_version
-
-/**
- * This section allows you to customise the generated litemod.json file
- */
-litemod {
-    json {
-        name = config.mod_id
-        displayName = config.mod_name
-        mcversion = config.minecraft_version
-        version = config.mod_version
-        author = config.author
-
-        // Uncomment any of the following lines and fill in your own details as required
-        //requiredAPIs = [ 'someapi' ]
-        //tweakClass = 'name.of.tweaker.here'
-        dependsOn = [ 'malilib' ]
-        mixinConfigs = [ 'mixins.' + config.mod_id + '.json' ]
-    }
-}
-
-/**
- * This section allows you to customise your generated jar (litemod) file. By
- * default it includes the generated litemod.json file, however if you prefer to
- * include your own file from resources, simply remove the line below.
- */
-jar {
-    // Remove the "-mc1.12" suffix from the file name
-    classifier = ""
-    // Don't append a 'mod-' filename prefix >_>
-    baseName = archivesBaseName
-
-    from litemod.outputs
+dependencies {
+    deobfCompile "fi.dy.masa.malilib:malilib-forge-" + config.minecraft_version_out + ":" + config.malilib_version// + ":deobf"
 
     /*
-    manifest.mainAttributes (
-        'Built-By': System.properties['user.name'],
-        'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
-        'Implementation-Title': config.mod_id,
-        'Implementation-Version': project.version
-    )
+    shade('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+        exclude module: "asm-commons"
+        exclude module: "asm-tree"
+        exclude module: "launchwrapper"
+        exclude module: "guava"
+        exclude module: "log4j-core"
+        exclude module: "gson"
+        exclude module: "commons-io"
+    }
     */
+    
+    compile 'org.jetbrains.java.decompiler:fernflower:sponge-SNAPSHOT'
 }
 
-mixin {
-    defaultObfuscationEnv notch
+group = config.group + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = config.mod_file_name + '-' + config.minecraft_version_out
+version = project.minecraft.mod_version
+
+jar {
+    manifest.attributes(
+            'FMLCorePlugin': 'fi.dy.masa.litematica.core.LitematicaCore',
+            'FMLCorePluginContainsFMLMod': 'fi.dy.masa.litematica.core.Litematica',
+            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+            'ForceLoadAsMod': 'true',
+            'TweakOrder': 0
+    )
+
+    /*
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)){
+            exclude 'META-INF', 'META-INF/**'
+        }
+        from(project.zipTree(dep)){
+            include 'META-INF/services', 'META-INF/services/**'
+        }
+    }
+    */
 }
 
 //tasks.withType(Jar)*.baseName = archivesBaseName
@@ -135,4 +148,18 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+if (project.hasProperty("signJarKeyStore")) {
+    task signJar(type: SignJar, dependsOn: reobfJar) {
+        inputFile = jar.archivePath
+        outputFile = jar.archivePath
+
+        keyStore = signJarKeyStore
+        alias = signJarAlias
+        storePass = signJarStorePass
+        keyPass = signJarKeyPass
+    }
+
+    build.dependsOn signJar
 }

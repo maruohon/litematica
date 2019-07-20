@@ -139,4 +139,31 @@ public class ChunkCacheSchematic implements IBlockAccess
     {
         return this.world.getWorldType();
     }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean defaultValue)
+    {
+        if (pos.getY() < 0 || pos.getY() >= 256)
+        {
+            return defaultValue;
+        }
+
+        int x = (pos.getX() >> 4) - this.chunkStartX;
+        int z = (pos.getZ() >> 4) - this.chunkStartZ;
+
+        if (this.withinBounds(x, z) == false)
+        {
+            return defaultValue;
+        }
+
+        IBlockState state = getBlockState(pos);
+
+        return state.getBlock().isSideSolid(state, this, pos, side);
+    }
+
+    private boolean withinBounds(int x, int z)
+    {
+        return x >= 0 && x < chunkArray.length && z >= 0 && z < chunkArray[x].length && chunkArray[x][z] != null;
+    }
 }

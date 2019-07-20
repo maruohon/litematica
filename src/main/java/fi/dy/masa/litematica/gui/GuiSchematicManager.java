@@ -6,7 +6,9 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.LiteModLitematica;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ScreenShotHelper;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -28,8 +30,6 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ScreenShotHelper;
 
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
@@ -499,7 +499,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 }
                 catch (Exception e)
                 {
-                    LiteModLitematica.logger.warn("Exception while creating preview image", e);
+                    Litematica.logger.warn("Exception while creating preview image", e);
                 }
             }
             else

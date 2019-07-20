@@ -46,6 +46,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -273,12 +274,12 @@ public class SchematicUtils
                 if (stack.getItem() instanceof ItemBlock)
                 {
                     stateNew = ((ItemBlock) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
-                                    side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, meta, mc.player);
+                                    side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, meta, mc.player, EnumHand.MAIN_HAND);
                 }
                 else if (stack.getItem() instanceof ItemBlockSpecial)
                 {
                     stateNew = ((IMixinItemBlockSpecial) stack.getItem()).getBlock().getStateForPlacement(world, pos.offset(side),
-                                    side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, 0, mc.player);
+                                    side, (float) hitVec.x, (float) hitVec.y, (float) hitVec.z, 0, mc.player, EnumHand.MAIN_HAND);
                 }
                 else if (ToolMode.REBUILD.getPrimaryBlock() != null)
                 {

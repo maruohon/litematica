@@ -2,7 +2,8 @@
     "required": true,
     "package": "fi.dy.masa.litematica.mixin",
     "refmap": "mixins.litematica.refmap.json",
-    "minVersion": "0.6",
+    "minVersion": "0.7",
+    "compatibilityLevel": "JAVA_8",
     "client": [
         "IMixinBlockRendererDispatcher",
         "IMixinCompiledChunk",

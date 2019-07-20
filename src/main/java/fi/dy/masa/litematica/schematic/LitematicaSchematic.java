@@ -11,26 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
-import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.mixin.IMixinDataFixer;
-import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.util.ReplaceBehavior;
-import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.NBTUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -56,6 +36,26 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.mixin.IMixinDataFixer;
+import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
+import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class LitematicaSchematic
 {
@@ -271,7 +271,7 @@ public class LitematicaSchematic
                 }
                 else
                 {
-                    LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
+                    Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
                 }
 
                 if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
@@ -396,7 +396,7 @@ public class LitematicaSchematic
                             }
                             catch (Exception e)
                             {
-                                LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                Litematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
                             }
                         }
                     }
@@ -495,7 +495,7 @@ public class LitematicaSchematic
                 }
                 else
                 {
-                    LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
+                    Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
                 }
 
                 if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
@@ -638,7 +638,7 @@ public class LitematicaSchematic
                             }
                             catch (Exception e)
                             {
-                                LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                Litematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
                             }
                         }
                     }
@@ -839,7 +839,7 @@ public class LitematicaSchematic
                             this.totalBlocks++;
                         }
 
-                        if (state.getBlock().hasTileEntity())
+                        if (state.getBlock().hasTileEntity(state))
                         {
                             TileEntity te = world.getTileEntity(posMutable);
 
@@ -909,7 +909,7 @@ public class LitematicaSchematic
 
             if (box == null)
             {
-                LiteModLitematica.logger.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
+                Litematica.logger.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }
 
@@ -919,7 +919,7 @@ public class LitematicaSchematic
 
             if (container == null || tileEntityMap == null || tickMap == null)
             {
-                LiteModLitematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
+                Litematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }
 
@@ -953,7 +953,7 @@ public class LitematicaSchematic
                             this.totalBlocks++;
                         }
 
-                        if (state.getBlock().hasTileEntity())
+                        if (state.getBlock().hasTileEntity(state))
                         {
                             TileEntity te = world.getTileEntity(posMutable);
 

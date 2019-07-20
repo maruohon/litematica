@@ -7,12 +7,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockDoor;
@@ -38,6 +32,12 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.FileUtils;
 
 public class MaterialCache
 {
@@ -104,6 +104,7 @@ public class MaterialCache
         return stack;
     }
 
+    @SuppressWarnings("deprecation")
     protected ItemStack getItemForStateFromWorld(IBlockState state, World world, BlockPos pos, boolean isBuildItem)
     {
         ItemStack stack = isBuildItem ? this.getStateToItemOverride(state) : null;
@@ -362,7 +363,7 @@ public class MaterialCache
         {
             if (dir.exists() == false && dir.mkdirs() == false)
             {
-                LiteModLitematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath());
+                Litematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath());
                 return false;
             }
 
@@ -375,7 +376,7 @@ public class MaterialCache
         }
         catch (Exception e)
         {
-            LiteModLitematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath(), e);
+            Litematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath(), e);
         }
 
         return false;
@@ -405,7 +406,7 @@ public class MaterialCache
         }
         catch (Exception e)
         {
-            LiteModLitematica.logger.warn("Failed to read the material list cache from file '{}'", file.getAbsolutePath(), e);
+            Litematica.logger.warn("Failed to read the material list cache from file '{}'", file.getAbsolutePath(), e);
         }
     }
 }

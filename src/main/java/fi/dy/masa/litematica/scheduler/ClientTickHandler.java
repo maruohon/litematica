@@ -1,11 +1,10 @@
 package fi.dy.masa.litematica.scheduler;
 
+import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
-import fi.dy.masa.litematica.render.DebugScreenMessages;
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
-import net.minecraft.client.Minecraft;
 
 public class ClientTickHandler implements IClientTickHandler
 {
@@ -15,7 +14,6 @@ public class ClientTickHandler implements IClientTickHandler
         if (mc.world != null && mc.player != null)
         {
             InputHandler.onTick(mc);
-            DebugScreenMessages.update(mc);
 
             if (Configs.Generic.LAYER_MODE_DYNAMIC.getBooleanValue())
             {

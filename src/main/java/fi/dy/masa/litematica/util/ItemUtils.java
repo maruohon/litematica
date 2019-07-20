@@ -34,6 +34,7 @@ public class ItemUtils
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static ItemStack getItemForBlock(World world, BlockPos pos, IBlockState state, boolean checkCache)
     {
         if (checkCache)

@@ -9,7 +9,14 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import fi.dy.masa.litematica.LiteModLitematica;
+import net.minecraft.client.Minecraft;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiConfigs;
@@ -33,13 +40,6 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 
 public class DataManager implements IDirectoryCache
 {
@@ -402,7 +402,7 @@ public class DataManager implements IDirectoryCache
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            LiteModLitematica.logger.warn("Failed to create the schematic directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the schematic directory '{}'", dir.getAbsolutePath());
         }
 
         return dir;
@@ -426,7 +426,7 @@ public class DataManager implements IDirectoryCache
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            LiteModLitematica.logger.warn("Failed to create the area selections base directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the area selections base directory '{}'", dir.getAbsolutePath());
         }
 
         return dir;
@@ -438,7 +438,7 @@ public class DataManager implements IDirectoryCache
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            LiteModLitematica.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
+            Litematica.logger.warn("Failed to create the config directory '{}'", dir.getAbsolutePath());
         }
 
         return new File(dir, getStorageFileName(globalData));

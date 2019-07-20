@@ -36,7 +36,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
 
     public boolean renderModel(IBlockAccess worldIn, IBakedModel modelIn, IBlockState stateIn, BlockPos posIn, BufferBuilder buffer)
     {
-        boolean ao = Minecraft.isAmbientOcclusionEnabled() && stateIn.getLightValue() == 0 && modelIn.isAmbientOcclusion();
+        boolean ao = Minecraft.isAmbientOcclusionEnabled() && stateIn.getLightValue(worldIn, posIn) == 0 && modelIn.isAmbientOcclusion();
         long rand = MathHelper.getPositionRandom(posIn);
 
         try

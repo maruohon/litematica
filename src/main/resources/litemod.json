@@ -1,5 +1,0 @@
-{
-    "name": "litematica",
-    "mcversion": "1.12",
-    "mixinConfigs": [ "mixins.litematica.json" ]
-}

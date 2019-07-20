@@ -278,7 +278,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
         // Schematic has a block, client has air
         if (clientHasAir || (stateSchematic != stateClient && Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue()))
         {
-            if (blockSchematic.hasTileEntity())
+            if (blockSchematic.hasTileEntity(stateSchematic))
             {
                 this.addTileEntity(pos, this.compiledChunk, tileEntities);
             }

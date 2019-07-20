@@ -1,5 +1,10 @@
 package fi.dy.masa.litematica.event;
 
+import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -9,12 +14,38 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.util.GuiUtils;
-import net.minecraft.client.Minecraft;
 
 public class RenderHandler implements IRenderer
 {
+    public static final RenderHandler INSTANCE = new RenderHandler();
+
+    @SubscribeEvent
+    public void onRenderDebugScreen(RenderGameOverlayEvent.Text event)
+    {
+        if (Minecraft.getMinecraft().gameSettings.showDebugInfo)
+        {
+            WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
+
+            if (world != null)
+            {
+                RenderGlobal renderer = LitematicaRenderer.getInstance().getWorldRenderer();
+
+                String pre = GuiBase.TXT_GOLD;
+                String rst = GuiBase.TXT_RST;
+
+                List<String> listLeft = event.getLeft();
+                listLeft.add("");
+                listLeft.add(String.format("%s[Litematica]%s %s", pre, rst, renderer.getDebugInfoRenders()));
+                listLeft.add(String.format("%s[Litematica]%s %s E: %s TE: %d", pre, rst, renderer.getDebugInfoEntities(), world.getDebugLoadedEntities(), world.loadedTileEntityList.size()));
+            }
+        }
+    }
+
     @Override
     public void onRenderWorldLast(float partialTicks)
     {
