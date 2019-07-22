@@ -24,7 +24,8 @@ public class Hotkeys
     public static final ConfigHotkey NUDGE_SELECTION_POSITIVE           = new ConfigHotkey("nudgeSelectionPositive",            "",    "Nudge the current selection in the \"positive\" direction\nThis is basically the same as mouse wheel up\nwith the Nudge modifier pressed");
     public static final ConfigHotkey MOVE_ENTIRE_SELECTION              = new ConfigHotkey("moveEntireSelection",               "",    "Move the entire current selection here");
     public static final ConfigHotkey OPEN_GUI_AREA_SETTINGS             = new ConfigHotkey("openGuiAreaSettings",               "MULTIPLY",  "Open the Area Settings GUI for the currently selected area");
-    public static final ConfigHotkey OPEN_GUI_LOADED_SCHEMATICS         = new ConfigHotkey("openGuiLoadedSchematics",           "",     "Open the Loaded Schematic GUI");
+    public static final ConfigHotkey OPEN_GUI_LOAD_SCHEMATICS           = new ConfigHotkey("openGuiLoadSchematics",             "",     "Open the Load Schematics GUI");
+    public static final ConfigHotkey OPEN_GUI_LOADED_SCHEMATICS         = new ConfigHotkey("openGuiLoadedSchematics",           "",     "Open the Loaded Schematics GUI");
     public static final ConfigHotkey OPEN_GUI_MAIN_MENU                 = new ConfigHotkey("openGuiMainMenu",                   "M",    KeybindSettings.RELEASE_EXCLUSIVE, "Open the Litematica main menu");
     public static final ConfigHotkey OPEN_GUI_MATERIAL_LIST             = new ConfigHotkey("openGuiMaterialList",               "M,L",  "Open the Material List GUI for the currently\nselected schematic placement");
     public static final ConfigHotkey OPEN_GUI_PLACEMENT_SETTINGS        = new ConfigHotkey("openGuiPlacementSettings",          "SUBTRACT",  "Open the Placement Settings GUI for the currently\nselected placement or sub-region");
@@ -100,6 +101,7 @@ public class Hotkeys
             NUDGE_SELECTION_POSITIVE,
             MOVE_ENTIRE_SELECTION,
             OPEN_GUI_AREA_SETTINGS,
+            OPEN_GUI_LOAD_SCHEMATICS,
             OPEN_GUI_LOADED_SCHEMATICS,
             OPEN_GUI_MAIN_MENU,
             OPEN_GUI_MATERIAL_LIST,
