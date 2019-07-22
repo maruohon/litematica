@@ -188,6 +188,8 @@ public class DataManager implements IDirectoryCache
 
     public static void load()
     {
+        LAST_DIRECTORIES.clear();
+
         getInstance().loadPerDimensionData();
 
         File file = getCurrentStorageFile(true);
@@ -195,8 +197,6 @@ public class DataManager implements IDirectoryCache
 
         if (element != null && element.isJsonObject())
         {
-            LAST_DIRECTORIES.clear();
-
             JsonObject root = element.getAsJsonObject();
 
             if (JsonUtils.hasObject(root, "last_directories"))
@@ -279,13 +279,9 @@ public class DataManager implements IDirectoryCache
     {
         TaskScheduler.getInstanceClient().clearTasks();
         SchematicVerifier.clearActiveVerifiers();
-
-        getSchematicPlacementManager().clear();
-        getSchematicProjectsManager().clear();
-        getSelectionManager().clear();
-        setMaterialList(null);
-
         InfoHud.getInstance().reset(); // remove the line providers and clear the data
+
+        getInstance().clearData();
     }
 
     private void savePerDimensionData()
@@ -297,12 +293,18 @@ public class DataManager implements IDirectoryCache
         JsonUtils.writeJsonToFile(root, file);
     }
 
-    private void loadPerDimensionData()
+    private void clearData()
     {
         this.selectionManager.clear();
         this.schematicPlacementManager.clear();
         this.schematicProjectsManager.clear();
         this.materialList = null;
+        this.areaSimple = new AreaSelectionSimple(true);
+    }
+
+    private void loadPerDimensionData()
+    {
+        this.clearData();
 
         File file = getCurrentStorageFile(false);
         JsonElement element = JsonUtils.parseJsonFile(file);
