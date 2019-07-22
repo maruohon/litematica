@@ -1,21 +1,33 @@
 package fi.dy.masa.litematica.schematic.conversion;
 
+import fi.dy.masa.litematica.mixin.IMixinBlockFenceGate;
 import fi.dy.masa.litematica.mixin.IMixinBlockRedstoneWire;
+import fi.dy.masa.litematica.mixin.IMixinBlockStairs;
+import fi.dy.masa.litematica.mixin.IMixinBlockVine;
 import fi.dy.masa.litematica.util.PositionUtils;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockAttachedStem;
 import net.minecraft.block.BlockChorusPlant;
 import net.minecraft.block.BlockDirtSnowy;
+import net.minecraft.block.BlockDoor;
+import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockFourWay;
 import net.minecraft.block.BlockPane;
 import net.minecraft.block.BlockRedstoneWire;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockStem;
+import net.minecraft.block.BlockStemGrown;
+import net.minecraft.block.BlockTripWire;
+import net.minecraft.block.BlockVine;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
@@ -33,6 +45,45 @@ public class SchematicConversionFixers
         return state.with(BlockDirtSnowy.SNOWY, Boolean.valueOf(block == Blocks.SNOW_BLOCK || block == Blocks.SNOW));
     };
 
+    public static final IStateFixer FIXER_DOOR = (reader, state, pos) -> {
+        if (state.get(BlockDoor.HALF) == DoubleBlockHalf.UPPER)
+        {
+            IBlockState stateLower = reader.getBlockState(pos.down());
+
+            if (stateLower.getBlock() == state.getBlock())
+            {
+                state = state.with(BlockDoor.FACING, stateLower.get(BlockDoor.FACING));
+                state = state.with(BlockDoor.OPEN,   stateLower.get(BlockDoor.OPEN));
+            }
+        }
+        else
+        {
+            IBlockState stateUpper = reader.getBlockState(pos.up());
+
+            if (stateUpper.getBlock() == state.getBlock())
+            {
+                state = state.with(BlockDoor.HINGE,   stateUpper.get(BlockDoor.HINGE));
+                state = state.with(BlockDoor.POWERED, stateUpper.get(BlockDoor.POWERED));
+            }
+        }
+
+        return state;
+    };
+
+    public static final IStateFixer FIXER_DOUBLE_PLANT = (reader, state, pos) -> {
+        if (state.get(BlockDoublePlant.HALF) == DoubleBlockHalf.UPPER)
+        {
+            IBlockState stateLower = reader.getBlockState(pos.down());
+
+            if (stateLower.getBlock() instanceof BlockDoublePlant)
+            {
+                state = stateLower.with(BlockDoublePlant.HALF, DoubleBlockHalf.UPPER);
+            }
+        }
+
+        return state;
+    };
+
     public static final IStateFixer FIXER_FENCE = (reader, state, pos) -> {
         BlockFence fence = (BlockFence) state.getBlock();
 
@@ -44,6 +95,25 @@ public class SchematicConversionFixers
         }
 
         return state;
+    };
+
+    public static final IStateFixer FIXER_FENCE_GATE = (reader, state, pos) -> {
+        BlockFenceGate gate = (BlockFenceGate) state.getBlock();
+        EnumFacing facing = state.get(BlockFenceGate.HORIZONTAL_FACING);
+        boolean inWall = false;
+
+        if (facing.getAxis() == EnumFacing.Axis.X)
+        {
+            inWall = (((IMixinBlockFenceGate) gate).invokeIsWall(reader.getBlockState(pos.offset(EnumFacing.NORTH)))
+                   || ((IMixinBlockFenceGate) gate).invokeIsWall(reader.getBlockState(pos.offset(EnumFacing.SOUTH))));
+        }
+        else
+        {
+            inWall = (((IMixinBlockFenceGate) gate).invokeIsWall(reader.getBlockState(pos.offset(EnumFacing.WEST)))
+                   || ((IMixinBlockFenceGate) gate).invokeIsWall(reader.getBlockState(pos.offset(EnumFacing.EAST))));
+        }
+
+        return state.with(BlockFenceGate.IN_WALL, inWall);
     };
 
     public static final IStateFixer FIXER_FIRE = (reader, state, pos) -> {
@@ -72,6 +142,43 @@ public class SchematicConversionFixers
             .with(BlockRedstoneWire.EAST, ((IMixinBlockRedstoneWire) wire).invokeGetSide(reader, pos, EnumFacing.EAST))
             .with(BlockRedstoneWire.NORTH, ((IMixinBlockRedstoneWire) wire).invokeGetSide(reader, pos, EnumFacing.NORTH))
             .with(BlockRedstoneWire.SOUTH, ((IMixinBlockRedstoneWire) wire).invokeGetSide(reader, pos, EnumFacing.SOUTH));
+    };
+
+    public static final IStateFixer FIXER_STAIRS = (reader, state, pos) -> {
+        return state.with(BlockStairs.SHAPE, IMixinBlockStairs.invokeGetStairShape(state, reader, pos));
+    };
+
+    public static final IStateFixer FIXER_STEM = (reader, state, pos) -> {
+        BlockStemGrown crop = ((BlockStem) state.getBlock()).getCrop();
+
+        for (EnumFacing side : PositionUtils.FACING_HORIZONTALS)
+        {
+            BlockPos posAdj = pos.offset(side);
+            IBlockState stateAdj = reader.getBlockState(posAdj);
+
+            if (stateAdj.getBlock() == crop)
+            {
+                state = crop.getAttachedStem().getDefaultState().with(BlockAttachedStem.FACING, side);
+                break;
+            }
+        }
+
+        return state;
+    };
+
+    public static final IStateFixer FIXER_TRIPWIRE = (reader, state, pos) -> {
+        BlockTripWire wire = (BlockTripWire) state.getBlock();
+
+        return state
+                .with(BlockTripWire.NORTH, ((BlockTripWire) wire).shouldConnectTo(reader.getBlockState(pos.north()), EnumFacing.NORTH))
+                .with(BlockTripWire.SOUTH, ((BlockTripWire) wire).shouldConnectTo(reader.getBlockState(pos.south()), EnumFacing.SOUTH))
+                .with(BlockTripWire.WEST, ((BlockTripWire) wire).shouldConnectTo(reader.getBlockState(pos.west()), EnumFacing.WEST))
+                .with(BlockTripWire.EAST, ((BlockTripWire) wire).shouldConnectTo(reader.getBlockState(pos.east()), EnumFacing.EAST));
+    };
+
+    public static final IStateFixer FIXER_VINE = (reader, state, pos) -> {
+        BlockVine vine = (BlockVine) state.getBlock();
+        return state.with(BlockVine.UP, ((IMixinBlockVine) vine).invokeShouldConnectUp(reader, pos.up(), EnumFacing.UP));
     };
 
     public static final IStateFixer FIXER_WALL = (reader, state, pos) -> {

@@ -13,16 +13,20 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockChorusPlant;
 import net.minecraft.block.BlockDirtSnowy;
 import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockFire;
+import net.minecraft.block.BlockGlassPane;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockMycelium;
 import net.minecraft.block.BlockPane;
+import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockRedstoneWire;
+import net.minecraft.block.BlockShearableDoublePlant;
+import net.minecraft.block.BlockStainedGlassPane;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockStem;
+import net.minecraft.block.BlockTallFlower;
 import net.minecraft.block.BlockTripWire;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.BlockWall;
@@ -143,22 +147,32 @@ public class SchematicConverter
 
     private void addPostUpdateBlocks()
     {
-        //this.postUpdateBlocks.add(BlockBed.class);
-        this.fixersPerBlock.put(BlockChorusPlant.class, SchematicConversionFixers.FIXER_CHRORUS_PLANT);
-        this.fixersPerBlock.put(BlockDirtSnowy.class, SchematicConversionFixers.FIXER_DIRT_SNOWY); // Podzol
-        this.fixersPerBlock.add(BlockDoor.class);
-        this.fixersPerBlock.add(BlockDoublePlant.class);
-        this.fixersPerBlock.put(BlockFence.class, SchematicConversionFixers.FIXER_FENCE);
-        this.fixersPerBlock.add(BlockFenceGate.class);
-        this.fixersPerBlock.put(BlockFire.class, SchematicConversionFixers.FIXER_FIRE);
-        this.fixersPerBlock.put(BlockGrass.class, SchematicConversionFixers.FIXER_DIRT_SNOWY);
-        this.fixersPerBlock.put(BlockMycelium.class, SchematicConversionFixers.FIXER_DIRT_SNOWY);
-        this.fixersPerBlock.put(BlockPane.class, SchematicConversionFixers.FIXER_PANE);
-        this.fixersPerBlock.put(BlockRedstoneWire.class, SchematicConversionFixers.FIXER_REDSTONE_WIRE);
-        this.fixersPerBlock.add(BlockStem.class);
-        this.fixersPerBlock.add(BlockStairs.class);
-        this.fixersPerBlock.add(BlockTripWire.class);
-        this.fixersPerBlock.add(BlockVine.class);
-        this.fixersPerBlock.put(BlockWall.class, SchematicConversionFixers.FIXER_WALL);
+        // TODO: Note block
+        // TODO: Flower pot
+        // TODO: Skulls
+        // TODO: Banner
+
+        // TODO: Farmland moisture
+        // TODO: Melons and pumpkins are broken?
+        this.fixersPerBlock.put(BlockChorusPlant.class,             SchematicConversionFixers.FIXER_CHRORUS_PLANT);
+        this.fixersPerBlock.put(BlockDirtSnowy.class,               SchematicConversionFixers.FIXER_DIRT_SNOWY); // Podzol
+        this.fixersPerBlock.put(BlockDoor.class,                    SchematicConversionFixers.FIXER_DOOR);
+        this.fixersPerBlock.put(BlockFence.class,                   SchematicConversionFixers.FIXER_FENCE);
+        this.fixersPerBlock.put(BlockFenceGate.class,               SchematicConversionFixers.FIXER_FENCE_GATE);
+        this.fixersPerBlock.put(BlockFire.class,                    SchematicConversionFixers.FIXER_FIRE);
+        this.fixersPerBlock.put(BlockGlassPane.class,               SchematicConversionFixers.FIXER_PANE);
+        this.fixersPerBlock.put(BlockGrass.class,                   SchematicConversionFixers.FIXER_DIRT_SNOWY);
+        this.fixersPerBlock.put(BlockMycelium.class,                SchematicConversionFixers.FIXER_DIRT_SNOWY);
+        this.fixersPerBlock.put(BlockPane.class,                    SchematicConversionFixers.FIXER_PANE); // Iron Bars
+        //this.fixersPerBlock.put(BlockRedstoneRepeater.class,        SchematicConversionFixers.FIXER_REDSTONE_WIRE);
+        this.fixersPerBlock.put(BlockRedstoneWire.class,            SchematicConversionFixers.FIXER_REDSTONE_WIRE);
+        this.fixersPerBlock.put(BlockShearableDoublePlant.class,    SchematicConversionFixers.FIXER_DOUBLE_PLANT);
+        this.fixersPerBlock.put(BlockStem.class,                    SchematicConversionFixers.FIXER_STEM);
+        this.fixersPerBlock.put(BlockStainedGlassPane.class,        SchematicConversionFixers.FIXER_PANE);
+        this.fixersPerBlock.put(BlockStairs.class,                  SchematicConversionFixers.FIXER_STAIRS);
+        this.fixersPerBlock.put(BlockTallFlower.class,              SchematicConversionFixers.FIXER_DOUBLE_PLANT);
+        this.fixersPerBlock.put(BlockTripWire.class,                SchematicConversionFixers.FIXER_TRIPWIRE);
+        this.fixersPerBlock.put(BlockVine.class,                    SchematicConversionFixers.FIXER_VINE);
+        this.fixersPerBlock.put(BlockWall.class,                    SchematicConversionFixers.FIXER_WALL);
     }
 }
