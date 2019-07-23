@@ -48,6 +48,7 @@ public class SchematicaSchematic
 {
     public static final String FILE_EXTENSION = ".schematic";
 
+    private final SchematicConverter converter;
     private LitematicaBlockStateContainer blocks;
     private IBlockState[] palette = new IBlockState[65536];
     private Map<BlockPos, NBTTagCompound> tiles = new HashMap<>();
@@ -59,6 +60,7 @@ public class SchematicaSchematic
 
     private SchematicaSchematic()
     {
+        this.converter = SchematicConverter.create();
     }
 
     public Vec3i getSize()
@@ -470,7 +472,6 @@ public class SchematicaSchematic
     private boolean readPaletteFromNBT(NBTTagCompound nbt)
     {
         Arrays.fill(this.palette, Blocks.AIR.getDefaultState());
-        SchematicConverter converter = SchematicConverter.create();
 
         // Schematica palette
         if (nbt.contains("SchematicaMapping", Constants.NBT.TAG_COMPOUND))
@@ -490,7 +491,7 @@ public class SchematicaSchematic
                     return false;
                 }
 
-                if (converter.getConvertedStatesForBlock(id, key, this.palette) == false)
+                if (this.converter.getConvertedStatesForBlock(id, key, this.palette) == false)
                 {
                     String str = String.format("SchematicaSchematic: Missing/non-existing block '%s' in SchematicaMapping", key);
                     InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, str);
@@ -498,9 +499,9 @@ public class SchematicaSchematic
                 }
             }
 
-            if (converter.createPostProcessStateFilter(this.palette))
+            if (this.converter.createPostProcessStateFilter(this.palette))
             {
-                this.postProcessingFilter = converter.getPostProcessStateFilter();
+                this.postProcessingFilter = this.converter.getPostProcessStateFilter();
                 this.needsConversionPostProcessing = true;
             }
         }
@@ -535,7 +536,7 @@ public class SchematicaSchematic
                     return false;
                 }
 
-                if (converter.getConvertedStatesForBlock(id, key, this.palette) == false)
+                if (this.converter.getConvertedStatesForBlock(id, key, this.palette) == false)
                 {
                     String str = String.format("SchematicaSchematic: Missing/non-existing block '%s' in MCEdit2 palette", key);
                     InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, str);
@@ -543,9 +544,9 @@ public class SchematicaSchematic
                 }
             }
 
-            if (converter.createPostProcessStateFilter(this.palette))
+            if (this.converter.createPostProcessStateFilter(this.palette))
             {
-                this.postProcessingFilter = converter.getPostProcessStateFilter();
+                this.postProcessingFilter = this.converter.getPostProcessStateFilter();
                 this.needsConversionPostProcessing = true;
             }
         }
@@ -736,7 +737,15 @@ public class SchematicaSchematic
         {
             NBTTagCompound tag = tagList.getCompound(i);
             BlockPos pos = new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
-            this.tiles.put(pos, tag);
+            Vec3i size = this.blocks.getSize();
+
+            if (pos.getX() >= 0 && pos.getX() < size.getX() &&
+                pos.getY() >= 0 && pos.getY() < size.getY() &&
+                pos.getZ() >= 0 && pos.getZ() < size.getZ())
+            {
+                tag = this.converter.fixTileEntityNBT(tag, this.blocks.get(pos.getX(), pos.getY(), pos.getZ()));
+                this.tiles.put(pos, tag);
+            }
         }
     }
 

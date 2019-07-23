@@ -16,6 +16,8 @@ import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockFourWay;
 import net.minecraft.block.BlockPane;
+import net.minecraft.block.BlockRedstoneDiode;
+import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockStem;
@@ -134,6 +136,10 @@ public class SchematicConversionFixers
         return state;
     };
 
+    public static final IStateFixer FIXER_REDSTONE_REPEATER = (reader, state, pos) -> {
+        return state.with(BlockRedstoneRepeater.LOCKED, Boolean.valueOf(getIsRepeaterPoweredOnSide(reader, pos, state)));
+    };
+
     public static final IStateFixer FIXER_REDSTONE_WIRE = (reader, state, pos) -> {
         BlockRedstoneWire wire = (BlockRedstoneWire) state.getBlock();
 
@@ -149,17 +155,18 @@ public class SchematicConversionFixers
     };
 
     public static final IStateFixer FIXER_STEM = (reader, state, pos) -> {
-        BlockStemGrown crop = ((BlockStem) state.getBlock()).getCrop();
+        BlockStem stem = (BlockStem) state.getBlock();
+        BlockStemGrown crop = stem.getCrop();
 
         for (EnumFacing side : PositionUtils.FACING_HORIZONTALS)
         {
             BlockPos posAdj = pos.offset(side);
             IBlockState stateAdj = reader.getBlockState(posAdj);
+            Block blockAdj = stateAdj.getBlock();
 
-            if (stateAdj.getBlock() == crop)
+            if (blockAdj == crop || (stem == Blocks.PUMPKIN_STEM && blockAdj == Blocks.CARVED_PUMPKIN))
             {
-                state = crop.getAttachedStem().getDefaultState().with(BlockAttachedStem.FACING, side);
-                break;
+                return crop.getAttachedStem().getDefaultState().with(BlockAttachedStem.FACING, side);
             }
         }
 
@@ -209,7 +216,39 @@ public class SchematicConversionFixers
         boolean flag = shape == BlockFaceShape.MIDDLE_POLE_THICK || shape == BlockFaceShape.MIDDLE_POLE && block instanceof BlockFenceGate;
         return ! BlockWall.isExcepBlockForAttachWithPiston(block) && shape == BlockFaceShape.SOLID || flag;
     }
-    
+
+    private static boolean getIsRepeaterPoweredOnSide(IBlockReader reader, BlockPos pos, IBlockState stateRepeater)
+    {
+        EnumFacing facing = stateRepeater.get(BlockRedstoneRepeater.HORIZONTAL_FACING);
+        EnumFacing sideLeft = facing.rotateYCCW();
+        EnumFacing sideRight = facing.rotateY();
+
+        return getRepeaterPowerOnSide(reader, pos.offset(sideLeft) , sideLeft ) > 0 ||
+               getRepeaterPowerOnSide(reader, pos.offset(sideRight), sideRight) > 0;
+    }
+
+    private static int getRepeaterPowerOnSide(IBlockReader reader, BlockPos pos, EnumFacing side)
+    {
+        IBlockState state = reader.getBlockState(pos);
+        Block block = state.getBlock();
+
+        if (BlockRedstoneDiode.isDiode(state))
+        {
+            if (block == Blocks.REDSTONE_BLOCK)
+            {
+                return 15;
+            }
+            else
+            {
+                return block == Blocks.REDSTONE_WIRE ? state.get(BlockRedstoneWire.POWER) : state.getStrongPower(reader, pos, side);
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     public interface IStateFixer
     {
         IBlockState fixState(IBlockReader reader, IBlockState state, BlockPos pos);

@@ -5,6 +5,7 @@ import java.util.IdentityHashMap;
 import javax.annotation.Nullable;
 import com.mojang.datafixers.Dynamic;
 import fi.dy.masa.litematica.mixin.IMixinBlockStateFlatteningMap;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers.IStateFixer;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -31,13 +32,18 @@ import net.minecraft.block.BlockTripWire;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.datafix.TypeReferences;
 import net.minecraft.util.datafix.fixes.BlockStateFlatteningMap;
 
 public class SchematicConverter
 {
+    private final Minecraft mc = Minecraft.getInstance();
     private final Object2IntMap<String> nameToShiftedBlockId;
     private final IdentityHashMap<Class<? extends Block>, IStateFixer> fixersPerBlock = new IdentityHashMap<>();
     private IdentityHashMap<IBlockState, IStateFixer> postProcessingStateFixers = new IdentityHashMap<>();
@@ -61,17 +67,19 @@ public class SchematicConverter
 
         if (shiftedOldVanillaId >= 0)
         {
-            //System.out.printf("name: %s, vanilla id: %d\n", blockName, shiftedOldVanillaId);
             for (int meta = 0; meta < 16; ++meta)
             {
                 // Make sure to clear the meta bits, in case the entry in the map for the name wasn't for meta 0
                 Dynamic<?> newStateString = BlockStateFlatteningMap.getFixedNBTForID((shiftedOldVanillaId & 0xFFF0) | meta);
-                //System.out.printf("name: %s, newStateString: %s\n", blockName, newStateString);
                 try
                 {
                     NBTTagCompound tag = (NBTTagCompound) newStateString.getValue();//.JsonToNBT.getTagFromJson(optional.get().replace('\'', '"'));
+
+                    // Run the DataFixer for the block name, for blocks that were renamed after the flattening.
+                    // ie. the flattening map actually has outdated names for some blocks... >_>
+                    tag.putString("Name", this.fixBlockName(tag.getString("Name")));
+
                     IBlockState state = NBTUtil.readBlockState(tag);
-                    //System.out.printf("name: %s, tag: %s, state: %s\n", blockName, tag, state);
                     paletteOut[(schematicBlockId << 4) | meta] = state;
                     ++successCount;
                 }
@@ -145,6 +153,31 @@ public class SchematicConverter
         return this.fixersPerBlock.get(state.getBlock().getClass());
     }
 
+    public String fixBlockName(String oldName)
+    {
+        NBTTagString tagStr = new NBTTagString(oldName);
+
+        return this.mc.getDataFixer().update(TypeReferences.BLOCK_NAME, new Dynamic<>(NBTDynamicOps.INSTANCE, tagStr),
+                        1139, LitematicaSchematic.MINECRAFT_DATA_VERSION).getValue().getString();
+    }
+
+    public NBTTagCompound fixTileEntityNBT(NBTTagCompound tag, IBlockState state)
+    {
+        /*
+        try
+        {
+            tag = (NBTTagCompound) this.mc.getDataFixer().update(TypeReferences.BLOCK_ENTITY, new Dynamic<>(NBTDynamicOps.INSTANCE, tag),
+                    1139, LitematicaSchematic.MINECRAFT_DATA_VERSION).getValue();
+        }
+        catch (Throwable e)
+        {
+            Litematica.logger.warn("Failed to update BlockEntity data for block '{}'", state, e);
+        }
+        */
+
+        return tag;
+    }
+
     private void addPostUpdateBlocks()
     {
         // TODO: Note block
@@ -152,8 +185,6 @@ public class SchematicConverter
         // TODO: Skulls
         // TODO: Banner
 
-        // TODO: Farmland moisture
-        // TODO: Melons and pumpkins are broken?
         this.fixersPerBlock.put(BlockChorusPlant.class,             SchematicConversionFixers.FIXER_CHRORUS_PLANT);
         this.fixersPerBlock.put(BlockDirtSnowy.class,               SchematicConversionFixers.FIXER_DIRT_SNOWY); // Podzol
         this.fixersPerBlock.put(BlockDoor.class,                    SchematicConversionFixers.FIXER_DOOR);
@@ -164,7 +195,7 @@ public class SchematicConverter
         this.fixersPerBlock.put(BlockGrass.class,                   SchematicConversionFixers.FIXER_DIRT_SNOWY);
         this.fixersPerBlock.put(BlockMycelium.class,                SchematicConversionFixers.FIXER_DIRT_SNOWY);
         this.fixersPerBlock.put(BlockPane.class,                    SchematicConversionFixers.FIXER_PANE); // Iron Bars
-        //this.fixersPerBlock.put(BlockRedstoneRepeater.class,        SchematicConversionFixers.FIXER_REDSTONE_WIRE);
+        this.fixersPerBlock.put(BlockRedstoneRepeater.class,        SchematicConversionFixers.FIXER_REDSTONE_REPEATER);
         this.fixersPerBlock.put(BlockRedstoneWire.class,            SchematicConversionFixers.FIXER_REDSTONE_WIRE);
         this.fixersPerBlock.put(BlockShearableDoublePlant.class,    SchematicConversionFixers.FIXER_DOUBLE_PLANT);
         this.fixersPerBlock.put(BlockStem.class,                    SchematicConversionFixers.FIXER_STEM);
