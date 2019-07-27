@@ -30,7 +30,6 @@ import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -39,7 +38,6 @@ import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
-import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerMode;
 import net.minecraft.client.Minecraft;
@@ -52,9 +50,9 @@ public class KeyCallbacks
     {
         IHotkeyCallback callbackHotkeys = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
-        ValueChangeCallback valueChangeCallback = new ValueChangeCallback();
 
-        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback(valueChangeCallback);
+        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((config) -> { InventoryUtils.setPickBlockableSlots(config.getStringValue()); });
+        Configs.Generic.TOOL_ITEM.setValueChangeCallback((config) -> { DataManager.setToolItem(config.getStringValue()); });
 
         Hotkeys.CLONE_SELECTION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(callbackHotkeys);
@@ -118,18 +116,6 @@ public class KeyCallbacks
         Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(new RenderToggle(Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT));
         Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED));
         Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.TOOL_ITEM_ENABLED));
-    }
-
-    private static class ValueChangeCallback implements IValueChangeCallback<ConfigString>
-    {
-        @Override
-        public void onValueChanged(ConfigString config)
-        {
-            if (config == Configs.Generic.PICK_BLOCKABLE_SLOTS)
-            {
-                InventoryUtils.setPickBlockableSlots(Configs.Generic.PICK_BLOCKABLE_SLOTS.getStringValue());
-            }
-        }
     }
 
     private static class RenderToggle extends KeyCallbackToggleBooleanConfigWithMessage
