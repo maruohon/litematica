@@ -39,6 +39,17 @@ public abstract class MaterialListBase implements IMaterialList
         return false;
     }
 
+    /**
+     * Whether or not this material list is made based on a schematic placement,
+     * and thus should be cleared on dimension changes and when the currently
+     * selected placement is changed by any means.
+     * @return
+     */
+    public boolean isForPlacement()
+    {
+        return false;
+    }
+
     public MaterialListHudRenderer getHudRenderer()
     {
         return this.hudRenderer;

@@ -9,6 +9,13 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.Minecraft;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
@@ -33,13 +40,6 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 
 public class DataManager implements IDirectoryCache
 {
@@ -139,7 +139,7 @@ public class DataManager implements IDirectoryCache
     {
         MaterialListBase old = getInstance().materialList;
 
-        if (old != null)
+        if (old != null && materialList != old)
         {
             MaterialListHudRenderer renderer = old.getHudRenderer();
 
@@ -281,7 +281,7 @@ public class DataManager implements IDirectoryCache
         SchematicVerifier.clearActiveVerifiers();
         InfoHud.getInstance().reset(); // remove the line providers and clear the data
 
-        getInstance().clearData();
+        getInstance().clearData(true);
     }
 
     private void savePerDimensionData()
@@ -293,18 +293,22 @@ public class DataManager implements IDirectoryCache
         JsonUtils.writeJsonToFile(root, file);
     }
 
-    private void clearData()
+    private void clearData(boolean isLogout)
     {
         this.selectionManager.clear();
         this.schematicPlacementManager.clear();
         this.schematicProjectsManager.clear();
-        this.materialList = null;
         this.areaSimple = new AreaSelectionSimple(true);
+
+        if (isLogout || (this.materialList != null && this.materialList.isForPlacement()))
+        {
+            setMaterialList(null);
+        }
     }
 
     private void loadPerDimensionData()
     {
-        this.clearData();
+        this.clearData(false);
 
         File file = getCurrentStorageFile(false);
         JsonElement element = JsonUtils.parseJsonFile(file);

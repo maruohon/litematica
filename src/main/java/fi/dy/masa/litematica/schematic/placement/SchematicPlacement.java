@@ -13,6 +13,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.gen.structure.template.PlacementSettings;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -33,12 +39,6 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.structure.template.PlacementSettings;
 
 public class SchematicPlacement
 {
@@ -995,8 +995,7 @@ public class SchematicPlacement
 
             if (JsonUtils.hasObject(obj, "material_list"))
             {
-                schematicPlacement.materialList = new MaterialListPlacement(schematicPlacement);
-                schematicPlacement.materialList.fromJson(JsonUtils.getNestedObject(obj, "material_list", false));
+                schematicPlacement.materialList = MaterialListPlacement.createFromJson(JsonUtils.getNestedObject(obj, "material_list", false), schematicPlacement);
             }
 
             if (JsonUtils.hasString(obj, "verifier_type"))
