@@ -1,5 +1,8 @@
 package fi.dy.masa.litematica.event;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -40,9 +43,6 @@ import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerMode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
 
 public class KeyCallbacks
 {
@@ -675,6 +675,11 @@ public class KeyCallbacks
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                         Corner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? Corner.CORNER_1 : Corner.CORNER_2;
                         area.setSelectedSubRegionCornerPos(pos, corner);
+
+                        if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
+                        {
+                            area.getSelectedSubRegionBox().setSelectedCorner(corner);
+                        }
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         InfoUtils.printActionbarMessage("litematica.message.set_selection_box_point", corner.ordinal(), posStr);
