@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.conversion.IBlockReaderWithData;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers.IStateFixer;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConverter;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -38,7 +39,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.feature.template.PlacementSettings;
@@ -689,7 +689,7 @@ public class SchematicaSchematic
             final int sizeX = this.blocks.getSize().getX();
             final int sizeY = this.blocks.getSize().getY();
             final int sizeZ = this.blocks.getSize().getZ();
-            IBlockReader reader = new BlockReaderSchematicaSchematic(this.blocks);
+            BlockReaderSchematicaSchematic reader = new BlockReaderSchematicaSchematic(this.blocks, this.tiles);
             BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
             for (int y = 0; y < sizeY; ++y)
@@ -772,15 +772,17 @@ public class SchematicaSchematic
         return false;
     }
 
-    public static class BlockReaderSchematicaSchematic implements IBlockReader
+    public static class BlockReaderSchematicaSchematic implements IBlockReaderWithData
     {
         private final LitematicaBlockStateContainer container;
+        private final Map<BlockPos, NBTTagCompound> blockEntityData;
         private final Vec3i size;
         private final IBlockState air;
 
-        public BlockReaderSchematicaSchematic(LitematicaBlockStateContainer container)
+        public BlockReaderSchematicaSchematic(LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> blockEntityData)
         {
             this.container = container;
+            this.blockEntityData = blockEntityData;
             this.size = container.getSize();
             this.air = Blocks.AIR.getDefaultState();
         }
@@ -805,11 +807,18 @@ public class SchematicaSchematic
             return this.getBlockState(pos).getFluidState();
         }
 
-        @Nullable
         @Override
+        @Nullable
         public TileEntity getTileEntity(BlockPos pos)
         {
             return null;
+        }
+
+        @Override
+        @Nullable
+        public NBTTagCompound getBlockEntityData(BlockPos pos)
+        {
+            return this.blockEntityData.get(pos);
         }
     }
 

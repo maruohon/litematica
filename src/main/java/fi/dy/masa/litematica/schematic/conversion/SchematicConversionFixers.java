@@ -5,8 +5,13 @@ import fi.dy.masa.litematica.mixin.IMixinBlockRedstoneWire;
 import fi.dy.masa.litematica.mixin.IMixinBlockStairs;
 import fi.dy.masa.litematica.mixin.IMixinBlockVine;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.util.Constants;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockAbstractBanner;
+import net.minecraft.block.BlockAbstractSkull;
 import net.minecraft.block.BlockAttachedStem;
+import net.minecraft.block.BlockBanner;
+import net.minecraft.block.BlockBannerWall;
 import net.minecraft.block.BlockChorusPlant;
 import net.minecraft.block.BlockDirtSnowy;
 import net.minecraft.block.BlockDoor;
@@ -15,10 +20,13 @@ import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockFourWay;
+import net.minecraft.block.BlockNote;
 import net.minecraft.block.BlockPane;
 import net.minecraft.block.BlockRedstoneDiode;
 import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockRedstoneWire;
+import net.minecraft.block.BlockSkull;
+import net.minecraft.block.BlockSkullWall;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockStem;
 import net.minecraft.block.BlockStemGrown;
@@ -28,15 +36,129 @@ import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.properties.DoubleBlockHalf;
+import net.minecraft.state.properties.NoteBlockInstrument;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 
 public class SchematicConversionFixers
 {
     private static final BooleanProperty[] FENCE_WALL_PROP_MAP = new BooleanProperty[] { null, null, BlockFourWay.NORTH, BlockFourWay.SOUTH, BlockFourWay.WEST, BlockFourWay.EAST };
+
+    public static final IStateFixer FIXER_BANNER = (reader, state, pos) -> {
+        NBTTagCompound tag = reader.getBlockEntityData(pos);
+
+        if (tag != null)
+        {
+            EnumDyeColor colorOrig = ((BlockAbstractBanner) state.getBlock()).getColor();
+            EnumDyeColor colorFromData = EnumDyeColor.byId(tag.getInt("Base") - 15);
+
+            if (colorOrig != colorFromData)
+            {
+                Integer rotation = state.get(BlockBanner.ROTATION);
+
+                switch (colorFromData)
+                {
+                    case WHITE:         state = Blocks.WHITE_BANNER.getDefaultState();      break;
+                    case ORANGE:        state = Blocks.ORANGE_BANNER.getDefaultState();     break;
+                    case MAGENTA:       state = Blocks.MAGENTA_BANNER.getDefaultState();    break;
+                    case LIGHT_BLUE:    state = Blocks.LIGHT_BLUE_BANNER.getDefaultState(); break;
+                    case YELLOW:        state = Blocks.YELLOW_BANNER.getDefaultState();     break;
+                    case LIME:          state = Blocks.LIME_BANNER.getDefaultState();       break;
+                    case PINK:          state = Blocks.PINK_BANNER.getDefaultState();       break;
+                    case GRAY:          state = Blocks.GRAY_BANNER.getDefaultState();       break;
+                    case LIGHT_GRAY:    state = Blocks.LIGHT_GRAY_BANNER.getDefaultState(); break;
+                    case CYAN:          state = Blocks.CYAN_BANNER.getDefaultState();       break;
+                    case PURPLE:        state = Blocks.PURPLE_BANNER.getDefaultState();     break;
+                    case BLUE:          state = Blocks.BLUE_BANNER.getDefaultState();       break;
+                    case BROWN:         state = Blocks.BROWN_BANNER.getDefaultState();      break;
+                    case GREEN:         state = Blocks.GREEN_BANNER.getDefaultState();      break;
+                    case RED:           state = Blocks.RED_BANNER.getDefaultState();        break;
+                    case BLACK:         state = Blocks.BLACK_BANNER.getDefaultState();      break;
+                }
+
+                state = state.with(BlockBanner.ROTATION, rotation);
+            }
+        }
+
+        return state;
+    };
+
+    public static final IStateFixer FIXER_BANNER_WALL = (reader, state, pos) -> {
+        NBTTagCompound tag = reader.getBlockEntityData(pos);
+
+        if (tag != null)
+        {
+            EnumDyeColor colorOrig = ((BlockAbstractBanner) state.getBlock()).getColor();
+            EnumDyeColor colorFromData = EnumDyeColor.byId(tag.getInt("Base") - 15);
+
+            if (colorOrig != colorFromData)
+            {
+                EnumFacing facing = state.get(BlockBannerWall.HORIZONTAL_FACING);
+
+                switch (colorFromData)
+                {
+                    case WHITE:         state = Blocks.WHITE_WALL_BANNER.getDefaultState();      break;
+                    case ORANGE:        state = Blocks.ORANGE_WALL_BANNER.getDefaultState();     break;
+                    case MAGENTA:       state = Blocks.MAGENTA_WALL_BANNER.getDefaultState();    break;
+                    case LIGHT_BLUE:    state = Blocks.LIGHT_BLUE_WALL_BANNER.getDefaultState(); break;
+                    case YELLOW:        state = Blocks.YELLOW_WALL_BANNER.getDefaultState();     break;
+                    case LIME:          state = Blocks.LIME_WALL_BANNER.getDefaultState();       break;
+                    case PINK:          state = Blocks.PINK_WALL_BANNER.getDefaultState();       break;
+                    case GRAY:          state = Blocks.GRAY_WALL_BANNER.getDefaultState();       break;
+                    case LIGHT_GRAY:    state = Blocks.LIGHT_GRAY_WALL_BANNER.getDefaultState(); break;
+                    case CYAN:          state = Blocks.CYAN_WALL_BANNER.getDefaultState();       break;
+                    case PURPLE:        state = Blocks.PURPLE_WALL_BANNER.getDefaultState();     break;
+                    case BLUE:          state = Blocks.BLUE_WALL_BANNER.getDefaultState();       break;
+                    case BROWN:         state = Blocks.BROWN_WALL_BANNER.getDefaultState();      break;
+                    case GREEN:         state = Blocks.GREEN_WALL_BANNER.getDefaultState();      break;
+                    case RED:           state = Blocks.RED_WALL_BANNER.getDefaultState();        break;
+                    case BLACK:         state = Blocks.BLACK_WALL_BANNER.getDefaultState();      break;
+                }
+
+                state = state.with(BlockBannerWall.HORIZONTAL_FACING, facing);
+            }
+        }
+
+        return state;
+    };
+
+    public static final IStateFixer FIXER_BED = (reader, state, pos) -> {
+        NBTTagCompound tag = reader.getBlockEntityData(pos);
+
+        if (tag != null && tag.contains("color", Constants.NBT.TAG_INT))
+        {
+            int colorId = tag.getInt("color");
+
+            switch (colorId)
+            {
+                case  0: return Blocks.WHITE_BED.getDefaultState();
+                case  1: return Blocks.ORANGE_BED.getDefaultState();
+                case  2: return Blocks.MAGENTA_BED.getDefaultState();
+                case  3: return Blocks.LIGHT_BLUE_BED.getDefaultState();
+                case  4: return Blocks.YELLOW_BED.getDefaultState();
+                case  5: return Blocks.LIME_BED.getDefaultState();
+                case  6: return Blocks.PINK_BED.getDefaultState();
+                case  7: return Blocks.GRAY_BED.getDefaultState();
+                case  8: return Blocks.LIGHT_GRAY_BED.getDefaultState();
+                case  9: return Blocks.CYAN_BED.getDefaultState();
+                case 10: return Blocks.PURPLE_BED.getDefaultState();
+                case 11: return Blocks.BLUE_BED.getDefaultState();
+                case 12: return Blocks.BROWN_BED.getDefaultState();
+                case 13: return Blocks.GREEN_BED.getDefaultState();
+                case 14: return Blocks.RED_BED.getDefaultState();
+                case 15: return Blocks.BLACK_BED.getDefaultState();
+                default: return state;
+            }
+        }
+
+        return state;
+    };
 
     public static final IStateFixer FIXER_CHRORUS_PLANT = (reader, state, pos) -> {
         return ((BlockChorusPlant) state.getBlock()).makeConnections(reader, pos);
@@ -123,6 +245,69 @@ public class SchematicConversionFixers
         return fire.getStateForPlacement(reader, pos);
     };
 
+    public static final IStateFixer FIXER_FLOWER_POT = (reader, state, pos) -> {
+        NBTTagCompound tag = reader.getBlockEntityData(pos);
+
+        if (tag != null)
+        {
+            String itemName = tag.getString("Item");
+
+            if (itemName.length() > 0)
+            {
+                int meta = tag.getInt("Data");
+
+                switch (itemName)
+                {
+                    case "sapling":
+                        if (meta == 0)      return Blocks.POTTED_OAK_SAPLING.getDefaultState();
+                        if (meta == 1)      return Blocks.POTTED_SPRUCE_SAPLING.getDefaultState();
+                        if (meta == 2)      return Blocks.POTTED_BIRCH_SAPLING.getDefaultState();
+                        if (meta == 3)      return Blocks.POTTED_JUNGLE_SAPLING.getDefaultState();
+                        if (meta == 4)      return Blocks.POTTED_ACACIA_SAPLING.getDefaultState();
+                        if (meta == 5)      return Blocks.POTTED_DARK_OAK_SAPLING.getDefaultState();
+                        break;
+                    case "tallgrass":
+                        if (meta == 0)      return Blocks.POTTED_DEAD_BUSH.getDefaultState();
+                        if (meta == 1)      return Blocks.POTTED_FERN.getDefaultState();
+                        break;
+                    case "red_flower":
+                        if (meta == 0)      return Blocks.POTTED_POPPY.getDefaultState();
+                        if (meta == 1)      return Blocks.POTTED_BLUE_ORCHID.getDefaultState();
+                        if (meta == 2)      return Blocks.POTTED_ALLIUM.getDefaultState();
+                        if (meta == 3)      return Blocks.POTTED_AZURE_BLUET.getDefaultState();
+                        if (meta == 4)      return Blocks.POTTED_RED_TULIP.getDefaultState();
+                        if (meta == 5)      return Blocks.POTTED_ORANGE_TULIP.getDefaultState();
+                        if (meta == 6)      return Blocks.POTTED_WHITE_TULIP.getDefaultState();
+                        if (meta == 7)      return Blocks.POTTED_PINK_TULIP.getDefaultState();
+                        if (meta == 8)      return Blocks.POTTED_OXEYE_DAISY.getDefaultState();
+                        break;
+                    case "yellow_flower":   return Blocks.POTTED_DANDELION.getDefaultState();
+                    case "brown_mushroom":  return Blocks.POTTED_BROWN_MUSHROOM.getDefaultState();
+                    case "red_mushroom":    return Blocks.POTTED_RED_MUSHROOM.getDefaultState();
+                    case "deadbush":        return Blocks.POTTED_DEAD_BUSH.getDefaultState();
+                    case "cactus":          return Blocks.POTTED_CACTUS.getDefaultState();
+                    default:                return state;
+                }
+            }
+        }
+
+        return state;
+    };
+
+    public static final IStateFixer FIXER_NOTE_BLOCK = (reader, state, pos) -> {
+        NBTTagCompound tag = reader.getBlockEntityData(pos);
+
+        if (tag != null)
+        {
+            state = state
+                        .with(BlockNote.POWERED, Boolean.valueOf(tag.getBoolean("powered")))
+                        .with(BlockNote.NOTE, Integer.valueOf(MathHelper.clamp(tag.getByte("note"), 0, 24)))
+                        .with(BlockNote.INSTRUMENT, NoteBlockInstrument.byState(reader.getBlockState(pos.down())));
+        }
+
+        return state;
+    };
+
     public static final IStateFixer FIXER_PANE = (reader, state, pos) -> {
         BlockPane pane = (BlockPane) state.getBlock();
 
@@ -148,6 +333,92 @@ public class SchematicConversionFixers
             .with(BlockRedstoneWire.EAST, ((IMixinBlockRedstoneWire) wire).invokeGetSide(reader, pos, EnumFacing.EAST))
             .with(BlockRedstoneWire.NORTH, ((IMixinBlockRedstoneWire) wire).invokeGetSide(reader, pos, EnumFacing.NORTH))
             .with(BlockRedstoneWire.SOUTH, ((IMixinBlockRedstoneWire) wire).invokeGetSide(reader, pos, EnumFacing.SOUTH));
+    };
+
+    public static final IStateFixer FIXER_SKULL = (reader, state, pos) -> {
+        NBTTagCompound tag = reader.getBlockEntityData(pos);
+
+        if (tag != null)
+        {
+            BlockSkull.ISkullType typeOrig = ((BlockAbstractSkull) state.getBlock()).getSkullType();
+            BlockSkull.ISkullType typeFromData = BlockSkull.Types.values()[MathHelper.clamp(tag.getByte("SkullType"), 0, 5)];
+
+            if (typeOrig != typeFromData)
+            {
+                if (typeFromData == BlockSkull.Types.SKELETON)
+                {
+                    state = Blocks.SKELETON_SKULL.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.WITHER_SKELETON)
+                {
+                    state = Blocks.WITHER_SKELETON_SKULL.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.PLAYER)
+                {
+                    state = Blocks.PLAYER_HEAD.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.ZOMBIE)
+                {
+                    state = Blocks.ZOMBIE_HEAD.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.CREEPER)
+                {
+                    state = Blocks.CREEPER_HEAD.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.DRAGON)
+                {
+                    state = Blocks.DRAGON_HEAD.getDefaultState();
+                }
+            }
+
+            state = state.with(BlockBanner.ROTATION, MathHelper.clamp(tag.getByte("Rot"), 0, 15));
+        }
+
+        return state;
+    };
+
+    public static final IStateFixer FIXER_SKULL_WALL = (reader, state, pos) -> {
+        NBTTagCompound tag = reader.getBlockEntityData(pos);
+
+        if (tag != null)
+        {
+            BlockSkull.ISkullType typeOrig = ((BlockAbstractSkull) state.getBlock()).getSkullType();
+            BlockSkull.ISkullType typeFromData = BlockSkull.Types.values()[MathHelper.clamp(tag.getByte("SkullType"), 0, 5)];
+
+            if (typeOrig != typeFromData)
+            {
+                EnumFacing facing = state.get(BlockSkullWall.FACING);
+
+                if (typeFromData == BlockSkull.Types.SKELETON)
+                {
+                    state = Blocks.SKELETON_WALL_SKULL.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.WITHER_SKELETON)
+                {
+                    state = Blocks.WITHER_SKELETON_WALL_SKULL.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.PLAYER)
+                {
+                    state = Blocks.PLAYER_WALL_HEAD.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.ZOMBIE)
+                {
+                    state = Blocks.ZOMBIE_WALL_HEAD.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.CREEPER)
+                {
+                    state = Blocks.CREEPER_WALL_HEAD.getDefaultState();
+                }
+                else if (typeFromData == BlockSkull.Types.DRAGON)
+                {
+                    state = Blocks.DRAGON_WALL_HEAD.getDefaultState();
+                }
+
+                state = state.with(BlockSkullWall.FACING, facing);
+            }
+        }
+
+        return state;
     };
 
     public static final IStateFixer FIXER_STAIRS = (reader, state, pos) -> {
@@ -251,6 +522,6 @@ public class SchematicConversionFixers
 
     public interface IStateFixer
     {
-        IBlockState fixState(IBlockReader reader, IBlockState state, BlockPos pos);
+        IBlockState fixState(IBlockReaderWithData reader, IBlockState state, BlockPos pos);
     }
 }

@@ -11,19 +11,26 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockBanner;
+import net.minecraft.block.BlockBannerWall;
+import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockChorusPlant;
 import net.minecraft.block.BlockDirtSnowy;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockFire;
+import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.BlockGlassPane;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockMycelium;
+import net.minecraft.block.BlockNote;
 import net.minecraft.block.BlockPane;
 import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.BlockShearableDoublePlant;
+import net.minecraft.block.BlockSkull;
+import net.minecraft.block.BlockSkullWall;
 import net.minecraft.block.BlockStainedGlassPane;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockStem;
@@ -180,11 +187,7 @@ public class SchematicConverter
 
     private void addPostUpdateBlocks()
     {
-        // TODO: Note block
-        // TODO: Flower pot
-        // TODO: Skulls
-        // TODO: Banner
-
+        // Fixers to fix the state according to the adjacent blocks
         this.fixersPerBlock.put(BlockChorusPlant.class,             SchematicConversionFixers.FIXER_CHRORUS_PLANT);
         this.fixersPerBlock.put(BlockDirtSnowy.class,               SchematicConversionFixers.FIXER_DIRT_SNOWY); // Podzol
         this.fixersPerBlock.put(BlockDoor.class,                    SchematicConversionFixers.FIXER_DOOR);
@@ -205,5 +208,14 @@ public class SchematicConverter
         this.fixersPerBlock.put(BlockTripWire.class,                SchematicConversionFixers.FIXER_TRIPWIRE);
         this.fixersPerBlock.put(BlockVine.class,                    SchematicConversionFixers.FIXER_VINE);
         this.fixersPerBlock.put(BlockWall.class,                    SchematicConversionFixers.FIXER_WALL);
+
+        // Fixers to get values from old TileEntity data
+        this.fixersPerBlock.put(BlockBanner.class,                  SchematicConversionFixers.FIXER_BANNER);
+        this.fixersPerBlock.put(BlockBannerWall.class,              SchematicConversionFixers.FIXER_BANNER_WALL);
+        this.fixersPerBlock.put(BlockBed.class,                     SchematicConversionFixers.FIXER_BED);
+        this.fixersPerBlock.put(BlockFlowerPot.class,               SchematicConversionFixers.FIXER_FLOWER_POT);
+        this.fixersPerBlock.put(BlockNote.class,                    SchematicConversionFixers.FIXER_NOTE_BLOCK);
+        this.fixersPerBlock.put(BlockSkull.class,                   SchematicConversionFixers.FIXER_SKULL);
+        this.fixersPerBlock.put(BlockSkullWall.class,               SchematicConversionFixers.FIXER_SKULL_WALL);
     }
 }
