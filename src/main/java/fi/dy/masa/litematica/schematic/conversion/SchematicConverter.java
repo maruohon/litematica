@@ -30,7 +30,11 @@ import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.BlockShearableDoublePlant;
 import net.minecraft.block.BlockSkull;
+import net.minecraft.block.BlockSkullPlayer;
 import net.minecraft.block.BlockSkullWall;
+import net.minecraft.block.BlockSkullWallPlayer;
+import net.minecraft.block.BlockSkullWither;
+import net.minecraft.block.BlockSkullWitherWall;
 import net.minecraft.block.BlockStainedGlassPane;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockStem;
@@ -72,6 +76,7 @@ public class SchematicConverter
         int shiftedOldVanillaId = this.nameToShiftedBlockId.getInt(blockName);
         int successCount = 0;
 
+        System.out.printf("blockName: %s, shiftedOldVanillaId: %d\n", blockName, shiftedOldVanillaId);
         if (shiftedOldVanillaId >= 0)
         {
             for (int meta = 0; meta < 16; ++meta)
@@ -82,13 +87,20 @@ public class SchematicConverter
                 {
                     NBTTagCompound tag = (NBTTagCompound) newStateString.getValue();//.JsonToNBT.getTagFromJson(optional.get().replace('\'', '"'));
 
-                    // Run the DataFixer for the block name, for blocks that were renamed after the flattening.
-                    // ie. the flattening map actually has outdated names for some blocks... >_>
-                    tag.putString("Name", this.fixBlockName(tag.getString("Name")));
+                    if (tag != null)
+                    {
+                        tag = tag.copy();
 
-                    IBlockState state = NBTUtil.readBlockState(tag);
-                    paletteOut[(schematicBlockId << 4) | meta] = state;
-                    ++successCount;
+                        // Run the DataFixer for the block name, for blocks that were renamed after the flattening.
+                        // ie. the flattening map actually has outdated names for some blocks... >_>
+                        String namePre = tag.getString("Name");
+                        tag.putString("Name", this.fixBlockName(namePre));
+
+                        IBlockState state = NBTUtil.readBlockState(tag);
+                        System.out.printf("name pre: %s, post: %s, state: %s\n", namePre, tag.getString("Name"), state);
+                        paletteOut[(schematicBlockId << 4) | meta] = state;
+                        ++successCount;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -217,5 +229,9 @@ public class SchematicConverter
         this.fixersPerBlock.put(BlockNote.class,                    SchematicConversionFixers.FIXER_NOTE_BLOCK);
         this.fixersPerBlock.put(BlockSkull.class,                   SchematicConversionFixers.FIXER_SKULL);
         this.fixersPerBlock.put(BlockSkullWall.class,               SchematicConversionFixers.FIXER_SKULL_WALL);
+        this.fixersPerBlock.put(BlockSkullPlayer.class,             SchematicConversionFixers.FIXER_SKULL);
+        this.fixersPerBlock.put(BlockSkullWallPlayer.class,         SchematicConversionFixers.FIXER_SKULL_WALL);
+        this.fixersPerBlock.put(BlockSkullWither.class,             SchematicConversionFixers.FIXER_SKULL);
+        this.fixersPerBlock.put(BlockSkullWitherWall.class,         SchematicConversionFixers.FIXER_SKULL_WALL);
     }
 }

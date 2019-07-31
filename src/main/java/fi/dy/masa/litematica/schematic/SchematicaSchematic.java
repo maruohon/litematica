@@ -459,6 +459,7 @@ public class SchematicaSchematic
         {
             this.readEntitiesFromNBT(nbt);
             this.readTileEntitiesFromNBT(nbt);
+            this.postProcessBlocks();
 
             return true;
         }
@@ -676,8 +677,6 @@ public class SchematicaSchematic
             int z = (bi % layerSize) / sizeX;
             this.blocks.set(x, y, z, state);
         }
-
-        this.postProcessBlocks();
 
         return true;
     }

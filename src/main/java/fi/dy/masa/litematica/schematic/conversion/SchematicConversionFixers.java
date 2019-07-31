@@ -12,6 +12,7 @@ import net.minecraft.block.BlockAbstractSkull;
 import net.minecraft.block.BlockAttachedStem;
 import net.minecraft.block.BlockBanner;
 import net.minecraft.block.BlockBannerWall;
+import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockChorusPlant;
 import net.minecraft.block.BlockDirtSnowy;
 import net.minecraft.block.BlockDoor;
@@ -39,6 +40,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.properties.BedPart;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.state.properties.NoteBlockInstrument;
 import net.minecraft.util.EnumFacing;
@@ -56,7 +58,7 @@ public class SchematicConversionFixers
         if (tag != null)
         {
             EnumDyeColor colorOrig = ((BlockAbstractBanner) state.getBlock()).getColor();
-            EnumDyeColor colorFromData = EnumDyeColor.byId(tag.getInt("Base") - 15);
+            EnumDyeColor colorFromData = EnumDyeColor.byId(15 - tag.getInt("Base"));
 
             if (colorOrig != colorFromData)
             {
@@ -95,7 +97,7 @@ public class SchematicConversionFixers
         if (tag != null)
         {
             EnumDyeColor colorOrig = ((BlockAbstractBanner) state.getBlock()).getColor();
-            EnumDyeColor colorFromData = EnumDyeColor.byId(tag.getInt("Base") - 15);
+            EnumDyeColor colorFromData = EnumDyeColor.byId(15 - tag.getInt("Base"));
 
             if (colorOrig != colorFromData)
             {
@@ -134,27 +136,34 @@ public class SchematicConversionFixers
         if (tag != null && tag.contains("color", Constants.NBT.TAG_INT))
         {
             int colorId = tag.getInt("color");
+            EnumFacing facing = state.get(BlockBed.HORIZONTAL_FACING);
+            BedPart part = state.get(BlockBed.PART);
+            Boolean occupied = state.get(BlockBed.OCCUPIED);
 
             switch (colorId)
             {
-                case  0: return Blocks.WHITE_BED.getDefaultState();
-                case  1: return Blocks.ORANGE_BED.getDefaultState();
-                case  2: return Blocks.MAGENTA_BED.getDefaultState();
-                case  3: return Blocks.LIGHT_BLUE_BED.getDefaultState();
-                case  4: return Blocks.YELLOW_BED.getDefaultState();
-                case  5: return Blocks.LIME_BED.getDefaultState();
-                case  6: return Blocks.PINK_BED.getDefaultState();
-                case  7: return Blocks.GRAY_BED.getDefaultState();
-                case  8: return Blocks.LIGHT_GRAY_BED.getDefaultState();
-                case  9: return Blocks.CYAN_BED.getDefaultState();
-                case 10: return Blocks.PURPLE_BED.getDefaultState();
-                case 11: return Blocks.BLUE_BED.getDefaultState();
-                case 12: return Blocks.BROWN_BED.getDefaultState();
-                case 13: return Blocks.GREEN_BED.getDefaultState();
-                case 14: return Blocks.RED_BED.getDefaultState();
-                case 15: return Blocks.BLACK_BED.getDefaultState();
+                case  0: state = Blocks.WHITE_BED.getDefaultState(); break;
+                case  1: state = Blocks.ORANGE_BED.getDefaultState(); break;
+                case  2: state = Blocks.MAGENTA_BED.getDefaultState(); break;
+                case  3: state = Blocks.LIGHT_BLUE_BED.getDefaultState(); break;
+                case  4: state = Blocks.YELLOW_BED.getDefaultState(); break;
+                case  5: state = Blocks.LIME_BED.getDefaultState(); break;
+                case  6: state = Blocks.PINK_BED.getDefaultState(); break;
+                case  7: state = Blocks.GRAY_BED.getDefaultState(); break;
+                case  8: state = Blocks.LIGHT_GRAY_BED.getDefaultState(); break;
+                case  9: state = Blocks.CYAN_BED.getDefaultState(); break;
+                case 10: state = Blocks.PURPLE_BED.getDefaultState(); break;
+                case 11: state = Blocks.BLUE_BED.getDefaultState(); break;
+                case 12: state = Blocks.BROWN_BED.getDefaultState(); break;
+                case 13: state =  Blocks.GREEN_BED.getDefaultState(); break;
+                case 14: state = Blocks.RED_BED.getDefaultState(); break;
+                case 15: state = Blocks.BLACK_BED.getDefaultState(); break;
                 default: return state;
             }
+
+            state = state.with(BlockBed.HORIZONTAL_FACING, facing)
+                         .with(BlockBed.PART, part)
+                         .with(BlockBed.OCCUPIED, occupied);
         }
 
         return state;
@@ -258,7 +267,7 @@ public class SchematicConversionFixers
 
                 switch (itemName)
                 {
-                    case "sapling":
+                    case "minecraft:sapling":
                         if (meta == 0)      return Blocks.POTTED_OAK_SAPLING.getDefaultState();
                         if (meta == 1)      return Blocks.POTTED_SPRUCE_SAPLING.getDefaultState();
                         if (meta == 2)      return Blocks.POTTED_BIRCH_SAPLING.getDefaultState();
@@ -266,11 +275,11 @@ public class SchematicConversionFixers
                         if (meta == 4)      return Blocks.POTTED_ACACIA_SAPLING.getDefaultState();
                         if (meta == 5)      return Blocks.POTTED_DARK_OAK_SAPLING.getDefaultState();
                         break;
-                    case "tallgrass":
+                    case "minecraft:tallgrass":
                         if (meta == 0)      return Blocks.POTTED_DEAD_BUSH.getDefaultState();
-                        if (meta == 1)      return Blocks.POTTED_FERN.getDefaultState();
+                        if (meta == 2)      return Blocks.POTTED_FERN.getDefaultState();
                         break;
-                    case "red_flower":
+                    case "minecraft:red_flower":
                         if (meta == 0)      return Blocks.POTTED_POPPY.getDefaultState();
                         if (meta == 1)      return Blocks.POTTED_BLUE_ORCHID.getDefaultState();
                         if (meta == 2)      return Blocks.POTTED_ALLIUM.getDefaultState();
@@ -281,12 +290,12 @@ public class SchematicConversionFixers
                         if (meta == 7)      return Blocks.POTTED_PINK_TULIP.getDefaultState();
                         if (meta == 8)      return Blocks.POTTED_OXEYE_DAISY.getDefaultState();
                         break;
-                    case "yellow_flower":   return Blocks.POTTED_DANDELION.getDefaultState();
-                    case "brown_mushroom":  return Blocks.POTTED_BROWN_MUSHROOM.getDefaultState();
-                    case "red_mushroom":    return Blocks.POTTED_RED_MUSHROOM.getDefaultState();
-                    case "deadbush":        return Blocks.POTTED_DEAD_BUSH.getDefaultState();
-                    case "cactus":          return Blocks.POTTED_CACTUS.getDefaultState();
-                    default:                return state;
+                    case "minecraft:yellow_flower":     return Blocks.POTTED_DANDELION.getDefaultState();
+                    case "minecraft:brown_mushroom":    return Blocks.POTTED_BROWN_MUSHROOM.getDefaultState();
+                    case "minecraft:red_mushroom":      return Blocks.POTTED_RED_MUSHROOM.getDefaultState();
+                    case "minecraft:deadbush":          return Blocks.POTTED_DEAD_BUSH.getDefaultState();
+                    case "minecraft:cactus":            return Blocks.POTTED_CACTUS.getDefaultState();
+                    default:                            return state;
                 }
             }
         }
