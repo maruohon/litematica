@@ -4,12 +4,9 @@ import java.util.Arrays;
 import java.util.IdentityHashMap;
 import javax.annotation.Nullable;
 import com.mojang.datafixers.Dynamic;
-import fi.dy.masa.litematica.mixin.IMixinBlockStateFlatteningMap;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers.IStateFixer;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBanner;
 import net.minecraft.block.BlockBannerWall;
@@ -43,26 +40,18 @@ import net.minecraft.block.BlockTripWire;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTDynamicOps;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagString;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.datafix.TypeReferences;
 import net.minecraft.util.datafix.fixes.BlockStateFlatteningMap;
 
 public class SchematicConverter
 {
-    private final Minecraft mc = Minecraft.getInstance();
-    private final Object2IntMap<String> nameToShiftedBlockId;
     private final IdentityHashMap<Class<? extends Block>, IStateFixer> fixersPerBlock = new IdentityHashMap<>();
     private IdentityHashMap<IBlockState, IStateFixer> postProcessingStateFixers = new IdentityHashMap<>();
 
     private SchematicConverter()
     {
-        this.nameToShiftedBlockId = IMixinBlockStateFlatteningMap.getOldNameToShiftedOldBlockIdMap();
-
         this.addPostUpdateBlocks();
     }
 
@@ -73,7 +62,7 @@ public class SchematicConverter
 
     public boolean getConvertedStatesForBlock(int schematicBlockId, String blockName, IBlockState[] paletteOut)
     {
-        int shiftedOldVanillaId = this.nameToShiftedBlockId.getInt(blockName);
+        int shiftedOldVanillaId = SchematicConversionMaps.getOldNameToShiftedBlockId(blockName);
         int successCount = 0;
 
         System.out.printf("blockName: %s, shiftedOldVanillaId: %d\n", blockName, shiftedOldVanillaId);
@@ -94,10 +83,10 @@ public class SchematicConverter
                         // Run the DataFixer for the block name, for blocks that were renamed after the flattening.
                         // ie. the flattening map actually has outdated names for some blocks... >_>
                         String namePre = tag.getString("Name");
-                        tag.putString("Name", this.fixBlockName(namePre));
+                        //tag.putString("Name", SchematicConversionMaps.updateBlockName(namePre));
 
                         IBlockState state = NBTUtil.readBlockState(tag);
-                        System.out.printf("name pre: %s, post: %s, state: %s\n", namePre, tag.getString("Name"), state);
+                        System.out.printf("idMeta: %3d: name pre: %s, post: %s, state: %s\n", (shiftedOldVanillaId & 0xFFF0) | meta, namePre, tag.getString("Name"), state);
                         paletteOut[(schematicBlockId << 4) | meta] = state;
                         ++successCount;
                     }
@@ -170,14 +159,6 @@ public class SchematicConverter
     private IStateFixer getFixerFor(IBlockState state)
     {
         return this.fixersPerBlock.get(state.getBlock().getClass());
-    }
-
-    public String fixBlockName(String oldName)
-    {
-        NBTTagString tagStr = new NBTTagString(oldName);
-
-        return this.mc.getDataFixer().update(TypeReferences.BLOCK_NAME, new Dynamic<>(NBTDynamicOps.INSTANCE, tagStr),
-                        1139, LitematicaSchematic.MINECRAFT_DATA_VERSION).getValue().getString();
     }
 
     public NBTTagCompound fixTileEntityNBT(NBTTagCompound tag, IBlockState state)
