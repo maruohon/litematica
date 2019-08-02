@@ -100,6 +100,8 @@ public class SchematicConversionMaps
         ID_META_TO_BLOCKSTATE.put(0, air);
 
         // These will get converted to the correct type in the state fixers
+        ID_META_TO_UPDATED_NAME.put(1648, "minecraft:melon");
+
         ID_META_TO_UPDATED_NAME.put(2304, "minecraft:skeleton_skull");
         ID_META_TO_UPDATED_NAME.put(2305, "minecraft:skeleton_skull");
         ID_META_TO_UPDATED_NAME.put(2306, "minecraft:skeleton_wall_skull");
@@ -112,6 +114,13 @@ public class SchematicConversionMaps
         ID_META_TO_UPDATED_NAME.put(2315, "minecraft:skeleton_wall_skull");
         ID_META_TO_UPDATED_NAME.put(2316, "minecraft:skeleton_wall_skull");
         ID_META_TO_UPDATED_NAME.put(2317, "minecraft:skeleton_wall_skull");
+
+        ID_META_TO_UPDATED_NAME.put(3664, "minecraft:shulker_box");
+        ID_META_TO_UPDATED_NAME.put(3665, "minecraft:shulker_box");
+        ID_META_TO_UPDATED_NAME.put(3666, "minecraft:shulker_box");
+        ID_META_TO_UPDATED_NAME.put(3667, "minecraft:shulker_box");
+        ID_META_TO_UPDATED_NAME.put(3668, "minecraft:shulker_box");
+        ID_META_TO_UPDATED_NAME.put(3669, "minecraft:shulker_box");
     }
 
     private static void clearMaps()
@@ -144,6 +153,14 @@ public class SchematicConversionMaps
                 newStateTag.putString("Name", newName);
             }
 
+            // Store the id + meta => state maps before renaming the block for the state <=> state maps
+            BlockState state = TagHelper.deserializeBlockState(newStateTag);
+            //System.out.printf("id: %5d, state: %s, tag: %s\n", idMeta, state, newStateTag);
+            ID_META_TO_BLOCKSTATE.putIfAbsent(idMeta, state);
+
+            // Don't override the id and meta for air, which is what unrecognized blocks will turn into
+            BLOCKSTATE_TO_ID_META.putIfAbsent(state, idMeta);
+
             if (oldStateStrings.length > 0)
             {
                 CompoundTag oldStateTag = getStateTagFromString(oldStateStrings[0]);
@@ -164,13 +181,6 @@ public class SchematicConversionMaps
 
                 addOldStateToNewState(newStateTag, oldStateStrings);
             }
-
-            BlockState state = TagHelper.deserializeBlockState(newStateTag);
-            //System.out.printf("id: %5d, state: %s, tag: %s\n", idMeta, state, newStateTag);
-            ID_META_TO_BLOCKSTATE.putIfAbsent(idMeta, state);
-
-            // Don't override the id and meta for air, which is what unrecognized blocks will turn into
-            BLOCKSTATE_TO_ID_META.putIfAbsent(state, idMeta);
         }
         catch (Exception e)
         {
