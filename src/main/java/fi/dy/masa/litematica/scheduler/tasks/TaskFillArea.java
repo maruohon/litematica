@@ -175,7 +175,10 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (this.finished)
         {
-            InfoUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_filled");
+            if (this.printCompletionMessage)
+            {
+                InfoUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_filled");
+            }
         }
         else
         {

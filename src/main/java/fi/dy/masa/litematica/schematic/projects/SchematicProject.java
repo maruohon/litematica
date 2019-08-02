@@ -242,13 +242,11 @@ public class SchematicProject
 
             this.cacheCurrentAreaFromPlacement();
 
-            ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, () -> this.pastePlacement(mc), mc);
+            ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, () ->
+            {
+                DataManager.getSchematicPlacementManager().pastePlacementToWorld(this.currentPlacement, false, mc);
+            }, mc);
         }
-    }
-
-    private void pastePlacement(MinecraftClient mc)
-    {
-        DataManager.getSchematicPlacementManager().pastePlacementToWorld(this.currentPlacement, false, mc);
     }
 
     public void deleteLastSeenArea(MinecraftClient mc)

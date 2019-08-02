@@ -18,7 +18,10 @@ public class TaskDeleteArea extends TaskFillArea
     {
         if (this.finished)
         {
-            InfoUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
+            if (this.printCompletionMessage)
+            {
+                InfoUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
+            }
         }
         else
         {

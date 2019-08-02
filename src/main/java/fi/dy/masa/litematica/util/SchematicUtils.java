@@ -3,33 +3,10 @@ package fi.dy.masa.litematica.util;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.GuiSchematicSave;
-import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager.PlacementPart;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
-import fi.dy.masa.litematica.schematic.projects.SchematicProject;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
-import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -45,9 +22,43 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
+import fi.dy.masa.litematica.gui.GuiSchematicSave;
+import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.litematica.scheduler.tasks.TaskBase;
+import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicDirect;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager.PlacementPart;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
+import fi.dy.masa.litematica.schematic.projects.SchematicProject;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class SchematicUtils
 {
+    private static long areaMovedTime;
+
     public static boolean saveSchematic(boolean inMemoryOnly)
     {
         SelectionManager sm = DataManager.getSelectionManager();
@@ -79,6 +90,20 @@ public class SchematicUtils
         }
 
         return false;
+    }
+
+    public static void unloadCurrentlySelectedSchematic()
+    {
+        SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+        if (placement != null)
+        {
+            SchematicHolder.getInstance().removeSchematic(placement.getSchematic());
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+        }
     }
 
     public static boolean breakSchematicBlock(MinecraftClient mc)
@@ -580,6 +605,140 @@ public class SchematicUtils
         schematicPlacement.getSchematic().getMetadata().setTotalBlocks(totalBlocks);
 
         return true;
+    }
+
+    public static void moveCurrentlySelectedWorldRegionToLookingDirection(int amount, PlayerEntity player, MinecraftClient mc)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+
+        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        {
+            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(player), amount);
+            moveCurrentlySelectedWorldRegionTo(pos, mc);
+        }
+    }
+
+    public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos, MinecraftClient mc)
+    {
+        if (mc.player == null || mc.player.abilities.creativeMode == false)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+            return;
+        }
+
+        TaskScheduler scheduler = TaskScheduler.getServerInstanceIfExistsOrClient();
+        long currentTime = System.currentTimeMillis();
+
+        // Add a delay from the previous move operation, to allow time for
+        // server -> client chunk/block syncing, otherwise a subsequent move
+        // might wipe the area before the new blocks have arrived on the
+        // client and thus the new move schematic would just be air.
+        if ((currentTime - areaMovedTime) < 400 ||
+            scheduler.hasTask(TaskSaveSchematic.class) ||
+            scheduler.hasTask(TaskDeleteArea.class) ||
+            scheduler.hasTask(TaskPasteSchematicSetblock.class) ||
+            scheduler.hasTask(TaskPasteSchematicDirect.class))
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.move.pending_tasks");
+            return;
+        }
+
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+
+        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        {
+            LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, "");
+            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
+            taskSave.disableCompletionMessage();
+            areaMovedTime = System.currentTimeMillis();
+
+            taskSave.setCompletionListener(() ->
+            {
+                SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, "-", true, true);
+                DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, false);
+
+                TaskDeleteArea taskDelete = new TaskDeleteArea(area.getAllSubRegionBoxes(), true);
+                taskDelete.disableCompletionMessage();
+                areaMovedTime = System.currentTimeMillis();
+
+                taskDelete.setCompletionListener(() ->
+                {
+                    TaskBase taskPaste;
+
+                    if (mc.isIntegratedServerRunning())
+                    {
+                        taskPaste = new TaskPasteSchematicDirect(placement);
+                    }
+                    else
+                    {
+                        taskPaste = new TaskPasteSchematicSetblock(placement, false);
+                    }
+
+                    taskPaste.disableCompletionMessage();
+                    areaMovedTime = System.currentTimeMillis();
+
+                    taskPaste.setCompletionListener(() ->
+                    {
+                        SchematicHolder.getInstance().removeSchematic(schematic);
+                        area.moveEntireSelectionTo(pos, false);
+                        areaMovedTime = System.currentTimeMillis();
+                    });
+
+                    scheduler.scheduleTask(taskPaste, 1);
+                });
+
+                scheduler.scheduleTask(taskDelete, 1);
+            });
+
+            scheduler.scheduleTask(taskSave, 1);
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+        }
+    }
+
+    public static void cloneSelectionArea(MinecraftClient mc)
+    {
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+
+        if (area != null && area.getAllSubRegionBoxes().size() > 0)
+        {
+            LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, mc.player.getName().getString());
+            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
+            taskSave.disableCompletionMessage();
+
+            taskSave.setCompletionListener(() ->
+            {
+                SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+                String name = schematic.getMetadata().getName();
+                BlockPos origin = RayTraceUtils.getTargetedPosition(mc.world, mc.player, 6, false);
+
+                if (origin == null)
+                {
+                    origin = new BlockPos(mc.player);
+                }
+
+                SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, true);
+
+                manager.addSchematicPlacement(placement, false);
+                manager.setSelectedSchematicPlacement(placement);
+
+                if (mc.player.abilities.creativeMode)
+                {
+                    DataManager.setToolMode(ToolMode.PASTE_SCHEMATIC);
+                }
+            });
+
+            TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(taskSave, 10);
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+        }
     }
 
     @Nullable

@@ -436,7 +436,7 @@ public class LitematicaSchematic
                 {
                     BlockPos pos = entry.getKey().add(regionPosAbs);
                     ScheduledTick<Block> tick = entry.getValue();
-                    serverWorld.method_14196().schedule(pos, world.getBlockState(pos).getBlock(), (int) tick.time, tick.priority);
+                    serverWorld.method_14196().schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
                 }
             }
 
@@ -450,7 +450,7 @@ public class LitematicaSchematic
                     if (state.getFluidState().isEmpty() == false)
                     {
                         ScheduledTick<Fluid> tick = entry.getValue();
-                        serverWorld.method_14179().schedule(pos, state.getFluidState().getFluid(), (int) tick.time, tick.priority);
+                        serverWorld.method_14179().schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
                     }
                 }
             }
@@ -1323,28 +1323,34 @@ public class LitematicaSchematic
         {
             CompoundTag tag = tagList.getCompoundTag(i);
 
-            if (tag.containsKey("Block", Constants.NBT.TAG_STRING) &&
-                tag.containsKey("Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
+            if (tag.containsKey("Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
             {
-                T target;
+                T target = null;
 
-                if (clazz.getClass() == Block.class)
+                // Don't crash on invalid ResourceLocation in 1.13+
+                try
                 {
-                    target = (T) Registry.BLOCK.get(new Identifier(tag.getString("Block")));
-
-                    if (target == null || target == Blocks.AIR)
+                    if (clazz instanceof Block && tag.containsKey("Block", Constants.NBT.TAG_STRING))
                     {
-                        continue;
+                        target = (T) Registry.BLOCK.get(new Identifier(tag.getString("Block")));
+
+                        if (target == null || target == Blocks.AIR)
+                        {
+                            continue;
+                        }
+                    }
+                    else if (clazz instanceof Fluid && tag.containsKey("Fluid", Constants.NBT.TAG_STRING))
+                    {
+                        target = (T) Registry.FLUID.get(new Identifier(tag.getString("Fluid")));
+
+                        if (target == null || target == Fluids.EMPTY)
+                        {
+                            continue;
+                        }
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    target = (T) Registry.FLUID.get(new Identifier(tag.getString("Fluid")));
-
-                    if (target == null || target == Fluids.EMPTY)
-                    {
-                        continue;
-                    }
                 }
 
                 if (target != null)

@@ -401,10 +401,6 @@
     "litematica.hud.schematic_projects.project_name": "Project: %s",
     "litematica.hud.schematic_projects_mode": "§6Schematic Projects mode§r",
 
-    "litematica.tool_hud.block_1": "Block: %s",
-    "litematica.tool_hud.block_2": "Replace: %s",
-    "litematica.tool_hud.facing": "Facing: %s",
-
     "litematica.info.material_list": "- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one",
 
     "litematica.label.alignment.center": "Center",
@@ -420,6 +416,7 @@
     "litematica.message.error.no_area_selected": "§cNo area selected§r",
     "litematica.message.error.no_placement_selected": "§cNo placement selected§r",
     "litematica.message.error.only_works_in_single_player": "§cThis operation only works in single player§r",
+    "litematica.message.error.move.pending_tasks": "§cCan not start a move operation while there are pending tasks§r",
     "litematica.message.error.placement_paste_outside_world": "The placement can't be pasted in the current position, because it goes outside the world bounds",
     "litematica.message.error.schematic_paste_failed": "§cSchematic Paste to world failed§r",
     "litematica.message.error.schematic_save_failed": "Failed to save schematic to file '%s'",
@@ -478,10 +475,15 @@
 
     "litematica.warning.area_editor.area_rendering_disabled": "Note: The Area Selection boxes rendering is currently disabled\nSee Visuals -> %s, or Hotkeys -> %s ['%s']",
 
+    "litematica.tool_hud.block_1": "Block: %s",
+    "litematica.tool_hud.block_2": "Replace: %s",
+    "litematica.tool_hud.facing": "Facing: %s",
+
     "litematica.tool_mode.name.area_selection": "Area Selection",
     "litematica.tool_mode.name.delete": "Delete",
     "litematica.tool_mode.name.fill": "Fill",
     "litematica.tool_mode.name.grid_paste": "Grid Paste Schematic in world",
+    "litematica.tool_mode.name.move": "Move",
     "litematica.tool_mode.name.paste_schematic": "Paste Schematic in world",
     "litematica.tool_mode.name.rebuild": "Rebuild Schematic",
     "litematica.tool_mode.name.replace_block": "Replace block",

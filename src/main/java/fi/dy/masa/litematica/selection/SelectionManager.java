@@ -8,6 +8,13 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -26,16 +33,6 @@ import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 public class SelectionManager
 {
@@ -528,7 +525,7 @@ public class SelectionManager
 
             if (movingCorner || movingOrigin)
             {
-                BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
+                BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
                 if (pos == null)
                 {
@@ -586,7 +583,7 @@ public class SelectionManager
         {
             if (selection.isOriginSelected())
             {
-                BlockPos newOrigin = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
+                BlockPos newOrigin = RayTraceUtils.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
                 if (newOrigin != null)
                 {
@@ -612,7 +609,7 @@ public class SelectionManager
 
         if (area != null && area.getSelectedSubRegionBox() != null)
         {
-            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
+            BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
             if (pos != null)
             {
@@ -628,7 +625,7 @@ public class SelectionManager
 
         if (sel != null && sel.getSelectedSubRegionBox() != null)
         {
-            BlockPos pos = this.getTargetedPosition(mc.world, mc.player, maxDistance, true);
+            BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, mc.player, maxDistance, true);
 
             if (pos != null)
             {
@@ -665,27 +662,6 @@ public class SelectionManager
         {
             selection.renameSubRegionBox(selection.getName(), newName);
         }
-    }
-
-    @Nullable
-    private BlockPos getTargetedPosition(World world, PlayerEntity player, double maxDistance, boolean sneakToOffset)
-    {
-        HitResult trace = RayTraceUtils.getRayTraceFromEntity(world, player, false, maxDistance);
-
-        if (trace.getType() != HitResult.Type.BLOCK)
-        {
-            return null;
-        }
-
-        BlockPos pos = ((BlockHitResult) trace).getBlockPos();
-
-        // Sneaking puts the position adjacent the targeted block face, not sneaking puts it inside the targeted block
-        if (sneakToOffset && player.isSneaking())
-        {
-            pos = pos.offset(((BlockHitResult) trace).getSide());
-        }
-
-        return pos;
     }
 
     public void releaseGrabbedElement()

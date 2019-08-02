@@ -14,6 +14,7 @@ public enum ToolMode
     REPLACE_BLOCK       ("litematica.tool_mode.name.replace_block",         true, false, true, true),
     PASTE_SCHEMATIC     ("litematica.tool_mode.name.paste_schematic",       true, true),
     GRID_PASTE          ("litematica.tool_mode.name.grid_paste",            true, true),
+    MOVE                ("litematica.tool_mode.name.move",                  true, false),
     DELETE              ("litematica.tool_mode.name.delete",                true, false),
     REBUILD             ("litematica.tool_mode.name.rebuild",               false, true);
 

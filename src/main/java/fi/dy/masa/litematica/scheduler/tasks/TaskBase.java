@@ -5,6 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
@@ -15,11 +20,6 @@ import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
 public abstract class TaskBase implements ITask, IInfoHudRenderer
 {
@@ -29,7 +29,8 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     protected String name = "";
     protected List<String> infoHudLines = new ArrayList<>();
     protected boolean finished;
-    @Nullable protected ICompletionListener completionListener;
+    protected boolean printCompletionMessage = true;
+    @Nullable private ICompletionListener completionListener;
 
     protected TaskBase()
     {
@@ -52,6 +53,11 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     public void createTimer(int interval)
     {
         this.timer = new TaskTimer(interval);
+    }
+
+    public void disableCompletionMessage()
+    {
+        this.printCompletionMessage = false;
     }
 
     public void setCompletionListener(@Nullable ICompletionListener listener)
@@ -86,14 +92,17 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     {
         if (this.completionListener != null)
         {
-            if (this.finished)
+            this.mc.execute(() ->
             {
-                this.completionListener.onTaskCompleted();
-            }
-            else
-            {
-                this.completionListener.onTaskAborted();
-            }
+                if (this.finished)
+                {
+                    this.completionListener.onTaskCompleted();
+                }
+                else
+                {
+                    this.completionListener.onTaskAborted();
+                }
+            });
         }
     }
 

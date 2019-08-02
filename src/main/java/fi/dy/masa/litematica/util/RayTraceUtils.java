@@ -47,6 +47,28 @@ public class RayTraceUtils
     private static double closestOriginDistance;
     private static HitType originType;
 
+    @Nullable
+    public static BlockPos getTargetedPosition(World world, Entity player, double maxDistance, boolean sneakToOffset)
+    {
+        HitResult trace = getRayTraceFromEntity(world, player, false, maxDistance);
+
+        if (trace.getType() != HitResult.Type.BLOCK)
+        {
+            return null;
+        }
+
+        BlockHitResult traceBlock = (BlockHitResult) trace;
+        BlockPos pos = traceBlock.getBlockPos();
+
+        // Sneaking puts the position adjacent the targeted block face, not sneaking puts it inside the targeted block
+        if (sneakToOffset == player.isSneaking())
+        {
+            pos = pos.offset(traceBlock.getSide());
+        }
+
+        return pos;
+    }
+
     @Nonnull
     public static RayTraceWrapper getWrappedRayTraceFromEntity(World world, Entity entity, double range)
     {

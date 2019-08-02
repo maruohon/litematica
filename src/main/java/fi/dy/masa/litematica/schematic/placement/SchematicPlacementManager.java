@@ -65,6 +65,16 @@ public class SchematicPlacementManager
     @Nullable
     private SchematicPlacement selectedPlacement;
 
+    public boolean hasPendingRebuilds()
+    {
+        return this.chunksToRebuild.isEmpty() == false;
+    }
+
+    public boolean hasPendingRebuildFor(ChunkPos pos)
+    {
+        return this.chunksToRebuild.contains(pos);
+    }
+
     public boolean processQueuedChunks()
     {
         if (this.chunksToUnload.isEmpty() == false)
@@ -643,6 +653,11 @@ public class SchematicPlacementManager
 
     public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, MinecraftClient mc)
     {
+        this.pastePlacementToWorld(schematicPlacement, changedBlocksOnly, true, mc);
+    }
+
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, boolean printMessage, MinecraftClient mc)
+    {
         if (mc.player != null && mc.player.abilities.creativeMode)
         {
             if (schematicPlacement != null)
@@ -657,13 +672,16 @@ public class SchematicPlacementManager
                 {
                     final ServerWorld world = mc.getServer().getWorld(mc.player.getEntityWorld().dimension.getType());
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
-
                     MinecraftServer server = mc.getServer();
+
                     server.method_18858(new ServerTask(server.getTicks(), () ->
                     {
                         if (schematic.placeToWorld(world, schematicPlacement, false))
                         {
-                            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
+                            if (printMessage)
+                            {
+                                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
+                            }
                         }
                         else
                         {
@@ -671,13 +689,20 @@ public class SchematicPlacementManager
                         }
                     }));
 
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                    if (printMessage)
+                    {
+                        InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                    }
                 }
                 else
                 {
                     TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblock(schematicPlacement, changedBlocksOnly);
                     TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+
+                    if (printMessage)
+                    {
+                        InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                    }
                 }
             }
             else

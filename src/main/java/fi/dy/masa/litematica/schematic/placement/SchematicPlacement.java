@@ -108,7 +108,19 @@ public class SchematicPlacement
         // regardless of where the defined origin point is in relation to the minimum corner.
         Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(schematic.getAreas().values());
         BlockPos originAdjusted = pair != null ? origin.subtract(pair.getLeft()) : origin;
-        SchematicPlacement placement = new SchematicPlacement(schematic, originAdjusted, "?", true, true);
+
+        return createTemporary(schematic, originAdjusted);
+    }
+
+    /**
+     * Creates a temporary placement which doesn't affect the SchematicPlacementManager
+     * @param schematic
+     * @param origin
+     * @return
+     */
+    public static SchematicPlacement createTemporary(LitematicaSchematic schematic, BlockPos origin)
+    {
+        SchematicPlacement placement = new SchematicPlacement(schematic, origin, "?", true, true);
         placement.resetAllSubRegionsToSchematicValues(InfoUtils.INFO_MESSAGE_CONSUMER, false);
 
         return placement;
