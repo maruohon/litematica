@@ -225,6 +225,7 @@ public class SchematicaSchematic
             final int czStart = posMin.getZ() >> 4;
             final int cxEnd = posMax.getX() >> 4;
             final int czEnd = posMax.getZ() >> 4;
+            BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
 
             for (int cz = czStart; cz <= czEnd; ++cz)
             {
@@ -249,8 +250,8 @@ public class SchematicaSchematic
                                     continue;
                                 }
 
-                                BlockPos pos = new BlockPos(x, y, z);
-                                NBTTagCompound teNBT = this.tiles.get(pos);
+                                posMutable.setPos(xSrc, ySrc, zSrc);
+                                NBTTagCompound teNBT = this.tiles.get(posMutable);
 
                                 // TODO The rotations need to be transformed back to get the correct source position in the schematic...
                                 /*
@@ -259,6 +260,8 @@ public class SchematicaSchematic
                                 state = state.withMirror(mirror);
                                 state = state.withRotation(rotation);
                                 */
+
+                                BlockPos pos = new BlockPos(x, y, z);
 
                                 if (teNBT != null)
                                 {

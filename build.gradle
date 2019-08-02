@@ -55,7 +55,8 @@ minecraft {
 
 dependencies {
     implementation 'fi.dy.masa.malilib:malilib-rift-' + config.minecraft_version_out + ':' + config.malilib_version + ':deobf'
-    implementation 'com.github.Chocohead:Rift:jitpack-SNAPSHOT:dev'
+    //implementation 'com.github.Chocohead:Rift:jitpack-SNAPSHOT:dev'
+    implementation 'com.github.Chocohead:Rift:jitpack-aeee80c1fb-1:dev'
 }
 
 /*

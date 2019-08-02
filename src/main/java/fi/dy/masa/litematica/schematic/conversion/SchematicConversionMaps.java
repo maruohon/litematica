@@ -1,7 +1,8 @@
 package fi.dy.masa.litematica.schematic.conversion;
 
 import java.util.ArrayList;
-import com.google.common.collect.HashBiMap;
+import java.util.HashMap;
+import javax.annotation.Nullable;
 import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.Dynamic;
 import fi.dy.masa.litematica.Litematica;
@@ -17,15 +18,17 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.datafix.TypeReferences;
-import net.minecraft.util.datafix.fixes.BlockStateFlatteningMap;
 
 public class SchematicConversionMaps
 {
     private static final Object2IntOpenHashMap<String> OLD_BLOCK_NAME_TO_SHIFTED_BLOCK_ID = DataFixUtils.make(new Object2IntOpenHashMap<>(), (map) -> { map.defaultReturnValue(-1); });
+    private static final Int2ObjectOpenHashMap<String> ID_META_TO_UPDATED_NAME = new Int2ObjectOpenHashMap<>();
     private static final Object2IntOpenHashMap<IBlockState> BLOCKSTATE_TO_ID_META = DataFixUtils.make(new Object2IntOpenHashMap<>(), (map) -> { map.defaultReturnValue(-1); });
     private static final Int2ObjectOpenHashMap<IBlockState> ID_META_TO_BLOCKSTATE = new Int2ObjectOpenHashMap<>();
-    private static final HashBiMap<String, String> OLD_NAME_TO_NEW_NAME = HashBiMap.create();
-    private static final HashBiMap<NBTTagCompound, NBTTagCompound> OLD_STATE_TO_NEW_STATE = HashBiMap.create();
+    private static final HashMap<String, String> OLD_NAME_TO_NEW_NAME = new HashMap<>();
+    private static final HashMap<String, String> NEW_NAME_TO_OLD_NAME = new HashMap<>();
+    private static final HashMap<NBTTagCompound, NBTTagCompound> OLD_STATE_TO_NEW_STATE = new HashMap<>();
+    private static final HashMap<NBTTagCompound, NBTTagCompound> NEW_STATE_TO_OLD_STATE = new HashMap<>();
     private static final ArrayList<ConversionData> CACHED_DATA = new ArrayList<>();
 
     public static void addEntry(int idMeta, String newStateString, String... oldStateStrings)
@@ -36,6 +39,7 @@ public class SchematicConversionMaps
     public static void computeMaps()
     {
         clearMaps();
+        addOverrides();
 
         for (ConversionData data : CACHED_DATA)
         {
@@ -43,12 +47,21 @@ public class SchematicConversionMaps
             {
                 if (data.oldStateStrings.length > 0)
                 {
-                    Dynamic<?> dynamic = BlockStateFlatteningMap.makeDynamic(data.oldStateStrings[0]);
-                    String name = dynamic.getString("Name");
-                    OLD_BLOCK_NAME_TO_SHIFTED_BLOCK_ID.putIfAbsent(name, data.idMeta & 0xFFFFFFF0);
+                    NBTTagCompound oldStateTag = getStateTagFromString(data.oldStateStrings[0]);
+
+                    if (oldStateTag != null)
+                    {
+                        String name = oldStateTag.getString("Name");
+                        OLD_BLOCK_NAME_TO_SHIFTED_BLOCK_ID.putIfAbsent(name, data.idMeta & 0xFFF0);
+                    }
                 }
 
-                addIdMetaToBlockState(data.idMeta, BlockStateFlatteningMap.makeDynamic(data.newStateString), data.oldStateStrings);
+                NBTTagCompound newStateTag = getStateTagFromString(data.newStateString);
+
+                if (newStateTag != null)
+                {
+                    addIdMetaToBlockState(data.idMeta, newStateTag, data.oldStateStrings);
+                }
             }
             catch (Exception e)
             {
@@ -57,16 +70,22 @@ public class SchematicConversionMaps
         }
     }
 
-    public static NBTTagCompound get_1_13_2_StateTagFor_1_12_tag(NBTTagCompound oldStateTag)
+    @Nullable
+    public static IBlockState get_1_13_2_StateForIdMeta(int idMeta)
     {
-        NBTTagCompound tag = OLD_STATE_TO_NEW_STATE.get(oldStateTag);
-        return tag != null ? tag : NBTUtil.writeBlockState(Blocks.AIR.getDefaultState());
+        return ID_META_TO_BLOCKSTATE.get(idMeta);
     }
 
-    public static NBTTagCompound get_1_12_StateTagFor_1_13_2_tag(NBTTagCompound newStateTag)
+    public static NBTTagCompound get_1_13_2_StateTagFor_1_12_Tag(NBTTagCompound oldStateTag)
     {
-        NBTTagCompound tag = OLD_STATE_TO_NEW_STATE.inverse().get(newStateTag);
-        return tag != null ? tag : NBTUtil.writeBlockState(Blocks.AIR.getDefaultState());
+        NBTTagCompound tag = OLD_STATE_TO_NEW_STATE.get(oldStateTag);
+        return tag != null ? tag : oldStateTag;
+    }
+
+    public static NBTTagCompound get_1_12_StateTagFor_1_13_2_Tag(NBTTagCompound newStateTag)
+    {
+        NBTTagCompound tag = NEW_STATE_TO_OLD_STATE.get(newStateTag);
+        return tag != null ? tag : newStateTag;
     }
 
     public static int getOldNameToShiftedBlockId(String oldBlockname)
@@ -79,57 +98,79 @@ public class SchematicConversionMaps
         IBlockState air = Blocks.AIR.getDefaultState();
         BLOCKSTATE_TO_ID_META.put(air, 0);
         ID_META_TO_BLOCKSTATE.put(0, air);
+
+        // These will get converted to the correct type in the state fixers
+        ID_META_TO_UPDATED_NAME.put(2304, "minecraft:skeleton_skull");
+        ID_META_TO_UPDATED_NAME.put(2305, "minecraft:skeleton_skull");
+        ID_META_TO_UPDATED_NAME.put(2306, "minecraft:skeleton_wall_skull");
+        ID_META_TO_UPDATED_NAME.put(2307, "minecraft:skeleton_wall_skull");
+        ID_META_TO_UPDATED_NAME.put(2308, "minecraft:skeleton_wall_skull");
+        ID_META_TO_UPDATED_NAME.put(2309, "minecraft:skeleton_wall_skull");
+        ID_META_TO_UPDATED_NAME.put(2312, "minecraft:skeleton_skull");
+        ID_META_TO_UPDATED_NAME.put(2313, "minecraft:skeleton_skull");
+        ID_META_TO_UPDATED_NAME.put(2314, "minecraft:skeleton_wall_skull");
+        ID_META_TO_UPDATED_NAME.put(2315, "minecraft:skeleton_wall_skull");
+        ID_META_TO_UPDATED_NAME.put(2316, "minecraft:skeleton_wall_skull");
+        ID_META_TO_UPDATED_NAME.put(2317, "minecraft:skeleton_wall_skull");
     }
 
     private static void clearMaps()
     {
         OLD_BLOCK_NAME_TO_SHIFTED_BLOCK_ID.clear();
+        ID_META_TO_UPDATED_NAME.clear();
+
         BLOCKSTATE_TO_ID_META.clear();
         ID_META_TO_BLOCKSTATE.clear();
 
-        addOverrides();
+        OLD_NAME_TO_NEW_NAME.clear();
+        NEW_NAME_TO_OLD_NAME.clear();
+
+        OLD_STATE_TO_NEW_STATE.clear();
+        NEW_STATE_TO_OLD_STATE.clear();
     }
 
-    private static void addIdMetaToBlockState(int idMeta, Dynamic<?> newStateString, String... oldStateStrings)
+    private static void addIdMetaToBlockState(int idMeta, NBTTagCompound newStateTag, String... oldStateStrings)
     {
         try
         {
-            NBTTagCompound tag = (NBTTagCompound) newStateString.getValue();
+            // The flattening map actually has outdated names for some blocks...
+            // Ie. some blocks were renamed after the flattening, so we need to handle those here.
+            String newName = newStateTag.getString("Name");
+            String overriddenName = ID_META_TO_UPDATED_NAME.get(idMeta);
 
-            if (tag != null)
+            if (overriddenName != null)
             {
-                tag = tag.copy();
-
-                // Run the DataFixer for the block name, for blocks that were renamed after the flattening.
-                // ie. the flattening map actually has outdated names for some blocks... >_>
-                String namePre = tag.getString("Name");
-
-                if (namePre.equals("%%FILTER_ME%%"))
-                {
-                    // FIXME
-                    tag.putString("Name", "minecraft:skull");
-                }
-                else
-                {
-                    tag.putString("Name", updateBlockName(namePre));
-                }
-
-                String newName = tag.getString("Name");
-
-                if (OLD_NAME_TO_NEW_NAME.containsKey(namePre) == false &&
-                    OLD_NAME_TO_NEW_NAME.inverse().containsKey(newName) == false)
-                {
-                    OLD_NAME_TO_NEW_NAME.put(namePre, newName);
-                }
-
-                IBlockState state = NBTUtil.readBlockState(tag);
-                ID_META_TO_BLOCKSTATE.put(idMeta, state);
-
-                // Don't override the id and meta for air, which is what unrecognized blocks will turn into
-                BLOCKSTATE_TO_ID_META.putIfAbsent(state, idMeta);
-
-                addOldStateToNewState(tag, oldStateStrings);
+                newName = overriddenName;
+                newStateTag.putString("Name", newName);
             }
+
+            if (oldStateStrings.length > 0)
+            {
+                NBTTagCompound oldStateTag = getStateTagFromString(oldStateStrings[0]);
+                String oldName = oldStateTag.getString("Name");
+
+                // Don't run the vanilla block rename for overidden names
+                if (overriddenName == null)
+                {
+                    newName = updateBlockName(newName);
+                    newStateTag.putString("Name", newName);
+                }
+
+                if (oldName.equals(newName) == false)
+                {
+                    OLD_NAME_TO_NEW_NAME.putIfAbsent(oldName, newName);
+                    NEW_NAME_TO_OLD_NAME.putIfAbsent(newName, oldName);
+                }
+
+                addOldStateToNewState(newStateTag, oldStateStrings);
+            }
+
+            IBlockState state = NBTUtil.readBlockState(newStateTag);
+            //System.out.printf("id: %5d, state: %s, tag: %s\n", idMeta, state, newStateTag);
+            ID_META_TO_BLOCKSTATE.putIfAbsent(idMeta, state);
+
+            // Don't override the id and meta for air, which is what unrecognized blocks will turn into
+            BLOCKSTATE_TO_ID_META.putIfAbsent(state, idMeta);
         }
         catch (Exception e)
         {
@@ -144,12 +185,12 @@ public class SchematicConversionMaps
             // A 1:1 mapping from the old state to the new state
             if (oldStateStrings.length == 1)
             {
-                NBTTagCompound oldStateTag = JsonToNBT.getTagFromJson(oldStateStrings[0].replace('\'', '"'));
+                NBTTagCompound oldStateTag = getStateTagFromString(oldStateStrings[0]);
 
-                if (OLD_STATE_TO_NEW_STATE.containsKey(oldStateTag) == false &&
-                    OLD_STATE_TO_NEW_STATE.inverse().containsKey(newStateTagIn) == false)
+                if (oldStateTag != null)
                 {
-                    OLD_STATE_TO_NEW_STATE.put(oldStateTag, newStateTagIn);
+                    OLD_STATE_TO_NEW_STATE.putIfAbsent(oldStateTag, newStateTagIn);
+                    NEW_STATE_TO_OLD_STATE.putIfAbsent(newStateTagIn, oldStateTag);
                 }
             }
             // Multiple old states collapsed into one new state.
@@ -157,11 +198,11 @@ public class SchematicConversionMaps
             // some of the property values were calculated in the getActualState() method.
             else if (oldStateStrings.length > 1)
             {
-                NBTTagCompound oldStateTag = JsonToNBT.getTagFromJson(oldStateStrings[0].replace('\'', '"'));
+                NBTTagCompound oldStateTag = getStateTagFromString(oldStateStrings[0]);
 
                 // Same property names and same number of properties - just remap the block name.
                 // FIXME Is this going to be correct for everything?
-                if (newStateTagIn.keySet().equals(oldStateTag.keySet()))
+                if (oldStateTag != null && newStateTagIn.keySet().equals(oldStateTag.keySet()))
                 {
                     String oldBlockName = oldStateTag.getString("Name");
                     String newBlockName = OLD_NAME_TO_NEW_NAME.get(oldBlockName);
@@ -170,14 +211,15 @@ public class SchematicConversionMaps
                     {
                         for (String oldStateString : oldStateStrings)
                         {
-                            oldStateTag = JsonToNBT.getTagFromJson(oldStateString.replace('\'', '"'));
-                            NBTTagCompound newTag = oldStateTag.copy();
-                            newTag.putString("Name", newBlockName);
+                            oldStateTag = getStateTagFromString(oldStateString);
 
-                            if (OLD_STATE_TO_NEW_STATE.containsKey(oldStateTag) == false &&
-                                OLD_STATE_TO_NEW_STATE.inverse().containsKey(newTag) == false)
+                            if (oldStateTag != null)
                             {
-                                OLD_STATE_TO_NEW_STATE.put(oldStateTag, newTag);
+                                NBTTagCompound newTag = oldStateTag.copy();
+                                newTag.putString("Name", newBlockName);
+
+                                OLD_STATE_TO_NEW_STATE.putIfAbsent(oldStateTag, newTag);
+                                NEW_STATE_TO_OLD_STATE.putIfAbsent(newTag, oldStateTag);
                             }
                         }
                     }
@@ -187,6 +229,18 @@ public class SchematicConversionMaps
         catch (Exception e)
         {
             Litematica.logger.warn("addOldStateToNewState(): Exception while adding new blockstate to old blockstate conversion map entry for '{}'", newStateTagIn, e);
+        }
+    }
+
+    public static NBTTagCompound getStateTagFromString(String str)
+    {
+        try
+        {
+            return JsonToNBT.getTagFromJson(str.replace('\'', '"'));
+        }
+        catch (Exception e)
+        {
+            return null;
         }
     }
 

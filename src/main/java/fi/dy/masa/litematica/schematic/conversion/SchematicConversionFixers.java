@@ -349,8 +349,13 @@ public class SchematicConversionFixers
 
         if (tag != null)
         {
+            int id = MathHelper.clamp(tag.getByte("SkullType"), 0, 5);
+
+            // ;_; >_> <_<
+            if (id == 2) { id = 3; } else if (id == 3) { id = 2; }
+
             BlockSkull.ISkullType typeOrig = ((BlockAbstractSkull) state.getBlock()).getSkullType();
-            BlockSkull.ISkullType typeFromData = BlockSkull.Types.values()[MathHelper.clamp(tag.getByte("SkullType"), 0, 5)];
+            BlockSkull.ISkullType typeFromData = BlockSkull.Types.values()[id];
 
             if (typeOrig != typeFromData)
             {
@@ -391,8 +396,13 @@ public class SchematicConversionFixers
 
         if (tag != null)
         {
+            int id = MathHelper.clamp(tag.getByte("SkullType"), 0, 5);
+
+            // ;_; >_> <_<
+            if (id == 2) { id = 3; } else if (id == 3) { id = 2; }
+
             BlockSkull.ISkullType typeOrig = ((BlockAbstractSkull) state.getBlock()).getSkullType();
-            BlockSkull.ISkullType typeFromData = BlockSkull.Types.values()[MathHelper.clamp(tag.getByte("SkullType"), 0, 5)];
+            BlockSkull.ISkullType typeFromData = BlockSkull.Types.values()[id];
 
             if (typeOrig != typeFromData)
             {

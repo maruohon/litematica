@@ -1289,7 +1289,7 @@ public class LitematicaSchematic
 
             for (int i = 0; i < count; ++i)
             {
-                newPalette.add(SchematicConversionMaps.get_1_13_2_StateTagFor_1_12_tag(oldPalette.getCompound(i)));
+                newPalette.add(SchematicConversionMaps.get_1_13_2_StateTagFor_1_12_Tag(oldPalette.getCompound(i)));
             }
 
             return newPalette;

@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.schematic.conversion;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
 import javax.annotation.Nullable;
-import com.mojang.datafixers.Dynamic;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers.IStateFixer;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -27,11 +26,7 @@ import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.BlockShearableDoublePlant;
 import net.minecraft.block.BlockSkull;
-import net.minecraft.block.BlockSkullPlayer;
 import net.minecraft.block.BlockSkullWall;
-import net.minecraft.block.BlockSkullWallPlayer;
-import net.minecraft.block.BlockSkullWither;
-import net.minecraft.block.BlockSkullWitherWall;
 import net.minecraft.block.BlockStainedGlassPane;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockStem;
@@ -42,8 +37,6 @@ import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.datafix.fixes.BlockStateFlatteningMap;
 
 public class SchematicConverter
 {
@@ -65,34 +58,19 @@ public class SchematicConverter
         int shiftedOldVanillaId = SchematicConversionMaps.getOldNameToShiftedBlockId(blockName);
         int successCount = 0;
 
-        System.out.printf("blockName: %s, shiftedOldVanillaId: %d\n", blockName, shiftedOldVanillaId);
+        //System.out.printf("blockName: %s, shiftedOldVanillaId: %d\n", blockName, shiftedOldVanillaId);
         if (shiftedOldVanillaId >= 0)
         {
             for (int meta = 0; meta < 16; ++meta)
             {
                 // Make sure to clear the meta bits, in case the entry in the map for the name wasn't for meta 0
-                Dynamic<?> newStateString = BlockStateFlatteningMap.getFixedNBTForID((shiftedOldVanillaId & 0xFFF0) | meta);
-                try
+                IBlockState state = SchematicConversionMaps.get_1_13_2_StateForIdMeta((shiftedOldVanillaId & 0xFFF0) | meta);
+
+                if (state != null)
                 {
-                    NBTTagCompound tag = (NBTTagCompound) newStateString.getValue();//.JsonToNBT.getTagFromJson(optional.get().replace('\'', '"'));
-
-                    if (tag != null)
-                    {
-                        tag = tag.copy();
-
-                        // Run the DataFixer for the block name, for blocks that were renamed after the flattening.
-                        // ie. the flattening map actually has outdated names for some blocks... >_>
-                        String namePre = tag.getString("Name");
-                        //tag.putString("Name", SchematicConversionMaps.updateBlockName(namePre));
-
-                        IBlockState state = NBTUtil.readBlockState(tag);
-                        System.out.printf("idMeta: %3d: name pre: %s, post: %s, state: %s\n", (shiftedOldVanillaId & 0xFFF0) | meta, namePre, tag.getString("Name"), state);
-                        paletteOut[(schematicBlockId << 4) | meta] = state;
-                        ++successCount;
-                    }
-                }
-                catch (Exception e)
-                {
+                    paletteOut[(schematicBlockId << 4) | meta] = state;
+                    ++successCount;
+                    //System.out.printf("idMeta: %5d: state: %s\n", (shiftedOldVanillaId & 0xFFF0) | meta, state);
                 }
             }
         }
@@ -210,9 +188,5 @@ public class SchematicConverter
         this.fixersPerBlock.put(BlockNote.class,                    SchematicConversionFixers.FIXER_NOTE_BLOCK);
         this.fixersPerBlock.put(BlockSkull.class,                   SchematicConversionFixers.FIXER_SKULL);
         this.fixersPerBlock.put(BlockSkullWall.class,               SchematicConversionFixers.FIXER_SKULL_WALL);
-        this.fixersPerBlock.put(BlockSkullPlayer.class,             SchematicConversionFixers.FIXER_SKULL);
-        this.fixersPerBlock.put(BlockSkullWallPlayer.class,         SchematicConversionFixers.FIXER_SKULL_WALL);
-        this.fixersPerBlock.put(BlockSkullWither.class,             SchematicConversionFixers.FIXER_SKULL);
-        this.fixersPerBlock.put(BlockSkullWitherWall.class,         SchematicConversionFixers.FIXER_SKULL_WALL);
     }
 }
