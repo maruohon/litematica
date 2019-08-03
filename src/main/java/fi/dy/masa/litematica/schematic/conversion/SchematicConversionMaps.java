@@ -68,6 +68,8 @@ public class SchematicConversionMaps
                 Litematica.logger.warn("addEntry(): Exception while adding blockstate conversion map entry for ID '{}' (fixed state: '{}')", data.idMeta, data.newStateString, e);
             }
         }
+
+        StateTagFixers_1_12_to_1_13_2.init();
     }
 
     @Nullable
@@ -99,9 +101,9 @@ public class SchematicConversionMaps
         BLOCKSTATE_TO_ID_META.put(air, 0);
         ID_META_TO_BLOCKSTATE.put(0, air);
 
-        // These will get converted to the correct type in the state fixers
         ID_META_TO_UPDATED_NAME.put(1648, "minecraft:melon");
 
+        // These will get converted to the correct type in the state fixers
         ID_META_TO_UPDATED_NAME.put(2304, "minecraft:skeleton_skull");
         ID_META_TO_UPDATED_NAME.put(2305, "minecraft:skeleton_skull");
         ID_META_TO_UPDATED_NAME.put(2306, "minecraft:skeleton_wall_skull");
@@ -115,6 +117,7 @@ public class SchematicConversionMaps
         ID_META_TO_UPDATED_NAME.put(2316, "minecraft:skeleton_wall_skull");
         ID_META_TO_UPDATED_NAME.put(2317, "minecraft:skeleton_wall_skull");
 
+        // From the old Purple Shulker Box to the new default/non-colored Shulker Box
         ID_META_TO_UPDATED_NAME.put(3664, "minecraft:shulker_box");
         ID_META_TO_UPDATED_NAME.put(3665, "minecraft:shulker_box");
         ID_META_TO_UPDATED_NAME.put(3666, "minecraft:shulker_box");
@@ -210,14 +213,34 @@ public class SchematicConversionMaps
             {
                 NBTTagCompound oldStateTag = getStateTagFromString(oldStateStrings[0]);
 
-                // Same property names and same number of properties - just remap the block name.
-                // FIXME Is this going to be correct for everything?
-                if (oldStateTag != null && newStateTagIn.keySet().equals(oldStateTag.keySet()))
+                if (oldStateTag != null)
                 {
-                    String oldBlockName = oldStateTag.getString("Name");
-                    String newBlockName = OLD_NAME_TO_NEW_NAME.get(oldBlockName);
+                    // Same property names and same number of properties - just remap the block name.
+                    // FIXME Is this going to be correct for everything?
+                    if (newStateTagIn.keySet().equals(oldStateTag.keySet()))
+                    {
+                        String oldBlockName = oldStateTag.getString("Name");
+                        String newBlockName = OLD_NAME_TO_NEW_NAME.get(oldBlockName);
 
-                    if (newBlockName != null && newBlockName.equals(oldBlockName) == false)
+                        if (newBlockName != null && newBlockName.equals(oldBlockName) == false)
+                        {
+                            for (String oldStateString : oldStateStrings)
+                            {
+                                oldStateTag = getStateTagFromString(oldStateString);
+
+                                if (oldStateTag != null)
+                                {
+                                    NBTTagCompound newStateTag = oldStateTag.copy();
+                                    newStateTag.putString("Name", newBlockName);
+
+                                    OLD_STATE_TO_NEW_STATE.putIfAbsent(oldStateTag, newStateTag);
+                                    NEW_STATE_TO_OLD_STATE.putIfAbsent(newStateTag, oldStateTag);
+                                }
+                            }
+                        }
+                    }
+                    // The property names or the set of properties changed, use the state fixers
+                    else
                     {
                         for (String oldStateString : oldStateStrings)
                         {
@@ -225,11 +248,10 @@ public class SchematicConversionMaps
 
                             if (oldStateTag != null)
                             {
-                                NBTTagCompound newTag = oldStateTag.copy();
-                                newTag.putString("Name", newBlockName);
+                                NBTTagCompound newStateTag = StateTagFixers_1_12_to_1_13_2.fixStateTag(oldStateTag);
 
-                                OLD_STATE_TO_NEW_STATE.putIfAbsent(oldStateTag, newTag);
-                                NEW_STATE_TO_OLD_STATE.putIfAbsent(newTag, oldStateTag);
+                                OLD_STATE_TO_NEW_STATE.putIfAbsent(oldStateTag, newStateTag);
+                                NEW_STATE_TO_OLD_STATE.putIfAbsent(newStateTag, oldStateTag);
                             }
                         }
                     }
