@@ -47,8 +47,8 @@ public class SchematicaSchematic
     public static final String FILE_EXTENSION = ".schematic";
 
     private final SchematicConverter converter;
+    private final BlockState[] palette = new BlockState[65536];
     private LitematicaBlockStateContainer blocks;
-    private BlockState[] palette = new BlockState[65536];
     private Map<BlockPos, CompoundTag> tiles = new HashMap<>();
     private List<CompoundTag> entities = new ArrayList<>();
     private Vec3i size = Vec3i.ZERO;
@@ -492,12 +492,6 @@ public class SchematicaSchematic
                     Litematica.logger.warn(str);
                 }
             }
-
-            if (this.converter.createPostProcessStateFilter(this.palette))
-            {
-                this.postProcessingFilter = this.converter.getPostProcessStateFilter();
-                this.needsConversionPostProcessing = true;
-            }
         }
         // MCEdit2 palette
         else if (nbt.containsKey("BlockIDs", Constants.NBT.TAG_COMPOUND))
@@ -537,18 +531,17 @@ public class SchematicaSchematic
                     Litematica.logger.warn(str);
                 }
             }
-
-            if (this.converter.createPostProcessStateFilter(this.palette))
-            {
-                this.postProcessingFilter = this.converter.getPostProcessStateFilter();
-                this.needsConversionPostProcessing = true;
-            }
         }
-        // No palette, use the current registry IDs directly
+        // No palette, use old vanilla IDs
         else
         {
-            Litematica.logger.error("SchematicaSchematic: Registry based palette is not supported in 1.13+");
-            return false;
+            this.converter.getVanillaBlockPalette(this.palette);
+        }
+
+        if (this.converter.createPostProcessStateFilter(this.palette))
+        {
+            this.postProcessingFilter = this.converter.getPostProcessStateFilter();
+            this.needsConversionPostProcessing = true;
         }
 
         return true;
