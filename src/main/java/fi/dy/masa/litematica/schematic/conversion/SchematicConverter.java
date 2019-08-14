@@ -82,6 +82,21 @@ public class SchematicConverter
         return successCount > 0;
     }
 
+    public boolean getVanillaBlockPalette(IBlockState[] paletteOut)
+    {
+        for (int idMeta = 0; idMeta < paletteOut.length; ++idMeta)
+        {
+            IBlockState state = SchematicConversionMaps.get_1_13_2_StateForIdMeta(idMeta);
+
+            if (state != null)
+            {
+                paletteOut[idMeta] = state;
+            }
+        }
+
+        return true;
+    }
+
     public IBlockState[] getBlockStatePaletteForBlockPalette(String[] blockPalette)
     {
         IBlockState[] palette = new IBlockState[blockPalette.length * 16];

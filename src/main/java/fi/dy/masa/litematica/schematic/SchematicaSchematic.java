@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.conversion.IBlockReaderWithData;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers.IStateFixer;
+import fi.dy.masa.litematica.schematic.conversion.SchematicConversionMaps;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConverter;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -49,8 +50,8 @@ public class SchematicaSchematic
     public static final String FILE_EXTENSION = ".schematic";
 
     private final SchematicConverter converter;
+    private final IBlockState[] palette = new IBlockState[65536];
     private LitematicaBlockStateContainer blocks;
-    private IBlockState[] palette = new IBlockState[65536];
     private Map<BlockPos, NBTTagCompound> tiles = new HashMap<>();
     private List<NBTTagCompound> entities = new ArrayList<>();
     private Vec3i size = Vec3i.NULL_VECTOR;
@@ -502,12 +503,6 @@ public class SchematicaSchematic
                     Litematica.logger.warn(str);
                 }
             }
-
-            if (this.converter.createPostProcessStateFilter(this.palette))
-            {
-                this.postProcessingFilter = this.converter.getPostProcessStateFilter();
-                this.needsConversionPostProcessing = true;
-            }
         }
         // MCEdit2 palette
         else if (nbt.contains("BlockIDs", Constants.NBT.TAG_COMPOUND))
@@ -547,18 +542,17 @@ public class SchematicaSchematic
                     Litematica.logger.warn(str);
                 }
             }
-
-            if (this.converter.createPostProcessStateFilter(this.palette))
-            {
-                this.postProcessingFilter = this.converter.getPostProcessStateFilter();
-                this.needsConversionPostProcessing = true;
-            }
         }
-        // No palette, use the current registry IDs directly
+        // No palette, use old vanilla IDs
         else
         {
-            Litematica.logger.error("SchematicaSchematic: Registry based palette is not supported in 1.13+");
-            return false;
+            this.converter.getVanillaBlockPalette(this.palette);
+        }
+
+        if (this.converter.createPostProcessStateFilter(this.palette))
+        {
+            this.postProcessingFilter = this.converter.getPostProcessStateFilter();
+            this.needsConversionPostProcessing = true;
         }
 
         return true;
