@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import javax.annotation.Nullable;
+import net.minecraft.class_4543;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -11,13 +12,17 @@ import net.minecraft.world.ExtendedBlockView;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.light.LightingProvider;
+import fi.dy.masa.litematica.world.FakeLightingProvider;
 
 public class ChunkCacheSchematic implements ExtendedBlockView
 {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
 
+    private final FakeLightingProvider lightingProvider;
     protected int chunkStartX;
     protected int chunkStartZ;
     protected WorldChunk[][] chunkArray;
@@ -26,6 +31,8 @@ public class ChunkCacheSchematic implements ExtendedBlockView
 
     public ChunkCacheSchematic(ClientWorld worldIn, BlockPos pos, int expand)
     {
+        this.lightingProvider = new FakeLightingProvider();
+
         this.world = worldIn;
         this.chunkStartX = (pos.getX() - expand) >> 4;
         this.chunkStartZ = (pos.getZ() - expand) >> 4;
@@ -88,10 +95,7 @@ public class ChunkCacheSchematic implements ExtendedBlockView
     @Override
     public Biome getBiome(BlockPos pos)
     {
-        int cx = (pos.getX() >> 4) - this.chunkStartX;
-        int cz = (pos.getZ() >> 4) - this.chunkStartZ;
-
-        return this.chunkArray[cx][cz].getBiome(pos);
+        return Biomes.THE_END;
     }
 
     @Override
@@ -121,5 +125,17 @@ public class ChunkCacheSchematic implements ExtendedBlockView
     {
         // TODO change when fluids become separate
         return this.getBlockState(pos).getFluidState();
+    }
+
+    @Override
+    public class_4543 method_22385()
+    {
+        return null;
+    }
+
+    @Override
+    public LightingProvider method_22336()
+    {
+        return this.lightingProvider;
     }
 }

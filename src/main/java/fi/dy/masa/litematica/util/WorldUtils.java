@@ -392,7 +392,7 @@ public class WorldUtils
                     // The creative mode pick block with NBT only works correctly
                     // if the server world doesn't have a TileEntity in that position.
                     // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (GuiBase.isCtrlDown() && te != null && mc.world.isAir(pos))
+                    if (GuiBase.isCtrlDown() && te != null && mc.world.method_22347(pos)) // isAir
                     {
                         ItemUtils.storeTEInStack(stack, te);
                     }
@@ -733,7 +733,7 @@ public class WorldUtils
 
             World worldSchematic = SchematicWorldHandler.getSchematicWorld();
             LayerRange range = DataManager.getRenderLayerRange();
-            boolean schematicHasAir = worldSchematic.isAir(pos);
+            boolean schematicHasAir = worldSchematic.method_22347(pos); // isAir
 
             // The targeted position is outside the current render range
             if (schematicHasAir == false && range.isPositionWithinRange(pos) == false)

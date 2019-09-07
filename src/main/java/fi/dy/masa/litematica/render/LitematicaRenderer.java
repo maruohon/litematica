@@ -2,20 +2,21 @@ package fi.dy.masa.litematica.render;
 
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
-import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.render.shader.ShaderProgram;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.FrustumWithOrigin;
 import net.minecraft.client.render.VisibleRegion;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.render.shader.ShaderProgram;
 
 public class LitematicaRenderer
 {
@@ -237,7 +238,7 @@ public class LitematicaRenderer
             GlStateManager.lineWidth(lineWidth);
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-            GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, 240.0F, 240.0F);
+            RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240.0F, 240.0F);
 
             if (renderThrough)
             {
@@ -256,7 +257,7 @@ public class LitematicaRenderer
 
     public void startShaderIfEnabled()
     {
-        this.translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && GLX.usePostProcess;
+        this.translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
 
         if (this.translucentSchematic)
         {

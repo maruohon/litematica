@@ -1,11 +1,12 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import org.lwjgl.opengl.GL11;
-import com.mojang.blaze3d.platform.GLX;
+import org.lwjgl.opengl.GL13;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.client.gl.GlBuffer;
+import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 
 public class ChunkRendererListSchematicVbo extends ChunkRendererListSchematicBase
 {
@@ -74,9 +75,9 @@ public class ChunkRendererListSchematicVbo extends ChunkRendererListSchematicBas
         GlStateManager.vertexPointer(3, GL11.GL_FLOAT, 28, 0);
         GlStateManager.colorPointer(4, GL11.GL_UNSIGNED_BYTE, 28, 12);
         GlStateManager.texCoordPointer(2, GL11.GL_FLOAT, 28, 16);
-        GLX.glClientActiveTexture(GLX.GL_TEXTURE1);
+        RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE1);
         GlStateManager.texCoordPointer(2, GL11.GL_SHORT, 28, 24);
-        GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
+        RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE0);
     }
 
     private void setupArrayPointersOverlay()
