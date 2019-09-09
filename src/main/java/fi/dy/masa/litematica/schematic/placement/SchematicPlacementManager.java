@@ -14,6 +14,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -40,15 +49,6 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 
 public class SchematicPlacementManager
 {
@@ -315,6 +315,23 @@ public class SchematicPlacementManager
         }
 
         return ret;
+    }
+
+    public List<SchematicPlacement> getAllPlacementsOfSchematic(LitematicaSchematic schematic)
+    {
+        List<SchematicPlacement> list = new ArrayList<>();
+
+        for (int i = 0; i < this.schematicPlacements.size(); ++i)
+        {
+            SchematicPlacement placement = this.schematicPlacements.get(i);
+
+            if (placement.getSchematic() == schematic)
+            {
+                list.add(placement);
+            }
+        }
+
+        return list;
     }
 
     public void removeAllPlacementsOfSchematic(LitematicaSchematic schematic)

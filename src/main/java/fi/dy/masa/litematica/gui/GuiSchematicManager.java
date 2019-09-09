@@ -5,11 +5,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
 import javax.annotation.Nullable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ScreenShotHelper;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.config.options.IConfigOptionList;
@@ -28,8 +33,6 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ScreenShotHelper;
 
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
@@ -352,11 +355,30 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         {
             if (this.schematic != null)
             {
+                String oldName = this.schematic.getMetadata().getName();
+                long currentTime = System.currentTimeMillis();
                 this.schematic.getMetadata().setName(string);
-                this.schematic.getMetadata().setTimeModifiedToNow();
+                this.schematic.getMetadata().setTimeModified(currentTime);
 
                 if (this.schematic.writeToFile(this.dir, this.fileName, true))
                 {
+                    List<LitematicaSchematic> list = SchematicHolder.getInstance().getAllOf(new File(this.dir, this.fileName));
+
+                    for (LitematicaSchematic schematic : list)
+                    {
+                        schematic.getMetadata().setName(string);
+                        schematic.getMetadata().setTimeModified(currentTime);
+
+                        // Rename all placements that used the old schematic name (ie. were not manually renamed)
+                        for (SchematicPlacement placement : DataManager.getSchematicPlacementManager().getAllPlacementsOfSchematic(schematic))
+                        {
+                            if (placement.getName().equals(oldName))
+                            {
+                                placement.setName(string);
+                            }
+                        }
+                    }
+
                     this.gui.getListWidget().clearSchematicMetadataCache();
                     return true;
                 }
