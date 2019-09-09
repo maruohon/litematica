@@ -30,6 +30,7 @@ dependencies {
     //modCompile "net.fabricmc:fabric:" + config.fabric_version
 
     modCompile "fi.dy.masa.malilib:malilib-fabric-" + config.minecraft_version_out + ":" + config.malilib_version
+    modCompile "io.github.prospector:modmenu:" + config.mod_menu_version
 }
 
 minecraft {
