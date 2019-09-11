@@ -9,7 +9,8 @@
         "masa"
     ],
     "contact": {
-        "homepage": "https://minecraft.curseforge.com/projects/litematica",
+        "homepage": "https://www.curseforge.com/minecraft/mc-mods/litematica",
+        "issues": "https://github.com/maruohon/litematica/issues",
         "sources": "https://github.com/maruohon/litematica",
         "twitter": "https://twitter.com/maruohon",
         "discord": "https://discordapp.com/channels/211786369951989762/453662800460644354/"
@@ -21,13 +22,21 @@
     "entrypoints": {
         "main": [
             "fi.dy.masa.litematica.Litematica"
+        ],
+        "modmenu": [
+            "fi.dy.masa.litematica.compat.modmenu.ModMenuImpl"
         ]
     },
+
     "mixins": [
         "mixins.litematica.json"
     ],
 
     "depends": {
         "malilib": ">=0.10.0-dev.19"
+    },
+
+    "custom": {
+        "modmenu:clientsideOnly": true
     }
 }
