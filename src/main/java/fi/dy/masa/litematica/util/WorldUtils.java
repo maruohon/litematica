@@ -595,6 +595,13 @@ public class WorldUtils
         return false;
     }
 
+    /**
+     * Apply the Carpet-Extra mod accurate block placement protocol support
+     * @param pos
+     * @param state
+     * @param hitVecIn
+     * @return
+     */
     public static Vec3d applyCarpetProtocolHitVec(BlockPos pos, BlockState state, Vec3d hitVecIn)
     {
         double x = hitVecIn.x;
@@ -602,27 +609,29 @@ public class WorldUtils
         double z = hitVecIn.z;
         Block block = state.getBlock();
         Direction facing = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
+        final int propertyIncrement = 16;
+        double relX = hitVecIn.x - pos.getX();
 
         if (facing != null)
         {
-            x = facing.ordinal() + 2 + pos.getX();
+            x = pos.getX() + relX + 2 + (facing.getId() * 2);
         }
 
         if (block instanceof RepeaterBlock)
         {
-            x += ((state.get(RepeaterBlock.DELAY)) - 1) * 10;
+            x += ((state.get(RepeaterBlock.DELAY)) - 1) * propertyIncrement;
         }
         else if (block instanceof TrapdoorBlock && state.get(TrapdoorBlock.HALF) == BlockHalf.TOP)
         {
-            x += 10;
+            x += propertyIncrement;
         }
         else if (block instanceof ComparatorBlock && state.get(ComparatorBlock.MODE) == ComparatorMode.SUBTRACT)
         {
-            x += 10;
+            x += propertyIncrement;
         }
         else if (block instanceof StairsBlock && state.get(StairsBlock.HALF) == BlockHalf.TOP)
         {
-            x += 10;
+            x += propertyIncrement;
         }
         else if (block instanceof SlabBlock && state.get(SlabBlock.TYPE) != SlabType.DOUBLE)
         {
