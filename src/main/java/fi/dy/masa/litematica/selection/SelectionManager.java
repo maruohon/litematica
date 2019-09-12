@@ -42,7 +42,7 @@ public class SelectionManager
     private String currentSelectionId;
     @Nullable
     private GrabbedElement grabbedElement;
-    private SelectionMode mode = SelectionMode.NORMAL;
+    private SelectionMode mode = SelectionMode.SIMPLE;
 
     public SelectionMode getSelectionMode()
     {

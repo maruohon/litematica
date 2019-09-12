@@ -2,6 +2,10 @@ package fi.dy.masa.litematica.event;
 
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -25,10 +29,6 @@ import fi.dy.masa.malilib.hotkeys.KeybindCategory;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 
 public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
 {
@@ -117,36 +117,39 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         final int amount = dWheel > 0 ? 1 : -1;
         ToolMode mode = DataManager.getToolMode();
+        EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getClosestLookingDirection(player);
 
-        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
+        if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeybind().isKeybindHeld() && mode.getUsesAreaSelection())
         {
-            if (mode.getUsesAreaSelection())
-            {
-                SelectionManager sm = DataManager.getSelectionManager();
+            return this.modifySelectionBox(amount, mode, direction, (boxIn, amountIn, side) -> PositionUtils.expandOrShrinkBox(boxIn, amountIn, side));
+        }
 
-                if (sm.hasGrabbedElement())
-                {
-                    sm.changeGrabDistance(player, amount);
-                    return true;
-                }
-                else if (sm.hasSelectedOrigin())
-                {
-                    AreaSelection area = sm.getCurrentSelection();
-                    BlockPos old = area.getEffectiveOrigin();
-                    area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(player), amount), false);
-                    return true;
-                }
-                else if (mode == ToolMode.MOVE)
-                {
-                    SchematicUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, player, mc);
-                    return true;
-                }
+        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld() && mode.getUsesAreaSelection())
+        {
+            SelectionManager sm = DataManager.getSelectionManager();
+
+            if (sm.hasGrabbedElement())
+            {
+                sm.changeGrabDistance(player, amount);
+                return true;
+            }
+            else if (sm.hasSelectedOrigin())
+            {
+                AreaSelection area = sm.getCurrentSelection();
+                BlockPos old = area.getEffectiveOrigin();
+                area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(player), amount), false);
+                return true;
+            }
+            else if (mode == ToolMode.MOVE)
+            {
+                SchematicUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, player, mc);
+                return true;
             }
         }
 
         if (Hotkeys.SELECTION_GROW_MODIFIER.getKeybind().isKeybindHeld())
         {
-            return this.growOrShrinkSelection(amount, mode);
+            return this.modifySelectionBox(amount, mode, direction, (boxIn, amountIn, side) -> PositionUtils.growOrShrinkBox(boxIn, amountIn));
         }
 
         if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
@@ -194,32 +197,29 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
-    private boolean growOrShrinkSelection(int amount, ToolMode mode)
+    private boolean modifySelectionBox(int amount, ToolMode mode, EnumFacing direction, IBoxEditor editor)
     {
-        if (mode.getUsesAreaSelection())
+        SelectionManager sm = DataManager.getSelectionManager();
+        AreaSelection area = sm.getCurrentSelection();
+
+        if (area != null)
         {
-            SelectionManager sm = DataManager.getSelectionManager();
-            AreaSelection area = sm.getCurrentSelection();
+            Box box = area.getSelectedSubRegionBox();
 
-            if (area != null)
+            if (box != null)
             {
-                Box box = area.getSelectedSubRegionBox();
-
-                if (box != null)
-                {
-                    Box newBox = PositionUtils.growOrShrinkBox(box, amount);
-                    area.setSelectedSubRegionCornerPos(newBox.getPos1(), Corner.CORNER_1);
-                    area.setSelectedSubRegionCornerPos(newBox.getPos2(), Corner.CORNER_2);
-                }
-                else
-                {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.grow.no_sub_region_selected");
-                }
+                Box newBox = editor.editBox(box, amount, direction);
+                area.setSelectedSubRegionCornerPos(newBox.getPos1(), Corner.CORNER_1);
+                area.setSelectedSubRegionCornerPos(newBox.getPos2(), Corner.CORNER_2);
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.no_sub_region_selected");
             }
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
         }
 
         return true;
@@ -307,5 +307,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             WorldUtils.easyPlaceOnUseTick(mc);
         }
+    }
+
+    private interface IBoxEditor
+    {
+        Box editBox(Box boxIn, int amount, EnumFacing side);
     }
 }

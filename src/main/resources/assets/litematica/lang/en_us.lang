@@ -6,8 +6,8 @@ language.code=en_US
 litematica.error.area_selection.copy_failed=Failed to copy the selection
 litematica.error.area_selection.create_failed=Failed to create a new selection by the name '%s', file already exists
 litematica.error.area_selection.failed_to_load=Failed to load the Area Selection
-litematica.error.area_selection.grow.no_sub_region_selected=No sub-region selected!
 litematica.error.area_selection.no_placement_selected=No Schematic Placement selected!
+litematica.error.area_selection.no_sub_region_selected=No sub-region selected!
 litematica.error.area_selection.rename.already_exists=Error: An area already exists with the file name '%s'
 litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated safe file name '%s'
 

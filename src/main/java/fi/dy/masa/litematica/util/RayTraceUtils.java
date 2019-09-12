@@ -348,6 +348,12 @@ public class RayTraceUtils
     @Nullable
     public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range, boolean respectRenderRange)
     {
+        return getGenericTrace(worldClient, entity, range, respectRenderRange, false);
+    }
+
+    @Nullable
+    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range, boolean respectRenderRange, boolean includeVerifier)
+    {
         RayTraceResult traceClient = getRayTraceFromEntity(worldClient, entity, true, range);
         RayTraceResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange);
         double distClosest = -1D;
@@ -381,7 +387,7 @@ public class RayTraceUtils
 
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-        if (placement != null && placement.hasVerifier())
+        if (includeVerifier && placement != null && placement.hasVerifier())
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();

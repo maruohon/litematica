@@ -52,6 +52,7 @@ public class Hotkeys
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_MODIFIER   = new ConfigHotkey("schematicVersionCycleModifier",     "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to be able to use the mouse wheel\nto cycle through the schematic versions in the Version Control tool mode");
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_NEXT       = new ConfigHotkey("schematicVersionCycleNext",         "",     "A hotkey to cycle to the next schematic version in the Version Control tool mode");
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_PREVIOUS   = new ConfigHotkey("schematicVersionCyclePrevious",     "",     "A hotkey to cycle to the next schematic version in the Version Control tool mode");
+    public static final ConfigHotkey SELECTION_EXPAND_MODIFIER          = new ConfigHotkey("selectionExpandModifier",           "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to expand or shrink a selection box\nfrom the looking direction side while scrolling");
     public static final ConfigHotkey SELECTION_GRAB_MODIFIER            = new ConfigHotkey("selectionGrabModifier",             "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to \"grab\" a selection\nbox or corner for cursor moving.");
     public static final ConfigHotkey SELECTION_GROW_HOTKEY              = new ConfigHotkey("selectionGrow",                     "",     "The action hotkey to auto-grow the selection box around\nany adjacent/diagonally connected blocks");
     public static final ConfigHotkey SELECTION_GROW_MODIFIER            = new ConfigHotkey("selectionGrowModifier",             "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to grow or shrink\na selection box while scrolling");
@@ -129,6 +130,7 @@ public class Hotkeys
             SCHEMATIC_VERSION_CYCLE_MODIFIER,
             SCHEMATIC_VERSION_CYCLE_NEXT,
             SCHEMATIC_VERSION_CYCLE_PREVIOUS,
+            SELECTION_EXPAND_MODIFIER,
             SELECTION_GRAB_MODIFIER,
             SELECTION_GROW_HOTKEY,
             SELECTION_GROW_MODIFIER,

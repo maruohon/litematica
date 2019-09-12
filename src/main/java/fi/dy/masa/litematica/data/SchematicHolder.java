@@ -22,6 +22,21 @@ public class SchematicHolder
         this.schematics.clear();
     }
 
+    public List<LitematicaSchematic> getAllOf(File file)
+    {
+        List<LitematicaSchematic> list = new ArrayList<>();
+
+        for (LitematicaSchematic schematic : this.schematics)
+        {
+            if (file.equals(schematic.getFile()))
+            {
+                list.add(schematic);
+            }
+        }
+
+        return list;
+    }
+
     @Nullable
     public LitematicaSchematic getOrLoad(File file)
     {
