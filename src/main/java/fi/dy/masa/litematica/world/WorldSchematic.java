@@ -183,7 +183,7 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public int method_22335(BlockPos pos, int defaultValue)
+    public int getBaseLightLevel(BlockPos pos, int defaultValue)
     {
         return 15;
     }
