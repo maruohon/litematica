@@ -25,7 +25,7 @@ public class FakeLightingProvider extends LightingProvider
     }
 
     @Override
-    public int method_22363(BlockPos pos, int defaultValue)
+    public int getLight(BlockPos pos, int defaultValue)
     {
         return 15;
     }
@@ -39,7 +39,7 @@ public class FakeLightingProvider extends LightingProvider
         }
 
         @Override
-        public ChunkNibbleArray getChunkLightArray(ChunkSectionPos var1)
+        public ChunkNibbleArray getLightArray(ChunkSectionPos var1)
         {
             return null;
         }

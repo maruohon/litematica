@@ -4,8 +4,6 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -20,7 +18,9 @@ import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.ExtendedBlockView;
+import net.minecraft.world.BlockRenderView;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 
 public class BlockModelRendererSchematic extends BlockModelRenderer
 {
@@ -34,7 +34,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         this.blockColors = blockColorsIn;
     }
 
-    public boolean renderModel(ExtendedBlockView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
+    public boolean renderModel(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, long rand)
     {
         boolean ao = MinecraftClient.isAmbientOcclusionEnabled() && stateIn.getLuminance() == 0 && modelIn.useAmbientOcclusion();
 
@@ -59,7 +59,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
     }
 
-    public boolean renderModelSmooth(ExtendedBlockView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
+    public boolean renderModelSmooth(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
     {
         boolean renderedSomething = false;
         float[] quadBounds = new float[Direction.values().length * 2];
@@ -93,7 +93,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         return renderedSomething;
     }
 
-    public boolean renderModelFlat(ExtendedBlockView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
+    public boolean renderModelFlat(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, BufferBuilder buffer, Random random, long seedIn)
     {
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
@@ -126,14 +126,14 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         return renderedSomething;
     }
 
-    private boolean shouldRenderModelSide(ExtendedBlockView worldIn, BlockState stateIn, BlockPos posIn, Direction side)
+    private boolean shouldRenderModelSide(BlockRenderView worldIn, BlockState stateIn, BlockPos posIn, Direction side)
     {
         return DataManager.getRenderLayerRange().isPositionAtRenderEdgeOnSide(posIn, side) ||
                (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.getBooleanValue()) ||
                Block.shouldDrawSide(stateIn, worldIn, posIn, side);
     }
 
-    private void renderQuadsSmooth(ExtendedBlockView world, BlockState state, BlockPos pos, BufferBuilder buffer, List<BakedQuad> list, float[] quadBounds, BitSet bitSet, AmbientOcclusionFace aoFace)
+    private void renderQuadsSmooth(BlockRenderView world, BlockState state, BlockPos pos, BufferBuilder buffer, List<BakedQuad> list, float[] quadBounds, BitSet bitSet, AmbientOcclusionFace aoFace)
     {
         Vec3d vec3d = state.getOffsetPos(world, pos);
         double x = (double) pos.getX() + vec3d.x;
@@ -172,7 +172,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
     }
 
-    private void renderQuadsFlat(ExtendedBlockView world, BlockState state, BlockPos pos, int brightnessIn, boolean ownBrightness, BufferBuilder buffer, List<BakedQuad> list, BitSet bitSet)
+    private void renderQuadsFlat(BlockRenderView world, BlockState state, BlockPos pos, int brightnessIn, boolean ownBrightness, BufferBuilder buffer, List<BakedQuad> list, BitSet bitSet)
     {
         Vec3d vec3d = state.getOffsetPos(world, pos);
         double d0 = (double)pos.getX() + vec3d.x;
@@ -210,7 +210,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         }
     }
 
-    private void fillQuadBounds(ExtendedBlockView world, BlockState stateIn, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] quadBounds, BitSet boundsFlags)
+    private void fillQuadBounds(BlockRenderView world, BlockState stateIn, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] quadBounds, BitSet boundsFlags)
     {
         float f = 32.0F;
         float f1 = 32.0F;
@@ -282,7 +282,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
         private final float[] vertexColorMultiplier = new float[4];
         private final int[] vertexBrightness = new int[4];
 
-        public void updateVertexBrightness(ExtendedBlockView worldIn, BlockState state, BlockPos centerPos, Direction direction, float[] faceShape, BitSet shapeState)
+        public void updateVertexBrightness(BlockRenderView worldIn, BlockState state, BlockPos centerPos, Direction direction, float[] faceShape, BitSet shapeState)
         {
             /*
             BlockPos blockpos = shapeState.get(0) ? centerPos.offset(direction) : centerPos;

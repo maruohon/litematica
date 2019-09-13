@@ -37,7 +37,7 @@ import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.ExtendedBlockView;
+import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.chunk.WorldChunk;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
@@ -579,7 +579,7 @@ public class WorldRendererSchematic
         this.mc.gameRenderer.disableLightmap();
     }
 
-    public boolean renderBlock(ExtendedBlockView world, BlockState state, BlockPos pos, BufferBuilder bufferBuilderIn)
+    public boolean renderBlock(BlockRenderView world, BlockState state, BlockPos pos, BufferBuilder bufferBuilderIn)
     {
         try
         {
@@ -611,7 +611,7 @@ public class WorldRendererSchematic
         }
     }
 
-    public boolean renderFluid(ExtendedBlockView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
+    public boolean renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
     {
         return this.blockRenderManager.tesselateFluid(pos, world, bufferBuilderIn, state);
     }
