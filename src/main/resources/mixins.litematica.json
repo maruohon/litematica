@@ -4,6 +4,11 @@
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7",
     "client": [
+        "IMixinFenceGateBlock",
+        "IMixinRedstoneWireBlock",
+        "IMixinStairsBlock",
+        "IMixinVineBlock",
+        "MixinBlockStateFlattening",
         "MixinClientPlayNetworkHandler",
         "MixinClientWorld",
         "MixinDebugHud",
