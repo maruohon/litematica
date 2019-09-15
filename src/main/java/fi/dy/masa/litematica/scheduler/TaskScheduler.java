@@ -172,7 +172,10 @@ public class TaskScheduler
 
     public ImmutableList<ITask> getAllTasks()
     {
-        return ImmutableList.copyOf(this.tasks);
+        synchronized (this)
+        {
+            return ImmutableList.copyOf(this.tasks);
+        }
     }
 
     public boolean removeTask(ITask task)
