@@ -169,7 +169,7 @@ public class SchematicUtils
 
     public static boolean breakSchematicBlocks(Minecraft mc)
     {
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 20);
 
         if (wrapper != null)
         {
@@ -194,7 +194,7 @@ public class SchematicUtils
 
     public static boolean breakAllIdenticalSchematicBlocks(Minecraft mc)
     {
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 20);
 
         // The state can be null in 1.13+
         if (wrapper != null)
@@ -257,7 +257,7 @@ public class SchematicUtils
             (stack.isEmpty() && ToolMode.REBUILD.getPrimaryBlock() != null))
         {
             WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 20, true);
 
             if (world != null && traceWrapper != null &&
                 traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
@@ -323,7 +323,7 @@ public class SchematicUtils
     public static boolean setTargetedSchematicBlockState(Minecraft mc, IBlockState state)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 20, true);
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
