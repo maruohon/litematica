@@ -11,26 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
-import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.mixin.IMixinDataFixer;
-import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.util.ReplaceBehavior;
-import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.NBTUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -56,6 +36,26 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.mixin.IMixinDataFixer;
+import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
+import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class LitematicaSchematic
 {
@@ -70,7 +70,7 @@ public class LitematicaSchematic
     private final Map<String, BlockPos> subRegionPositions = new HashMap<>();
     private final Map<String, BlockPos> subRegionSizes = new HashMap<>();
     private final SchematicMetadata metadata = new SchematicMetadata();
-    private int totalBlocks;
+    private int totalBlocksReadFromWorld;
     @Nullable
     private final File schematicFile;
 
@@ -90,9 +90,9 @@ public class LitematicaSchematic
         return this.metadata.getEnclosingSize();
     }
 
-    public int getTotalBlocks()
+    public int getTotalBlocksReadFromWorld()
     {
-        return this.totalBlocks;
+        return this.totalBlocksReadFromWorld;
     }
 
     public SchematicMetadata getMetadata()
@@ -190,7 +190,7 @@ public class LitematicaSchematic
         schematic.metadata.setRegionCount(boxes.size());
         schematic.metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
         schematic.metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
-        schematic.metadata.setTotalBlocks(schematic.totalBlocks);
+        schematic.metadata.setTotalBlocks(schematic.totalBlocksReadFromWorld);
 
         return schematic;
     }
@@ -836,7 +836,7 @@ public class LitematicaSchematic
 
                         if (state.getBlock() != Blocks.AIR)
                         {
-                            this.totalBlocks++;
+                            this.totalBlocksReadFromWorld++;
                         }
 
                         if (state.getBlock().hasTileEntity())
@@ -950,7 +950,7 @@ public class LitematicaSchematic
 
                         if (state.getBlock() != Blocks.AIR)
                         {
-                            this.totalBlocks++;
+                            this.totalBlocksReadFromWorld++;
                         }
 
                         if (state.getBlock().hasTileEntity())
@@ -1147,8 +1147,10 @@ public class LitematicaSchematic
         this.blockContainers.clear();
         this.tileEntities.clear();
         this.entities.clear();
+        this.pendingBlockTicks.clear();
         this.subRegionPositions.clear();
         this.subRegionSizes.clear();
+        this.metadata.clearModifiedSinceSaved();
 
         if (nbt.hasKey("Version", Constants.NBT.TAG_INT))
         {
@@ -1381,6 +1383,38 @@ public class LitematicaSchematic
         return false;
     }
 
+    public boolean readFromFile()
+    {
+        if (this.schematicFile == null)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.no_file");
+            return false;
+        }
+
+        File file = this.schematicFile;
+
+        if (file.exists() == false || file.canRead() == false)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", file.getAbsolutePath());
+            return false;
+        }
+
+        try
+        {
+            FileInputStream is = new FileInputStream(file);
+            NBTTagCompound nbt = CompressedStreamTools.readCompressed(is);
+            is.close();
+
+            return nbt != null && this.readFromNBT(nbt);
+        }
+        catch (Exception e)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.exception", file.getAbsolutePath());
+        }
+
+        return false;
+    }
+
     @Nullable
     public static LitematicaSchematic createFromFile(File dir, String fileName)
     {
@@ -1389,36 +1423,10 @@ public class LitematicaSchematic
             fileName = fileName + FILE_EXTENSION;
         }
 
-        File fileSchematic = new File(dir, fileName);
+        File file = new File(dir, fileName);
+        LitematicaSchematic schematic = new LitematicaSchematic(file);
 
-        if (fileSchematic.exists() == false || fileSchematic.canRead() == false)
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", fileSchematic.getAbsolutePath());
-            return null;
-        }
-
-        try
-        {
-            FileInputStream is = new FileInputStream(fileSchematic);
-            NBTTagCompound nbt = CompressedStreamTools.readCompressed(is);
-            is.close();
-
-            if (nbt != null)
-            {
-                LitematicaSchematic schematic = new LitematicaSchematic(fileSchematic);
-
-                if (schematic.readFromNBT(nbt))
-                {
-                    return schematic;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.exception", fileSchematic.getAbsolutePath());
-        }
-
-        return null;
+        return schematic.readFromFile() ? schematic : null;
     }
 
     public static class EntityInfo

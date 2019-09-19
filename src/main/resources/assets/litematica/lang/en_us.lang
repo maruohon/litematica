@@ -53,6 +53,7 @@ litematica.error.schematic_save.schematic_creation_failed=Failed to create the s
 
 litematica.error.schematic_read_from_file_failed.cant_read=Failed to read schematic from file '%s'
 litematica.error.schematic_read_from_file_failed.exception=Exception while trying to read schematic from file '%s'
+litematica.error.schematic_read_from_file_failed.no_file=Failed to read schematic from file: no file available (in-memory schematic?)
 
 litematica.error.schematic_projects.empty_selection=Empty Area Selection (0 sub-regions)
 litematica.error.schematic_projects.failed_to_load_project=Failed to load project
@@ -119,6 +120,7 @@ litematica.gui.button.hover.material_list.write_hold_shift_for_csv=Hold shift to
 litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift to select the sub regions used for the Material List
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
+litematica.gui.button.hover.schematic_list.reload_schematic=Reloads the schematic from file.\nThis can be useful if you make a mistake\nin the Schematic Rebuild mode.
 litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode=There is currently a Schematic Project open.\nThe Schematic Project overrides the normal area selection functionality
 litematica.gui.button.hover.schematic_projects.delete_area=§6Delete the last placed or saved area§r
 litematica.gui.button.hover.schematic_projects.move_origin_to_player=Move the project origin to the player's current position\nThis will also move the area selection and placement
@@ -194,6 +196,7 @@ litematica.gui.button.load_schematic_to_memory=Load Schematic
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
 litematica.gui.button.ok=Ok
+litematica.gui.button.reload=Reload
 litematica.gui.button.remove=Remove
 litematica.gui.button.remove_placement=Remove placement
 litematica.gui.button.rename=Rename
