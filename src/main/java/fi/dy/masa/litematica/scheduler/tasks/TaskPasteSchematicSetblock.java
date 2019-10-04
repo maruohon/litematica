@@ -3,22 +3,9 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.util.PositionUtils.ChunkPosComparator;
-import fi.dy.masa.litematica.util.ReplaceBehavior;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -33,6 +20,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.util.PositionUtils.ChunkPosComparator;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
 {
@@ -78,9 +79,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     @Override
     public boolean canExecute()
     {
-        // Only use this command-based task in multiplayer
-        return this.boxesInChunks.isEmpty() == false && this.mc.world != null &&
-               this.mc.player != null && this.mc.isSingleplayer() == false;
+        return this.boxesInChunks.isEmpty() == false && this.mc.world != null && this.mc.player != null;
     }
 
     @Override
@@ -282,7 +281,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                 String nbtString = nbt.toString();
                 */
 
-                String strCommand = String.format("/summon %s %f %f %f", entityName, entity.posX, entity.posY, entity.posZ);
+                String strCommand = String.format(Locale.ROOT, "/summon %s %f %f %f", entityName, entity.posX, entity.posY, entity.posZ);
                 /*
                 String strCommand = String.format("/summon %s %f %f %f %s", entityName, entity.posX, entity.posY, entity.posZ, nbtString);
                 System.out.printf("entity: %s\n", entity);
