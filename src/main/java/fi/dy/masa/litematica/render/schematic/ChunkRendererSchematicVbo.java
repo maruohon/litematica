@@ -67,6 +67,7 @@ public class ChunkRendererSchematicVbo
     private net.minecraft.util.math.Box boundingBox;
     protected Color4f overlayColor;
     protected boolean hasOverlay = false;
+    private boolean ignoreFluidsAsExtra;
 
     protected ChunkCacheSchematic schematicWorldView;
     protected ChunkCacheSchematic clientWorldView;
@@ -665,7 +666,7 @@ public class ChunkRendererSchematicVbo
 
             if (schematicHasAir)
             {
-                return clientHasAir ? OverlayType.NONE : OverlayType.EXTRA;
+                return (clientHasAir || (this.ignoreFluidsAsExtra && stateClient.getMaterial().isLiquid())) ? OverlayType.NONE : OverlayType.EXTRA;
             }
             else
             {
@@ -894,6 +895,7 @@ public class ChunkRendererSchematicVbo
     {
         synchronized (this.boxes)
         {
+            this.ignoreFluidsAsExtra = Configs.Visuals.IGNORE_FLUIDS_AS_EXTRA.getBooleanValue();
             ClientWorld worldClient = MinecraftClient.getInstance().world;
             this.schematicWorldView = new ChunkCacheSchematic(this.world, worldClient, this.position, 2);
             this.clientWorldView    = new ChunkCacheSchematic(worldClient, worldClient, this.position, 2);
