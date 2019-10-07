@@ -15,6 +15,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
@@ -36,15 +45,6 @@ import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
 
 public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 {
@@ -723,7 +723,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
             if (this.ignoredMismatches.contains(MUTABLE_PAIR) == false)
             {
-                BlockMismatch mismatch;
+                BlockMismatch mismatch = null;
 
                 if (stateSchematic != AIR)
                 {
@@ -746,16 +746,19 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                         }
                     }
                 }
-                else
+                else if (Configs.Visuals.IGNORE_FLUIDS_AS_EXTRA.getBooleanValue() == false || stateClient.getMaterial().isLiquid() == false)
                 {
                     mismatch = new BlockMismatch(MismatchType.EXTRA, stateSchematic, stateClient, 1);
                     this.extraBlocksPositions.put(Pair.of(stateSchematic, stateClient), pos);
                 }
 
-                this.blockMismatches.put(pos, mismatch);
+                if (mismatch != null)
+                {
+                    this.blockMismatches.put(pos, mismatch);
 
-                ItemUtils.setItemForBlock(this.worldClient, pos, stateClient);
-                ItemUtils.setItemForBlock(this.worldSchematic, pos, stateSchematic);
+                    ItemUtils.setItemForBlock(this.worldClient, pos, stateClient);
+                    ItemUtils.setItemForBlock(this.worldSchematic, pos, stateSchematic);
+                }
             }
         }
         else
