@@ -723,7 +723,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
             if (this.ignoredMismatches.contains(MUTABLE_PAIR) == false)
             {
-                BlockMismatch mismatch;
+                BlockMismatch mismatch = null;
 
                 if (stateSchematic.isAir() == false)
                 {
@@ -746,16 +746,19 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                         }
                     }
                 }
-                else
+                else if (Configs.Visuals.IGNORE_FLUIDS_AS_EXTRA.getBooleanValue() == false || stateClient.getMaterial().isLiquid() == false)
                 {
                     mismatch = new BlockMismatch(MismatchType.EXTRA, stateSchematic, stateClient, 1);
                     this.extraBlocksPositions.put(Pair.of(stateSchematic, stateClient), pos);
                 }
 
-                this.blockMismatches.put(pos, mismatch);
+                if (mismatch != null)
+                {
+                    this.blockMismatches.put(pos, mismatch);
 
-                ItemUtils.setItemForBlock(this.worldClient, pos, stateClient);
-                ItemUtils.setItemForBlock(this.worldSchematic, pos, stateSchematic);
+                    ItemUtils.setItemForBlock(this.worldClient, pos, stateClient);
+                    ItemUtils.setItemForBlock(this.worldSchematic, pos, stateSchematic);
+                }
             }
         }
         else
