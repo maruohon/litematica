@@ -33,6 +33,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
@@ -53,7 +54,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private int boxVolume;
     private boolean boxInProgress;
 
-    public TaskPasteSchematicSetblock(SchematicPlacement placement, boolean changedBlocksOnly)
+    public TaskPasteSchematicSetblock(SchematicPlacement placement, LayerRange range, boolean changedBlocksOnly)
     {
         this.changedBlockOnly = changedBlocksOnly;
         this.maxCommandsPerTick = Configs.Generic.PASTE_COMMAND_LIMIT.getIntegerValue();
@@ -66,8 +67,23 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
         for (ChunkPos pos : touchedChunks)
         {
-            this.boxesInChunks.putAll(pos, placement.getBoxesWithinChunk(pos.x, pos.z).values());
-            this.chunks.add(pos);
+            int count = 0;
+
+            for (IntBoundingBox box : placement.getBoxesWithinChunk(pos.x, pos.z).values())
+            {
+                box = range.getClampedBox(box);
+
+                if (box != null)
+                {
+                    this.boxesInChunks.put(pos, box);
+                    ++count;
+                }
+            }
+
+            if (count > 0)
+            {
+                this.chunks.add(pos);
+            }
         }
 
         this.sortChunkList();

@@ -3,6 +3,24 @@ package fi.dy.masa.litematica.util;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemBlockSpecial;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
@@ -37,23 +55,6 @@ import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemBlockSpecial;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 
 public class SchematicUtils
 {
@@ -349,9 +350,10 @@ public class SchematicUtils
                     if (part.getBox().containsPos(pos))
                     {
                         SchematicPlacement placement = part.getPlacement();
+                        LitematicaSchematic schematic = placement.getSchematic();
                         String regionName = part.getSubRegionName();
-                        LitematicaBlockStateContainer container = placement.getSchematic().getSubRegionContainer(regionName);
-                        BlockPos posSchematic = getSchematicContainerPositionFromWorldPosition(pos, placement.getSchematic(),
+                        LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
+                        BlockPos posSchematic = getSchematicContainerPositionFromWorldPosition(pos, schematic,
                                 regionName, placement, placement.getRelativeSubRegionPlacement(regionName), container);
 
                         if (posSchematic != null)
@@ -360,7 +362,8 @@ public class SchematicUtils
 
                             IBlockState stateOriginal = container.get(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ());
 
-                            int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
+                            SchematicMetadata metadata = schematic.getMetadata();
+                            int totalBlocks = metadata.getTotalBlocks();
                             int increment = 0;
 
                             if (stateOriginal.getBlock() != Blocks.AIR)
@@ -376,7 +379,6 @@ public class SchematicUtils
 
                             container.set(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ(), state);
 
-                            SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
                             metadata.setTotalBlocks(totalBlocks);
                             metadata.setTimeModifiedToNow();
                             metadata.setModifiedSinceSaved();
@@ -408,13 +410,15 @@ public class SchematicUtils
                 {
                     if (part.getBox().containsPos(posStart))
                     {
-                        SchematicPlacement placement = part.getPlacement();
                         String regionName = part.getSubRegionName();
-                        LitematicaBlockStateContainer container = placement.getSchematic().getSubRegionContainer(regionName);
-                        BlockPos posStartSchematic = getSchematicContainerPositionFromWorldPosition(posStart, placement.getSchematic(),
-                                regionName, placement, placement.getRelativeSubRegionPlacement(regionName), container);
-                        BlockPos posEndSchematic = getSchematicContainerPositionFromWorldPosition(posEnd, placement.getSchematic(),
-                                regionName, placement, placement.getRelativeSubRegionPlacement(regionName), container);
+                        SchematicPlacement schematicPlacement = part.getPlacement();
+                        SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+                        LitematicaSchematic schematic = schematicPlacement.getSchematic();
+                        LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
+                        BlockPos posStartSchematic = getSchematicContainerPositionFromWorldPosition(posStart, schematic,
+                                regionName, schematicPlacement, placement, container);
+                        BlockPos posEndSchematic = getSchematicContainerPositionFromWorldPosition(posEnd, schematic,
+                                regionName, schematicPlacement, placement, container);
 
                         if (posStartSchematic != null && posEndSchematic != null)
                         {
@@ -426,10 +430,10 @@ public class SchematicUtils
                             final int maxX = Math.min(posMax.getX(), container.getSize().getX() - 1);
                             final int maxY = Math.min(posMax.getY(), container.getSize().getY() - 1);
                             final int maxZ = Math.min(posMax.getZ(), container.getSize().getZ() - 1);
-                            int totalBlocks = part.getPlacement().getSchematic().getMetadata().getTotalBlocks();
+                            int totalBlocks = schematic.getMetadata().getTotalBlocks();
                             int increment = 0;
 
-                            state = getUntransformedBlockState(state, placement, regionName);
+                            state = getUntransformedBlockState(state, schematicPlacement, regionName);
 
                             for (int y = minY; y <= maxY; ++y)
                             {
@@ -455,12 +459,12 @@ public class SchematicUtils
                                 }
                             }
 
-                            SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
+                            SchematicMetadata metadata = schematic.getMetadata();
                             metadata.setTotalBlocks(totalBlocks);
                             metadata.setTimeModifiedToNow();
                             metadata.setModifiedSinceSaved();
 
-                            DataManager.getSchematicPlacementManager().markAllPlacementsOfSchematicForRebuild(placement.getSchematic());
+                            DataManager.getSchematicPlacementManager().markAllPlacementsOfSchematicForRebuild(schematic);
 
                             return true;
                         }
@@ -507,6 +511,7 @@ public class SchematicUtils
             IBlockState stateOriginalIn, IBlockState stateNewIn)
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
+        LitematicaSchematic schematic = schematicPlacement.getSchematic();
         String selected = schematicPlacement.getSelectedSubRegionName();
         List<String> regions = new ArrayList<>();
 
@@ -529,7 +534,7 @@ public class SchematicUtils
 
         LayerRange range = DataManager.getRenderLayerRange();
 
-        int totalBlocks = schematicPlacement.getSchematic().getMetadata().getTotalBlocks();
+        int totalBlocks = schematic.getMetadata().getTotalBlocks();
         int increment = 0;
 
         if (stateOriginalIn.getBlock() != Blocks.AIR)
@@ -543,44 +548,32 @@ public class SchematicUtils
 
         for (String regionName : regions)
         {
-            LitematicaBlockStateContainer container = schematicPlacement.getSchematic().getSubRegionContainer(regionName);
+            LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
             SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+            BlockPos regionSize = schematic.getAreaSize(regionName);
 
-            if (container == null || placement == null)
+            if (container == null || placement == null || regionSize == null)
             {
                 continue;
             }
 
-            int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
-            int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
-            int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
-            int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
-            int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
-            int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
+            Pair<Vec3i, Vec3i> pair = getLayerRangeClampedSubRegion(range, schematicPlacement, placement, regionSize);
 
-            BlockPos posStart = new BlockPos(minX, minY, minZ);
-            BlockPos posEnd = new BlockPos(maxX, maxY, maxZ);
-
-            BlockPos pos1 = getReverserTransformedWorldPosition(posStart, schematicPlacement.getSchematic(),
-                    regionName, schematicPlacement, schematicPlacement.getRelativeSubRegionPlacement(regionName));
-            BlockPos pos2 = getReverserTransformedWorldPosition(posEnd, schematicPlacement.getSchematic(),
-                    regionName, schematicPlacement, schematicPlacement.getRelativeSubRegionPlacement(regionName));
-
-            if (pos1 == null || pos2 == null)
+            if (pair == null)
             {
                 return false;
             }
 
-            BlockPos posStartWorld = PositionUtils.getMinCorner(pos1, pos2);
-            BlockPos posEndWorld   = PositionUtils.getMaxCorner(pos1, pos2);
-
+            Vec3i containerStart = pair.getLeft();
+            Vec3i containerEnd = pair.getRight();
             Vec3i size = container.getSize();
-            final int startX = Math.max(posStartWorld.getX(), 0);
-            final int startY = Math.max(posStartWorld.getY(), 0);
-            final int startZ = Math.max(posStartWorld.getZ(), 0);
-            final int endX = Math.min(posEndWorld.getX(), size.getX() - 1);
-            final int endY = Math.min(posEndWorld.getY(), size.getY() - 1);
-            final int endZ = Math.min(posEndWorld.getZ(), size.getZ() - 1);
+
+            final int startX = containerStart.getX();
+            final int startY = containerStart.getY();
+            final int startZ = containerStart.getZ();
+            final int endX = containerEnd.getX();
+            final int endY = containerEnd.getY();
+            final int endZ = containerEnd.getZ();
 
             //System.out.printf("DEBUG == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
             //        regionName, startX, startY, startZ, endX, endY, endZ, container.getSize().getX(), container.getSize().getY(), container.getSize().getZ());
@@ -617,7 +610,7 @@ public class SchematicUtils
             }
         }
 
-        SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
+        SchematicMetadata metadata = schematic.getMetadata();
         metadata.setTotalBlocks(totalBlocks);
         metadata.setTimeModifiedToNow();
         metadata.setModifiedSinceSaved();
@@ -667,6 +660,7 @@ public class SchematicUtils
 
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
+            final LayerRange range = DataManager.getRenderLayerRange().copy();
             LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, "");
             TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
             taskSave.disableCompletionMessage();
@@ -687,11 +681,11 @@ public class SchematicUtils
 
                     if (mc.isSingleplayer())
                     {
-                        taskPaste = new TaskPasteSchematicDirect(placement);
+                        taskPaste = new TaskPasteSchematicDirect(placement, range);
                     }
                     else
                     {
-                        taskPaste = new TaskPasteSchematicSetblock(placement, false);
+                        taskPaste = new TaskPasteSchematicSetblock(placement, range, false);
                     }
 
                     taskPaste.disableCompletionMessage();
@@ -763,7 +757,7 @@ public class SchematicUtils
     public static BlockPos getSchematicContainerPositionFromWorldPosition(BlockPos worldPos, LitematicaSchematic schematic, String regionName,
             SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, LitematicaBlockStateContainer container)
     {
-        BlockPos boxMinRel = getReverserTransformedWorldPosition(worldPos, schematic, regionName, schematicPlacement, regionPlacement);
+        BlockPos boxMinRel = getReverseTransformedWorldPosition(worldPos, schematic, schematicPlacement, regionPlacement, schematic.getAreaSize(regionName));
 
         if (boxMinRel == null)
         {
@@ -792,17 +786,11 @@ public class SchematicUtils
     }
 
     @Nullable
-    private static BlockPos getReverserTransformedWorldPosition(BlockPos worldPos, LitematicaSchematic schematic,
-            String regionName, SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement)
+    private static BlockPos getReverseTransformedWorldPosition(BlockPos worldPos, LitematicaSchematic schematic,
+            SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, Vec3i regionSize)
     {
         BlockPos origin = schematicPlacement.getOrigin();
         BlockPos regionPos = regionPlacement.getPos();
-        BlockPos regionSize = schematic.getAreaSize(regionName);
-
-        if (regionSize == null)
-        {
-            return null;
-        }
 
         // These are the untransformed relative positions
         BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
@@ -825,6 +813,42 @@ public class SchematicUtils
         relPos = relPos.subtract(posMinRel.subtract(regionPos));
 
         return relPos;
+    }
+
+    @Nullable
+    public static Pair<Vec3i, Vec3i> getLayerRangeClampedSubRegion(LayerRange range,
+            SchematicPlacement schematicPlacement, SubRegionPlacement placement, Vec3i regionSize)
+    {
+        int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
+        int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
+        int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
+        int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
+        int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
+        int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
+
+        BlockPos posMinRange = new BlockPos(minX, minY, minZ);
+        BlockPos posMaxRange = new BlockPos(maxX, maxY, maxZ);
+
+        LitematicaSchematic schematic = schematicPlacement.getSchematic();
+        BlockPos pos1 = getReverseTransformedWorldPosition(posMinRange, schematic, schematicPlacement, placement, regionSize);
+        BlockPos pos2 = getReverseTransformedWorldPosition(posMaxRange, schematic, schematicPlacement, placement, regionSize);
+
+        if (pos1 == null || pos2 == null)
+        {
+            return null;
+        }
+
+        BlockPos posMinReversed = PositionUtils.getMinCorner(pos1, pos2);
+        BlockPos posMaxReversed = PositionUtils.getMaxCorner(pos1, pos2);
+
+        final int startX = Math.max(posMinReversed.getX(), 0);
+        final int startY = Math.max(posMinReversed.getY(), 0);
+        final int startZ = Math.max(posMinReversed.getZ(), 0);
+        final int endX = Math.min(posMaxReversed.getX(), regionSize.getX() - 1);
+        final int endY = Math.min(posMaxReversed.getY(), regionSize.getY() - 1);
+        final int endZ = Math.min(posMaxReversed.getZ(), regionSize.getZ() - 1);
+
+        return Pair.of(new Vec3i(startX, startY, startZ), new Vec3i(endX, endY, endZ));
     }
 
     public static IBlockState getUntransformedBlockState(IBlockState state, SchematicPlacement schematicPlacement, String subRegionName)

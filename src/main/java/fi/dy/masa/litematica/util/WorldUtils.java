@@ -8,33 +8,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.materials.MaterialCache;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.schematic.SchematicaSchematic;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.tool.ToolMode;
-import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
-import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.config.values.InfoType;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
@@ -69,6 +42,33 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 import net.minecraft.world.gen.structure.template.Template;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.materials.MaterialCache;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.SchematicaSchematic;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.config.values.InfoType;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class WorldUtils
 {
@@ -217,7 +217,8 @@ public class WorldUtils
         BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, size);
         SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
-        litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
+        LayerRange range = new LayerRange(SchematicWorldRefresher.INSTANCE); // This is by default in the All layers mode
+        litematicaSchematic.placeToWorld(world, schematicPlacement, range, false); // TODO use a per-chunk version for a bit more speed
 
         SchematicaSchematic schematic = SchematicaSchematic.createFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities);
 
@@ -253,7 +254,8 @@ public class WorldUtils
         BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, size);
         SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
-        litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
+        LayerRange range = new LayerRange(SchematicWorldRefresher.INSTANCE); // This is by default in the All layers mode
+        litematicaSchematic.placeToWorld(world, schematicPlacement, range, false); // TODO use a per-chunk version for a bit more speed
 
         Template template = new Template();
         template.takeBlocksFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities == false, Blocks.STRUCTURE_VOID);

@@ -2,13 +2,6 @@ package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -20,6 +13,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.litematica.render.infohud.InfoHud;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public class TaskFillArea extends TaskProcessChunkBase
 {

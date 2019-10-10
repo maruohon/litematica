@@ -194,7 +194,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
                 for (IntBoundingBox box : this.boxes)
                 {
-                    box = range.getClampedRenderBoundingBox(box);
+                    box = range.getClampedBox(box);
 
                     // The rendered layer(s) don't intersect this sub-volume
                     if (box == null)

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -48,12 +49,14 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
+import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.NBTUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -245,7 +248,7 @@ public class LitematicaSchematic
         this.entities.put(subRegionName, schematic.getEntities());
     }
 
-    public boolean placeToWorld(World world, SchematicPlacement schematicPlacement, boolean notifyNeighbors)
+    public boolean placeToWorld(World world, SchematicPlacement schematicPlacement, LayerRange range, boolean notifyNeighbors)
     {
         WorldUtils.setShouldPreventOnBlockAdded(true);
 
@@ -267,7 +270,7 @@ public class LitematicaSchematic
 
                 if (regionPos != null && regionSize != null && container != null && tileMap != null)
                 {
-                    this.placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, container, tileMap, scheduledTicks, notifyNeighbors);
+                    this.placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, container, tileMap, scheduledTicks, range, notifyNeighbors);
                 }
                 else
                 {
@@ -276,7 +279,7 @@ public class LitematicaSchematic
 
                 if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
                 {
-                    this.placeEntitiesToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, entityList);
+                    this.placeEntitiesToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, entityList, range);
                 }
             }
         }
@@ -289,7 +292,7 @@ public class LitematicaSchematic
     private boolean placeBlocksToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
             SchematicPlacement schematicPlacement, SubRegionPlacement placement,
             LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap,
-            @Nullable Map<BlockPos, NextTickListEntry> scheduledTicks, boolean notifyNeighbors)
+            @Nullable Map<BlockPos, NextTickListEntry> scheduledTicks, LayerRange range, boolean notifyNeighbors)
     {
         // These are the untransformed relative positions
         BlockPos posEndRelSub = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize);
@@ -300,14 +303,18 @@ public class LitematicaSchematic
         BlockPos posEndAbs = PositionUtils.getTransformedBlockPos(posEndRelSub, placement.getMirror(), placement.getRotation()).add(regionPosTransformed).add(origin);
         BlockPos regionPosAbs = regionPosTransformed.add(origin);
 
-        if (PositionUtils.arePositionsWithinWorld(world, regionPosAbs, posEndAbs) == false)
+        if (PositionUtils.arePositionsWithinWorld(world, regionPosAbs, posEndAbs) == false || range.intersectsBox(regionPosAbs, posEndAbs) == false)
         {
             return false;
         }
 
-        final int sizeX = Math.abs(regionSize.getX());
-        final int sizeY = Math.abs(regionSize.getY());
-        final int sizeZ = Math.abs(regionSize.getZ());
+        Pair<Vec3i, Vec3i> pair = SchematicUtils.getLayerRangeClampedSubRegion(range, schematicPlacement, placement, regionSize);
+
+        if (pair == null)
+        {
+            return false;
+        }
+
         final IBlockState barrier = Blocks.BARRIER.getDefaultState();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
         ReplaceBehavior replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
@@ -323,11 +330,20 @@ public class LitematicaSchematic
             mirrorSub = mirrorSub == Mirror.FRONT_BACK ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK;
         }
 
-        for (int y = 0; y < sizeY; ++y)
+        Vec3i containerStart = pair.getLeft();
+        Vec3i containerEnd = pair.getRight();
+        final int startX = containerStart.getX();
+        final int startY = containerStart.getY();
+        final int startZ = containerStart.getZ();
+        final int endX = containerEnd.getX();
+        final int endY = containerEnd.getY();
+        final int endZ = containerEnd.getZ();
+
+        for (int y = startY; y <= endY; ++y)
         {
-            for (int z = 0; z < sizeZ; ++z)
+            for (int z = startZ; z <= endZ; ++z)
             {
-                for (int x = 0; x < sizeX; ++x)
+                for (int x = startX; x <= endX; ++x)
                 {
                     IBlockState state = container.get(x, y, z);
 
@@ -406,11 +422,11 @@ public class LitematicaSchematic
 
         if (notifyNeighbors)
         {
-            for (int y = 0; y < sizeY; ++y)
+            for (int y = containerStart.getY(); y < containerEnd.getY(); ++y)
             {
-                for (int z = 0; z < sizeZ; ++z)
+                for (int z = containerStart.getZ(); z < containerEnd.getZ(); ++z)
                 {
-                    for (int x = 0; x < sizeX; ++x)
+                    for (int x = containerStart.getX(); x < containerEnd.getX(); ++x)
                     {
                         posMutable.setPos(  posMinRel.getX() + x - regionPos.getX(),
                                             posMinRel.getY() + y - regionPos.getY(),
@@ -435,7 +451,8 @@ public class LitematicaSchematic
         return true;
     }
 
-    private void placeEntitiesToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize, SchematicPlacement schematicPlacement, SubRegionPlacement placement, List<EntityInfo> entityList)
+    private void placeEntitiesToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
+            SchematicPlacement schematicPlacement, SubRegionPlacement placement, List<EntityInfo> entityList, LayerRange range)
     {
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         final int offX = regionPosRelTransformed.getX() + origin.getX();
@@ -455,19 +472,23 @@ public class LitematicaSchematic
 
         for (EntityInfo info : entityList)
         {
-            Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
+            Vec3d pos = info.posVec;
+            pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
+            pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
 
-            if (entity != null)
+            if (range.isPositionWithinRange((int) Math.floor(pos.x), (int) Math.floor(pos.y), (int) Math.floor(pos.z)))
             {
-                Vec3d pos = info.posVec;
-                pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-                pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
-                double x = pos.x + offX;
-                double y = pos.y + offY;
-                double z = pos.z + offZ;
+                Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
 
-                this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
-                EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
+                if (entity != null)
+                {
+                    double x = pos.x + offX;
+                    double y = pos.y + offY;
+                    double z = pos.z + offZ;
+
+                    this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
+                    EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
+                }
             }
         }
     }
