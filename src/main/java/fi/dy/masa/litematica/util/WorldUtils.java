@@ -391,10 +391,12 @@ public class WorldUtils
             World world = SchematicWorldHandler.getSchematicWorld();
             IBlockState state = world.getBlockState(pos);
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
+            boolean ignoreNBT = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
 
             if (stack.isEmpty() == false)
             {
                 InventoryPlayer inv = mc.player.inventory;
+                int slotNum = InventoryUtils.findSlotWithItem(inv, stack, false, ignoreNBT);
 
                 if (mc.player.capabilities.isCreativeMode)
                 {
@@ -408,23 +410,12 @@ public class WorldUtils
                         ItemUtils.storeTEInStack(stack, te);
                     }
 
-                    InventoryUtils.setPickedItemToHand(stack, mc);
+                    InventoryUtils.setPickedItemToHand(slotNum, stack, ignoreNBT, mc);
                     mc.playerController.sendSlotPacket(mc.player.getHeldItem(EnumHand.MAIN_HAND), 36 + inv.currentItem);
-
-                    //return true;
                 }
-                else
+                else if (slotNum != -1 && inv.currentItem != slotNum)
                 {
-                    int slot = inv.getSlotFor(stack);
-                    boolean shouldPick = inv.currentItem != slot;
-                    boolean canPick = slot != -1;
-
-                    if (shouldPick && canPick)
-                    {
-                        InventoryUtils.setPickedItemToHand(stack, mc);
-                    }
-
-                    //return shouldPick == false || canPick;
+                    InventoryUtils.setPickedItemToHand(slotNum, stack, ignoreNBT, mc);
                 }
             }
 

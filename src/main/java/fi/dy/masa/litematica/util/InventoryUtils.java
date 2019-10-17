@@ -84,11 +84,41 @@ public class InventoryUtils
         return inv;
     }
 
-    public static void setPickedItemToHand(ItemStack stack, Minecraft mc)
+    /**
+     * Finds a slot with an identical item than <b>stackReference</b>, ignoring the NBT data if <b>ignoreNBT</b> is true.
+     * @param inv
+     * @param stackReference
+     * @param reverse
+     * @param ignoreNBT
+     * @return the slot number, or -1 if none were found
+     */
+    public static int findSlotWithItem(InventoryPlayer inv, ItemStack stackReference, boolean reverse, boolean ignoreNBT)
+    {
+        final int startSlot = reverse ? inv.getSizeInventory() - 1 : 0;
+        final int endSlot = reverse ? -1 : inv.getSizeInventory();
+        final int increment = reverse ? -1 : 1;
+
+        for (int slotNum = startSlot; slotNum != endSlot; slotNum += increment)
+        {
+            ItemStack stack = inv.getStackInSlot(slotNum);
+
+            if (ignoreNBT && ItemStack.areItemsEqual(stack, stackReference))
+            {
+                return slotNum;
+            }
+            else if (ignoreNBT == false && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, stackReference))
+            {
+                return slotNum;
+            }
+        }
+
+        return -1;
+    }
+
+    public static void setPickedItemToHand(int slotNum, ItemStack stack, boolean ignoreNBT, Minecraft mc)
     {
         EntityPlayer player = mc.player;
         InventoryPlayer inventory = player.inventory;
-        int slotNum = inventory.getSlotFor(stack);
 
         if (InventoryPlayer.isHotbar(slotNum))
         {
