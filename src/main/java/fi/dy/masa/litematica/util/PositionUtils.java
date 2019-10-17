@@ -941,38 +941,6 @@ public class PositionUtils
         return z2 > z1 ? EnumFacing.SOUTH : EnumFacing.WEST;
     }
 
-    public static Rotation cycleRotation(Rotation rotation, boolean reverse)
-    {
-        int ordinal = rotation.ordinal();
-
-        if (reverse)
-        {
-            ordinal = ordinal == 0 ? Rotation.values().length - 1 : ordinal - 1;
-        }
-        else
-        {
-            ordinal = ordinal >= Rotation.values().length - 1 ? 0 : ordinal + 1;
-        }
-
-        return Rotation.values()[ordinal];
-    }
-
-    public static Mirror cycleMirror(Mirror mirror, boolean reverse)
-    {
-        int ordinal = mirror.ordinal();
-
-        if (reverse)
-        {
-            ordinal = ordinal == 0 ? Mirror.values().length - 1 : ordinal - 1;
-        }
-        else
-        {
-            ordinal = ordinal >= Mirror.values().length - 1 ? 0 : ordinal + 1;
-        }
-
-        return Mirror.values()[ordinal];
-    }
-
     public static String getRotationNameShort(Rotation rotation)
     {
         switch (rotation)

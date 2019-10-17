@@ -1,6 +1,9 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -18,9 +21,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
 
 public class GuiSubRegionConfiguration extends GuiBase
 {
@@ -253,7 +253,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
-                    Rotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
+                    Rotation rotation = fi.dy.masa.malilib.util.PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
                     this.schematicPlacement.setSubRegionRotation(this.subRegionName, rotation, this.parent);
                     break;
                 }
@@ -261,7 +261,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 case MIRROR:
                 {
                     boolean reverse = mouseButton == 1;
-                    Mirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
+                    Mirror mirror = fi.dy.masa.malilib.util.PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
                     this.schematicPlacement.setSubRegionMirror(this.subRegionName, mirror, this.parent);
                     break;
                 }
