@@ -225,7 +225,7 @@ public class SchematicConversionFixers
             BlockPos posAdj = pos.offset(side);
             BlockState stateAdj = reader.getBlockState(posAdj);
             Direction sideOpposite = side.getOpposite();
-            boolean flag = stateAdj.method_20827(reader, posAdj, sideOpposite);
+            boolean flag = stateAdj.isSideSolidFullSquare(reader, posAdj, sideOpposite);
             state = state.with(FENCE_WALL_PROP_MAP[side.getId()], fence.canConnect(stateAdj, flag, sideOpposite));
         }
 
@@ -327,7 +327,7 @@ public class SchematicConversionFixers
             BlockPos posAdj = pos.offset(side);
             BlockState stateAdj = reader.getBlockState(posAdj);
             Direction sideOpposite = side.getOpposite();
-            boolean flag = stateAdj.method_20827(reader, posAdj, sideOpposite);
+            boolean flag = stateAdj.isSideSolidFullSquare(reader, posAdj, sideOpposite);
             state = state.with(FENCE_WALL_PROP_MAP[side.getId()], pane.connectsTo(stateAdj, flag));
         }
 
@@ -507,7 +507,7 @@ public class SchematicConversionFixers
     private static boolean wallAttachesTo(BlockState state, Direction side, BlockView world, BlockPos pos)
     {
         Block block = state.getBlock();
-        boolean flag1 = state.method_20827(world, pos, side);
+        boolean flag1 = state.isSideSolidFullSquare(world, pos, side);
         boolean flag2 = block.matches(BlockTags.WALLS) || block instanceof FenceGateBlock && FenceGateBlock.canWallConnect(state, side);
         return ! WallBlock.canConnect(block) && flag1 || flag2;
     }
