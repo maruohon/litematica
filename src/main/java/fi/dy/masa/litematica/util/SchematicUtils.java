@@ -844,9 +844,9 @@ public class SchematicUtils
         final int startX = Math.max(posMinReversed.getX(), 0);
         final int startY = Math.max(posMinReversed.getY(), 0);
         final int startZ = Math.max(posMinReversed.getZ(), 0);
-        final int endX = Math.min(posMaxReversed.getX(), regionSize.getX() - 1);
-        final int endY = Math.min(posMaxReversed.getY(), regionSize.getY() - 1);
-        final int endZ = Math.min(posMaxReversed.getZ(), regionSize.getZ() - 1);
+        final int endX = Math.min(posMaxReversed.getX(), Math.abs(regionSize.getX()) - 1);
+        final int endY = Math.min(posMaxReversed.getY(), Math.abs(regionSize.getY()) - 1);
+        final int endZ = Math.min(posMaxReversed.getZ(), Math.abs(regionSize.getZ()) - 1);
 
         return Pair.of(new Vec3i(startX, startY, startZ), new Vec3i(endX, endY, endZ));
     }
