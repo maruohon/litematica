@@ -121,7 +121,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
             RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(text));
         }
 
-        RenderUtils.disableItemLighting();
+        RenderUtils.disableDiffuseLighting();
         GlStateManager.disableLighting();
     }
 

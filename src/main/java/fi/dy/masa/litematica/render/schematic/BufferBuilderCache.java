@@ -1,20 +1,22 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
+import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 
 public class BufferBuilderCache
 {
-    private final BufferBuilder[] blockBufferBuilders = new BufferBuilder[BlockRenderLayer.values().length];
+    private final Map<RenderLayer, BufferBuilder> blockBufferBuilders = new HashMap<>();
     private BufferBuilder[] overlayBufferBuilders;
 
     public BufferBuilderCache()
     {
-        this.blockBufferBuilders[BlockRenderLayer.SOLID.ordinal()] = new BufferBuilder(2097152);
-        this.blockBufferBuilders[BlockRenderLayer.CUTOUT.ordinal()] = new BufferBuilder(131072);
-        this.blockBufferBuilders[BlockRenderLayer.CUTOUT_MIPPED.ordinal()] = new BufferBuilder(131072);
-        this.blockBufferBuilders[BlockRenderLayer.TRANSLUCENT.ordinal()] = new BufferBuilder(262144);
+        for (RenderLayer layer : RenderLayer.getBlockLayers())
+        {
+            this.blockBufferBuilders.put(layer, new BufferBuilder(layer.getExpectedBufferSize()));
+        }
 
         this.overlayBufferBuilders = new BufferBuilder[OverlayRenderType.values().length];
 
@@ -24,14 +26,9 @@ public class BufferBuilderCache
         }
     }
 
-    public BufferBuilder getBlockBufferByLayer(BlockRenderLayer layer)
+    public BufferBuilder getBlockBufferByLayer(RenderLayer layer)
     {
-        return this.blockBufferBuilders[layer.ordinal()];
-    }
-
-    public BufferBuilder getBlockBufferByLayerId(int id)
-    {
-        return this.blockBufferBuilders[id];
+        return this.blockBufferBuilders.get(layer);
     }
 
     public BufferBuilder getOverlayBuffer(OverlayRenderType type)

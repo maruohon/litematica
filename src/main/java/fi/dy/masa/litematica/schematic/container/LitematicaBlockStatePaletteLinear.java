@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.util.TagHelper;
+import net.minecraft.nbt.NbtHelper;
 
 public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStatePalette
 {
@@ -86,8 +86,8 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag tag = tagList.getCompoundTag(i);
-            BlockState state = TagHelper.deserializeBlockState(tag);
+            CompoundTag tag = tagList.getCompound(i);
+            BlockState state = NbtHelper.toBlockState(tag);
 
             if (i > 0 || state != LitematicaBlockStateContainer.AIR_BLOCK_STATE)
             {
@@ -103,7 +103,7 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
 
         for (int id = 0; id < this.currentSize; ++id)
         {
-            CompoundTag tag = TagHelper.serializeBlockState(this.states[id]);
+            CompoundTag tag = NbtHelper.fromBlockState(this.states[id]);
             tagList.add(tag);
         }
 

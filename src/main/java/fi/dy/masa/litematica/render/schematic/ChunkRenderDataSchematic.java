@@ -1,23 +1,27 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
+import java.util.Map;
+import java.util.Set;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
+import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 
 public class ChunkRenderDataSchematic
 {
     public static final ChunkRenderDataSchematic EMPTY = new ChunkRenderDataSchematic() {
         @Override
-        public void setBlockLayerUsed(BlockRenderLayer layer)
+        public void setBlockLayerUsed(RenderLayer layer)
         {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public void setBlockLayerStarted(BlockRenderLayer layer)
+        public void setBlockLayerStarted(RenderLayer layer)
         {
             throw new UnsupportedOperationException();
         }
@@ -35,13 +39,13 @@ public class ChunkRenderDataSchematic
         }
     };
 
-    private final boolean[] blockLayersUsed = new boolean[BlockRenderLayer.values().length];
-    private final boolean[] blockLayersStarted = new boolean[BlockRenderLayer.values().length];
+    private final Set<RenderLayer> blockLayersUsed = new ObjectArraySet<>();
+    private final Set<RenderLayer> blockLayersStarted = new ObjectArraySet<>();
     private final List<BlockEntity> blockEntities = new ArrayList<>();
 
     private final boolean[] overlayLayersUsed = new boolean[OverlayRenderType.values().length];
     private final boolean[] overlayLayersStarted = new boolean[OverlayRenderType.values().length];
-    private final BufferBuilder.State[] blockBufferStates = new BufferBuilder.State[BlockRenderLayer.values().length];
+    private final Map<RenderLayer, BufferBuilder.State> blockBufferStates = new HashMap<>();
     private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.values().length];
     private boolean overlayEmpty = true;
     private boolean empty = true;
@@ -52,25 +56,25 @@ public class ChunkRenderDataSchematic
         return this.empty;
     }
 
-    public boolean isBlockLayerEmpty(BlockRenderLayer layer)
+    public boolean isBlockLayerEmpty(RenderLayer layer)
     {
-        return ! this.blockLayersUsed[layer.ordinal()];
+        return ! this.blockLayersUsed.contains(layer);
     }
 
-    public void setBlockLayerUsed(BlockRenderLayer layer)
+    public void setBlockLayerUsed(RenderLayer layer)
     {
-        this.blockLayersUsed[layer.ordinal()] = true;
+        this.blockLayersUsed.add(layer);
         this.empty = false;
     }
 
-    public boolean isBlockLayerStarted(BlockRenderLayer layer)
+    public boolean isBlockLayerStarted(RenderLayer layer)
     {
-        return this.blockLayersStarted[layer.ordinal()];
+        return this.blockLayersStarted.contains(layer);
     }
 
-    public void setBlockLayerStarted(BlockRenderLayer layer)
+    public void setBlockLayerStarted(RenderLayer layer)
     {
-        this.blockLayersStarted[layer.ordinal()] = true;
+        this.blockLayersStarted.add(layer);
     }
 
     public boolean isOverlayEmpty()
@@ -99,14 +103,14 @@ public class ChunkRenderDataSchematic
         return this.overlayLayersStarted[type.ordinal()];
     }
 
-    public BufferBuilder.State getBlockBufferState(BlockRenderLayer layer)
+    public BufferBuilder.State getBlockBufferState(RenderLayer layer)
     {
-        return this.blockBufferStates[layer.ordinal()];
+        return this.blockBufferStates.get(layer);
     }
 
-    public void setBlockBufferState(BlockRenderLayer layer, BufferBuilder.State state)
+    public void setBlockBufferState(RenderLayer layer, BufferBuilder.State state)
     {
-        this.blockBufferStates[layer.ordinal()] = state;
+        this.blockBufferStates.put(layer, state);
     }
 
     public BufferBuilder.State getOverlayBufferState(OverlayRenderType type)

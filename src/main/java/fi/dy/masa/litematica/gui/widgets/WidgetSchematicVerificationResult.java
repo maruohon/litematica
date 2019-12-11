@@ -294,7 +294,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.mismatchInfo.stateFound.getBlock() == Blocks.FLOWER_POT);
 
             GlStateManager.pushMatrix();
-            RenderUtils.enableGuiItemLighting();
+            RenderUtils.enableDiffuseLightingGui3D();
 
             BakedModel model;
 
@@ -325,7 +325,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
             }
 
-            RenderUtils.disableItemLighting();
+            RenderUtils.disableDiffuseLighting();
             GlStateManager.disableBlend();
             GlStateManager.popMatrix();
         }
@@ -450,7 +450,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 y += 12;
 
                 GlStateManager.disableLighting();
-                RenderUtils.enableGuiItemLighting();
+                RenderUtils.enableDiffuseLightingGui3D();
 
                 boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
                 boolean hasModelExpected = this.stateExpected.getRenderType() == BlockRenderType.MODEL;
@@ -492,7 +492,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 //mc.getRenderItem().zLevel -= 100;
 
                 //GlStateManager.disableBlend();
-                RenderUtils.disableItemLighting();
+                RenderUtils.disableDiffuseLighting();
 
                 textRenderer.draw(this.nameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
                 textRenderer.draw(this.nameFound,    x2 + 20, y + 4, 0xFFFFFFFF);

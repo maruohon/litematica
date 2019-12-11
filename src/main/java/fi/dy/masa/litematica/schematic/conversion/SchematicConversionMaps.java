@@ -11,9 +11,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.datafixers.NbtOps;
 import net.minecraft.datafixers.TypeReferences;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.util.TagHelper;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -154,7 +154,7 @@ public class SchematicConversionMaps
             }
 
             // Store the id + meta => state maps before renaming the block for the state <=> state maps
-            BlockState state = TagHelper.deserializeBlockState(newStateTag);
+            BlockState state = NbtHelper.toBlockState(newStateTag);
             //System.out.printf("id: %5d, state: %s, tag: %s\n", idMeta, state, newStateTag);
             ID_META_TO_BLOCKSTATE.putIfAbsent(idMeta, state);
 
@@ -225,7 +225,7 @@ public class SchematicConversionMaps
 
                             if (oldStateTag != null)
                             {
-                                CompoundTag newTag = oldStateTag.method_10553();
+                                CompoundTag newTag = oldStateTag.copy();
                                 newTag.putString("Name", newBlockName);
 
                                 OLD_STATE_TO_NEW_STATE.putIfAbsent(oldStateTag, newTag);
@@ -256,7 +256,7 @@ public class SchematicConversionMaps
 
     public static String updateBlockName(String oldName)
     {
-        StringTag tagStr = new StringTag(oldName);
+        StringTag tagStr = StringTag.of(oldName);
 
         return MinecraftClient.getInstance().getDataFixer().update(TypeReferences.BLOCK_NAME, new Dynamic<>(NbtOps.INSTANCE, tagStr),
                         1139, LitematicaSchematic.MINECRAFT_DATA_VERSION).getValue().asString();

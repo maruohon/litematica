@@ -21,7 +21,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
@@ -52,13 +51,7 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public ClientChunkManager method_2935()
-    {
-        return this.getChunkProvider();
-    }
-
-    @Override
-    public ChunkManager getChunkManager()
+    public ClientChunkManager getChunkManager()
     {
         return this.getChunkProvider();
     }
@@ -66,11 +59,11 @@ public class WorldSchematic extends ClientWorld
     @Override
     public WorldChunk getWorldChunk(BlockPos pos)
     {
-        return this.method_8497(pos.getX() >> 4, pos.getZ() >> 4);
+        return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
     }
 
     @Override
-    public WorldChunk method_8497(int chunkX, int chunkZ)
+    public WorldChunk getChunk(int chunkX, int chunkZ)
     {
         return this.chunkProviderSchematic.getChunk(chunkX, chunkZ);
     }
@@ -78,7 +71,7 @@ public class WorldSchematic extends ClientWorld
     @Override
     public Chunk getChunk(int chunkX, int chunkZ, ChunkStatus status, boolean required)
     {
-        return this.method_8497(chunkX, chunkZ);
+        return this.getChunk(chunkX, chunkZ);
     }
 
     @Override
@@ -101,8 +94,8 @@ public class WorldSchematic extends ClientWorld
 
     private boolean spawnEntityBase(Entity entityIn)
     {
-        int cx = MathHelper.floor(entityIn.x / 16.0D);
-        int cz = MathHelper.floor(entityIn.z / 16.0D);
+        int cx = MathHelper.floor(entityIn.getX() / 16.0D);
+        int cz = MathHelper.floor(entityIn.getZ() / 16.0D);
 
         if (this.chunkProviderSchematic.isChunkLoaded(cx, cz) == false)
         {
@@ -133,7 +126,7 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void scheduleBlockRender(BlockPos pos, BlockState stateOld, BlockState stateNew)
+    public void checkBlockRerender(BlockPos pos, BlockState stateOld, BlockState stateNew)
     {
         this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
     }
@@ -190,12 +183,6 @@ public class WorldSchematic extends ClientWorld
 
     @Override
     public void updateListeners(BlockPos blockPos_1, BlockState blockState_1, BlockState blockState_2, int int_1)
-    {
-        // NO-OP
-    }
-
-    @Override
-    public void setBlockBreakingProgress(int int_1, BlockPos blockPos_1, int int_2)
     {
         // NO-OP
     }

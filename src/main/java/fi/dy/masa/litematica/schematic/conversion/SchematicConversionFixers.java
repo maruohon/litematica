@@ -133,7 +133,7 @@ public class SchematicConversionFixers
     public static final IStateFixer FIXER_BED = (reader, state, pos) -> {
         CompoundTag tag = reader.getBlockEntityData(pos);
 
-        if (tag != null && tag.containsKey("color", Constants.NBT.TAG_INT))
+        if (tag != null && tag.contains("color", Constants.NBT.TAG_INT))
         {
             int colorId = tag.getInt("color");
             Direction facing = state.get(BedBlock.FACING);

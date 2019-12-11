@@ -225,7 +225,7 @@ public class SchematicaSchematic
                     final int zMinChunk = Math.max(cz << 4, posMin.getZ());
                     final int xMaxChunk = Math.min((cx << 4) + 15, posMax.getX());
                     final int zMaxChunk = Math.min((cz << 4) + 15, posMax.getZ());
-                    WorldChunk chunk = world.method_8497(cx, cz);
+                    WorldChunk chunk = world.getChunk(cx, cz);
 
                     if (chunk == null)
                     {
@@ -411,7 +411,7 @@ public class SchematicaSchematic
 
             if (entity.saveToTag(tag))
             {
-                Vec3d pos = new Vec3d(entity.x - posStart.getX(), entity.y - posStart.getY(), entity.z - posStart.getZ());
+                Vec3d pos = new Vec3d(entity.getX() - posStart.getX(), entity.getY() - posStart.getY(), entity.getZ() - posStart.getZ());
                 NBTUtils.writeEntityPositionToTag(pos, tag);
 
                 this.entities.add(tag);
@@ -468,7 +468,7 @@ public class SchematicaSchematic
         Arrays.fill(this.palette, Blocks.AIR.getDefaultState());
 
         // Schematica palette
-        if (nbt.containsKey("SchematicaMapping", Constants.NBT.TAG_COMPOUND))
+        if (nbt.contains("SchematicaMapping", Constants.NBT.TAG_COMPOUND))
         {
             CompoundTag tag = nbt.getCompound("SchematicaMapping");
             Set<String> keys = tag.getKeys();
@@ -494,7 +494,7 @@ public class SchematicaSchematic
             }
         }
         // MCEdit2 palette
-        else if (nbt.containsKey("BlockIDs", Constants.NBT.TAG_COMPOUND))
+        else if (nbt.contains("BlockIDs", Constants.NBT.TAG_COMPOUND))
         {
             CompoundTag tag = nbt.getCompound("BlockIDs");
             Set<String> keys = tag.getKeys();
@@ -549,11 +549,11 @@ public class SchematicaSchematic
 
     private boolean readBlocksFromNBT(CompoundTag nbt)
     {
-        if (nbt.containsKey("Blocks", Constants.NBT.TAG_BYTE_ARRAY) == false ||
-            nbt.containsKey("Data", Constants.NBT.TAG_BYTE_ARRAY) == false ||
-            nbt.containsKey("Width", Constants.NBT.TAG_SHORT) == false ||
-            nbt.containsKey("Height", Constants.NBT.TAG_SHORT) == false ||
-            nbt.containsKey("Length", Constants.NBT.TAG_SHORT) == false)
+        if (nbt.contains("Blocks", Constants.NBT.TAG_BYTE_ARRAY) == false ||
+            nbt.contains("Data", Constants.NBT.TAG_BYTE_ARRAY) == false ||
+            nbt.contains("Width", Constants.NBT.TAG_SHORT) == false ||
+            nbt.contains("Height", Constants.NBT.TAG_SHORT) == false ||
+            nbt.contains("Length", Constants.NBT.TAG_SHORT) == false)
         {
             return false;
         }
@@ -594,7 +594,7 @@ public class SchematicaSchematic
         this.blocks = new LitematicaBlockStateContainer(sizeX, sizeY, sizeZ);
 
         // Old Schematica format
-        if (nbt.containsKey("Add", Constants.NBT.TAG_BYTE_ARRAY))
+        if (nbt.contains("Add", Constants.NBT.TAG_BYTE_ARRAY))
         {
             // FIXME is this array 4 or 8 bits per block?
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "SchematicaSchematic: Old Schematica format detected, not currently implemented...");
@@ -603,7 +603,7 @@ public class SchematicaSchematic
 
         byte[] add = null;
 
-        if (nbt.containsKey("AddBlocks", Constants.NBT.TAG_BYTE_ARRAY))
+        if (nbt.contains("AddBlocks", Constants.NBT.TAG_BYTE_ARRAY))
         {
             add = nbt.getByteArray("AddBlocks");
             final int expectedAddLength = (int) Math.ceil((double) blockIdsByte.length / 2D);
@@ -709,7 +709,7 @@ public class SchematicaSchematic
 
         for (int i = 0; i < tagList.size(); ++i)
         {
-            this.entities.add(tagList.getCompoundTag(i));
+            this.entities.add(tagList.getCompound(i));
         }
     }
 
@@ -720,7 +720,7 @@ public class SchematicaSchematic
 
         for (int i = 0; i < tagList.size(); ++i)
         {
-            CompoundTag tag = tagList.getCompoundTag(i);
+            CompoundTag tag = tagList.getCompound(i);
             BlockPos pos = new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
             Vec3i size = this.blocks.getSize();
 

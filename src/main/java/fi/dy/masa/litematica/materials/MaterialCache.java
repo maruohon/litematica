@@ -7,13 +7,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.Litematica;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,11 +24,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.util.TagHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.FileUtils;
 
 public class MaterialCache
 {
@@ -224,7 +224,7 @@ public class MaterialCache
         for (Map.Entry<BlockState, ItemStack> entry : this.itemsForStates.entrySet())
         {
             CompoundTag tag = new CompoundTag();
-            CompoundTag stateTag = TagHelper.serializeBlockState(entry.getKey());
+            CompoundTag stateTag = NbtHelper.fromBlockState(entry.getKey());
 
             tag.put("Block", stateTag);
             tag.put("Item", entry.getValue().toTag(new CompoundTag()));
@@ -241,19 +241,19 @@ public class MaterialCache
     {
         this.itemsForStates.clear();
 
-        if (nbt.containsKey("MaterialCache", Constants.NBT.TAG_LIST))
+        if (nbt.contains("MaterialCache", Constants.NBT.TAG_LIST))
         {
             ListTag list = nbt.getList("MaterialCache", Constants.NBT.TAG_COMPOUND);
             final int count = list.size();
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag tag = list.getCompoundTag(i);
+                CompoundTag tag = list.getCompound(i);
 
-                if (tag.containsKey("Block", Constants.NBT.TAG_COMPOUND) &&
-                    tag.containsKey("Item", Constants.NBT.TAG_COMPOUND))
+                if (tag.contains("Block", Constants.NBT.TAG_COMPOUND) &&
+                    tag.contains("Item", Constants.NBT.TAG_COMPOUND))
                 {
-                    BlockState state = TagHelper.deserializeBlockState(tag.getCompound("Block"));
+                    BlockState state = NbtHelper.toBlockState(tag.getCompound("Block"));
 
                     if (state != null)
                     {

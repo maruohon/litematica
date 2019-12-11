@@ -9,13 +9,13 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import fi.dy.masa.litematica.Litematica;
-import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.crash.CrashReport;
+import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 
 public class ChunkRenderWorkerLitematica implements Runnable
 {
@@ -54,7 +54,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.create(throwable, "Batching chunks");
-                MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().populateCrashReport(crashreport));
+                MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
                 return;
             }
         }
@@ -94,17 +94,14 @@ public class ChunkRenderWorkerLitematica implements Runnable
             generator.setRegionRenderCacheBuilder(this.getRegionRenderCacheBuilder());
 
             ChunkRenderTaskSchematic.Type generatorType = generator.getType();
-            float x = (float) entity.x;
-            float y = (float) entity.y + entity.getStandingEyeHeight();
-            float z = (float) entity.z;
 
             if (generatorType == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK)
             {
-                generator.getRenderChunk().rebuildChunk(x, y, z, generator);
+                generator.getRenderChunk().rebuildChunk(generator);
             }
             else if (generatorType == ChunkRenderTaskSchematic.Type.RESORT_TRANSPARENCY)
             {
-                generator.getRenderChunk().resortTransparency(x, y, z, generator);
+                generator.getRenderChunk().resortTransparency(generator);
             }
 
             generator.getLock().lock();
@@ -115,7 +112,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 {
                     if (generator.isFinished() == false)
                     {
-                        LOGGER.warn("Chunk render task was {} when I expected it to be compiling; aborting task", (Object)generator.getStatus());
+                        LOGGER.warn("Chunk render task was {} when I expected it to be compiling; aborting task", (Object) generator.getStatus());
                     }
 
                     this.freeRenderBuilder(generator);
@@ -137,11 +134,12 @@ public class ChunkRenderWorkerLitematica implements Runnable
             if (generatorType == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK)
             {
                 //if (GuiBase.isCtrlDown()) System.out.printf("pre uploadChunk()\n");
-                for (BlockRenderLayer layer : BlockRenderLayer.values())
+                for (RenderLayer layer : RenderLayer.getBlockLayers())
                 {
                     if (chunkRenderData.isBlockLayerEmpty(layer) == false)
                     {
                         //if (GuiBase.isCtrlDown()) System.out.printf("REBUILD_CHUNK pre uploadChunkBlocks()\n");
+                        //System.out.printf("REBUILD_CHUNK pre uploadChunkBlocks(%s)\n", layer.toString());
                         BufferBuilder buffer = buffers.getBlockBufferByLayer(layer);
                         futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(layer, buffer, renderChunk, chunkRenderData, generator.getDistanceSq()));
                     }
@@ -159,13 +157,19 @@ public class ChunkRenderWorkerLitematica implements Runnable
             }
             else if (generatorType == ChunkRenderTaskSchematic.Type.RESORT_TRANSPARENCY)
             {
-                BufferBuilder buffer = buffers.getBlockBufferByLayer(BlockRenderLayer.TRANSLUCENT);
-                futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, chunkRenderData, generator.getDistanceSq()));
+                RenderLayer layer = RenderLayer.getTranslucent();
+
+                if (chunkRenderData.isBlockLayerEmpty(layer) == false)
+                {
+                    //System.out.printf("RESORT_TRANSPARENCY pre uploadChunkBlocks(%s)\n", layer.toString());
+                    BufferBuilder buffer = buffers.getBlockBufferByLayer(layer);
+                    futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(RenderLayer.getTranslucent(), buffer, renderChunk, chunkRenderData, generator.getDistanceSq()));
+                }
 
                 if (chunkRenderData.isOverlayTypeEmpty(OverlayRenderType.QUAD) == false)
                 {
                     //if (GuiBase.isCtrlDown()) System.out.printf("RESORT_TRANSPARENCY pre uploadChunkOverlay()\n");
-                    buffer = buffers.getOverlayBuffer(OverlayRenderType.QUAD);
+                    BufferBuilder buffer = buffers.getOverlayBuffer(OverlayRenderType.QUAD);
                     futuresList.add(this.chunkRenderDispatcher.uploadChunkOverlay(OverlayRenderType.QUAD, buffer, renderChunk, chunkRenderData, generator.getDistanceSq()));
                 }
             }

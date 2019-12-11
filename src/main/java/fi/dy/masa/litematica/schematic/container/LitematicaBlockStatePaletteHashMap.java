@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.util.Int2ObjectBiMap;
-import net.minecraft.util.TagHelper;
 
 public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockStatePalette
 {
@@ -73,8 +73,8 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag tag = tagList.getCompoundTag(i);
-            BlockState state = TagHelper.deserializeBlockState(tag);
+            CompoundTag tag = tagList.getCompound(i);
+            BlockState state = NbtHelper.toBlockState(tag);
 
             if (i > 0 || state != LitematicaBlockStateContainer.AIR_BLOCK_STATE)
             {
@@ -90,7 +90,7 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
 
         for (int id = 0; id < this.statePaletteMap.size(); ++id)
         {
-            CompoundTag tag = TagHelper.serializeBlockState(this.statePaletteMap.get(id));
+            CompoundTag tag = NbtHelper.fromBlockState(this.statePaletteMap.get(id));
             tagList.add(tag);
         }
 

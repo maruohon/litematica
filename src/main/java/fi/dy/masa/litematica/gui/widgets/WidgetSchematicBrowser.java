@@ -8,6 +8,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicBrowserBase;
@@ -18,11 +23,6 @@ import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3i;
 
 public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 {
@@ -94,10 +94,12 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
         if (meta != null)
         {
+            RenderUtils.color(1f, 1f, 1f, 1f);
+
             x += 3;
             y += 3;
             int textColor = 0xC0C0C0C0;
-            int valueColor = 0xC0FFFFFF;
+            int valueColor = 0xFFFFFFFF;
 
             String str = StringUtils.translate("litematica.gui.label.schematic_info.name");
             this.drawString(str, x, y, textColor);
@@ -253,7 +255,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                             int val = previewImageData[i++];
                             // Swap the color channels from ARGB to ABGR
                             val = (val & 0xFF00FF00) | (val & 0xFF0000) >> 16 | (val & 0xFF) << 16;
-                            image.setPixelRGBA(x, y, val);
+                            image.setPixelRgba(x, y, val);
                         }
                     }
 

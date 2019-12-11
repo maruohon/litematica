@@ -1,17 +1,17 @@
 package fi.dy.masa.litematica.world;
 
 import java.util.Arrays;
-import net.minecraft.class_4548;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.util.SystemUtil;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
 
@@ -22,7 +22,7 @@ public class ChunkSchematic extends WorldChunk
 
     public ChunkSchematic(World worldIn, ChunkPos pos)
     {
-        super(worldIn, pos, new class_4548(SystemUtil.consume(new Biome[class_4548.field_20649], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
+        super(worldIn, pos, new BiomeArray(Util.make(new Biome[BiomeArray.DEFAULT_LENGTH], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
 
         this.timeCreated = worldIn.getTime();
     }

@@ -30,13 +30,13 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.TaskPriority;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ScheduledTick;
+import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
@@ -389,7 +389,7 @@ public class LitematicaSchematic
 
                         if (te != null)
                         {
-                            teNBT = teNBT.method_10553();
+                            teNBT = teNBT.copy();
                             teNBT.putInt("x", pos.getX());
                             teNBT.putInt("y", pos.getY());
                             teNBT.putInt("z", pos.getZ());
@@ -440,7 +440,7 @@ public class LitematicaSchematic
                 {
                     BlockPos pos = entry.getKey().add(regionPosAbs);
                     ScheduledTick<Block> tick = entry.getValue();
-                    serverWorld.method_14196().schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
+                    serverWorld.getBlockTickScheduler().schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
                 }
             }
 
@@ -454,7 +454,7 @@ public class LitematicaSchematic
                     if (state.getFluidState().isEmpty() == false)
                     {
                         ScheduledTick<Fluid> tick = entry.getValue();
-                        serverWorld.method_14179().schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
+                        serverWorld.getFluidTickScheduler().schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
                     }
                 }
             }
@@ -651,7 +651,7 @@ public class LitematicaSchematic
 
                         if (te != null)
                         {
-                            teNBT = teNBT.method_10553();
+                            teNBT = teNBT.copy();
                             teNBT.putInt("x", pos.getX());
                             teNBT.putInt("y", pos.getY());
                             teNBT.putInt("z", pos.getZ());
@@ -777,7 +777,7 @@ public class LitematicaSchematic
 
                 if (entity.saveToTag(tag))
                 {
-                    Vec3d posVec = new Vec3d(entity.x - regionPosAbs.getX(), entity.y - regionPosAbs.getY(), entity.z - regionPosAbs.getZ());
+                    Vec3d posVec = new Vec3d(entity.getX() - regionPosAbs.getX(), entity.getY() - regionPosAbs.getY(), entity.getZ() - regionPosAbs.getZ());
                     NBTUtils.writeEntityPositionToTag(posVec, tag);
                     list.add(new EntityInfo(posVec, tag));
                 }
@@ -820,7 +820,7 @@ public class LitematicaSchematic
 
                     if (entity.saveToTag(tag))
                     {
-                        Vec3d posVec = new Vec3d(entity.x - regionPosAbs.getX(), entity.y - regionPosAbs.getY(), entity.z - regionPosAbs.getZ());
+                        Vec3d posVec = new Vec3d(entity.getX() - regionPosAbs.getX(), entity.getY() - regionPosAbs.getY(), entity.getZ() - regionPosAbs.getZ());
                         NBTUtils.writeEntityPositionToTag(posVec, tag);
                         list.add(new EntityInfo(posVec, tag));
                         existingEntities.add(uuid);
@@ -890,14 +890,14 @@ public class LitematicaSchematic
                 IntBoundingBox tickBox = IntBoundingBox.createProper(
                         startX,         startY,         startZ,
                         startX + sizeX, startY + sizeY, startZ + sizeZ);
-                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).method_14196().getScheduledTicks(tickBox.toVanillaBox(), false, false);
+                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).getBlockTickScheduler().getScheduledTicks(tickBox.toVanillaBox(), false, false);
 
                 if (blockTicks != null)
                 {
                     this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getTime());
                 }
 
-                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).method_14179().getScheduledTicks(tickBox.toVanillaBox(), false, false);
+                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).getFluidTickScheduler().getScheduledTicks(tickBox.toVanillaBox(), false, false);
 
                 if (fluidTicks != null)
                 {
@@ -1016,14 +1016,14 @@ public class LitematicaSchematic
                 IntBoundingBox tickBox = IntBoundingBox.createProper(
                         offsetX + startX  , offsetY + startY  , offsetZ + startZ  ,
                         offsetX + endX + 1, offsetY + endY + 1, offsetZ + endZ + 1);
-                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).method_14196().getScheduledTicks(tickBox.toVanillaBox(), false, false);
+                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).getBlockTickScheduler().getScheduledTicks(tickBox.toVanillaBox(), false, false);
 
                 if (blockTicks != null)
                 {
                     this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getTime());
                 }
 
-                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).method_14179().getScheduledTicks(tickBox.toVanillaBox(), false, false);
+                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).getFluidTickScheduler().getScheduledTicks(tickBox.toVanillaBox(), false, false);
 
                 if (fluidTicks != null)
                 {
@@ -1159,7 +1159,7 @@ public class LitematicaSchematic
                     CompoundTag tag = new CompoundTag();
 
                     tag.putString(tagName, rl.toString());
-                    tag.putInt("Priority", entry.priority.getPriorityIndex());
+                    tag.putInt("Priority", entry.priority.getIndex());
                     tag.putInt("Time", (int) entry.time);
                     tag.putInt("x", entry.pos.getX());
                     tag.putInt("y", entry.pos.getY());
@@ -1196,7 +1196,7 @@ public class LitematicaSchematic
         this.subRegionPositions.clear();
         this.subRegionSizes.clear();
 
-        if (nbt.containsKey("Version", Constants.NBT.TAG_INT))
+        if (nbt.contains("Version", Constants.NBT.TAG_INT))
         {
             final int version = nbt.getInt("Version");
             final int minecraftDataVersion = nbt.getInt("MinecraftDataVersion");
@@ -1225,7 +1225,7 @@ public class LitematicaSchematic
     {
         for (String regionName : tag.getKeys())
         {
-            if (tag.getTag(regionName).getType() == Constants.NBT.TAG_COMPOUND)
+            if (tag.get(regionName).getType() == Constants.NBT.TAG_COMPOUND)
             {
                 CompoundTag regionTag = tag.getCompound(regionName);
                 BlockPos regionPos = NBTUtils.readBlockPos(regionTag.getCompound("Position"));
@@ -1259,7 +1259,7 @@ public class LitematicaSchematic
                         this.pendingFluidTicks.put(regionName, this.readPendingTicksFromNBT(list, Fluids.EMPTY));
                     }
 
-                    Tag nbtBase = regionTag.getTag("BlockStates");
+                    Tag nbtBase = regionTag.get("BlockStates");
 
                     // There are no convenience methods in NBTTagCompound yet in 1.12, so we'll have to do it the ugly way...
                     if (nbtBase != null && nbtBase.getType() == Constants.NBT.TAG_LONG_ARRAY)
@@ -1292,7 +1292,7 @@ public class LitematicaSchematic
 
             for (int i = 0; i < count; ++i)
             {
-                newPalette.add(SchematicConversionMaps.get_1_13_2_StateTagFor_1_12_Tag(oldPalette.getCompoundTag(i)));
+                newPalette.add(SchematicConversionMaps.get_1_13_2_StateTagFor_1_12_Tag(oldPalette.getCompound(i)));
             }
 
             return newPalette;
@@ -1308,7 +1308,7 @@ public class LitematicaSchematic
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag entityData = tagList.getCompoundTag(i);
+            CompoundTag entityData = tagList.getCompound(i);
             Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
 
             if (posVec != null && entityData.isEmpty() == false)
@@ -1327,7 +1327,7 @@ public class LitematicaSchematic
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag tag = tagList.getCompoundTag(i);
+            CompoundTag tag = tagList.getCompound(i);
             BlockPos pos = NBTUtils.readBlockPos(tag);
 
             if (pos != null && tag.isEmpty() == false)
@@ -1347,16 +1347,16 @@ public class LitematicaSchematic
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag tag = tagList.getCompoundTag(i);
+            CompoundTag tag = tagList.getCompound(i);
 
-            if (tag.containsKey("Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
+            if (tag.contains("Time", Constants.NBT.TAG_ANY_NUMERIC)) // XXX these were accidentally saved as longs in version 3
             {
                 T target = null;
 
                 // Don't crash on invalid ResourceLocation in 1.13+
                 try
                 {
-                    if (clazz instanceof Block && tag.containsKey("Block", Constants.NBT.TAG_STRING))
+                    if (clazz instanceof Block && tag.contains("Block", Constants.NBT.TAG_STRING))
                     {
                         target = (T) Registry.BLOCK.get(new Identifier(tag.getString("Block")));
 
@@ -1365,7 +1365,7 @@ public class LitematicaSchematic
                             continue;
                         }
                     }
-                    else if (clazz instanceof Fluid && tag.containsKey("Fluid", Constants.NBT.TAG_STRING))
+                    else if (clazz instanceof Fluid && tag.contains("Fluid", Constants.NBT.TAG_STRING))
                     {
                         target = (T) Registry.FLUID.get(new Identifier(tag.getString("Fluid")));
 
@@ -1384,7 +1384,7 @@ public class LitematicaSchematic
                     BlockPos pos = new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
                     // Note: the time is a relative delay at this point
                     int scheduledTime = tag.getInt("Time");
-                    TaskPriority priority = TaskPriority.getByIndex(tag.getInt("Priority"));
+                    TickPriority priority = TickPriority.byIndex(tag.getInt("Priority"));
 
                     ScheduledTick<T> entry = new ScheduledTick<>(pos, target, scheduledTime, priority);
 
@@ -1403,7 +1403,7 @@ public class LitematicaSchematic
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag tag = tagList.getCompoundTag(i);
+            CompoundTag tag = tagList.getCompound(i);
             Vec3d posVec = NBTUtils.readVec3d(tag);
             CompoundTag entityData = tag.getCompound("EntityData");
 
@@ -1425,7 +1425,7 @@ public class LitematicaSchematic
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag tag = tagList.getCompoundTag(i);
+            CompoundTag tag = tagList.getCompound(i);
             CompoundTag tileNbt = tag.getCompound("TileNBT");
 
             // Note: This within-schematic relative position is not inside the tile tag!

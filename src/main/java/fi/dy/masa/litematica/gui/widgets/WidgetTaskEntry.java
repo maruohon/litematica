@@ -53,7 +53,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
 
         this.drawSubWidgets(mouseX, mouseY);
 
-        RenderUtils.disableItemLighting();
+        RenderUtils.disableDiffuseLighting();
         GlStateManager.disableLighting();
     }
 

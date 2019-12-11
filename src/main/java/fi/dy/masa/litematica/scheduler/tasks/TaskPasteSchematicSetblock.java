@@ -271,7 +271,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                 String nbtString = nbt.toString();
                 */
 
-                String strCommand = String.format("/summon %s %f %f %f", id, entity.x, entity.y, entity.z);
+                String strCommand = String.format("/summon %s %f %f %f", id, entity.getX(), entity.getY(), entity.getZ());
                 /*
                 String strCommand = String.format("/summon %s %f %f %f %s", entityName, entity.posX, entity.posY, entity.posZ, nbtString);
                 System.out.printf("entity: %s\n", entity);

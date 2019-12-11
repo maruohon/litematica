@@ -14,6 +14,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerTask;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -40,18 +52,6 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerTask;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 
 public class SchematicPlacementManager
 {
@@ -674,7 +674,7 @@ public class SchematicPlacementManager
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
                     MinecraftServer server = mc.getServer();
 
-                    server.method_18858(new ServerTask(server.getTicks(), () ->
+                    server.send(new ServerTask(server.getTicks(), () ->
                     {
                         if (schematic.placeToWorld(world, schematicPlacement, false))
                         {

@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import javax.annotation.Nullable;
-import net.minecraft.class_4543;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -10,30 +9,30 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.LightType;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
+import net.minecraft.world.level.ColorResolver;
 import fi.dy.masa.litematica.world.FakeLightingProvider;
 
 public class ChunkCacheSchematic implements BlockRenderView
 {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
 
-    private final FakeLightingProvider lightingProvider;
+    protected final ClientWorld world;
+    protected final ClientWorld worldClient;
+    protected final FakeLightingProvider lightingProvider;
     protected int chunkStartX;
     protected int chunkStartZ;
     protected WorldChunk[][] chunkArray;
     protected boolean empty;
-    protected World world;
 
-    public ChunkCacheSchematic(ClientWorld worldIn, BlockPos pos, int expand)
+    public ChunkCacheSchematic(ClientWorld worldIn, ClientWorld clientWorld, BlockPos pos, int expand)
     {
         this.lightingProvider = new FakeLightingProvider();
 
         this.world = worldIn;
+        this.worldClient = clientWorld;
         this.chunkStartX = (pos.getX() - expand) >> 4;
         this.chunkStartZ = (pos.getZ() - expand) >> 4;
         int chunkEndX = (pos.getX() + expand + 15) >> 4;
@@ -93,12 +92,6 @@ public class ChunkCacheSchematic implements BlockRenderView
     }
 
     @Override
-    public Biome getBiome(BlockPos pos)
-    {
-        return Biomes.THE_END;
-    }
-
-    @Override
     @Nullable
     public BlockEntity getBlockEntity(BlockPos pos)
     {
@@ -128,14 +121,14 @@ public class ChunkCacheSchematic implements BlockRenderView
     }
 
     @Override
-    public class_4543 method_22385()
-    {
-        return null;
-    }
-
-    @Override
     public LightingProvider getLightingProvider()
     {
         return this.lightingProvider;
+    }
+
+    @Override
+    public int getColor(BlockPos pos, ColorResolver colorResolver)
+    {
+        return colorResolver.getColor(this.worldClient.getBiome(pos), (double)pos.getX(), (double)pos.getZ());
     }
 }
