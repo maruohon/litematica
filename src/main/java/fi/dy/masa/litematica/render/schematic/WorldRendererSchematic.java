@@ -645,12 +645,11 @@ public class WorldRendererSchematic
 
                         if (shouldRender)
                         {
-                            double x = MathHelper.lerp(partialTicks, entityTmp.lastRenderX, entityTmp.getX()) - cameraX;
-                            double y = MathHelper.lerp(partialTicks, entityTmp.lastRenderY, entityTmp.getY()) - cameraY;
-                            double z = MathHelper.lerp(partialTicks, entityTmp.lastRenderZ, entityTmp.getZ()) - cameraZ;
-                            float yaw = MathHelper.lerp(partialTicks, entityTmp.prevYaw, entityTmp.yaw);
+                            double x = entityTmp.getX() - cameraX;
+                            double y = entityTmp.getY() - cameraY;
+                            double z = entityTmp.getZ() - cameraZ;
 
-                            this.entityRenderDispatcher.render(entityTmp, x, y, z, yaw, partialTicks, matrices, entityVertexConsumers, this.entityRenderDispatcher.getLight(entityTmp, partialTicks));
+                            this.entityRenderDispatcher.render(entityTmp, x, y, z, entityTmp.yaw, partialTicks, matrices, entityVertexConsumers, this.entityRenderDispatcher.getLight(entityTmp, partialTicks));
                             ++this.countEntitiesRendered;
                         }
                     }
