@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
@@ -63,7 +64,6 @@ public class ChunkRendererSchematicVbo
     protected final EnumSet<OverlayRenderType> existingOverlays = EnumSet.noneOf(OverlayRenderType.class);
 
     private net.minecraft.util.math.Box boundingBox;
-    private Vec3d cameraPos;
     protected Color4f overlayColor;
     protected boolean hasOverlay = false;
 
@@ -87,7 +87,6 @@ public class ChunkRendererSchematicVbo
         this.vertexBufferOverlay = new VertexBuffer[OverlayRenderType.values().length];
         this.position = new BlockPos.Mutable();
         this.chunkRelativePos = new BlockPos.Mutable();
-        this.cameraPos = Vec3d.ZERO;
 
         for (RenderLayer layer : RenderLayer.getBlockLayers())
         {
@@ -195,15 +194,16 @@ public class ChunkRendererSchematicVbo
         }
     }
 
-    public void resortTransparency(ChunkRenderTaskSchematic generator)
+    public void resortTransparency(ChunkRenderTaskSchematic task)
     {
         RenderLayer layerTranslucent = RenderLayer.getTranslucent();
-        ChunkRenderDataSchematic data = generator.getChunkRenderData();
-        BufferBuilderCache buffers = generator.getBufferCache();
+        ChunkRenderDataSchematic data = task.getChunkRenderData();
+        BufferBuilderCache buffers = task.getBufferCache();
         BufferBuilder.State bufferState = data.getBlockBufferState(layerTranslucent);
-        float x = (float) this.cameraPos.x - this.position.getX();
-        float y = (float) this.cameraPos.y - this.position.getY();
-        float z = (float) this.cameraPos.z - this.position.getZ();
+        Vec3d cameraPos = task.getCameraPosSupplier().get();
+        float x = (float) cameraPos.x - this.position.getX();
+        float y = (float) cameraPos.y - this.position.getY();
+        float z = (float) cameraPos.z - this.position.getZ();
 
         if (bufferState != null)
         {
@@ -234,23 +234,23 @@ public class ChunkRendererSchematicVbo
         }
     }
 
-    public void rebuildChunk(ChunkRenderTaskSchematic generator)
+    public void rebuildChunk(ChunkRenderTaskSchematic task)
     {
         ChunkRenderDataSchematic data = new ChunkRenderDataSchematic();
-        generator.getLock().lock();
+        task.getLock().lock();
 
         try
         {
-            if (generator.getStatus() != ChunkRenderTaskSchematic.Status.COMPILING)
+            if (task.getStatus() != ChunkRenderTaskSchematic.Status.COMPILING)
             {
                 return;
             }
 
-            generator.setChunkRenderData(data);
+            task.setChunkRenderData(data);
         }
         finally
         {
-            generator.getLock().unlock();
+            task.getLock().unlock();
         }
 
         Set<BlockEntity> tileEntities = new HashSet<>();
@@ -268,11 +268,12 @@ public class ChunkRendererSchematicVbo
             {
                 ++schematicRenderChunksUpdated;
 
-                float x = (float) this.cameraPos.x - this.position.getX();
-                float y = (float) this.cameraPos.y - this.position.getY();
-                float z = (float) this.cameraPos.z - this.position.getZ();
+                Vec3d cameraPos = task.getCameraPosSupplier().get();
+                float x = (float) cameraPos.x - this.position.getX();
+                float y = (float) cameraPos.y - this.position.getY();
+                float z = (float) cameraPos.z - this.position.getZ();
                 Set<RenderLayer> usedLayers = new HashSet<>();
-                BufferBuilderCache buffers = generator.getBufferCache();
+                BufferBuilderCache buffers = task.getBufferCache();
                 MatrixStack matrices = new MatrixStack();
 
                 for (IntBoundingBox box : this.boxes)
@@ -781,7 +782,7 @@ public class ChunkRendererSchematicVbo
         buffer.end();
     }
 
-    public ChunkRenderTaskSchematic makeCompileTaskChunkSchematic()
+    public ChunkRenderTaskSchematic makeCompileTaskChunkSchematic(Supplier<Vec3d> cameraPosSupplier)
     {
         this.chunkRenderLock.lock();
         ChunkRenderTaskSchematic generator = null;
@@ -791,7 +792,7 @@ public class ChunkRendererSchematicVbo
             //if (GuiBase.isCtrlDown()) System.out.printf("makeCompileTaskChunk()\n");
             this.finishCompileTask();
             this.rebuildWorldView();
-            this.compileTask = new ChunkRenderTaskSchematic(this, ChunkRenderTaskSchematic.Type.REBUILD_CHUNK, this.getDistanceSq());
+            this.compileTask = new ChunkRenderTaskSchematic(this, ChunkRenderTaskSchematic.Type.REBUILD_CHUNK, cameraPosSupplier, this.getDistanceSq());
             generator = this.compileTask;
         }
         finally
@@ -803,7 +804,7 @@ public class ChunkRendererSchematicVbo
     }
 
     @Nullable
-    public ChunkRenderTaskSchematic makeCompileTaskTransparencySchematic()
+    public ChunkRenderTaskSchematic makeCompileTaskTransparencySchematic(Supplier<Vec3d> cameraPosSupplier)
     {
         this.chunkRenderLock.lock();
 
@@ -816,7 +817,7 @@ public class ChunkRendererSchematicVbo
                     this.compileTask.finish();
                 }
 
-                this.compileTask = new ChunkRenderTaskSchematic(this, ChunkRenderTaskSchematic.Type.RESORT_TRANSPARENCY, this.getDistanceSq());
+                this.compileTask = new ChunkRenderTaskSchematic(this, ChunkRenderTaskSchematic.Type.RESORT_TRANSPARENCY, cameraPosSupplier, this.getDistanceSq());
                 this.compileTask.setChunkRenderData(this.chunkRenderData);
 
                 return this.compileTask;

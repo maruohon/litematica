@@ -67,11 +67,11 @@ public class WorldRendererSchematic
     private int cameraChunkX = Integer.MIN_VALUE;
     private int cameraChunkY = Integer.MIN_VALUE;
     private int cameraChunkZ = Integer.MIN_VALUE;
-    private double lastViewEntityX = Double.MIN_VALUE;
-    private double lastViewEntityY = Double.MIN_VALUE;
-    private double lastViewEntityZ = Double.MIN_VALUE;
-    private float lastViewEntityPitch = Float.MIN_VALUE;
-    private float lastViewEntityYaw = Float.MIN_VALUE;
+    private double lastCameraX = Double.MIN_VALUE;
+    private double lastCameraY = Double.MIN_VALUE;
+    private double lastCameraZ = Double.MIN_VALUE;
+    private float lastCameraPitch = Float.MIN_VALUE;
+    private float lastCameraYaw = Float.MIN_VALUE;
     private ChunkRenderDispatcherLitematica renderDispatcher;
     private final IChunkRendererFactory renderChunkFactory;
     //private ShaderGroup entityOutlineShader;
@@ -256,9 +256,13 @@ public class WorldRendererSchematic
         }
 
         this.world.getProfiler().swap("renderlist_camera");
-        double cameraX = camera.getPos().x;
-        double cameraY = camera.getPos().y;
-        double cameraZ = camera.getPos().z;
+
+        Vec3d cameraPos = camera.getPos();
+        double cameraX = cameraPos.x;
+        double cameraY = cameraPos.y;
+        double cameraZ = cameraPos.z;
+
+        this.renderDispatcher.setCameraPosition(cameraPos);
 
         this.world.getProfiler().swap("culling");
         BlockPos viewPos = new BlockPos(cameraX, cameraY + (double) entity.getStandingEyeHeight(), cameraZ);
@@ -269,16 +273,16 @@ public class WorldRendererSchematic
         BlockPos viewPosSubChunk = new BlockPos(viewSubChunk.getX() << 4, viewSubChunk.getY() << 4, viewSubChunk.getZ() << 4);
 
         this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false ||
-                entityX != this.lastViewEntityX ||
-                entityY != this.lastViewEntityY ||
-                entityZ != this.lastViewEntityZ ||
-                entity.pitch != this.lastViewEntityPitch ||
-                entity.yaw != this.lastViewEntityYaw;
-        this.lastViewEntityX = cameraX;
-        this.lastViewEntityY = cameraY;
-        this.lastViewEntityZ = cameraZ;
-        this.lastViewEntityPitch = camera.getPitch();
-        this.lastViewEntityYaw = camera.getYaw();
+                entityX != this.lastCameraX ||
+                entityY != this.lastCameraY ||
+                entityZ != this.lastCameraZ ||
+                entity.pitch != this.lastCameraPitch ||
+                entity.yaw != this.lastCameraYaw;
+        this.lastCameraX = cameraX;
+        this.lastCameraY = cameraY;
+        this.lastCameraZ = cameraZ;
+        this.lastCameraPitch = camera.getPitch();
+        this.lastCameraYaw = camera.getYaw();
 
         this.world.getProfiler().swap("update");
 

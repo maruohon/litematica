@@ -35,4 +35,14 @@ public class BufferBuilderCache
     {
         return this.overlayBufferBuilders[type.ordinal()];
     }
+
+    public void clear()
+    {
+        this.blockBufferBuilders.values().forEach(BufferBuilder::reset);
+
+        for (BufferBuilder buffer : this.overlayBufferBuilders)
+        {
+            buffer.reset();
+        }
+    }
 }
