@@ -17,7 +17,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
@@ -744,18 +743,7 @@ public class LitematicaSchematic
         if (rotationCombined != BlockRotation.NONE) { rotationYaw += entity.yaw - entity.applyRotation(rotationCombined); }
 
         entity.setPositionAndAngles(x, y, z, rotationYaw, entity.pitch);
-
-        entity.prevYaw = rotationYaw;
-        entity.prevPitch = entity.pitch;
-
-        if (entity instanceof LivingEntity)
-        {
-            LivingEntity livingBase = (LivingEntity) entity;
-            livingBase.headYaw = rotationYaw;
-            livingBase.prevHeadYaw = rotationYaw;
-            //livingBase.renderYawOffset = rotationYaw;
-            //livingBase.prevRenderYawOffset = rotationYaw;
-        }
+        EntityUtils.setEntityRotations(entity, rotationYaw, entity.pitch);
     }
 
     private void takeEntitiesFromWorld(World world, List<Box> boxes, BlockPos origin)
