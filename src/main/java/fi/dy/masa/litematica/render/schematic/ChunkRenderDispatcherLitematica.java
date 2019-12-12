@@ -19,6 +19,7 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 
@@ -34,12 +35,14 @@ public class ChunkRenderDispatcherLitematica
     private final Queue<ChunkRenderDispatcherLitematica.PendingUpload> queueChunkUploads = Queues.newPriorityQueue();
     private final ChunkRenderWorkerLitematica renderWorker;
     private final int countRenderBuilders;
+    private Vec3d cameraPos;
 
     public ChunkRenderDispatcherLitematica()
     {
         int threadLimitMemory = Math.max(1, (int)((double)Runtime.getRuntime().maxMemory() * 0.3D) / 10485760);
         int threadLimitCPU = Math.max(1, MathHelper.clamp(Runtime.getRuntime().availableProcessors(), 1, threadLimitMemory / 5));
         this.countRenderBuilders = MathHelper.clamp(threadLimitCPU * 10, 1, threadLimitMemory);
+        this.cameraPos = Vec3d.ZERO;
 
         if (threadLimitCPU > 1)
         {
@@ -61,6 +64,16 @@ public class ChunkRenderDispatcherLitematica
         }
 
         this.renderWorker = new ChunkRenderWorkerLitematica(this, new BufferBuilderCache());
+    }
+
+    public void setCameraPosition(Vec3d cameraPos)
+    {
+        this.cameraPos = cameraPos;
+    }
+
+    public Vec3d getCameraPos()
+    {
+        return this.cameraPos;
     }
 
     public String getDebugInfo()
@@ -121,7 +134,7 @@ public class ChunkRenderDispatcherLitematica
 
         try
         {
-            final ChunkRenderTaskSchematic generator = renderChunk.makeCompileTaskChunkSchematic();
+            final ChunkRenderTaskSchematic generator = renderChunk.makeCompileTaskChunkSchematic(this::getCameraPos);
 
             generator.addFinishRunnable(new Runnable()
             {
@@ -156,7 +169,7 @@ public class ChunkRenderDispatcherLitematica
 
         try
         {
-            ChunkRenderTaskSchematic generator = chunkRenderer.makeCompileTaskChunkSchematic();
+            ChunkRenderTaskSchematic generator = chunkRenderer.makeCompileTaskChunkSchematic(this::getCameraPos);
 
             try
             {
@@ -220,7 +233,7 @@ public class ChunkRenderDispatcherLitematica
 
         try
         {
-            final ChunkRenderTaskSchematic generator = renderChunk.makeCompileTaskTransparencySchematic();
+            final ChunkRenderTaskSchematic generator = renderChunk.makeCompileTaskTransparencySchematic(this::getCameraPos);
 
             if (generator == null)
             {
