@@ -176,12 +176,12 @@ public class BlockModelRendererSchematic
 
             if (useWorldLight)
             {
+                ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeGetQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), null, flags);
                 BlockPos blockPos = flags.get(0) ? pos.offset(bakedQuad.getFace()) : pos;
                 light = WorldRenderer.getLightmapCoordinates(world, state, blockPos);
-
-                ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeGetQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), null, flags);
-                ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeRenderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad, 1.0F, 1.0F, 1.0F, 1.0F, light, light, light, light, overlay);
             }
+
+            ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeRenderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad, 1.0F, 1.0F, 1.0F, 1.0F, light, light, light, light, overlay);
         }
     }
 
