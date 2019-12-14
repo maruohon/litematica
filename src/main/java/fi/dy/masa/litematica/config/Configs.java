@@ -83,6 +83,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       RENDER_MATERIALS_IN_GUI = new ConfigBoolean(    "renderMaterialListInGuis", true, "Whether or not the material list should\nbe rendered inside GUIs");
         public static final ConfigBoolean       RENDER_THREAD_NO_TIMEOUT = new ConfigBoolean(   "renderThreadNoTimeout", true, "Removes the timeout from the rendering worker threads.\nIf you get very stuttery rendering when moving around\nor dealing with large schematics, try disabling this. It will however make\nthe schematic rendering a lot slower in some cases.");
         public static final ConfigOptionList    SELECTION_CORNERS_MODE  = new ConfigOptionList( "selectionCornersMode", CornerSelectionMode.CORNERS, "The Area Selection corners mode to use (Corners, or Expand)");
+        public static final ConfigBoolean       SIGN_TEXT_PASTE         = new ConfigBoolean(    "signTextPaste", true, "Automatically set the text in the sign GUIs from the schematic");
         public static final ConfigString        TOOL_ITEM               = new ConfigString(     "toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
         public static final ConfigBoolean       TOOL_ITEM_ENABLED       = new ConfigBoolean(    "toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.", "Tool Item Enabled");
         public static final ConfigBoolean       UNHIDE_SCHEMATIC_PROJECTS = new ConfigBoolean(  "unhideSchematicVCS", false, "Un-hides the Schematic VCS (Version Control System) menu button,\nand enables the hotkey and the VCS functionality in general.\n(This was called Schematic Projects before.)\n\nIn general you §6should not§r be using this feature,\nunless you really know how it works and what it does.\nIt somewhat changes how the area selections, placements and pasting works,\nin particular that there is also an area delete operation when pasting.\n\nBasically this feature is intended for §6iterative, in-place§r design work,\nand it allows you to easier create multiple versions/snapshots\nof the same build, and also to switch between the versions by deleting what is\nin the world first, and then pasting the next version in its place.");
@@ -127,6 +128,7 @@ public class Configs implements IConfigHandler
                 PLACEMENT_RESTRICTION_WARN,
                 RENDER_MATERIALS_IN_GUI,
                 RENDER_THREAD_NO_TIMEOUT,
+                SIGN_TEXT_PASTE,
                 TOOL_ITEM_ENABLED,
                 UNHIDE_SCHEMATIC_PROJECTS,
 
