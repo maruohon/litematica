@@ -8,6 +8,7 @@
 		"IMixinFenceGateBlock",
 		"IMixinHandledScreen",
 		"IMixinRedstoneWireBlock",
+		"IMixinSignBlockEntity",
 		"IMixinStairsBlock",
 		"IMixinVineBlock",
 		"IMixinWorldTickScheduler",
@@ -23,6 +24,7 @@
 		"MixinModelOverrideList",
 		"MixinRailBlocks",
 		"MixinServerPlayNetworkHandler",
+		"MixinSignEditScreen",
 		"MixinWorld",
 		"MixinWorldChunk",
 		"MixinWorldRenderer"
