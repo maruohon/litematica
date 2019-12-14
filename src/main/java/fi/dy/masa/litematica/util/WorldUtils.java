@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -34,6 +35,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
@@ -423,6 +425,35 @@ public class WorldUtils
         }
 
         return false;
+    }
+
+    public static void insertSignTextFromSchematic(TileEntitySign teClient)
+    {
+        WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
+
+        if (worldSchematic != null)
+        {
+            TileEntity te = worldSchematic.getTileEntity(teClient.getPos());
+
+            if (te instanceof TileEntitySign)
+            {
+                ITextComponent[] textSchematic = ((TileEntitySign) te).signText;
+                ITextComponent[] textClient = teClient.signText;
+
+                if (textClient != null && textSchematic != null)
+                {
+                    int size = Math.min(textSchematic.length, textClient.length);
+
+                    for (int i = 0; i < size; ++i)
+                    {
+                        if (textSchematic[i] != null)
+                        {
+                            textClient[i] = textSchematic[i].createCopy();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void easyPlaceOnUseTick(Minecraft mc)
