@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.materials;
 
+import com.google.gson.JsonObject;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -11,11 +12,6 @@ public class MaterialListPlacement extends MaterialListBase
 {
     private final SchematicPlacement placement;
 
-    public MaterialListPlacement(SchematicPlacement placement)
-    {
-        this(placement, false);
-    }
-
     public MaterialListPlacement(SchematicPlacement placement, boolean reCreate)
     {
         super();
@@ -26,6 +22,12 @@ public class MaterialListPlacement extends MaterialListBase
         {
             this.reCreateMaterialList();
         }
+    }
+
+    @Override
+    public boolean isForPlacement()
+    {
+        return true;
     }
 
     @Override
@@ -52,5 +54,12 @@ public class MaterialListPlacement extends MaterialListBase
         TaskCountBlocksPlacement task = new TaskCountBlocksPlacement(this.placement, this);
         TaskScheduler.getInstanceClient().scheduleTask(task, 20);
         InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+    }
+
+    public static MaterialListPlacement createFromJson(JsonObject obj, SchematicPlacement schematicPlacement)
+    {
+        MaterialListPlacement materialList = new MaterialListPlacement(schematicPlacement, false);
+        materialList.fromJson(obj);
+        return materialList;
     }
 }

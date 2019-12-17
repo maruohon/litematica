@@ -24,7 +24,8 @@ public class Hotkeys
     public static final ConfigHotkey NUDGE_SELECTION_POSITIVE           = new ConfigHotkey("nudgeSelectionPositive",            "",    "Nudge the current selection in the \"positive\" direction\nThis is basically the same as mouse wheel up\nwith the Nudge modifier pressed");
     public static final ConfigHotkey MOVE_ENTIRE_SELECTION              = new ConfigHotkey("moveEntireSelection",               "",    "Move the entire current selection here");
     public static final ConfigHotkey OPEN_GUI_AREA_SETTINGS             = new ConfigHotkey("openGuiAreaSettings",               "MULTIPLY",  "Open the Area Settings GUI for the currently selected area");
-    public static final ConfigHotkey OPEN_GUI_LOADED_SCHEMATICS         = new ConfigHotkey("openGuiLoadedSchematics",           "",     "Open the Loaded Schematic GUI");
+    public static final ConfigHotkey OPEN_GUI_LOAD_SCHEMATICS           = new ConfigHotkey("openGuiLoadSchematics",             "",     "Open the Load Schematics GUI");
+    public static final ConfigHotkey OPEN_GUI_LOADED_SCHEMATICS         = new ConfigHotkey("openGuiLoadedSchematics",           "",     "Open the Loaded Schematics GUI");
     public static final ConfigHotkey OPEN_GUI_MAIN_MENU                 = new ConfigHotkey("openGuiMainMenu",                   "M",    KeybindSettings.RELEASE_EXCLUSIVE, "Open the Litematica main menu");
     public static final ConfigHotkey OPEN_GUI_MATERIAL_LIST             = new ConfigHotkey("openGuiMaterialList",               "M,L",  "Open the Material List GUI for the currently\nselected schematic placement");
     public static final ConfigHotkey OPEN_GUI_PLACEMENT_SETTINGS        = new ConfigHotkey("openGuiPlacementSettings",          "SUBTRACT",  "Open the Placement Settings GUI for the currently\nselected placement or sub-region");
@@ -51,6 +52,7 @@ public class Hotkeys
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_MODIFIER   = new ConfigHotkey("schematicVersionCycleModifier",     "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to be able to use the mouse wheel\nto cycle through the schematic versions in the Version Control tool mode");
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_NEXT       = new ConfigHotkey("schematicVersionCycleNext",         "",     "A hotkey to cycle to the next schematic version in the Version Control tool mode");
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_PREVIOUS   = new ConfigHotkey("schematicVersionCyclePrevious",     "",     "A hotkey to cycle to the next schematic version in the Version Control tool mode");
+    public static final ConfigHotkey SELECTION_EXPAND_MODIFIER          = new ConfigHotkey("selectionExpandModifier",           "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to expand or shrink a selection box\nfrom the looking direction side while scrolling");
     public static final ConfigHotkey SELECTION_GRAB_MODIFIER            = new ConfigHotkey("selectionGrabModifier",             "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to \"grab\" a selection\nbox or corner for cursor moving.");
     public static final ConfigHotkey SELECTION_GROW_HOTKEY              = new ConfigHotkey("selectionGrow",                     "",     "The action hotkey to auto-grow the selection box around\nany adjacent/diagonally connected blocks");
     public static final ConfigHotkey SELECTION_GROW_MODIFIER            = new ConfigHotkey("selectionGrowModifier",             "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to grow or shrink\na selection box while scrolling");
@@ -70,6 +72,7 @@ public class Hotkeys
     public static final ConfigHotkey TOGGLE_PLACEMENT_BOXES_RENDERING   = new ConfigHotkey("togglePlacementBoxesRendering",     "",     "Toggle Schematic Placement boxes rendering on/off");
     public static final ConfigHotkey TOGGLE_PLACEMENT_RESTRICTION       = new ConfigHotkey("togglePlacementRestriction",        "",     "A hotkey to toggle the placement restriction mode");
     public static final ConfigHotkey TOGGLE_SCHEMATIC_BLOCK_RENDERING   = new ConfigHotkey("toggleSchematicBlockRendering",     "",     "Toggle schematic block rendering on/off");
+    public static final ConfigHotkey TOGGLE_SIGN_TEXT_PASTE             = new ConfigHotkey("toggleSignTextPaste",               "",     "Toggle the signTextPaste config value (in Generic category)");
     public static final ConfigHotkey TOGGLE_TRANSLUCENT_RENDERING       = new ConfigHotkey("toggleTranslucentRendering",        "",     "Toggle translucent vs. opaque ghost block rendering");
     public static final ConfigHotkey TOGGLE_VERIFIER_OVERLAY_RENDERING  = new ConfigHotkey("toggleVerifierOverlayRendering",    "",     "Toggle the Schematic Verifier overlay rendering");
     public static final ConfigHotkey TOOL_ENABLED_TOGGLE                = new ConfigHotkey("toolEnabledToggle",                 "M,T",  "The keybind to toggle the \"tool\" item functionality on/off");
@@ -100,6 +103,7 @@ public class Hotkeys
             NUDGE_SELECTION_POSITIVE,
             MOVE_ENTIRE_SELECTION,
             OPEN_GUI_AREA_SETTINGS,
+            OPEN_GUI_LOAD_SCHEMATICS,
             OPEN_GUI_LOADED_SCHEMATICS,
             OPEN_GUI_MAIN_MENU,
             OPEN_GUI_MATERIAL_LIST,
@@ -127,6 +131,7 @@ public class Hotkeys
             SCHEMATIC_VERSION_CYCLE_MODIFIER,
             SCHEMATIC_VERSION_CYCLE_NEXT,
             SCHEMATIC_VERSION_CYCLE_PREVIOUS,
+            SELECTION_EXPAND_MODIFIER,
             SELECTION_GRAB_MODIFIER,
             SELECTION_GROW_HOTKEY,
             SELECTION_GROW_MODIFIER,
@@ -146,6 +151,7 @@ public class Hotkeys
             TOGGLE_PLACEMENT_RESTRICTION,
             TOGGLE_SCHEMATIC_BLOCK_RENDERING,
             TOGGLE_SCHEMATIC_RENDERING,
+            TOGGLE_SIGN_TEXT_PASTE,
             TOGGLE_TRANSLUCENT_RENDERING,
             TOGGLE_VERIFIER_OVERLAY_RENDERING,
             TOOL_ENABLED_TOGGLE,

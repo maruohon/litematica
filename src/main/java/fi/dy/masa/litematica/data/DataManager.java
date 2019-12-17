@@ -139,7 +139,7 @@ public class DataManager implements IDirectoryCache
     {
         MaterialListBase old = getInstance().materialList;
 
-        if (old != null)
+        if (old != null && materialList != old)
         {
             MaterialListHudRenderer renderer = old.getHudRenderer();
 
@@ -188,6 +188,8 @@ public class DataManager implements IDirectoryCache
 
     public static void load()
     {
+        LAST_DIRECTORIES.clear();
+
         getInstance().loadPerDimensionData();
 
         File file = getCurrentStorageFile(true);
@@ -195,8 +197,6 @@ public class DataManager implements IDirectoryCache
 
         if (element != null && element.isJsonObject())
         {
-            LAST_DIRECTORIES.clear();
-
             JsonObject root = element.getAsJsonObject();
 
             if (JsonUtils.hasObject(root, "last_directories"))
@@ -279,13 +279,9 @@ public class DataManager implements IDirectoryCache
     {
         TaskScheduler.getInstanceClient().clearTasks();
         SchematicVerifier.clearActiveVerifiers();
-
-        getSchematicPlacementManager().clear();
-        getSchematicProjectsManager().clear();
-        getSelectionManager().clear();
-        setMaterialList(null);
-
         InfoHud.getInstance().reset(); // remove the line providers and clear the data
+
+        getInstance().clearData(true);
     }
 
     private void savePerDimensionData()
@@ -297,12 +293,22 @@ public class DataManager implements IDirectoryCache
         JsonUtils.writeJsonToFile(root, file);
     }
 
-    private void loadPerDimensionData()
+    private void clearData(boolean isLogout)
     {
         this.selectionManager.clear();
         this.schematicPlacementManager.clear();
         this.schematicProjectsManager.clear();
-        this.materialList = null;
+        this.areaSimple = new AreaSelectionSimple(true);
+
+        if (isLogout || (this.materialList != null && this.materialList.isForPlacement()))
+        {
+            setMaterialList(null);
+        }
+    }
+
+    private void loadPerDimensionData()
+    {
+        this.clearData(false);
 
         File file = getCurrentStorageFile(false);
         JsonElement element = JsonUtils.parseJsonFile(file);

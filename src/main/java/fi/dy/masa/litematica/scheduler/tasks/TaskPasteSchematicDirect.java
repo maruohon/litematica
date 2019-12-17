@@ -1,19 +1,22 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
+import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.world.WorldServer;
 
 public class TaskPasteSchematicDirect extends TaskBase
 {
     private final SchematicPlacement placement;
+    private final LayerRange range;
 
-    public TaskPasteSchematicDirect(SchematicPlacement placement)
+    public TaskPasteSchematicDirect(SchematicPlacement placement, LayerRange range)
     {
         this.placement = placement;
+        this.range = range;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class TaskPasteSchematicDirect extends TaskBase
         WorldServer world = this.mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(this.mc.world));
         LitematicaSchematic schematic = this.placement.getSchematic();
 
-        if (world != null && schematic.placeToWorld(world, this.placement, false))
+        if (world != null && schematic.placeToWorld(world, this.placement, this.range, false))
         {
             this.finished = true;
         }

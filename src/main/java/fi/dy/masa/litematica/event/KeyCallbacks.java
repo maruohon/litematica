@@ -1,5 +1,8 @@
 package fi.dy.masa.litematica.event;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -8,6 +11,7 @@ import fi.dy.masa.litematica.gui.GuiConfigs;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.GuiSchematicLoad;
 import fi.dy.masa.litematica.gui.GuiSchematicLoadedList;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
@@ -29,8 +33,8 @@ import fi.dy.masa.litematica.util.SchematicUtils;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
+import fi.dy.masa.malilib.config.values.LayerMode;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
@@ -38,12 +42,7 @@ import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
-import fi.dy.masa.malilib.interfaces.IValueChangeCallback;
 import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.LayerMode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
 
 public class KeyCallbacks
 {
@@ -51,9 +50,9 @@ public class KeyCallbacks
     {
         IHotkeyCallback callbackHotkeys = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
-        ValueChangeCallback valueChangeCallback = new ValueChangeCallback();
 
-        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback(valueChangeCallback);
+        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((config) -> { InventoryUtils.setPickBlockableSlots(config.getStringValue()); });
+        Configs.Generic.TOOL_ITEM.setValueChangeCallback((config) -> { DataManager.setToolItem(config.getStringValue()); });
 
         Hotkeys.CLONE_SELECTION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(callbackHotkeys);
@@ -65,6 +64,7 @@ public class KeyCallbacks
         Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_LOADED_SCHEMATICS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind().setCallback(callbackHotkeys);
@@ -113,21 +113,10 @@ public class KeyCallbacks
         Hotkeys.TOGGLE_PLACEMENT_RESTRICTION.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PLACEMENT_RESTRICTION));
         Hotkeys.TOGGLE_PLACEMENT_BOXES_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING));
         Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS));
+        Hotkeys.TOGGLE_SIGN_TEXT_PASTE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.SIGN_TEXT_PASTE));
         Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(new RenderToggle(Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT));
         Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED));
         Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.TOOL_ITEM_ENABLED));
-    }
-
-    private static class ValueChangeCallback implements IValueChangeCallback<ConfigString>
-    {
-        @Override
-        public void onValueChanged(ConfigString config)
-        {
-            if (config == Configs.Generic.PICK_BLOCKABLE_SLOTS)
-            {
-                InventoryUtils.setPickBlockableSlots(Configs.Generic.PICK_BLOCKABLE_SLOTS.getStringValue());
-            }
-        }
     }
 
     private static class RenderToggle extends KeyCallbackToggleBooleanConfigWithMessage
@@ -263,6 +252,11 @@ public class KeyCallbacks
             if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
                 GuiBase.openGui(new GuiMainMenu());
+                return true;
+            }
+            else if (key == Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeybind())
+            {
+                GuiBase.openGui(new GuiSchematicLoad());
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_LOADED_SCHEMATICS.getKeybind())
@@ -682,6 +676,11 @@ public class KeyCallbacks
                         BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                         Corner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? Corner.CORNER_1 : Corner.CORNER_2;
                         area.setSelectedSubRegionCornerPos(pos, corner);
+
+                        if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
+                        {
+                            area.getSelectedSubRegionBox().setSelectedCorner(corner);
+                        }
 
                         String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                         InfoUtils.printActionbarMessage("litematica.message.set_selection_box_point", corner.ordinal(), posStr);

@@ -995,8 +995,7 @@ public class SchematicPlacement
 
             if (JsonUtils.hasObject(obj, "material_list"))
             {
-                schematicPlacement.materialList = new MaterialListPlacement(schematicPlacement);
-                schematicPlacement.materialList.fromJson(JsonUtils.getNestedObject(obj, "material_list", false));
+                schematicPlacement.materialList = MaterialListPlacement.createFromJson(JsonUtils.getNestedObject(obj, "material_list", false), schematicPlacement);
             }
 
             if (JsonUtils.hasString(obj, "verifier_type"))

@@ -42,7 +42,7 @@ public class SelectionManager
     private String currentSelectionId;
     @Nullable
     private GrabbedElement grabbedElement;
-    private SelectionMode mode = SelectionMode.NORMAL;
+    private SelectionMode mode = SelectionMode.SIMPLE;
 
     public SelectionMode getSelectionMode()
     {
@@ -197,6 +197,11 @@ public class SelectionManager
     {
         if (selectionId != null && this.selections.remove(selectionId) != null)
         {
+            if (selectionId.equals(this.currentSelectionId))
+            {
+                this.currentSelectionId = null;
+            }
+
             File file = new File(selectionId);
 
             if (file.exists() && file.isFile())

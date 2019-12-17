@@ -2,9 +2,11 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
@@ -20,7 +22,6 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
 
 public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 {
@@ -175,7 +176,14 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
             }
             else if (this.type == ButtonType.REMOVE)
             {
-                this.selectionManager.removeSelection(selectionId);
+                String current = this.selectionManager.getCurrentNormalSelectionId();
+
+                if (this.selectionManager.removeSelection(selectionId) &&
+                    this.selectionManager.getSelectionMode() == SelectionMode.NORMAL &&
+                    current.equals(selectionId))
+                {
+                    this.widget.parent.getSelectionManagerGui().initGui();
+                }
             }
             else if (this.type == ButtonType.CONFIGURE)
             {

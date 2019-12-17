@@ -78,7 +78,7 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
             long time = System.currentTimeMillis();
             this.schematic.getMetadata().setTimeCreated(time);
             this.schematic.getMetadata().setTimeModified(time);
-            this.schematic.getMetadata().setTotalBlocks(this.schematic.getTotalBlocks());
+            this.schematic.getMetadata().setTotalBlocks(this.schematic.getTotalBlocksReadFromWorld());
 
             if (this.dir != null)
             {

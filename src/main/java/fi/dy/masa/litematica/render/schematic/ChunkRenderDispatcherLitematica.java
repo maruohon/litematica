@@ -46,12 +46,14 @@ public class ChunkRenderDispatcherLitematica
 
     public ChunkRenderDispatcherLitematica()
     {
-        int threadLimitMemory = Math.max(1, (int)((double)Runtime.getRuntime().maxMemory() * 0.3D) / 10485760);
+        int threadLimitMemory = Math.max(1, (int)((double)Runtime.getRuntime().maxMemory() * 0.15D) / 10485760);
         int threadLimitCPU = Math.max(1, MathHelper.clamp(Runtime.getRuntime().availableProcessors(), 1, threadLimitMemory / 5));
-        this.countRenderBuilders = MathHelper.clamp(threadLimitCPU * 10, 1, threadLimitMemory);
+        this.countRenderBuilders = MathHelper.clamp(threadLimitCPU * 8, 1, threadLimitMemory);
 
         if (threadLimitCPU > 1)
         {
+            Litematica.logger.info("Creating {} render threads", threadLimitCPU);
+
             for (int i = 0; i < threadLimitCPU; ++i)
             {
                 ChunkRenderWorkerLitematica worker = new ChunkRenderWorkerLitematica(this);
@@ -61,6 +63,8 @@ public class ChunkRenderDispatcherLitematica
                 this.listWorkerThreads.add(thread);
             }
         }
+
+        Litematica.logger.info("Using {} total BufferBuilder caches", this.countRenderBuilders + 1);
 
         this.queueFreeRenderBuilders = Queues.newArrayBlockingQueue(this.countRenderBuilders);
 

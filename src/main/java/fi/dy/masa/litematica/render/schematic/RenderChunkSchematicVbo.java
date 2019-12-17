@@ -8,16 +8,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
-import fi.dy.masa.litematica.render.RenderUtils;
-import fi.dy.masa.litematica.util.OverlayType;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
@@ -41,6 +31,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
+import fi.dy.masa.litematica.render.RenderUtils;
+import fi.dy.masa.litematica.util.OverlayType;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class RenderChunkSchematicVbo extends RenderChunk
 {
@@ -52,6 +52,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     private final List<IntBoundingBox> boxes = new ArrayList<>();
     private final EnumSet<OverlayRenderType> existingOverlays = EnumSet.noneOf(OverlayRenderType.class);
     private boolean hasOverlay = false;
+    private boolean ignoreFluidsAsExtra;
     private ChunkCompileTaskGeneratorSchematic compileTask;
 
     private ChunkCacheSchematic schematicWorldView;
@@ -193,7 +194,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
                 for (IntBoundingBox box : this.boxes)
                 {
-                    box = range.getClampedRenderBoundingBox(box);
+                    box = range.getClampedBox(box);
 
                     // The rendered layer(s) don't intersect this sub-volume
                     if (box == null)
@@ -358,7 +359,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     {
                         if (type.getRenderPriority() > typeAdj.getRenderPriority())
                         {
-                            RenderUtils.drawBlockBoxSideBatchedQuads(pos, side, this.overlayColor, 0, bufferOverlayQuads);
+                            fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceSideBatchedQuads(pos, side, this.overlayColor, 0, bufferOverlayQuads);
                         }
                     }
                 }
@@ -375,7 +376,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 }
                 else
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxSidesBatchedQuads(pos, this.overlayColor, 0, bufferOverlayQuads);
+                    fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllSidesBatchedQuads(pos, this.overlayColor, 0, bufferOverlayQuads);
                 }
             }
         }
@@ -450,7 +451,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 }
                 else
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(pos, this.overlayColor, 0, bufferOverlayOutlines);
+                    fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(pos, this.overlayColor, 0, bufferOverlayOutlines);
                 }
             }
         }
@@ -547,7 +548,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
             if (schematicHasAir)
             {
-                return clientHasAir ? OverlayType.NONE : OverlayType.EXTRA;
+                return (clientHasAir || (this.ignoreFluidsAsExtra && stateClient.getMaterial().isLiquid())) ? OverlayType.NONE : OverlayType.EXTRA;
             }
             else
             {
@@ -742,6 +743,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     {
         synchronized (this.boxes)
         {
+            this.ignoreFluidsAsExtra = Configs.Visuals.IGNORE_FLUIDS_AS_EXTRA.getBooleanValue();
             this.schematicWorldView = new ChunkCacheSchematic(this.getWorld(), this.getPosition(), 2);
             this.clientWorldView    = new ChunkCacheSchematic(Minecraft.getMinecraft().world, this.getPosition(), 2);
 

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.malilib.config.values.LayerMode;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 

@@ -11,18 +11,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
-import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
-import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
@@ -35,6 +23,18 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
+import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionManager;
+import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class PositionUtils
 {
@@ -46,6 +46,24 @@ public class PositionUtils
     public static final EnumFacing[] ADJACENT_SIDES_ZY = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH };
     public static final EnumFacing[] ADJACENT_SIDES_XY = new EnumFacing[] { EnumFacing.DOWN, EnumFacing.UP, EnumFacing.EAST, EnumFacing.WEST };
     public static final EnumFacing[] ADJACENT_SIDES_XZ = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.EAST, EnumFacing.WEST };
+
+    public static final ICoordinateAccessor BLOCKPOS_X_ACCESSOR = new ICoordinateAccessor()
+    {
+        @Override public BlockPos setValue(BlockPos vec, int newValue) { return new BlockPos(newValue, vec.getY(), vec.getZ()); }
+        @Override public int getValue(Vec3i vec) { return vec.getX(); }
+    };
+
+    public static final ICoordinateAccessor BLOCKPOS_Y_ACCESSOR = new ICoordinateAccessor()
+    {
+        @Override public BlockPos setValue(BlockPos vec, int newValue) { return new BlockPos(vec.getX(), newValue, vec.getZ()); }
+        @Override public int getValue(Vec3i vec) { return vec.getY(); }
+    };
+
+    public static final ICoordinateAccessor BLOCKPOS_Z_ACCESSOR = new ICoordinateAccessor()
+    {
+        @Override public BlockPos setValue(BlockPos vec, int newValue) { return new BlockPos(vec.getX(), vec.getY(), newValue); }
+        @Override public int getValue(Vec3i vec) { return vec.getZ(); }
+    };
 
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i(-1,  0, -1) };
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i( 1,  0, -1) };
@@ -468,6 +486,59 @@ public class PositionUtils
         return 0;
     }
 
+    public static Box expandOrShrinkBox(Box box, int amount, EnumFacing side)
+    {
+        BlockPos pos1 = box.getPos1();
+        BlockPos pos2 = box.getPos2();
+
+        EnumFacing.Axis axis = side.getAxis();
+        boolean positiveSide = side.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE;
+        ICoordinateAccessor accessor = axis == EnumFacing.Axis.X ? BLOCKPOS_X_ACCESSOR : (axis == EnumFacing.Axis.Y ? BLOCKPOS_Y_ACCESSOR : BLOCKPOS_Z_ACCESSOR);
+        int modifyAmount = positiveSide ? amount : -amount; // the amount is inversed when adjusting the negative axis sides
+
+        // The corners are at the same position on the targeted axis
+        if (accessor.getValue(pos1) == accessor.getValue(pos2))
+        {
+            // Only allow the box to grow from the one thick state
+            if (amount > 0)
+            {
+                // corner 2 should be on the to-be-modified side of the box
+                if (positiveSide)
+                {
+                    pos2 = accessor.setValue(pos2, accessor.getValue(pos2) + modifyAmount);
+                }
+                // corner 1 should be on the to-be-modified side of the box
+                else
+                {
+                    pos1 = accessor.setValue(pos1, accessor.getValue(pos1) + modifyAmount);
+                }
+            }
+            else
+            {
+                return box;
+            }
+        }
+        else
+        {
+            // corner 1 is on the to-be-modified side of the box
+            if (accessor.getValue(pos1) > accessor.getValue(pos2) == positiveSide)
+            {
+                pos1 = accessor.setValue(pos1, accessor.getValue(pos1) + modifyAmount);
+            }
+            // corner 2 is on the to-be-modified side of the box
+            else
+            {
+                pos2 = accessor.setValue(pos2, accessor.getValue(pos2) + modifyAmount);
+            }
+        }
+
+        Box boxNew = box.copy();
+        boxNew.setPos1(pos1);
+        boxNew.setPos2(pos2);
+
+        return boxNew;
+    }
+
     public static Box growOrShrinkBox(Box box, int amount)
     {
         BlockPos pos1 = box.getPos1();
@@ -870,38 +941,6 @@ public class PositionUtils
         return z2 > z1 ? EnumFacing.SOUTH : EnumFacing.WEST;
     }
 
-    public static Rotation cycleRotation(Rotation rotation, boolean reverse)
-    {
-        int ordinal = rotation.ordinal();
-
-        if (reverse)
-        {
-            ordinal = ordinal == 0 ? Rotation.values().length - 1 : ordinal - 1;
-        }
-        else
-        {
-            ordinal = ordinal >= Rotation.values().length - 1 ? 0 : ordinal + 1;
-        }
-
-        return Rotation.values()[ordinal];
-    }
-
-    public static Mirror cycleMirror(Mirror mirror, boolean reverse)
-    {
-        int ordinal = mirror.ordinal();
-
-        if (reverse)
-        {
-            ordinal = ordinal == 0 ? Mirror.values().length - 1 : ordinal - 1;
-        }
-        else
-        {
-            ordinal = ordinal >= Mirror.values().length - 1 ? 0 : ordinal + 1;
-        }
-
-        return Mirror.values()[ordinal];
-    }
-
     public static String getRotationNameShort(Rotation rotation)
     {
         switch (rotation)
@@ -1039,5 +1078,12 @@ public class PositionUtils
         NONE,
         CORNER_1,
         CORNER_2;
+    }
+
+    public interface ICoordinateAccessor
+    {
+        int getValue(Vec3i vec);
+
+        BlockPos setValue(BlockPos vec, int newValue);
     }
 }

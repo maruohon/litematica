@@ -342,11 +342,17 @@ public class RayTraceUtils
         Vec3d rangedLookRot = entity.getLook(1f).scale(range);
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
 
-        return rayTraceSchematicWorldBlocks(world, eyesPos, lookEndPos, true, false, true, respectRenderRange, 200);
+        return rayTraceSchematicWorldBlocks(world, eyesPos, lookEndPos, false, true, respectRenderRange, 200);
     }
 
     @Nullable
     public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range, boolean respectRenderRange)
+    {
+        return getGenericTrace(worldClient, entity, range, respectRenderRange, false);
+    }
+
+    @Nullable
+    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range, boolean respectRenderRange, boolean includeVerifier)
     {
         RayTraceResult traceClient = getRayTraceFromEntity(worldClient, entity, true, range);
         RayTraceResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange);
@@ -381,7 +387,7 @@ public class RayTraceUtils
 
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-        if (placement != null && placement.hasVerifier())
+        if (includeVerifier && placement != null && placement.hasVerifier())
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
@@ -719,7 +725,7 @@ public class RayTraceUtils
 
     @Nullable
     public static RayTraceResult rayTraceSchematicWorldBlocks(World world, Vec3d posStart, Vec3d posEnd,
-            boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock, boolean respectRenderRange, int maxSteps)
+            boolean ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock, boolean respectRenderRange, int maxSteps)
     {
         if (Double.isNaN(posStart.x) || Double.isNaN(posStart.y) || Double.isNaN(posStart.z) ||
             Double.isNaN(posEnd.x) || Double.isNaN(posEnd.y) || Double.isNaN(posEnd.z))
@@ -738,11 +744,11 @@ public class RayTraceUtils
         data.z = MathHelper.floor(data.posStart.z);
         data.pos = new BlockPos(data.x, data.y, data.z);
         IBlockState state = world.getBlockState(data.pos);
-        Block block = state.getBlock();
 
-        if ((respectRenderRange == false || range.isPositionWithinRange(data.x, data.y, data.z)) &&
-            (ignoreBlockWithoutBoundingBox == false || state.getCollisionBoundingBox(world, data.pos) != Block.NULL_AABB) &&
-             block.canCollideCheck(state, stopOnLiquid))
+        // TODO 1.13+: switch to isAir()
+        if (state.getMaterial() != Material.AIR &&
+            (respectRenderRange == false || range.isPositionWithinRange(data.x, data.y, data.z)) &&
+            (ignoreBlockWithoutBoundingBox == false || state.getCollisionBoundingBox(world, data.pos) != Block.NULL_AABB))
         {
             RayTraceResult trace = state.collisionRayTrace(world, data.pos, data.posStart, posEnd);
 
@@ -769,24 +775,18 @@ public class RayTraceUtils
             rayTraceCalcs(data);
 
             state = world.getBlockState(data.pos);
-            block = state.getBlock();
 
-            if ((respectRenderRange == false || range.isPositionWithinRange(data.x, data.y, data.z)) &&
-                (!ignoreBlockWithoutBoundingBox || state.getMaterial() == Material.PORTAL ||
+            // TODO 1.13+: switch to isAir()
+            if (state.getMaterial() != Material.AIR &&
+                (respectRenderRange == false || range.isPositionWithinRange(data.x, data.y, data.z)) &&
+                (ignoreBlockWithoutBoundingBox == false || state.getMaterial() == Material.PORTAL ||
                  state.getCollisionBoundingBox(world, data.pos) != Block.NULL_AABB))
             {
-                if (block.canCollideCheck(state, stopOnLiquid))
-                {
-                    RayTraceResult traceTmp = state.collisionRayTrace(world, data.pos, data.posStart, posEnd);
+                RayTraceResult traceTmp = state.collisionRayTrace(world, data.pos, data.posStart, posEnd);
 
-                    if (traceTmp != null)
-                    {
-                        return traceTmp;
-                    }
-                }
-                else
+                if (traceTmp != null)
                 {
-                    trace = new RayTraceResult(RayTraceResult.Type.MISS, data.posStart, data.facing, data.pos);
+                    return traceTmp;
                 }
             }
         }

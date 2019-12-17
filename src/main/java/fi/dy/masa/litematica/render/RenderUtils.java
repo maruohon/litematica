@@ -2,15 +2,6 @@ package fi.dy.masa.litematica.render;
 
 import java.util.List;
 import org.lwjgl.opengl.GL11;
-import fi.dy.masa.litematica.util.BlockInfoAlignment;
-import fi.dy.masa.litematica.util.InventoryUtils;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
-import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.malilib.util.HorizontalAlignment;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -28,6 +19,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.util.BlockInfoAlignment;
+import fi.dy.masa.litematica.util.InventoryUtils;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
+import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.HorizontalAlignment;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class RenderUtils
 {
@@ -512,64 +512,6 @@ public class RenderUtils
             fz = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
 
             buffer.pos(fx, fy, fz).color(color.r, color.g, color.b, color.a).endVertex();
-        }
-    }
-
-    /**
-     * Assumes a BufferBuilder in GL_QUADS mode has been initialized
-     */
-    public static void drawBlockBoxSideBatchedQuads(BlockPos pos, EnumFacing side, Color4f color, double expand, BufferBuilder buffer)
-    {
-        double minX = pos.getX() - expand;
-        double minY = pos.getY() - expand;
-        double minZ = pos.getZ() - expand;
-        double maxX = pos.getX() + expand + 1;
-        double maxY = pos.getY() + expand + 1;
-        double maxZ = pos.getZ() + expand + 1;
-
-        switch (side)
-        {
-            case DOWN:
-                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                break;
-
-            case UP:
-                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                break;
-
-            case NORTH:
-                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                break;
-
-            case SOUTH:
-                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                break;
-
-            case WEST:
-                buffer.pos(minX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(minX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                break;
-
-            case EAST:
-                buffer.pos(maxX, minY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, minY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, maxY, minZ).color(color.r, color.g, color.b, color.a).endVertex();
-                buffer.pos(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).endVertex();
-                break;
         }
     }
 
