@@ -3,6 +3,12 @@ package fi.dy.masa.litematica.render.infohud;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -22,10 +28,6 @@ import fi.dy.masa.malilib.config.values.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
 
 public class ToolHud extends InfoHud
 {
@@ -180,20 +182,30 @@ public class ToolHud extends InfoHud
                 {
                     strOr = StringUtils.translate("litematica.gui.label.origin.manual");
                 }
+
                 int count = selection.getAllSubRegionBoxes().size();
 
                 str = String.format("%d, %d, %d %s[%s%s%s]", o.getX(), o.getY(), o.getZ(), rst, orange, strOr, rst);
                 String strOrigin = StringUtils.translate("litematica.hud.area_selection.origin", green + str + rst);
-                String strBoxes = StringUtils.translate("litematica.hud.area_selection.box_count", green + count + rst);
 
-                lines.add(strOrigin + " - " + strBoxes);
+                if (sm.getSelectionMode() == SelectionMode.NORMAL)
+                {
+                    strOrigin += " - " + StringUtils.translate("litematica.hud.area_selection.box_count", green + count + rst);
+                }
+
+                lines.add(strOrigin);
 
                 String subRegionName = selection.getCurrentSubRegionBoxName();
                 Box box = selection.getSelectedSubRegionBox();
 
                 if (subRegionName != null && box != null)
                 {
-                    lines.add(StringUtils.translate("litematica.hud.area_selection.selected_sub_region", green + subRegionName + rst));
+                    // Only show the sub-region name for Normal mode selections
+                    if (sm.getSelectionMode() == SelectionMode.NORMAL)
+                    {
+                        lines.add(StringUtils.translate("litematica.hud.area_selection.selected_sub_region", green + subRegionName + rst));
+                    }
+
                     BlockPos p1 = box.getPos1();
                     BlockPos p2 = box.getPos2();
 
@@ -208,24 +220,16 @@ public class ToolHud extends InfoHud
                 }
             }
 
-            if (mode.getUsesBlockPrimary())
+            if (mode.getUsesBlockPrimary() && mode.getPrimaryBlock() != null)
             {
-                IBlockState state = mode.getPrimaryBlock();
-
-                if (state != null)
-                {
-                    lines.add(StringUtils.translate("litematica.tool_hud.block_1", this.getBlockString(state)));
-                }
+                lines.add(StringUtils.translate("litematica.tool_hud.block_1", this.getBlockStateString(mode.getPrimaryBlock())));
+                this.getBlockStateProperties(mode.getPrimaryBlock(), lines);
             }
 
-            if (mode.getUsesBlockSecondary())
+            if (mode.getUsesBlockSecondary() && mode.getSecondaryBlock() != null)
             {
-                IBlockState state = mode.getSecondaryBlock();
-
-                if (state != null)
-                {
-                    lines.add(StringUtils.translate("litematica.tool_hud.block_2", this.getBlockString(state)));
-                }
+                lines.add(StringUtils.translate("litematica.tool_hud.block_2", this.getBlockStateString(mode.getSecondaryBlock())));
+                this.getBlockStateProperties(mode.getSecondaryBlock(), lines);
             }
 
             str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
@@ -259,7 +263,8 @@ public class ToolHud extends InfoHud
                 if (state != null && mode == ToolMode.REBUILD &&
                     (stack.isEmpty() || EntityUtils.hasToolItem(this.mc.player)))
                 {
-                    lines.add(StringUtils.translate("litematica.tool_hud.block_1", this.getBlockString(state)));
+                    lines.add(StringUtils.translate("litematica.tool_hud.block_1", this.getBlockStateString(state)));
+                    this.getBlockStateProperties(state, lines);
                 }
 
                 SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
@@ -319,14 +324,15 @@ public class ToolHud extends InfoHud
         }
     }
 
-    protected String getBlockString(IBlockState state)
+    protected String getBlockStateString(IBlockState state)
     {
-        String strBlock;
+        ResourceLocation id = Block.REGISTRY.getNameForObject(state.getBlock());
+        String regName = id != null ? id.toString() : "<null>";
 
         String green = GuiBase.TXT_GREEN;
         String rst = GuiBase.TXT_RST;
 
-        strBlock = green + state.getBlock().getLocalizedName() + rst;
+        String strBlock = String.format("%s%s (%s)%s", green, regName, state.getBlock().getLocalizedName(), rst);
         EnumFacing facing = BlockUtils.getFirstPropertyFacingValue(state);
 
         if (facing != null)
@@ -337,5 +343,13 @@ public class ToolHud extends InfoHud
         }
 
         return strBlock;
+    }
+
+    protected void getBlockStateProperties(IBlockState state, List<String> lines)
+    {
+        if (state.getProperties().isEmpty() == false)
+        {
+            BlockUtils.getFormattedBlockStateProperties(state, " = ").forEach((str) -> lines.add(" > " + str)); 
+        }
     }
 }
