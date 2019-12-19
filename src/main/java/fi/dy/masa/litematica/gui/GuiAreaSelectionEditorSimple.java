@@ -67,6 +67,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
         x = this.createButton(22, nextY, -1, ButtonListener.Type.CREATE_SCHEMATIC) + 26;
 
         this.addRenderingDisabledWarning(250, 48);
+        this.textFieldSelectionName.setFocused(true);
 
         return y;
     }
