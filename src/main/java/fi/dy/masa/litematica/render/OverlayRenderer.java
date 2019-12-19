@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -681,7 +682,7 @@ public class OverlayRenderer
 
         if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            Entity entity = this.mc.player;
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
             BlockHitResult trace = traceWrapper.getBlockHitResult();
             BlockPos pos = trace.getBlockPos();
 
@@ -690,6 +691,8 @@ public class OverlayRenderer
             GlStateManager.disableCull();
             GlStateManager.disableTexture();
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            RenderSystem.enablePolygonOffset();
+            RenderSystem.polygonOffset(-0.8f, -1.8f);
 
             if (direction)
             {
@@ -702,6 +705,7 @@ public class OverlayRenderer
                         entity, pos, trace.getSide(), color, matrixStack, this.mc);
             }
 
+            RenderSystem.disablePolygonOffset();
             GlStateManager.enableTexture();
             //GlStateManager.enableDepth();
             GlStateManager.disableBlend();

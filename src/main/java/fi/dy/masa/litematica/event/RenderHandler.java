@@ -32,12 +32,12 @@ public class RenderHandler implements IRenderer
                 OverlayRenderer.getInstance().renderSchematicVerifierMismatches(matrices, partialTicks);
             }
 
+            RenderSystem.popMatrix();
+
             if (DataManager.getToolMode() == ToolMode.REBUILD)
             {
                 OverlayRenderer.getInstance().renderSchematicRebuildTargetingOverlay(matrices, partialTicks);
             }
-
-            RenderSystem.popMatrix();
         }
     }
 
