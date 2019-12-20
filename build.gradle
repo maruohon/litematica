@@ -30,6 +30,8 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     //modCompile "net.fabricmc:fabric:" + config.fabric_version
+
+    modCompile "io.github.prospector:modmenu:${config.mod_menu_version}"
 }
 
 minecraft {
