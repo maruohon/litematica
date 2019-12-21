@@ -29,7 +29,7 @@ public class SchematicConversionMaps
     private static final HashMap<String, String> NEW_NAME_TO_OLD_NAME = new HashMap<>();
     private static final HashMap<NBTTagCompound, NBTTagCompound> OLD_STATE_TO_NEW_STATE = new HashMap<>();
     private static final HashMap<NBTTagCompound, NBTTagCompound> NEW_STATE_TO_OLD_STATE = new HashMap<>();
-    private static final ArrayList<ConversionData> CACHED_DATA = new ArrayList<>();
+    static final ArrayList<ConversionData> CACHED_DATA = new ArrayList<>();
 
     public static void addEntry(int idMeta, String newStateString, String... oldStateStrings)
     {
@@ -284,11 +284,11 @@ public class SchematicConversionMaps
                         1139, LitematicaSchematic.MINECRAFT_DATA_VERSION).getValue().getString();
     }
 
-    private static class ConversionData
+    public static class ConversionData
     {
-        private final int idMeta;
-        private final String newStateString;
-        private final String[] oldStateStrings;
+        public final int idMeta;
+        public final String newStateString;
+        public final String[] oldStateStrings;
 
         private ConversionData(int idMeta, String newStateString, String[] oldStateStrings)
         {

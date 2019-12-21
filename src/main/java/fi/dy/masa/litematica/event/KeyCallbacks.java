@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.materials.MaterialListBase;
+import fi.dy.masa.litematica.schematic.conversion.BlockStateMapBuilder;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -281,7 +282,8 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeybind())
             {
-                DataManager.getSchematicProjectsManager().openSchematicProjectsGui();
+                //DataManager.getSchematicProjectsManager().openSchematicProjectsGui();
+                BlockStateMapBuilder.run();
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeybind())
