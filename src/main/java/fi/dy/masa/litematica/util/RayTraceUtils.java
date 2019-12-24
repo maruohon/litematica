@@ -7,6 +7,18 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.RayTraceResult.Type;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -19,19 +31,6 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.LayerRange;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 public class RayTraceUtils
 {
@@ -44,9 +43,9 @@ public class RayTraceUtils
     private static HitType originType;
 
     @Nullable
-    public static BlockPos getTargetedPosition(World world, EntityPlayer player, double maxDistance, boolean sneakToOffset)
+    public static BlockPos getTargetedPosition(World world, Entity entity, double maxDistance, boolean sneakToOffset)
     {
-        RayTraceResult trace = getRayTraceFromEntity(world, player, false, maxDistance);
+        RayTraceResult trace = getRayTraceFromEntity(world, entity, false, maxDistance);
 
         if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
         {
@@ -56,7 +55,7 @@ public class RayTraceUtils
         BlockPos pos = trace.getBlockPos();
 
         // Sneaking puts the position adjacent the targeted block face, not sneaking puts it inside the targeted block
-        if (sneakToOffset == player.isSneaking())
+        if (sneakToOffset == entity.isSneaking())
         {
             pos = pos.offset(trace.sideHit);
         }

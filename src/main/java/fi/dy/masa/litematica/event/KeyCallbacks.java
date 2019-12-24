@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.event;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
@@ -194,7 +195,8 @@ public class KeyCallbacks
 
                         if (grabModifier && mode == ToolMode.MOVE)
                         {
-                            BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, this.mc.player, maxDistance, false);
+                            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                            BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, entity, maxDistance, false);
 
                             if (pos != null)
                             {
@@ -220,6 +222,8 @@ public class KeyCallbacks
                 }
                 else if (isToolSelect)
                 {
+                    Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+
                     if (mode.getUsesAreaSelection() || projectMode)
                     {
                         SelectionManager sm = DataManager.getSelectionManager();
@@ -237,12 +241,12 @@ public class KeyCallbacks
                         }
                         else
                         {
-                            sm.changeSelection(this.mc.world, this.mc.player, maxDistance);
+                            sm.changeSelection(this.mc.world, entity, maxDistance);
                         }
                     }
                     else if (mode.getUsesSchematic())
                     {
-                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
+                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, entity, maxDistance);
                     }
 
                     return true;

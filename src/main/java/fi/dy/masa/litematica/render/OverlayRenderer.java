@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
@@ -362,7 +361,8 @@ public class OverlayRenderer
             if (list.isEmpty() == false)
             {
                 List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 128);
+                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
                 BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
                 this.renderSchematicMismatches(list, posLook, partialTicks);
             }
@@ -379,7 +379,7 @@ public class OverlayRenderer
 
         GlStateManager.glLineWidth(2f);
 
-        EntityPlayer player = this.mc.player;
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
@@ -393,7 +393,7 @@ public class OverlayRenderer
 
             if (entry.pos.equals(lookPos) == false)
             {
-                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.pos, color, 0.002, buffer, player, partialTicks);
+                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(entry.pos, color, 0.002, buffer, entity, partialTicks);
             }
             else
             {
@@ -402,7 +402,7 @@ public class OverlayRenderer
 
             if (connections && prevEntry != null)
             {
-                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, entry.pos, false, color, buffer, player, partialTicks);
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, entry.pos, false, color, buffer, entity, partialTicks);
             }
 
             prevEntry = entry;
@@ -412,14 +412,14 @@ public class OverlayRenderer
         {
             if (connections && prevEntry != null)
             {
-                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, lookedEntry.pos, false, lookedEntry.type.getColor(), buffer, player, partialTicks);
+                RenderUtils.drawConnectingLineBatchedLines(prevEntry.pos, lookedEntry.pos, false, lookedEntry.type.getColor(), buffer, entity, partialTicks);
             }
 
             tessellator.draw();
             buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
             GlStateManager.glLineWidth(6f);
-            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, player, partialTicks);
+            RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, entity, partialTicks);
         }
 
         tessellator.draw();
@@ -436,7 +436,7 @@ public class OverlayRenderer
             {
                 Color4f color = entry.type.getColor();
                 color = new Color4f(color.r, color.g, color.b, alpha);
-                RenderUtils.renderAreaSidesBatched(entry.pos, entry.pos, color, 0.002, this.mc.player, partialTicks, buffer);
+                RenderUtils.renderAreaSidesBatched(entry.pos, entry.pos, color, 0.002, entity, partialTicks, buffer);
             }
 
             tessellator.draw();
@@ -471,7 +471,8 @@ public class OverlayRenderer
 
             if (renderBlockInfoLines || renderInfoOverlay)
             {
-                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10, true);
             }
 
             if (traceWrapper != null)
@@ -520,7 +521,8 @@ public class OverlayRenderer
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-            RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 128);
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            RayTraceResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
 
             if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
             {
@@ -659,35 +661,35 @@ public class OverlayRenderer
     public void renderSchematicRebuildTargetingOverlay(float partialTicks)
     {
         RayTraceWrapper traceWrapper = null;
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
         Color4f color = null;
         boolean direction = false;
 
         if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
             direction = true;
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
             direction = true;
         }
 
         if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            Entity entity = this.mc.player;
             RayTraceResult trace = traceWrapper.getRayTraceResult();
             BlockPos pos = trace.getBlockPos();
 
