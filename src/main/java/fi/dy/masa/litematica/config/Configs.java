@@ -52,7 +52,7 @@ public class Configs implements IConfigHandler
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 AREAS_PER_WORLD,
-                BETTER_RENDER_ORDER,
+                //BETTER_RENDER_ORDER,
                 CHANGE_SELECTED_CORNER,
                 EASY_PLACE_MODE,
                 EASY_PLACE_HOLD_ENABLED,
