@@ -5,8 +5,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 
 @Mixin(net.minecraft.client.render.WorldRenderer.class)
@@ -104,6 +102,7 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderEntities(matrices, tickDelta);
     }
 
+    /*
     @Inject(method = "render", at = @At("TAIL"))
     private void onRenderWorldLast(
             net.minecraft.client.util.math.MatrixStack matrices,
@@ -122,4 +121,5 @@ public abstract class MixinWorldRenderer
             LitematicaRenderer.getInstance().renderSchematicWorld(matrices, matrix4f, tickDelta);
         }
     }
+    */
 }
