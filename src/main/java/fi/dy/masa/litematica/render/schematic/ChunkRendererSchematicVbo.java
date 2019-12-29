@@ -218,7 +218,7 @@ public class ChunkRendererSchematicVbo
         }
 
         //if (GuiBase.isCtrlDown()) System.out.printf("resortTransparency\n");
-        if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue())
+        //if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue())
         {
             OverlayRenderType type = OverlayRenderType.QUAD;
             bufferState = data.getOverlayBufferState(type);
