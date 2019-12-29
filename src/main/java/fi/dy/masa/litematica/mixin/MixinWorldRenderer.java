@@ -34,7 +34,7 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewisePrepareAndUpdate(frustum);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 0,
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 0, shift = At.Shift.AFTER,
             target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/util/math/MatrixStack;DDD)V"))
     private void renderLayerSolid(
             net.minecraft.client.util.math.MatrixStack matrices,
@@ -48,7 +48,7 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderSolid(matrices, tickDelta);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 1,
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 1, shift = At.Shift.AFTER,
             target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/util/math/MatrixStack;DDD)V"))
     private void renderLayerCutoutMipped(
             net.minecraft.client.util.math.MatrixStack matrices,
@@ -62,7 +62,7 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(matrices, tickDelta);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 2,
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 2, shift = At.Shift.AFTER,
             target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/util/math/MatrixStack;DDD)V"))
     private void renderLayerCutout(
             net.minecraft.client.util.math.MatrixStack matrices,
@@ -76,7 +76,7 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderCutout(matrices, tickDelta);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 3,
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 3, shift = At.Shift.AFTER,
             target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/util/math/MatrixStack;DDD)V"))
     private void renderLayerTranslucent(
             net.minecraft.client.util.math.MatrixStack matrices,
