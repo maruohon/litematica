@@ -1,8 +1,7 @@
-package fi.dy.masa.litematica.util;
+package fi.dy.masa.litematica.world;
 
 import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
@@ -14,9 +13,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-public class SchematicWorldRefresher implements IRangeChangeListener
+public class SchematicWorldRenderingNotifier implements IRangeChangeListener
 {
-    public static final SchematicWorldRefresher INSTANCE = new SchematicWorldRefresher();
+    public static final SchematicWorldRenderingNotifier INSTANCE = new SchematicWorldRenderingNotifier();
 
     @Override
     public void updateAll()

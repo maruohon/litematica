@@ -12,7 +12,7 @@ public class MaterialListSchematic extends MaterialListBase
 
     public MaterialListSchematic(LitematicaSchematic schematic, boolean reCreate)
     {
-        this(schematic, schematic.getAreas().keySet(), reCreate);
+        this(schematic, schematic.getSubRegionNames(), reCreate);
     }
 
     public MaterialListSchematic(LitematicaSchematic schematic, Collection<String> subRegions, boolean reCreate)
@@ -45,6 +45,6 @@ public class MaterialListSchematic extends MaterialListBase
     @Override
     public String getTitle()
     {
-        return StringUtils.translate("litematica.gui.title.material_list.schematic", this.getName(), this.regions.size(), this.schematic.getAreas().size());
+        return StringUtils.translate("litematica.gui.title.material_list.schematic", this.getName(), this.regions.size(), this.schematic.getSubRegionNames().size());
     }
 }

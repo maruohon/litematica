@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.schematic.container;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 
 public class LitematicaBlockStateContainer implements ILitematicaBlockStatePaletteResizer
@@ -119,7 +118,7 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
         return this.palette;
     }
 
-    public static LitematicaBlockStateContainer createFrom(NBTTagList palette, long[] blockStates, BlockPos size)
+    public static LitematicaBlockStateContainer createFrom(NBTTagList palette, long[] blockStates, Vec3i size)
     {
         int bits = Math.max(2, Integer.SIZE - Integer.numberOfLeadingZeros(palette.tagCount() - 1));
         LitematicaBlockStateContainer container = new LitematicaBlockStateContainer(size.getX(), size.getY(), size.getZ(), bits, blockStates);

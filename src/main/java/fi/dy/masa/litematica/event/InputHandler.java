@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager;
+import fi.dy.masa.litematica.schematic.util.SchematicEditUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -18,7 +19,7 @@ import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.litematica.util.SchematicUtils;
+import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
@@ -142,7 +143,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             }
             else if (mode == ToolMode.MOVE)
             {
-                SchematicUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, player, mc);
+                ToolUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, player, mc);
                 return true;
             }
         }
@@ -231,15 +232,15 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
             {
-                return SchematicUtils.breakSchematicBlocks(mc);
+                return SchematicEditUtils.breakSchematicBlocks(mc);
             }
             else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
             {
-                return SchematicUtils.breakAllIdenticalSchematicBlocks(mc);
+                return SchematicEditUtils.breakAllIdenticalSchematicBlocks(mc);
             }
             else
             {
-                return SchematicUtils.breakSchematicBlock(mc);
+                return SchematicEditUtils.breakSchematicBlock(mc);
             }
         }
 
@@ -254,23 +255,23 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
                 {
-                    return SchematicUtils.replaceSchematicBlocksInDirection(mc);
+                    return SchematicEditUtils.replaceSchematicBlocksInDirection(mc);
                 }
                 else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
                 {
-                    return SchematicUtils.replaceAllIdenticalSchematicBlocks(mc);
+                    return SchematicEditUtils.replaceAllIdenticalSchematicBlocks(mc);
                 }
                 else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
                 {
-                    return SchematicUtils.placeSchematicBlocksInDirection(mc);
+                    return SchematicEditUtils.placeSchematicBlocksInDirection(mc);
                 }
                 else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
                 {
-                    return SchematicUtils.fillAirWithBlocks(mc);
+                    return SchematicEditUtils.fillAirWithBlocks(mc);
                 }
                 else
                 {
-                    return SchematicUtils.placeSchematicBlock(mc);
+                    return SchematicEditUtils.placeSchematicBlock(mc);
                 }
             }
             else if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&

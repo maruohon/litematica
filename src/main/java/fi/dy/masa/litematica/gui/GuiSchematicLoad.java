@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import java.util.Collection;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
@@ -24,7 +25,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
 {
@@ -189,7 +189,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                     if (GuiBase.isShiftDown())
                     {
                         MaterialListCreator creator = new MaterialListCreator(schematic);
-                        GuiStringListSelection gui = new GuiStringListSelection(schematic.getAreas().keySet(), creator);
+                        GuiStringListSelection gui = new GuiStringListSelection(schematic.getSubRegionNames(), creator);
                         gui.setTitle(StringUtils.translate("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
                         gui.setParent(GuiUtils.getCurrentScreen());
                         GuiBase.openGui(gui);

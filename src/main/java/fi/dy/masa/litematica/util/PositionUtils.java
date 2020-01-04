@@ -177,7 +177,7 @@ public class PositionUtils
         return true;
     }
 
-    public static BlockPos getAreaSizeFromRelativeEndPosition(BlockPos posEndRelative)
+    public static Vec3i getAreaSizeFromRelativeEndPosition(Vec3i posEndRelative)
     {
         int x = posEndRelative.getX();
         int y = posEndRelative.getY();
@@ -187,10 +187,10 @@ public class PositionUtils
         y = y >= 0 ? y + 1 : y - 1;
         z = z >= 0 ? z + 1 : z - 1;
 
-        return new BlockPos(x, y, z);
+        return new Vec3i(x, y, z);
     }
 
-    public static BlockPos getAreaSizeFromRelativeEndPositionAbs(BlockPos posEndRelative)
+    public static Vec3i getAreaSizeFromRelativeEndPositionAbs(Vec3i posEndRelative)
     {
         int x = posEndRelative.getX();
         int y = posEndRelative.getY();
@@ -200,10 +200,10 @@ public class PositionUtils
         y = y >= 0 ? y + 1 : y - 1;
         z = z >= 0 ? z + 1 : z - 1;
 
-        return new BlockPos(Math.abs(x), Math.abs(y), Math.abs(z));
+        return new Vec3i(Math.abs(x), Math.abs(y), Math.abs(z));
     }
 
-    public static BlockPos getRelativeEndPositionFromAreaSize(Vec3i size)
+    public static Vec3i getRelativeEndPositionFromAreaSize(Vec3i size)
     {
         int x = size.getX();
         int y = size.getY();
@@ -213,7 +213,7 @@ public class PositionUtils
         y = y >= 0 ? y - 1 : y + 1;
         z = z >= 0 ? z - 1 : z + 1;
 
-        return new BlockPos(x, y, z);
+        return new Vec3i(x, y, z);
     }
 
     public static List<Box> getValidBoxes(AreaSelection area)

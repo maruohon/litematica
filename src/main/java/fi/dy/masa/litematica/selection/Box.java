@@ -3,17 +3,18 @@ package fi.dy.masa.litematica.selection;
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.util.math.BlockPos;
 
 public class Box
 {
     @Nullable private BlockPos pos1;
     @Nullable private BlockPos pos2;
-    private BlockPos size = BlockPos.ORIGIN;
+    private Vec3i size = BlockPos.ORIGIN;
     private String name = "Unnamed";
     private Corner selectedCorner = Corner.NONE;
 
@@ -52,7 +53,7 @@ public class Box
         return this.pos2;
     }
 
-    public BlockPos getSize()
+    public Vec3i getSize()
     {
         return this.size;
     }
@@ -111,7 +112,7 @@ public class Box
         }
         else if (this.pos1 == null && this.pos2 == null)
         {
-            this.size = BlockPos.ORIGIN;
+            this.size = new Vec3i(0, 0, 0);
         }
         else
         {

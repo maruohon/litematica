@@ -6,7 +6,7 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.util.SchematicWorldRefresher;
+import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.config.gui.ConfigGuiTabBase;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
@@ -65,6 +65,6 @@ public class GuiConfigs extends GuiConfigsBase
     {
         super.onSettingsChanged();
 
-        SchematicWorldRefresher.INSTANCE.updateAll();
+        SchematicWorldRenderingNotifier.INSTANCE.updateAll();
     }
 }

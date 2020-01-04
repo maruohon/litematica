@@ -8,6 +8,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -156,7 +157,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
 
                 String author = this.mc.player.getName();
                 boolean takeEntities = this.checkboxIgnoreEntities.isChecked() == false;
-                LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
+                LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(area, author);
                 TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
                 task.setCompletionListener(this);
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
@@ -185,7 +186,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         {
             boolean takeEntities = true; // TODO
             String author = this.mc.player.getName();
-            LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(this.area, author);
+            LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(this.area, author);
 
             if (schematic != null)
             {

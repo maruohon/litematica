@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -18,9 +21,6 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlacement>
 {
@@ -159,7 +159,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.origin", strOrigin));
 
-            Vec3i size = schematic.getAreaSize(this.placement.getName());
+            Vec3i size = schematic.getSubRegionSize(this.placement.getName());
 
             if (size != null)
             {

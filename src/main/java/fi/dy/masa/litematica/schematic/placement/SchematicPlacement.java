@@ -26,6 +26,7 @@ import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListPlacement;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.LitematicaSchematic.SubRegion;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.selection.Box;
@@ -107,7 +108,7 @@ public class SchematicPlacement
     {
         // Adjust the origin such that the actual sub regions minimum corner is at the provided origin,
         // regardless of where the defined origin point is in relation to the minimum corner.
-        Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(schematic.getAreas().values());
+        Pair<BlockPos, BlockPos> pair = PositionUtils.getEnclosingAreaCorners(schematic.getSubRegionBoxes().values());
         BlockPos originAdjusted = pair != null ? origin.subtract(pair.getLeft()) : origin;
 
         return createTemporary(schematic, originAdjusted);
@@ -433,30 +434,31 @@ public class SchematicPlacement
     public ImmutableMap<String, Box> getSubRegionBoxes(RequiredEnabled required)
     {
         ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
-        Map<String, BlockPos> areaSizes = this.schematic.getAreaSizes();
+        Map<String, SubRegion> subRegions = this.schematic.getSubRegions();
 
         for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
         {
-            String name = entry.getKey();
-            BlockPos areaSize = areaSizes.get(name);
-
-            if (areaSize == null)
-            {
-                LiteModLitematica.logger.warn("SchematicPlacement.getSubRegionBoxes(): Size for sub-region '{}' not found in the schematic '{}'", name, this.schematic.getMetadata().getName());
-                continue;
-            }
-
             SubRegionPlacement placement = entry.getValue();
 
             if (placement.matchesRequirement(required))
             {
-                BlockPos boxOriginRelative = placement.getPos();
-                BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
-                BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSize);
-                pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
-                pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
+                String name = entry.getKey();
+                SubRegion region = subRegions.get(name);
 
-                builder.put(name, new Box(boxOriginAbsolute, pos2, name));
+                if (region != null)
+                {
+                    BlockPos boxOriginRelative = placement.getPos();
+                    BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
+                    BlockPos pos2 = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(region.size));
+                    pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
+                    pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
+
+                    builder.put(name, new Box(boxOriginAbsolute, pos2, name));
+                }
+                else
+                {
+                    LiteModLitematica.logger.warn("SchematicPlacement.getSubRegionBoxes(): Sub-region '{}' not found in the schematic '{}'", name, this.schematic.getMetadata().getName());
+                }
             }
         }
 
@@ -466,30 +468,26 @@ public class SchematicPlacement
     public ImmutableMap<String, Box> getSubRegionBoxFor(String regionName, RequiredEnabled required)
     {
         ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
-        Map<String, BlockPos> areaSizes = this.schematic.getAreaSizes();
-
         SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
 
-        if (placement != null)
+        if (placement != null && placement.matchesRequirement(required))
         {
-            if (placement.matchesRequirement(required))
+            Map<String, SubRegion> subRegions = this.schematic.getSubRegions();
+            SubRegion region = subRegions.get(regionName);
+
+            if (region != null)
             {
-                BlockPos areaSize = areaSizes.get(regionName);
+                BlockPos boxOriginRelative = placement.getPos();
+                BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
+                BlockPos pos2 = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(region.size));
+                pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
+                pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
 
-                if (areaSize != null)
-                {
-                    BlockPos boxOriginRelative = placement.getPos();
-                    BlockPos boxOriginAbsolute = PositionUtils.getTransformedBlockPos(boxOriginRelative, this.mirror, this.rotation).add(this.origin);
-                    BlockPos pos2 = PositionUtils.getRelativeEndPositionFromAreaSize(areaSize);
-                    pos2 = PositionUtils.getTransformedBlockPos(pos2, this.mirror, this.rotation);
-                    pos2 = PositionUtils.getTransformedBlockPos(pos2, placement.getMirror(), placement.getRotation()).add(boxOriginAbsolute);
-
-                    builder.put(regionName, new Box(boxOriginAbsolute, pos2, regionName));
-                }
-                else
-                {
-                    LiteModLitematica.logger.warn("SchematicPlacement.getSubRegionBoxFor(): Size for sub-region '{}' not found in the schematic '{}'", regionName, this.schematic.getMetadata().getName());
-                }
+                builder.put(regionName, new Box(boxOriginAbsolute, pos2, regionName));
+            }
+            else
+            {
+                LiteModLitematica.logger.warn("SchematicPlacement.getSubRegionBoxFor(): Sub-region '{}' not found in the schematic '{}'", regionName, this.schematic.getMetadata().getName());
             }
         }
 
@@ -549,19 +547,19 @@ public class SchematicPlacement
 
     private void checkAreSubRegionsModified()
     {
-        Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
+        Map<String, SubRegion> subRegions = this.schematic.getSubRegions();
 
-        if (areaPositions.size() != this.relativeSubRegionPlacements.size())
+        if (subRegions.size() != this.relativeSubRegionPlacements.size())
         {
             this.regionPlacementsModified = true;
             return;
         }
 
-        for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
+        for (Map.Entry<String, SubRegion> entry : subRegions.entrySet())
         {
             SubRegionPlacement placement = this.relativeSubRegionPlacements.get(entry.getKey());
 
-            if (placement == null || placement.isRegionPlacementModified(entry.getValue()))
+            if (placement == null || placement.isRegionPlacementModified(entry.getValue().pos))
             {
                 this.regionPlacementsModified = true;
                 return;
@@ -704,14 +702,14 @@ public class SchematicPlacement
             DataManager.getSchematicPlacementManager().onPrePlacementChange(this);
         }
 
-        Map<String, BlockPos> areaPositions = this.schematic.getAreaPositions();
+        Map<String, SubRegion> subRegions = this.schematic.getSubRegions();
         this.relativeSubRegionPlacements.clear();
         this.regionPlacementsModified = false;
 
-        for (Map.Entry<String, BlockPos> entry : areaPositions.entrySet())
+        for (Map.Entry<String, SubRegion> entry : subRegions.entrySet())
         {
             String name = entry.getKey();
-            this.relativeSubRegionPlacements.put(name, new SubRegionPlacement(entry.getValue(), name));
+            this.relativeSubRegionPlacements.put(name, new SubRegionPlacement(entry.getValue().pos, name));
         }
 
         if (updatePlacementManager)

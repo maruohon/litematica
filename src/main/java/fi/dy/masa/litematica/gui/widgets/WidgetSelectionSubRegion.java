@@ -2,6 +2,8 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSubRegion;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
@@ -16,7 +18,6 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
 
 public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 {
@@ -114,7 +115,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             if (pos1 != null && pos2 != null)
             {
                 String str = StringUtils.translate("litematica.gui.label.area_editor.dimensions");
-                BlockPos size = PositionUtils.getAreaSizeFromRelativeEndPosition(pos2.subtract(pos1));
+                Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPosition(pos2.subtract(pos1));
                 text.add(String.format("%s: %d x %d x %d", str, Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ())));
             }
         }

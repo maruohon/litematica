@@ -53,6 +53,8 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
+import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -60,6 +62,7 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.config.values.InfoType;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -124,11 +127,11 @@ public class WorldUtils
         area.setSubRegionCornerPos(box, Corner.CORNER_1, BlockPos.ORIGIN);
         area.setSubRegionCornerPos(box, Corner.CORNER_2, (new BlockPos(schematic.getSize())).add(-1, -1, -1));
 
-        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);
+        LitematicaSchematic litematicaSchematic = SchematicCreationUtils.createFromWorld(world, area, false, "?", feedback);
 
         if (litematicaSchematic != null && ignoreEntities == false)
         {
-            litematicaSchematic.takeEntityDataFromSchematicaSchematic(schematic, subRegionName);
+            SchematicCreationUtils.takeEntityDataFromSchematicaSchematic(litematicaSchematic, schematic, subRegionName);
         }
         else
         {
@@ -176,7 +179,7 @@ public class WorldUtils
             area.setSubRegionCornerPos(box, Corner.CORNER_1, BlockPos.ORIGIN);
             area.setSubRegionCornerPos(box, Corner.CORNER_2, template.getSize().add(-1, -1, -1));
 
-            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, ignoreEntities, template.getAuthor(), feedback);
+            LitematicaSchematic litematicaSchematic = SchematicCreationUtils.createFromWorld(world, area, ignoreEntities, template.getAuthor(), feedback);
 
             if (litematicaSchematic != null)
             {
@@ -217,11 +220,11 @@ public class WorldUtils
         WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
         WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().profiler);
 
-        BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
+        BlockPos size = new BlockPos(litematicaSchematic.getMetadata().getEnclosingSize());
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, size);
         SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
-        LayerRange range = new LayerRange(SchematicWorldRefresher.INSTANCE); // This is by default in the All layers mode
-        litematicaSchematic.placeToWorld(world, schematicPlacement, range, false); // TODO use a per-chunk version for a bit more speed
+        LayerRange range = new LayerRange(SchematicWorldRenderingNotifier.INSTANCE); // This is by default in the All layers mode
+        SchematicPlacingUtils.placeToWorld(litematicaSchematic, world, schematicPlacement, range, false); // TODO use a per-chunk version for a bit more speed
 
         SchematicaSchematic schematic = SchematicaSchematic.createFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities);
 
@@ -254,11 +257,11 @@ public class WorldUtils
         WorldSettings settings = new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.FLAT);
         WorldClient world = new WorldSchematic(null, settings, 0, EnumDifficulty.NORMAL, Minecraft.getMinecraft().profiler);
 
-        BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
+        BlockPos size = new BlockPos(litematicaSchematic.getMetadata().getEnclosingSize());
         WorldUtils.loadChunksClientWorld(world, BlockPos.ORIGIN, size);
         SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
-        LayerRange range = new LayerRange(SchematicWorldRefresher.INSTANCE); // This is by default in the All layers mode
-        litematicaSchematic.placeToWorld(world, schematicPlacement, range, false); // TODO use a per-chunk version for a bit more speed
+        LayerRange range = new LayerRange(SchematicWorldRenderingNotifier.INSTANCE); // This is by default in the All layers mode
+        SchematicPlacingUtils.placeToWorld(litematicaSchematic, world, schematicPlacement, range, false); // TODO use a per-chunk version for a bit more speed
 
         Template template = new Template();
         template.takeBlocksFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities == false, Blocks.STRUCTURE_VOID);

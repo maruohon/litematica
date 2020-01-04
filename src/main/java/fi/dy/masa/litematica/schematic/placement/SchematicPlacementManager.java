@@ -34,6 +34,7 @@ import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
+import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -144,7 +145,7 @@ public class SchematicPlacementManager
                         {
                             if (placement.isEnabled())
                             {
-                                placement.getSchematic().placeToWorldWithinChunk(worldSchematic, pos, placement, false);
+                                SchematicPlacingUtils.placeToWorldWithinChunk(placement.getSchematic(), worldSchematic, pos, placement, false);
                             }
                         }
 
@@ -370,6 +371,20 @@ public class SchematicPlacementManager
             OverlayRenderer.getInstance().updatePlacementCache();
             // Forget the last viewed material list when changing the placement selection
             DataManager.setMaterialList(null);
+        }
+    }
+
+    public void unloadCurrentlySelectedSchematic()
+    {
+        SchematicPlacement placement = this.getSelectedSchematicPlacement();
+
+        if (placement != null)
+        {
+            SchematicHolder.getInstance().removeSchematic(placement.getSchematic());
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
         }
     }
 
@@ -707,7 +722,7 @@ public class SchematicPlacementManager
 
                     world.addScheduledTask(() ->
                     {
-                        if (schematic.placeToWorld(world, schematicPlacement, range, false))
+                        if (SchematicPlacingUtils.placeToWorld(schematic, world, schematicPlacement, range, false))
                         {
                             if (printMessage)
                             {

@@ -437,6 +437,8 @@ litematica.message.error.placement_paste_outside_world=The placement can't be pa
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
 litematica.message.error.schematic_save_failed=Failed to save schematic to file '%s'
 litematica.message.error.schematic_save_interrupted=Schematic saving interrupted or stopped
+litematica.message.error.schematic_save.missing_container=One of the data containers not found for sub-region '%s'
+litematica.message.error.schematic_save.missing_entity_list=Entity list not found for sub-region '%s'
 litematica.message.error.schematic_save_no_area_selected=§cSchematic saving failed - no area selected§r
 
 litematica.message.added_selection_box=Added a new selection box at %s

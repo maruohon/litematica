@@ -32,7 +32,7 @@ import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
-import fi.dy.masa.litematica.util.SchematicWorldRefresher;
+import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -59,7 +59,7 @@ public class DataManager implements IDirectoryCache
     private final SelectionManager selectionManager = new SelectionManager();
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
     private final SchematicProjectsManager schematicProjectsManager = new SchematicProjectsManager();
-    private LayerRange renderRange = new LayerRange(SchematicWorldRefresher.INSTANCE);
+    private LayerRange renderRange = new LayerRange(SchematicWorldRenderingNotifier.INSTANCE);
     private ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
     @Nullable
@@ -339,7 +339,7 @@ public class DataManager implements IDirectoryCache
 
         if (JsonUtils.hasObject(obj, "render_range"))
         {
-            this.renderRange = LayerRange.createFromJson(JsonUtils.getNestedObject(obj, "render_range", false), SchematicWorldRefresher.INSTANCE);
+            this.renderRange = LayerRange.createFromJson(JsonUtils.getNestedObject(obj, "render_range", false), SchematicWorldRenderingNotifier.INSTANCE);
         }
 
         if (JsonUtils.hasString(obj, "operation_mode"))

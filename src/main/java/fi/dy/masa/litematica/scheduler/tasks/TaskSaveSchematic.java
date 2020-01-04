@@ -6,17 +6,18 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
 public class TaskSaveSchematic extends TaskProcessChunkBase
 {
@@ -60,11 +61,11 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
     protected boolean processChunk(ChunkPos pos)
     {
         ImmutableMap<String, IntBoundingBox> volumes = PositionUtils.getBoxesWithinChunk(pos.x, pos.z, this.subRegions);
-        this.schematic.takeBlocksFromWorldWithinChunk(this.world, pos.x, pos.z, volumes, this.subRegions);
+        SchematicCreationUtils.takeBlocksFromWorldWithinChunk(this.schematic, this.world, pos.x, pos.z, volumes, this.subRegions);
 
         if (this.takeEntities)
         {
-            this.schematic.takeEntitiesFromWorldWithinChunk(this.world, pos.x, pos.z, volumes, this.subRegions, this.existingEntities, this.origin);
+            SchematicCreationUtils.takeEntitiesFromWorldWithinChunk(this.schematic, this.world, pos.x, pos.z, volumes, this.subRegions, this.existingEntities, this.origin);
         }
 
         return true;

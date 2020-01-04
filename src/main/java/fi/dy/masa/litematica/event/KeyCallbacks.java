@@ -20,6 +20,7 @@ import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.util.SchematicUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -30,10 +31,9 @@ import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
-import fi.dy.masa.litematica.util.SchematicUtils;
-import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.config.values.LayerMode;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -134,7 +134,7 @@ public class KeyCallbacks
 
             if (this.config.getBooleanValue())
             {
-                SchematicWorldRefresher.INSTANCE.updateAll();
+                SchematicWorldRenderingNotifier.INSTANCE.updateAll();
             }
 
             return true;
@@ -200,7 +200,7 @@ public class KeyCallbacks
 
                             if (pos != null)
                             {
-                                SchematicUtils.moveCurrentlySelectedWorldRegionTo(pos, mc);
+                                ToolUtils.moveCurrentlySelectedWorldRegionTo(pos, mc);
                             }
                         }
                         else if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
@@ -379,7 +379,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
             {
-                SchematicWorldRefresher.INSTANCE.updateAll();
+                SchematicWorldRenderingNotifier.INSTANCE.updateAll();
                 InfoUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
                 return true;
             }
@@ -479,7 +479,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.CLONE_SELECTION.getKeybind())
             {
-                SchematicUtils.cloneSelectionArea(this.mc);
+                ToolUtils.cloneSelectionArea(this.mc);
                 return true;
             }
             else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && ((hasTool && toolEnabled) || Configs.Generic.EXECUTE_REQUIRE_TOOL.getBooleanValue() == false))
@@ -546,7 +546,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.UNLOAD_CURRENT_SCHEMATIC.getKeybind())
             {
-                SchematicUtils.unloadCurrentlySelectedSchematic();
+                DataManager.getSchematicPlacementManager().unloadCurrentlySelectedSchematic();
                 return true;
             }
 
@@ -616,7 +616,7 @@ public class KeyCallbacks
 
                         if (mode == ToolMode.MOVE)
                         {
-                            SchematicUtils.moveCurrentlySelectedWorldRegionTo(pos, this.mc);
+                            ToolUtils.moveCurrentlySelectedWorldRegionTo(pos, this.mc);
                         }
                         else
                         {

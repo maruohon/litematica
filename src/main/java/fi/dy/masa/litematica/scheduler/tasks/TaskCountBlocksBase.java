@@ -7,7 +7,7 @@ import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.litematica.util.SchematicWorldRefresher;
+import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -32,7 +32,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
 
         if (materialList.getMaterialListType() == BlockInfoListType.ALL)
         {
-            this.layerRange = new LayerRange(SchematicWorldRefresher.INSTANCE);
+            this.layerRange = new LayerRange(SchematicWorldRenderingNotifier.INSTANCE);
         }
         else
         {

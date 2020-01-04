@@ -16,8 +16,8 @@ public class SchematicMetadata
     private long timeCreated;
     private long timeModified;
     private int regionCount;
-    private int totalVolume;
-    private int totalBlocks;
+    private long totalVolume;
+    private long totalBlocks;
     private int[] thumbnailPixelData;
     private boolean modifiedSinceSaved;
 
@@ -47,12 +47,12 @@ public class SchematicMetadata
         return this.regionCount;
     }
 
-    public int getTotalVolume()
+    public long getTotalVolume()
     {
         return this.totalVolume;
     }
 
-    public int getTotalBlocks()
+    public long getTotalBlocks()
     {
         return this.totalBlocks;
     }
@@ -122,7 +122,7 @@ public class SchematicMetadata
         this.totalVolume = totalVolume;
     }
 
-    public void setTotalBlocks(int totalBlocks)
+    public void setTotalBlocks(long totalBlocks)
     {
         this.totalBlocks = totalBlocks;
     }
@@ -155,8 +155,8 @@ public class SchematicMetadata
         nbt.setString("Author", this.author);
         nbt.setString("Description", this.description);
         nbt.setInteger("RegionCount", this.regionCount);
-        nbt.setInteger("TotalVolume", this.totalVolume);
-        nbt.setInteger("TotalBlocks", this.totalBlocks);
+        nbt.setLong("TotalVolume", this.totalVolume);
+        nbt.setLong("TotalBlocks", this.totalBlocks);
         nbt.setLong("TimeCreated", this.timeCreated);
         nbt.setLong("TimeModified", this.timeModified);
         nbt.setTag("EnclosingSize", NBTUtils.createBlockPosTag(this.enclosingSize));
@@ -175,8 +175,8 @@ public class SchematicMetadata
         this.author = nbt.getString("Author");
         this.description = nbt.getString("Description");
         this.regionCount = nbt.getInteger("RegionCount");
-        this.totalVolume = nbt.getInteger("TotalVolume");
-        this.totalBlocks = nbt.getInteger("TotalBlocks");
+        this.totalVolume = nbt.getLong("TotalVolume");
+        this.totalBlocks = nbt.getLong("TotalBlocks");
         this.timeCreated = nbt.getLong("TimeCreated");
         this.timeModified = nbt.getLong("TimeModified");
 
