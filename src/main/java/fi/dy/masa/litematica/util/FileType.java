@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.util;
 
 import java.io.File;
+import java.util.Locale;
 
 public enum FileType
 {
@@ -9,13 +10,14 @@ public enum FileType
     JSON,
     LITEMATICA_SCHEMATIC,
     SCHEMATICA_SCHEMATIC,
+    SPONGE_SCHEMATIC,
     VANILLA_STRUCTURE;
 
-    public static FileType fromFile(File file)
+    public static FileType fromFileName(File file)
     {
         if (file.isFile() && file.canRead())
         {
-            String name = file.getName();
+            String name = file.getName().toLowerCase(Locale.ROOT);
 
             if (name.endsWith(".litematic"))
             {
@@ -24,6 +26,10 @@ public enum FileType
             else if (name.endsWith(".schematic"))
             {
                 return SCHEMATICA_SCHEMATIC;
+            }
+            else if (name.endsWith(".schem"))
+            {
+                return SPONGE_SCHEMATIC;
             }
             else if (name.endsWith(".nbt"))
             {

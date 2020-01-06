@@ -14,7 +14,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -29,12 +29,12 @@ public class TaskFillArea extends TaskProcessChunkBase
     protected final boolean removeEntities;
     protected int chunkCount;
 
-    public TaskFillArea(List<Box> boxes, IBlockState fillState, @Nullable IBlockState replaceState, boolean removeEntities)
+    public TaskFillArea(List<SelectionBox> boxes, IBlockState fillState, @Nullable IBlockState replaceState, boolean removeEntities)
     {
         this(boxes, fillState, replaceState, removeEntities, "litematica.gui.label.task_name.fill");
     }
 
-    protected TaskFillArea(List<Box> boxes, IBlockState fillState, @Nullable IBlockState replaceState, boolean removeEntities, String nameOnHud)
+    protected TaskFillArea(List<SelectionBox> boxes, IBlockState fillState, @Nullable IBlockState replaceState, boolean removeEntities, String nameOnHud)
     {
         super(nameOnHud);
 

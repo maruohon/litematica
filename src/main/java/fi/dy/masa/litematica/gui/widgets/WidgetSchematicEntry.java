@@ -12,7 +12,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -25,17 +25,17 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchematic>
+public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
 {
     private final WidgetListLoadedSchematics parent;
-    private final LitematicaSchematic schematic;
+    private final ISchematic schematic;
     private final int typeIconX;
     private final int typeIconY;
     private final boolean isOdd;
     private final int buttonsStartX;
 
     public WidgetSchematicEntry(int x, int y, int width, int height, boolean isOdd,
-            LitematicaSchematic schematic, int listIndex, WidgetListLoadedSchematics parent)
+            ISchematic schematic, int listIndex, WidgetListLoadedSchematics parent)
     {
         super(x, y, width, height, schematic, listIndex);
 
@@ -178,7 +178,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
             if (this.type == Type.CREATE_PLACEMENT)
             {
                 BlockPos pos = new BlockPos(this.widget.mc.player.getPositionVector());
-                LitematicaSchematic entry = this.widget.schematic;
+                ISchematic entry = this.widget.schematic;
                 String name = entry.getMetadata().getName();
                 boolean enabled = GuiBase.isShiftDown() == false;
 
@@ -189,7 +189,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {
-                LitematicaSchematic entry = this.widget.schematic;
+                ISchematic entry = this.widget.schematic;
                 GuiSchematicSave gui = new GuiSchematicSave(entry);
                 gui.setParent(GuiUtils.getCurrentScreen());
                 GuiBase.openGui(gui);

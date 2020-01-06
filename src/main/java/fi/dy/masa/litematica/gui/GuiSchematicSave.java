@@ -7,6 +7,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -28,7 +29,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         this(null);
     }
 
-    public GuiSchematicSave(@Nullable LitematicaSchematic schematic)
+    public GuiSchematicSave(@Nullable ISchematic schematic)
     {
         super(schematic);
 
@@ -124,7 +125,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         // Saving a schematic from memory
         if (this.schematic != null)
         {
-            LitematicaSchematic schematic = this.schematic;
+            ISchematic schematic = this.schematic;
 
             if (schematic.writeToFile(dir, fileName, GuiBase.isShiftDown()))
             {
@@ -144,9 +145,9 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                 String fileNameTmp = fileName;
 
                 // The file name extension gets added in the schematic write method, so need to add it here for the check
-                if (fileNameTmp.endsWith(LitematicaSchematic.FILE_EXTENSION) == false)
+                if (fileNameTmp.endsWith(LitematicaSchematic.FILE_NAME_EXTENSION) == false)
                 {
-                    fileNameTmp += LitematicaSchematic.FILE_EXTENSION;
+                    fileNameTmp += LitematicaSchematic.FILE_NAME_EXTENSION;
                 }
 
                 if (FileUtils.canWriteToFile(dir, fileNameTmp, overwrite) == false)

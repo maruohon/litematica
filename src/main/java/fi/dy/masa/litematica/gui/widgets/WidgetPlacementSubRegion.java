@@ -9,7 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -137,7 +138,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean selected)
     {
-        LitematicaSchematic schematic = this.schematicPlacement.getSchematic();
+        ISchematic schematic = this.schematicPlacement.getSchematic();
         File schematicFile = schematic.getFile();
         String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.in_memory");
 
@@ -159,7 +160,8 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.origin", strOrigin));
 
-            Vec3i size = schematic.getSubRegionSize(this.placement.getName());
+            ISchematicRegion region = schematic.getSchematicRegion(this.placement.getName());
+            Vec3i size = region != null ? region.getSize() : null;
 
             if (size != null)
             {

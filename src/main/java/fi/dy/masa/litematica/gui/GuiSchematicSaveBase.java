@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -21,9 +21,9 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     protected WidgetCheckBox checkboxIgnoreEntities;
     protected String lastText = "";
     protected String defaultText = "";
-    @Nullable protected final LitematicaSchematic schematic;
+    @Nullable protected final ISchematic schematic;
 
-    public GuiSchematicSaveBase(@Nullable LitematicaSchematic schematic)
+    public GuiSchematicSaveBase(@Nullable ISchematic schematic)
     {
         super(10, 70);
 

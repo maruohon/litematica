@@ -26,7 +26,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -80,7 +80,7 @@ public class RayTraceUtils
 
         if (DataManager.getToolMode().getUsesSchematic() == false && area != null)
         {
-            for (Box box : area.getAllSubRegionBoxes())
+            for (SelectionBox box : area.getAllSubRegionBoxes())
             {
                 boolean hitCorner = false;
                 hitCorner |= traceToSelectionBoxCorner(box, Corner.CORNER_1, eyesPos, lookEndPos);
@@ -162,7 +162,7 @@ public class RayTraceUtils
         closestOriginDistance = -1D;
     }
 
-    private static boolean traceToSelectionBoxCorner(Box box, Corner corner, Vec3d start, Vec3d end)
+    private static boolean traceToSelectionBoxCorner(SelectionBox box, Corner corner, Vec3d start, Vec3d end)
     {
         BlockPos pos = (corner == Corner.CORNER_1) ? box.getPos1() : (corner == Corner.CORNER_2) ? box.getPos2() : null;
 
@@ -188,7 +188,7 @@ public class RayTraceUtils
         return false;
     }
 
-    private static boolean traceToSelectionBoxBody(Box box, Vec3d start, Vec3d end)
+    private static boolean traceToSelectionBoxBody(SelectionBox box, Vec3d start, Vec3d end)
     {
         if (box.getPos1() != null && box.getPos2() != null)
         {
@@ -214,13 +214,13 @@ public class RayTraceUtils
 
     private static boolean traceToPlacementBox(SchematicPlacement placement, Vec3d start, Vec3d end)
     {
-        ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
+        ImmutableMap<String, SelectionBox> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
         boolean hitSomething = false;
 
-        for (Map.Entry<String, Box> entry : boxes.entrySet())
+        for (Map.Entry<String, SelectionBox> entry : boxes.entrySet())
         {
             String boxName = entry.getKey();
-            Box box = entry.getValue();
+            SelectionBox box = entry.getValue();
 
             if (box.getPos1() != null && box.getPos2() != null)
             {
@@ -1007,7 +1007,7 @@ public class RayTraceUtils
         @Nullable
         private final RayTraceResult trace;
         @Nullable
-        private final Box box;
+        private final SelectionBox box;
         @Nullable
         private final SchematicPlacement schematicPlacement;
         @Nullable
@@ -1057,7 +1057,7 @@ public class RayTraceUtils
             this.placementRegionName = null;
         }
 
-        public RayTraceWrapper(Box box, Corner corner, Vec3d hitVec)
+        public RayTraceWrapper(SelectionBox box, Corner corner, Vec3d hitVec)
         {
             this.type = corner == Corner.NONE ? HitType.SELECTION_BOX_BODY : HitType.SELECTION_BOX_CORNER;
             this.corner = corner;
@@ -1091,7 +1091,7 @@ public class RayTraceUtils
         }
 
         @Nullable
-        public Box getHitSelectionBox()
+        public SelectionBox getHitSelectionBox()
         {
             return this.box;
         }

@@ -20,7 +20,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinItemBlockSpecial;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -288,9 +289,16 @@ public class SchematicEditUtils
                     if (part.getBox().containsPos(pos))
                     {
                         SchematicPlacement placement = part.getPlacement();
-                        LitematicaSchematic schematic = placement.getSchematic();
+                        ISchematic schematic = placement.getSchematic();
                         String regionName = part.getSubRegionName();
-                        LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
+                        ISchematicRegion region = schematic.getSchematicRegion(regionName);
+
+                        if (region == null)
+                        {
+                            continue;
+                        }
+
+                        LitematicaBlockStateContainer container = region.getBlockStateContainer();
                         BlockPos posSchematic = SchematicUtils.getSchematicContainerPositionFromWorldPosition(pos, schematic,
                                 regionName, placement, placement.getRelativeSubRegionPlacement(regionName), container);
 
@@ -351,8 +359,15 @@ public class SchematicEditUtils
                         String regionName = part.getSubRegionName();
                         SchematicPlacement schematicPlacement = part.getPlacement();
                         SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
-                        LitematicaSchematic schematic = schematicPlacement.getSchematic();
-                        LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
+                        ISchematic schematic = schematicPlacement.getSchematic();
+                        ISchematicRegion region = schematic.getSchematicRegion(regionName);
+
+                        if (region == null)
+                        {
+                            continue;
+                        }
+
+                        LitematicaBlockStateContainer container = region.getBlockStateContainer();
                         BlockPos posStartSchematic = SchematicUtils.getSchematicContainerPositionFromWorldPosition(posStart, schematic,
                                 regionName, schematicPlacement, placement, container);
                         BlockPos posEndSchematic = SchematicUtils.getSchematicContainerPositionFromWorldPosition(posEnd, schematic,
@@ -449,7 +464,7 @@ public class SchematicEditUtils
             IBlockState stateOriginalIn, IBlockState stateNewIn)
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
-        LitematicaSchematic schematic = schematicPlacement.getSchematic();
+        ISchematic schematic = schematicPlacement.getSchematic();
         String selected = schematicPlacement.getSelectedSubRegionName();
         List<String> regions = new ArrayList<>();
 
@@ -486,9 +501,16 @@ public class SchematicEditUtils
 
         for (String regionName : regions)
         {
-            LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
+            ISchematicRegion region = schematic.getSchematicRegion(regionName);
+
+            if (region == null)
+            {
+                continue;
+            }
+
             SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
-            Vec3i regionSize = schematic.getSubRegionSize(regionName);
+            LitematicaBlockStateContainer container = region.getBlockStateContainer();
+            Vec3i regionSize = region.getSize();
 
             if (container == null || placement == null || regionSize == null)
             {

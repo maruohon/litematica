@@ -10,7 +10,7 @@ import fi.dy.masa.malilib.util.NBTUtils;
 public class SchematicMetadata
 {
     private String name = "?";
-    private String author = "Unknown";
+    private String author = "?";
     private String description = "";
     private Vec3i enclosingSize = Vec3i.NULL_VECTOR;
     private long timeCreated;
@@ -18,8 +18,8 @@ public class SchematicMetadata
     private int regionCount;
     private long totalVolume;
     private long totalBlocks;
-    private int[] thumbnailPixelData;
     private boolean modifiedSinceSaved;
+    @Nullable private int[] thumbnailPixelData;
 
     public String getName()
     {
@@ -147,7 +147,31 @@ public class SchematicMetadata
         this.timeModified = System.currentTimeMillis();
     }
 
-    public NBTTagCompound writeToNBT()
+    public void copyFrom(SchematicMetadata other)
+    {
+        this.name = other.name;
+        this.author = other.author;
+        this.description = other.description;
+        this.enclosingSize = other.enclosingSize;
+        this.timeCreated = other.timeCreated;
+        this.timeModified = other.timeModified;
+        this.regionCount = other.regionCount;
+        this.totalVolume = other.totalVolume;
+        this.totalBlocks = other.totalBlocks;
+        this.modifiedSinceSaved = false;
+
+        if (other.thumbnailPixelData != null)
+        {
+            this.thumbnailPixelData = new int[other.thumbnailPixelData.length];
+            System.arraycopy(other.thumbnailPixelData, 0, this.thumbnailPixelData, 0, this.thumbnailPixelData.length);
+        }
+        else
+        {
+            this.thumbnailPixelData = null;
+        }
+    }
+
+    public NBTTagCompound toTag()
     {
         NBTTagCompound nbt = new NBTTagCompound();
 
@@ -169,7 +193,7 @@ public class SchematicMetadata
         return nbt;
     }
 
-    public void readFromNBT(NBTTagCompound nbt)
+    public void fromTag(NBTTagCompound nbt)
     {
         this.name = nbt.getString("Name");
         this.author = nbt.getString("Author");

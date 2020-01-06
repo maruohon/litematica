@@ -12,7 +12,8 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -62,10 +63,17 @@ public class SchematicUtils
     }
 
     @Nullable
-    public static BlockPos getSchematicContainerPositionFromWorldPosition(BlockPos worldPos, LitematicaSchematic schematic, String regionName,
+    public static BlockPos getSchematicContainerPositionFromWorldPosition(BlockPos worldPos, ISchematic schematic, String regionName,
             SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, LitematicaBlockStateContainer container)
     {
-        BlockPos boxMinRel = getReverseTransformedWorldPosition(worldPos, schematic, schematicPlacement, regionPlacement, schematic.getSubRegionSize(regionName));
+        ISchematicRegion region = schematic.getSchematicRegion(regionName);
+
+        if (region == null)
+        {
+            return null;
+        }
+
+        BlockPos boxMinRel = getReverseTransformedWorldPosition(worldPos, schematic, schematicPlacement, regionPlacement, region.getSize());
 
         if (boxMinRel == null)
         {
@@ -94,7 +102,7 @@ public class SchematicUtils
     }
 
     @Nullable
-    private static BlockPos getReverseTransformedWorldPosition(BlockPos worldPos, LitematicaSchematic schematic,
+    private static BlockPos getReverseTransformedWorldPosition(BlockPos worldPos, ISchematic schematic,
             SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, Vec3i regionSize)
     {
         BlockPos origin = schematicPlacement.getOrigin();
@@ -137,7 +145,7 @@ public class SchematicUtils
         BlockPos posMinRange = new BlockPos(minX, minY, minZ);
         BlockPos posMaxRange = new BlockPos(maxX, maxY, maxZ);
 
-        LitematicaSchematic schematic = schematicPlacement.getSchematic();
+        ISchematic schematic = schematicPlacement.getSchematic();
         BlockPos pos1 = getReverseTransformedWorldPosition(posMinRange, schematic, schematicPlacement, placement, regionSize);
         BlockPos pos2 = getReverseTransformedWorldPosition(posMaxRange, schematic, schematicPlacement, placement, regionSize);
 

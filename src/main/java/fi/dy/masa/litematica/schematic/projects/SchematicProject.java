@@ -348,7 +348,7 @@ public class SchematicProject
         while (failsafe-- > 0)
         {
             String name = nameBase + String.format("%05d", version);
-            File file = new File(this.directory, name + LitematicaSchematic.FILE_EXTENSION);
+            File file = new File(this.directory, name + LitematicaSchematic.FILE_NAME_EXTENSION);
 
             if (file.exists() == false)
             {

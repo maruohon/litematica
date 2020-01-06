@@ -6,15 +6,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
-import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
 
 public abstract class TaskProcessChunkBase extends TaskBase
 {
@@ -96,7 +96,7 @@ public abstract class TaskProcessChunkBase extends TaskBase
 
     protected abstract boolean processChunk(ChunkPos pos);
 
-    protected void addBoxesPerChunks(Collection<Box> allBoxes)
+    protected void addBoxesPerChunks(Collection<SelectionBox> allBoxes)
     {
         this.boxesInChunks.clear();
         this.requiredChunks.clear();

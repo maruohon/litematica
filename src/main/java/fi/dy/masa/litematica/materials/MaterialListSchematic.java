@@ -2,20 +2,20 @@ package fi.dy.masa.litematica.materials;
 
 import java.util.Collection;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListSchematic extends MaterialListBase
 {
-    private final LitematicaSchematic schematic;
+    private final ISchematic schematic;
     private final ImmutableList<String> regions;
 
-    public MaterialListSchematic(LitematicaSchematic schematic, boolean reCreate)
+    public MaterialListSchematic(ISchematic schematic, boolean reCreate)
     {
-        this(schematic, schematic.getSubRegionNames(), reCreate);
+        this(schematic, schematic.getRegionNames(), reCreate);
     }
 
-    public MaterialListSchematic(LitematicaSchematic schematic, Collection<String> subRegions, boolean reCreate)
+    public MaterialListSchematic(ISchematic schematic, Collection<String> subRegions, boolean reCreate)
     {
         super();
 
@@ -45,6 +45,6 @@ public class MaterialListSchematic extends MaterialListBase
     @Override
     public String getTitle()
     {
-        return StringUtils.translate("litematica.gui.title.material_list.schematic", this.getName(), this.regions.size(), this.schematic.getSubRegionNames().size());
+        return StringUtils.translate("litematica.gui.title.material_list.schematic", this.getName(), this.regions.size(), this.schematic.getRegionNames().size());
     }
 }

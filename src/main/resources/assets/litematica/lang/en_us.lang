@@ -52,8 +52,8 @@ litematica.error.schematic_save.invalid_schematic_name=Invalid schematic name '%
 litematica.error.schematic_save.schematic_creation_failed=Failed to create the schematic!
 
 litematica.error.schematic_read_from_file_failed.cant_read=Failed to read schematic from file '%s'
-litematica.error.schematic_read_from_file_failed.exception=Exception while trying to read schematic from file '%s'
 litematica.error.schematic_read_from_file_failed.no_file=Failed to read schematic from file: no file available (in-memory schematic?)
+litematica.error.schematic_read_from_file_failed.region_container=Failed to read region '%s' from NBT for schematic '%s'
 
 litematica.error.schematic_projects.empty_selection=Empty Area Selection (0 sub-regions)
 litematica.error.schematic_projects.failed_to_load_project=Failed to load project
@@ -435,11 +435,28 @@ litematica.message.error.only_works_in_single_player=§cThis operation only work
 litematica.message.error.move.pending_tasks=§cCan not start a move operation while there are pending tasks§r
 litematica.message.error.placement_paste_outside_world=The placement can't be pasted in the current position, because it goes outside the world bounds
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
+litematica.message.error.schematic_read.invalid_or_missing_size=Invalid or missing schematic size
+litematica.message.error.schematic_read.mcedit2.missing_block_data=SchematicaSchematic: Missing/non-existing block '%s' in MCEdit2 palette
+litematica.message.error.schematic_read.mcedit2.palette.id_not_number=SchematicaSchematic: Invalid ID '%s' (not a number) in MCEdit2 palette for block '%s'
+litematica.message.error.schematic_read.mcedit2.palette.invalid_id=SchematicaSchematic: Invalid ID %s in MCEdit2 palette for block '%s', max = %s
+litematica.message.error.schematic_read.missing_or_invalid_data=Failed to read schematic, missing or invalid data in the schematic '%s'
+litematica.message.error.schematic_read.registry_palette.missing_block_data=SchematicaSchematic: Invalid ID %s for block '%s' from the block registry
+litematica.message.error.schematic_read.schematica.old_schematica_format_not_supported=SchematicaSchematic: Old Schematica format detected, not currently implemented...
+litematica.message.error.schematic_read.schematica.palette.failed_to_read=SchematicaSchematic: Failed to read the block palette
+litematica.message.error.schematic_read.schematica.palette.invalid_block=SchematicaSchematic: Missing/non-existing block '%s' in SchematicaMapping
+litematica.message.error.schematic_read.schematica.palette.invalid_id=SchematicaSchematic: Invalid ID %s in SchematicaMapping for block '%s', max = %s
+litematica.message.error.schematic_read.schematica.schematic.invalid_block_add_array_size=SchematicaSchematic: Add array size mismatch, blocks: %s, add: %s, expected add: %s
+litematica.message.error.schematic_read.schematica.schematic.invalid_block_array_size=SchematicaSchematic: Mismatched block array length compared to the reported schematic size: array length: %s, W x H x L: %s x %s x %s
+litematica.message.error.schematic_read.schematica.schematic.invalid_metadata_array_size=SchematicaSchematic: Mismatched block ID and metadata array sizes, blocks: %s, meta: %s
+litematica.message.error.schematic_read.sponge.palette.invalid_id=Invalid ID '%s' in the Sponge format schematic block palette
+litematica.message.error.schematic_read.sponge.palette.unknown_block=Unknown block '%s' in the Sponge format schematic block palette
+litematica.message.error.schematic_read.sponge.failed_to_read_blocks=Failed to read the blocks for a Sponge format schematic
 litematica.message.error.schematic_save_failed=Failed to save schematic to file '%s'
 litematica.message.error.schematic_save_interrupted=Schematic saving interrupted or stopped
 litematica.message.error.schematic_save.missing_container=One of the data containers not found for sub-region '%s'
 litematica.message.error.schematic_save.missing_entity_list=Entity list not found for sub-region '%s'
 litematica.message.error.schematic_save_no_area_selected=§cSchematic saving failed - no area selected§r
+litematica.message.error.schematic_write.schematica.palette.invalid_id=SchematicaSchematic: Block id %s for block '%s' is out of range, max = %s
 
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.area_clear_fail=§cFailed to clear the area(s)§r

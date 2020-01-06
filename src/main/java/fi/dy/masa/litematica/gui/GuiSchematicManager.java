@@ -13,6 +13,7 @@ import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.FileType;
@@ -86,7 +87,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
         if (selected != null)
         {
-            FileType type = FileType.fromFile(selected.getFullPath());
+            FileType type = FileType.fromFileName(selected.getFullPath());
 
             if (type == FileType.LITEMATICA_SCHEMATIC)
             {
@@ -244,7 +245,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 return;
             }
 
-            FileType fileType = FileType.fromFile(entry.getFullPath());
+            FileType fileType = FileType.fromFileName(entry.getFullPath());
 
             if (this.type == Type.EXPORT_SCHEMATIC)
             {
@@ -362,9 +363,9 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
                 if (this.schematic.writeToFile(this.dir, this.fileName, true))
                 {
-                    List<LitematicaSchematic> list = SchematicHolder.getInstance().getAllOf(new File(this.dir, this.fileName));
+                    List<ISchematic> list = SchematicHolder.getInstance().getAllOf(new File(this.dir, this.fileName));
 
-                    for (LitematicaSchematic schematic : list)
+                    for (ISchematic schematic : list)
                     {
                         schematic.getMetadata().setName(string);
                         schematic.getMetadata().setTimeModified(currentTime);

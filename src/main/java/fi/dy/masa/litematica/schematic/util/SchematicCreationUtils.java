@@ -1,10 +1,13 @@
 package fi.dy.masa.litematica.schematic.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.state.IBlockState;
@@ -20,13 +23,16 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.schematic.EntityInfo;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
-import fi.dy.masa.litematica.schematic.SchematicaSchematic;
+import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
@@ -37,6 +43,27 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class SchematicCreationUtils
 {
+    @Nullable
+    public static <S extends ISchematic> S createFromFile(File file, Function<File, S> factory)
+    {
+        S schematic = factory.apply(file);
+
+        if (schematic.readFromFile())
+        {
+            return schematic;
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static <S extends ISchematic> S createFromSchematic(ISchematic other, Supplier<S> factory)
+    {
+        S schematic = factory.get();
+        schematic.readFrom(other);
+        return schematic;
+    }
+
     /**
      * Creates an empty schematic with all the maps and lists and containers already created.
      * This is intended to be used for the chunk-wise schematic creation.
@@ -47,7 +74,7 @@ public class SchematicCreationUtils
      */
     public static LitematicaSchematic createEmptySchematic(AreaSelection area, String author)
     {
-        List<Box> boxes = PositionUtils.getValidBoxes(area);
+        List<SelectionBox> boxes = PositionUtils.getValidBoxes(area);
 
         if (boxes.isEmpty())
         {
@@ -55,7 +82,7 @@ public class SchematicCreationUtils
             return null;
         }
 
-        LitematicaSchematic schematic = new LitematicaSchematic(null);
+        LitematicaSchematic schematic = SchematicType.LITEMATICA.createSchematic(null);
         SchematicMetadata metadata = schematic.getMetadata();
 
         schematic.setSubRegions(boxes, area.getEffectiveOrigin());
@@ -72,7 +99,7 @@ public class SchematicCreationUtils
     @Nullable
     public static LitematicaSchematic createFromWorld(World world, AreaSelection area, boolean ignoreEntities, String author, IStringConsumer feedback)
     {
-        List<Box> boxes = PositionUtils.getValidBoxes(area);
+        List<SelectionBox> boxes = PositionUtils.getValidBoxes(area);
 
         if (boxes.isEmpty())
         {
@@ -80,7 +107,7 @@ public class SchematicCreationUtils
             return null;
         }
 
-        LitematicaSchematic schematic = new LitematicaSchematic(null);
+        LitematicaSchematic schematic = SchematicType.LITEMATICA.createSchematic(null);
         long time = System.currentTimeMillis();
 
         BlockPos origin = area.getEffectiveOrigin();
@@ -106,28 +133,13 @@ public class SchematicCreationUtils
         return schematic;
     }
 
-    public static void takeEntityDataFromSchematicaSchematic(LitematicaSchematic schematic,
-            SchematicaSchematic schematicaSchematic, String subRegionName)
+    private static void takeEntitiesFromWorld(LitematicaSchematic schematic, World world, List<SelectionBox> boxes, BlockPos origin)
     {
-        Map<BlockPos, NBTTagCompound> blockEntityMap = schematic.getBlockEntityMap(subRegionName);
-        List<EntityInfo> schematicEntityList = schematic.getEntityList(subRegionName);
-
-        if (blockEntityMap != null && schematicEntityList != null)
+        for (SelectionBox box : boxes)
         {
-            blockEntityMap.putAll(schematicaSchematic.getTiles());
-            schematicEntityList.addAll(schematicaSchematic.getEntities());
-        }
-        else
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_container", subRegionName);
-        }
-    }
-
-    private static void takeEntitiesFromWorld(LitematicaSchematic schematic, World world, List<Box> boxes, BlockPos origin)
-    {
-        for (Box box : boxes)
-        {
-            List<EntityInfo> schematicEntityList = schematic.getEntityList(box.getName());
+            String regionName = box.getName();
+            ISchematicRegion region = schematic.getSchematicRegion(regionName);
+            List<EntityInfo> schematicEntityList = region != null ? region.getEntityList() : null;
 
             if (schematicEntityList == null)
             {
@@ -157,15 +169,16 @@ public class SchematicCreationUtils
     }
 
     public static void takeEntitiesFromWorldWithinChunk(LitematicaSchematic schematic, World world, int chunkX, int chunkZ,
-            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, Box> boxes, Set<UUID> existingEntities, BlockPos origin)
+            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, SelectionBox> boxes, Set<UUID> existingEntities, BlockPos origin)
     {
         for (Map.Entry<String, IntBoundingBox> entry : volumes.entrySet())
         {
             String regionName = entry.getKey();
-            List<EntityInfo> list = schematic.getEntityList(regionName);
             Box box = boxes.get(regionName);
+            ISchematicRegion region = schematic.getSchematicRegion(regionName);
+            List<EntityInfo> schematicEntityList = region != null ? region.getEntityList() : null;
 
-            if (box == null || list == null)
+            if (box == null || schematicEntityList == null)
             {
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_entity_list", regionName);
                 continue;
@@ -191,7 +204,7 @@ public class SchematicCreationUtils
                     {
                         Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
                         NBTUtils.writeEntityPositionToTag(posVec, tag);
-                        list.add(new EntityInfo(posVec, tag));
+                        schematicEntityList.add(new EntityInfo(posVec, tag));
                         existingEntities.add(uuid);
                     }
                 }
@@ -199,17 +212,18 @@ public class SchematicCreationUtils
         }
     }
 
-    private static void takeBlocksFromWorld(LitematicaSchematic schematic, World world, List<Box> boxes)
+    private static void takeBlocksFromWorld(LitematicaSchematic schematic, World world, List<SelectionBox> boxes)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
         long totalBlocks = 0;
 
-        for (Box box : boxes)
+        for (SelectionBox box : boxes)
         {
             String regionName = box.getName();
-            LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
-            Map<BlockPos, NBTTagCompound> blockEntityMap = schematic.getBlockEntityMap(regionName);
-            Map<BlockPos, NextTickListEntry> tickMap = schematic.getBlockTickMap(regionName);
+            ISchematicRegion region = schematic.getSchematicRegion(regionName);
+            LitematicaBlockStateContainer container = region != null ? region.getBlockStateContainer() : null;
+            Map<BlockPos, NBTTagCompound> blockEntityMap = region != null ? region.getBlockEntityMap() : null;
+            Map<BlockPos, NextTickListEntry> tickMap = region != null ? region.getBlockTickMap() : null;
 
             if (container == null || blockEntityMap == null || tickMap == null)
             {
@@ -301,7 +315,7 @@ public class SchematicCreationUtils
     }
 
     public static void takeBlocksFromWorldWithinChunk(LitematicaSchematic schematic, World world, int chunkX, int chunkZ,
-            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, Box> boxes)
+            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, SelectionBox> boxes)
     {
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
         long totalBlocks = schematic.getTotalBlocksReadFromWorld();
@@ -309,18 +323,19 @@ public class SchematicCreationUtils
         for (Map.Entry<String, IntBoundingBox> volumeEntry : volumes.entrySet())
         {
             String regionName = volumeEntry.getKey();
+            ISchematicRegion region = schematic.getSchematicRegion(regionName);
             IntBoundingBox bb = volumeEntry.getValue();
             Box box = boxes.get(regionName);
 
-            if (box == null)
+            if (box == null || region == null)
             {
                 LiteModLitematica.logger.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }
 
-            LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
-            Map<BlockPos, NBTTagCompound> blockEntityMap = schematic.getBlockEntityMap(regionName);
-            Map<BlockPos, NextTickListEntry> tickMap = schematic.getBlockTickMap(regionName);
+            LitematicaBlockStateContainer container = region.getBlockStateContainer();
+            Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
+            Map<BlockPos, NextTickListEntry> tickMap = region.getBlockTickMap();
 
             if (container == null || blockEntityMap == null || tickMap == null)
             {

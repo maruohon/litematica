@@ -6,17 +6,17 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.HorizontalAlignment;
 
-public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchematic, WidgetSchematicEntry>
+public class WidgetListLoadedSchematics extends WidgetListBase<ISchematic, WidgetSchematicEntry>
 {
     public WidgetListLoadedSchematics(int x, int y, int width, int height,
-            @Nullable ISelectionListener<LitematicaSchematic> selectionListener)
+            @Nullable ISelectionListener<ISchematic> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
@@ -26,13 +26,13 @@ public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchemat
     }
 
     @Override
-    protected Collection<LitematicaSchematic> getAllEntries()
+    protected Collection<ISchematic> getAllEntries()
     {
         return SchematicHolder.getInstance().getAllSchematics();
     }
 
     @Override
-    protected List<String> getEntryStringsForFilter(LitematicaSchematic entry)
+    protected List<String> getEntryStringsForFilter(ISchematic entry)
     {
         String metaName = entry.getMetadata().getName().toLowerCase();
 
@@ -48,7 +48,7 @@ public class WidgetListLoadedSchematics extends WidgetListBase<LitematicaSchemat
     }
 
     @Override
-    protected WidgetSchematicEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, LitematicaSchematic entry)
+    protected WidgetSchematicEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, ISchematic entry)
     {
         return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
                 isOdd, entry, listIndex, this);

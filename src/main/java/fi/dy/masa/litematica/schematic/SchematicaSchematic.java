@@ -1,468 +1,74 @@
 package fi.dy.masa.litematica.schematic;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
-import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.NBTUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityStructure;
-import net.minecraft.util.Mirror;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.structure.template.PlacementSettings;
-import net.minecraft.world.gen.structure.template.Template;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.InfoUtils;
 
-public class SchematicaSchematic
+public class SchematicaSchematic extends SingleRegionSchematic
 {
-    public static final String FILE_EXTENSION = ".schematic";
-    private LitematicaBlockStateContainer blocks;
+    public static final String FILE_NAME_EXTENSION = ".schematic";
+
     private Block[] palette;
-    private Map<BlockPos, NBTTagCompound> tiles = new HashMap<>();
-    private List<NBTTagCompound> entities = new ArrayList<>();
-    private Vec3i size = Vec3i.NULL_VECTOR;
-    private String fileName;
 
-    private SchematicaSchematic()
+    SchematicaSchematic(@Nullable File fileName)
     {
+        super(fileName);
     }
 
-    public Vec3i getSize()
+    @Override
+    public String getFileNameExtension()
     {
-        return this.size;
+        return FILE_NAME_EXTENSION;
     }
 
-    public Map<BlockPos, NBTTagCompound> getTiles()
+    public static boolean isValidSchematic(NBTTagCompound tag)
     {
-        return this.tiles;
-    }
-
-    public List<EntityInfo> getEntities()
-    {
-        List<EntityInfo> entityList = new ArrayList<>();
-        final int size = this.entities.size();
-
-        for (int i = 0; i < size; ++i)
+        if (tag.hasKey("Width", Constants.NBT.TAG_SHORT) &&
+            tag.hasKey("Height", Constants.NBT.TAG_SHORT) &&
+            tag.hasKey("Length", Constants.NBT.TAG_SHORT) &&
+            tag.hasKey("Blocks", Constants.NBT.TAG_BYTE_ARRAY) &&
+            tag.hasKey("Data", Constants.NBT.TAG_BYTE_ARRAY))
         {
-            NBTTagCompound entityData = this.entities.get(i);
-            Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
-
-            if (posVec != null && entityData.isEmpty() == false)
-            {
-                entityList.add(new EntityInfo(posVec, entityData));
-            }
+            return isSizeValid(readSizeFromTagImpl(tag));
         }
 
-        return entityList;
+        return false;
     }
 
-    public void placeSchematicToWorld(World world, BlockPos posStart, PlacementSettings placement, int setBlockStateFlags)
+    private static Vec3i readSizeFromTagImpl(NBTTagCompound tag)
     {
-        final int width = this.size.getX();
-        final int height = this.size.getY();
-        final int length = this.size.getZ();
-        final int numBlocks = width * height * length;
-
-        if (this.blocks != null && numBlocks > 0 && this.blocks.getSize().equals(this.size))
-        {
-            final Block ignoredBlock = placement.getReplacedBlock();
-            final Rotation rotation = placement.getRotation();
-            final Mirror mirror = placement.getMirror();
-
-            // Place blocks and read any TileEntity data
-            for (int y = 0; y < height; ++y)
-            {
-                for (int z = 0; z < length; ++z)
-                {
-                    for (int x = 0; x < width; ++x)
-                    {
-                        IBlockState state = this.blocks.get(x, y, z);
-
-                        if (ignoredBlock != null && state.getBlock() == ignoredBlock)
-                        {
-                            continue;
-                        }
-
-                        BlockPos pos = new BlockPos(x, y, z);
-                        NBTTagCompound teNBT = this.tiles.get(pos);
-
-                        pos = Template.transformedBlockPos(placement, pos).add(posStart);
-
-                        state = state.withMirror(mirror);
-                        state = state.withRotation(rotation);
-
-                        if (teNBT != null)
-                        {
-                            TileEntity te = world.getTileEntity(pos);
-
-                            if (te != null)
-                            {
-                                if (te instanceof IInventory)
-                                {
-                                    ((IInventory) te).clear();
-                                }
-
-                                world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 0x14);
-                            }
-                        }
-
-                        if (world.setBlockState(pos, state, setBlockStateFlags) && teNBT != null)
-                        {
-                            TileEntity te = world.getTileEntity(pos);
-
-                            if (te != null)
-                            {
-                                teNBT.setInteger("x", pos.getX());
-                                teNBT.setInteger("y", pos.getY());
-                                teNBT.setInteger("z", pos.getZ());
-
-                                try
-                                {
-                                    te.readFromNBT(teNBT);
-                                    te.mirror(mirror);
-                                    te.rotate(rotation);
-                                }
-                                catch (Exception e)
-                                {
-                                    LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ((setBlockStateFlags & 0x01) != 0)
-            {
-                // Update blocks
-                for (int y = 0; y < height; ++y)
-                {
-                    for (int z = 0; z < length; ++z)
-                    {
-                        for (int x = 0; x < width; ++x)
-                        {
-                            BlockPos pos = new BlockPos(x, y, z);
-                            NBTTagCompound teNBT = this.tiles.get(pos);
-
-                            pos = Template.transformedBlockPos(placement, pos).add(posStart);
-                            world.notifyNeighborsRespectDebug(pos, world.getBlockState(pos).getBlock(), false);
-
-                            if (teNBT != null)
-                            {
-                                TileEntity te = world.getTileEntity(pos);
-
-                                if (te != null)
-                                {
-                                    te.markDirty();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (placement.getIgnoreEntities() == false)
-            {
-                this.addEntitiesToWorld(world, posStart, placement);
-            }
-        }
+        return new Vec3i(tag.getShort("Width"), tag.getShort("Height"), tag.getShort("Length"));
     }
 
-    public void placeSchematicDirectlyToChunks(World world, BlockPos posStart, PlacementSettings placement)
+    @Override
+    public NBTTagCompound toTag()
     {
-        final int width = this.size.getX();
-        final int height = this.size.getY();
-        final int length = this.size.getZ();
-        final int numBlocks = width * height * length;
-        BlockPos posEnd = posStart.add(this.size).add(-1, -1, -1);
-        //BlockPos posEnd = Template.transformedBlockPos(placement, (new BlockPos(this.size)).add(-1, -1, -1)).add(posStart);
+        NBTTagCompound nbt = new NBTTagCompound();
 
-        if (this.blocks != null && numBlocks > 0 && this.blocks.getSize().equals(this.size) &&
-            PositionUtils.arePositionsWithinWorld(world, posStart, posEnd))
-        {
-            final BlockPos posMin = PositionUtils.getMinCorner(posStart, posEnd);
-            final BlockPos posMax = PositionUtils.getMaxCorner(posStart, posEnd);
-            final Block ignoredBlock = placement.getReplacedBlock();
-            final Rotation rotation = placement.getRotation();
-            final Mirror mirror = placement.getMirror();
-            final int cxStart = posMin.getX() >> 4;
-            final int czStart = posMin.getZ() >> 4;
-            final int cxEnd = posMax.getX() >> 4;
-            final int czEnd = posMax.getZ() >> 4;
+        this.createPalette();
+        this.writeBlocksToTag(nbt);
+        this.writePaletteToTag(nbt);
+        nbt.setTag("TileEntities", this.writeBlockEntitiesToListTag(this.blockEntities));
+        nbt.setTag("Entities", this.writeEntitiesToListTag(this.entities));
 
-            for (int cz = czStart; cz <= czEnd; ++cz)
-            {
-                for (int cx = cxStart; cx <= cxEnd; ++cx)
-                {
-                    final int xMinChunk = Math.max(cx << 4, posMin.getX());
-                    final int zMinChunk = Math.max(cz << 4, posMin.getZ());
-                    final int xMaxChunk = Math.min((cx << 4) + 15, posMax.getX());
-                    final int zMaxChunk = Math.min((cz << 4) + 15, posMax.getZ());
-                    Chunk chunk = world.getChunk(cx, cz);
-
-                    for (int y = posMin.getY(), ySrc = 0; ySrc < height; ++y, ++ySrc)
-                    {
-                        for (int z = zMinChunk, zSrc = zMinChunk - posStart.getZ(); z <= zMaxChunk; ++z, ++zSrc)
-                        {
-                            for (int x = xMinChunk, xSrc = xMinChunk - posStart.getX(); x <= xMaxChunk; ++x, ++xSrc)
-                            {
-                                IBlockState state = this.blocks.get(xSrc, ySrc, zSrc);
-
-                                if (state.getBlock() == ignoredBlock)
-                                {
-                                    continue;
-                                }
-
-                                BlockPos pos = new BlockPos(x, y, z);
-                                NBTTagCompound teNBT = this.tiles.get(pos);
-
-                                // TODO The rotations need to be transformed back to get the correct source position in the schematic...
-                                /*
-                                pos = Template.transformedBlockPos(placement, pos).add(posStart);
-
-                                state = state.withMirror(mirror);
-                                state = state.withRotation(rotation);
-                                */
-
-                                if (teNBT != null)
-                                {
-                                    TileEntity te = chunk.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
-
-                                    if (te != null)
-                                    {
-                                        if (te instanceof IInventory)
-                                        {
-                                            ((IInventory) te).clear();
-                                        }
-
-                                        world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 0x14);
-                                    }
-                                }
-
-                                chunk.setBlockState(pos, state);
-
-                                if (teNBT != null)
-                                {
-                                    TileEntity te = chunk.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
-
-                                    if (te != null)
-                                    {
-                                        teNBT.setInteger("x", pos.getX());
-                                        teNBT.setInteger("y", pos.getY());
-                                        teNBT.setInteger("z", pos.getZ());
-
-                                        try
-                                        {
-                                            te.readFromNBT(teNBT);
-                                            te.mirror(mirror);
-                                            te.rotate(rotation);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (placement.getIgnoreEntities() == false)
-            {
-                this.addEntitiesToWorld(world, posStart, placement);
-            }
-        }
+        return nbt;
     }
 
-    private void addEntitiesToWorld(World world, BlockPos posStart, PlacementSettings placement)
-    {
-        Mirror mirror = placement.getMirror();
-        Rotation rotation = placement.getRotation();
-
-        for (NBTTagCompound tag : this.entities)
-        {
-            Vec3d relativePos = NBTUtils.readEntityPositionFromTag(tag);
-            Vec3d transformedRelativePos = PositionUtils.getTransformedPosition(relativePos, mirror, rotation);
-            Vec3d realPos = transformedRelativePos.add(posStart.getX(), posStart.getY(), posStart.getZ());
-            Entity entity = EntityUtils.createEntityAndPassengersFromNBT(tag, world);
-
-            if (entity != null)
-            {
-                float rotationYaw = entity.getMirroredYaw(mirror);
-                rotationYaw = rotationYaw + (entity.rotationYaw - entity.getRotatedYaw(rotation));
-                entity.setLocationAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.rotationPitch);
-                EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
-            }
-        }
-    }
-
-    public Map<BlockPos, String> getDataStructureBlocks(BlockPos posStart, PlacementSettings placement)
-    {
-        Map<BlockPos, String> map = new HashMap<>();
-
-        for (Map.Entry<BlockPos, NBTTagCompound> entry : this.tiles.entrySet())
-        {
-            NBTTagCompound tag = entry.getValue();
-
-            if (tag.getString("id").equals("minecraft:structure_block") &&
-                TileEntityStructure.Mode.valueOf(tag.getString("mode")) == TileEntityStructure.Mode.DATA)
-            {
-                BlockPos pos = entry.getKey();
-                pos = Template.transformedBlockPos(placement, pos).add(posStart);
-                map.put(pos, tag.getString("metadata"));
-            }
-        }
-
-        return map;
-    }
-
-    private void readBlocksFromWorld(World world, BlockPos posStart, BlockPos size)
-    {
-        final int startX = posStart.getX();
-        final int startY = posStart.getY();
-        final int startZ = posStart.getZ();
-        final int endX = startX + size.getX();
-        final int endY = startY + size.getY();
-        final int endZ = startZ + size.getZ();
-        BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos(0, 0, 0);
-
-        this.blocks = new LitematicaBlockStateContainer(size.getX(), size.getY(), size.getZ());
-        this.tiles.clear();
-        this.size = size;
-
-        for (int y = startY; y < endY; ++y)
-        {
-            for (int z = startZ; z < endZ; ++z)
-            {
-                for (int x = startX; x < endX; ++x)
-                {
-                    int relX = x - startX;
-                    int relY = y - startY;
-                    int relZ = z - startZ;
-
-                    posMutable.setPos(x, y, z);
-                    IBlockState state = world.getBlockState(posMutable);
-                    this.blocks.set(relX, relY, relZ, state);
-
-                    TileEntity te = world.getTileEntity(posMutable);
-
-                    if (te != null)
-                    {
-                        try
-                        {
-                            NBTTagCompound nbt = te.writeToNBT(new NBTTagCompound());
-
-                            nbt.setInteger("x", relX);
-                            nbt.setInteger("y", relY);
-                            nbt.setInteger("z", relZ);
-
-                            this.tiles.put(new BlockPos(relX, relY, relZ), nbt);
-                        }
-                        catch (Exception e)
-                        {
-                            LiteModLitematica.logger.warn("SchematicaSchematic: Exception while trying to store TileEntity data for block '{}' at {}",
-                                    state, posMutable.toString(), e);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void readEntitiesFromWorld(World world, BlockPos posStart, BlockPos size)
-    {
-        this.entities.clear();
-        List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(posStart, posStart.add(size)));
-
-        for (Entity entity : entities)
-        {
-            NBTTagCompound tag = new NBTTagCompound();
-
-            if (entity.writeToNBTOptional(tag))
-            {
-                Vec3d pos = new Vec3d(entity.posX - posStart.getX(), entity.posY - posStart.getY(), entity.posZ - posStart.getZ());
-                NBTUtils.writeEntityPositionToTag(pos, tag);
-
-                this.entities.add(tag);
-            }
-        }
-    }
-
-    public static SchematicaSchematic createFromWorld(World world, BlockPos posStart, BlockPos size, boolean ignoreEntities)
-    {
-        SchematicaSchematic schematic = new SchematicaSchematic();
-
-        schematic.readBlocksFromWorld(world, posStart, size);
-
-        if (ignoreEntities == false)
-        {
-            schematic.readEntitiesFromWorld(world, posStart, size);
-        }
-
-        return schematic;
-    }
-
-    @Nullable
-    public static SchematicaSchematic createFromFile(File file)
-    {
-        SchematicaSchematic schematic = new SchematicaSchematic();
-
-        if (schematic.readFromFile(file))
-        {
-            return schematic;
-        }
-
-        return null;
-    }
-
-    public boolean readFromNBT(NBTTagCompound nbt)
-    {
-        if (this.readBlocksFromNBT(nbt))
-        {
-            this.readEntitiesFromNBT(nbt);
-            this.readTileEntitiesFromNBT(nbt);
-
-            return true;
-        }
-        else
-        {
-            LiteModLitematica.logger.error("SchematicaSchematic: Missing block data in the schematic '{}'", this.fileName);
-            return false;
-        }
-    }
-
-    private boolean readPaletteFromNBT(NBTTagCompound nbt)
+    protected boolean readPaletteFromTag(NBTTagCompound nbt)
     {
         final Block air = Blocks.AIR;
         this.palette = new Block[4096];
@@ -471,90 +77,188 @@ public class SchematicaSchematic
         // Schematica palette
         if (nbt.hasKey("SchematicaMapping", Constants.NBT.TAG_COMPOUND))
         {
-            NBTTagCompound tag = nbt.getCompoundTag("SchematicaMapping");
-            Set<String> keys = tag.getKeySet();
-
-            for (String key : keys)
-            {
-                int id = tag.getShort(key);
-
-                if (id >= this.palette.length)
-                {
-                    LiteModLitematica.logger.error("SchematicaSchematic: Invalid ID '{}' in SchematicaMapping for block '{}', max = 4095", id, key);
-                    return false;
-                }
-
-                Block block = Block.REGISTRY.getObject(new ResourceLocation(key));
-
-                if (block != null)
-                {
-                    this.palette[id] = block;
-                }
-                else
-                {
-                    LiteModLitematica.logger.error("SchematicaSchematic: Missing/non-existing block '{}' in SchematicaMapping", key);
-                }
-            }
+            return this.readSchematicaPaletteFromTag(nbt.getCompoundTag("SchematicaMapping"));
         }
         // MCEdit2 palette
         else if (nbt.hasKey("BlockIDs", Constants.NBT.TAG_COMPOUND))
         {
-            NBTTagCompound tag = nbt.getCompoundTag("BlockIDs");
-            Set<String> keys = tag.getKeySet();
+            return this.readMCEdit2PaletteFromTag(nbt.getCompoundTag("BlockIDs"));
+        }
+        // No palette, use the current registry IDs directly
+        else
+        {
+            this.createRegistryBasedPalette();
+        }
 
-            for (String idStr : keys)
+        return true;
+    }
+
+    protected boolean readSchematicaPaletteFromTag(NBTTagCompound tag)
+    {
+        Set<String> keys = tag.getKeySet();
+
+        for (String key : keys)
+        {
+            int id = tag.getShort(key);
+
+            if (id >= this.palette.length)
             {
-                String key = tag.getString(idStr);
-                int id;
+                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.invalid_id", id, key, this.palette.length - 1);
+                continue;
+            }
 
-                try
-                {
-                    id = Integer.parseInt(idStr);
-                }
-                catch (NumberFormatException e)
-                {
-                    LiteModLitematica.logger.error("SchematicaSchematic: Invalid ID '{}' (not a number) in MCEdit2 palette for block '{}'", idStr, key);
-                    continue;
-                }
+            Block block = Block.REGISTRY.getObject(new ResourceLocation(key));
 
-                if (id >= this.palette.length)
-                {
-                    LiteModLitematica.logger.error("SchematicaSchematic: Invalid ID '{}' in MCEdit2 palette for block '{}', max = 4095", id, key);
-                    return false;
-                }
+            if (block == null)
+            {
+                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.invalid_block", key);
+                continue;
+            }
 
-                Block block = Block.REGISTRY.getObject(new ResourceLocation(key));
+            this.palette[id] = block;
+        }
 
-                if (block != null)
+        return true;
+    }
+
+    protected boolean readMCEdit2PaletteFromTag(NBTTagCompound tag)
+    {
+        Set<String> keys = tag.getKeySet();
+
+        for (String idStr : keys)
+        {
+            String key = tag.getString(idStr);
+            int id;
+
+            try
+            {
+                id = Integer.parseInt(idStr);
+            }
+            catch (NumberFormatException e)
+            {
+                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.id_not_number", idStr, key);
+                continue;
+            }
+
+            if (id >= this.palette.length)
+            {
+                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.mcedit2.palette.invalid_id", id, key, this.palette.length - 1);
+                continue;
+            }
+
+            Block block = Block.REGISTRY.getObject(new ResourceLocation(key));
+
+            if (block == null)
+            {
+                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.mcedit2.missing_block_data", key);
+                continue;
+            }
+
+            this.palette[id] = block;
+        }
+
+        return true;
+    }
+
+    protected void createRegistryBasedPalette()
+    {
+        for (ResourceLocation key : Block.REGISTRY.getKeys())
+        {
+            Block block = Block.REGISTRY.getObject(key);
+
+            if (block != null)
+            {
+                int id = Block.getIdFromBlock(block);
+
+                if (id >= 0 && id < this.palette.length)
                 {
                     this.palette[id] = block;
                 }
                 else
                 {
-                    LiteModLitematica.logger.error("SchematicaSchematic: Missing/non-existing block '{}' in MCEdit2 palette", key);
+                    InfoUtils.printErrorMessage("litematica.message.error.schematic_read.registry_palette.missing_block_data", id, key);
                 }
             }
         }
-        // No palette, use the current registry IDs directly
+    }
+
+    @Override
+    protected Vec3i readSizeFromTag(NBTTagCompound tag)
+    {
+        if (tag.hasKey("Blocks", Constants.NBT.TAG_BYTE_ARRAY) &&
+            tag.hasKey("Data", Constants.NBT.TAG_BYTE_ARRAY) &&
+            tag.hasKey("Width", Constants.NBT.TAG_SHORT) &&
+            tag.hasKey("Height", Constants.NBT.TAG_SHORT) &&
+            tag.hasKey("Length", Constants.NBT.TAG_SHORT))
+        {
+            final int sizeX = tag.getShort("Width");
+            final int sizeY = tag.getShort("Height");
+            final int sizeZ = tag.getShort("Length");
+
+            return new Vec3i(sizeX, sizeY, sizeZ);
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("deprecation")
+    protected boolean readBlocksFromTag(NBTTagCompound tag)
+    {
+        // This method was implemented based on
+        // https://minecraft.gamepedia.com/Schematic_file_format
+        // as it was on 2018-04-18.
+
+        Vec3i size = this.getSize();
+        final int sizeX = size.getX();
+        final int sizeY = size.getY();
+        final int sizeZ = size.getZ();
+        final byte[] blockIdsByte = tag.getByteArray("Blocks");
+        final byte[] metaArr = tag.getByteArray("Data");
+        final int numBlocks = blockIdsByte.length;
+        final int layerSize = sizeX * sizeZ;
+
+        if (numBlocks != (sizeX * sizeY * sizeZ))
+        {
+            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_block_array_size", numBlocks, sizeX, sizeY, sizeZ);
+            return false;
+        }
+
+        if (numBlocks != metaArr.length)
+        {
+            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_metadata_array_size", numBlocks, metaArr.length);
+            return false;
+        }
+
+        if (this.readPaletteFromTag(tag) == false)
+        {
+            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.failed_to_read");
+            return false;
+        }
+
+        if (tag.hasKey("AddBlocks", Constants.NBT.TAG_BYTE_ARRAY))
+        {
+            return this.readBlocks12Bit(tag, blockIdsByte, metaArr, sizeX, layerSize);
+        }
+        // Old Schematica format
+        else if (tag.hasKey("Add", Constants.NBT.TAG_BYTE_ARRAY))
+        {
+            // FIXME is this array 4 or 8 bits per block?
+            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.old_schematica_format_not_supported");
+            return false;
+        }
+        // No palette, use the registry IDs directly
         else
         {
-            for (ResourceLocation key : Block.REGISTRY.getKeys())
+            LitematicaBlockStateContainer container = this.blockContainer;
+            Block[] palette = this.palette;
+
+            for (int i = 0; i < numBlocks; i++)
             {
-                Block block = Block.REGISTRY.getObject(key);
-
-                if (block != null)
-                {
-                    int id = Block.getIdFromBlock(block);
-
-                    if (id >= 0 && id < this.palette.length)
-                    {
-                        this.palette[id] = block;
-                    }
-                    else
-                    {
-                        LiteModLitematica.logger.error("SchematicaSchematic: Invalid ID {} for block '{}' from the registry", id, key);
-                    }
-                }
+                Block block = palette[blockIdsByte[i] & 0xFF];
+                int x = i % sizeX;
+                int y = i / layerSize;
+                int z = (i % layerSize) / sizeX;
+                container.set(x, y, z, block.getStateFromMeta(metaArr[i]));
             }
         }
 
@@ -562,187 +266,89 @@ public class SchematicaSchematic
     }
 
     @SuppressWarnings("deprecation")
-    private boolean readBlocksFromNBT(NBTTagCompound nbt)
+    protected boolean readBlocks12Bit(NBTTagCompound nbt, final byte[] blockIdsByte, final byte[] metaArr, final int sizeX, final int layerSize)
     {
-        if (nbt.hasKey("Blocks", Constants.NBT.TAG_BYTE_ARRAY) == false ||
-            nbt.hasKey("Data", Constants.NBT.TAG_BYTE_ARRAY) == false ||
-            nbt.hasKey("Width", Constants.NBT.TAG_SHORT) == false ||
-            nbt.hasKey("Height", Constants.NBT.TAG_SHORT) == false ||
-            nbt.hasKey("Length", Constants.NBT.TAG_SHORT) == false)
-        {
-            return false;
-        }
-
-        // This method was implemented based on
-        // https://minecraft.gamepedia.com/Schematic_file_format
-        // as it was on 2018-04-18.
-
-        final int sizeX = nbt.getShort("Width");
-        final int sizeY = nbt.getShort("Height");
-        final int sizeZ = nbt.getShort("Length");
-        final byte[] blockIdsByte = nbt.getByteArray("Blocks");
-        final byte[] metaArr = nbt.getByteArray("Data");
+        LitematicaBlockStateContainer container = this.blockContainer;
+        Block[] palette = this.palette;
+        byte[] add = nbt.getByteArray("AddBlocks");
         final int numBlocks = blockIdsByte.length;
-        final int layerSize = sizeX * sizeZ;
+        final int expectedAddLength = (int) Math.ceil((double) blockIdsByte.length / 2D);
 
-        if (numBlocks != (sizeX * sizeY * sizeZ))
+        if (add.length != expectedAddLength)
         {
-            LiteModLitematica.logger.error("SchematicaSchematic: Mismatched block array size compared to the width/height/length, blocks: {}, W x H x L: {} x {} x {}",
-                    numBlocks, sizeX, sizeY, sizeZ);
+            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_block_add_array_size", numBlocks, add.length, expectedAddLength);
             return false;
         }
 
-        if (numBlocks != metaArr.length)
+        final int loopMax;
+
+        // Even number of blocks, we can handle two position (meaning one full add byte) at a time
+        if ((numBlocks % 2) == 0)
         {
-            LiteModLitematica.logger.error("SchematicaSchematic: Mismatched block ID and metadata array sizes, blocks: {}, meta: {}", numBlocks, metaArr.length);
-            return false;
+            loopMax = numBlocks - 1;
         }
-
-        if (this.readPaletteFromNBT(nbt) == false)
-        {
-            LiteModLitematica.logger.error("SchematicaSchematic: Failed to read the block palette");
-            return false;
-        }
-
-        this.size = new Vec3i(sizeX, sizeY, sizeZ);
-        this.blocks = new LitematicaBlockStateContainer(sizeX, sizeY, sizeZ);
-
-        if (nbt.hasKey("AddBlocks", Constants.NBT.TAG_BYTE_ARRAY))
-        {
-            byte[] add = nbt.getByteArray("AddBlocks");
-            final int expectedAddLength = (int) Math.ceil((double) blockIdsByte.length / 2D);
-
-            if (add.length != expectedAddLength)
-            {
-                LiteModLitematica.logger.error("SchematicaSchematic: Add array size mismatch, blocks: {}, add: {}, expected add: {}",
-                        numBlocks, add.length, expectedAddLength);
-                return false;
-            }
-
-            final int loopMax;
-
-            // Even number of blocks, we can handle two position (meaning one full add byte) at a time
-            if ((numBlocks % 2) == 0)
-            {
-                loopMax = numBlocks - 1;
-            }
-            else
-            {
-                loopMax = numBlocks - 2;
-            }
-
-            Block block;
-            int byteId;
-            int bi, ai;
-
-            // Handle two positions per iteration, ie. one full byte of the add array
-            for (bi = 0, ai = 0; bi < loopMax; bi += 2, ai++)
-            {
-                final int addValue = add[ai];
-
-                byteId = blockIdsByte[bi    ] & 0xFF;
-                block = this.palette[(addValue & 0xF0) << 4 | byteId];
-                int x = bi % sizeX;
-                int y = bi / layerSize;
-                int z = (bi % layerSize) / sizeX;
-                this.blocks.set(x, y, z, block.getStateFromMeta(metaArr[bi    ]));
-
-                x = (bi + 1) % sizeX;
-                y = (bi + 1) / layerSize;
-                z = ((bi + 1) % layerSize) / sizeX;
-                byteId = blockIdsByte[bi + 1] & 0xFF;
-                block = this.palette[(addValue & 0x0F) << 8 | byteId];
-                this.blocks.set(x, y, z, block.getStateFromMeta(metaArr[bi + 1]));
-            }
-
-            // Odd number of blocks, handle the last position
-            if ((numBlocks % 2) != 0)
-            {
-                final int addValue = add[ai];
-                byteId = blockIdsByte[bi    ] & 0xFF;
-                block = this.palette[(addValue & 0xF0) << 4 | byteId];
-                int x = bi % sizeX;
-                int y = bi / layerSize;
-                int z = (bi % layerSize) / sizeX;
-                this.blocks.set(x, y, z, block.getStateFromMeta(metaArr[bi    ]));
-            }
-        }
-        // Old Schematica format
-        else if (nbt.hasKey("Add", Constants.NBT.TAG_BYTE_ARRAY))
-        {
-            // FIXME is this array 4 or 8 bits per block?
-            LiteModLitematica.logger.error("SchematicaSchematic: Old Schematica format detected, not currently implemented...");
-            return false;
-        }
-        // No palette, use the registry IDs directly
         else
         {
-            for (int i = 0; i < numBlocks; i++)
-            {
-                Block block = this.palette[blockIdsByte[i] & 0xFF];
-                int x = i % sizeX;
-                int y = i / layerSize;
-                int z = (i % layerSize) / sizeX;
-                this.blocks.set(x, y, z, block.getStateFromMeta(metaArr[i]));
-            }
+            loopMax = numBlocks - 2;
+        }
+
+        Block block;
+        int byteId;
+        int bi, ai;
+
+        // Handle two positions per iteration, ie. one full byte of the add array
+        for (bi = 0, ai = 0; bi < loopMax; bi += 2, ai++)
+        {
+            final int addValue = add[ai];
+
+            byteId = blockIdsByte[bi    ] & 0xFF;
+            block = palette[(addValue & 0xF0) << 4 | byteId];
+            int x = bi % sizeX;
+            int y = bi / layerSize;
+            int z = (bi % layerSize) / sizeX;
+            container.set(x, y, z, block.getStateFromMeta(metaArr[bi    ]));
+
+            x = (bi + 1) % sizeX;
+            y = (bi + 1) / layerSize;
+            z = ((bi + 1) % layerSize) / sizeX;
+            byteId = blockIdsByte[bi + 1] & 0xFF;
+            block = palette[(addValue & 0x0F) << 8 | byteId];
+            container.set(x, y, z, block.getStateFromMeta(metaArr[bi + 1]));
+        }
+
+        // Odd number of blocks, handle the last position
+        if ((numBlocks % 2) != 0)
+        {
+            final int addValue = add[ai];
+            byteId = blockIdsByte[bi    ] & 0xFF;
+            block = palette[(addValue & 0xF0) << 4 | byteId];
+            int x = bi % sizeX;
+            int y = bi / layerSize;
+            int z = (bi % layerSize) / sizeX;
+            container.set(x, y, z, block.getStateFromMeta(metaArr[bi    ]));
         }
 
         return true;
     }
 
-    private void readEntitiesFromNBT(NBTTagCompound nbt)
+    @Override
+    protected Map<BlockPos, NBTTagCompound> readBlockEntitiesFromTag(NBTTagCompound tag)
     {
-        this.entities.clear();
-        NBTTagList tagList = nbt.getTagList("Entities", Constants.NBT.TAG_COMPOUND);
-
-        for (int i = 0; i < tagList.tagCount(); ++i)
-        {
-            this.entities.add(tagList.getCompoundTagAt(i));
-        }
+        return this.readBlockEntitiesFromListTag(tag.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND));
     }
 
-    private void readTileEntitiesFromNBT(NBTTagCompound nbt)
+    @Override
+    protected List<EntityInfo> readEntitiesFromTag(NBTTagCompound tag)
     {
-        this.tiles.clear();
-        NBTTagList tagList = nbt.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND);
-
-        for (int i = 0; i < tagList.tagCount(); ++i)
-        {
-            NBTTagCompound tag = tagList.getCompoundTagAt(i);
-            BlockPos pos = new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"));
-            this.tiles.put(pos, tag);
-        }
+        return this.readEntitiesFromListTag(tag.getTagList("Entities", Constants.NBT.TAG_COMPOUND));
     }
 
-    public boolean readFromFile(File file)
-    {
-        if (file.exists() && file.isFile() && file.canRead())
-        {
-            this.fileName = file.getName();
-
-            try
-            {
-                FileInputStream is = new FileInputStream(file);
-                NBTTagCompound nbt = CompressedStreamTools.readCompressed(is);
-                is.close();
-
-                return this.readFromNBT(nbt);
-            }
-            catch (Exception e)
-            {
-                LiteModLitematica.logger.error("SchematicaSchematic: Failed to read Schematic data from file '{}'", file.getAbsolutePath());
-            }
-        }
-
-        return false;
-    }
-
-    private void createPalette()
+    protected void createPalette()
     {
         if (this.palette == null)
         {
             this.palette = new Block[4096];
-            ILitematicaBlockStatePalette litematicaPalette = this.blocks.getPalette();
+            ILitematicaBlockStatePalette litematicaPalette = this.blockContainer.getPalette();
             final int numBlocks = litematicaPalette.getPaletteSize();
 
             for (int i = 0; i < numBlocks; ++i)
@@ -753,8 +359,8 @@ public class SchematicaSchematic
 
                 if (id >= this.palette.length)
                 {
-                    throw new IllegalArgumentException(String.format("Block id %d for block '%s' is out of range, max allowed = %d!",
-                            id, state, this.palette.length - 1));
+                    InfoUtils.printErrorMessage("litematica.message.error.schematic_write.schematica.palette.invalid_id", id, state, this.palette.length - 1);
+                    continue;
                 }
 
                 this.palette[id] = block;
@@ -762,7 +368,7 @@ public class SchematicaSchematic
         }
     }
 
-    private void writePaletteToNBT(NBTTagCompound nbt)
+    protected void writePaletteToTag(NBTTagCompound nbt)
     {
         NBTTagCompound tag = new NBTTagCompound();
 
@@ -784,36 +390,39 @@ public class SchematicaSchematic
         nbt.setTag("SchematicaMapping", tag);
     }
 
-    private void writeBlocksToNBT(NBTTagCompound nbt)
+    protected void writeBlocksToTag(NBTTagCompound nbt)
     {
-        nbt.setShort("Width", (short) this.size.getX());
-        nbt.setShort("Height", (short) this.size.getY());
-        nbt.setShort("Length", (short) this.size.getZ());
+        Vec3i size = this.getSize();
+        final int sizeX = size.getX();
+        final int sizeZ = size.getZ();
+
+        nbt.setShort("Width", (short) sizeX);
+        nbt.setShort("Height", (short) size.getY());
+        nbt.setShort("Length", (short) sizeZ);
         nbt.setString("Materials", "Alpha");
 
-        final int numBlocks = this.size.getX() * this.size.getY() * this.size.getZ();
+        final int numBlocks = sizeX * size.getY() * sizeZ;
         final int loopMax = (int) Math.floor((double) numBlocks / 2D);
         final int addSize = (int) Math.ceil((double) numBlocks / 2D);
         final byte[] blockIdsArr = new byte[numBlocks];
         final byte[] metaArr = new byte[numBlocks];
         final byte[] addArr = new byte[addSize];
-        final int sizeX = this.size.getX();
-        final int sizeZ = this.size.getZ();
         final int layerSize = sizeX * sizeZ;
         int numAdd = 0;
         int bi, ai;
+        LitematicaBlockStateContainer container = this.blockContainer;
 
         for (bi = 0, ai = 0; ai < loopMax; bi += 2, ++ai)
         {
             int x = bi % sizeX;
             int y = bi / layerSize;
             int z = (bi % layerSize) / sizeX;
-            IBlockState state1 = this.blocks.get(x, y, z);
+            IBlockState state1 = container.get(x, y, z);
 
             x = (bi + 1) % sizeX;
             y = (bi + 1) / layerSize;
             z = ((bi + 1) % layerSize) / sizeX;
-            IBlockState state2 = this.blocks.get(x, y, z);
+            IBlockState state2 = container.get(x, y, z);
 
             int id1 = Block.getIdFromBlock(state1.getBlock());
             int id2 = Block.getIdFromBlock(state2.getBlock());
@@ -824,7 +433,7 @@ public class SchematicaSchematic
             if (add != 0)
             {
                 addArr[ai] = (byte) add;
-                numAdd++;
+                ++numAdd;
             }
 
             metaArr[bi    ] = (byte) state1.getBlock().getMetaFromState(state1);
@@ -837,7 +446,7 @@ public class SchematicaSchematic
             int x = bi % sizeX;
             int y = bi / layerSize;
             int z = (bi % layerSize) / sizeX;
-            IBlockState state = this.blocks.get(x, y, z);
+            IBlockState state = container.get(x, y, z);
 
             int id = Block.getIdFromBlock(state.getBlock());
             int add = (id >>> 4) & 0xF0;
@@ -846,7 +455,7 @@ public class SchematicaSchematic
             if (add != 0)
             {
                 addArr[ai] = (byte) add;
-                numAdd++;
+                ++numAdd;
             }
 
             metaArr[bi] = (byte) state.getBlock().getMetaFromState(state);
@@ -859,71 +468,5 @@ public class SchematicaSchematic
         {
             nbt.setByteArray("AddBlocks", addArr);
         }
-    }
-
-    private NBTTagCompound writeToNBT()
-    {
-        NBTTagCompound nbt = new NBTTagCompound();
-
-        this.createPalette();
-        this.writeBlocksToNBT(nbt);
-        this.writePaletteToNBT(nbt);
-
-        NBTTagList tagListTiles = new NBTTagList();
-        NBTTagList tagListEntities = new NBTTagList();
-
-        for (NBTTagCompound tag : this.entities)
-        {
-            tagListEntities.appendTag(tag);
-        }
-
-        for (NBTTagCompound tag : this.tiles.values())
-        {
-            tagListTiles.appendTag(tag);
-        }
-
-        nbt.setTag("TileEntities", tagListTiles);
-        nbt.setTag("Entities", tagListEntities);
-
-        return nbt;
-    }
-
-    public boolean writeToFile(File dir, String fileNameIn, boolean override, IStringConsumer feedback)
-    {
-        String fileName = fileNameIn;
-
-        if (fileName.endsWith(FILE_EXTENSION) == false)
-        {
-            fileName = fileName + FILE_EXTENSION;
-        }
-
-        File fileSchematic = new File(dir, fileName);
-
-        try
-        {
-            if (dir.exists() == false && dir.mkdirs() == false)
-            {
-                feedback.setString(StringUtils.translate("litematica.error.schematic_write_to_file_failed.directory_creation_failed", dir.getAbsolutePath()));
-                return false;
-            }
-
-            if (override == false && fileSchematic.exists())
-            {
-                feedback.setString(StringUtils.translate("litematica.error.schematic_write_to_file_failed.exists", fileSchematic.getAbsolutePath()));
-                return false;
-            }
-
-            FileOutputStream os = new FileOutputStream(fileSchematic);
-            CompressedStreamTools.writeCompressed(this.writeToNBT(), os);
-            os.close();
-
-            return true;
-        }
-        catch (Exception e)
-        {
-            feedback.setString(StringUtils.translate("litematica.error.schematic_write_to_file_failed.exception", fileSchematic.getAbsolutePath()));
-        }
-
-        return false;
     }
 }

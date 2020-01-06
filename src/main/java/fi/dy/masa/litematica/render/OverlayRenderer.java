@@ -34,6 +34,7 @@ import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchRenderPos;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.ItemUtils;
@@ -79,7 +80,7 @@ public class OverlayRenderer
         };
 
     private final Minecraft mc;
-    private final Map<SchematicPlacement, ImmutableMap<String, Box>> placements = new HashMap<>();
+    private final Map<SchematicPlacement, ImmutableMap<String, SelectionBox>> placements = new HashMap<>();
     private Color4f colorPos1 = new Color4f(1f, 0.0625f, 0.0625f);
     private Color4f colorPos2 = new Color4f(0.0625f, 0.0625f, 1f);
     private Color4f colorOverlapping = new Color4f(1f, 0.0625f, 1f);
@@ -150,7 +151,7 @@ public class OverlayRenderer
 
                 Box currentBox = currentSelection.getSelectedSubRegionBox();
 
-                for (Box box : currentSelection.getAllSubRegionBoxes())
+                for (SelectionBox box : currentSelection.getAllSubRegionBoxes())
                 {
                     BoxType type = box == currentBox ? BoxType.AREA_SELECTED : BoxType.AREA_UNSELECTED;
                     this.renderSelectionBox(box, type, expand, lineWidthBlockBox, lineWidthArea, renderViewEntity, partialTicks, null);
@@ -180,13 +181,13 @@ public class OverlayRenderer
                 SchematicPlacementManager spm = DataManager.getSchematicPlacementManager();
                 SchematicPlacement currentPlacement = spm.getSelectedSchematicPlacement();
 
-                for (Map.Entry<SchematicPlacement, ImmutableMap<String, Box>> entry : this.placements.entrySet())
+                for (Map.Entry<SchematicPlacement, ImmutableMap<String, SelectionBox>> entry : this.placements.entrySet())
                 {
                     SchematicPlacement schematicPlacement = entry.getKey();
-                    ImmutableMap<String, Box> boxMap = entry.getValue();
+                    ImmutableMap<String, SelectionBox> boxMap = entry.getValue();
                     boolean origin = schematicPlacement.getSelectedSubRegionPlacement() == null;
 
-                    for (Map.Entry<String, Box> entryBox : boxMap.entrySet())
+                    for (Map.Entry<String, SelectionBox> entryBox : boxMap.entrySet())
                     {
                         String boxName = entryBox.getKey();
                         boolean boxSelected = schematicPlacement == currentPlacement && (origin || boxName.equals(schematicPlacement.getSelectedSubRegionName()));
@@ -233,7 +234,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSelectionBox(Box box, BoxType boxType, float expand,
+    public void renderSelectionBox(SelectionBox box, BoxType boxType, float expand,
             float lineWidthBlockBox, float lineWidthArea, Entity renderViewEntity, float partialTicks, @Nullable SchematicPlacement placement)
     {
         BlockPos pos1 = box.getPos1();

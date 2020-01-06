@@ -27,6 +27,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 {
     private final SelectionManager selectionManager;
     private final WidgetAreaSelectionBrowser parent;
+    private final FileType fileType;
     private int buttonsStartX;
 
     public WidgetAreaSelectionEntry(int x, int y, int width, int height, boolean isOdd,
@@ -35,6 +36,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     {
         super(x, y, width, height, isOdd, entry, listIndex, parent, iconProvider);
 
+        this.fileType = FileType.fromFileName(this.entry.getFullPath());
         this.selectionManager = selectionManager;
         this.parent = parent;
 
@@ -43,7 +45,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
         // Note: These are placed from right to left
 
-        if (entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(entry.getFullPath()) == FileType.JSON)
+        if (entry.getType() == DirectoryEntryType.FILE && this.fileType == FileType.JSON)
         {
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.REMOVE);
             posX = this.createButton(posX, posY, ButtonListener.ButtonType.RENAME);
@@ -73,7 +75,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
-        if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
+        if (this.entry.getType() == DirectoryEntryType.FILE && this.fileType == FileType.JSON)
         {
             selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentNormalSelectionId());
             super.render(mouseX, mouseY, selected);
@@ -87,7 +89,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     @Override
     protected String getDisplayName()
     {
-        if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
+        if (this.entry.getType() == DirectoryEntryType.FILE && this.fileType == FileType.JSON)
         {
             AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(this.getDirectoryEntry().getFullPath().getAbsolutePath());
             String prefix = this.entry.getDisplayNamePrefix();

@@ -24,8 +24,9 @@ import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
+import fi.dy.masa.litematica.schematic.EntityInfo;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -38,7 +39,7 @@ import fi.dy.masa.malilib.util.LayerRange;
 
 public class SchematicPlacingUtils
 {
-    public static boolean placeToWorld(LitematicaSchematic schematic, World world, SchematicPlacement schematicPlacement, LayerRange range, boolean notifyNeighbors)
+    public static boolean placeToWorld(ISchematic schematic, World world, SchematicPlacement schematicPlacement, LayerRange range, boolean notifyNeighbors)
     {
         WorldUtils.setShouldPreventOnBlockAdded(true);
 
@@ -48,15 +49,16 @@ public class SchematicPlacingUtils
         for (String regionName : relativePlacements.keySet())
         {
             SubRegionPlacement placement = relativePlacements.get(regionName);
+            ISchematicRegion region = schematic.getSchematicRegion(regionName);
 
-            if (placement.isEnabled())
+            if (placement.isEnabled() && region != null)
             {
                 BlockPos regionPos = placement.getPos();
-                Vec3i regionSize = schematic.getSubRegionSize(regionName);
-                LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
-                Map<BlockPos, NBTTagCompound> blockEntityMap = schematic.getBlockEntityMap(regionName);
-                List<EntityInfo> entityList = schematic.getEntityList(regionName);
-                Map<BlockPos, NextTickListEntry> scheduledBlockTicks = schematic.getBlockTickMap(regionName);
+                Vec3i regionSize = region.getSize();
+                LitematicaBlockStateContainer container = region.getBlockStateContainer();
+                Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
+                List<EntityInfo> entityList = region.getEntityList();
+                Map<BlockPos, NextTickListEntry> scheduledBlockTicks = region.getBlockTickMap();
 
                 if (regionPos != null && regionSize != null && container != null && blockEntityMap != null)
                 {
@@ -283,7 +285,7 @@ public class SchematicPlacingUtils
         }
     }
 
-    public static boolean placeToWorldWithinChunk(LitematicaSchematic schematic, World world, ChunkPos chunkPos, SchematicPlacement schematicPlacement, boolean notifyNeighbors)
+    public static boolean placeToWorldWithinChunk(ISchematic schematic, World world, ChunkPos chunkPos, SchematicPlacement schematicPlacement, boolean notifyNeighbors)
     {
         Set<String> regionsTouchingChunk = schematicPlacement.getRegionsTouchingChunk(chunkPos.x, chunkPos.z);
         BlockPos origin = schematicPlacement.getOrigin();
@@ -291,14 +293,15 @@ public class SchematicPlacingUtils
         for (String regionName : regionsTouchingChunk)
         {
             SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+            ISchematicRegion region = schematic.getSchematicRegion(regionName);
 
-            if (placement.isEnabled())
+            if (placement.isEnabled() && region != null)
             {
                 BlockPos regionPos = placement.getPos();
-                Vec3i regionSize = schematic.getSubRegionSize(regionName);
-                LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
-                Map<BlockPos, NBTTagCompound> blockEntityMap = schematic.getBlockEntityMap(regionName);
-                List<EntityInfo> entityList = schematic.getEntityList(regionName);
+                Vec3i regionSize = region.getSize();
+                LitematicaBlockStateContainer container = region.getBlockStateContainer();
+                Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
+                List<EntityInfo> entityList = region.getEntityList();
 
                 if (regionPos != null && regionSize != null && container != null && blockEntityMap != null)
                 {

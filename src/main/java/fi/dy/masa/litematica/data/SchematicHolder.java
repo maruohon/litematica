@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.SchematicType;
 
 public class SchematicHolder
 {
     private static final SchematicHolder INSTANCE = new SchematicHolder();
-    private final List<LitematicaSchematic> schematics = new ArrayList<>();
+    private final List<ISchematic> schematics = new ArrayList<>();
 
     public static SchematicHolder getInstance()
     {
@@ -22,11 +23,11 @@ public class SchematicHolder
         this.schematics.clear();
     }
 
-    public List<LitematicaSchematic> getAllOf(File file)
+    public List<ISchematic> getAllOf(File file)
     {
-        List<LitematicaSchematic> list = new ArrayList<>();
+        List<ISchematic> list = new ArrayList<>();
 
-        for (LitematicaSchematic schematic : this.schematics)
+        for (ISchematic schematic : this.schematics)
         {
             if (file.equals(schematic.getFile()))
             {
@@ -38,9 +39,9 @@ public class SchematicHolder
     }
 
     @Nullable
-    public LitematicaSchematic getOrLoad(File file)
+    public ISchematic getOrLoad(File file)
     {
-        for (LitematicaSchematic schematic : this.schematics)
+        for (ISchematic schematic : this.schematics)
         {
             if (file.equals(schematic.getFile()))
             {
@@ -48,7 +49,7 @@ public class SchematicHolder
             }
         }
 
-        LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName());
+        ISchematic schematic = SchematicType.tryCreateSchematicFrom(file);
 
         if (schematic != null)
         {
@@ -58,13 +59,13 @@ public class SchematicHolder
         return schematic;
     }
 
-    public void addSchematic(LitematicaSchematic schematic, boolean allowDuplicates)
+    public void addSchematic(ISchematic schematic, boolean allowDuplicates)
     {
         if (allowDuplicates || this.schematics.contains(schematic) == false)
         {
             if (allowDuplicates == false && schematic.getFile() != null)
             {
-                for (LitematicaSchematic tmp : this.schematics)
+                for (ISchematic tmp : this.schematics)
                 {
                     if (schematic.getFile().equals(tmp.getFile()))
                     {
@@ -77,7 +78,7 @@ public class SchematicHolder
         }
     }
 
-    public boolean removeSchematic(LitematicaSchematic schematic)
+    public boolean removeSchematic(ISchematic schematic)
     {
         if (this.schematics.remove(schematic))
         {
@@ -88,7 +89,7 @@ public class SchematicHolder
         return false;
     }
 
-    public Collection<LitematicaSchematic> getAllSchematics()
+    public Collection<ISchematic> getAllSchematics()
     {
         return this.schematics;
     }

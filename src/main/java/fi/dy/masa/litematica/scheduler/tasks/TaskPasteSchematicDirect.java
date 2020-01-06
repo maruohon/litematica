@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import net.minecraft.world.WorldServer;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -30,7 +30,7 @@ public class TaskPasteSchematicDirect extends TaskBase
     public boolean execute()
     {
         WorldServer world = this.mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(this.mc.world));
-        LitematicaSchematic schematic = this.placement.getSchematic();
+        ISchematic schematic = this.placement.getSchematic();
 
         if (world != null && SchematicPlacingUtils.placeToWorld(schematic, world, this.placement, this.range, false))
         {

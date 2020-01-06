@@ -2,16 +2,16 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimple
 {
-    protected final Box box;
+    protected final SelectionBox box;
 
-    public GuiAreaSelectionEditorSubRegion(AreaSelection selection, Box box)
+    public GuiAreaSelectionEditorSubRegion(AreaSelection selection, SelectionBox box)
     {
         super(selection);
 
@@ -54,7 +54,7 @@ public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimpl
 
     @Override
     @Nullable
-    protected Box getBox()
+    protected SelectionBox getBox()
     {
         return this.box;
     }

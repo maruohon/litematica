@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSubRegion;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
@@ -23,7 +23,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 {
     private final WidgetListSelectionSubRegions parent;
     private final AreaSelection selection;
-    private final Box box;
+    private final SelectionBox box;
     private final boolean isOdd;
     private final int buttonsStartX;
 

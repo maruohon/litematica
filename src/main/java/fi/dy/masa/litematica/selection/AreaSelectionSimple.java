@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.malilib.util.JsonUtils;
 
 public class AreaSelectionSimple extends AreaSelection
 {
@@ -33,7 +33,7 @@ public class AreaSelectionSimple extends AreaSelection
     }
 
     @Override
-    public boolean addSubRegionBox(Box box, boolean replace)
+    public boolean addSubRegionBox(SelectionBox box, boolean replace)
     {
         // NO-OP
         return false;
@@ -64,7 +64,7 @@ public class AreaSelectionSimple extends AreaSelection
         if (this.subRegionBoxes.size() != 1)
         {
             this.subRegionBoxes.clear();
-            Box box = new Box(BlockPos.ORIGIN, BlockPos.ORIGIN, this.getName());
+            SelectionBox box = new SelectionBox(BlockPos.ORIGIN, BlockPos.ORIGIN, this.getName());
             this.subRegionBoxes.put(box.getName(), box);
             this.currentBox = box.getName();
         }
@@ -94,7 +94,7 @@ public class AreaSelectionSimple extends AreaSelection
 
                 if (el.isJsonObject())
                 {
-                    Box box = Box.fromJson(el.getAsJsonObject());
+                    SelectionBox box = SelectionBox.fromJson(el.getAsJsonObject());
 
                     if (box != null)
                     {

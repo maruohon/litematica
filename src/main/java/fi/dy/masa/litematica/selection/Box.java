@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.selection;
 
 import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -12,32 +11,26 @@ import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class Box
 {
-    @Nullable private BlockPos pos1;
-    @Nullable private BlockPos pos2;
-    private Vec3i size = BlockPos.ORIGIN;
-    private String name = "Unnamed";
-    private Corner selectedCorner = Corner.NONE;
+    @Nullable protected BlockPos pos1;
+    @Nullable protected BlockPos pos2;
+    protected Vec3i size = Vec3i.NULL_VECTOR;
 
     public Box()
     {
-        this.pos1 = BlockPos.ORIGIN;
-        this.pos2 = BlockPos.ORIGIN;
-        this.updateSize();
+        this(BlockPos.ORIGIN, BlockPos.ORIGIN);
     }
 
-    public Box(@Nullable BlockPos pos1, @Nullable BlockPos pos2, String name)
+    public Box(@Nullable BlockPos pos1, @Nullable BlockPos pos2)
     {
         this.pos1 = pos1;
         this.pos2 = pos2;
-        this.name = name;
 
         this.updateSize();
     }
 
     public Box copy()
     {
-        Box box = new Box(this.pos1, this.pos2, this.name);
-        box.setSelectedCorner(this.selectedCorner);
+        Box box = new Box(this.pos1, this.pos2);
         return box;
     }
 
@@ -58,16 +51,6 @@ public class Box
         return this.size;
     }
 
-    public String getName()
-    {
-        return this.name;
-    }
-
-    public Corner getSelectedCorner()
-    {
-        return this.selectedCorner;
-    }
-
     public void setPos1(@Nullable BlockPos pos)
     {
         this.pos1 = pos;
@@ -78,16 +61,6 @@ public class Box
     {
         this.pos2 = pos;
         this.updateSize();
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public void setSelectedCorner(Corner corner)
-    {
-        this.selectedCorner = corner;
     }
 
     /*
@@ -116,7 +89,7 @@ public class Box
         }
         else
         {
-            this.size = new BlockPos(1, 1, 1);
+            this.size = new Vec3i(1, 1, 1);
         }
     }
 
@@ -159,36 +132,6 @@ public class Box
     }
 
     @Nullable
-    public static Box fromJson(JsonObject obj)
-    {
-        if (JsonUtils.hasString(obj, "name"))
-        {
-            BlockPos pos1 = JsonUtils.blockPosFromJson(obj, "pos1");
-            BlockPos pos2 = JsonUtils.blockPosFromJson(obj, "pos2");
-
-            if (pos1 != null || pos2 != null)
-            {
-                Box box = new Box();
-                box.setName(obj.get("name").getAsString());
-
-                if (pos1 != null)
-                {
-                    box.setPos1(pos1);
-                }
-
-                if (pos2 != null)
-                {
-                    box.setPos2(pos2);
-                }
-
-                return box;
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
@@ -202,8 +145,6 @@ public class Box
         {
             obj.add("pos2", JsonUtils.blockPosToJson(this.pos2));
         }
-
-        obj.add("name", new JsonPrimitive(this.name));
 
         return this.pos1 != null || this.pos2 != null ? obj : null;
     }

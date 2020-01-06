@@ -6,40 +6,46 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.apache.commons.lang3.tuple.Pair;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
+import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.NBTUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec3i;
 
-public class WidgetSchematicBrowser extends WidgetFileBrowserBase
+public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>
 {
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
 
-    protected final Map<File, SchematicMetadata> cachedMetadata = new HashMap<>();
-    protected final Map<File, Pair<ResourceLocation, DynamicTexture>> cachedPreviewImages = new HashMap<>();
+    protected final Map<File, CachedSchematicData> cachedData = new HashMap<>();
     protected final GuiSchematicBrowserBase parent;
+    @Nullable protected final ISelectionListener<DirectoryEntry> parentSelectionListener;
     protected final int infoWidth;
     protected final int infoHeight;
 
     public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, DataManager.getDirectoryCache(), parent.getBrowserContext(),
-                parent.getDefaultDirectory(), selectionListener, Icons.FILE_ICON_LITEMATIC);
+                parent.getDefaultDirectory(), null, Icons.FILE_ICON_LITEMATIC);
 
+        this.parentSelectionListener = selectionListener;
         this.title = StringUtils.translate("litematica.gui.title.schematic_browser");
         this.infoWidth = 170;
         this.infoHeight = 290;
         this.parent = parent;
+        this.setSelectionListener(this);
     }
 
     @Override
@@ -53,14 +59,17 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     {
         super.onGuiClosed();
 
-        this.clearPreviewImages();
+        this.clearSchematicMetadataCache();
     }
 
     private void clearPreviewImages()
     {
-        for (Pair<ResourceLocation, DynamicTexture> pair : this.cachedPreviewImages.values())
+        for (CachedSchematicData data : this.cachedData.values())
         {
-            this.mc.getTextureManager().deleteTexture(pair.getLeft());
+            if (data != null && data.texture != null)
+            {
+                this.mc.getTextureManager().deleteTexture(data.iconName);
+            }
         }
     }
 
@@ -74,6 +83,20 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     protected FileFilter getFileFilter()
     {
         return SCHEMATIC_FILTER;
+    }
+
+    @Override
+    public void onSelectionChange(DirectoryEntry entry)
+    {
+        if (entry != null)
+        {
+            this.cacheSchematicData(entry);
+        }
+
+        if (this.parentSelectionListener != null)
+        {
+            this.parentSelectionListener.onSelectionChange(entry);
+        }
     }
 
     @Override
@@ -95,10 +118,12 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             return;
         }
 
-        SchematicMetadata meta = this.getSchematicMetadata(entry);
+        CachedSchematicData data = this.cachedData.get(entry.getFullPath());
 
-        if (meta != null)
+        if (data != null)
         {
+            SchematicMetadata meta = data.schematic.getMetadata();
+
             x += 3;
             y += 3;
             int textColor = 0xC0C0C0C0;
@@ -170,13 +195,11 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             */
             //y += 12;
 
-            Pair<ResourceLocation, DynamicTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
-
-            if (pair != null)
+            if (data.texture != null)
             {
                 y += 14;
 
-                int iconSize = (int) Math.sqrt(pair.getRight().getTextureData().length);
+                int iconSize = (int) Math.sqrt(data.texture.getTextureData().length);
                 boolean needsScaling = height < this.infoHeight;
 
                 RenderUtils.color(1f, 1f, 1f, 1f);
@@ -188,7 +211,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
                 RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
-                this.bindTexture(pair.getLeft());
+                this.bindTexture(data.iconName);
                 Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
@@ -197,36 +220,43 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     public void clearSchematicMetadataCache()
     {
         this.clearPreviewImages();
-        this.cachedMetadata.clear();
-        this.cachedPreviewImages.clear();
+        this.cachedData.clear();
     }
 
     @Nullable
-    protected SchematicMetadata getSchematicMetadata(DirectoryEntry entry)
+    public CachedSchematicData getCachedData(File file)
+    {
+        return this.cachedData.get(file);
+    }
+
+    protected void cacheSchematicData(DirectoryEntry entry)
     {
         File file = new File(entry.getDirectory(), entry.getName());
-        SchematicMetadata meta = this.cachedMetadata.get(file);
 
-        if (meta == null && this.cachedMetadata.containsKey(file) == false)
+        if (this.cachedData.containsKey(file) == false)
         {
-            if (entry.getName().endsWith(LitematicaSchematic.FILE_EXTENSION))
+            NBTTagCompound tag = NBTUtils.readNbtFromFile(file);
+            CachedSchematicData data = null;
+
+            if (tag != null)
             {
-                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
+                ISchematic schematic = SchematicType.tryCreateSchematicFrom(file, tag);
 
                 if (schematic != null)
                 {
-                    meta = schematic.getMetadata();
-                    this.createPreviewImage(file, meta);
+                    SchematicMetadata metadata = schematic.getMetadata();
+                    ResourceLocation iconName = new ResourceLocation(Reference.MOD_ID, file.getAbsolutePath());
+                    DynamicTexture texture = this.createPreviewImage(iconName, metadata);
+                    data = new CachedSchematicData(tag, schematic, iconName, texture);
                 }
             }
 
-            this.cachedMetadata.put(file, meta);
+            this.cachedData.put(file, data);
         }
-
-        return meta;
     }
 
-    private void createPreviewImage(File file, SchematicMetadata meta)
+    @Nullable
+    private DynamicTexture createPreviewImage(ResourceLocation iconName, SchematicMetadata meta)
     {
         int[] previewImageData = meta.getPreviewImagePixelData();
 
@@ -242,18 +272,35 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                     //buf.setRGB(0, 0, size, size, previewImageData, 0, size);
 
                     DynamicTexture tex = new DynamicTexture(size, size);
-                    ResourceLocation rl = new ResourceLocation("litematica", file.getAbsolutePath());
-                    this.mc.getTextureManager().loadTexture(rl, tex);
+                    this.mc.getTextureManager().loadTexture(iconName, tex);
 
                     System.arraycopy(previewImageData, 0, tex.getTextureData(), 0, previewImageData.length);
                     tex.updateDynamicTexture();
 
-                    this.cachedPreviewImages.put(file, Pair.of(rl, tex));
+                    return tex;
                 }
             }
             catch (Exception e)
             {
             }
+        }
+
+        return null;
+    }
+
+    public static class CachedSchematicData
+    {
+        public final NBTTagCompound tag;
+        public final ISchematic schematic;
+        public final ResourceLocation iconName;
+        @Nullable public final DynamicTexture texture;
+
+        protected CachedSchematicData(NBTTagCompound tag, ISchematic schematic, ResourceLocation iconName, @Nullable DynamicTexture texture)
+        {
+            this.tag = tag;
+            this.schematic = schematic;
+            this.iconName = iconName;
+            this.texture = texture;
         }
     }
 
@@ -265,6 +312,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             String name = pathName.getName();
             return  name.endsWith(".litematic") ||
                     name.endsWith(".schematic") ||
+                    name.endsWith(".schem") ||
                     name.endsWith(".nbt");
         }
     }

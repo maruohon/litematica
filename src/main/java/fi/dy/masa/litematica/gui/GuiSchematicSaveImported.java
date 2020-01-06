@@ -1,13 +1,15 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
+import net.minecraft.nbt.NBTTagCompound;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.litematica.util.FileType;
-import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.NBTUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicSaveImported extends GuiSchematicSaveBase
@@ -70,8 +72,19 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
             String inFile = this.inputFileName;
             boolean override = GuiBase.isShiftDown();
             boolean ignoreEntities = this.checkboxIgnoreEntities.isChecked();
-            FileType fileType = FileType.fromFile(new File(inDir, inFile));
+            FileType fileType = FileType.fromFileName(new File(inDir, inFile));
 
+            if (fileType == FileType.LITEMATICA_SCHEMATIC)
+            {
+                File file = new File(inDir, inFile);
+                NBTTagCompound tag = NBTUtils.readNbtFromFile(file);
+
+                if (tag != null && SchematicType.SPONGE.isValidData(tag))
+                {
+                    
+                }
+            }
+            /*
             if (fileType == FileType.SCHEMATICA_SCHEMATIC)
             {
                 if (WorldUtils.convertSchematicaSchematicToLitematicaSchematic(inDir, inFile, dir, fileName, ignoreEntities, override, this))
@@ -92,6 +105,7 @@ public class GuiSchematicSaveImported extends GuiSchematicSaveBase
 
                 return;
             }
+            */
         }
 
         this.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", this.inputFileName);

@@ -137,7 +137,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     @Override
     public void onSelectionChange(DirectoryEntry entry)
     {
-        if (entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(entry.getFullPath()) == FileType.JSON)
+        if (entry.getType() == DirectoryEntryType.FILE && FileType.fromFileName(entry.getFullPath()) == FileType.JSON)
         {
             String selectionId = entry.getFullPath().getAbsolutePath();
 

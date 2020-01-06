@@ -1,14 +1,14 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.List;
-import fi.dy.masa.litematica.selection.Box;
+import net.minecraft.init.Blocks;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.init.Blocks;
 
 public class TaskDeleteArea extends TaskFillArea
 {
-    public TaskDeleteArea(List<Box> boxes, boolean removeEntities)
+    public TaskDeleteArea(List<SelectionBox> boxes, boolean removeEntities)
     {
         super(boxes, Blocks.AIR.getDefaultState(), null, removeEntities, "litematica.gui.label.task_name.delete");
     }

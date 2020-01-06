@@ -21,7 +21,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
@@ -48,8 +48,8 @@ public class ToolUtils
 
             if (area.getAllSubRegionBoxes().size() > 0)
             {
-                Box currentBox = area.getSelectedSubRegionBox();
-                final ImmutableList<Box> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
+                SelectionBox currentBox = area.getSelectedSubRegionBox();
+                final ImmutableList<SelectionBox> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
 
                 TaskFillArea task = new TaskFillArea(boxes, state, stateToReplace, false);
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
@@ -106,8 +106,8 @@ public class ToolUtils
 
             if (area.getAllSubRegionBoxes().size() > 0)
             {
-                Box currentBox = area.getSelectedSubRegionBox();
-                final ImmutableList<Box> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
+                SelectionBox currentBox = area.getSelectedSubRegionBox();
+                final ImmutableList<SelectionBox> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
 
                 TaskDeleteArea task = new TaskDeleteArea(boxes, removeEntities);
 

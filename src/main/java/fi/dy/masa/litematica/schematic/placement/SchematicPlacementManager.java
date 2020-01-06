@@ -32,7 +32,7 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -319,7 +319,7 @@ public class SchematicPlacementManager
         return ret;
     }
 
-    public List<SchematicPlacement> getAllPlacementsOfSchematic(LitematicaSchematic schematic)
+    public List<SchematicPlacement> getAllPlacementsOfSchematic(ISchematic schematic)
     {
         List<SchematicPlacement> list = new ArrayList<>();
 
@@ -336,7 +336,7 @@ public class SchematicPlacementManager
         return list;
     }
 
-    public void removeAllPlacementsOfSchematic(LitematicaSchematic schematic)
+    public void removeAllPlacementsOfSchematic(ISchematic schematic)
     {
         boolean removed = false;
 
@@ -519,7 +519,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void markAllPlacementsOfSchematicForRebuild(LitematicaSchematic schematic)
+    public void markAllPlacementsOfSchematicForRebuild(ISchematic schematic)
     {
         for (int i = 0; i < this.schematicPlacements.size(); ++i)
         {
@@ -717,7 +717,7 @@ public class SchematicPlacementManager
                 if (mc.isSingleplayer())
                 {
                     final WorldServer world = mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld()));
-                    final LitematicaSchematic schematic = schematicPlacement.getSchematic();
+                    final ISchematic schematic = schematicPlacement.getSchematic();
                     final LayerRange range = DataManager.getRenderLayerRange().copy();
 
                     world.addScheduledTask(() ->

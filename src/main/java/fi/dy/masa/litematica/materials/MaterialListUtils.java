@@ -8,7 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.ItemType;
@@ -16,18 +17,19 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public class MaterialListUtils
 {
-    public static List<MaterialListEntry> createMaterialListFor(LitematicaSchematic schematic)
+    public static List<MaterialListEntry> createMaterialListFor(ISchematic schematic)
     {
-        return createMaterialListFor(schematic, schematic.getSubRegionNames());
+        return createMaterialListFor(schematic, schematic.getRegionNames());
     }
 
-    public static List<MaterialListEntry> createMaterialListFor(LitematicaSchematic schematic, Collection<String> subRegions)
+    public static List<MaterialListEntry> createMaterialListFor(ISchematic schematic, Collection<String> subRegions)
     {
         Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
 
         for (String regionName : subRegions)
         {
-            LitematicaBlockStateContainer container = schematic.getSubRegionContainer(regionName);
+            ISchematicRegion region = schematic.getSchematicRegion(regionName);
+            LitematicaBlockStateContainer container = region != null ? region.getBlockStateContainer() : null;
 
             if (container != null)
             {

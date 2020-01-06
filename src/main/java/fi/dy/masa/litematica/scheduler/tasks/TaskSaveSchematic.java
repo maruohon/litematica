@@ -13,7 +13,7 @@ import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -23,7 +23,7 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
 {
     private final LitematicaSchematic schematic;
     private final BlockPos origin;
-    private final ImmutableMap<String, Box> subRegions;
+    private final ImmutableMap<String, SelectionBox> subRegions;
     private final Set<UUID> existingEntities = new HashSet<>();
     @Nullable private final File dir;
     @Nullable private final String fileName;

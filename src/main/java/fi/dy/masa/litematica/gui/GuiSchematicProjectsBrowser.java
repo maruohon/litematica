@@ -69,7 +69,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
 
         DirectoryEntry selected = this.getListWidget().getLastSelectedEntry();
 
-        if (selected != null && FileType.fromFile(selected.getFullPath()) == FileType.JSON)
+        if (selected != null && FileType.fromFileName(selected.getFullPath()) == FileType.JSON)
         {
             x += this.createButton(x, y, false, ButtonListener.Type.LOAD_PROJECT);
         }

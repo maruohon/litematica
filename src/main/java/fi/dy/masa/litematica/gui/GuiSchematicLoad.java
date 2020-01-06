@@ -6,12 +6,11 @@ import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
+import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser.CachedSchematicData;
 import fi.dy.masa.litematica.materials.MaterialListSchematic;
-import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.litematica.util.FileType;
-import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiStringListSelection;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -23,7 +22,6 @@ import fi.dy.masa.malilib.gui.interfaces.IStringListConsumer;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.util.GuiUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
@@ -134,77 +132,49 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
             }
 
             File file = entry.getFullPath();
+            CachedSchematicData data = this.gui.getListWidget().getCachedData(file);
 
-            if (file.exists() == false || file.isFile() == false || file.canRead() == false)
+            if (data == null)
             {
                 this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
                 return;
             }
 
             this.gui.setNextMessageType(MessageType.ERROR);
-            LitematicaSchematic schematic = null;
-            FileType fileType = FileType.fromFile(entry.getFullPath());
-            boolean warnType = false;
+            ISchematic schematic = data.schematic;
 
-            if (fileType == FileType.LITEMATICA_SCHEMATIC)
+            if (this.type == Type.LOAD_SCHEMATIC)
             {
-                schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
-            }
-            else if (fileType == FileType.SCHEMATICA_SCHEMATIC)
-            {
-                schematic = WorldUtils.convertSchematicaSchematicToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
-                warnType = true;
-            }
-            else if (fileType == FileType.VANILLA_STRUCTURE)
-            {
-                schematic = WorldUtils.convertStructureToLitematicaSchematic(entry.getDirectory(), entry.getName(), false, this.gui);
-                warnType = true;
-            }
-            else
-            {
-                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_type", file.getName());
-            }
+                SchematicHolder.getInstance().addSchematic(schematic, true);
+                this.gui.addMessage(MessageType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
 
-            if (schematic != null)
-            {
-                if (this.type == Type.LOAD_SCHEMATIC)
+                if (DataManager.getCreatePlacementOnLoad())
                 {
-                    SchematicHolder.getInstance().addSchematic(schematic, true);
-                    this.gui.addMessage(MessageType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
+                    BlockPos pos = new BlockPos(this.gui.mc.player.getPositionVector());
+                    String name = schematic.getMetadata().getName();
+                    boolean enabled = GuiBase.isShiftDown() == false;
 
-                    if (DataManager.getCreatePlacementOnLoad())
-                    {
-                        BlockPos pos = new BlockPos(this.gui.mc.player.getPositionVector());
-                        String name = schematic.getMetadata().getName();
-                        boolean enabled = GuiBase.isShiftDown() == false;
-
-                        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-                        SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, enabled, enabled);
-                        manager.addSchematicPlacement(placement, true);
-                        manager.setSelectedSchematicPlacement(placement);
-                    }
+                    SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+                    SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, enabled, enabled);
+                    manager.addSchematicPlacement(placement, true);
+                    manager.setSelectedSchematicPlacement(placement);
                 }
-                else if (this.type == Type.MATERIAL_LIST)
+            }
+            else if (this.type == Type.MATERIAL_LIST)
+            {
+                if (GuiBase.isShiftDown())
                 {
-                    if (GuiBase.isShiftDown())
-                    {
-                        MaterialListCreator creator = new MaterialListCreator(schematic);
-                        GuiStringListSelection gui = new GuiStringListSelection(schematic.getSubRegionNames(), creator);
-                        gui.setTitle(StringUtils.translate("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
-                        gui.setParent(GuiUtils.getCurrentScreen());
-                        GuiBase.openGui(gui);
-                    }
-                    else
-                    {
-                        MaterialListSchematic materialList = new MaterialListSchematic(schematic, true);
-                        DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-                        GuiBase.openGui(new GuiMaterialList(materialList));
-                    }
+                    MaterialListCreator creator = new MaterialListCreator(schematic);
+                    GuiStringListSelection gui = new GuiStringListSelection(schematic.getRegionNames(), creator);
+                    gui.setTitle(StringUtils.translate("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
+                    gui.setParent(GuiUtils.getCurrentScreen());
+                    GuiBase.openGui(gui);
                 }
-
-                if (warnType)
+                else
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, 15000, "litematica.message.warn.schematic_load_non_litematica");
+                    MaterialListSchematic materialList = new MaterialListSchematic(schematic, true);
+                    DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
+                    GuiBase.openGui(new GuiMaterialList(materialList));
                 }
             }
         }
@@ -239,9 +209,9 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
     private static class MaterialListCreator implements IStringListConsumer
     {
-        private final LitematicaSchematic schematic;
+        private final ISchematic schematic;
 
-        public MaterialListCreator(LitematicaSchematic schematic)
+        public MaterialListCreator(ISchematic schematic)
         {
             this.schematic = schematic;
         }

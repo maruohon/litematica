@@ -1,16 +1,16 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSelectionSubRegions;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
 
 public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
 {
@@ -74,7 +74,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
 
     @Override
     @Nullable
-    protected Box getBox()
+    protected SelectionBox getBox()
     {
         return this.selection.getSelectedSubRegionBox();
     }

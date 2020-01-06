@@ -24,11 +24,13 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -216,12 +218,12 @@ public class PositionUtils
         return new Vec3i(x, y, z);
     }
 
-    public static List<Box> getValidBoxes(AreaSelection area)
+    public static List<SelectionBox> getValidBoxes(AreaSelection area)
     {
-        List<Box> boxes = new ArrayList<>();
-        Collection<Box> originalBoxes = area.getAllSubRegionBoxes();
+        List<SelectionBox> boxes = new ArrayList<>();
+        Collection<SelectionBox> originalBoxes = area.getAllSubRegionBoxes();
 
-        for (Box box : originalBoxes)
+        for (SelectionBox box : originalBoxes)
         {
             if (isBoxValid(box))
             {
@@ -242,7 +244,7 @@ public class PositionUtils
         return getEnclosingAreaSize(area.getAllSubRegionBoxes());
     }
 
-    public static BlockPos getEnclosingAreaSize(Collection<Box> boxes)
+    public static BlockPos getEnclosingAreaSize(Collection<? extends Box> boxes)
     {
         Pair<BlockPos, BlockPos> pair = getEnclosingAreaCorners(boxes);
         return pair.getRight().subtract(pair.getLeft()).add(1, 1, 1);
@@ -255,20 +257,51 @@ public class PositionUtils
      * @return
      */
     @Nullable
-    public static Pair<BlockPos, BlockPos> getEnclosingAreaCorners(Collection<Box> boxes)
+    public static Pair<BlockPos, BlockPos> getEnclosingAreaCorners(Collection<? extends Box> boxes)
     {
         if (boxes.isEmpty())
         {
             return null;
         }
 
-        BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos( 60000000,  60000000,  60000000);
-        BlockPos.MutableBlockPos posMax = new BlockPos.MutableBlockPos(-60000000, -60000000, -60000000);
+        BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        BlockPos.MutableBlockPos posMax = new BlockPos.MutableBlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
         for (Box box : boxes)
         {
             getMinMaxCoords(posMin, posMax, box.getPos1());
             getMinMaxCoords(posMin, posMax, box.getPos2());
+        }
+
+        return Pair.of(posMin.toImmutable(), posMax.toImmutable());
+    }
+
+    /**
+     * Returns the min and max corners of the enclosing box around the given collection of boxes.
+     * The minimum corner is the left entry and the maximum corner is the right entry of the pair.
+     * @param boxes
+     * @return
+     */
+    @Nullable
+    public static Pair<BlockPos, BlockPos> getEnclosingAreaCornersForRegions(Collection<ISchematicRegion> regions)
+    {
+        if (regions.isEmpty())
+        {
+            return null;
+        }
+
+        BlockPos.MutableBlockPos posMin = new BlockPos.MutableBlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        BlockPos.MutableBlockPos posMax = new BlockPos.MutableBlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        BlockPos.MutableBlockPos posEnd = new BlockPos.MutableBlockPos();
+
+        for (ISchematicRegion region : regions)
+        {
+            BlockPos pos = region.getPosition();
+            Vec3i endRel = getRelativeEndPositionFromAreaSize(region.getSize());
+            posEnd.setPos(pos.getX() + endRel.getX(), pos.getY() + endRel.getY(), pos.getZ() + endRel.getZ());
+
+            getMinMaxCoords(posMin, posMax, pos);
+            getMinMaxCoords(posMin, posMax, posEnd);
         }
 
         return Pair.of(posMin.toImmutable(), posMax.toImmutable());
@@ -288,7 +321,7 @@ public class PositionUtils
         }
     }
 
-    public static int getTotalVolume(Collection<Box> boxes)
+    public static int getTotalVolume(Collection<? extends Box> boxes)
     {
         if (boxes.isEmpty())
         {
@@ -310,13 +343,13 @@ public class PositionUtils
         return volume;
     }
 
-    public static ImmutableMap<String, IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, ImmutableMap<String, Box> subRegions)
+    public static ImmutableMap<String, IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, ImmutableMap<String, SelectionBox> subRegions)
     {
         ImmutableMap.Builder<String, IntBoundingBox> builder = new ImmutableMap.Builder<>();
 
-        for (Map.Entry<String, Box> entry : subRegions.entrySet())
+        for (Map.Entry<String, SelectionBox> entry : subRegions.entrySet())
         {
-            Box box = entry.getValue();
+            SelectionBox box = entry.getValue();
             IntBoundingBox bb = box != null ? getBoundsWithinChunkForBox(box, chunkX, chunkZ) : null;
 
             if (bb != null)
@@ -328,7 +361,7 @@ public class PositionUtils
         return builder.build();
     }
 
-    public static ImmutableList<IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<Box> boxes)
+    public static ImmutableList<IntBoundingBox> getBoxesWithinChunk(int chunkX, int chunkZ, Collection<? extends Box> boxes)
     {
         ImmutableList.Builder<IntBoundingBox> builder = new ImmutableList.Builder<>();
 
@@ -345,12 +378,12 @@ public class PositionUtils
         return builder.build();
     }
 
-    public static Set<ChunkPos> getTouchedChunks(ImmutableMap<String, Box> boxes)
+    public static Set<ChunkPos> getTouchedChunks(ImmutableMap<String, SelectionBox> boxes)
     {
         return getTouchedChunksForBoxes(boxes.values());
     }
 
-    public static Set<ChunkPos> getTouchedChunksForBoxes(Collection<Box> boxes)
+    public static Set<ChunkPos> getTouchedChunksForBoxes(Collection<? extends Box> boxes)
     {
         Set<ChunkPos> set = new HashSet<>();
 

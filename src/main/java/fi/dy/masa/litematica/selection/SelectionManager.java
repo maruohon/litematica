@@ -452,7 +452,7 @@ public class SelectionManager
 
         if (trace.getHitType() == HitType.SELECTION_BOX_CORNER || trace.getHitType() == HitType.SELECTION_BOX_BODY)
         {
-            Box box = trace.getHitSelectionBox();
+            SelectionBox box = trace.getHitSelectionBox();
             area.setSelectedSubRegionBox(box.getName());
             area.setOriginSelected(false);
             box.setSelectedCorner(trace.getHitCorner());
@@ -662,7 +662,7 @@ public class SelectionManager
 
     public static void renameSubRegionBoxIfSingle(AreaSelection selection, String newName)
     {
-        List<Box> boxes = selection.getAllSubRegionBoxes();
+        List<SelectionBox> boxes = selection.getAllSubRegionBoxes();
 
         // If the selection had only one box with the exact same name as the area selection itself,
         // then also rename that box to the new name.
@@ -794,20 +794,20 @@ public class SelectionManager
     private static class GrabbedElement
     {
         private final AreaSelection area;
-        public final Box grabbedBox;
-        public final Box originalBox;
+        public final SelectionBox grabbedBox;
+        public final SelectionBox originalBox;
         public final Vec3d grabPosition;
         public final Corner grabbedCorner;
         public double grabDistance;
 
-        private GrabbedElement(AreaSelection area, Box box, Corner corner, Vec3d grabPosition, double grabDistance)
+        private GrabbedElement(AreaSelection area, SelectionBox box, Corner corner, Vec3d grabPosition, double grabDistance)
         {
             this.area = area;
             this.grabbedBox = box;
             this.grabbedCorner = corner;
             this.grabPosition = grabPosition;
             this.grabDistance = grabDistance;
-            this.originalBox = new Box(box.getPos1(), box.getPos2(), "");
+            this.originalBox = new SelectionBox(box.getPos1(), box.getPos2(), "");
         }
 
         public void changeGrabDistance(double amount)
