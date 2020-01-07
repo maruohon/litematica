@@ -9,7 +9,6 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -18,14 +17,18 @@ import fi.dy.masa.malilib.util.StringUtils;
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
     protected GuiTextFieldGeneric textField;
-    protected WidgetCheckBox checkboxIgnoreEntities;
     protected String lastText = "";
     protected String defaultText = "";
     @Nullable protected final ISchematic schematic;
 
     public GuiSchematicSaveBase(@Nullable ISchematic schematic)
     {
-        super(10, 70);
+        this(schematic, 10, 70);
+    }
+
+    public GuiSchematicSaveBase(@Nullable ISchematic schematic, int listX, int listY)
+    {
+        super(listX, listY);
 
         this.schematic = schematic;
 
@@ -69,9 +72,9 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
             {
                 this.setTextFieldText(FileUtils.getNameWithoutExtension(entry.getName()));
             }
-            else if (this.schematic != null)
+            else if (this.schematic != null && this.schematic.getFile() != null)
             {
-                this.setTextFieldText(this.schematic.getMetadata().getName());
+                this.setTextFieldText(FileUtils.getNameWithoutExtension(this.schematic.getFile().getName()));
             }
             else
             {
@@ -79,14 +82,15 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
             }
         }
 
+        this.createCustomElements();
+    }
+
+    protected void createCustomElements()
+    {
         int x = this.textField.x + this.textField.getWidth() + 12;
         int y = 32;
 
-        String str = StringUtils.translate("litematica.gui.label.schematic_save.checkbox.ignore_entities");
-        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, str);
-        this.addWidget(this.checkboxIgnoreEntities);
-
-        x = this.createButton(x, y, ButtonType.SAVE);
+        this.createButton(x, y, ButtonType.SAVE);
     }
 
     protected void setTextFieldText(String text)
@@ -103,7 +107,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
     protected abstract void saveSchematic();
 
-    private int createButton(int x, int y, ButtonType type)
+    protected int createButton(int x, int y, ButtonType type)
     {
         String label = StringUtils.translate(type.getLabelKey());
         int width = this.getStringWidth(label) + 10;

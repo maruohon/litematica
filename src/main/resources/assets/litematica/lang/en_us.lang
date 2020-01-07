@@ -13,7 +13,6 @@ litematica.error.area_selection.rename.invalid_safe_file_name=Invalid generated 
 
 litematica.error.duplicate_schematic_placement=Error: Tried to add a placement that already exists
 litematica.error.generic.creative_mode_only=This action is only available in Creative mode
-litematica.error.generic.failed_to_delete_file=Failed to delete the file '%s'
 litematica.error.generic.failed_to_sort_list_of_ignored_states=Failed to sort the list of ignored states
 litematica.error.generic.schematic_world_not_loaded=Schematic world was not loaded
 
@@ -23,15 +22,13 @@ litematica.error.area_editor.open_gui.no_selection=Currently in Selection Mode: 
 litematica.error.area_editor.rename_sub_region.exists=Failed to rename the sub-region:\nA sub-region already exists by the name '%s'
 litematica.error.area_editor.switch_mode.no_selection=Can't switch to Selection Mode: Normal, because there is currently no area selected.\nSelect an area or create a new selection in the Area Selection browser
 
-litematica.error.illegal_characters_in_file_name=Invalid characters in the given file name '%s'.\nFor example slashes are not allowed, and on Windows also\nmany other special characters are not valid for file names!
-
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=Failed to create the Litematica schematic
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
 litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the Structure to a Litematica Schematic
 
+litematica.error.schematic_convert.failed_to_save=Failed to save the converted schematic as '%s'
+litematica.error.schematic_convert.no_output_type_selected=Select the output type using the dropdown widget
 litematica.error.schematic.create.no_selections=No valid selection regions!
-
-litematica.error.schematic_file_rename.read_failed=Failed to read the file '%s'
 
 litematica.error.schematic_load.cant_read_file=Can't read the schematic file '%s' (doesn't exist or permission issue)
 litematica.error.schematic_load.no_schematic_selected=No Schematic file selected!
@@ -39,8 +36,8 @@ litematica.error.schematic_load.no_schematic_version_information=The schematic d
 litematica.error.schematic_load.unsupported_schematic_version=Unsupported or future schematic version '%d'
 litematica.error.schematic_load.unsupported_type=Unknown or unsupported file type for '%s'
 
-litematica.error.schematic_manager.schematic_export.unsupported_type=Only Litematica schematics can be exported in other formats!
-litematica.error.schematic_manager.schematic_import.unsupported_type=The selected schematic type isn't supported for import!
+litematica.error.schematic_manager.schematic_has_no_name=The selected schematic type ('%s) does not store a name
+litematica.error.schematic_manager.schematic_has_no_thumbnail=The selected schematic type ('%s) does not store a preview/thumbnail
 
 litematica.error.schematic_placements.remove_fail_locked=The placement is locked!\n- Hold Shift to force remove it
 litematica.error.schematic_rename.read_failed=Failed to read the schematic from file '%s'
@@ -121,6 +118,7 @@ litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift
 litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
 litematica.gui.button.hover.schematic_list.reload_schematic=Reloads the schematic from file.\nThis can be useful if you make a mistake\nin the Schematic Rebuild mode.
+litematica.gui.button.hover.schematic_manager.convert_format=Convert the selected schematic to another schematic format
 litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode=There is currently a Schematic Project open.\nThe Schematic Project overrides the normal area selection functionality
 litematica.gui.button.hover.schematic_projects.delete_area=§6Delete the last placed or saved area§r
 litematica.gui.button.hover.schematic_projects.move_origin_to_player=Move the project origin to the player's current position\nThis will also move the area selection and placement
@@ -140,8 +138,6 @@ litematica.gui.button.material_list.write_to_file=Write to file
 litematica.gui.button.placement_sub.placement_configuration=Placement configuration
 litematica.gui.button.placement_sub.reset_sub_region_placement=Reset sub-region
 litematica.gui.button.placement_sub.slice_type=Slice: %s
-
-litematica.gui.button.schematic_manager.export_as=Export as:
 
 litematica.gui.button.schematic_placement.abbr.rendering=R
 
@@ -185,13 +181,13 @@ litematica.gui.button.schematic_verifier.toggle_info_hud=Info HUD: %s
 
 litematica.gui.button.cancel=Cancel
 litematica.gui.button.configure=Configure
+litematica.gui.button.convert_format=Convert Format
 litematica.gui.button.copy=Copy
 litematica.gui.button.create_directory=Create New Directory
 litematica.gui.button.create_placement=Create placement
 litematica.gui.button.delete=Delete
 litematica.gui.button.disable=Disable
 litematica.gui.button.enable=Enable
-litematica.gui.button.import=Import
 litematica.gui.button.load_schematic_to_memory=Load Schematic
 litematica.gui.button.mirror_value=Mirror: %s
 litematica.gui.button.move_to_player=Move to player
@@ -341,6 +337,7 @@ litematica.gui.title.configure_schematic_placement=Configure Schematic placement
 litematica.gui.title.configure_schematic_sub_region=Configure Placement Sub-Region
 litematica.gui.title.configs=Litematica Configs
 litematica.gui.title.confirm_file_deletion=Confirm file deletion
+litematica.gui.title.convert_schematic_format=Save schematic '%s' in a different schematic format
 litematica.gui.title.copy_area_selection=Copy Area Selection '%s'
 litematica.gui.title.create_area_selection=Create a new Area Selection
 litematica.gui.title.create_area_selection_from_placement=Create a new Area Selection from a Schematic Placement
@@ -478,6 +475,7 @@ litematica.message.placement_restriction_fail=Action prevented by Placement Rest
 litematica.message.removed_area_origin=Removed the explicit/manual area origin point
 litematica.message.removed_selection_box=Removed selection box %s
 litematica.message.scheduled_task_added=Scheduled task added...
+litematica.message.schematic_convert.success=Successfully converted the schematic and saved it as '%s'
 litematica.message.schematic_exported_as=Schematic exported as '%s'
 litematica.message.schematic_pasted=Schematic pasted in world
 litematica.message.schematic_pasted_using_setblock=Schematic pasted using %s setblock commands

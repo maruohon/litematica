@@ -13,26 +13,34 @@ import fi.dy.masa.malilib.util.NBTUtils;
 
 public class SchematicType<S extends ISchematic>
 {
-    public static final SchematicType<LitematicaSchematic> LITEMATICA = new SchematicType<LitematicaSchematic>(
-            LitematicaSchematic::new,
-            LitematicaSchematic::isValidSchematic,
-            LitematicaSchematic.FILE_NAME_EXTENSION,
-            LitematicaSchematic.FILE_NAME_EXTENSION::equals,
-            LitematicaGuiIcons.FILE_ICON_LITEMATIC);
+    public static final SchematicType<LitematicaSchematic> LITEMATICA = SchematicType.<LitematicaSchematic>builder()
+            .setDisplayName("Litematica")
+            .setFactory(LitematicaSchematic::new)
+            .setDataValidator(LitematicaSchematic::isValidSchematic)
+            .setExtension(LitematicaSchematic.FILE_NAME_EXTENSION)
+            .setExtensionValidator(LitematicaSchematic.FILE_NAME_EXTENSION::equals)
+            .setIcon(LitematicaGuiIcons.FILE_ICON_LITEMATIC)
+            .setHasName(true)
+            .build();
 
-    public static final SchematicType<SchematicaSchematic> SCHEMATICA = new SchematicType<SchematicaSchematic>(
-            SchematicaSchematic::new,
-            SchematicaSchematic::isValidSchematic,
-            SchematicaSchematic.FILE_NAME_EXTENSION,
-            SchematicaSchematic.FILE_NAME_EXTENSION::equals,
-            LitematicaGuiIcons.FILE_ICON_SCHEMATIC);
+    public static final SchematicType<SchematicaSchematic> SCHEMATICA = SchematicType.<SchematicaSchematic>builder()
+            .setDisplayName("Schematica/MCEdit")
+            .setFactory(SchematicaSchematic::new)
+            .setDataValidator(SchematicaSchematic::isValidSchematic)
+            .setExtension(SchematicaSchematic.FILE_NAME_EXTENSION)
+            .setExtensionValidator(SchematicaSchematic.FILE_NAME_EXTENSION::equals)
+            .setIcon(LitematicaGuiIcons.FILE_ICON_SCHEMATIC)
+            .build();
 
-    public static final SchematicType<SpongeSchematic> SPONGE = new SchematicType<SpongeSchematic>(
-            SpongeSchematic::new,
-            SpongeSchematic::isValidSchematic,
-            SpongeSchematic.FILE_NAME_EXTENSION,
-            (ext) -> { return SpongeSchematic.FILE_NAME_EXTENSION.equals(ext) || SchematicaSchematic.FILE_NAME_EXTENSION.equals(ext); },
-            LitematicaGuiIcons.FILE_ICON_SPONGE);
+    public static final SchematicType<SpongeSchematic> SPONGE = SchematicType.<SpongeSchematic>builder()
+            .setDisplayName("Sponge")
+            .setFactory(SpongeSchematic::new)
+            .setDataValidator(SpongeSchematic::isValidSchematic)
+            .setExtension(SpongeSchematic.FILE_NAME_EXTENSION)
+            .setExtensionValidator((ext) -> { return SpongeSchematic.FILE_NAME_EXTENSION.equals(ext) || SchematicaSchematic.FILE_NAME_EXTENSION.equals(ext); })
+            .setIcon(LitematicaGuiIcons.FILE_ICON_SPONGE)
+            .setHasName(true)
+            .build();
 
     public static final ImmutableList<SchematicType<?>> KNOWN_TYPES = ImmutableList.of(LITEMATICA, SCHEMATICA, SPONGE);
 
@@ -41,15 +49,19 @@ public class SchematicType<S extends ISchematic>
     private final Function<File, S> factory;
     private final Function<String, Boolean> extensionValidator;
     private final Function<NBTTagCompound, Boolean> dataValidator;
+    private final String displayName;
+    private final boolean hasName;
 
-    public SchematicType(Function<File, S> factory, Function<NBTTagCompound, Boolean> dataValidator,
-            String extension, Function<String, Boolean> extensionValidator, IGuiIcon icon)
+    private SchematicType(String displayName, Function<File, S> factory, Function<NBTTagCompound, Boolean> dataValidator,
+            String extension, Function<String, Boolean> extensionValidator, IGuiIcon icon, boolean hasName)
     {
+        this.displayName = displayName;
         this.extension = extension;
         this.factory = factory;
         this.extensionValidator = extensionValidator;
         this.dataValidator = dataValidator;
         this.icon = icon;
+        this.hasName = hasName;
     }
 
     public String getFileNameExtension()
@@ -57,9 +69,19 @@ public class SchematicType<S extends ISchematic>
         return this.extension;
     }
 
+    public String getDisplayName()
+    {
+        return this.displayName;
+    }
+
     public IGuiIcon getIcon()
     {
         return this.icon;
+    }
+
+    public boolean getHasName()
+    {
+        return this.hasName;
     }
 
     public boolean isValidExtension(String extension)
@@ -72,6 +94,12 @@ public class SchematicType<S extends ISchematic>
         return this.dataValidator.apply(tag).booleanValue();
     }
 
+    /**
+     * Creates a new schematic, with the provided file passed to the constructor of the schematic.
+     * This does not read anything from the file.
+     * @param file
+     * @return
+     */
     public S createSchematic(@Nullable File file)
     {
         return this.factory.apply(file);
@@ -145,5 +173,68 @@ public class SchematicType<S extends ISchematic>
     {
         SchematicType<?> type = getType(file, tag);
         return type != null ? type.createSchematicAndReadFromTag(file, tag) : null;
+    }
+
+    public static <S extends ISchematic> Builder<S> builder()
+    {
+        return new Builder<S>();
+    }
+
+    public static class Builder<S extends ISchematic>
+    {
+        private String extension = null;
+        private IGuiIcon icon = null;
+        private Function<File, S> factory = null;
+        private Function<String, Boolean> extensionValidator = null;
+        private Function<NBTTagCompound, Boolean> dataValidator = null;
+        private String displayName = "?";
+        private boolean hasName = false;
+
+        public Builder<S> setDataValidator(Function<NBTTagCompound, Boolean> dataValidator)
+        {
+            this.dataValidator = dataValidator;
+            return this;
+        }
+
+        public Builder<S> setDisplayName(String displayName)
+        {
+            this.displayName = displayName;
+            return this;
+        }
+
+        public Builder<S> setExtension(String extension)
+        {
+            this.extension = extension;
+            return this;
+        }
+
+        public Builder<S> setExtensionValidator(Function<String, Boolean> extensionValidator)
+        {
+            this.extensionValidator = extensionValidator;
+            return this;
+        }
+
+        public Builder<S> setFactory(Function<File, S> factory)
+        {
+            this.factory = factory;
+            return this;
+        }
+
+        public Builder<S> setHasName(boolean hasName)
+        {
+            this.hasName = hasName;
+            return this;
+        }
+
+        public Builder<S> setIcon(IGuiIcon icon)
+        {
+            this.icon = icon;
+            return this;
+        }
+
+        public SchematicType<S> build()
+        {
+            return new SchematicType<S>(this.displayName, this.factory, this.dataValidator, this.extension, this.extensionValidator, this.icon, this.hasName);
+        }
     }
 }

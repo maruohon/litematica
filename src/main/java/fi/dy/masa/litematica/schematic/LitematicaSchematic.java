@@ -70,12 +70,6 @@ public class LitematicaSchematic extends SchematicBase
     }
 
     @Override
-    public String getFileNameExtension()
-    {
-        return FILE_NAME_EXTENSION;
-    }
-
-    @Override
     public ImmutableList<String> getRegionNames()
     {
         return ImmutableList.copyOf(this.subRegions.keySet());

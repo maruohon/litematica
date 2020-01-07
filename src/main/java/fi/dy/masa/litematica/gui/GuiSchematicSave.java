@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -23,6 +24,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
     private final SelectionManager selectionManager;
+    protected WidgetCheckBox checkboxIgnoreEntities;
 
     public GuiSchematicSave()
     {
@@ -55,6 +57,19 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                 this.defaultText = FileUtils.generateSimpleSafeFileName(this.defaultText);
             }
         }
+    }
+
+    @Override
+    protected void createCustomElements()
+    {
+        int x = this.textField.x + this.textField.getWidth() + 12;
+        int y = 32;
+
+        String str = StringUtils.translate("litematica.gui.label.schematic_save.checkbox.ignore_entities");
+        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, str);
+        this.addWidget(this.checkboxIgnoreEntities);
+
+        this.createButton(x, y, ButtonType.SAVE);
     }
 
     @Override
@@ -106,7 +121,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
 
         if (FileUtils.doesFilenameContainIllegalCharacters(fileName))
         {
-            this.addMessage(MessageType.ERROR, "litematica.error.illegal_characters_in_file_name", fileName);
+            this.addMessage(MessageType.ERROR, "malilib.error.illegal_characters_in_file_name", fileName);
             return;
         }
 

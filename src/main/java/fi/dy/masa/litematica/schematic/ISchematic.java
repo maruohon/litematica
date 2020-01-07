@@ -26,12 +26,6 @@ public interface ISchematic
     @Nullable File getFile();
 
     /**
-     * Returns the file name extension this schematic should be saved with.
-     * @return
-     */
-    String getFileNameExtension();
-
-    /**
      * Returns the metadata object for this schematic
      * @return
      */
@@ -106,7 +100,7 @@ public interface ISchematic
     default boolean writeToFile(File dir, String fileNameIn, boolean override)
     {
         String fileName = fileNameIn;
-        String extension = this.getFileNameExtension();
+        String extension = this.getType().getFileNameExtension();
 
         if (fileName.endsWith(extension) == false)
         {

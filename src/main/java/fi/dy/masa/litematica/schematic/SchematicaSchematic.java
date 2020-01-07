@@ -35,12 +35,6 @@ public class SchematicaSchematic extends SingleRegionSchematic
         return SchematicType.SCHEMATICA;
     }
 
-    @Override
-    public String getFileNameExtension()
-    {
-        return FILE_NAME_EXTENSION;
-    }
-
     public static boolean isValidSchematic(NBTTagCompound tag)
     {
         if (tag.hasKey("Width", Constants.NBT.TAG_SHORT) &&
