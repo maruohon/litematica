@@ -4,7 +4,7 @@ import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
-import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.WorldUtils;

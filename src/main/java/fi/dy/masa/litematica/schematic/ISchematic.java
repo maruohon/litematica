@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
 

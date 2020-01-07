@@ -9,8 +9,8 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.interfaces.IRenderer;
-import fi.dy.masa.malilib.util.GuiUtils;
 import net.minecraft.client.Minecraft;
 
 public class RenderHandler implements IRenderer

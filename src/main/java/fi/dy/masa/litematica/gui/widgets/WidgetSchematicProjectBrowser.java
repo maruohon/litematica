@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.File;
 import java.io.FileFilter;
 import javax.annotation.Nullable;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -13,7 +13,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
 
 public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>
 {
@@ -24,7 +23,7 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
     public WidgetSchematicProjectBrowser(int x, int y, int width, int height, ISelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, DataManager.getDirectoryCache(), "version_control",
-                DataManager.getSchematicsBaseDirectory(), null, Icons.DUMMY);
+                DataManager.getSchematicsBaseDirectory(), null);
 
         this.selectionListener = selectionListener;
         this.browserEntryHeight = 14;
