@@ -7,7 +7,7 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NBTTagCompound;
-import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.util.NBTUtils;
 
@@ -18,21 +18,21 @@ public class SchematicType<S extends ISchematic>
             LitematicaSchematic::isValidSchematic,
             LitematicaSchematic.FILE_NAME_EXTENSION,
             LitematicaSchematic.FILE_NAME_EXTENSION::equals,
-            Icons.FILE_ICON_LITEMATIC);
+            LitematicaGuiIcons.FILE_ICON_LITEMATIC);
 
     public static final SchematicType<SchematicaSchematic> SCHEMATICA = new SchematicType<SchematicaSchematic>(
             SchematicaSchematic::new,
             SchematicaSchematic::isValidSchematic,
             SchematicaSchematic.FILE_NAME_EXTENSION,
             SchematicaSchematic.FILE_NAME_EXTENSION::equals,
-            Icons.FILE_ICON_SCHEMATIC);
+            LitematicaGuiIcons.FILE_ICON_SCHEMATIC);
 
     public static final SchematicType<SpongeSchematic> SPONGE = new SchematicType<SpongeSchematic>(
             SpongeSchematic::new,
             SpongeSchematic::isValidSchematic,
             SpongeSchematic.FILE_NAME_EXTENSION,
             (ext) -> { return SpongeSchematic.FILE_NAME_EXTENSION.equals(ext) || SchematicaSchematic.FILE_NAME_EXTENSION.equals(ext); },
-            Icons.FILE_ICON_SPONGE);
+            LitematicaGuiIcons.FILE_ICON_SPONGE);
 
     public static final ImmutableList<SchematicType<?>> KNOWN_TYPES = ImmutableList.of(LITEMATICA, SCHEMATICA, SPONGE);
 

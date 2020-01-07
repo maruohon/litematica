@@ -21,6 +21,7 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
@@ -182,7 +183,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
         String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x = x + offset + width + 20;
-        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "", hover);
+        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, "", hover);
         cb.setChecked(this.placement.isCoordinateLocked(type), false);
         cb.setListener(new CoordinateLockListener(type, this.placement));
         this.addWidget(cb);
@@ -212,7 +213,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         {
             case TOGGLE_ENCLOSING_BOX:
             {
-                Icons icon = this.placement.shouldRenderEnclosingBox() ? Icons.ENCLOSING_BOX_ENABLED : Icons.ENCLOSING_BOX_DISABLED;
+                IGuiIcon icon = this.placement.shouldRenderEnclosingBox() ? LitematicaGuiIcons.ENCLOSING_BOX_ENABLED : LitematicaGuiIcons.ENCLOSING_BOX_DISABLED;
                 boolean enabled = this.placement.shouldRenderEnclosingBox();
                 String str = (enabled ? TXT_GREEN : TXT_RED) + StringUtils.translate("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
                 String hover = StringUtils.translate("litematica.gui.button.schematic_placement.hover.enclosing_box", str);
@@ -253,7 +254,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             case NUDGE_COORD_Z:
             {
                 String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-                ButtonGeneric button = new ButtonGeneric(x, y, Icons.BUTTON_PLUS_MINUS_16, hover);
+                ButtonGeneric button = new ButtonGeneric(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return width;
             }

@@ -44,7 +44,7 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
     @Override
     protected IGuiIcon getValueAdjustButtonIcon()
     {
-        return Icons.BUTTON_PLUS_MINUS_16;
+        return LitematicaGuiIcons.BUTTON_PLUS_MINUS_16;
     }
 
     private int createTabButton(int x, int y, int width, IConfigGuiTab tab)
@@ -71,13 +71,13 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
         String label = StringUtils.translate("litematica.gui.label.render_layers.hotkey");
         String hover = StringUtils.translate("litematica.gui.label.render_layers.hover.hotkey");
 
-        WidgetCheckBox cb = new WidgetCheckBox(x, y + 4, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, hover);
+        WidgetCheckBox cb = new WidgetCheckBox(x, y + 4, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label, hover);
         cb.setChecked(layerRange.getMoveLayerRangeMax(), false);
         cb.setListener(new RangeHotkeyListener(layerRange, true));
         this.addWidget(cb);
 
         y += 23;
-        cb = new WidgetCheckBox(x, y + 4, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, hover);
+        cb = new WidgetCheckBox(x, y + 4, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label, hover);
         cb.setChecked(layerRange.getMoveLayerRangeMin(), false);
         cb.setListener(new RangeHotkeyListener(layerRange, false));
         this.addWidget(cb);

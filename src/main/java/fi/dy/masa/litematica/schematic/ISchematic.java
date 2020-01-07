@@ -38,6 +38,12 @@ public interface ISchematic
     SchematicMetadata getMetadata();
 
     /**
+     * Returns the type of this schematic
+     * @return
+     */
+    SchematicType<?> getType();
+
+    /**
      * Returns the number of (sub-)regions in this schematic
      * @return
      */

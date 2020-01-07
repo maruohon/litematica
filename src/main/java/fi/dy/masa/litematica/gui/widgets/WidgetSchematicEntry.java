@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
-import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
@@ -96,29 +97,24 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
         int color = modified ? 0xFFFF9010 : 0xFFFFFFFF;
         this.drawString(this.x + 20, this.y + 7, color, schematicName);
 
-        RenderUtils.color(1f, 1f, 1f, 1f);
         GlStateManager.disableBlend();
 
-        File schematicFile = this.schematic.getFile();
-        String fileName = schematicFile != null ? schematicFile.getName() : null;
-        this.parent.bindTexture(Icons.TEXTURE);
+        IGuiIcon icon;
 
-        Icons icon;
-
-        if (fileName != null)
+        if (this.schematic.getFile() != null)
         {
-            icon = Icons.SCHEMATIC_TYPE_FILE;
+            icon = this.schematic.getType().getIcon();
         }
         else
         {
-            icon = Icons.SCHEMATIC_TYPE_MEMORY;
+            icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
         }
 
         icon.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
 
         if (modified)
         {
-            Icons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, this.y + 6, this.zLevel, false, false);
+            LitematicaGuiIcons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, this.y + 6, this.zLevel, false, false);
         }
 
         this.drawSubWidgets(mouseX, mouseY);

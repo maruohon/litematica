@@ -91,7 +91,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         MultiplierListener listener = new MultiplierListener(this.materialList, this);
         this.addTextField(tf, listener);
 
-        this.addWidget(new WidgetInfoIcon(this.width - 23, 10, Icons.INFO_11, "litematica.info.material_list"));
+        this.addWidget(new WidgetInfoIcon(this.width - 23, 10, LitematicaGuiIcons.INFO_11, "litematica.info.material_list"));
 
         int gap = 1;
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + gap;

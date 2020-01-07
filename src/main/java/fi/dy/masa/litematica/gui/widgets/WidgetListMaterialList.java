@@ -5,16 +5,16 @@ import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.gui.GuiMaterialList;
-import fi.dy.masa.litematica.gui.Icons;
-import fi.dy.masa.litematica.materials.MaterialListEntry;
-import fi.dy.masa.litematica.materials.MaterialListSorter;
-import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
-import fi.dy.masa.malilib.util.HorizontalAlignment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import fi.dy.masa.litematica.gui.GuiMaterialList;
+import fi.dy.masa.litematica.materials.MaterialListEntry;
+import fi.dy.masa.litematica.materials.MaterialListSorter;
+import fi.dy.masa.malilib.gui.util.GuiIconBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.util.HorizontalAlignment;
 
 public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
 {
@@ -30,7 +30,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
 
         this.browserEntryHeight = 22;
         this.gui = parent;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 0, Icons.FILE_ICON_SEARCH, HorizontalAlignment.RIGHT);
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.RIGHT);
         this.widgetSearchBar.setZLevel(1);
         this.sorter = new MaterialListSorter(parent.getMaterialList());
         this.shouldSortList = true;

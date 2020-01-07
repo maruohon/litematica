@@ -5,8 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
-import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.malilib.gui.util.GuiIconBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.util.AlphaNumComparator;
@@ -22,7 +22,7 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
 
         this.parent = parent;
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, HorizontalAlignment.LEFT);
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT);
         //this.widgetSearchBar.setSearchOpen(true);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
         this.shouldSortList = true;

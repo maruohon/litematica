@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import net.minecraft.client.gui.Gui;
@@ -14,10 +15,11 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicBrowserBase;
-import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.SchematicType;
+import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
+import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
@@ -25,11 +27,12 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>
+public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>, IFileBrowserIconProvider
 {
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
 
     protected final Map<File, CachedSchematicData> cachedData = new HashMap<>();
+    protected final Map<File, IGuiIcon> possibleTypeIcons = new HashMap<>();
     protected final GuiSchematicBrowserBase parent;
     @Nullable protected final ISelectionListener<DirectoryEntry> parentSelectionListener;
     protected final int infoWidth;
@@ -38,13 +41,14 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
     public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, DataManager.getDirectoryCache(), parent.getBrowserContext(),
-                parent.getDefaultDirectory(), null, Icons.FILE_ICON_LITEMATIC);
+                parent.getDefaultDirectory(), null);
 
         this.parentSelectionListener = selectionListener;
         this.title = StringUtils.translate("litematica.gui.title.schematic_browser");
         this.infoWidth = 170;
         this.infoHeight = 290;
         this.parent = parent;
+
         this.setSelectionListener(this);
     }
 
@@ -62,17 +66,6 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
         this.clearSchematicMetadataCache();
     }
 
-    private void clearPreviewImages()
-    {
-        for (CachedSchematicData data : this.cachedData.values())
-        {
-            if (data != null && data.texture != null)
-            {
-                this.mc.getTextureManager().deleteTexture(data.iconName);
-            }
-        }
-    }
-
     @Override
     protected File getRootDirectory()
     {
@@ -86,9 +79,48 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
     }
 
     @Override
+    public int getEntryIconWidth(DirectoryEntry entry)
+    {
+        return 12;
+    }
+
+    @Override
+    public IGuiIcon getIconForFile(File file)
+    {
+        CachedSchematicData data = this.getCachedSchematicData(file);
+
+        if (data != null)
+        {
+            return data.schematic.getType().getIcon();
+        }
+
+        IGuiIcon icon = this.possibleTypeIcons.get(file);
+
+        if (icon == null && this.possibleTypeIcons.containsKey(file) == false)
+        {
+            List<SchematicType<?>> possibleTypes = SchematicType.getPossibleTypesFromFileName(file);
+
+            if (possibleTypes.isEmpty() == false)
+            {
+                icon = possibleTypes.get(0).getIcon();
+            }
+
+            this.possibleTypeIcons.put(file, icon);
+        }
+
+        return icon;
+    }
+
+    @Override
+    protected IFileBrowserIconProvider getIconProvider()
+    {
+        return this;
+    }
+
+    @Override
     public void onSelectionChange(DirectoryEntry entry)
     {
-        if (entry != null)
+        if (entry != null && entry.getType() == DirectoryEntryType.FILE)
         {
             this.cacheSchematicData(entry);
         }
@@ -223,8 +255,19 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
         this.cachedData.clear();
     }
 
+    private void clearPreviewImages()
+    {
+        for (CachedSchematicData data : this.cachedData.values())
+        {
+            if (data != null && data.texture != null)
+            {
+                this.mc.getTextureManager().deleteTexture(data.iconName);
+            }
+        }
+    }
+
     @Nullable
-    public CachedSchematicData getCachedData(File file)
+    public CachedSchematicData getCachedSchematicData(File file)
     {
         return this.cachedData.get(file);
     }

@@ -64,7 +64,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         label = StringUtils.translate("litematica.gui.label.schematic_load.checkbox.create_placement");
         String hover = StringUtils.translate("litematica.gui.label.schematic_load.hoverinfo.create_placement");
-        WidgetCheckBox checkbox = new WidgetCheckBox(x, y, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, label, hover);
+        WidgetCheckBox checkbox = new WidgetCheckBox(x, y, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label, hover);
         checkbox.setListener(new CheckboxListener());
         checkbox.setChecked(DataManager.getCreatePlacementOnLoad(), false);
         this.addWidget(checkbox);
@@ -132,7 +132,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
             }
 
             File file = entry.getFullPath();
-            CachedSchematicData data = this.gui.getListWidget().getCachedData(file);
+            CachedSchematicData data = this.gui.getListWidget().getCachedSchematicData(file);
 
             if (data == null)
             {

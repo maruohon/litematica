@@ -83,7 +83,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         int y = 32;
 
         String str = StringUtils.translate("litematica.gui.label.schematic_save.checkbox.ignore_entities");
-        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, str);
+        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, str);
         this.addWidget(this.checkboxIgnoreEntities);
 
         x = this.createButton(x, y, ButtonType.SAVE);

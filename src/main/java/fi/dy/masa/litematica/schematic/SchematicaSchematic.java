@@ -30,6 +30,12 @@ public class SchematicaSchematic extends SingleRegionSchematic
     }
 
     @Override
+    public SchematicType<?> getType()
+    {
+        return SchematicType.SCHEMATICA;
+    }
+
+    @Override
     public String getFileNameExtension()
     {
         return FILE_NAME_EXTENSION;

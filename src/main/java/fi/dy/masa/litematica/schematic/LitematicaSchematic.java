@@ -47,6 +47,12 @@ public class LitematicaSchematic extends SchematicBase
     }
 
     @Override
+    public SchematicType<?> getType()
+    {
+        return SchematicType.LITEMATICA;
+    }
+
+    @Override
     public int getSubRegionCount()
     {
         return this.blockContainers.size();

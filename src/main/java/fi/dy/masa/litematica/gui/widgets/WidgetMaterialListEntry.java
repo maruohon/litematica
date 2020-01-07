@@ -2,7 +2,9 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.gui.Icons;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.item.ItemStack;
+import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListBase.SortCriteria;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
@@ -13,8 +15,6 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntrySortable;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.item.ItemStack;
 
 public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialListEntry>
 {
@@ -209,7 +209,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
                 this.drawString(x3, y, color, this.header3);
                 this.drawString(x4, y, color, this.header4);
 
-                this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
+                this.renderColumnHeader(mouseX, mouseY, LitematicaGuiIcons.ARROW_DOWN, LitematicaGuiIcons.ARROW_UP);
             }
         }
         else if (this.entry != null)

@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
-import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -16,6 +16,7 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
@@ -99,31 +100,28 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         String pre = this.placement.isEnabled() ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
         this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name);
 
-        Icons icon;
+        IGuiIcon icon;
 
         if (this.placement.getSchematic().getFile() != null)
         {
-            icon = Icons.SCHEMATIC_TYPE_FILE;
+            icon = this.placement.getSchematic().getType().getIcon();
         }
         else
         {
-            icon = Icons.SCHEMATIC_TYPE_MEMORY;
+            icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
         }
 
-        RenderUtils.color(1, 1, 1, 1);
-
-        this.parent.bindTexture(Icons.TEXTURE);
         icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
 
         if (this.placement.isRegionPlacementModified())
         {
-            icon = Icons.NOTICE_EXCLAMATION_11;
+            icon = LitematicaGuiIcons.NOTICE_EXCLAMATION_11;
             icon.renderAt(this.buttonsStartX - 13, this.y + 6, this.zLevel, false, false);
         }
 
         if (this.placement.isLocked())
         {
-            icon = Icons.LOCK_LOCKED;
+            icon = LitematicaGuiIcons.LOCK_LOCKED;
             icon.renderAt(this.buttonsStartX - 26, this.y + 6, this.zLevel, false, false);
         }
 

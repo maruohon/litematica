@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
-import fi.dy.masa.litematica.gui.Icons;
+import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -110,25 +111,22 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         String pre = this.placement.isEnabled() ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
         this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name);
 
-        Icons icon;
+        IGuiIcon icon;
 
         if (this.schematicPlacement.getSchematic().getFile() != null)
         {
-            icon = Icons.SCHEMATIC_TYPE_FILE;
+            icon = this.schematicPlacement.getSchematic().getType().getIcon();
         }
         else
         {
-            icon = Icons.SCHEMATIC_TYPE_MEMORY;
+            icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
         }
 
-        RenderUtils.color(1f, 1f, 1f, 1f);
-
-        this.parent.bindTexture(Icons.TEXTURE);
         icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
 
         if (this.placement.isRegionPlacementModifiedFromDefault())
         {
-            icon = Icons.NOTICE_EXCLAMATION_11;
+            icon = LitematicaGuiIcons.NOTICE_EXCLAMATION_11;
             icon.renderAt(this.buttonsStartX - icon.getWidth() - 2, this.y + 6, this.zLevel, false, false);
         }
 

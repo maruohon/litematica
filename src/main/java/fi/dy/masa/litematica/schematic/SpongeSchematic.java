@@ -27,6 +27,12 @@ public class SpongeSchematic extends SingleRegionSchematic
     }
 
     @Override
+    public SchematicType<?> getType()
+    {
+        return SchematicType.SPONGE;
+    }
+
+    @Override
     public String getFileNameExtension()
     {
         return FILE_NAME_EXTENSION;

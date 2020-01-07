@@ -3,18 +3,18 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.util.Collection;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
-import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.util.GuiIconBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.HorizontalAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
 
 public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion, WidgetSchematicVersion>
 {
@@ -28,7 +28,7 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
         this.project = project;
         this.browserEntryHeight = 16;
         this.infoWidth = 180;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, Icons.FILE_ICON_SEARCH, HorizontalAlignment.LEFT);
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
     }
 
