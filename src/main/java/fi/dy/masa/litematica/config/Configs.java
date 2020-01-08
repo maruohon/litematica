@@ -35,6 +35,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       GENERATE_LOWERCASE_NAMES = new ConfigBoolean(   "generateLowercaseNames", true, "If enabled, then by default the suggested schematic names\nwill be lowercase and using underscores instead of spaces");
         public static final ConfigBoolean       LAYER_MODE_DYNAMIC      = new ConfigBoolean(    "layerModeFollowsPlayer", false, "If true, then the render layer follows the player.\nNote: This currently collapses Layer Range type ranges unfortunately");
         public static final ConfigBoolean       LOAD_ENTIRE_SCHEMATICS  = new ConfigBoolean(    "loadEntireSchematics", false, "If true, then the entire schematic is always loaded at once.\nIf false, then only the part that is within the client's view distance is loaded.");
+        public static final ConfigBoolean       MATERIALS_FROM_CONTAINER = new ConfigBoolean(   "materialListFromContainer", true, "WHen enabled, the schematic-based Material List is\nfetched directly from the block state container. Normally you want this.\nOnly disable this if there is an issue where it gets it wrong for some reason\n(and then also report the issue and send the affected schematic).");
         public static final ConfigInteger       PASTE_COMMAND_INTERVAL  = new ConfigInteger(    "pasteCommandInterval", 1, 1, 1000, "The interval in game ticks the Paste schematic task runs at,\nin the command-based mode");
         public static final ConfigInteger       PASTE_COMMAND_LIMIT     = new ConfigInteger(    "pasteCommandLimit", 64, 1, 1000000, "Max number of commands sent per game tick,\nwhen using the Paste schematic feature in the\ncommand mode on a server");
         public static final ConfigString        PASTE_COMMAND_SETBLOCK  = new ConfigString(     "pasteCommandNameSetblock", "setblock", "The setblock command name to use for the\nPaste schematic feature on servers, when\nusing the command-based paste mode");
@@ -61,6 +62,7 @@ public class Configs implements IConfigHandler
                 GENERATE_LOWERCASE_NAMES,
                 LAYER_MODE_DYNAMIC,
                 LOAD_ENTIRE_SCHEMATICS,
+                MATERIALS_FROM_CONTAINER,
                 PICK_BLOCK_ENABLED,
                 PICK_BLOCK_IGNORE_NBT,
                 PLACEMENT_RESTRICTION,

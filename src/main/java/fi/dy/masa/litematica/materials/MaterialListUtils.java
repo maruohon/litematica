@@ -3,11 +3,13 @@ package fi.dy.masa.litematica.materials;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
@@ -33,19 +35,29 @@ public class MaterialListUtils
 
             if (container != null)
             {
-                Vec3i size = container.getSize();
-                final int sizeX = size.getX();
-                final int sizeY = size.getY();
-                final int sizeZ = size.getZ();
-
-                for (int y = 0; y < sizeY; ++y)
+                if (Configs.Generic.MATERIALS_FROM_CONTAINER.getBooleanValue())
                 {
-                    for (int z = 0; z < sizeZ; ++z)
+                    for (Map.Entry<IBlockState, Long> entry : container.getBlockCountsMap().entrySet())
                     {
-                        for (int x = 0; x < sizeX; ++x)
+                        countsTotal.addTo(entry.getKey(), (int) entry.getValue().longValue());
+                    }
+                }
+                else
+                {
+                    Vec3i size = container.getSize();
+                    final int sizeX = size.getX();
+                    final int sizeY = size.getY();
+                    final int sizeZ = size.getZ();
+
+                    for (int y = 0; y < sizeY; ++y)
+                    {
+                        for (int z = 0; z < sizeZ; ++z)
                         {
-                            IBlockState state = container.get(x, y, z);
-                            countsTotal.addTo(state, 1);
+                            for (int x = 0; x < sizeX; ++x)
+                            {
+                                IBlockState state = container.get(x, y, z);
+                                countsTotal.addTo(state, 1);
+                            }
                         }
                     }
                 }
