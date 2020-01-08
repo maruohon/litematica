@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.mixin.IMixinDataFixer;
+import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
 
 public abstract class SchematicBase implements ISchematic
@@ -51,13 +52,17 @@ public abstract class SchematicBase implements ISchematic
         this.totalBlocksReadFromWorld = count;
     }
 
-    public static boolean isSizeValid(Vec3i size)
+    public static boolean isSizeValid(@Nullable Vec3i size)
     {
         return size != null && size.getX() > 0 && size.getY() > 0 && size.getZ() > 0;
     }
 
     protected void readMetadataFromTag(NBTTagCompound tag)
     {
+        if (tag.hasKey("Metadata", Constants.NBT.TAG_COMPOUND))
+        {
+            this.getMetadata().fromTag(tag.getCompoundTag("Metadata"));
+        }
     }
 
     protected List<EntityInfo> readEntitiesFromListTag(NBTTagList tagList)

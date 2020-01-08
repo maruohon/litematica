@@ -41,6 +41,11 @@ public class SchematicHolder
     @Nullable
     public ISchematic getOrLoad(File file)
     {
+        if (file.exists() == false || file.isFile() == false || file.canRead() == false)
+        {
+            return null;
+        }
+
         for (ISchematic schematic : this.schematics)
         {
             if (file.equals(schematic.getFile()))

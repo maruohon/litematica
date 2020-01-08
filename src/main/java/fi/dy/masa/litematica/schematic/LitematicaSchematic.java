@@ -66,7 +66,7 @@ public class LitematicaSchematic extends SchematicBase
         this.blockEntities.clear();
         this.entities.clear();
         this.pendingBlockTicks.clear();
-        this.metadata.clearModifiedSinceSaved();
+        this.getMetadata().clearModifiedSinceSaved();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class LitematicaSchematic extends SchematicBase
             {
                 for (ISchematicRegion region : regions.values())
                 {
-                    return region.getSize();
+                    return PositionUtils.getAbsoluteAreaSize(region.getSize());
                 }
             }
             else
@@ -131,28 +131,6 @@ public class LitematicaSchematic extends SchematicBase
 
         return null;
     }
-
-    /**
-     * Returns an immutable view of the sub-region boxes in this schematic
-     * @return
-     */
-    /*
-    public ImmutableMap<String, Box> getSubRegionBoxes()
-    {
-        ImmutableMap.Builder<String, Box> builder = ImmutableMap.builder();
-
-        for (Map.Entry<String, SubRegion> entry : this.subRegions.entrySet())
-        {
-            SubRegion region = entry.getValue();
-            String name = entry.getKey();
-            Vec3i posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(region.size);
-            Box box = new Box(region.pos, region.pos.add(posEndRel), name);
-            builder.put(name, box);
-        }
-
-        return builder.build();
-    }
-    */
 
     /**
      * Sets the sub-region boxes for this schematic.
@@ -234,25 +212,25 @@ public class LitematicaSchematic extends SchematicBase
 
         nbt.setInteger("Version", SCHEMATIC_VERSION);
         nbt.setInteger("MinecraftDataVersion", MINECRAFT_DATA_VERSION);
-        nbt.setTag("Metadata", this.metadata.toTag());
+        nbt.setTag("Metadata", this.getMetadata().toTag());
         nbt.setTag("Regions", this.writeSubRegionsToNBT());
 
         return nbt;
     }
 
     @Override
-    public boolean fromTag(NBTTagCompound nbt)
+    public boolean fromTag(NBTTagCompound tag)
     {
         this.clear();
 
-        if (nbt.hasKey("Version", Constants.NBT.TAG_INT))
+        if (tag.hasKey("Version", Constants.NBT.TAG_INT))
         {
-            final int version = nbt.getInteger("Version");
+            final int version = tag.getInteger("Version");
 
             if (version >= 1 && version <= SCHEMATIC_VERSION)
             {
-                this.readMetadataFromTag(nbt.getCompoundTag("Metadata"));
-                this.readSubRegionsFromNBT(nbt.getCompoundTag("Regions"), version);
+                this.readMetadataFromTag(tag);
+                this.readSubRegionsFromTag(tag, version);
 
                 return true;
             }
@@ -267,12 +245,6 @@ public class LitematicaSchematic extends SchematicBase
         }
 
         return false;
-    }
-
-    @Override
-    protected void readMetadataFromTag(NBTTagCompound tag)
-    {
-        this.metadata.fromTag(tag);
     }
 
     private NBTTagCompound writeSubRegionsToNBT()
@@ -349,8 +321,10 @@ public class LitematicaSchematic extends SchematicBase
         return tagList;
     }
 
-    private boolean readSubRegionsFromNBT(NBTTagCompound tag, int version)
+    private boolean readSubRegionsFromTag(NBTTagCompound tag, int version)
     {
+        tag = tag.getCompoundTag("Regions");
+
         for (String regionName : tag.getKeySet())
         {
             if (tag.getTag(regionName).getId() == Constants.NBT.TAG_COMPOUND)

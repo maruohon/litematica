@@ -218,6 +218,11 @@ public class PositionUtils
         return new Vec3i(x, y, z);
     }
 
+    public static long getAreaVolume(Vec3i size)
+    {
+        return (long) size.getX() * (long) size.getY() * (long) size.getZ();
+    }
+
     public static List<SelectionBox> getValidBoxes(AreaSelection area)
     {
         List<SelectionBox> boxes = new ArrayList<>();
@@ -237,6 +242,11 @@ public class PositionUtils
     public static boolean isBoxValid(Box box)
     {
         return box.getPos1() != null && box.getPos2() != null;
+    }
+
+    public static Vec3i getAbsoluteAreaSize(Vec3i size)
+    {
+        return new Vec3i(Math.abs(size.getX()), Math.abs(size.getY()), Math.abs(size.getZ()));
     }
 
     public static BlockPos getEnclosingAreaSize(AreaSelection area)

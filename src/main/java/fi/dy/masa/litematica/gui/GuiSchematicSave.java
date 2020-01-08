@@ -13,7 +13,6 @@ import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
@@ -101,15 +100,6 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                     GuiSchematicSave.this.refreshList();
                 }
             });
-        }
-    }
-
-    private void refreshList()
-    {
-        if (GuiUtils.getCurrentScreen() == this)
-        {
-            this.getListWidget().refreshEntries();
-            this.getListWidget().clearSchematicMetadataCache();
         }
     }
 

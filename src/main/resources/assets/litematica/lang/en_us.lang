@@ -433,6 +433,7 @@ litematica.message.error.move.pending_tasks=§cCan not start a move operation wh
 litematica.message.error.placement_paste_outside_world=The placement can't be pasted in the current position, because it goes outside the world bounds
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
 litematica.message.error.schematic_read.invalid_or_missing_size=Invalid or missing schematic size
+litematica.message.error.schematic_read.invalid_or_missing_size_value=Invalid schematic size: %s x %s x %s
 litematica.message.error.schematic_read.mcedit2.missing_block_data=SchematicaSchematic: Missing/non-existing block '%s' in MCEdit2 palette
 litematica.message.error.schematic_read.mcedit2.palette.id_not_number=SchematicaSchematic: Invalid ID '%s' (not a number) in MCEdit2 palette for block '%s'
 litematica.message.error.schematic_read.mcedit2.palette.invalid_id=SchematicaSchematic: Invalid ID %s in MCEdit2 palette for block '%s', max = %s

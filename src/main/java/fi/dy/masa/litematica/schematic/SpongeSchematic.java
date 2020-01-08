@@ -67,15 +67,19 @@ public class SpongeSchematic extends SingleRegionSchematic
     @Override
     protected void readMetadataFromTag(NBTTagCompound tag)
     {
-        NBTTagCompound metaTag = tag.getCompoundTag("Metadata");
+        super.readMetadataFromTag(tag);
 
-        this.getMetadata().fromTag(metaTag);
-
-        if (metaTag.hasKey("Date", Constants.NBT.TAG_LONG))
+        if (tag.hasKey("Metadata", Constants.NBT.TAG_COMPOUND))
         {
-            long time = metaTag.getLong("Date");
-            this.getMetadata().setTimeCreated(time);
-            this.getMetadata().setTimeModified(time);
+            NBTTagCompound metaTag = tag.getCompoundTag("Metadata");
+
+            if (metaTag.hasKey("Date", Constants.NBT.TAG_LONG) &&
+                this.getMetadata().getTimeCreated() <= 0)
+            {
+                long time = metaTag.getLong("Date");
+                this.getMetadata().setTimeCreated(time);
+                this.getMetadata().setTimeModified(time);
+            }
         }
     }
 

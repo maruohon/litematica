@@ -87,12 +87,19 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
         if (size != null)
         {
+            if (isSizeValid(size) == false)
+            {
+                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.invalid_or_missing_size_value", size.getX(), size.getY(), size.getZ());
+                return;
+            }
+
             if (createBlockContainer)
             {
                 this.blockContainer = new LitematicaBlockStateContainer(size);
             }
 
             this.getMetadata().setEnclosingSize(size);
+            this.getMetadata().setTotalVolume(PositionUtils.getAreaVolume(size));
         }
     }
 
@@ -292,6 +299,19 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
      */
     protected void initFromTag(NBTTagCompound tag)
     {
+    }
+
+    @Override
+    protected void readMetadataFromTag(NBTTagCompound tag)
+    {
+        super.readMetadataFromTag(tag);
+
+        // Not stored in metadata yet
+        if (this.getMetadata().getTotalBlocks() < 0)
+        {
+            long totalBlocks = this.blockContainer.getTotalBlockCount();
+            this.getMetadata().setTotalBlocks(totalBlocks);
+        }
     }
 
     @Nullable protected abstract Vec3i readSizeFromTag(NBTTagCompound tag);

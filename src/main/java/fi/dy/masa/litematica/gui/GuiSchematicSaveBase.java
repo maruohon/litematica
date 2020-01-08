@@ -8,6 +8,7 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
@@ -83,6 +84,15 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         }
 
         this.createCustomElements();
+    }
+
+    protected void refreshList()
+    {
+        if (GuiUtils.getCurrentScreen() == this)
+        {
+            this.getListWidget().refreshEntries();
+            this.getListWidget().clearSchematicMetadataCache();
+        }
     }
 
     protected void createCustomElements()

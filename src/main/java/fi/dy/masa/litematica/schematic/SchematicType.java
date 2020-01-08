@@ -161,8 +161,16 @@ public class SchematicType<S extends ISchematic>
         if (possibleTypes.isEmpty() == false)
         {
             NBTTagCompound tag = NBTUtils.readNbtFromFile(file);
-            SchematicType<?> type = getType(file, tag);
-            return type != null ? type.createSchematicAndReadFromTag(file, tag) : null;
+
+            if (tag != null)
+            {
+                SchematicType<?> type = getType(file, tag);
+
+                if (type != null)
+                {
+                    return type.createSchematicAndReadFromTag(file, tag);
+                }
+            }
         }
 
         return null;

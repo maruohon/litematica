@@ -16,8 +16,8 @@ public class SchematicMetadata
     private long timeCreated;
     private long timeModified;
     private int regionCount;
-    private long totalVolume;
-    private long totalBlocks;
+    private long totalVolume = -1;
+    private long totalBlocks = -1;
     private boolean modifiedSinceSaved;
     @Nullable private int[] thumbnailPixelData;
 
@@ -117,7 +117,7 @@ public class SchematicMetadata
         this.regionCount = regionCount;
     }
 
-    public void setTotalVolume(int totalVolume)
+    public void setTotalVolume(long totalVolume)
     {
         this.totalVolume = totalVolume;
     }
@@ -178,11 +178,32 @@ public class SchematicMetadata
         nbt.setString("Name", this.name);
         nbt.setString("Author", this.author);
         nbt.setString("Description", this.description);
-        nbt.setInteger("RegionCount", this.regionCount);
-        nbt.setLong("TotalVolume", this.totalVolume);
-        nbt.setLong("TotalBlocks", this.totalBlocks);
-        nbt.setLong("TimeCreated", this.timeCreated);
-        nbt.setLong("TimeModified", this.timeModified);
+
+        if (this.regionCount > 0)
+        {
+            nbt.setInteger("RegionCount", this.regionCount);
+        }
+
+        if (this.totalVolume > 0)
+        {
+            nbt.setLong("TotalVolume", this.totalVolume);
+        }
+
+        if (this.totalBlocks >= 0)
+        {
+            nbt.setLong("TotalBlocks", this.totalBlocks);
+        }
+
+        if (this.timeCreated > 0)
+        {
+            nbt.setLong("TimeCreated", this.timeCreated);
+        }
+
+        if (this.timeModified > 0)
+        {
+            nbt.setLong("TimeModified", this.timeModified);
+        }
+
         nbt.setTag("EnclosingSize", NBTUtils.createBlockPosTag(this.enclosingSize));
 
         if (this.thumbnailPixelData != null)
@@ -193,23 +214,54 @@ public class SchematicMetadata
         return nbt;
     }
 
-    public void fromTag(NBTTagCompound nbt)
+    public void fromTag(NBTTagCompound tag)
     {
-        this.name = nbt.getString("Name");
-        this.author = nbt.getString("Author");
-        this.description = nbt.getString("Description");
-        this.regionCount = nbt.getInteger("RegionCount");
-        this.totalVolume = nbt.getLong("TotalVolume");
-        this.totalBlocks = nbt.getLong("TotalBlocks");
-        this.timeCreated = nbt.getLong("TimeCreated");
-        this.timeModified = nbt.getLong("TimeModified");
+        if (tag.hasKey("Name", Constants.NBT.TAG_STRING))
+        {
+            this.name = tag.getString("Name");
+        }
 
-        Vec3i size = NBTUtils.readBlockPos(nbt.getCompoundTag("EnclosingSize"));
+        if (tag.hasKey("Author", Constants.NBT.TAG_STRING))
+        {
+            this.author = tag.getString("Author");
+        }
+
+        if (tag.hasKey("Description", Constants.NBT.TAG_STRING))
+        {
+            this.description = tag.getString("Description");
+        }
+
+        if (tag.hasKey("RegionCount", Constants.NBT.TAG_INT))
+        {
+            this.regionCount = tag.getInteger("RegionCount");
+        }
+
+        if (tag.hasKey("TotalVolume", Constants.NBT.TAG_LONG) || tag.hasKey("TotalVolume", Constants.NBT.TAG_INT))
+        {
+            this.totalVolume = tag.getLong("TotalVolume");
+        }
+
+        if (tag.hasKey("TotalBlocks", Constants.NBT.TAG_LONG) || tag.hasKey("TotalBlocks", Constants.NBT.TAG_INT))
+        {
+            this.totalBlocks = tag.getLong("TotalBlocks");
+        }
+
+        if (tag.hasKey("TimeCreated", Constants.NBT.TAG_LONG))
+        {
+            this.timeCreated = tag.getLong("TimeCreated");
+        }
+
+        if (tag.hasKey("TimeModified", Constants.NBT.TAG_LONG))
+        {
+            this.timeModified = tag.getLong("TimeModified");
+        }
+
+        Vec3i size = NBTUtils.readBlockPos(tag.getCompoundTag("EnclosingSize"));
         this.enclosingSize = size != null ? size : BlockPos.ORIGIN;
 
-        if (nbt.hasKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
+        if (tag.hasKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
         {
-            this.thumbnailPixelData = nbt.getIntArray("PreviewImageData");
+            this.thumbnailPixelData = tag.getIntArray("PreviewImageData");
         }
         else
         {

@@ -94,6 +94,7 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
 
             if (convertedSchematic.writeToFile(dir, fileName, override))
             {
+                this.refreshList();
                 this.addMessage(MessageType.SUCCESS, "litematica.message.schematic_convert.success", fileName);
             }
             else

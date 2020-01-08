@@ -62,8 +62,10 @@ public class SchematicaSchematic extends SingleRegionSchematic
         this.createPalette();
         this.writeBlocksToTag(nbt);
         this.writePaletteToTag(nbt);
+
         nbt.setTag("TileEntities", this.writeBlockEntitiesToListTag(this.blockEntities));
         nbt.setTag("Entities", this.writeEntitiesToListTag(this.entities));
+        nbt.setTag("Metadata", this.getMetadata().toTag());
 
         return nbt;
     }

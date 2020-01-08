@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
-import net.minecraft.util.math.MathHelper;
+import fi.dy.masa.malilib.util.MathUtils;
 
 public class LitematicaBitArray
 {
@@ -16,14 +16,14 @@ public class LitematicaBitArray
      */
     private final long maxEntryValue;
     /** Number of entries in this array (<b>not</b> the length of the long array that internally backs this array) */
-    private final int arraySize;
+    private final long arraySize;
 
-    public LitematicaBitArray(int bitsPerEntryIn, int arraySizeIn)
+    public LitematicaBitArray(int bitsPerEntryIn, long arraySizeIn)
     {
         this(bitsPerEntryIn, arraySizeIn, null);
     }
 
-    public LitematicaBitArray(int bitsPerEntryIn, int arraySizeIn, @Nullable long[] longArrayIn)
+    public LitematicaBitArray(int bitsPerEntryIn, long arraySizeIn, @Nullable long[] longArrayIn)
     {
         Validate.inclusiveBetween(1L, 32L, (long) bitsPerEntryIn);
         this.arraySize = arraySizeIn;
@@ -36,18 +36,18 @@ public class LitematicaBitArray
         }
         else
         {
-            this.longArray = new long[MathHelper.roundUp(arraySizeIn * bitsPerEntryIn, 64) / 64];
+            this.longArray = new long[(int) (MathUtils.roundUp((long) arraySizeIn * (long) bitsPerEntryIn, 64L) / 64L)];
         }
     }
 
-    public void setAt(int index, int value)
+    public void setAt(long index, int value)
     {
-        Validate.inclusiveBetween(0L, (long) (this.arraySize - 1), (long) index);
+        Validate.inclusiveBetween(0L, this.arraySize - 1L, (long) index);
         Validate.inclusiveBetween(0L, this.maxEntryValue, (long) value);
-        int startOffset = index * this.bitsPerEntry;
-        int startArrIndex = startOffset >> 6; // startOffset / 64
-        int endArrIndex = ((index + 1) * this.bitsPerEntry - 1) >> 6;
-        int startBitOffset = startOffset & 0x3F; // startOffset % 64
+        long startOffset = index * (long) this.bitsPerEntry;
+        int startArrIndex = (int) (startOffset >> 6); // startOffset / 64
+        int endArrIndex = (int) (((index + 1L) * (long) this.bitsPerEntry - 1L) >> 6);
+        int startBitOffset = (int) (startOffset & 0x3F); // startOffset % 64
         this.longArray[startArrIndex] = this.longArray[startArrIndex] & ~(this.maxEntryValue << startBitOffset) | ((long) value & this.maxEntryValue) << startBitOffset;
 
         if (startArrIndex != endArrIndex)
@@ -58,13 +58,13 @@ public class LitematicaBitArray
         }
     }
 
-    public int getAt(int index)
+    public int getAt(long index)
     {
-        Validate.inclusiveBetween(0L, (long) (this.arraySize - 1), (long) index);
-        int startOffset = index * this.bitsPerEntry;
-        int startArrIndex = startOffset >> 6; // startOffset / 64
-        int endArrIndex = ((index + 1) * this.bitsPerEntry - 1) >> 6;
-        int startBitOffset = startOffset & 0x3F; // startOffset % 64
+        Validate.inclusiveBetween(0L, this.arraySize - 1L, (long) index);
+        long startOffset = index * (long) this.bitsPerEntry;
+        int startArrIndex = (int) (startOffset >> 6); // startOffset / 64
+        int endArrIndex = (int) (((index + 1L) * (long) this.bitsPerEntry - 1L) >> 6);
+        int startBitOffset = (int) (startOffset & 0x3F); // startOffset % 64
 
         if (startArrIndex == endArrIndex)
         {
@@ -82,7 +82,7 @@ public class LitematicaBitArray
         return this.longArray;
     }
 
-    public int size()
+    public long size()
     {
         return this.arraySize;
     }
