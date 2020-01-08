@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -80,13 +81,17 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         return this.regionSize;
     }
 
-    protected void setSize(@Nullable Vec3i size)
+    protected void setSize(@Nullable Vec3i size, boolean createBlockContainer)
     {
         this.regionSize = size;
 
         if (size != null)
         {
-            this.blockContainer = new LitematicaBlockStateContainer(size);
+            if (createBlockContainer)
+            {
+                this.blockContainer = new LitematicaBlockStateContainer(size);
+            }
+
             this.getMetadata().setEnclosingSize(size);
         }
     }
@@ -134,8 +139,15 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
             if (size != null)
             {
-                this.setSize(size);
-                this.readFrom(regions);
+                try
+                {
+                    this.setSize(size, regions.size() > 1);
+                    this.readFrom(regions);
+                }
+                catch (Exception e)
+                {
+                    InfoUtils.printErrorMessage(e.getMessage());
+                }
             }
         }
 
@@ -152,7 +164,46 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
             return;
         }
 
-        BlockPos minCorner = pair.getLeft();
+        final BlockPos minCorner = pair.getLeft();
+
+        if (regions.size() == 1)
+        {
+            for (ISchematicRegion region : regions.values())
+            {
+                this.blockContainer = region.getBlockStateContainer().copy();
+            }
+        }
+        else
+        {
+            for (ISchematicRegion region : regions.values())
+            {
+                LitematicaBlockStateContainer containerOther = region.getBlockStateContainer();
+                LitematicaBlockStateContainer containerThis = this.blockContainer;
+                Vec3i size = containerOther.getSize();
+
+                // This is the relative position of this sub-region within the new single region enclosing schematic volume
+                Vec3i regionOffset = this.getRegionOffset(region, minCorner);
+
+                final int sizeX = size.getX();
+                final int sizeY = size.getY();
+                final int sizeZ = size.getZ();
+                final int offX = regionOffset.getX();
+                final int offY = regionOffset.getY();
+                final int offZ = regionOffset.getZ();
+
+                for (int y = 0; y < sizeY; ++y)
+                {
+                    for (int z = 0; z < sizeZ; ++z)
+                    {
+                        for (int x = 0; x < sizeX; ++x)
+                        {
+                            IBlockState state = containerOther.get(x, y, z);
+                            containerThis.set(x + offX, y + offY, z + offZ, state);
+                        }
+                    }
+                }
+            }
+        }
 
         for (ISchematicRegion region : regions.values())
         {
@@ -166,7 +217,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
             else
             {
                 // This is the relative position of this sub-region within the new single region enclosing schematic volume
-                BlockPos regionOffset = region.getPosition().subtract(minCorner);
+                Vec3i regionOffset = this.getRegionOffset(region, minCorner);
 
                 region.getBlockEntityMap().entrySet().forEach((entry) -> {
                     BlockPos pos = entry.getKey().add(regionOffset);
@@ -188,13 +239,26 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         }
     }
 
+    protected Vec3i getRegionOffset(ISchematicRegion region, BlockPos minCorner)
+    {
+        // Get the offset from the region's block state container origin
+        // (the minimum corner of the region) to the enclosing area's origin/minimum corner.
+        BlockPos regionPos = region.getPosition();
+        Vec3i endRel = PositionUtils.getRelativeEndPositionFromAreaSize(region.getSize());
+        BlockPos regionEnd = regionPos.add(endRel);
+        BlockPos regionMin = PositionUtils.getMinCorner(regionPos, regionEnd);
+        BlockPos regionOffset = regionMin.subtract(minCorner);
+
+        return regionOffset;
+    }
+
     @Override
     public final boolean fromTag(NBTTagCompound tag)
     {
         this.clear();
 
         this.initFromTag(tag);
-        this.setSize(this.readSizeFromTag(tag));
+        this.setSize(this.readSizeFromTag(tag), true);
 
         if (isSizeValid(this.regionSize) == false)
         {

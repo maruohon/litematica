@@ -478,8 +478,6 @@ public class LitematicaSchematic extends SchematicBase
 
             if (pos != null && tileNbt.isEmpty() == false)
             {
-                // Update the correct position to the Block Entity NBT, where it is stored in version 2
-                NBTUtils.writeBlockPosToTag(pos, tileNbt);
                 tileMap.put(pos, tileNbt);
             }
         }

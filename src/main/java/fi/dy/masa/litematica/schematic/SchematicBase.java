@@ -88,6 +88,7 @@ public abstract class SchematicBase implements ISchematic
         {
             NBTTagCompound tag = tagList.getCompoundTagAt(i);
             BlockPos pos = NBTUtils.readBlockPos(tag);
+            NBTUtils.removeBlockPosFromTag(tag);
 
             if (pos != null && tag.isEmpty() == false)
             {
@@ -119,8 +120,10 @@ public abstract class SchematicBase implements ISchematic
 
         if (tileMap.isEmpty() == false)
         {
-            for (NBTTagCompound tag : tileMap.values())
+            for (Map.Entry<BlockPos, NBTTagCompound> entry : tileMap.entrySet())
             {
+                NBTTagCompound tag = entry.getValue();
+                NBTUtils.writeBlockPosToTag(entry.getKey(), tag);
                 tagList.appendTag(tag);
             }
         }
