@@ -19,7 +19,7 @@ public class SpongeSchematic extends SingleRegionSchematic
 {
     public static final String FILE_NAME_EXTENSION = ".schem";
 
-    protected int version;
+    protected int version = 1;
 
     SpongeSchematic(File file)
     {
@@ -69,15 +69,7 @@ public class SpongeSchematic extends SingleRegionSchematic
     {
         NBTTagCompound metaTag = tag.getCompoundTag("Metadata");
 
-        if (metaTag.hasKey("Author", Constants.NBT.TAG_STRING))
-        {
-            this.getMetadata().setAuthor(metaTag.getString("Author"));
-        }
-
-        if (metaTag.hasKey("Name", Constants.NBT.TAG_STRING))
-        {
-            this.getMetadata().setName(metaTag.getString("Name"));
-        }
+        this.getMetadata().fromTag(metaTag);
 
         if (metaTag.hasKey("Date", Constants.NBT.TAG_LONG))
         {
@@ -156,26 +148,109 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound entityData = tagList.getCompoundTagAt(i);
-            Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
+            Vec3d pos = NBTUtils.readEntityPositionFromTag(entityData);
 
-            if (posVec != null && entityData.isEmpty() == false)
+            if (pos != null && entityData.isEmpty() == false)
             {
                 entityData.setString("id", entityData.getString("Id"));
 
                 // Remove the Sponge tags from the data that is kept in memory
                 entityData.removeTag("Id");
 
-                entities.add(new EntityInfo(posVec, entityData));
+                entities.add(new EntityInfo(pos, entityData));
             }
         }
 
         return entities;
     }
 
+    protected void writeMetadataToTag(NBTTagCompound tag)
+    {
+        NBTTagCompound metaTag = this.getMetadata().toTag();
+
+        if (this.getMetadata().getTimeCreated() > 0)
+        {
+            metaTag.setLong("Date", this.getMetadata().getTimeCreated());
+        }
+
+        tag.setTag("Metadata", metaTag);
+    }
+
+    protected void writeBlocksToTag(NBTTagCompound tag)
+    {
+        NBTTagCompound paletteTag = this.blockContainer.getPalette().writeToSpongeTag();
+        byte[] blockData = this.blockContainer.getBackingArrayAsByteArray();
+
+        tag.setTag("Palette", paletteTag);
+        tag.setByteArray("BlockData", blockData);
+    }
+
+    protected void writeBlockEntitiesToTag(NBTTagCompound tag)
+    {
+        String tagName = this.version == 1 ? "TileEntities" : "BlockEntities";
+        NBTTagList tagList = new NBTTagList();
+
+        for (Map.Entry<BlockPos, NBTTagCompound> entry : this.blockEntities.entrySet())
+        {
+            NBTTagCompound beTag = entry.getValue().copy();
+            NBTUtils.writeBlockPosToArrayTag(entry.getKey(), beTag, "Pos");
+
+            // Add the Sponge tag and remove the vanilla/Litematica tag
+            beTag.setString("Id", beTag.getString("id"));
+            beTag.removeTag("id");
+
+            if (this.version == 1)
+            {
+                beTag.setInteger("ContentVersion", 1);
+            }
+
+            tagList.appendTag(beTag);
+        }
+
+        tag.setTag(tagName, tagList);
+    }
+
+    protected void writeEntitiesToTag(NBTTagCompound tag)
+    {
+        NBTTagList tagList = new NBTTagList();
+
+        for (EntityInfo info : this.entities)
+        {
+            NBTTagCompound entityData = info.nbt.copy();
+            NBTUtils.writeEntityPositionToTag(info.pos, entityData);
+
+            // Add the Sponge tag and remove the vanilla/Litematica tag
+            entityData.setString("Id", entityData.getString("id"));
+            entityData.removeTag("id");
+
+            if (this.version == 1)
+            {
+                entityData.setInteger("ContentVersion", 1);
+            }
+
+            tagList.appendTag(entityData);
+        }
+
+        tag.setTag("Entities", tagList);
+    }
+
     @Override
     public NBTTagCompound toTag()
     {
         NBTTagCompound tag = new NBTTagCompound();
+
+        this.writeBlocksToTag(tag);
+        this.writeBlockEntitiesToTag(tag);
+        this.writeEntitiesToTag(tag);
+        this.writeMetadataToTag(tag);
+
+        tag.setInteger("DataVersion", LitematicaSchematic.MINECRAFT_DATA_VERSION);
+        tag.setInteger("Version", this.version);
+        tag.setInteger("PaletteMax", this.blockContainer.getPalette().getPaletteSize() - 1);
+        tag.setShort("Width", (short) this.getSize().getX());
+        tag.setShort("Height", (short) this.getSize().getY());
+        tag.setShort("Length", (short) this.getSize().getZ());
+
         return tag;
     }
 }

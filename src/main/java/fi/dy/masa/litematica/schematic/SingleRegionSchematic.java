@@ -217,20 +217,24 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
             else
             {
                 // This is the relative position of this sub-region within the new single region enclosing schematic volume
-                Vec3i regionOffset = this.getRegionOffset(region, minCorner);
+                Vec3i regionOffsetBlocks = this.getRegionOffset(region, minCorner);
 
                 region.getBlockEntityMap().entrySet().forEach((entry) -> {
-                    BlockPos pos = entry.getKey().add(regionOffset);
+                    BlockPos pos = entry.getKey().add(regionOffsetBlocks);
                     this.blockEntities.put(pos, entry.getValue().copy());
                 });
 
                 region.getBlockTickMap().entrySet().forEach((entry) -> {
-                    BlockPos pos = entry.getKey().add(regionOffset);
+                    BlockPos pos = entry.getKey().add(regionOffsetBlocks);
                     this.pendingBlockTicks.put(pos, entry.getValue());
                 });
 
+                // The entity positions are not relative to the sub-region's minimum corner,
+                // but to the sub-region's origin point, whichever corner that is at.
+                Vec3i regionOffsetEntities = region.getPosition().subtract(minCorner);
+
                 region.getEntityList().forEach((info) -> {
-                    Vec3d pos = info.posVec.add(regionOffset.getX(), regionOffset.getY(), regionOffset.getZ());
+                    Vec3d pos = info.pos.add(regionOffsetEntities.getX(), regionOffsetEntities.getY(), regionOffsetEntities.getZ());
                     NBTTagCompound nbt = info.nbt.copy();
                     NBTUtils.writeEntityPositionToTag(pos, nbt);
                     this.entities.add(new EntityInfo(pos, nbt));

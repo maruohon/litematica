@@ -143,6 +143,7 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
         final int volume = this.storage.size();
         byte[] arr = new byte[entrySize * volume];
         PacketBuffer buf = new PacketBuffer(Unpooled.wrappedBuffer(arr));
+        buf.writerIndex(0);
 
         for (int i = 0; i < volume; ++i)
         {

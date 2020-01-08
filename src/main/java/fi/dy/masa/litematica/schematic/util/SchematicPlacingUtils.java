@@ -264,7 +264,7 @@ public class SchematicPlacingUtils
 
         for (EntityInfo info : entityList)
         {
-            Vec3d pos = info.posVec;
+            Vec3d pos = info.pos;
             pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
             pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
 
@@ -508,7 +508,7 @@ public class SchematicPlacingUtils
 
             if (entity != null)
             {
-                Vec3d pos = info.posVec;
+                Vec3d pos = info.pos;
                 pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
                 double x = pos.x + offX;
