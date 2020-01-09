@@ -120,11 +120,10 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 str = StringUtils.translate("litematica.gui.label.origin.manual");
             }
 
-            String strOrigin = String.format("x: %d, y: %d, z: %d (%s)", o.getX(), o.getY(), o.getZ(), str);
-            text.add(StringUtils.translate("litematica.gui.label.area_selection_origin", strOrigin));
+            text.add(StringUtils.translate("litematica.gui.label.area_selection.hover.origin", o.getX(), o.getY(), o.getZ(), str));
 
             int count = selection.getAllSubRegionBoxes().size();
-            text.add(StringUtils.translate("litematica.gui.label.area_selection_box_count", count));
+            text.add(StringUtils.translate("litematica.gui.label.area_selection.hover.box_count", count));
         }
 
         int offset = 12;

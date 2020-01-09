@@ -146,18 +146,18 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 18, this.height))
         {
             File schematicFile = this.placement.getSchematic().getFile();
-            String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.in_memory");
+            String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.hover.in_memory");
             List<String> text = new ArrayList<>();
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_file", fileName));
+
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_name", this.placement.getSchematic().getMetadata().getName()));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
+
             BlockPos o = this.placement.getOrigin();
-            String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.origin", strOrigin));
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.sub_region_count", String.valueOf(this.placement.getSubRegionCount())));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.origin", o.getX(), o.getY(), o.getZ()));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.sub_region_count", this.placement.getSubRegionCount()));
 
             Vec3i size = this.placement.getSchematic().getMetadata().getEnclosingSize();
-            String strSize = String.format("%d x %d x %d", size.getX(), size.getY(), size.getZ());
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.enclosing_size", strSize));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enclosing_size", size.getX(), size.getY(), size.getZ()));
 
             RenderUtils.drawHoverText(mouseX, mouseY, text);
         }

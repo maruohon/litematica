@@ -13,11 +13,13 @@ import fi.dy.masa.litematica.gui.widgets.WidgetSelectionSubRegion;
 import fi.dy.masa.litematica.materials.MaterialListAreaAnalyzer;
 import fi.dy.masa.litematica.schematic.util.SchematicUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
+import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
+import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
@@ -290,6 +292,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected int createButton(int x, int y, int width, @Nullable Corner corner, ButtonListener.Type type)
     {
         String label;
+        String hover = null;
         boolean projectsMode = DataManager.getSchematicProjectsManager().hasProjectOpen();
 
         if (type == ButtonListener.Type.CHANGE_SELECTION_MODE)
@@ -299,8 +302,17 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
         else if (type == ButtonListener.Type.CHANGE_CORNER_MODE)
         {
-            String name = Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName();
-            label = type.getDisplayName(name);
+            IConfigOptionListEntry mode = Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue();
+            label = type.getDisplayName(mode.getDisplayName());
+
+            if (mode == CornerSelectionMode.EXPAND)
+            {
+                hover = "litematica.gui.button.hover.area_editor.corner_mode.expand";
+            }
+            else
+            {
+                hover = "litematica.gui.button.hover.area_editor.corner_mode.corners";
+            }
         }
         else if (type == ButtonListener.Type.CREATE_SCHEMATIC && projectsMode)
         {
@@ -311,21 +323,25 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             label = type.getDisplayName();
         }
 
-        if (width == -1)
+        if (type == ButtonListener.Type.CREATE_SCHEMATIC && projectsMode == false)
         {
-            width = this.getStringWidth(label) + 10;
+            hover = "litematica.gui.button.hover.area_editor.shift_for_in_memory";
+        }
+        else if (type == ButtonListener.Type.ANALYZE_AREA)
+        {
+            hover = "litematica.gui.button.hover.area_editor.analyze_area";
         }
 
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
-        ButtonListener listener = new ButtonListener(type, corner, null, this);
-        this.addButton(button, listener);
 
-        if (type == ButtonListener.Type.CREATE_SCHEMATIC && projectsMode == false)
+        if (hover != null)
         {
-            button.setHoverStrings("litematica.gui.button.hover.area_editor.shift_for_in_memory");
+            button.setHoverStrings(hover);
         }
 
-        return width;
+        this.addButton(button, new ButtonListener(type, corner, null, this));
+
+        return button.getWidth();
     }
 
     protected void createCoordinateButton(int x, int y, Corner corner, CoordinateType coordType, ButtonListener.Type type)

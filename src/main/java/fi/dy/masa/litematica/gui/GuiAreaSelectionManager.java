@@ -107,6 +107,10 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         {
             button.setHoverStrings("litematica.gui.button.hover.area_selections.unselect");
         }
+        else if (type == ButtonListener.ButtonType.FROM_PLACEMENT)
+        {
+            button.setHoverStrings("litematica.gui.button.hover.area_selections.from_placement");
+        }
 
         this.addButton(button, new ButtonListener(type, this));
 

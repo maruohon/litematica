@@ -59,7 +59,7 @@ public class WidgetSchematicVersion extends WidgetListEntryBase<SchematicVersion
         List<String> text = new ArrayList<>();
         /*
         text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
-        text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_file", fileName));
+        text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
         BlockPos o = this.placement.getOrigin();
         String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
         text.add(StringUtils.translate("litematica.gui.label.schematic_placement.origin", strOrigin));

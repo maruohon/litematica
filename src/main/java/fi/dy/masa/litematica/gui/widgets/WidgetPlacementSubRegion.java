@@ -138,7 +138,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
     {
         ISchematic schematic = this.schematicPlacement.getSchematic();
         File schematicFile = schematic.getFile();
-        String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.in_memory");
+        String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.hover.in_memory");
 
         if (this.placement.isRegionPlacementModifiedFromDefault() &&
             GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 25, this.y + 6, 11, 11))
@@ -149,22 +149,20 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 14, this.height))
         {
             List<String> text = new ArrayList<>();
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_name", schematic.getMetadata().getName()));
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_file", fileName));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_name", schematic.getMetadata().getName()));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
 
             BlockPos o = this.placement.getPos();
             o = PositionUtils.getTransformedBlockPos(o, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
             o = o.add(this.schematicPlacement.getOrigin());
-            String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.origin", strOrigin));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.origin", o.getX(), o.getY(), o.getZ()));
 
             ISchematicRegion region = schematic.getSchematicRegion(this.placement.getName());
             Vec3i size = region != null ? region.getSize() : null;
 
             if (size != null)
             {
-                String strSize = String.format("%d x %d x %d", size.getX(), size.getY(), size.getZ());
-                text.add(StringUtils.translate("litematica.gui.label.placement_sub.region_size", strSize));
+                text.add(StringUtils.translate("litematica.gui.label.placement_sub.hover.region_size", size.getX(), size.getY(), size.getZ()));
             }
 
             RenderUtils.drawHoverText(mouseX, mouseY, text);

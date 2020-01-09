@@ -110,8 +110,13 @@ litematica.gui.button.config_gui.info_overlays=Info Overlays
 litematica.gui.button.config_gui.render_layers=Render Layers
 litematica.gui.button.config_gui.visuals=Visuals
 
-litematica.gui.button.hover.area_editor.shift_for_in_memory=Hold Shift to create an in-memory-only schematic
-litematica.gui.button.hover.area_selections.unselect=Unselects the current Area Selection
+litematica.gui.button.hover.area_editor.analyze_area=§7Creates a Material List from the current selection
+litematica.gui.button.hover.area_editor.corner_mode.corners=§fCorners Mode:\n§7Left click to set the first/origin corner,\n§7right click to set the second corner.\n§7Middle click to select a corner, and then you can Alt + scroll\n§7to nudge it around in the looking direction.
+litematica.gui.button.hover.area_editor.corner_mode.expand=§fExpand Mode:\n§7Right click to reset/collapse the selection box to the clicked position.\n§7Left click to expand the selection around all the clicked positions.\n§7Middle click to select a corner, and then you can Alt + scroll\n§7to nudge it around in the looking direction.
+litematica.gui.button.hover.area_editor.shift_for_in_memory=§7Hold Shift to create an in-memory-only schematic
+
+litematica.gui.button.hover.area_selections.from_placement=§7Creates a new selection from the currently selected\n§7Schematic Placement. This will essentially replicate the original\n§7selection that was used to create the Schematic in the first place.
+litematica.gui.button.hover.area_selections.unselect=§7Unselects the current Area Selection
 litematica.gui.button.hover.material_list.clear_cache=Clears the Material Cache\nNormally this should not be needed\nThis can be used instead of deleting the 'material_cache.nbt'\nfile in case the cache has some wrong data, like items\nstored for blocks that shouldn't have them, like piston heads
 litematica.gui.button.hover.material_list.write_hold_shift_for_csv=Hold shift to write to a CSV file,\ninstead of the normal ASCII-art table text file
 litematica.gui.button.hover.material_list_shift_to_select_sub_regions=Hold shift to select the sub regions used for the Material List
@@ -119,6 +124,7 @@ litematica.gui.button.hover.plus_minus_tip=Left click to increase\nRight click t
 litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)
 litematica.gui.button.hover.schematic_list.reload_schematic=Reloads the schematic from file.\nThis can be useful if you make a mistake\nin the Schematic Rebuild mode.
 litematica.gui.button.hover.schematic_manager.convert_format=Convert the selected schematic to another schematic format
+
 litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode=There is currently a Schematic Project open.\nThe Schematic Project overrides the normal area selection functionality
 litematica.gui.button.hover.schematic_projects.delete_area=§6Delete the last placed or saved area§r
 litematica.gui.button.hover.schematic_projects.move_origin_to_player=Move the project origin to the player's current position\nThis will also move the area selection and placement
@@ -218,10 +224,11 @@ litematica.gui.label.area_editor.pos1=Corner 1
 litematica.gui.label.area_editor.pos2=Corner 2
 litematica.gui.label.area_editor.sub_regions=Sub-regions (%s)
 
-litematica.gui.label.area_selection_manager.current_selection=Selected area: %s
+litematica.gui.label.area_selection_manager.current_selection=§7Selected area: §b%s
 
-litematica.gui.label.area_selection_box_count=Boxes: %d
-litematica.gui.label.area_selection_origin=Origin: %s
+litematica.gui.label.area_selection.hover.box_count=§7Boxes: §6%d
+litematica.gui.label.area_selection.hover.origin=§7Origin - x: §9%s§7, y: §9%s§7, z: §9%s§7 [§6%s§7]
+
 litematica.gui.label.area_selection.mode.normal=Normal
 litematica.gui.label.area_selection.mode.simple=Simple
 
@@ -253,7 +260,8 @@ litematica.gui.label.origin.manual=Manual
 
 litematica.gui.label.placement_sub.region_name=Region name: %s
 litematica.gui.label.placement_sub.region_position=Region position
-litematica.gui.label.placement_sub.region_size=Region size: %s
+
+litematica.gui.label.placement_sub.hover.region_size=§7Region size: §9%s x %s x %s
 
 litematica.gui.label.placement_settings.placement_origin=Placement origin
 
@@ -281,15 +289,17 @@ litematica.gui.label.schematic_load.hoverinfo.create_placement=Immediately creat
 
 litematica.gui.label.schematic_paste.missing_chunks=Paste, missing chunks (%s)
 
-litematica.gui.label.schematic_placement.enclosing_size=Enclosing size: %s
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
-litematica.gui.label.schematic_placement.in_memory=IN-MEMORY ONLY
-litematica.gui.label.schematic_placement.origin=Origin: %s
 litematica.gui.label.schematic_placement.rename_placement=Rename placement:
-litematica.gui.label.schematic_placement.schematic_file=File: %s
-litematica.gui.label.schematic_placement.schematic_name=Schematic: %s
-litematica.gui.label.schematic_placement.sub_region_count=Sub-regions: %s
 litematica.gui.label.schematic_placement.sub_regions=Sub-regions (%s):
+
+litematica.gui.label.schematic_placement.hover.enclosing_size=§7Enclosing size: §9%s x %s x %s
+litematica.gui.label.schematic_placement.hover.in_memory=§bIN-MEMORY ONLY
+litematica.gui.label.schematic_placement.hover.origin=§7Origin - x: §9%s§7, y: §9%s§7, z: §9%s
+litematica.gui.label.schematic_placement.hover.schematic_file=§7File: §3%s
+litematica.gui.label.schematic_placement.hover.schematic_name=§7Schematic name: §2%s
+litematica.gui.label.schematic_placement.hover.schematic_type=§7Type: §b%s
+litematica.gui.label.schematic_placement.hover.sub_region_count=§7Sub-regions: §6%s
 
 litematica.gui.label.schematic_projects.currently_open_project=Currently open project: %s
 litematica.gui.label.schematic_projects.origin=Origin:
@@ -394,9 +404,9 @@ litematica.hud.misc.renderer_status=Renderers: A: %s S: %s B: %s O: %s SEL: %s
 litematica.hud.misc.schematic_paste.replace_mode=Replace blocks: %s
 
 litematica.hud.schematic_placement.hover_info.lock_coordinate=Lock this coordinate\nThis allows changing the other coordinates\nwithout affecting the locked ones
-litematica.hud.schematic_placement.hover_info.placement_locked=This placement has been locked and can't\nbe modified without unlocking it first
-litematica.hud.schematic_placement.hover_info.placement_modified=This placement has been modified
-litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=This sub-region has been modified
+litematica.hud.schematic_placement.hover_info.placement_locked=§6This placement has been locked and can't\n§6be modified without unlocking it first
+litematica.hud.schematic_placement.hover_info.placement_modified=§6This placement has been modified
+litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=§6This sub-region has been modified
 litematica.hud.schematic_placement.selected_placement=Placement
 litematica.hud.schematic_placement.selected_sub_region=Sub-region
 litematica.hud.schematic_placement.sub_region_count=Regions
