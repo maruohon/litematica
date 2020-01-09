@@ -29,7 +29,7 @@ import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.SchematicType;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
@@ -159,7 +159,7 @@ public class SchematicCreationUtils
                 if (entity.writeToNBTOptional(tag))
                 {
                     Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
-                    NBTUtils.writeEntityPositionToTag(posVec, tag);
+                    NBTUtils.writeVec3dToListTag(posVec, tag);
                     list.add(new EntityInfo(posVec, tag));
                 }
             }
@@ -203,7 +203,7 @@ public class SchematicCreationUtils
                     if (entity.writeToNBTOptional(tag))
                     {
                         Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
-                        NBTUtils.writeEntityPositionToTag(posVec, tag);
+                        NBTUtils.writeVec3dToListTag(posVec, tag);
                         schematicEntityList.add(new EntityInfo(posVec, tag));
                         existingEntities.add(uuid);
                     }
@@ -221,7 +221,7 @@ public class SchematicCreationUtils
         {
             String regionName = box.getName();
             ISchematicRegion region = schematic.getSchematicRegion(regionName);
-            LitematicaBlockStateContainer container = region != null ? region.getBlockStateContainer() : null;
+            ILitematicaBlockStateContainer container = region != null ? region.getBlockStateContainer() : null;
             Map<BlockPos, NBTTagCompound> blockEntityMap = region != null ? region.getBlockEntityMap() : null;
             Map<BlockPos, NextTickListEntry> tickMap = region != null ? region.getBlockTickMap() : null;
 
@@ -252,7 +252,7 @@ public class SchematicCreationUtils
                     {
                         posMutable.setPos(x + startX, y + startY, z + startZ);
                         IBlockState state = world.getBlockState(posMutable).getActualState(world, posMutable);
-                        container.set(x, y, z, state);
+                        container.setBlockState(x, y, z, state);
 
                         if (state.getBlock() != Blocks.AIR)
                         {
@@ -333,7 +333,7 @@ public class SchematicCreationUtils
                 continue;
             }
 
-            LitematicaBlockStateContainer container = region.getBlockStateContainer();
+            ILitematicaBlockStateContainer container = region.getBlockStateContainer();
             Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
             Map<BlockPos, NextTickListEntry> tickMap = region.getBlockTickMap();
 
@@ -367,7 +367,7 @@ public class SchematicCreationUtils
                     {
                         posMutable.setPos(x + offsetX, y + offsetY, z + offsetZ);
                         IBlockState state = world.getBlockState(posMutable).getActualState(world, posMutable);
-                        container.set(x, y, z, state);
+                        container.setBlockState(x, y, z, state);
 
                         if (state.getBlock() != Blocks.AIR)
                         {

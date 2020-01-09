@@ -13,8 +13,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
 
@@ -251,7 +251,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
         // No palette, use the registry IDs directly
         else
         {
-            LitematicaBlockStateContainer container = this.blockContainer;
+            ILitematicaBlockStateContainer container = this.blockContainer;
             Block[] palette = this.palette;
 
             for (int i = 0; i < numBlocks; i++)
@@ -260,7 +260,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
                 int x = i % sizeX;
                 int y = i / layerSize;
                 int z = (i % layerSize) / sizeX;
-                container.set(x, y, z, block.getStateFromMeta(metaArr[i]));
+                container.setBlockState(x, y, z, block.getStateFromMeta(metaArr[i]));
             }
         }
 
@@ -270,7 +270,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
     @SuppressWarnings("deprecation")
     protected boolean readBlocks12Bit(NBTTagCompound nbt, final byte[] blockIdsByte, final byte[] metaArr, final int sizeX, final int layerSize)
     {
-        LitematicaBlockStateContainer container = this.blockContainer;
+        ILitematicaBlockStateContainer container = this.blockContainer;
         Block[] palette = this.palette;
         byte[] add = nbt.getByteArray("AddBlocks");
         final int numBlocks = blockIdsByte.length;
@@ -308,14 +308,14 @@ public class SchematicaSchematic extends SingleRegionSchematic
             int x = bi % sizeX;
             int y = bi / layerSize;
             int z = (bi % layerSize) / sizeX;
-            container.set(x, y, z, block.getStateFromMeta(metaArr[bi    ]));
+            container.setBlockState(x, y, z, block.getStateFromMeta(metaArr[bi    ]));
 
             x = (bi + 1) % sizeX;
             y = (bi + 1) / layerSize;
             z = ((bi + 1) % layerSize) / sizeX;
             byteId = blockIdsByte[bi + 1] & 0xFF;
             block = palette[(addValue & 0x0F) << 8 | byteId];
-            container.set(x, y, z, block.getStateFromMeta(metaArr[bi + 1]));
+            container.setBlockState(x, y, z, block.getStateFromMeta(metaArr[bi + 1]));
         }
 
         // Odd number of blocks, handle the last position
@@ -327,7 +327,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
             int x = bi % sizeX;
             int y = bi / layerSize;
             int z = (bi % layerSize) / sizeX;
-            container.set(x, y, z, block.getStateFromMeta(metaArr[bi    ]));
+            container.setBlockState(x, y, z, block.getStateFromMeta(metaArr[bi    ]));
         }
 
         return true;
@@ -412,19 +412,19 @@ public class SchematicaSchematic extends SingleRegionSchematic
         final int layerSize = sizeX * sizeZ;
         int numAdd = 0;
         int bi, ai;
-        LitematicaBlockStateContainer container = this.blockContainer;
+        ILitematicaBlockStateContainer container = this.blockContainer;
 
         for (bi = 0, ai = 0; ai < loopMax; bi += 2, ++ai)
         {
             int x = bi % sizeX;
             int y = bi / layerSize;
             int z = (bi % layerSize) / sizeX;
-            IBlockState state1 = container.get(x, y, z);
+            IBlockState state1 = container.getBlockState(x, y, z);
 
             x = (bi + 1) % sizeX;
             y = (bi + 1) / layerSize;
             z = ((bi + 1) % layerSize) / sizeX;
-            IBlockState state2 = container.get(x, y, z);
+            IBlockState state2 = container.getBlockState(x, y, z);
 
             int id1 = Block.getIdFromBlock(state1.getBlock());
             int id2 = Block.getIdFromBlock(state2.getBlock());
@@ -448,7 +448,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
             int x = bi % sizeX;
             int y = bi / layerSize;
             int z = (bi % layerSize) / sizeX;
-            IBlockState state = container.get(x, y, z);
+            IBlockState state = container.getBlockState(x, y, z);
 
             int id = Block.getIdFromBlock(state.getBlock());
             int add = (id >>> 4) & 0xF0;

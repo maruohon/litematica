@@ -6,13 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.mixin.IMixinDataFixer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
 
@@ -57,12 +62,53 @@ public abstract class SchematicBase implements ISchematic
         return size != null && size.getX() > 0 && size.getY() > 0 && size.getZ() > 0;
     }
 
+    protected Class<? extends ILitematicaBlockStateContainer> getContainerClass()
+    {
+        return LitematicaBlockStateContainerFull.class;
+    }
+
+    protected void copyContainerContents(ILitematicaBlockStateContainer from, ILitematicaBlockStateContainer to)
+    {
+        Vec3i sizeFrom = from.getSize();
+        Vec3i sizeTo = to.getSize();
+        final int sizeX = Math.min(sizeFrom.getX(), sizeTo.getX());
+        final int sizeY = Math.min(sizeFrom.getY(), sizeTo.getY());
+        final int sizeZ = Math.min(sizeFrom.getZ(), sizeTo.getZ());
+
+        for (int y = 0; y < sizeY; ++y)
+        {
+            for (int z = 0; z < sizeZ; ++z)
+            {
+                for (int x = 0; x < sizeX; ++x)
+                {
+                    IBlockState state = from.getBlockState(x, y, z);
+                    to.setBlockState(x, y, z, state);
+                }
+            }
+        }
+    }
+
     protected void readMetadataFromTag(NBTTagCompound tag)
     {
         if (tag.hasKey("Metadata", Constants.NBT.TAG_COMPOUND))
         {
             this.getMetadata().fromTag(tag.getCompoundTag("Metadata"));
         }
+    }
+
+    protected boolean readPaletteFromLitematicaFormatTag(NBTTagList tagList, ILitematicaBlockStatePalette palette)
+    {
+        final int size = tagList.tagCount();
+        List<IBlockState> list = new ArrayList<>(size);
+
+        for (int id = 0; id < size; ++id)
+        {
+            NBTTagCompound tag = tagList.getCompoundTagAt(id);
+            IBlockState state = NBTUtil.readBlockState(tag);
+            list.add(state);
+        }
+
+        return palette.setMapping(list);
     }
 
     protected List<EntityInfo> readEntitiesFromListTag(NBTTagList tagList)
@@ -73,7 +119,7 @@ public abstract class SchematicBase implements ISchematic
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound entityData = tagList.getCompoundTagAt(i);
-            Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
+            Vec3d posVec = NBTUtils.readVec3dFromListTag(entityData);
 
             if (posVec != null && entityData.isEmpty() == false)
             {
@@ -102,6 +148,22 @@ public abstract class SchematicBase implements ISchematic
         }
 
         return tileMap;
+    }
+
+    protected NBTTagList writePaletteToLitematicaFormatTag(ILitematicaBlockStatePalette palette)
+    {
+        final int size = palette.getPaletteSize();
+        List<IBlockState> list = palette.getMapping();
+        NBTTagList tagList = new NBTTagList();
+
+        for (int id = 0; id < size; ++id)
+        {
+            NBTTagCompound tag = new NBTTagCompound();
+            NBTUtil.writeBlockState(tag, list.get(id));
+            tagList.appendTag(tag);
+        }
+
+        return tagList;
     }
 
     protected NBTTagList writeEntitiesToListTag(List<EntityInfo> entityList)

@@ -42,7 +42,17 @@ public class SchematicType<S extends ISchematic>
             .setHasName(true)
             .build();
 
-    public static final ImmutableList<SchematicType<?>> KNOWN_TYPES = ImmutableList.of(LITEMATICA, SCHEMATICA, SPONGE);
+    public static final SchematicType<VanillaStructure> VANILLA = SchematicType.<VanillaStructure>builder()
+            .setDisplayName("Vanilla Structure")
+            .setFactory(VanillaStructure::new)
+            .setDataValidator(VanillaStructure::isValidSchematic)
+            .setExtension(VanillaStructure.FILE_NAME_EXTENSION)
+            .setExtensionValidator(VanillaStructure.FILE_NAME_EXTENSION::equals)
+            .setIcon(LitematicaGuiIcons.FILE_ICON_VANILLA)
+            .setHasName(true)
+            .build();
+
+    public static final ImmutableList<SchematicType<?>> KNOWN_TYPES = ImmutableList.of(LITEMATICA, SCHEMATICA, SPONGE, VANILLA);
 
     private final String extension;
     private final IGuiIcon icon;

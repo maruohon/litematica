@@ -12,7 +12,7 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.ItemType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -31,7 +31,7 @@ public class MaterialListUtils
         for (String regionName : subRegions)
         {
             ISchematicRegion region = schematic.getSchematicRegion(regionName);
-            LitematicaBlockStateContainer container = region != null ? region.getBlockStateContainer() : null;
+            ILitematicaBlockStateContainer container = region != null ? region.getBlockStateContainer() : null;
 
             if (container != null)
             {
@@ -55,7 +55,7 @@ public class MaterialListUtils
                         {
                             for (int x = 0; x < sizeX; ++x)
                             {
-                                IBlockState state = container.get(x, y, z);
+                                IBlockState state = container.getBlockState(x, y, z);
                                 countsTotal.addTo(state, 1);
                             }
                         }

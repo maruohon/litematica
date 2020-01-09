@@ -15,7 +15,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -25,7 +26,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
     protected final Map<BlockPos, NBTTagCompound> blockEntities = new HashMap<>();
     protected final Map<BlockPos, NextTickListEntry> pendingBlockTicks = new HashMap<>();
     protected final List<EntityInfo> entities = new ArrayList<>();
-    protected LitematicaBlockStateContainer blockContainer;
+    protected ILitematicaBlockStateContainer blockContainer;
     protected BlockPos regionPos = BlockPos.ORIGIN;
     private Vec3i regionSize = Vec3i.NULL_VECTOR;
 
@@ -95,7 +96,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
             if (createBlockContainer)
             {
-                this.blockContainer = new LitematicaBlockStateContainer(size);
+                this.createEmptyContainer(size);
             }
 
             this.getMetadata().setEnclosingSize(size);
@@ -103,8 +104,13 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         }
     }
 
+    protected void createEmptyContainer(Vec3i size)
+    {
+        this.blockContainer = new LitematicaBlockStateContainerFull(size);
+    }
+
     @Override
-    public LitematicaBlockStateContainer getBlockStateContainer()
+    public ILitematicaBlockStateContainer getBlockStateContainer()
     {
         return this.blockContainer;
     }
@@ -177,15 +183,26 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         {
             for (ISchematicRegion region : regions.values())
             {
-                this.blockContainer = region.getBlockStateContainer().copy();
+                ILitematicaBlockStateContainer containerOther = region.getBlockStateContainer();
+                Vec3i size = containerOther.getSize();
+
+                if (this.getContainerClass() == containerOther.getClass())
+                {
+                    this.blockContainer = containerOther.copy();
+                }
+                else
+                {
+                    this.createEmptyContainer(size);
+                    this.copyContainerContents(containerOther, this.blockContainer);
+                }
             }
         }
         else
         {
             for (ISchematicRegion region : regions.values())
             {
-                LitematicaBlockStateContainer containerOther = region.getBlockStateContainer();
-                LitematicaBlockStateContainer containerThis = this.blockContainer;
+                ILitematicaBlockStateContainer containerOther = region.getBlockStateContainer();
+                ILitematicaBlockStateContainer containerThis = this.blockContainer;
                 Vec3i size = containerOther.getSize();
 
                 // This is the relative position of this sub-region within the new single region enclosing schematic volume
@@ -204,8 +221,8 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
                     {
                         for (int x = 0; x < sizeX; ++x)
                         {
-                            IBlockState state = containerOther.get(x, y, z);
-                            containerThis.set(x + offX, y + offY, z + offZ, state);
+                            IBlockState state = containerOther.getBlockState(x, y, z);
+                            containerThis.setBlockState(x + offX, y + offY, z + offZ, state);
                         }
                     }
                 }
@@ -243,7 +260,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
                 region.getEntityList().forEach((info) -> {
                     Vec3d pos = info.pos.add(regionOffsetEntities.getX(), regionOffsetEntities.getY(), regionOffsetEntities.getZ());
                     NBTTagCompound nbt = info.nbt.copy();
-                    NBTUtils.writeEntityPositionToTag(pos, nbt);
+                    NBTUtils.writeVec3dToListTag(pos, nbt);
                     this.entities.add(new EntityInfo(pos, nbt));
                 });
             }

@@ -1,23 +1,28 @@
 package fi.dy.masa.litematica.schematic.container;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
 
 public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStatePalette
 {
     private final IBlockState[] states;
-    private final ILitematicaBlockStatePaletteResizer paletteResizer;
+    private final IPaletteResizeHandler paletteResizer;
     private final int bits;
     private int currentSize;
 
-    public LitematicaBlockStatePaletteLinear(int bitsIn, ILitematicaBlockStatePaletteResizer paletteResizer)
+    public LitematicaBlockStatePaletteLinear(int bitsIn, IPaletteResizeHandler paletteResizer)
     {
         this.states = new IBlockState[1 << bitsIn];
         this.bits = bitsIn;
         this.paletteResizer = paletteResizer;
+    }
+
+    @Override
+    public int getPaletteSize()
+    {
+        return this.currentSize;
     }
 
     @Override
@@ -41,7 +46,7 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
         }
         else
         {
-            return this.paletteResizer.onResize(this.bits + 1, state);
+            return this.paletteResizer.onResize(this.bits + 1, state, this);
         }
     }
 
@@ -53,72 +58,42 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
     }
 
     @Override
-    public int getPaletteSize()
+    public List<IBlockState> getMapping()
     {
-        return this.currentSize;
+        List<IBlockState> list = new ArrayList<>(this.currentSize);
+
+        for (int id = 0; id < this.currentSize; ++id)
+        {
+            list.add(this.states[id]);
+        }
+
+        return list;
     }
 
     @Override
-    public boolean setIdFor(int id, IBlockState state)
+    public boolean setMapping(List<IBlockState> list)
     {
-        if (id >= 0 && id < this.states.length)
+        final int size = list.size();
+
+        if (size <= this.states.length)
         {
-            this.states[id] = state;
+            for (int id = 0; id < size; ++id)
+            {
+                this.states[id] = list.get(id);
+            }
+
+            this.currentSize = size;
+
             return true;
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     @Override
-    public boolean readFromLitematicaTag(NBTTagList tagList)
+    public LitematicaBlockStatePaletteLinear copy(IPaletteResizeHandler resizeHandler)
     {
-        this.currentSize = tagList.tagCount();
-        return ILitematicaBlockStatePalette.super.readFromLitematicaTag(tagList);
-    }
-
-    @Override
-    public boolean readFromSpongeTag(NBTTagCompound tag)
-    {
-        this.currentSize = tag.getKeySet().size();
-        return ILitematicaBlockStatePalette.super.readFromSpongeTag(tag);
-    }
-
-    @Override
-    public NBTTagList writeToLitematicaTag()
-    {
-        NBTTagList tagList = new NBTTagList();
-
-        for (int id = 0; id < this.currentSize; ++id)
-        {
-            NBTTagCompound tag = new NBTTagCompound();
-            NBTUtil.writeBlockState(tag, this.states[id]);
-            tagList.appendTag(tag);
-        }
-
-        return tagList;
-    }
-
-    @Override
-    public NBTTagCompound writeToSpongeTag()
-    {
-        NBTTagCompound tag = new NBTTagCompound();
-
-        for (int id = 0; id < this.currentSize; ++id)
-        {
-            IBlockState state = this.states[id];
-            tag.setInteger(state.toString(), id);
-        }
-
-        return tag;
-    }
-
-    @Override
-    public LitematicaBlockStatePaletteLinear copy()
-    {
-        LitematicaBlockStatePaletteLinear copy = new LitematicaBlockStatePaletteLinear(this.bits, this.paletteResizer);
+        LitematicaBlockStatePaletteLinear copy = new LitematicaBlockStatePaletteLinear(this.bits, resizeHandler);
 
         System.arraycopy(this.states, 0, copy.states, 0, this.states.length);
         copy.currentSize  = this.currentSize;

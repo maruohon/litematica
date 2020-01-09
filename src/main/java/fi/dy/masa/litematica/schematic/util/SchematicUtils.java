@@ -14,7 +14,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave;
 import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
@@ -64,7 +64,7 @@ public class SchematicUtils
 
     @Nullable
     public static BlockPos getSchematicContainerPositionFromWorldPosition(BlockPos worldPos, ISchematic schematic, String regionName,
-            SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, LitematicaBlockStateContainer container)
+            SchematicPlacement schematicPlacement, SubRegionPlacement regionPlacement, ILitematicaBlockStateContainer container)
     {
         ISchematicRegion region = schematic.getSchematicRegion(regionName);
 

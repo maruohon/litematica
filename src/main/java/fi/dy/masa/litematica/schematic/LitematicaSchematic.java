@@ -21,7 +21,8 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.mixin.IMixinNBTTagLongArray;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -35,7 +36,7 @@ public class LitematicaSchematic extends SchematicBase
     public static final String FILE_NAME_EXTENSION = ".litematic";
     public static final int SCHEMATIC_VERSION = 4;
 
-    private final Map<String, LitematicaBlockStateContainer> blockContainers = new HashMap<>();
+    private final Map<String, LitematicaBlockStateContainerFull> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, NBTTagCompound>> blockEntities = new HashMap<>();
     private final Map<String, Map<BlockPos, NextTickListEntry>> pendingBlockTicks = new HashMap<>();
     private final Map<String, List<EntityInfo>> entities = new HashMap<>();
@@ -156,7 +157,7 @@ public class LitematicaSchematic extends SchematicBase
 
             try
             {
-                this.blockContainers.put(regionName, new LitematicaBlockStateContainer(new Vec3i(sizeX, sizeY, sizeZ)));
+                this.blockContainers.put(regionName, new LitematicaBlockStateContainerFull(new Vec3i(sizeX, sizeY, sizeZ)));
             }
             catch (Exception e)
             {
@@ -183,9 +184,21 @@ public class LitematicaSchematic extends SchematicBase
             {
                 String regionName = regionEntry.getKey();
                 ISchematicRegion region = regionEntry.getValue();
+                ILitematicaBlockStateContainer containerOther = region.getBlockStateContainer();
 
                 this.subRegions.put(regionName, new SubRegion(region.getPosition(), region.getSize()));
-                this.blockContainers.put(regionName, region.getBlockStateContainer().copy());
+
+                if (containerOther instanceof LitematicaBlockStateContainerFull)
+                {
+                    this.blockContainers.put(regionName, (LitematicaBlockStateContainerFull) containerOther.copy());
+                }
+                else
+                {
+                    Vec3i size = containerOther.getSize();
+                    LitematicaBlockStateContainerFull container = new LitematicaBlockStateContainerFull(size);
+                    this.copyContainerContents(containerOther, container);
+                    this.blockContainers.put(regionName, container);
+                }
 
                 Map<BlockPos, NBTTagCompound> blockEntityMap = new HashMap<>();
                 Map<BlockPos, NextTickListEntry> blockTickMap = new HashMap<>();
@@ -255,14 +268,14 @@ public class LitematicaSchematic extends SchematicBase
         {
             for (String regionName : this.blockContainers.keySet())
             {
-                LitematicaBlockStateContainer blockContainer = this.blockContainers.get(regionName);
+                LitematicaBlockStateContainerFull blockContainer = (LitematicaBlockStateContainerFull) this.blockContainers.get(regionName);
                 Map<BlockPos, NBTTagCompound> tileMap = this.blockEntities.get(regionName);
                 List<EntityInfo> entityList = this.entities.get(regionName);
                 Map<BlockPos, NextTickListEntry> pendingTicks = this.pendingBlockTicks.get(regionName);
 
                 NBTTagCompound tag = new NBTTagCompound();
 
-                tag.setTag("BlockStatePalette", blockContainer.getPalette().writeToLitematicaTag());
+                tag.setTag("BlockStatePalette", this.writePaletteToLitematicaFormatTag(blockContainer.getPalette()));
                 tag.setTag("BlockStates", new NBTTagLongArray(blockContainer.getBackingLongArray()));
 
                 if (tileMap != null)
@@ -359,24 +372,26 @@ public class LitematicaSchematic extends SchematicBase
                     if (nbtBase != null && nbtBase.getId() == Constants.NBT.TAG_LONG_ARRAY)
                     {
                         Vec3i size = new Vec3i(Math.abs(regionSize.getX()), Math.abs(regionSize.getY()), Math.abs(regionSize.getZ()));
-                        NBTTagList palette = regionTag.getTagList("BlockStatePalette", Constants.NBT.TAG_COMPOUND);
+                        NBTTagList paletteTag = regionTag.getTagList("BlockStatePalette", Constants.NBT.TAG_COMPOUND);
                         long[] blockStateArr = ((IMixinNBTTagLongArray) nbtBase).getArray();
+                        int paletteSize = paletteTag.tagCount();
 
-                        @Nullable LitematicaBlockStateContainer container = LitematicaBlockStateContainer.createFromLitematicaFormat(palette, blockStateArr, size);
+                        LitematicaBlockStateContainerFull container = LitematicaBlockStateContainerFull.createContainer(paletteSize, blockStateArr, size);
 
-                        if (container != null)
-                        {
-                            this.blockContainers.put(regionName, container);
-                            continue;
-                        }
-                        else
+                        if (container == null)
                         {
                             InfoUtils.printErrorMessage("litematica.error.schematic_read_from_file_failed.region_container",
                                     regionName, this.getFile() != null ? this.getFile().getName() : "<null>");
+                            return false;
                         }
-                    }
 
-                    return false;
+                        this.readPaletteFromLitematicaFormatTag(paletteTag, container.getPalette());
+                        this.blockContainers.put(regionName, container);
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -429,7 +444,7 @@ public class LitematicaSchematic extends SchematicBase
             if (posVec != null && entityData.isEmpty() == false)
             {
                 // Update the correct position to the Entity NBT, where it is stored in version 2
-                NBTUtils.writeEntityPositionToTag(posVec, entityData);
+                NBTUtils.writeVec3dToListTag(posVec, entityData);
                 entityList.add(new EntityInfo(posVec, entityData));
             }
         }
@@ -509,7 +524,7 @@ public class LitematicaSchematic extends SchematicBase
         }
 
         @Override
-        public LitematicaBlockStateContainer getBlockStateContainer()
+        public ILitematicaBlockStateContainer getBlockStateContainer()
         {
             return this.schematic.blockContainers.get(this.regionName);
         }

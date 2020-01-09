@@ -27,7 +27,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -55,7 +55,7 @@ public class SchematicPlacingUtils
             {
                 BlockPos regionPos = placement.getPos();
                 Vec3i regionSize = region.getSize();
-                LitematicaBlockStateContainer container = region.getBlockStateContainer();
+                ILitematicaBlockStateContainer container = region.getBlockStateContainer();
                 Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
                 List<EntityInfo> entityList = region.getEntityList();
                 Map<BlockPos, NextTickListEntry> scheduledBlockTicks = region.getBlockTickMap();
@@ -83,7 +83,7 @@ public class SchematicPlacingUtils
 
     public static boolean placeBlocksToWorld(World world, BlockPos origin, BlockPos regionPos, Vec3i regionSize,
             SchematicPlacement schematicPlacement, SubRegionPlacement placement,
-            LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap,
+            ILitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap,
             @Nullable Map<BlockPos, NextTickListEntry> scheduledTicks, LayerRange range, boolean notifyNeighbors)
     {
         // These are the untransformed relative positions
@@ -137,7 +137,7 @@ public class SchematicPlacingUtils
             {
                 for (int x = startX; x <= endX; ++x)
                 {
-                    IBlockState state = container.get(x, y, z);
+                    IBlockState state = container.getBlockState(x, y, z);
 
                     if (state.getBlock() == Blocks.STRUCTURE_VOID)
                     {
@@ -299,7 +299,7 @@ public class SchematicPlacingUtils
             {
                 BlockPos regionPos = placement.getPos();
                 Vec3i regionSize = region.getSize();
-                LitematicaBlockStateContainer container = region.getBlockStateContainer();
+                ILitematicaBlockStateContainer container = region.getBlockStateContainer();
                 Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
                 List<EntityInfo> entityList = region.getEntityList();
 
@@ -325,7 +325,7 @@ public class SchematicPlacingUtils
     public static void placeBlocksWithinChunk(World world, ChunkPos chunkPos, String regionName,
             BlockPos origin, BlockPos regionPos, Vec3i regionSize,
             SchematicPlacement schematicPlacement, SubRegionPlacement placement,
-            LitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
+            ILitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
     {
         IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
 
@@ -395,7 +395,7 @@ public class SchematicPlacingUtils
             {
                 for (int x = startX; x <= endX; ++x)
                 {
-                    IBlockState state = container.get(x, y, z);
+                    IBlockState state = container.getBlockState(x, y, z);
 
                     if (state.getBlock() == Blocks.AIR)
                     {

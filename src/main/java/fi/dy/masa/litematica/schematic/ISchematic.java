@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -132,7 +133,7 @@ public interface ISchematic
         catch (Exception e)
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exception", file.getAbsolutePath());
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, e.getMessage());
+            LiteModLitematica.logger.warn("Failed to write schematic to file '{}'", file.getAbsolutePath(), e);
         }
 
         return false;

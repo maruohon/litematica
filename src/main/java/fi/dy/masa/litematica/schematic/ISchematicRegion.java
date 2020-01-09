@@ -6,7 +6,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 
 public interface ISchematicRegion
 {
@@ -28,7 +28,7 @@ public interface ISchematicRegion
      * Returns the block state container used for storing the block states in this region
      * @return
      */
-    LitematicaBlockStateContainer getBlockStateContainer();
+    ILitematicaBlockStateContainer getBlockStateContainer();
 
     /**
      * Returns the BlockEntity map used for this region

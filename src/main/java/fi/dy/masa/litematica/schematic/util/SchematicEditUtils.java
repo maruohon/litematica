@@ -23,7 +23,7 @@ import fi.dy.masa.litematica.mixin.IMixinItemBlockSpecial;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager.PlacementPart;
@@ -298,7 +298,7 @@ public class SchematicEditUtils
                             continue;
                         }
 
-                        LitematicaBlockStateContainer container = region.getBlockStateContainer();
+                        ILitematicaBlockStateContainer container = region.getBlockStateContainer();
                         BlockPos posSchematic = SchematicUtils.getSchematicContainerPositionFromWorldPosition(pos, schematic,
                                 regionName, placement, placement.getRelativeSubRegionPlacement(regionName), container);
 
@@ -306,7 +306,7 @@ public class SchematicEditUtils
                         {
                             state = SchematicUtils.getUntransformedBlockState(state, placement, regionName);
 
-                            IBlockState stateOriginal = container.get(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ());
+                            IBlockState stateOriginal = container.getBlockState(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ());
 
                             SchematicMetadata metadata = schematic.getMetadata();
                             long totalBlocks = metadata.getTotalBlocks();
@@ -323,7 +323,7 @@ public class SchematicEditUtils
 
                             totalBlocks += increment;
 
-                            container.set(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ(), state);
+                            container.setBlockState(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ(), state);
 
                             metadata.setTotalBlocks(totalBlocks);
                             metadata.setTimeModifiedToNow();
@@ -367,7 +367,7 @@ public class SchematicEditUtils
                             continue;
                         }
 
-                        LitematicaBlockStateContainer container = region.getBlockStateContainer();
+                        ILitematicaBlockStateContainer container = region.getBlockStateContainer();
                         BlockPos posStartSchematic = SchematicUtils.getSchematicContainerPositionFromWorldPosition(posStart, schematic,
                                 regionName, schematicPlacement, placement, container);
                         BlockPos posEndSchematic = SchematicUtils.getSchematicContainerPositionFromWorldPosition(posEnd, schematic,
@@ -394,7 +394,7 @@ public class SchematicEditUtils
                                 {
                                     for (int x = minX; x <= maxX; ++x)
                                     {
-                                        IBlockState stateOriginal = container.get(x, y, z);
+                                        IBlockState stateOriginal = container.getBlockState(x, y, z);
 
                                         if (stateOriginal.getBlock() != Blocks.AIR)
                                         {
@@ -407,7 +407,7 @@ public class SchematicEditUtils
 
                                         totalBlocks += increment;
 
-                                        container.set(x, y, z, state);
+                                        container.setBlockState(x, y, z, state);
                                     }
                                 }
                             }
@@ -509,7 +509,7 @@ public class SchematicEditUtils
             }
 
             SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
-            LitematicaBlockStateContainer container = region.getBlockStateContainer();
+            ILitematicaBlockStateContainer container = region.getBlockStateContainer();
             Vec3i regionSize = region.getSize();
 
             if (container == null || placement == null || regionSize == null)
@@ -560,9 +560,9 @@ public class SchematicEditUtils
                 {
                     for (int x = startX; x <= endX; ++x)
                     {
-                        if (container.get(x, y, z) == stateOriginal)
+                        if (container.getBlockState(x, y, z) == stateOriginal)
                         {
-                            container.set(x, y, z, stateNew);
+                            container.setBlockState(x, y, z, stateNew);
                             totalBlocks += increment;
                         }
                     }

@@ -1,19 +1,18 @@
 package fi.dy.masa.litematica.schematic.container;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.IntIdentityHashBiMap;
 
 public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockStatePalette
 {
-    private final IntIdentityHashBiMap<IBlockState> statePaletteMap;
-    private final ILitematicaBlockStatePaletteResizer paletteResizer;
-    private final int bits;
+    protected final IntIdentityHashBiMap<IBlockState> statePaletteMap;
+    protected final IPaletteResizeHandler paletteResizer;
+    protected final int bits;
 
-    public LitematicaBlockStatePaletteHashMap(int bitsIn, ILitematicaBlockStatePaletteResizer paletteResizer)
+    public LitematicaBlockStatePaletteHashMap(int bitsIn, IPaletteResizeHandler paletteResizer)
     {
         this.bits = bitsIn;
         this.paletteResizer = paletteResizer;
@@ -23,19 +22,19 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     @Override
     public int idFor(IBlockState state)
     {
-        int i = this.statePaletteMap.getId(state);
+        int id = this.statePaletteMap.getId(state);
 
-        if (i == -1)
+        if (id == -1)
         {
-            i = this.statePaletteMap.add(state);
+            id = this.statePaletteMap.add(state);
 
-            if (i >= (1 << this.bits))
+            if (id >= (1 << this.bits))
             {
-                i = this.paletteResizer.onResize(this.bits + 1, state);
+                id = this.paletteResizer.onResize(this.bits + 1, state, this);
             }
         }
 
-        return i;
+        return id;
     }
 
     @Override
@@ -52,61 +51,37 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     }
 
     @Override
-    public boolean setIdFor(int id, IBlockState state)
+    public List<IBlockState> getMapping()
     {
-        if (id >= 0)
+        final int size = this.statePaletteMap.size();
+        List<IBlockState> list = new ArrayList<>(size);
+
+        for (int id = 0; id < size; ++id)
         {
-            this.statePaletteMap.put(state, id);
-            return true;
+            list.add(this.statePaletteMap.get(id));
         }
-        else
-        {
-            return false;
-        }
+
+        return list;
     }
 
     @Override
-    public NBTTagList writeToLitematicaTag()
+    public boolean setMapping(List<IBlockState> list)
     {
-        NBTTagList tagList = new NBTTagList();
+        this.statePaletteMap.clear();
+        final int size = list.size();
 
-        for (int id = 0; id < this.statePaletteMap.size(); ++id)
+        for (int id = 0; id < size; ++id)
         {
-            IBlockState state = this.statePaletteMap.get(id);
-
-            if (state != null)
-            {
-                NBTTagCompound tag = new NBTTagCompound();
-                NBTUtil.writeBlockState(tag, state);
-                tagList.appendTag(tag);
-            }
+            this.statePaletteMap.add(list.get(id));
         }
 
-        return tagList;
+        return true;
     }
 
     @Override
-    public NBTTagCompound writeToSpongeTag()
+    public LitematicaBlockStatePaletteHashMap copy(IPaletteResizeHandler resizeHandler)
     {
-        NBTTagCompound tag = new NBTTagCompound();
-
-        for (int id = 0; id < this.statePaletteMap.size(); ++id)
-        {
-            IBlockState state = this.statePaletteMap.get(id);
-
-            if (state != null)
-            {
-                tag.setInteger(state.toString(), id);
-            }
-        }
-
-        return tag;
-    }
-
-    @Override
-    public LitematicaBlockStatePaletteHashMap copy()
-    {
-        LitematicaBlockStatePaletteHashMap copy = new LitematicaBlockStatePaletteHashMap(this.bits, this.paletteResizer);
+        LitematicaBlockStatePaletteHashMap copy = new LitematicaBlockStatePaletteHashMap(this.bits, resizeHandler);
 
         for (int id = 0; id < this.statePaletteMap.size(); ++id)
         {

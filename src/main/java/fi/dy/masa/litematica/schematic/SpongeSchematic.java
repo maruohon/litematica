@@ -5,12 +5,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
+import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -83,6 +87,35 @@ public class SpongeSchematic extends SingleRegionSchematic
         }
     }
 
+    protected boolean readPaletteFromTag(NBTTagCompound tag, ILitematicaBlockStatePalette palette)
+    {
+        final int size = tag.getKeySet().size();
+        List<IBlockState> list = new ArrayList<>(size);
+        for (int i = 0; i < size; ++i) { list.add(null); }
+
+        for (String key : tag.getKeySet())
+        {
+            int id = tag.getInteger(key);
+            IBlockState state = BlockUtils.getBlockStateFromString(key);
+
+            if (state == null)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.error.schematic_read.sponge.palette.unknown_block", key);
+                state = LitematicaBlockStateContainerFull.AIR_BLOCK_STATE;
+            }
+
+            if (id < 0 || id >= size)
+            {
+                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.sponge.palette.invalid_id", id);
+                return false;
+            }
+
+            list.set(id, state);
+        }
+
+        return palette.setMapping(list);
+    }
+
     @Override
     protected boolean readBlocksFromTag(NBTTagCompound tag)
     {
@@ -92,8 +125,9 @@ public class SpongeSchematic extends SingleRegionSchematic
         {
             NBTTagCompound paletteTag = tag.getCompoundTag("Palette");
             byte[] blockData = tag.getByteArray("BlockData");
+            int paletteSize = paletteTag.getKeySet().size();
 
-            this.blockContainer = LitematicaBlockStateContainer.createFromSpongeFormat(paletteTag, blockData, this.getSize());
+            this.blockContainer = LitematicaBlockStateContainerFull.createContainer(paletteSize, blockData, this.getSize());
 
             if (this.blockContainer == null)
             {
@@ -101,7 +135,7 @@ public class SpongeSchematic extends SingleRegionSchematic
                 return false;
             }
 
-            return true;
+            return this.readPaletteFromTag(paletteTag, this.blockContainer.getPalette());
         }
 
         return false;
@@ -152,7 +186,7 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound entityData = tagList.getCompoundTagAt(i);
-            Vec3d pos = NBTUtils.readEntityPositionFromTag(entityData);
+            Vec3d pos = NBTUtils.readVec3dFromListTag(entityData);
 
             if (pos != null && entityData.isEmpty() == false)
             {
@@ -182,11 +216,25 @@ public class SpongeSchematic extends SingleRegionSchematic
 
     protected void writeBlocksToTag(NBTTagCompound tag)
     {
-        NBTTagCompound paletteTag = this.blockContainer.getPalette().writeToSpongeTag();
-        byte[] blockData = this.blockContainer.getBackingArrayAsByteArray();
+        NBTTagCompound paletteTag = this.writePaletteToTag(this.blockContainer.getPalette().getMapping());
+        byte[] blockData = ((LitematicaBlockStateContainerFull) this.blockContainer).getBackingArrayAsByteArray();
 
         tag.setTag("Palette", paletteTag);
         tag.setByteArray("BlockData", blockData);
+    }
+
+    protected NBTTagCompound writePaletteToTag(List<IBlockState> list)
+    {
+        final int size = list.size();
+        NBTTagCompound tag = new NBTTagCompound();
+
+        for (int id = 0; id < size; ++id)
+        {
+            IBlockState state = list.get(id);
+            tag.setInteger(state.toString(), id);
+        }
+
+        return tag;
     }
 
     protected void writeBlockEntitiesToTag(NBTTagCompound tag)
@@ -221,7 +269,7 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (EntityInfo info : this.entities)
         {
             NBTTagCompound entityData = info.nbt.copy();
-            NBTUtils.writeEntityPositionToTag(info.pos, entityData);
+            NBTUtils.writeVec3dToListTag(info.pos, entityData);
 
             // Add the Sponge tag and remove the vanilla/Litematica tag
             entityData.setString("Id", entityData.getString("id"));
