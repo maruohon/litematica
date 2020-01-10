@@ -18,6 +18,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -33,6 +35,7 @@ import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
 import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -43,7 +46,9 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.config.values.LayerMode;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -55,6 +60,7 @@ import fi.dy.masa.malilib.util.WorldUtils;
 public class SchematicPlacementManager
 {
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
+    private final List<SchematicPlacementUnloaded> lightlyLoadedPlacements = new ArrayList<>();
     private final HashMultimap<ChunkPos, SchematicPlacement> schematicsTouchingChunk = HashMultimap.create();
     private final ArrayListMultimap<SubChunkPos, PlacementPart> touchedVolumesInSubChunk = ArrayListMultimap.create();
     private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
@@ -191,9 +197,17 @@ public class SchematicPlacementManager
         }
     }
 
-    public List<SchematicPlacement> getAllSchematicsPlacements()
+    public List<SchematicPlacement> getEnabledSchematicPlacements()
     {
         return this.schematicPlacements;
+    }
+
+    public List<SchematicPlacementUnloaded> getAllSchematicPlacements()
+    {
+        List<SchematicPlacementUnloaded> list = new ArrayList<>();
+        list.addAll(this.schematicPlacements);
+        list.addAll(this.lightlyLoadedPlacements);
+        return list;
     }
 
     public List<IntBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
@@ -291,32 +305,41 @@ public class SchematicPlacementManager
         }
     }
 
-    public boolean removeSchematicPlacement(SchematicPlacement placement)
+    public boolean removeSchematicPlacement(SchematicPlacementUnloaded placement)
     {
         return this.removeSchematicPlacement(placement, true);
     }
 
-    public boolean removeSchematicPlacement(SchematicPlacement placement, boolean update)
+    public boolean removeSchematicPlacement(SchematicPlacementUnloaded placement, boolean update)
     {
         if (this.selectedPlacement == placement)
         {
             this.selectedPlacement = null;
         }
 
-        boolean ret = this.schematicPlacements.remove(placement);
-        this.removeTouchedChunksFor(placement);
-
-        if (ret)
+        if (placement.isLoaded())
         {
-            placement.onRemoved();
+            SchematicPlacement loadedPlacement = (SchematicPlacement) placement;
+            boolean ret = this.schematicPlacements.remove(loadedPlacement);
+            this.removeTouchedChunksFor(loadedPlacement);
 
-            if (update)
+            if (ret)
             {
-                this.onPlacementModified(placement);
-            }
-        }
+                loadedPlacement.onRemoved();
 
-        return ret;
+                if (update)
+                {
+                    this.updateOverlayRenderer(loadedPlacement);
+                }
+            }
+
+            return ret;
+        }
+        else
+        {
+            this.lightlyLoadedPlacements.remove(placement);
+            return false;
+        }
     }
 
     public List<SchematicPlacement> getAllPlacementsOfSchematic(ISchematic schematic)
@@ -406,7 +429,7 @@ public class SchematicPlacementManager
             }
 
             this.markChunksForRebuild(placement);
-            this.onPlacementModified(placement);
+            this.updateOverlayRenderer(placement);
         }
     }
 
@@ -433,13 +456,13 @@ public class SchematicPlacementManager
         }
     }
 
-    void onPrePlacementChange(SchematicPlacement placement)
+    private void onPrePlacementChange(SchematicPlacement placement)
     {
         this.chunksPreChange.clear();
         this.chunksPreChange.addAll(placement.getTouchedChunks());
     }
 
-    void onPostPlacementChange(SchematicPlacement placement)
+    private void onPostPlacementChange(SchematicPlacement placement)
     {
         Set<ChunkPos> chunksPost = placement.getTouchedChunks();
         Set<ChunkPos> toRebuild = new HashSet<>(chunksPost);
@@ -476,7 +499,268 @@ public class SchematicPlacementManager
         }
 
         this.markChunksForRebuild(toRebuild);
+        this.updateOverlayRenderer(placement);
+    }
+
+    private void onPlacementModified(SchematicPlacement placement)
+    {
+        placement.updateEnclosingBox();
+        this.onPostPlacementChange(placement);
+        OverlayRenderer.getInstance().updatePlacementCache();
+    }
+
+    private void onPlacementRegionModified(SchematicPlacement placement)
+    {
+        placement.checkAreSubRegionsModified();
         this.onPlacementModified(placement);
+    }
+
+    private void updateOverlayRenderer(SchematicPlacement placement)
+    {
+        if (placement.isEnabled())
+        {
+            OverlayRenderer.getInstance().updatePlacementCache();
+        }
+    }
+
+    public void toggleEnabled(SchematicPlacementUnloaded placement)
+    {
+        if (placement.isLoaded())
+        {
+            SchematicPlacement loadedPlacement = (SchematicPlacement) placement;
+            this.onPrePlacementChange(loadedPlacement);
+            loadedPlacement.toggleEnabled();
+            this.onPlacementModified(loadedPlacement);
+        }
+        else
+        {
+            SchematicPlacement loadedPlacement = placement.fullyLoadPlacement();
+
+            if (loadedPlacement != null)
+            {
+                loadedPlacement.toggleEnabled();
+                this.addSchematicPlacement(loadedPlacement, false);
+                this.lightlyLoadedPlacements.remove(placement);
+                this.addTouchedChunksFor(loadedPlacement);
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_placement.load_failed", placement.getName(), placement.getSchematicFile());
+            }
+        }
+    }
+
+    public void toggleRenderingEnabled(SchematicPlacement placement)
+    {
+        // Marks the currently touched chunks before doing the modification
+        this.onPrePlacementChange(placement);
+        placement.toggleRenderingEnabled();
+        this.onPlacementModified(placement);
+    }
+
+    public void toggleIgnoreEntities(SchematicPlacement placement, IMessageConsumer feedback)
+    {
+        this.onPrePlacementChange(placement);
+        placement.toggleIgnoreEntities();
+        this.onPlacementModified(placement);
+    }
+
+    public void setOrigin(SchematicPlacement placement, BlockPos origin, IStringConsumer feedback)
+    {
+        if (placement.isLocked())
+        {
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        BlockPos oldOrigin = placement.getOrigin();
+        origin = PositionUtils.getModifiedPartiallyLockedPosition(oldOrigin, origin, placement.coordinateLockMask);
+
+        if (oldOrigin.equals(origin) == false)
+        {
+            this.onPrePlacementChange(placement);
+            placement.setOrigin(origin);
+            this.onPlacementModified(placement);
+        }
+    }
+
+    public void setRotation(SchematicPlacement placement, Rotation rotation, IMessageConsumer feedback)
+    {
+        if (placement.isLocked())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        if (placement.getRotation() != rotation)
+        {
+            this.onPrePlacementChange(placement);
+            placement.setRotation(rotation);
+            this.onPlacementModified(placement);
+        }
+    }
+
+    public void rotateBy(SchematicPlacement placement, Rotation rotation)
+    {
+        this.setRotation(placement, rotation, InfoUtils.INGAME_MESSAGE_CONSUMER);
+    }
+
+    public void setMirror(SchematicPlacement placement, Mirror mirror, IMessageConsumer feedback)
+    {
+        if (placement.isLocked())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        if (placement.getMirror() != mirror)
+        {
+            this.onPrePlacementChange(placement);
+            placement.setMirror(mirror);
+            this.onPlacementModified(placement);
+        }
+    }
+
+    public void toggleSubRegionEnabled(SchematicPlacement placement, String regionName, IMessageConsumer feedback)
+    {
+        SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
+
+        if (subPlacement != null)
+        {
+            this.onPrePlacementChange(placement);
+            placement.toggleSubRegionEnabled(regionName);
+            this.onPlacementRegionModified(placement);
+        }
+    }
+
+    public void toggleSubRegionIgnoreEntities(SchematicPlacement placement, String regionName, IMessageConsumer feedback)
+    {
+        SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
+
+        if (subPlacement != null)
+        {
+            this.onPrePlacementChange(placement);
+            placement.toggleSubRegionIgnoreEntities(regionName);
+            this.onPlacementRegionModified(placement);
+        }
+    }
+
+    public void setSubRegionsEnabled(SchematicPlacement placement, boolean enabled, Collection<SubRegionPlacement> subRegions)
+    {
+        this.onPrePlacementChange(placement);
+        placement.setSubRegionsEnabledState(enabled, subRegions);
+        this.onPlacementRegionModified(placement);
+    }
+
+    public void toggleSubRegionRenderingEnabled(SchematicPlacement placement, String regionName)
+    {
+        SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
+
+        if (subPlacement != null)
+        {
+            this.onPrePlacementChange(placement);
+            placement.toggleSubRegionRenderingEnabled(regionName);
+            this.onPlacementRegionModified(placement);
+        }
+    }
+
+    public void setSubRegionRotation(SchematicPlacement placement, String regionName, Rotation rotation, IMessageConsumer feedback)
+    {
+        if (placement.isLocked())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
+
+        if (subPlacement != null)
+        {
+            this.onPrePlacementChange(placement);
+            placement.setSubRegionRotation(regionName, rotation);
+            this.onPlacementRegionModified(placement);
+        }
+    }
+
+    public void setSubRegionMirror(SchematicPlacement placement, String regionName, Mirror mirror, IMessageConsumer feedback)
+    {
+        if (placement.isLocked())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
+
+        if (subPlacement != null)
+        {
+            this.onPrePlacementChange(placement);
+            placement.setSubRegionMirror(regionName, mirror);
+            this.onPlacementRegionModified(placement);
+        }
+    }
+
+    public void moveSubRegionTo(SchematicPlacement placement, String regionName, BlockPos newPos, IStringConsumer feedback)
+    {
+        if (placement.isLocked())
+        {
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
+
+        if (subPlacement != null)
+        {
+            this.onPrePlacementChange(placement);
+            placement.moveSubRegionTo(regionName, newPos);
+            this.onPlacementRegionModified(placement);
+        }
+    }
+
+    public void resetSubRegionToSchematicValues(SchematicPlacement placement, String regionName, IMessageConsumer feedback)
+    {
+        if (placement.isLocked())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        ISchematicRegion region = placement.getSchematic().getSchematicRegion(regionName);
+        SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
+
+        if (region != null && subPlacement != null)
+        {
+            this.onPrePlacementChange(placement);
+            placement.resetSubRegionToSchematicValues(regionName);
+            this.onPlacementRegionModified(placement);
+        }
+    }
+
+    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, IStringConsumer feedback)
+    {
+        this.resetAllSubRegionsToSchematicValues(placement, feedback, true);
+    }
+
+    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, IStringConsumer feedback, boolean updatePlacementManager)
+    {
+        if (placement.isLocked())
+        {
+            feedback.setString("litematica.message.placement.cant_modify_is_locked");
+            return;
+        }
+
+        if (updatePlacementManager)
+        {
+            this.onPrePlacementChange(placement);
+        }
+
+        placement.resetAllSubRegionsToSchematicValues();
+
+        if (updatePlacementManager)
+        {
+            this.onPlacementModified(placement);
+        }
     }
 
     private void updateTouchedBoxesInChunk(ChunkPos pos)
@@ -549,14 +833,6 @@ public class SchematicPlacementManager
     public void markChunkForRebuild(ChunkPos pos)
     {
         this.chunksToRebuild.add(pos);
-    }
-
-    private void onPlacementModified(SchematicPlacement placement)
-    {
-        if (placement.isEnabled())
-        {
-            OverlayRenderer.getInstance().updatePlacementCache();
-        }
     }
 
     public boolean changeSelection(World world, Entity entity, int maxDistance)
@@ -634,7 +910,7 @@ public class SchematicPlacementManager
 
             if (movingBox)
             {
-                schematicPlacement.moveSubRegionTo(schematicPlacement.getSelectedSubRegionName(), pos, InfoUtils.INFO_MESSAGE_CONSUMER);
+                this.moveSubRegionTo(schematicPlacement, schematicPlacement.getSelectedSubRegionName(), pos, InfoUtils.INFO_MESSAGE_CONSUMER);
 
                 String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
                 InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.placement.moved_subregion_to", posStr);
@@ -643,7 +919,7 @@ public class SchematicPlacementManager
             else
             {
                 BlockPos old = schematicPlacement.getOrigin();
-                schematicPlacement.setOrigin(pos, InfoUtils.INFO_MESSAGE_CONSUMER);
+                this.setOrigin(schematicPlacement, pos, InfoUtils.INFO_MESSAGE_CONSUMER);
 
                 if (old.equals(schematicPlacement.getOrigin()) == false)
                 {
@@ -676,13 +952,13 @@ public class SchematicPlacementManager
                 BlockPos old = PositionUtils.getTransformedBlockPos(placement.getPos(), schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 old = old.add(schematicPlacement.getOrigin());
 
-                schematicPlacement.moveSubRegionTo(placement.getName(), old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
+                this.moveSubRegionTo(schematicPlacement, placement.getName(), old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
             }
             // Moving the origin point
             else
             {
                 BlockPos old = schematicPlacement.getOrigin();
-                schematicPlacement.setOrigin(old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
+                this.setOrigin(schematicPlacement, old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
             }
         }
     }
@@ -766,6 +1042,7 @@ public class SchematicPlacementManager
     public void clear()
     {
         this.schematicPlacements.clear();
+        this.lightlyLoadedPlacements.clear();
         this.selectedPlacement = null;
         this.schematicsTouchingChunk.clear();
         this.touchedVolumesInSubChunk.clear();
@@ -779,16 +1056,17 @@ public class SchematicPlacementManager
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
+        List<SchematicPlacementUnloaded> list = this.getAllSchematicPlacements();
 
-        if (this.schematicPlacements.size() > 0)
+        if (list.isEmpty() == false)
         {
             JsonArray arr = new JsonArray();
             int selectedIndex = 0;
             boolean indexValid = false;
 
-            for (int i = 0; i < this.schematicPlacements.size(); ++i)
+            for (int i = 0; i < list.size(); ++i)
             {
-                SchematicPlacement placement = this.schematicPlacements.get(i);
+                SchematicPlacementUnloaded placement = list.get(i);
 
                 if (placement.shouldBeSaved() == false)
                 {
@@ -801,11 +1079,11 @@ public class SchematicPlacementManager
                 {
                     arr.add(objPlacement);
 
-                    if (this.selectedPlacement == placement)
+                    if (this.selectedPlacement == placement && placement.isEnabled())
                     {
                         indexValid = true;
                     }
-                    else if (indexValid == false)
+                    else if (indexValid == false && placement.isLoaded() && placement.isEnabled())
                     {
                         selectedIndex++;
                     }
@@ -840,11 +1118,23 @@ public class SchematicPlacementManager
 
                 if (el.isJsonObject())
                 {
-                    SchematicPlacement placement = SchematicPlacement.fromJson(el.getAsJsonObject());
+                    SchematicPlacementUnloaded placement = SchematicPlacementUnloaded.fromJson(el.getAsJsonObject());
 
                     if (placement != null)
                     {
-                        this.addSchematicPlacement(placement, false, true);
+                        if (placement.isEnabled())
+                        {
+                            SchematicPlacement loadedPlacement = placement.fullyLoadPlacement();
+
+                            if (loadedPlacement != null)
+                            {
+                                this.addSchematicPlacement(loadedPlacement, false, true);
+                            }
+                        }
+                        else
+                        {
+                            this.lightlyLoadedPlacements.add(placement);
+                        }
                     }
                 }
                 else

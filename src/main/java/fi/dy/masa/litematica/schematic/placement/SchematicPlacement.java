@@ -2,16 +2,12 @@ package fi.dy.masa.litematica.schematic.placement;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -19,11 +15,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
 import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListPlacement;
-import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
@@ -32,220 +25,34 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
-public class SchematicPlacement
+public class SchematicPlacement extends SchematicPlacementUnloaded
 {
-    private static final Set<Integer> USED_COLORS = new HashSet<>();
-    private static int nextColorIndex;
+    protected final ISchematic schematic;
+    protected final int subRegionCount;
 
-    private final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
-    private final int subRegionCount;
-    private SchematicVerifier verifier;
-    private ISchematic schematic;
-    private BlockPos origin;
-    private String name;
-    private Rotation rotation = Rotation.NONE;
-    private Mirror mirror = Mirror.NONE;
-    private BlockInfoListType verifierType = BlockInfoListType.ALL;
-    private boolean ignoreEntities;
-    private boolean enabled;
-    private boolean enableRender;
-    private boolean renderEnclosingBox;
-    private boolean regionPlacementsModified;
-    private boolean locked;
-    private boolean shouldBeSaved = true;
-    private int coordinateLockMask;
-    private int boxesBBColor;
-    private Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
-    @Nullable private Box enclosingBox;
-    @Nullable private File schematicFile;
-    @Nullable private String selectedSubRegionName;
-    @Nullable private MaterialListBase materialList;
+    @Nullable protected SchematicVerifier verifier;
+    @Nullable protected MaterialListBase materialList;
 
-    private SchematicPlacement(ISchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    protected SchematicPlacement(ISchematic schematic, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled, boolean enableRender)
     {
+        super(schematicFile, origin, name, enabled, enableRender);
+
         this.schematic = schematic;
-        this.schematicFile = schematic.getFile();
-        this.origin = origin;
-        this.name = name;
         this.subRegionCount = schematic.getSubRegionCount();
-        this.enabled = enabled;
-        this.enableRender = enableRender;
     }
 
-    public static SchematicPlacement createFor(ISchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    @Override
+    public boolean isLoaded()
     {
-        SchematicPlacement placement = new SchematicPlacement(schematic, origin, name, enabled, enableRender);
-        placement.setBoxesBBColorNext();
-        placement.resetAllSubRegionsToSchematicValues(InfoUtils.INFO_MESSAGE_CONSUMER);
-
-        return placement;
-    }
-
-    public boolean isEnabled()
-    {
-        return this.enabled;
-    }
-
-    public boolean isRenderingEnabled()
-    {
-        return this.isEnabled() && this.enableRender;
-    }
-
-    public boolean isLocked()
-    {
-        return this.locked;
-    }
-
-    public boolean shouldRenderEnclosingBox()
-    {
-        return this.renderEnclosingBox;
-    }
-
-    /**
-     * Returns whether or not this placement should be saved by the SchematicPlacementManager
-     * when it saves the list of placements.
-     * @return
-     */
-    public boolean shouldBeSaved()
-    {
-        return this.shouldBeSaved;
-    }
-
-    public void setShouldBeSaved(boolean shouldbeSaved)
-    {
-        this.shouldBeSaved = shouldbeSaved;
-    }
-
-    public boolean matchesRequirement(RequiredEnabled required)
-    {
-        switch (required)
-        {
-            case ANY:
-                return true;
-            case PLACEMENT_ENABLED:
-                return this.isEnabled();
-            default:
-                return this.isEnabled() && this.enableRender;
-        }
-    }
-
-    public boolean isRegionPlacementModified()
-    {
-        return this.regionPlacementsModified;
-    }
-
-    public boolean ignoreEntities()
-    {
-        return this.ignoreEntities;
-    }
-
-    public void toggleIgnoreEntities(IMessageConsumer feedback)
-    {
-        // Marks the currently touched chunks before doing the modification
-        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-        manager.onPrePlacementChange(this);
-
-        this.ignoreEntities = ! this.ignoreEntities;
-        this.onModified(manager);
-    }
-
-    public void toggleRenderEnclosingBox()
-    {
-        this.renderEnclosingBox = ! this.renderEnclosingBox;
-
-        if (this.shouldRenderEnclosingBox())
-        {
-            this.updateEnclosingBox();
-        }
-    }
-
-    public void toggleLocked()
-    {
-        this.locked = ! this.locked;
-    }
-
-    public void setCoordinateLocked(CoordinateType coord, boolean locked)
-    {
-        int mask = 0x1 << coord.ordinal();
-
-        if (locked)
-        {
-            this.coordinateLockMask |= mask;
-        }
-        else
-        {
-            this.coordinateLockMask &= ~mask;
-        }
-    }
-
-    public boolean isCoordinateLocked(CoordinateType coord)
-    {
-        int mask = 0x1 << coord.ordinal();
-        return (this.coordinateLockMask & mask) != 0;
-    }
-
-    public String getName()
-    {
-        return this.name;
+        return true;
     }
 
     public ISchematic getSchematic()
     {
         return schematic;
-    }
-
-    @Nullable
-    public File getSchematicFile()
-    {
-        return this.schematicFile;
-    }
-
-    @Nullable
-    public Box getEclosingBox()
-    {
-        return this.enclosingBox;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public SchematicPlacement setBoxesBBColor(int color)
-    {
-        this.boxesBBColor = color;
-        this.boxesBBColorVec = Color4f.fromColor(color, 1f);
-        USED_COLORS.add(color);
-        return this;
-    }
-
-    public BlockPos getOrigin()
-    {
-        return origin;
-    }
-
-    public Rotation getRotation()
-    {
-        return rotation;
-    }
-
-    public Mirror getMirror()
-    {
-        return mirror;
-    }
-
-    public Color4f getBoxesBBColor()
-    {
-        return this.boxesBBColorVec;
     }
 
     public int getSubRegionCount()
@@ -263,16 +70,6 @@ public class SchematicPlacement
         this.verifierType = type;
     }
 
-    public MaterialListBase getMaterialList()
-    {
-        if (this.materialList == null)
-        {
-            this.materialList = new MaterialListPlacement(this, true);
-        }
-
-        return this.materialList;
-    }
-
     public boolean hasVerifier()
     {
         return this.verifier != null;
@@ -286,6 +83,23 @@ public class SchematicPlacement
         }
 
         return this.verifier;
+    }
+
+    public MaterialListBase getMaterialList()
+    {
+        if (this.materialList == null)
+        {
+            if (this.materialListData != null)
+            {
+                this.materialList = MaterialListPlacement.createFromJson(this.materialListData, this);
+            }
+            else
+            {
+                this.materialList = new MaterialListPlacement(this, true);
+            }
+        }
+
+        return this.materialList;
     }
 
     public PlacementSettings getPlacementSettings()
@@ -352,7 +166,7 @@ public class SchematicPlacement
     }
     */
 
-    private void updateEnclosingBox()
+    protected void updateEnclosingBox()
     {
         if (this.shouldRenderEnclosingBox())
         {
@@ -507,7 +321,7 @@ public class SchematicPlacement
         return PositionUtils.getTouchedChunks(this.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED));
     }
 
-    private void checkAreSubRegionsModified()
+    protected void checkAreSubRegionsModified()
     {
         Map<String, ISchematicRegion> subRegions = this.schematic.getRegions();
 
@@ -531,209 +345,83 @@ public class SchematicPlacement
         this.regionPlacementsModified = false;
     }
 
-    /**
-     * Moves the sub-region to the given <b>absolute</b> position.
-     * @param regionName
-     * @param newPos
-     */
-    public void moveSubRegionTo(String regionName, BlockPos newPos, IStringConsumer feedback)
+    public void toggleRenderEnclosingBox()
     {
-        if (this.isLocked())
+        this.renderEnclosingBox = ! this.renderEnclosingBox;
+
+        if (this.shouldRenderEnclosingBox())
         {
-            feedback.setString("litematica.message.placement.cant_modify_is_locked");
-            return;
-        }
-
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            // The input argument position is an absolute position, so need to convert to relative position here
-            newPos = newPos.subtract(this.origin);
-            // The absolute-based input position needs to be transformed if the entire placement has been rotated or mirrored
-            newPos = PositionUtils.getReverseTransformedBlockPos(newPos, this.mirror, this.rotation);
-
-            this.relativeSubRegionPlacements.get(regionName).setPos(newPos);
-            this.onModified(regionName, manager);
+            this.updateEnclosingBox();
         }
     }
 
-    public void setSubRegionRotation(String regionName, Rotation rotation, IMessageConsumer feedback)
+    public void toggleLocked()
     {
-        if (this.isLocked())
+        this.locked = ! this.locked;
+    }
+
+    public void setCoordinateLocked(CoordinateType coord, boolean locked)
+    {
+        int mask = 0x1 << coord.ordinal();
+
+        if (locked)
         {
-            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
-            return;
+            this.coordinateLockMask |= mask;
         }
-
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
+        else
         {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            this.relativeSubRegionPlacements.get(regionName).setRotation(rotation);
-            this.onModified(regionName, manager);
+            this.coordinateLockMask &= ~mask;
         }
     }
 
-    public void setSubRegionMirror(String regionName, Mirror mirror, IMessageConsumer feedback)
+    public boolean isCoordinateLocked(CoordinateType coord)
     {
-        if (this.isLocked())
-        {
-            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
-            return;
-        }
+        int mask = 0x1 << coord.ordinal();
+        return (this.coordinateLockMask & mask) != 0;
 
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
+    }
 
-            this.relativeSubRegionPlacements.get(regionName).setMirror(mirror);
-            this.onModified(regionName, manager);
+    void toggleEnabled()
+    {
+        this.enabled = ! this.enabled;
+    }
+
+    void toggleRenderingEnabled()
+    {
+        this.enableRender = ! this.enableRender;
+    }
+
+    void toggleIgnoreEntities()
+    {
+        this.ignoreEntities = ! this.ignoreEntities;
+    }
+
+    void setOrigin(BlockPos origin)
+    {
+        this.origin = origin;
+    }
+
+    void setRotation(Rotation rotation)
+    {
+        this.rotation = rotation;
+    }
+
+    void setMirror(Mirror mirror)
+    {
+        this.mirror = mirror;
+    }
+
+    void toggleSubRegionEnabled(String regionName)
+    {
+        SubRegionPlacement subRegion = this.relativeSubRegionPlacements.get(regionName);
+
+        if (subRegion != null)
+        {
+            subRegion.toggleEnabled();
         }
     }
 
-    public void setSubRegionsEnabledState(boolean state, Collection<SubRegionPlacement> subRegions, IMessageConsumer feedback)
-    {
-        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-        // Marks the currently touched chunks before doing the modification
-        manager.onPrePlacementChange(this);
-
-        for (SubRegionPlacement placement : subRegions)
-        {
-            // Check that the sub-region is actually from this placement
-            placement = this.relativeSubRegionPlacements.get(placement.getName());
-
-            if (placement != null && placement.isEnabled() != state)
-            {
-                placement.setEnabled(state);
-            }
-        }
-
-        this.checkAreSubRegionsModified();
-        this.onModified(manager);
-    }
-
-    public void toggleSubRegionEnabled(String regionName, IMessageConsumer feedback)
-    {
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            this.relativeSubRegionPlacements.get(regionName).toggleEnabled();
-            this.onModified(regionName, manager);
-        }
-    }
-
-    public void toggleSubRegionIgnoreEntities(String regionName, IMessageConsumer feedback)
-    {
-        if (this.relativeSubRegionPlacements.containsKey(regionName))
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            this.relativeSubRegionPlacements.get(regionName).toggleIgnoreEntities();
-            this.onModified(regionName, manager);
-        }
-    }
-
-    public void resetAllSubRegionsToSchematicValues(IStringConsumer feedback)
-    {
-        this.resetAllSubRegionsToSchematicValues(feedback, true);
-    }
-
-    public void resetAllSubRegionsToSchematicValues(IStringConsumer feedback, boolean updatePlacementManager)
-    {
-        if (this.isLocked())
-        {
-            feedback.setString("litematica.message.placement.cant_modify_is_locked");
-            return;
-        }
-
-        if (updatePlacementManager)
-        {
-            // Marks the currently touched chunks before doing the modification
-            DataManager.getSchematicPlacementManager().onPrePlacementChange(this);
-        }
-
-        Map<String, ISchematicRegion> subRegions = this.schematic.getRegions();
-        this.relativeSubRegionPlacements.clear();
-        this.regionPlacementsModified = false;
-
-        for (Map.Entry<String, ISchematicRegion> entry : subRegions.entrySet())
-        {
-            String name = entry.getKey();
-            this.relativeSubRegionPlacements.put(name, new SubRegionPlacement(entry.getValue().getPosition(), name));
-        }
-
-        if (updatePlacementManager)
-        {
-            this.onModified(DataManager.getSchematicPlacementManager());
-        }
-    }
-
-    public void resetSubRegionToSchematicValues(String regionName, IMessageConsumer feedback)
-    {
-        if (this.isLocked())
-        {
-            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
-            return;
-        }
-
-        ISchematicRegion region = this.schematic.getSchematicRegion(regionName);
-        SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
-
-        if (region != null && placement != null)
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            placement.resetToOriginalValues();
-            this.onModified(regionName, manager);
-        }
-    }
-
-    public void setEnabled(boolean enabled)
-    {
-        if (enabled != this.enabled)
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            this.enabled = enabled;
-            this.onModified(manager);
-        }
-    }
-
-    public void toggleEnabled()
-    {
-        this.setEnabled(! this.enabled);
-    }
-
-    public void setRenderSchematic(boolean render)
-    {
-        if (render != this.enableRender)
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            this.enableRender = render;
-            this.onModified(manager);
-        }
-    }
-
-    public void toggleSubRegionRenderingEnabled(String regionName)
+    void toggleSubRegionRenderingEnabled(String regionName)
     {
         SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
 
@@ -743,281 +431,121 @@ public class SchematicPlacement
         }
     }
 
-    public SchematicPlacement setOrigin(BlockPos origin, IStringConsumer feedback)
+    void toggleSubRegionIgnoreEntities(String regionName)
     {
-        if (this.isLocked())
+        SubRegionPlacement subRegion = this.relativeSubRegionPlacements.get(regionName);
+
+        if (subRegion != null)
         {
-            feedback.setString("litematica.message.placement.cant_modify_is_locked");
-            return this;
-        }
-
-        origin = PositionUtils.getModifiedPartiallyLockedPosition(this.origin, origin, this.coordinateLockMask);
-
-        if (this.origin.equals(origin) == false)
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            this.origin = origin;
-            this.onModified(manager);
-        }
-
-        return this;
-    }
-
-    public SchematicPlacement setRotation(Rotation rotation, IMessageConsumer feedback)
-    {
-        if (this.isLocked())
-        {
-            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
-            return this;
-        }
-
-        if (this.rotation != rotation)
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            this.rotation = rotation;
-            this.onModified(manager);
-        }
-
-        return this;
-    }
-
-    public void rotateBy(Rotation rotation)
-    {
-        this.setRotation(this.rotation.add(rotation), InfoUtils.INGAME_MESSAGE_CONSUMER);
-    }
-
-    public SchematicPlacement setMirror(Mirror mirror, IMessageConsumer feedback)
-    {
-        if (this.isLocked())
-        {
-            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
-            return this;
-        }
-
-        if (this.mirror != mirror)
-        {
-            // Marks the currently touched chunks before doing the modification
-            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-            manager.onPrePlacementChange(this);
-
-            this.mirror = mirror;
-            this.onModified(manager);
-        }
-
-        return this;
-    }
-
-    private SchematicPlacement setBoxesBBColorNext()
-    {
-        return this.setBoxesBBColor(getNextBoxColor());
-    }
-
-    private void onModified(SchematicPlacementManager manager)
-    {
-        this.updateEnclosingBox();
-        manager.onPostPlacementChange(this);
-        OverlayRenderer.getInstance().updatePlacementCache();
-    }
-
-    private void onModified(String regionName, SchematicPlacementManager manager)
-    {
-        this.checkAreSubRegionsModified();
-        this.updateEnclosingBox();
-        manager.onPostPlacementChange(this);
-        OverlayRenderer.getInstance().updatePlacementCache();
-    }
-
-    public void onRemoved()
-    {
-        USED_COLORS.remove(this.boxesBBColor);
-
-        if (USED_COLORS.isEmpty())
-        {
-            nextColorIndex = 0;
+            subRegion.toggleIgnoreEntities();
         }
     }
 
+    void setSubRegionsEnabledState(boolean state, Collection<SubRegionPlacement> subRegions)
+    {
+        for (SubRegionPlacement subRegion : subRegions)
+        {
+            // Check that the sub-region is actually from this placement
+            subRegion = this.relativeSubRegionPlacements.get(subRegion.getName());
+
+            if (subRegion != null && subRegion.isEnabled() != state)
+            {
+                subRegion.setEnabled(state);
+            }
+        }
+    }
+
+    void setSubRegionRotation(String regionName, Rotation rotation)
+    {
+        SubRegionPlacement subRegion = this.relativeSubRegionPlacements.get(regionName);
+
+        if (subRegion != null)
+        {
+            subRegion.setRotation(rotation);
+        }
+    }
+
+    void setSubRegionMirror(String regionName, Mirror mirror)
+    {
+        SubRegionPlacement subRegion = this.relativeSubRegionPlacements.get(regionName);
+
+        if (subRegion != null)
+        {
+            subRegion.setMirror(mirror);
+        }
+    }
+
+    /**
+     * Moves the sub-region to the given <b>absolute</b> position.
+     * @param regionName
+     * @param newPos
+     */
+    void moveSubRegionTo(String regionName, BlockPos newPos)
+    {
+        SubRegionPlacement subRegion = this.relativeSubRegionPlacements.get(regionName);
+
+        if (subRegion != null)
+        {
+            // The input argument position is an absolute position, so need to convert to relative position here
+            newPos = newPos.subtract(this.origin);
+            // The absolute-based input position needs to be transformed if the entire placement has been rotated or mirrored
+            newPos = PositionUtils.getReverseTransformedBlockPos(newPos, this.mirror, this.rotation);
+
+            subRegion.setPos(newPos);
+        }
+    }
+
+    void resetSubRegionToSchematicValues(String regionName)
+    {
+        SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
+
+        if (placement != null)
+        {
+            placement.resetToOriginalValues();
+        }
+    }
+
+    void resetAllSubRegionsToSchematicValues()
+    {
+        Map<String, ISchematicRegion> subRegions = this.schematic.getRegions();
+        this.relativeSubRegionPlacements.clear();
+        this.regionPlacementsModified = false;
+
+        for (Map.Entry<String, ISchematicRegion> entry : subRegions.entrySet())
+        {
+            String name = entry.getKey();
+            this.relativeSubRegionPlacements.put(name, new SubRegionPlacement(entry.getValue().getPosition(), name));
+        }
+    }
+
+    public static SchematicPlacement createFor(ISchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    {
+        SchematicPlacement placement = new SchematicPlacement(schematic, schematic.getFile(), origin, name, enabled, enableRender);
+        placement.setBoxesBBColorNext();
+        placement.resetAllSubRegionsToSchematicValues();
+
+        return placement;
+    }
+
+    @Override
     @Nullable
     public JsonObject toJson()
     {
-        if (this.schematic.getFile() != null)
+        if (this.schematic != null)
         {
-            JsonObject obj = new JsonObject();
-            JsonArray arr = new JsonArray();
+            JsonObject obj = super.toJson();
 
-            arr.add(this.origin.getX());
-            arr.add(this.origin.getY());
-            arr.add(this.origin.getZ());
-
-            obj.add("schematic", new JsonPrimitive(this.schematic.getFile().getAbsolutePath()));
-            obj.add("name", new JsonPrimitive(this.name));
-            obj.add("origin", arr);
-            obj.add("rotation", new JsonPrimitive(this.rotation.name()));
-            obj.add("mirror", new JsonPrimitive(this.mirror.name()));
-            obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities()));
-            obj.add("enabled", new JsonPrimitive(this.isEnabled()));
-            obj.add("enable_render", new JsonPrimitive(this.enableRender));
-            obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
-            obj.add("locked", new JsonPrimitive(this.isLocked()));
-            obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
-            obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
-            obj.add("verifier_type", new JsonPrimitive(this.verifierType.getStringValue()));
-
-            if (this.selectedSubRegionName != null)
+            if (obj != null)
             {
-                obj.add("selected_region", new JsonPrimitive(this.selectedSubRegionName));
-            }
-
-            if (this.materialList != null)
-            {
-                obj.add("material_list", this.materialList.toJson());
-            }
-
-            if (this.relativeSubRegionPlacements.isEmpty() == false)
-            {
-                arr = new JsonArray();
-
-                for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
+                if (this.materialList != null)
                 {
-                    JsonObject placementObj = new JsonObject();
-                    placementObj.add("name", new JsonPrimitive(entry.getKey()));
-                    placementObj.add("placement", entry.getValue().toJson());
-                    arr.add(placementObj);
+                    obj.add("material_list", this.materialList.toJson());
                 }
-
-                obj.add("placements", arr);
             }
 
             return obj;
         }
 
-        // If this placement is for an an in-memory-only Schematic, then there is no point in saving
-        // this placement, as the schematic can't be automatically loaded anyway.
         return null;
-    }
-
-    @Nullable
-    public static SchematicPlacement fromJson(JsonObject obj)
-    {
-        if (JsonUtils.hasString(obj, "schematic") &&
-            JsonUtils.hasString(obj, "name") &&
-            JsonUtils.hasArray(obj, "origin") &&
-            JsonUtils.hasString(obj, "rotation") &&
-            JsonUtils.hasString(obj, "mirror") &&
-            JsonUtils.hasArray(obj, "placements"))
-        {
-            File file = new File(obj.get("schematic").getAsString());
-            ISchematic schematic = SchematicHolder.getInstance().getOrLoad(file);
-
-            if (schematic == null)
-            {
-                LiteModLitematica.logger.warn("Failed to load schematic '{}'", file.getAbsolutePath());
-                return null;
-            }
-
-            JsonArray posArr = obj.get("origin").getAsJsonArray();
-
-            if (posArr.size() != 3)
-            {
-                LiteModLitematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", file.getAbsolutePath());
-                return null;
-            }
-
-            String name = obj.get("name").getAsString();
-            BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
-            Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
-            Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
-            boolean enabled = JsonUtils.getBoolean(obj, "enabled");
-            boolean enableRender = JsonUtils.getBoolean(obj, "enable_render");
-
-            SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, pos, name, enabled, enableRender);
-            schematicPlacement.rotation = rotation;
-            schematicPlacement.mirror = mirror;
-            schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
-            schematicPlacement.renderEnclosingBox = JsonUtils.getBoolean(obj, "render_enclosing_box");
-            schematicPlacement.locked = JsonUtils.getBoolean(obj, "locked");
-            schematicPlacement.coordinateLockMask = JsonUtils.getInteger(obj, "locked_coords");
-
-            if (JsonUtils.hasInteger(obj, "bb_color"))
-            {
-                schematicPlacement.setBoxesBBColor(JsonUtils.getInteger(obj, "bb_color"));
-            }
-            else
-            {
-                schematicPlacement.setBoxesBBColorNext();
-            }
-
-            if (JsonUtils.hasObject(obj, "material_list"))
-            {
-                schematicPlacement.materialList = MaterialListPlacement.createFromJson(JsonUtils.getNestedObject(obj, "material_list", false), schematicPlacement);
-            }
-
-            if (JsonUtils.hasString(obj, "verifier_type"))
-            {
-                schematicPlacement.verifierType = BlockInfoListType.fromStringStatic(JsonUtils.getString(obj, "verifier_type"));
-            }
-
-            if (JsonUtils.hasString(obj, "selected_region"))
-            {
-                schematicPlacement.selectedSubRegionName = JsonUtils.getString(obj, "selected_region");
-            }
-
-            JsonArray placementArr = obj.get("placements").getAsJsonArray();
-
-            for (int i = 0; i < placementArr.size(); ++i)
-            {
-                JsonElement el = placementArr.get(i);
-
-                if (el.isJsonObject())
-                {
-                    JsonObject placementObj = el.getAsJsonObject();
-
-                    if (JsonUtils.hasString(placementObj, "name") &&
-                        JsonUtils.hasObject(placementObj, "placement"))
-                    {
-                        SubRegionPlacement placement = SubRegionPlacement.fromJson(placementObj.get("placement").getAsJsonObject());
-
-                        if (placement != null)
-                        {
-                            String placementName = placementObj.get("name").getAsString();
-                            schematicPlacement.relativeSubRegionPlacements.put(placementName, placement);
-                        }
-                    }
-                }
-            }
-
-            schematicPlacement.checkAreSubRegionsModified();
-            schematicPlacement.updateEnclosingBox();
-
-            return schematicPlacement;
-        }
-
-        return null;
-    }
-
-    private static int getNextBoxColor()
-    {
-        int length = OverlayRenderer.KELLY_COLORS.length;
-        int color = OverlayRenderer.KELLY_COLORS[nextColorIndex];
-        nextColorIndex = (nextColorIndex + 1) % length;
-
-        for (int i = 0; i < length; ++i)
-        {
-            if (USED_COLORS.contains(color) == false)
-            {
-                return color;
-            }
-
-            color = OverlayRenderer.KELLY_COLORS[nextColorIndex];
-            nextColorIndex = (nextColorIndex + 1) % length;
-        }
-
-        return color;
     }
 }

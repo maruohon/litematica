@@ -140,8 +140,9 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
             File schematicFile = this.schematic.getFile();
             String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.hover.in_memory");
 
-            lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_type", this.schematic.getType().getDisplayName()));
+            lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_name", this.schematic.getMetadata().getName()));
             lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
+            lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_type", this.schematic.getType().getDisplayName()));
 
             RenderUtils.drawHoverText(mouseX, mouseY, lines);
         }

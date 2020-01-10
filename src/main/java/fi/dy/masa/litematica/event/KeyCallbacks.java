@@ -19,6 +19,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -385,22 +386,24 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.ROTATE_PLACEMENT_CW.getKeybind())
             {
-                SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+                SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+                SchematicPlacement placement = manager.getSelectedSchematicPlacement();
 
                 if (placement != null)
                 {
-                    placement.rotateBy(Rotation.CLOCKWISE_90);
+                    manager.rotateBy(placement, Rotation.CLOCKWISE_90);
                 }
 
                 return true;
             }
             else if (key == Hotkeys.ROTATE_PLACEMENT_CCW.getKeybind())
             {
-                SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+                SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+                SchematicPlacement placement = manager.getSelectedSchematicPlacement();
 
                 if (placement != null)
                 {
-                    placement.rotateBy(Rotation.COUNTERCLOCKWISE_90);
+                    manager.rotateBy(placement, Rotation.COUNTERCLOCKWISE_90);
                 }
 
                 return true;

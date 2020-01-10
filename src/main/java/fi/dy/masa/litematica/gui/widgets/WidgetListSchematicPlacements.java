@@ -5,14 +5,14 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.util.GuiIconBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.HorizontalAlignment;
 
-public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
+public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacementUnloaded, WidgetSchematicPlacement>
 {
     private final GuiSchematicPlacementsList parent;
 
@@ -32,17 +32,17 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
     }
 
     @Override
-    protected Collection<SchematicPlacement> getAllEntries()
+    protected Collection<SchematicPlacementUnloaded> getAllEntries()
     {
-        return DataManager.getSchematicPlacementManager().getAllSchematicsPlacements();
+        return DataManager.getSchematicPlacementManager().getAllSchematicPlacements();
     }
 
     @Override
-    protected List<String> getEntryStringsForFilter(SchematicPlacement entry)
+    protected List<String> getEntryStringsForFilter(SchematicPlacementUnloaded entry)
     {
-        if (entry.getSchematic().getFile() != null)
+        if (entry.getSchematicFile() != null)
         {
-            String fileName = FileUtils.getNameWithoutExtension(entry.getSchematic().getFile().getName().toLowerCase());
+            String fileName = FileUtils.getNameWithoutExtension(entry.getSchematicFile().getName().toLowerCase());
             return ImmutableList.of(entry.getName().toLowerCase(), fileName);
         }
         else
@@ -52,7 +52,7 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
     }
 
     @Override
-    protected WidgetSchematicPlacement createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SchematicPlacement entry)
+    protected WidgetSchematicPlacement createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SchematicPlacementUnloaded entry)
     {
         return new WidgetSchematicPlacement(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
                 isOdd, entry, listIndex, this);

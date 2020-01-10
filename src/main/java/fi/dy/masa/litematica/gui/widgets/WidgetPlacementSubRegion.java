@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.schematic.ISchematic;
@@ -191,7 +192,8 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             }
             else if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED)
             {
-                this.widget.schematicPlacement.toggleSubRegionEnabled(this.widget.placement.getName(), this.widget.parent.getParentGui());
+                DataManager.getSchematicPlacementManager().toggleSubRegionEnabled(
+                        this.widget.schematicPlacement, this.widget.placement.getName(), this.widget.parent.getParentGui());
                 this.widget.parent.refreshEntries();
             }
         }

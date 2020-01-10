@@ -7,12 +7,15 @@ import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicPlacements;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiSchematicPlacementsList extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetListSchematicPlacements> implements ISelectionListener<SchematicPlacement>
+public class GuiSchematicPlacementsList
+        extends GuiListBase<SchematicPlacementUnloaded, WidgetSchematicPlacement, WidgetListSchematicPlacements>
+        implements ISelectionListener<SchematicPlacementUnloaded>
 {
     private final SchematicPlacementManager manager;
 
@@ -62,13 +65,16 @@ public class GuiSchematicPlacementsList extends GuiListBase<SchematicPlacement, 
     }
 
     @Override
-    public void onSelectionChange(@Nullable SchematicPlacement entry)
+    public void onSelectionChange(@Nullable SchematicPlacementUnloaded entry)
     {
-        this.manager.setSelectedSchematicPlacement(entry != this.manager.getSelectedSchematicPlacement() ? entry : null);
+        if (entry == null || entry.isLoaded())
+        {
+            this.manager.setSelectedSchematicPlacement(entry != this.manager.getSelectedSchematicPlacement() ? (SchematicPlacement) entry : null);
+        }
     }
 
     @Override
-    protected ISelectionListener<SchematicPlacement> getSelectionListener()
+    protected ISelectionListener<SchematicPlacementUnloaded> getSelectionListener()
     {
         return this;
     }

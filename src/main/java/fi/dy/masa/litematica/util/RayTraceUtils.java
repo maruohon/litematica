@@ -102,7 +102,7 @@ public class RayTraceUtils
 
         if (DataManager.getToolMode().getUsesSchematic())
         {
-            for (SchematicPlacement placement : DataManager.getSchematicPlacementManager().getAllSchematicsPlacements())
+            for (SchematicPlacement placement : DataManager.getSchematicPlacementManager().getEnabledSchematicPlacements())
             {
                 if (placement.isEnabled())
                 {

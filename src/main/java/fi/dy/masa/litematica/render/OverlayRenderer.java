@@ -111,7 +111,7 @@ public class OverlayRenderer
     public void updatePlacementCache()
     {
         this.placements.clear();
-        List<SchematicPlacement> list = DataManager.getSchematicPlacementManager().getAllSchematicsPlacements();
+        List<SchematicPlacement> list = DataManager.getSchematicPlacementManager().getEnabledSchematicPlacements();
 
         for (SchematicPlacement placement : list)
         {

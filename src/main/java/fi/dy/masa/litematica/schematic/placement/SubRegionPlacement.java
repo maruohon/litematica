@@ -1,16 +1,15 @@
 package fi.dy.masa.litematica.schematic.placement;
 
 import javax.annotation.Nullable;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
 
 public class SubRegionPlacement
 {
@@ -26,9 +25,29 @@ public class SubRegionPlacement
 
     public SubRegionPlacement(BlockPos pos, String name)
     {
+        this(pos, pos, name);
+    }
+
+    public SubRegionPlacement(BlockPos pos, BlockPos defaultPos, String name)
+    {
         this.pos = pos;
-        this.defaultPos = pos;
+        this.defaultPos = defaultPos;
         this.name = name;
+    }
+
+    public SubRegionPlacement copy()
+    {
+        SubRegionPlacement copy = new SubRegionPlacement(this.pos, this.defaultPos, this.name);
+
+        copy.pos = this.pos;
+        copy.rotation = this.rotation;
+        copy.mirror = this.mirror;
+        copy.enabled = this.enabled;
+        copy.renderingEnabled = this.renderingEnabled;
+        copy.ignoreEntities = this.ignoreEntities;
+        copy.coordinateLockMask = this.coordinateLockMask;
+
+        return copy;
     }
 
     public boolean isEnabled()
@@ -167,13 +186,9 @@ public class SubRegionPlacement
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
-        JsonArray arr = new JsonArray();
 
-        arr.add(this.pos.getX());
-        arr.add(this.pos.getY());
-        arr.add(this.pos.getZ());
-
-        obj.add("pos", arr);
+        obj.add("pos", JsonUtils.blockPosToJson(this.pos));
+        obj.add("default_pos", JsonUtils.blockPosToJson(this.defaultPos));
         obj.add("name", new JsonPrimitive(this.getName()));
         obj.add("rotation", new JsonPrimitive(this.rotation.name()));
         obj.add("mirror", new JsonPrimitive(this.mirror.name()));
@@ -193,16 +208,22 @@ public class SubRegionPlacement
             JsonUtils.hasString(obj, "rotation") &&
             JsonUtils.hasString(obj, "mirror"))
         {
-            JsonArray posArr = obj.get("pos").getAsJsonArray();
+            BlockPos pos = JsonUtils.blockPosFromJson(obj, "pos");
 
-            if (posArr.size() != 3)
+            if (pos == null)
             {
                 LiteModLitematica.logger.warn("Placement.fromJson(): Failed to load a placement from JSON, invalid position data");
                 return null;
             }
 
-            BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
-            SubRegionPlacement placement = new SubRegionPlacement(pos, obj.get("name").getAsString());
+            BlockPos defaultPos = JsonUtils.blockPosFromJson(obj, "default_pos");
+
+            if (defaultPos == null)
+            {
+                defaultPos = pos;
+            }
+
+            SubRegionPlacement placement = new SubRegionPlacement(pos, defaultPos, obj.get("name").getAsString());
             placement.setEnabled(JsonUtils.getBoolean(obj, "enabled"));
             placement.setRenderingEnabled(JsonUtils.getBoolean(obj, "rendering_enabled"));
             placement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");

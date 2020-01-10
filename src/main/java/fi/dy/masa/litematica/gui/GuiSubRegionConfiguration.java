@@ -4,8 +4,10 @@ import javax.annotation.Nullable;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -216,6 +218,7 @@ public class GuiSubRegionConfiguration extends GuiBase
     private static class ButtonListener implements IButtonActionListener
     {
         private final GuiBase parent;
+        private final SchematicPlacementManager manager;
         private final SchematicPlacement schematicPlacement;
         private final SubRegionPlacement placement;
         private final Type type;
@@ -224,6 +227,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         public ButtonListener(Type type, SchematicPlacement schematicPlacement, SubRegionPlacement placement, GuiBase parent)
         {
             this.type = type;
+            this.manager = DataManager.getSchematicPlacementManager();
             this.schematicPlacement = schematicPlacement;
             this.placement = placement;
             this.parent = parent;
@@ -254,7 +258,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 {
                     boolean reverse = mouseButton == 1;
                     Rotation rotation = fi.dy.masa.malilib.util.PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
-                    this.schematicPlacement.setSubRegionRotation(this.subRegionName, rotation, this.parent);
+                    this.manager.setSubRegionRotation(this.schematicPlacement, this.subRegionName, rotation, this.parent);
                     break;
                 }
 
@@ -262,40 +266,40 @@ public class GuiSubRegionConfiguration extends GuiBase
                 {
                     boolean reverse = mouseButton == 1;
                     Mirror mirror = fi.dy.masa.malilib.util.PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
-                    this.schematicPlacement.setSubRegionMirror(this.subRegionName, mirror, this.parent);
+                    this.manager.setSubRegionMirror(this.schematicPlacement, this.subRegionName, mirror, this.parent);
                     break;
                 }
 
                 case MOVE_TO_PLAYER:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, new BlockPos(this.parent.mc.player.getPositionVector()), this.parent);
+                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, new BlockPos(this.parent.mc.player.getPositionVector()), this.parent);
                     break;
 
                 case NUDGE_COORD_X:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(amount, 0, 0), this.parent);
+                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(amount, 0, 0), this.parent);
                     break;
 
                 case NUDGE_COORD_Y:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(0, amount, 0), this.parent);
+                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(0, amount, 0), this.parent);
                     break;
 
                 case NUDGE_COORD_Z:
-                    this.schematicPlacement.moveSubRegionTo(this.subRegionName, posOld.add(0, 0, amount), this.parent);
+                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(0, 0, amount), this.parent);
                     break;
 
                 case TOGGLE_ENABLED:
-                    this.schematicPlacement.toggleSubRegionEnabled(this.subRegionName, this.parent);
+                    this.manager.toggleSubRegionEnabled(this.schematicPlacement, this.subRegionName, this.parent);
                     break;
 
                 case TOGGLE_RENDERING:
-                    this.schematicPlacement.toggleSubRegionRenderingEnabled(this.subRegionName);
+                    this.manager.toggleSubRegionRenderingEnabled(this.schematicPlacement, this.subRegionName);
                     break;
 
                 case TOGGLE_ENTITIES:
-                    this.schematicPlacement.toggleSubRegionIgnoreEntities(this.subRegionName, this.parent);
+                    this.manager.toggleSubRegionIgnoreEntities(this.schematicPlacement, this.subRegionName, this.parent);
                     break;
 
                 case RESET_PLACEMENT:
-                    this.schematicPlacement.resetSubRegionToSchematicValues(this.subRegionName, this.parent);
+                    this.manager.resetSubRegionToSchematicValues(this.schematicPlacement, this.subRegionName, this.parent);
                     break;
 
                 case SLICE_TYPE:
@@ -349,12 +353,14 @@ public class GuiSubRegionConfiguration extends GuiBase
     private static class TextFieldListener implements ITextFieldListener<GuiTextFieldInteger>
     {
         private final GuiSubRegionConfiguration parent;
+        private final SchematicPlacementManager manager;
         private final SchematicPlacement schematicPlacement;
         private final SubRegionPlacement placement;
         private final CoordinateType type;
 
         public TextFieldListener(CoordinateType type, SchematicPlacement schematicPlacement, SubRegionPlacement placement, GuiSubRegionConfiguration parent)
         {
+            this.manager = DataManager.getSchematicPlacementManager();
             this.schematicPlacement = schematicPlacement;
             this.placement = placement;
             this.type = type;
@@ -382,7 +388,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 }
 
                 this.parent.setNextMessageType(MessageType.ERROR);
-                this.schematicPlacement.moveSubRegionTo(this.placement.getName(), pos, this.parent);
+                this.manager.moveSubRegionTo(this.schematicPlacement, this.placement.getName(), pos, this.parent);
                 this.parent.updateElements();
             }
             catch (NumberFormatException e)

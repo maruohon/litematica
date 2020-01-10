@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.gui.widgets.WidgetListPlacementSubRegions;
 import fi.dy.masa.litematica.gui.widgets.WidgetPlacementSubRegion;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -330,12 +331,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     private static class ButtonListener implements IButtonActionListener
     {
         private final GuiPlacementConfiguration parent;
+        private final SchematicPlacementManager manager;
         private final SchematicPlacement placement;
         private final Type type;
 
         public ButtonListener(Type type, SchematicPlacement placement, GuiPlacementConfiguration parent)
         {
             this.parent = parent;
+            this.manager = DataManager.getSchematicPlacementManager();
             this.placement = placement;
             this.type = type;
         }
@@ -360,7 +363,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 {
                     boolean reverse = mouseButton == 1;
                     Rotation rotation = fi.dy.masa.malilib.util.PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
-                    this.placement.setRotation(rotation, this.parent);
+                    this.manager.setRotation(this.placement, rotation, this.parent);
                     break;
                 }
 
@@ -368,35 +371,35 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 {
                     boolean reverse = mouseButton == 1;
                     Mirror mirror = fi.dy.masa.malilib.util.PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
-                    this.placement.setMirror(mirror, this.parent);
+                    this.manager.setMirror(this.placement, mirror, this.parent);
                     break;
                 }
 
                 case MOVE_TO_PLAYER:
                 {
                     BlockPos pos = new BlockPos(mc.player.getPositionVector());
-                    this.placement.setOrigin(pos, this.parent);
+                    this.manager.setOrigin(this.placement, pos, this.parent);
                     break;
                 }
 
                 case NUDGE_COORD_X:
-                    this.placement.setOrigin(oldOrigin.add(amount, 0, 0), this.parent);
+                    this.manager.setOrigin(this.placement, oldOrigin.add(amount, 0, 0), this.parent);
                     break;
 
                 case NUDGE_COORD_Y:
-                    this.placement.setOrigin(oldOrigin.add(0, amount, 0), this.parent);
+                    this.manager.setOrigin(this.placement, oldOrigin.add(0, amount, 0), this.parent);
                     break;
 
                 case NUDGE_COORD_Z:
-                    this.placement.setOrigin(oldOrigin.add(0, 0, amount), this.parent);
+                    this.manager.setOrigin(this.placement, oldOrigin.add(0, 0, amount), this.parent);
                     break;
 
                 case TOGGLE_ENABLED:
-                    this.placement.toggleEnabled();
+                    this.manager.toggleEnabled(this.placement);
                     break;
 
                 case TOGGLE_RENDERING:
-                    this.placement.setRenderSchematic(! this.placement.isRenderingEnabled());
+                    this.manager.toggleRenderingEnabled(this.placement);
                     break;
 
                 case TOGGLE_LOCKED:
@@ -404,7 +407,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     break;
 
                 case TOGGLE_ENTITIES:
-                    this.placement.toggleIgnoreEntities(this.parent);
+                    this.manager.toggleIgnoreEntities(this.placement, this.parent);
                     break;
 
                 case TOGGLE_ENCLOSING_BOX:
@@ -412,14 +415,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     break;
 
                 case RESET_SUB_REGIONS:
-                    this.placement.resetAllSubRegionsToSchematicValues(this.parent);
+                    this.manager.resetAllSubRegionsToSchematicValues(this.placement, this.parent);
                     break;
 
                 case TOGGLE_ALL_REGIONS_ON:
                 case TOGGLE_ALL_REGIONS_OFF:
                 {
                     boolean state = this.type == Type.TOGGLE_ALL_REGIONS_ON;
-                    this.placement.setSubRegionsEnabledState(state, this.parent.getListWidget().getCurrentEntries(), this.parent);
+                    this.manager.setSubRegionsEnabled(this.placement, state, this.parent.getListWidget().getCurrentEntries());
                     break;
                 }
 
@@ -500,11 +503,13 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     private static class TextFieldListener implements ITextFieldListener<GuiTextFieldInteger>
     {
         private final GuiPlacementConfiguration parent;
+        private final SchematicPlacementManager manager;
         private final SchematicPlacement placement;
         private final CoordinateType type;
 
         public TextFieldListener(CoordinateType type, SchematicPlacement placement, GuiPlacementConfiguration parent)
         {
+            this.manager = DataManager.getSchematicPlacementManager();
             this.placement = placement;
             this.type = type;
             this.parent = parent;
@@ -521,9 +526,9 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
                 switch (this.type)
                 {
-                    case X: this.placement.setOrigin(new BlockPos(value, posOld.getY(), posOld.getZ()), this.parent); break;
-                    case Y: this.placement.setOrigin(new BlockPos(posOld.getX(), value, posOld.getZ()), this.parent); break;
-                    case Z: this.placement.setOrigin(new BlockPos(posOld.getX(), posOld.getY(), value), this.parent); break;
+                    case X: this.manager.setOrigin(this.placement, new BlockPos(value, posOld.getY(), posOld.getZ()), this.parent); break;
+                    case Y: this.manager.setOrigin(this.placement, new BlockPos(posOld.getX(), value, posOld.getZ()), this.parent); break;
+                    case Z: this.manager.setOrigin(this.placement, new BlockPos(posOld.getX(), posOld.getY(), value), this.parent); break;
                 }
 
                 this.parent.updateElements();

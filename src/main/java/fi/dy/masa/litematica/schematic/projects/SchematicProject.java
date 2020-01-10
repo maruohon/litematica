@@ -131,7 +131,7 @@ public class SchematicProject
 
             if (this.currentPlacement != null)
             {
-                this.currentPlacement.setOrigin(areaPosition, InfoUtils.INFO_MESSAGE_CONSUMER);
+                DataManager.getSchematicPlacementManager().setOrigin(this.currentPlacement, areaPosition, InfoUtils.INFO_MESSAGE_CONSUMER);
             }
         }
 

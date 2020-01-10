@@ -3,14 +3,17 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
+import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -20,23 +23,26 @@ import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.Messages;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlacement>
+public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlacementUnloaded>
 {
     private final SchematicPlacementManager manager;
     private final WidgetListSchematicPlacements parent;
-    private final SchematicPlacement placement;
+    private final SchematicPlacementUnloaded placement;
+    @Nullable private final SchematicPlacement loadedPlacement;
     private final boolean isOdd;
     private int buttonsStartX;
 
     public WidgetSchematicPlacement(int x, int y, int width, int height, boolean isOdd,
-            SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent)
+            SchematicPlacementUnloaded placement, int listIndex, WidgetListSchematicPlacements parent)
     {
         super(x, y, width, height, placement, listIndex);
 
         this.parent = parent;
         this.placement = placement;
+        this.loadedPlacement = placement.isLoaded() ? (SchematicPlacement) placement : null;
         this.isOdd = isOdd;
         this.manager = DataManager.getSchematicPlacementManager();
 
@@ -102,16 +108,19 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
         IGuiIcon icon;
 
-        if (this.placement.getSchematic().getFile() != null)
+        if (this.loadedPlacement != null)
         {
-            icon = this.placement.getSchematic().getType().getIcon();
-        }
-        else
-        {
-            icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
-        }
+            if (this.loadedPlacement.getSchematicFile() != null)
+            {
+                icon = this.loadedPlacement.getSchematic().getType().getIcon();
+            }
+            else
+            {
+                icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
+            }
 
-        icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
+            icon.renderAt(this.x + 2, this.y + 5, this.zLevel, false, false);
+        }
 
         if (this.placement.isRegionPlacementModified())
         {
@@ -145,19 +154,29 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         }
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 18, this.height))
         {
-            File schematicFile = this.placement.getSchematic().getFile();
+            File schematicFile = this.placement.getSchematicFile();
+            SchematicMetadata metadata = this.loadedPlacement != null ? this.loadedPlacement.getSchematic().getMetadata() : null;
             String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.hover.in_memory");
             List<String> text = new ArrayList<>();
 
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_name", this.placement.getSchematic().getMetadata().getName()));
+            if (metadata != null)
+            {
+                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_name", metadata.getName()));
+            }
+
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_loaded", Messages.getYesNoColored(this.placement.isLoaded(), false)));
 
             BlockPos o = this.placement.getOrigin();
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.origin", o.getX(), o.getY(), o.getZ()));
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.sub_region_count", this.placement.getSubRegionCount()));
 
-            Vec3i size = this.placement.getSchematic().getMetadata().getEnclosingSize();
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enclosing_size", size.getX(), size.getY(), size.getZ()));
+            if (metadata != null)
+            {
+                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.sub_region_count", this.loadedPlacement.getSubRegionCount()));
+
+                Vec3i size = metadata.getEnclosingSize();
+                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enclosing_size", size.getX(), size.getY(), size.getZ()));
+            }
 
             RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
@@ -177,13 +196,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            if (this.type == ButtonType.CONFIGURE)
-            {
-                GuiPlacementConfiguration gui = new GuiPlacementConfiguration(this.widget.placement);
-                gui.setParent(this.widget.parent.getParentGui());
-                GuiBase.openGui(gui);
-            }
-            else if (this.type == ButtonType.REMOVE)
+            if (this.type == ButtonType.REMOVE)
             {
                 if (this.widget.placement.isLocked() && GuiBase.isShiftDown() == false)
                 {
@@ -197,8 +210,17 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {
-                this.widget.placement.toggleEnabled();
+                DataManager.getSchematicPlacementManager().toggleEnabled(this.widget.placement);
                 this.widget.parent.refreshEntries();
+            }
+            else if (this.widget.placement.isLoaded())
+            {
+                if (this.type == ButtonType.CONFIGURE)
+                {
+                    GuiPlacementConfiguration gui = new GuiPlacementConfiguration((SchematicPlacement) this.widget.placement);
+                    gui.setParent(this.widget.parent.getParentGui());
+                    GuiBase.openGui(gui);
+                }
             }
         }
 
