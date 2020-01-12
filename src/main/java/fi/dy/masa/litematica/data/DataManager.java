@@ -52,7 +52,6 @@ public class DataManager implements IDirectoryCache
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static IConfigGuiTab configGuiTab = GuiConfigs.VISUALS;
-    private static boolean createPlacementOnLoad = true;
     private static boolean canSave;
     private static long clientTickStart;
 
@@ -92,16 +91,6 @@ public class DataManager implements IDirectoryCache
     public static ItemStack getToolItem()
     {
         return toolItem;
-    }
-
-    public static boolean getCreatePlacementOnLoad()
-    {
-        return createPlacementOnLoad;
-    }
-
-    public static void setCreatePlacementOnLoad(boolean create)
-    {
-        createPlacementOnLoad = create;
     }
 
     public static IConfigGuiTab getConfigGuiTab()
@@ -234,8 +223,6 @@ public class DataManager implements IDirectoryCache
                     }
                 }
             }
-
-            createPlacementOnLoad = JsonUtils.getBooleanOrDefault(root, "create_placement_on_load", true);
         }
 
         canSave = true;
@@ -265,8 +252,6 @@ public class DataManager implements IDirectoryCache
         }
 
         root.add("last_directories", objDirs);
-
-        root.add("create_placement_on_load", new JsonPrimitive(createPlacementOnLoad));
         root.add("config_gui_tab", new JsonPrimitive(configGuiTab.getName()));
 
         File file = getCurrentStorageFile(true);

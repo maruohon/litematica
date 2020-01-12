@@ -241,6 +241,16 @@ public class Configs implements IConfigHandler
         );
     }
 
+    // Configs that are not shown in the config GUI
+    public static class Internal
+    {
+        public static final ConfigBoolean       CREATE_PLACEMENT_ON_LOAD        = new ConfigBoolean("createPlacementOnLoad",        true, "A Schematic Placement is created automatically when loading a schematic");
+
+        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
+                CREATE_PLACEMENT_ON_LOAD
+        );
+    }
+
     @Override
     public String getModName()
     {
@@ -260,11 +270,18 @@ public class Configs implements IConfigHandler
 
         map.put("Generic", Generic.OPTIONS);
         map.put("InfoOverlays", InfoOverlays.OPTIONS);
+        map.put("Internal", Internal.OPTIONS);
         map.put("Visuals", Visuals.OPTIONS);
         map.put("Colors", Colors.OPTIONS);
         map.put("Hotkeys", Hotkeys.HOTKEY_LIST);
 
         return map;
+    }
+
+    @Override
+    public boolean shouldShowCategoryOnConfigGuis(String category)
+    {
+        return category.equals("Internal") == false;
     }
 
     @Override

@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import java.util.Collection;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
@@ -16,7 +17,6 @@ import fi.dy.masa.malilib.gui.GuiStringListSelection;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.IStringListConsumer;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
@@ -65,8 +65,8 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         label = StringUtils.translate("litematica.gui.label.schematic_load.checkbox.create_placement");
         String hover = StringUtils.translate("litematica.gui.label.schematic_load.hoverinfo.create_placement");
         WidgetCheckBox checkbox = new WidgetCheckBox(x, y, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label, hover);
-        checkbox.setListener(new CheckboxListener());
-        checkbox.setChecked(DataManager.getCreatePlacementOnLoad(), false);
+        checkbox.setListener((widget) -> { Configs.Internal.CREATE_PLACEMENT_ON_LOAD.setBooleanValue(widget.isChecked()); });
+        checkbox.setChecked(Configs.Internal.CREATE_PLACEMENT_ON_LOAD.getBooleanValue(), false);
         this.addWidget(checkbox);
 
         y = this.height - 26;
@@ -148,7 +148,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                 SchematicHolder.getInstance().addSchematic(schematic, true);
                 this.gui.addMessage(MessageType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
 
-                if (DataManager.getCreatePlacementOnLoad())
+                if (Configs.Internal.CREATE_PLACEMENT_ON_LOAD.getBooleanValue())
                 {
                     BlockPos pos = new BlockPos(this.gui.mc.player.getPositionVector());
                     String name = schematic.getMetadata().getName();
@@ -195,15 +195,6 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
             {
                 return this.translationKey;
             }
-        }
-    }
-
-    private static class CheckboxListener implements ISelectionListener<WidgetCheckBox>
-    {
-        @Override
-        public void onSelectionChange(WidgetCheckBox entry)
-        {
-            DataManager.setCreatePlacementOnLoad(entry.isChecked());
         }
     }
 
