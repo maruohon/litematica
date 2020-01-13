@@ -112,7 +112,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
     }
 
     @Override
-    protected IFileBrowserIconProvider getIconProvider()
+    public IFileBrowserIconProvider getIconProvider()
     {
         return this;
     }

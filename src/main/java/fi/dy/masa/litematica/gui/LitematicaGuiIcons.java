@@ -36,11 +36,13 @@ public class LitematicaGuiIcons extends GuiIconBase
     public static final LitematicaGuiIcons AREA_SELECTION                 = new LitematicaGuiIcons(102,   0, 14, 14);
     public static final LitematicaGuiIcons CONFIGURATION                  = new LitematicaGuiIcons(102,  84, 14, 14);
     public static final LitematicaGuiIcons LOADED_SCHEMATICS              = new LitematicaGuiIcons(102,  14, 14, 14);
+    public static final LitematicaGuiIcons SAVE_DISK                      = new LitematicaGuiIcons(102, 140, 14, 14);
     public static final LitematicaGuiIcons SCHEMATIC_BROWSER              = new LitematicaGuiIcons(102,  28, 14, 14);
     public static final LitematicaGuiIcons SCHEMATIC_MANAGER              = new LitematicaGuiIcons(102,  56, 14, 14);
     public static final LitematicaGuiIcons SCHEMATIC_PLACEMENTS           = new LitematicaGuiIcons(102,  42, 14, 14);
     public static final LitematicaGuiIcons SCHEMATIC_PROJECTS             = new LitematicaGuiIcons(102,  98, 14, 14);
     public static final LitematicaGuiIcons TASK_MANAGER                   = new LitematicaGuiIcons(102, 112, 14, 14);
+    public static final LitematicaGuiIcons TRASH_CAN                      = new LitematicaGuiIcons(102, 154, 14, 14);
 
     private LitematicaGuiIcons(int u, int v, int w, int h)
     {

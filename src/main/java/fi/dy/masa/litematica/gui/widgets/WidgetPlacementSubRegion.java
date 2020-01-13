@@ -49,13 +49,13 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
 
         // Note: These are placed from right to left
 
-        posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED);
-        posX = this.createButtonGeneric(posX, posY, WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE);
+        posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), WidgetSchematicPlacementEntry.ButtonListener.ButtonType.TOGGLE_ENABLED);
+        posX = this.createButtonGeneric(posX, posY, WidgetSchematicPlacementEntry.ButtonListener.ButtonType.CONFIGURE);
 
         this.buttonsStartX = posX;
     }
 
-    private int createButtonGeneric(int xRight, int y, WidgetSchematicPlacement.ButtonListener.ButtonType type)
+    private int createButtonGeneric(int xRight, int y, WidgetSchematicPlacementEntry.ButtonListener.ButtonType type)
     {
         String label = StringUtils.translate(type.getTranslationKey());
         int len = this.getStringWidth(label) + 10;
@@ -65,7 +65,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         return xRight - 2;
     }
 
-    private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, WidgetSchematicPlacement.ButtonListener.ButtonType type)
+    private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, WidgetSchematicPlacementEntry.ButtonListener.ButtonType type)
     {
         ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this));
@@ -172,10 +172,10 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
 
     private static class ButtonListener implements IButtonActionListener
     {
-        private final WidgetSchematicPlacement.ButtonListener.ButtonType type;
+        private final WidgetSchematicPlacementEntry.ButtonListener.ButtonType type;
         private final WidgetPlacementSubRegion widget;
 
-        public ButtonListener(WidgetSchematicPlacement.ButtonListener.ButtonType type, WidgetPlacementSubRegion widget)
+        public ButtonListener(WidgetSchematicPlacementEntry.ButtonListener.ButtonType type, WidgetPlacementSubRegion widget)
         {
             this.type = type;
             this.widget = widget;
@@ -184,13 +184,13 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.CONFIGURE)
+            if (this.type == WidgetSchematicPlacementEntry.ButtonListener.ButtonType.CONFIGURE)
             {
                 GuiSubRegionConfiguration gui = new GuiSubRegionConfiguration(this.widget.schematicPlacement, this.widget.placement);
                 gui.setParent(this.widget.parent.getParentGui());
                 GuiBase.openGui(gui);
             }
-            else if (this.type == WidgetSchematicPlacement.ButtonListener.ButtonType.TOGGLE_ENABLED)
+            else if (this.type == WidgetSchematicPlacementEntry.ButtonListener.ButtonType.TOGGLE_ENABLED)
             {
                 DataManager.getSchematicPlacementManager().toggleSubRegionEnabled(
                         this.widget.schematicPlacement, this.widget.placement.getName(), this.widget.parent.getParentGui());

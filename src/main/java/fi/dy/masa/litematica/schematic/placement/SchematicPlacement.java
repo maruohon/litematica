@@ -36,9 +36,9 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     @Nullable protected SchematicVerifier verifier;
     @Nullable protected MaterialListBase materialList;
 
-    protected SchematicPlacement(ISchematic schematic, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    protected SchematicPlacement(ISchematic schematic, @Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled, boolean enableRender)
     {
-        super(schematicFile, origin, name, enabled, enableRender);
+        super(storageFile, schematicFile, origin, name, enabled, enableRender);
 
         this.schematic = schematic;
         this.subRegionCount = schematic.getSubRegionCount();
@@ -518,15 +518,6 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         }
     }
 
-    public static SchematicPlacement createFor(ISchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
-    {
-        SchematicPlacement placement = new SchematicPlacement(schematic, schematic.getFile(), origin, name, enabled, enableRender);
-        placement.setBoxesBBColorNext();
-        placement.resetAllSubRegionsToSchematicValues();
-
-        return placement;
-    }
-
     @Override
     @Nullable
     public JsonObject toJson()
@@ -547,5 +538,14 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         }
 
         return null;
+    }
+
+    public static SchematicPlacement createFor(ISchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    {
+        SchematicPlacement placement = new SchematicPlacement(schematic, null, schematic.getFile(), origin, name, enabled, enableRender);
+        placement.setBoxesBBColorNext();
+        placement.resetAllSubRegionsToSchematicValues();
+
+        return placement;
     }
 }

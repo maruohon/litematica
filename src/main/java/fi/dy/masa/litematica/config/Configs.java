@@ -245,9 +245,11 @@ public class Configs implements IConfigHandler
     public static class Internal
     {
         public static final ConfigBoolean       CREATE_PLACEMENT_ON_LOAD        = new ConfigBoolean("createPlacementOnLoad",        true, "A Schematic Placement is created automatically when loading a schematic");
+        public static final ConfigBoolean       PLACEMENT_LIST_ICON_BUTTONS     = new ConfigBoolean("placementListIconButtons",     false, "Show smaller, icon-only buttons in the Schematic Placements list");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                CREATE_PLACEMENT_ON_LOAD
+                CREATE_PLACEMENT_ON_LOAD,
+                PLACEMENT_LIST_ICON_BUTTONS
         );
     }
 

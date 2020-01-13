@@ -12,7 +12,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.HorizontalAlignment;
 
-public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacementUnloaded, WidgetSchematicPlacement>
+public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacementUnloaded, WidgetSchematicPlacementEntry>
 {
     private final GuiSchematicPlacementsList parent;
 
@@ -22,7 +22,7 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
 
         this.parent = parent;
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT);
+        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 17, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
     }
 
@@ -52,9 +52,9 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
     }
 
     @Override
-    protected WidgetSchematicPlacement createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SchematicPlacementUnloaded entry)
+    protected WidgetSchematicPlacementEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SchematicPlacementUnloaded entry)
     {
-        return new WidgetSchematicPlacement(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
+        return new WidgetSchematicPlacementEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
                 isOdd, entry, listIndex, this);
     }
 }

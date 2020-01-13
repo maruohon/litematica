@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -26,20 +27,22 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.Messages;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlacementUnloaded>
+public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<SchematicPlacementUnloaded>
 {
     private final SchematicPlacementManager manager;
+    private final GuiSchematicPlacementsList gui;
     private final WidgetListSchematicPlacements parent;
     private final SchematicPlacementUnloaded placement;
     @Nullable private final SchematicPlacement loadedPlacement;
     private final boolean isOdd;
     private int buttonsStartX;
 
-    public WidgetSchematicPlacement(int x, int y, int width, int height, boolean isOdd,
+    public WidgetSchematicPlacementEntry(int x, int y, int width, int height, boolean isOdd,
             SchematicPlacementUnloaded placement, int listIndex, WidgetListSchematicPlacements parent)
     {
         super(x, y, width, height, placement, listIndex);
 
+        this.gui = parent.getParentGui();
         this.parent = parent;
         this.placement = placement;
         this.loadedPlacement = placement.isLoaded() ? (SchematicPlacement) placement : null;
@@ -51,21 +54,72 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
         // Note: These are placed from right to left
 
-        posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.REMOVE);
-        posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
-        posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.CONFIGURE);
+        if (this.gui.useIconButtons())
+        {
+            posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.REMOVE);
+            posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.SAVE);
+            posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
+            posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.CONFIGURE);
+        }
+        else
+        {
+            posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.REMOVE);
+            posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.SAVE);
+            posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
+            posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.CONFIGURE);
+        }
 
         this.buttonsStartX = posX;
     }
 
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
-        return this.addButton(new ButtonGeneric(xRight, y, -1, true, type.getDisplayName()), new ButtonListener(type, this)).getX() - 1;
+        ButtonGeneric button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
+        String hover = type.getHoverKey();
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
+        {
+            button.setHoverStrings(hover);
+        }
+
+        return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
+    }
+
+    private int createButtonIconOnly(int xRight, int y, ButtonListener.ButtonType type)
+    {
+        IGuiIcon icon = type.getIcon();
+        ButtonGeneric button;
+        int size = 20;
+
+        if (icon != null)
+        {
+            button = new ButtonGeneric(xRight - size, y, size, size, "", icon, type.getHoverKey());
+        }
+        else
+        {
+            button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName(), type.getHoverKey());
+        }
+
+        String hover = type.getHoverKey();
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
+        {
+            button.setHoverStrings(hover);
+        }
+
+        return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
     }
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
         ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        String hover = type.getHoverKey();
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
+        {
+            button.setHoverStrings(hover);
+        }
+
         return this.addButton(button, new ButtonListener(type, this)).getX() - 2;
     }
 
@@ -180,14 +234,16 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
             RenderUtils.drawHoverText(mouseX, mouseY, text);
         }
+
+        super.postRenderHovered(mouseX, mouseY, selected);
     }
 
     static class ButtonListener implements IButtonActionListener
     {
         private final ButtonType type;
-        private final WidgetSchematicPlacement widget;
+        private final WidgetSchematicPlacementEntry widget;
 
-        public ButtonListener(ButtonType type, WidgetSchematicPlacement widget)
+        public ButtonListener(ButtonType type, WidgetSchematicPlacementEntry widget)
         {
             this.type = type;
             this.widget = widget;
@@ -208,6 +264,17 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
                     this.widget.parent.refreshEntries();
                 }
             }
+            else if (this.type == ButtonType.SAVE)
+            {
+                if (this.widget.placement.saveToFileIfChanged())
+                {
+                    this.widget.parent.getParentGui().addMessage(MessageType.SUCCESS, "litematica.gui.label.schematic_placement.saved_to_file");
+                }
+                else
+                {
+                    this.widget.parent.getParentGui().addMessage(MessageType.ERROR, "litematica.error.schematic_placements.save_failed");
+                }
+            }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {
                 DataManager.getSchematicPlacementManager().toggleEnabled(this.widget.placement);
@@ -226,20 +293,35 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
         public enum ButtonType
         {
-            CONFIGURE       ("litematica.gui.button.schematic_placements.configure"),
-            REMOVE          ("litematica.gui.button.schematic_placements.remove"),
-            TOGGLE_ENABLED  ("litematica.gui.button.schematic_placements.placement_enabled");
+            CONFIGURE       (LitematicaGuiIcons.CONFIGURATION,  "litematica.gui.button.schematic_placements.configure", "litematica.gui.hover.schematic_placement.button.configure"),
+            REMOVE          (LitematicaGuiIcons.TRASH_CAN,      "litematica.gui.button.schematic_placements.remove", "litematica.gui.hover.schematic_placement.button.remove"),
+            SAVE            (LitematicaGuiIcons.SAVE_DISK,      "litematica.gui.button.schematic_placements.save", "litematica.gui.hover.schematic_placement.button.save"),
+            TOGGLE_ENABLED  (null,                              "litematica.gui.button.schematic_placements.placement_enabled", "litematica.gui.hover.schematic_placement.button.toggle_enabled");
 
+            private final IGuiIcon icon;
             private final String translationKey;
+            private final String hoverKey;
 
-            private ButtonType(String translationKey)
+            private ButtonType(IGuiIcon icon, String translationKey, String hoverKey)
             {
+                this.icon = icon;
                 this.translationKey = translationKey;
+                this.hoverKey = hoverKey;
+            }
+
+            public IGuiIcon getIcon()
+            {
+                return this.icon;
             }
 
             public String getTranslationKey()
             {
                 return this.translationKey;
+            }
+
+            public String getHoverKey()
+            {
+                return this.hoverKey;
             }
 
             public String getDisplayName()

@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.schematic.placement;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -1053,6 +1054,77 @@ public class SchematicPlacementManager
         SchematicHolder.getInstance().clearLoadedSchematics();
     }
 
+    public void loadPlacementFromFile(File file)
+    {
+        SchematicPlacementUnloaded placement = SchematicPlacementUnloaded.fromFile(file);
+
+        if (placement != null)
+        {
+            this.loadPlacementFromFile(placement, false);
+        }
+        else
+        {
+            InfoUtils.printErrorMessage("litematica.error.schematic_placements.load_fail", file.getName());
+        }
+    }
+
+    private void loadPlacementFromFile(SchematicPlacementUnloaded placement, boolean isActiveList)
+    {
+        if (placement != null)
+        {
+            if (isActiveList == false && this.checkIsAlreadyLoaded(placement))
+            {
+                InfoUtils.printErrorMessage("litematica.error.schematic_placements.load_fail.already_loaded", placement.getName());
+                return;
+            }
+
+            if (placement.isEnabled())
+            {
+                SchematicPlacement loadedPlacement = placement.fullyLoadPlacement();
+
+                if (loadedPlacement != null)
+                {
+                    this.addSchematicPlacement(loadedPlacement, false, true);
+                }
+            }
+            else
+            {
+                this.lightlyLoadedPlacements.add(placement);
+            }
+
+            if (isActiveList == false)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_placement_loaded", placement.getName());
+            }
+        }
+    }
+
+    private boolean checkIsAlreadyLoaded(SchematicPlacementUnloaded placement)
+    {
+        if (placement.placementSaveFile == null)
+        {
+            return false;
+        }
+
+        for (SchematicPlacement entry : this.schematicPlacements)
+        {
+            if (placement.placementSaveFile.equals(entry.placementSaveFile))
+            {
+                return true;
+            }
+        }
+
+        for (SchematicPlacementUnloaded entry : this.lightlyLoadedPlacements)
+        {
+            if (placement.placementSaveFile.equals(entry.placementSaveFile))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public JsonObject toJson()
     {
         JsonObject obj = new JsonObject();
@@ -1119,23 +1191,7 @@ public class SchematicPlacementManager
                 if (el.isJsonObject())
                 {
                     SchematicPlacementUnloaded placement = SchematicPlacementUnloaded.fromJson(el.getAsJsonObject());
-
-                    if (placement != null)
-                    {
-                        if (placement.isEnabled())
-                        {
-                            SchematicPlacement loadedPlacement = placement.fullyLoadPlacement();
-
-                            if (loadedPlacement != null)
-                            {
-                                this.addSchematicPlacement(loadedPlacement, false, true);
-                            }
-                        }
-                        else
-                        {
-                            this.lightlyLoadedPlacements.add(placement);
-                        }
-                    }
+                    this.loadPlacementFromFile(placement, true);
                 }
                 else
                 {

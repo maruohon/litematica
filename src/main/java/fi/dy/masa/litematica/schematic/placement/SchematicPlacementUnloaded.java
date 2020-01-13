@@ -21,8 +21,11 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.WorldUtils;
 
 public class SchematicPlacementUnloaded
 {
@@ -32,6 +35,7 @@ public class SchematicPlacementUnloaded
     @Nullable protected final File schematicFile;
     protected final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
 
+    protected String placementSaveFile;
     protected BlockPos origin;
     protected String name;
     protected Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
@@ -45,14 +49,16 @@ public class SchematicPlacementUnloaded
     protected boolean regionPlacementsModified;
     protected boolean locked;
     protected boolean shouldBeSaved = true;
+    protected boolean isSavedToFile;
     protected int coordinateLockMask;
     protected int boxesBBColor;
     @Nullable protected Box enclosingBox;
     @Nullable protected String selectedSubRegionName;
     @Nullable protected JsonObject materialListData;
 
-    protected SchematicPlacementUnloaded(@Nullable File schematicFile, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    protected SchematicPlacementUnloaded(@Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled, boolean enableRender)
     {
+        this.placementSaveFile = storageFile;
         this.schematicFile = schematicFile;
         this.origin = origin;
         this.name = name;
@@ -187,21 +193,67 @@ public class SchematicPlacementUnloaded
         }
     }
 
+    protected void copyFrom(SchematicPlacementUnloaded other)
+    {
+        this.relativeSubRegionPlacements.clear();
+        other.relativeSubRegionPlacements.entrySet().forEach((entry) -> this.relativeSubRegionPlacements.put(entry.getKey(), entry.getValue().copy())); 
+
+        this.origin = other.origin;
+        this.name = other.name;
+        this.boxesBBColorVec = other.boxesBBColorVec;
+        this.rotation = other.rotation;
+        this.mirror = other.mirror;
+        this.ignoreEntities = other.ignoreEntities;
+        this.enabled = other.enabled;
+        this.enableRender = other.enableRender;
+        this.renderEnclosingBox = other.renderEnclosingBox;
+        this.regionPlacementsModified = other.regionPlacementsModified;
+        this.locked = other.locked;
+        this.shouldBeSaved = other.shouldBeSaved;
+        this.isSavedToFile = other.isSavedToFile;
+        this.coordinateLockMask = other.coordinateLockMask;
+        this.boxesBBColor = other.boxesBBColor;
+        this.enclosingBox = other.enclosingBox != null ? other.enclosingBox.copy() : null;
+        this.selectedSubRegionName = other.selectedSubRegionName;
+        this.materialListData = other.materialListData != null ? JsonUtils.deepCopy(other.materialListData) : null;
+    }
+
+    @Nullable
+    public SchematicPlacement fullyLoadPlacement()
+    {
+        if (this.schematicFile != null)
+        {
+            ISchematic schematic = SchematicHolder.getInstance().getOrLoad(this.schematicFile);
+
+            if (schematic != null)
+            {
+                SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, this.placementSaveFile, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
+
+                schematicPlacement.copyFrom(this);
+                schematicPlacement.checkAreSubRegionsModified();
+                schematicPlacement.updateEnclosingBox();
+
+                return schematicPlacement;
+            }
+            else
+            {
+                InfoUtils.printErrorMessage("litematica.error.schematic_load.failed", this.schematicFile.getAbsolutePath());
+            }
+        }
+
+        return null;
+    }
+
     @Nullable
     public JsonObject toJson()
     {
         if (this.schematicFile != null)
         {
             JsonObject obj = new JsonObject();
-            JsonArray arr = new JsonArray();
-
-            arr.add(this.origin.getX());
-            arr.add(this.origin.getY());
-            arr.add(this.origin.getZ());
 
             obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
             obj.add("name", new JsonPrimitive(this.name));
-            obj.add("origin", arr);
+            obj.add("origin", JsonUtils.blockPosToJson(this.origin));
             obj.add("rotation", new JsonPrimitive(this.rotation.name()));
             obj.add("mirror", new JsonPrimitive(this.mirror.name()));
             obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities()));
@@ -218,9 +270,14 @@ public class SchematicPlacementUnloaded
                 obj.add("selected_region", new JsonPrimitive(this.selectedSubRegionName));
             }
 
+            if (this.placementSaveFile != null)
+            {
+                obj.add("storage_file", new JsonPrimitive(this.placementSaveFile));
+            }
+
             if (this.relativeSubRegionPlacements.isEmpty() == false)
             {
-                arr = new JsonArray();
+                JsonArray arr = new JsonArray();
 
                 for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
                 {
@@ -241,56 +298,6 @@ public class SchematicPlacementUnloaded
         return null;
     }
 
-    protected void copyFrom(SchematicPlacementUnloaded other)
-    {
-        this.relativeSubRegionPlacements.clear();
-        other.relativeSubRegionPlacements.entrySet().forEach((entry) -> this.relativeSubRegionPlacements.put(entry.getKey(), entry.getValue().copy())); 
-
-        this.origin = other.origin;
-        this.name = other.name;
-        this.boxesBBColorVec = other.boxesBBColorVec;
-        this.rotation = other.rotation;
-        this.mirror = other.mirror;
-        this.ignoreEntities = other.ignoreEntities;
-        this.enabled = other.enabled;
-        this.enableRender = other.enableRender;
-        this.renderEnclosingBox = other.renderEnclosingBox;
-        this.regionPlacementsModified = other.regionPlacementsModified;
-        this.locked = other.locked;
-        this.shouldBeSaved = other.shouldBeSaved;
-        this.coordinateLockMask = other.coordinateLockMask;
-        this.boxesBBColor = other.boxesBBColor;
-        this.enclosingBox = other.enclosingBox != null ? other.enclosingBox.copy() : null;
-        this.selectedSubRegionName = other.selectedSubRegionName;
-        this.materialListData = other.materialListData != null ? JsonUtils.deepCopy(other.materialListData) : null;
-    }
-
-    @Nullable
-    public SchematicPlacement fullyLoadPlacement()
-    {
-        if (this.schematicFile != null)
-        {
-            ISchematic schematic = SchematicHolder.getInstance().getOrLoad(this.schematicFile);
-
-            if (schematic != null)
-            {
-                SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
-
-                schematicPlacement.copyFrom(this);
-                schematicPlacement.checkAreSubRegionsModified();
-                schematicPlacement.updateEnclosingBox();
-
-                return schematicPlacement;
-            }
-            else
-            {
-                InfoUtils.printErrorMessage("", this.schematicFile.getAbsolutePath());
-            }
-        }
-
-        return null;
-    }
-
     @Nullable
     public static SchematicPlacementUnloaded fromJson(JsonObject obj)
     {
@@ -302,22 +309,21 @@ public class SchematicPlacementUnloaded
             JsonUtils.hasArray(obj, "placements"))
         {
             File schematicFile = new File(obj.get("schematic").getAsString());
-            JsonArray posArr = obj.get("origin").getAsJsonArray();
+            BlockPos pos = JsonUtils.blockPosFromJson(obj, "origin");
 
-            if (posArr.size() != 3)
+            if (pos == null)
             {
                 LiteModLitematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", schematicFile.getAbsolutePath());
                 return null;
             }
 
             String name = obj.get("name").getAsString();
-            BlockPos pos = new BlockPos(posArr.get(0).getAsInt(), posArr.get(1).getAsInt(), posArr.get(2).getAsInt());
             Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
             Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
             boolean enabled = JsonUtils.getBoolean(obj, "enabled");
             boolean enableRender = JsonUtils.getBoolean(obj, "enable_render");
 
-            SchematicPlacementUnloaded schematicPlacement = new SchematicPlacementUnloaded(schematicFile, pos, name, enabled, enableRender);
+            SchematicPlacementUnloaded schematicPlacement = new SchematicPlacementUnloaded(null, schematicFile, pos, name, enabled, enableRender);
             schematicPlacement.rotation = rotation;
             schematicPlacement.mirror = mirror;
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
@@ -349,6 +355,11 @@ public class SchematicPlacementUnloaded
                 schematicPlacement.selectedSubRegionName = JsonUtils.getString(obj, "selected_region");
             }
 
+            if (JsonUtils.hasString(obj, "storage_file"))
+            {
+                schematicPlacement.placementSaveFile = JsonUtils.getString(obj, "storage_file");
+            }
+
             JsonArray placementArr = obj.get("placements").getAsJsonArray();
 
             for (int i = 0; i < placementArr.size(); ++i)
@@ -377,6 +388,158 @@ public class SchematicPlacementUnloaded
         }
 
         return null;
+    }
+
+    @Nullable
+    public static SchematicPlacementUnloaded fromFile(File file)
+    {
+        JsonElement el = JsonUtils.parseJsonFile(file);
+
+        if (el != null && el.isJsonObject())
+        {
+            SchematicPlacementUnloaded placement = fromJson(el.getAsJsonObject());
+
+            if (placement != null)
+            {
+                placement.isSavedToFile = true;
+                placement.placementSaveFile = file.getName();
+            }
+
+            return placement;
+        }
+
+        return null;
+    }
+
+    public boolean saveToFileIfChanged()
+    {
+        if (this.shouldBeSaved == false)
+        {
+            return false;
+        }
+
+        File file;
+
+        if (this.placementSaveFile != null)
+        {
+            file = new File(getSaveDirectory(), this.placementSaveFile);
+        }
+        else
+        {
+            file = this.getAvailableFileName();
+        }
+
+        if (file == null)
+        {
+            return false;
+        }
+
+        if (this.isSavedToFile == false || file.exists() == false)
+        {
+            JsonObject obj = this.toJson();
+            return obj != null && this.saveToFile(file, obj);
+        }
+
+        // Only the fully loaded placements can be modified
+        if (this.isLoaded() && this.schematicFile != null)
+        {
+            JsonElement el = JsonUtils.parseJsonFile(file);
+
+            if (el != null && el.isJsonObject())
+            {
+                JsonObject obj = this.toJson();
+
+                if (obj != null && el.getAsJsonObject().equals(obj) == false)
+                {
+                    return this.saveToFile(file, obj);
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected boolean saveToFile(File file, JsonObject obj)
+    {
+        boolean success = JsonUtils.writeJsonToFile(obj, file);
+
+        if (success)
+        {
+            if (this.placementSaveFile == null)
+            {
+                this.placementSaveFile = file.getName();
+            }
+
+            this.isSavedToFile = true;
+        }
+
+        return success;
+    }
+
+    public static File getSaveDirectory()
+    {
+        String sep = File.separator;
+        String worldAndDimPath = getWorldAndDimPath();
+        String path = "litematica" + sep + "placements" + sep + worldAndDimPath;
+        File dir = new File(FileUtils.getMinecraftDirectory(), path);
+
+        if (dir.exists() == false && dir.mkdirs() == false)
+        {
+            InfoUtils.printErrorMessage("Failed to create directory '", dir.getAbsolutePath() + "'");
+        }
+
+        return dir;
+    }
+
+    public static String getWorldAndDimPath()
+    {
+        String worldName = StringUtils.getWorldOrServerName();
+        net.minecraft.world.World world = net.minecraft.client.Minecraft.getMinecraft().world;
+        String path;
+
+        if (worldName == null || world == null)
+        {
+            path = "__fallback";
+        }
+        else
+        {
+            String sep = File.separator;
+            String dimStr = "dim_" + WorldUtils.getDimensionId(world);
+            path = worldName + sep + dimStr;
+        }
+
+        return path;
+    }
+
+    @Nullable
+    protected File getAvailableFileName()
+    {
+        if (this.getSchematicFile() == null)
+        {
+            return null;
+        }
+
+        File dir = getSaveDirectory();
+        String schName = FileUtils.getNameWithoutExtension(this.getSchematicFile().getName());
+        String nameBase = FileUtils.generateSafeFileName(schName);
+        int id = 1;
+        String name = String.format("%s_%03d.json", nameBase, id);
+        File file = new File(dir, name);
+
+        while (file.exists())
+        {
+            ++id;
+            name = String.format("%s_%03d.json", nameBase, id);
+            file = new File(dir, name);
+        }
+
+        return file;
     }
 
     protected static int getNextBoxColor()
