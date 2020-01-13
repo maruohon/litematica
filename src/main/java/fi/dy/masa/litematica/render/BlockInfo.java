@@ -75,7 +75,7 @@ public class BlockInfo
             y += 12;
 
             GlStateManager.disableLighting();
-            RenderUtils.enableGuiItemLighting();
+            RenderUtils.enableDiffuseLightingGui3D();
 
             //mc.getRenderItem().zLevel += 100;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
@@ -84,7 +84,7 @@ public class BlockInfo
             //mc.getRenderItem().zLevel -= 100;
 
             //GlStateManager.disableBlend();
-            RenderUtils.disableItemLighting();
+            RenderUtils.disableDiffuseLighting();
 
             textRenderer.draw(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
 

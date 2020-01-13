@@ -190,13 +190,13 @@ public class EntityUtils
         }
         else
         {
-            if (nbt.containsKey("Passengers", Constants.NBT.TAG_LIST))
+            if (nbt.contains("Passengers", Constants.NBT.TAG_LIST))
             {
                 ListTag taglist = nbt.getList("Passengers", Constants.NBT.TAG_COMPOUND);
 
                 for (int i = 0; i < taglist.size(); ++i)
                 {
-                    Entity passenger = createEntityAndPassengersFromNBT(taglist.getCompoundTag(i), world);
+                    Entity passenger = createEntityAndPassengersFromNBT(taglist.getCompound(i), world);
 
                     if (passenger != null)
                     {
@@ -215,7 +215,7 @@ public class EntityUtils
         {
             for (Entity passenger : entity.getPassengerList())
             {
-                passenger.setPosition(entity.x, entity.y + entity.getMountedHeightOffset() + passenger.getHeightOffset(), entity.z);
+                passenger.setPosition(entity.getX(), entity.getY() + entity.getMountedHeightOffset() + passenger.getHeightOffset(), entity.getZ());
                 spawnEntityAndPassengersInWorld(passenger, world);
             }
         }

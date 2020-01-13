@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.NBTUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.NBTUtils;
 
 public class SchematicMetadata
 {
@@ -165,7 +165,7 @@ public class SchematicMetadata
             this.enclosingSize = size;
         }
 
-        if (nbt.containsKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
+        if (nbt.contains("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
         {
             this.thumbnailPixelData = nbt.getIntArray("PreviewImageData");
         }

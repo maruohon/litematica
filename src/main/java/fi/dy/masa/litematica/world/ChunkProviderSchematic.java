@@ -42,7 +42,7 @@ public class ChunkProviderSchematic extends ClientChunkManager
     }
 
     @Override
-    public WorldChunk method_2857(int chunkX, int chunkZ, ChunkStatus status, boolean fallbackToEmpty)
+    public WorldChunk getChunk(int chunkX, int chunkZ, ChunkStatus status, boolean fallbackToEmpty)
     {
         ChunkSchematic chunk = this.getChunk(chunkX, chunkZ);
         return chunk == null && fallbackToEmpty ? this.blankChunk : chunk;

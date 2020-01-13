@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.2.4-SNAPSHOT'
+    id 'fabric-loom' version '0.2.6-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -21,16 +21,16 @@ configFile.withReader {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:" + config.minecraft_version
-    mappings "net.fabricmc:yarn:" + config.mappings_version
-    modCompile "net.fabricmc:fabric-loader:" + config.fabric_loader_version
+    minecraft "com.mojang:minecraft:${config.minecraft_version}"
+    mappings "net.fabricmc:yarn:${config.mappings_version}:v2"
+    modCompile "net.fabricmc:fabric-loader:${config.fabric_loader_version}"
     compile "com.google.code.findbugs:jsr305:3.0.2"
+
+    modCompile "fi.dy.masa.malilib:malilib-fabric-${config.minecraft_version_out}:${config.malilib_version}"
+    modCompile "io.github.prospector:modmenu:${config.mod_menu_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     //modCompile "net.fabricmc:fabric:" + config.fabric_version
-
-    modCompile "fi.dy.masa.malilib:malilib-fabric-" + config.minecraft_version_out + ":" + config.malilib_version
-    modCompile "io.github.prospector:modmenu:" + config.mod_menu_version
 }
 
 minecraft {

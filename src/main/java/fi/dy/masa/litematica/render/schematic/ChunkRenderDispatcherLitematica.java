@@ -14,11 +14,10 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GlBuffer;
-import net.minecraft.client.gl.GlBufferRenderer;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
@@ -32,7 +31,6 @@ public class ChunkRenderDispatcherLitematica
     private final List<ChunkRenderWorkerLitematica> listThreadedWorkers = new ArrayList<>();
     private final PriorityBlockingQueue<ChunkRenderTaskSchematic> queueChunkUpdates = Queues.newPriorityBlockingQueue();
     private final BlockingQueue<BufferBuilderCache> queueFreeRenderBuilders;
-    private final GlBufferRenderer vertexBufferUploader = new GlBufferRenderer();
     private final Queue<ChunkRenderDispatcherLitematica.PendingUpload> queueChunkUploads = Queues.newPriorityQueue();
     private final ChunkRenderWorkerLitematica renderWorker;
     private final int countRenderBuilders;
@@ -238,6 +236,7 @@ public class ChunkRenderDispatcherLitematica
                     ChunkRenderDispatcherLitematica.this.queueChunkUpdates.remove(generator);
                 }
             });
+
             flag = this.queueChunkUpdates.offer(generator);
         }
         finally
@@ -248,14 +247,13 @@ public class ChunkRenderDispatcherLitematica
         return flag;
     }
 
-    public ListenableFuture<Object> uploadChunkBlocks(final BlockRenderLayer layer, final BufferBuilder buffer,
+    public ListenableFuture<Object> uploadChunkBlocks(final RenderLayer layer, final BufferBuilder buffer,
             final ChunkRendererSchematicVbo renderChunk, final ChunkRenderDataSchematic chunkRenderData, final double distanceSq)
     {
         if (MinecraftClient.getInstance().isOnThread())
         {
             //if (GuiBase.isCtrlDown()) System.out.printf("uploadChunkBlocks()\n");
-            this.uploadVertexBuffer(buffer, renderChunk.getBlocksGlBufferByLayer(layer));
-            buffer.setOffset(0.0D, 0.0D, 0.0D);
+            this.uploadVertexBuffer(buffer, renderChunk.getBlocksVertexBufferByLayer(layer));
             return Futures.<Object>immediateFuture(null);
         }
         else
@@ -283,8 +281,7 @@ public class ChunkRenderDispatcherLitematica
         if (MinecraftClient.getInstance().isOnThread())
         {
             //if (GuiBase.isCtrlDown()) System.out.printf("uploadChunkOverlay()\n");
-            this.uploadVertexBuffer(buffer, renderChunk.getOverlayGlBuffer(type));
-            buffer.setOffset(0.0D, 0.0D, 0.0D);
+            this.uploadVertexBuffer(buffer, renderChunk.getOverlayVertexBuffer(type));
             return Futures.<Object>immediateFuture(null);
         }
         else
@@ -306,10 +303,9 @@ public class ChunkRenderDispatcherLitematica
         }
     }
 
-    private void uploadVertexBuffer(BufferBuilder bufferBuilder, GlBuffer vertexBufferIn)
+    private void uploadVertexBuffer(BufferBuilder buffer, VertexBuffer vertexBuffer)
     {
-        this.vertexBufferUploader.setGlBuffer(vertexBufferIn);
-        this.vertexBufferUploader.draw(bufferBuilder);
+        vertexBuffer.submitUpload(buffer);
     }
 
     public void clearChunkUpdates()

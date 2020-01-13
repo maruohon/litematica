@@ -193,7 +193,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         GlStateManager.enableRescaleNormal();
         RenderUtils.setupBlend();
-        RenderUtils.enableGuiItemLighting();
+        RenderUtils.enableDiffuseLightingGui3D();
 
         for (int i = 0; i < size; ++i)
         {
@@ -201,7 +201,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             y += lineHeight;
         }
 
-        RenderUtils.disableItemLighting();
+        RenderUtils.disableDiffuseLighting();
         GlStateManager.disableRescaleNormal();
         GlStateManager.disableBlend();
 

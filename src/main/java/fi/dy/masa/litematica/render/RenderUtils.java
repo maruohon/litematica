@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Random;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -45,10 +46,15 @@ public class RenderUtils
 
     public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth, Color4f color, MinecraftClient mc)
     {
-        GlStateManager.lineWidth(lineWidth);
+        RenderSystem.lineWidth(lineWidth);
 
-        net.minecraft.util.math.Box aabb = createAABB(pos.getX(), pos.getY(), pos.getZ(), expand, mc);
-        WorldRenderer.drawBoxOutline(aabb, color.r, color.g, color.b, color.a);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+
+        drawBlockBoundingBoxOutlinesBatchedLines(pos, color, expand, buffer, mc);
+
+        tessellator.draw();
     }
 
     public static void drawBlockBoundingBoxOutlinesBatchedLines(BlockPos pos, Color4f color,
@@ -58,6 +64,7 @@ public class RenderUtils
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
+
         double minX = pos.getX() - dx - expand;
         double minY = pos.getY() - dy - expand;
         double minZ = pos.getZ() - dz - expand;
@@ -75,6 +82,7 @@ public class RenderUtils
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
+
         double x1 = pos1.getX() - dx;
         double y1 = pos1.getY() - dy;
         double z1 = pos1.getZ() - dz;
@@ -97,7 +105,7 @@ public class RenderUtils
     }
 
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
-            Color4f color1, Color4f color2, Color4f color3, MinecraftClient mc)
+            Color4f color1, Color4f color2, Color4f color3, MatrixStack matrices, MinecraftClient mc)
     {
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
@@ -114,7 +122,7 @@ public class RenderUtils
         GlStateManager.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
         // Min corner
@@ -164,19 +172,25 @@ public class RenderUtils
     {
         GlStateManager.lineWidth(lineWidth);
 
-        net.minecraft.util.math.Box aabb = createEnclosingAABB(pos1, pos2, mc);
-        drawBoundingBoxEdges(aabb, colorX, colorY, colorZ);
-    }
+        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        final double dx = cameraPos.x;
+        final double dy = cameraPos.y;
+        final double dz = cameraPos.z;
 
-    private static void drawBoundingBoxEdges(net.minecraft.util.math.Box box, Color4f colorX, Color4f colorY, Color4f colorZ)
-    {
-        drawBoundingBoxEdges(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, colorX, colorY, colorZ);
+        double minX = Math.min(pos1.getX(), pos2.getX()) - dx;
+        double minY = Math.min(pos1.getY(), pos2.getY()) - dy;
+        double minZ = Math.min(pos1.getZ(), pos2.getZ()) - dz;
+        double maxX = Math.max(pos1.getX(), pos2.getX()) - dx + 1;
+        double maxY = Math.max(pos1.getY(), pos2.getY()) - dy + 1;
+        double maxZ = Math.max(pos1.getZ(), pos2.getZ()) - dz + 1;
+
+        drawBoundingBoxEdges(minX, minY, minZ, maxX, maxY, maxZ, colorX, colorY, colorZ);
     }
 
     private static void drawBoundingBoxEdges(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBufferBuilder();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
         drawBoundingBoxLinesX(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorX);
@@ -231,13 +245,13 @@ public class RenderUtils
         buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
     }
 
-    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, MinecraftClient mc)
+    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, MatrixStack matrices, MinecraftClient mc)
     {
         GlStateManager.enableBlend();
         GlStateManager.disableCull();
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
 
         renderAreaSidesBatched(pos1, pos2, color, 0.002, buffer, mc);
@@ -303,7 +317,7 @@ public class RenderUtils
         GlStateManager.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
         // Edges along the X-axis
@@ -454,9 +468,9 @@ public class RenderUtils
 
         for (int index = 0; index < 4; ++index)
         {
-            fx[index] = x + Float.intBitsToFloat(vertexData[index * 7 + 0]);
-            fy[index] = y + Float.intBitsToFloat(vertexData[index * 7 + 1]);
-            fz[index] = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
+            fx[index] = x + Float.intBitsToFloat(vertexData[index * 8 + 0]);
+            fy[index] = y + Float.intBitsToFloat(vertexData[index * 8 + 1]);
+            fz[index] = z + Float.intBitsToFloat(vertexData[index * 8 + 2]);
         }
 
         buffer.vertex(fx[0], fy[0], fz[0]).color(color.r, color.g, color.b, color.a).next();
@@ -506,9 +520,9 @@ public class RenderUtils
 
         for (int index = 0; index < 4; ++index)
         {
-            fx = x + Float.intBitsToFloat(vertexData[index * 7 + 0]);
-            fy = y + Float.intBitsToFloat(vertexData[index * 7 + 1]);
-            fz = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
+            fx = x + Float.intBitsToFloat(vertexData[index * 8 + 0]);
+            fy = y + Float.intBitsToFloat(vertexData[index * 8 + 1]);
+            fz = z + Float.intBitsToFloat(vertexData[index * 8 + 2]);
 
             buffer.vertex(fx, fy, fz).color(color.r, color.g, color.b, color.a).next();
         }
@@ -789,41 +803,4 @@ public class RenderUtils
         }
     }
     */
-
-    /**
-     * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
-     */
-    public static net.minecraft.util.math.Box createEnclosingAABB(BlockPos pos1, BlockPos pos2, MinecraftClient mc)
-    {
-        int minX = Math.min(pos1.getX(), pos2.getX());
-        int minY = Math.min(pos1.getY(), pos2.getY());
-        int minZ = Math.min(pos1.getZ(), pos2.getZ());
-        int maxX = Math.max(pos1.getX(), pos2.getX()) + 1;
-        int maxY = Math.max(pos1.getY(), pos2.getY()) + 1;
-        int maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1;
-
-        return createAABB(minX, minY, minZ, maxX, maxY, maxZ, 0, mc);
-    }
-
-    /**
-     * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
-     */
-    public static net.minecraft.util.math.Box createAABB(int x, int y, int z, double expand, MinecraftClient mc)
-    {
-        return createAABB(x, y, z, x + 1, y + 1, z + 1, expand, mc);
-    }
-
-    /**
-     * Creates an AABB for rendering purposes, which is offset by the render view entity's movement and current partialTicks
-     */
-    public static net.minecraft.util.math.Box createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, double expand, MinecraftClient mc)
-    {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
-        final double dx = cameraPos.x;
-        final double dy = cameraPos.y;
-        final double dz = cameraPos.z;
-
-        return new net.minecraft.util.math.Box( minX - dx - expand, minY - dy - expand, minZ - dz - expand,
-                                maxX - dx + expand, maxY - dy + expand, maxZ - dz + expand);
-    }
 }
