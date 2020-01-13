@@ -1,10 +1,12 @@
 package fi.dy.masa.litematica.world;
 
 import java.util.Arrays;
+import net.minecraft.class_4548;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.SystemUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -20,10 +22,9 @@ public class ChunkSchematic extends WorldChunk
 
     public ChunkSchematic(World worldIn, ChunkPos pos)
     {
-        super(worldIn, pos, new Biome[256]);
+        super(worldIn, pos, new class_4548(SystemUtil.consume(new Biome[class_4548.field_20649], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
 
         this.timeCreated = worldIn.getTime();
-        Arrays.fill(this.getBiomeArray(), Biomes.PLAINS);
     }
 
     @Override
@@ -116,11 +117,5 @@ public class ChunkSchematic extends WorldChunk
     public boolean isEmpty()
     {
         return this.isEmpty;
-    }
-
-    @Override
-    public int getLightLevel(BlockPos pos, int defaultValue)
-    {
-        return 15;
     }
 }

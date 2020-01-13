@@ -409,8 +409,8 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             {
                 BlockPos pos = iter.next();
 
-                if (this.worldClient.isBlockLoaded(pos) &&
-                    this.worldSchematic.isBlockLoaded(pos))
+                if (this.worldClient.method_22340(pos) && // isBlockLoaded
+                    this.worldSchematic.method_22340(pos))
                 {
                     BlockMismatch mismatch = this.blockMismatches.get(pos);
 

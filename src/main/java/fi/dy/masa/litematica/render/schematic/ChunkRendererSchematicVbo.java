@@ -9,7 +9,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
-import com.mojang.blaze3d.platform.GLX;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.block.BlockRenderType;
@@ -79,17 +78,14 @@ public class ChunkRendererSchematicVbo
         this.glBufferOverlay = new GlBuffer[OverlayRenderType.values().length];
         this.position = new BlockPos.Mutable();
 
-        if (GLX.useVbo())
+        for (int i = 0; i < BlockRenderLayer.values().length; ++i)
         {
-            for (int i = 0; i < BlockRenderLayer.values().length; ++i)
-            {
-                this.glBufferBlocks[i] = new GlBuffer(VertexFormats.POSITION_COLOR_UV_LMAP);
-            }
+            this.glBufferBlocks[i] = new GlBuffer(VertexFormats.POSITION_COLOR_UV_LMAP);
+        }
 
-            for (int i = 0; i < OverlayRenderType.values().length; ++i)
-            {
-                this.glBufferOverlay[i] = new GlBuffer(VertexFormats.POSITION_COLOR);
-            }
+        for (int i = 0; i < OverlayRenderType.values().length; ++i)
+        {
+            this.glBufferOverlay[i] = new GlBuffer(VertexFormats.POSITION_COLOR);
         }
     }
 

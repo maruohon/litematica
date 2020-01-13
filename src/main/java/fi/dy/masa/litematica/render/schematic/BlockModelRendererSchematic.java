@@ -107,7 +107,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             {
                 if (this.shouldRenderModelSide(worldIn, stateIn, posIn, side))
                 {
-                    int lightMapCoords = stateIn.getBlockBrightness(worldIn, posIn.offset(side));
+                    int lightMapCoords = worldIn.getLightmapIndex(stateIn, posIn.offset(side));
                     this.renderQuadsFlat(worldIn, stateIn, posIn, lightMapCoords, false, buffer, quads, bitset);
                     renderedSomething = true;
                 }
@@ -188,7 +188,7 @@ public class BlockModelRendererSchematic extends BlockModelRenderer
             {
                 this.fillQuadBounds(world, state, pos, bakedquad.getVertexData(), bakedquad.getFace(), (float[]) null, bitSet);
                 BlockPos blockpos = bitSet.get(0) ? pos.offset(bakedquad.getFace()) : pos;
-                brightnessIn = state.getBlockBrightness(world, blockpos);
+                brightnessIn = world.getLightmapIndex(state, blockpos);
             }
 
             buffer.putVertexData(bakedquad.getVertexData());

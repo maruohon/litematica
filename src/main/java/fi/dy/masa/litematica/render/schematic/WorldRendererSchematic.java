@@ -10,16 +10,10 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import fi.dy.masa.litematica.world.ChunkSchematic;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -45,6 +39,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.ExtendedBlockView;
 import net.minecraft.world.chunk.WorldChunk;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
+import fi.dy.masa.litematica.world.ChunkSchematic;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class WorldRendererSchematic
 {
@@ -69,8 +70,8 @@ public class WorldRendererSchematic
     private float lastViewEntityPitch = Float.MIN_VALUE;
     private float lastViewEntityYaw = Float.MIN_VALUE;
     private ChunkRenderDispatcherLitematica renderDispatcher;
-    private ChunkRendererListSchematicBase renderContainer;
-    private IChunkRendererFactory renderChunkFactory;
+    private final ChunkRendererListSchematicBase renderContainer;
+    private final IChunkRendererFactory renderChunkFactory;
     //private ShaderGroup entityOutlineShader;
     //private boolean entityOutlinesRendered;
 
@@ -80,7 +81,6 @@ public class WorldRendererSchematic
     private int countEntitiesRendered;
     private int countEntitiesHidden;
 
-    private boolean vboEnabled;
     private double prevRenderSortX;
     private double prevRenderSortY;
     private double prevRenderSortZ;
@@ -91,18 +91,8 @@ public class WorldRendererSchematic
         this.mc = mc;
         this.entityRenderDispatcher = mc.getEntityRenderManager();
 
-        this.vboEnabled = GLX.useVbo();
-
-        if (this.vboEnabled)
-        {
-            this.renderContainer = new ChunkRendererListSchematicVbo();
-            this.renderChunkFactory = new RenderChunkFactoryVbo();
-        }
-        else
-        {
-            this.renderContainer = new ChunkRendererListSchematicDisplaylist();
-            this.renderChunkFactory = new RenderChunkFactoryList();
-        }
+        this.renderContainer = new ChunkRendererListSchematicVbo();
+        this.renderChunkFactory = new RenderChunkFactoryVbo();
 
         this.blockRenderManager = MinecraftClient.getInstance().getBlockRenderManager();
         this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColorMap());
@@ -189,20 +179,6 @@ public class WorldRendererSchematic
 
             this.displayListEntitiesDirty = true;
             this.renderDistanceChunks = this.mc.options.viewDistance;
-
-            boolean vboEnabledPrevious = this.vboEnabled;
-            this.vboEnabled = GLX.useVbo();
-
-            if (this.vboEnabled == false && vboEnabledPrevious)
-            {
-                this.renderContainer = new ChunkRendererListSchematicDisplaylist();
-                this.renderChunkFactory = new RenderChunkFactoryList();
-            }
-            else if (this.vboEnabled && vboEnabledPrevious == false)
-            {
-                this.renderContainer = new ChunkRendererListSchematicVbo();
-                this.renderChunkFactory = new RenderChunkFactoryVbo();
-            }
 
             if (this.chunkRendererDispatcher != null)
             {
@@ -501,41 +477,35 @@ public class WorldRendererSchematic
     {
         this.mc.gameRenderer.enableLightmap();
 
-        if (GLX.useVbo())
-        {
-            GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
-            GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
-            GlStateManager.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-            GLX.glClientActiveTexture(GLX.GL_TEXTURE1);
-            GlStateManager.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-            GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
-            GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
-        }
+        GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
+        RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE0);
+        GlStateManager.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+        RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE1);
+        GlStateManager.enableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+        RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE0);
+        GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
 
         this.renderContainer.renderChunkLayer(layer);
 
-        if (GLX.useVbo())
+        for (VertexFormatElement element : VertexFormats.POSITION_COLOR_UV_LMAP.getElements())
         {
-            for (VertexFormatElement element : VertexFormats.POSITION_COLOR_UV_LMAP.getElements())
-            {
-                VertexFormatElement.Type type = element.getType();
-                int index = element.getIndex();
+            VertexFormatElement.Type type = element.getType();
+            int index = element.getIndex();
 
-                switch (type)
-                {
-                    case POSITION:
-                        GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
-                        break;
-                    case UV:
-                        GLX.glClientActiveTexture(GLX.GL_TEXTURE0 + index);
-                        GlStateManager.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
-                        break;
-                    case COLOR:
-                        GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
-                        GlStateManager.clearCurrentColor();
-                    default:
-                }
+            switch (type)
+            {
+                case POSITION:
+                    GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
+                    break;
+                case UV:
+                    RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE0 + index);
+                    GlStateManager.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE0);
+                    break;
+                case COLOR:
+                    GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
+                    GlStateManager.clearCurrentColor();
+                default:
             }
         }
 
@@ -580,35 +550,29 @@ public class WorldRendererSchematic
     {
         this.mc.gameRenderer.enableLightmap();
 
-        if (GLX.useVbo())
-        {
-            GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
-            GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
-        }
+        GlStateManager.enableClientState(GL11.GL_VERTEX_ARRAY);
+        GlStateManager.enableClientState(GL11.GL_COLOR_ARRAY);
 
         this.renderContainer.renderBlockOverlays(type);
 
-        if (GLX.useVbo())
+        for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())
         {
-            for (VertexFormatElement element : VertexFormats.POSITION_COLOR.getElements())
-            {
-                VertexFormatElement.Type usage = element.getType();
+            VertexFormatElement.Type usage = element.getType();
 
-                switch (usage)
-                {
-                    case POSITION:
-                        GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
-                        break;
-                    case UV:
-                        GLX.glClientActiveTexture(GLX.GL_TEXTURE0 + element.getIndex());
-                        GlStateManager.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-                        GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
-                        break;
-                    case COLOR:
-                        GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
-                        GlStateManager.clearCurrentColor();
-                    default:
-                }
+            switch (usage)
+            {
+                case POSITION:
+                    GlStateManager.disableClientState(GL11.GL_VERTEX_ARRAY);
+                    break;
+                case UV:
+                    RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE0 + element.getIndex());
+                    GlStateManager.disableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+                    RenderSystem.glClientActiveTexture(GL13.GL_TEXTURE0);
+                    break;
+                case COLOR:
+                    GlStateManager.disableClientState(GL11.GL_COLOR_ARRAY);
+                    GlStateManager.clearCurrentColor();
+                default:
             }
         }
 
@@ -694,7 +658,7 @@ public class WorldRendererSchematic
             for (ChunkRendererSchematicVbo chunkRenderer : this.renderInfos)
             {
                 BlockPos pos = chunkRenderer.getPosition();
-                WorldChunk chunk = (WorldChunk) this.world.getChunk(pos);
+                WorldChunk chunk = (WorldChunk) this.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
                 TypeFilterableList<Entity> list = chunk.getEntitySectionArray()[pos.getY() >> 4];
 
                 if (list.isEmpty() == false)

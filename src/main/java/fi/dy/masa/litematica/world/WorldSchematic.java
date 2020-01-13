@@ -90,7 +90,7 @@ public class WorldSchematic extends ClientWorld
         }
         else
         {
-            return this.getChunk(pos).setBlockState(pos, newState, false) != null;
+            return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4).setBlockState(pos, newState, false) != null;
         }
     }
 
@@ -177,19 +177,13 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public int getLightLevel(BlockPos pos)
-    {
-        return 15;
-    }
-
-    @Override
-    public int getLightLevel(BlockPos pos, int foo)
-    {
-        return 15;
-    }
-
-    @Override
     public int getLightLevel(LightType type, BlockPos pos)
+    {
+        return 15;
+    }
+
+    @Override
+    public int method_22335(BlockPos pos, int defaultValue)
     {
         return 15;
     }
