@@ -32,6 +32,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
 {
     protected final ISchematic schematic;
     protected final int subRegionCount;
+    protected boolean isRepeatedPlacement;
 
     @Nullable protected SchematicVerifier verifier;
     @Nullable protected MaterialListBase materialList;
@@ -44,10 +45,23 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         this.subRegionCount = schematic.getSubRegionCount();
     }
 
+    public SchematicPlacement copy(boolean isRepeatedPlacement)
+    {
+        SchematicPlacement copy = new SchematicPlacement(this.schematic, null, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
+        copy.copyFrom(this);
+        copy.isRepeatedPlacement = isRepeatedPlacement;
+        return copy;
+    }
+
     @Override
     public boolean isLoaded()
     {
         return true;
+    }
+
+    public boolean isRepeatedPlacement()
+    {
+        return this.isRepeatedPlacement;
     }
 
     public ISchematic getSchematic()
@@ -83,6 +97,16 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         }
 
         return this.verifier;
+    }
+
+    public Box getEclosingBox()
+    {
+        if (this.enclosingBox == null)
+        {
+            this.updateEnclosingBox();
+        }
+
+        return this.enclosingBox;
     }
 
     public MaterialListBase getMaterialList()
@@ -168,42 +192,39 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
 
     protected void updateEnclosingBox()
     {
-        if (this.shouldRenderEnclosingBox())
+        ImmutableMap<String, SelectionBox> boxes = this.getSubRegionBoxes(RequiredEnabled.ANY);
+        BlockPos pos1 = null;
+        BlockPos pos2 = null;
+
+        for (SelectionBox box : boxes.values())
         {
-            ImmutableMap<String, SelectionBox> boxes = this.getSubRegionBoxes(RequiredEnabled.ANY);
-            BlockPos pos1 = null;
-            BlockPos pos2 = null;
+            BlockPos tmp;
+            tmp = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
 
-            for (SelectionBox box : boxes.values())
+            if (pos1 == null)
             {
-                BlockPos tmp;
-                tmp = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
-
-                if (pos1 == null)
-                {
-                    pos1 = tmp;
-                }
-                else if (tmp.getX() < pos1.getX() || tmp.getY() < pos1.getY() || tmp.getZ() < pos1.getZ())
-                {
-                    pos1 = PositionUtils.getMinCorner(tmp, pos1);
-                }
-
-                tmp = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
-
-                if (pos2 == null)
-                {
-                    pos2 = tmp;
-                }
-                else if (tmp.getX() > pos2.getX() || tmp.getY() > pos2.getY() || tmp.getZ() > pos2.getZ())
-                {
-                    pos2 = PositionUtils.getMaxCorner(tmp, pos2);
-                }
+                pos1 = tmp;
+            }
+            else if (tmp.getX() < pos1.getX() || tmp.getY() < pos1.getY() || tmp.getZ() < pos1.getZ())
+            {
+                pos1 = PositionUtils.getMinCorner(tmp, pos1);
             }
 
-            if (pos1 != null && pos2 != null)
+            tmp = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+
+            if (pos2 == null)
             {
-                this.enclosingBox = new Box(pos1, pos2);
+                pos2 = tmp;
             }
+            else if (tmp.getX() > pos2.getX() || tmp.getY() > pos2.getY() || tmp.getZ() > pos2.getZ())
+            {
+                pos2 = PositionUtils.getMaxCorner(tmp, pos2);
+            }
+        }
+
+        if (pos1 != null && pos2 != null)
+        {
+            this.enclosingBox = new Box(pos1, pos2);
         }
     }
 

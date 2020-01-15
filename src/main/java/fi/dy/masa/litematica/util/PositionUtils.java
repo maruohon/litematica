@@ -67,6 +67,42 @@ public class PositionUtils
         @Override public int getValue(Vec3i vec) { return vec.getZ(); }
     };
 
+    public static final IIntBoundingBoxAccessor INT_BOUNDING_BOX_MIN_X_ACCESSOR = new IIntBoundingBoxAccessor()
+    {
+        @Override public IntBoundingBox setValue(IntBoundingBox box, int newValue) { return new IntBoundingBox(newValue, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ); }
+        @Override public int getValue(IntBoundingBox box) { return box.minX; }
+    };
+
+    public static final IIntBoundingBoxAccessor INT_BOUNDING_BOX_MIN_Y_ACCESSOR = new IIntBoundingBoxAccessor()
+    {
+        @Override public IntBoundingBox setValue(IntBoundingBox box, int newValue) { return new IntBoundingBox(box.minX, newValue, box.minZ, box.maxX, box.maxY, box.maxZ); }
+        @Override public int getValue(IntBoundingBox box) { return box.minY; }
+    };
+
+    public static final IIntBoundingBoxAccessor INT_BOUNDING_BOX_MIN_Z_ACCESSOR = new IIntBoundingBoxAccessor()
+    {
+        @Override public IntBoundingBox setValue(IntBoundingBox box, int newValue) { return new IntBoundingBox(box.minX, box.minY, newValue, box.maxX, box.maxY, box.maxZ); }
+        @Override public int getValue(IntBoundingBox box) { return box.minZ; }
+    };
+
+    public static final IIntBoundingBoxAccessor INT_BOUNDING_BOX_MAX_X_ACCESSOR = new IIntBoundingBoxAccessor()
+    {
+        @Override public IntBoundingBox setValue(IntBoundingBox box, int newValue) { return new IntBoundingBox(box.minX, box.minY, box.minZ, newValue, box.maxY, box.maxZ); }
+        @Override public int getValue(IntBoundingBox box) { return box.maxX; }
+    };
+
+    public static final IIntBoundingBoxAccessor INT_BOUNDING_BOX_MAX_Y_ACCESSOR = new IIntBoundingBoxAccessor()
+    {
+        @Override public IntBoundingBox setValue(IntBoundingBox box, int newValue) { return new IntBoundingBox(box.minX, box.minY, box.minZ, box.maxX, newValue, box.maxZ); }
+        @Override public int getValue(IntBoundingBox box) { return box.maxY; }
+    };
+
+    public static final IIntBoundingBoxAccessor INT_BOUNDING_BOX_MAX_Z_ACCESSOR = new IIntBoundingBoxAccessor()
+    {
+        @Override public IntBoundingBox setValue(IntBoundingBox box, int newValue) { return new IntBoundingBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, newValue); }
+        @Override public int getValue(IntBoundingBox box) { return box.maxZ; }
+    };
+
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i(-1,  0, -1) };
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i( 1,  0, -1) };
     private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  0,  1), new Vec3i(-1,  0,  1) };
@@ -95,6 +131,11 @@ public class PositionUtils
         }
 
         return null;
+    }
+
+    public static boolean areAllCoordinatesAtLeast(Vec3i vec, int threshold)
+    {
+        return vec.getX() >= threshold && vec.getY() >= threshold && vec.getZ() >= threshold;
     }
 
     public static BlockPos getMinCorner(BlockPos pos1, BlockPos pos2)
@@ -498,7 +539,7 @@ public class PositionUtils
      * @param type
      * @return
      */
-    public static BlockPos getModifiedPosition(BlockPos pos, int value, CoordinateType type)
+    public static BlockPos getModifiedPosition(Vec3i pos, int value, CoordinateType type)
     {
 
         switch (type)
@@ -514,10 +555,10 @@ public class PositionUtils
                 break;
         }
 
-        return pos;
+        return new BlockPos(pos);
     }
 
-    public static int getCoordinate(BlockPos pos, CoordinateType type)
+    public static int getCoordinate(Vec3i pos, CoordinateType type)
     {
         switch (type)
         {
@@ -1046,6 +1087,43 @@ public class PositionUtils
         return yaw;
     }
 
+    public static int getIntBoxValue(IntBoundingBox box, IntBoxCoordType type)
+    {
+        switch (type)
+        {
+            case MIN_X: return box.minX;
+            case MIN_Y: return box.minY;
+            case MIN_Z: return box.minZ;
+            case MAX_X: return box.maxX;
+            case MAX_Y: return box.maxY;
+            case MAX_Z: return box.maxZ;
+        }
+
+        return 0;
+    }
+
+    public static IntBoundingBox setIntBoxValue(IntBoundingBox old, IntBoxCoordType type, int value)
+    {
+        int minX = old.minX;
+        int minY = old.minY;
+        int minZ = old.minZ;
+        int maxX = old.maxX;
+        int maxY = old.maxY;
+        int maxZ = old.maxZ;
+
+        switch (type)
+        {
+            case MIN_X: minX = value; break;
+            case MIN_Y: minY = value; break;
+            case MIN_Z: minZ = value; break;
+            case MAX_X: maxX = value; break;
+            case MAX_Y: maxY = value; break;
+            case MAX_Z: maxZ = value; break;
+        }
+
+        return new IntBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
     public static class BlockPosComparator implements Comparator<BlockPos>
     {
         private BlockPos posReference = BlockPos.ORIGIN;
@@ -1123,10 +1201,27 @@ public class PositionUtils
         CORNER_2;
     }
 
+    public enum IntBoxCoordType
+    {
+        MIN_X,
+        MIN_Y,
+        MIN_Z,
+        MAX_X,
+        MAX_Y,
+        MAX_Z
+    }
+
     public interface ICoordinateAccessor
     {
         int getValue(Vec3i vec);
 
         BlockPos setValue(BlockPos vec, int newValue);
+    }
+
+    public interface IIntBoundingBoxAccessor
+    {
+        int getValue(IntBoundingBox box);
+
+        IntBoundingBox setValue(IntBoundingBox box, int newValue);
     }
 }

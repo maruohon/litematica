@@ -151,15 +151,17 @@ litematica.gui.button.placement_sub.slice_type=Slice: %s
 
 litematica.gui.button.schematic_placement.abbr.rendering=R
 
+litematica.gui.button.schematic_placement.grid_settings=Grid/repeat: %s
 litematica.gui.button.schematic_placement.ignore_entities=Ignore entities: %s
 litematica.gui.button.schematic_placement.region_enabled=Region: %s
 litematica.gui.button.schematic_placement.reset_sub_region_placements=Reset all sub-regions
 litematica.gui.button.schematic_placement.toggle_all_off=All §cOFF§r
 litematica.gui.button.schematic_placement.toggle_all_on=All §aON§r
 
-litematica.gui.button.schematic_placement.hover.enclosing_box=Enclosing box rendering: %s
-litematica.gui.button.schematic_placement.hover.lock=Locking a placement prevents moving or\notherwise changing it (accidentally)
-litematica.gui.button.schematic_placement.hover.rendering=Rendering: %s\nNote that this works a bit funky\nand doesn't prevent entity rendering.\nUsually you should just disable\nthe placement entirely
+litematica.gui.button.schematic_placement.hover.enclosing_box=§7Enclosing box rendering: %s
+litematica.gui.button.schematic_placement.hover.grid_settings_shift_to_toggle=§7Hold shift to just toggle the grid repeat on/off
+litematica.gui.button.schematic_placement.hover.lock=§7Locking a placement prevents moving or\n§7otherwise changing it (accidentally)
+litematica.gui.button.schematic_placement.hover.rendering=§7Rendering: %s\n§7Note that this works a bit funky\n§7and doesn't prevent entity rendering.\n§7Usually you should just disable\n§7the placement entirely
 
 litematica.gui.button.schematic_placements.configure=Configure
 litematica.gui.button.schematic_placements.disable=Disable
@@ -270,6 +272,18 @@ litematica.gui.label.material_list.total=Total: %s items
 litematica.gui.label.missing_chunks=%s, missing chunks (%s)
 litematica.gui.label.origin.auto=Auto
 litematica.gui.label.origin.manual=Manual
+
+litematica.gui.label.placement_grid.grid_size=Grid size
+litematica.gui.label.placement_grid.repeat_count=Repeat count
+litematica.gui.label.placement_grid_settings.max_x=Positive X
+litematica.gui.label.placement_grid_settings.max_y=Positive Y
+litematica.gui.label.placement_grid_settings.max_z=Positive Z
+litematica.gui.label.placement_grid_settings.min_x=Negative X
+litematica.gui.label.placement_grid_settings.min_y=Negative Y
+litematica.gui.label.placement_grid_settings.min_z=Negative Z
+litematica.gui.label.placement_grid_settings.size_x=Size X
+litematica.gui.label.placement_grid_settings.size_y=Size Y
+litematica.gui.label.placement_grid_settings.size_z=Size Z
 
 litematica.gui.label.placement_sub.region_name=Region name: %s
 litematica.gui.label.placement_sub.region_position=Region position
@@ -392,6 +406,7 @@ litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 litematica.gui.title.schematic_manager=Schematic Manager
 litematica.gui.title.schematic_placement_browser=Saved Schematic Placements
+litematica.gui.title.schematic_placement_grid_settings=Grid/Repeat settings for placement '%s'
 litematica.gui.title.schematic_project_manager=Schematic Project Manager
 litematica.gui.title.schematic_projects.confirm_delete_area=Confirm Delete area
 litematica.gui.title.schematic_projects.confirm_place_to_world=Confirm Place to world action
@@ -423,7 +438,7 @@ litematica.hud.misc.render_layer_mode_all=Layer Mode: %s
 litematica.hud.misc.renderer_status=Renderers: A: %s S: %s B: %s O: %s SEL: %s
 litematica.hud.misc.schematic_paste.replace_mode=Replace blocks: %s
 
-litematica.hud.schematic_placement.hover_info.lock_coordinate=Lock this coordinate\nThis allows changing the other coordinates\nwithout affecting the locked ones
+litematica.hud.schematic_placement.hover_info.lock_coordinate=§7Lock this coordinate\n§7This allows changing the other coordinates\n§7without (accidentally) affecting the locked ones
 litematica.hud.schematic_placement.hover_info.placement_locked=§6This placement has been locked and can't\n§6be modified without unlocking it first
 litematica.hud.schematic_placement.hover_info.placement_modified=§6This placement has been modified
 litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=§6This sub-region has been modified
@@ -460,6 +475,7 @@ litematica.message.error.no_area_selected=§cNo area selected§r
 litematica.message.error.no_placement_selected=§cNo placement selected§r
 litematica.message.error.only_works_in_single_player=§cThis operation only works in single player§r
 litematica.message.error.move.pending_tasks=§cCan not start a move operation while there are pending tasks§r
+litematica.message.error.placement_grid_settings.open_gui_selected_is_grid=The selected placement is a repeated/grid placement.\nRepeated placements can't be repeated again.\nSelect a normal placement to configure the grid settings for it.
 litematica.message.error.placement_paste_outside_world=The placement can't be pasted in the current position, because it goes outside the world bounds
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
 litematica.message.error.schematic_placement.load_failed=Failed to load the placement '%s' from schematic file '%s'

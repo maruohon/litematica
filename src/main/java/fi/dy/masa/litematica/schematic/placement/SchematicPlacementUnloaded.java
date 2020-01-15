@@ -34,6 +34,7 @@ public class SchematicPlacementUnloaded
 
     @Nullable protected final File schematicFile;
     protected final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
+    protected final GridSettings gridSettings = new GridSettings();
 
     protected String placementSaveFile;
     protected BlockPos origin;
@@ -140,10 +141,9 @@ public class SchematicPlacementUnloaded
         return this.schematicFile;
     }
 
-    @Nullable
-    public Box getEclosingBox()
+    public GridSettings getGridSettings()
     {
-        return this.enclosingBox;
+        return this.gridSettings;
     }
 
     public void setName(String name)
@@ -216,6 +216,7 @@ public class SchematicPlacementUnloaded
         this.enclosingBox = other.enclosingBox != null ? other.enclosingBox.copy() : null;
         this.selectedSubRegionName = other.selectedSubRegionName;
         this.materialListData = other.materialListData != null ? JsonUtils.deepCopy(other.materialListData) : null;
+        this.gridSettings.copyFrom(other.gridSettings);
     }
 
     @Nullable
@@ -273,6 +274,11 @@ public class SchematicPlacementUnloaded
             if (this.placementSaveFile != null)
             {
                 obj.add("storage_file", new JsonPrimitive(this.placementSaveFile));
+            }
+
+            if (this.gridSettings.isInitialized())
+            {
+                obj.add("grid", this.gridSettings.toJson());
             }
 
             if (this.relativeSubRegionPlacements.isEmpty() == false)
@@ -358,6 +364,11 @@ public class SchematicPlacementUnloaded
             if (JsonUtils.hasString(obj, "storage_file"))
             {
                 schematicPlacement.placementSaveFile = JsonUtils.getString(obj, "storage_file");
+            }
+
+            if (JsonUtils.hasObject(obj, "grid"))
+            {
+                schematicPlacement.gridSettings.fromJson(JsonUtils.getNestedObject(obj, "grid", false));
             }
 
             JsonArray placementArr = obj.get("placements").getAsJsonArray();

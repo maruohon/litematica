@@ -62,14 +62,25 @@ public class SchematicPlacementManager
 {
     private final List<SchematicPlacement> schematicPlacements = new ArrayList<>();
     private final List<SchematicPlacementUnloaded> lightlyLoadedPlacements = new ArrayList<>();
+    private final Set<SchematicPlacement> allVisibleSchematicPlacements = new HashSet<>();
+
     private final HashMultimap<ChunkPos, SchematicPlacement> schematicsTouchingChunk = HashMultimap.create();
     private final ArrayListMultimap<SubChunkPos, PlacementPart> touchedVolumesInSubChunk = ArrayListMultimap.create();
+
     private final Set<ChunkPos> chunksToRebuild = new HashSet<>();
     private final Set<ChunkPos> chunksToUnload = new HashSet<>();
     private final Set<ChunkPos> chunksPreChange = new HashSet<>();
 
+    private final GridPlacementManager gridManager;
+
     @Nullable
     private SchematicPlacement selectedPlacement;
+    private int tickCounter;
+
+    public SchematicPlacementManager()
+    {
+        this.gridManager = new GridPlacementManager(this);
+    }
 
     public boolean hasPendingRebuilds()
     {
@@ -83,6 +94,11 @@ public class SchematicPlacementManager
 
     public boolean processQueuedChunks()
     {
+        if ((++this.tickCounter % 40) == 0)
+        {
+            this.gridManager.createOrRemoveGridPlacementsForLoadedArea();
+        }
+
         if (this.chunksToUnload.isEmpty() == false)
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
@@ -198,9 +214,9 @@ public class SchematicPlacementManager
         }
     }
 
-    public List<SchematicPlacement> getEnabledSchematicPlacements()
+    public Set<SchematicPlacement> getVisibleSchematicPlacements()
     {
-        return this.schematicPlacements;
+        return this.allVisibleSchematicPlacements;
     }
 
     public List<SchematicPlacementUnloaded> getAllSchematicPlacements()
@@ -238,12 +254,28 @@ public class SchematicPlacementManager
         this.addSchematicPlacement(placement, printMessages, false);
     }
 
+    void addVisiblePlacement(SchematicPlacement placement)
+    {
+        this.allVisibleSchematicPlacements.add(placement);
+    }
+
+    void removeVisiblePlacement(SchematicPlacement placement)
+    {
+        this.allVisibleSchematicPlacements.remove(placement);
+    }
+
     private void addSchematicPlacement(SchematicPlacement placement, boolean printMessages, boolean isLoadFromFile)
     {
         if (this.schematicPlacements.contains(placement) == false)
         {
             this.schematicPlacements.add(placement);
+            this.addVisiblePlacement(placement);
             this.addTouchedChunksFor(placement);
+
+            if (placement.isEnabled() && placement.getGridSettings().isEnabled())
+            {
+                this.gridManager.updateGridPlacementsFor(placement);
+            }
 
             // Don't enable the overlay every time when switching dimensions via a portal or re-logging
             // (and thus reading the placements from file).
@@ -321,7 +353,12 @@ public class SchematicPlacementManager
         if (placement.isLoaded())
         {
             SchematicPlacement loadedPlacement = (SchematicPlacement) placement;
+
+            this.gridManager.removeAllGridPlacementsOf(loadedPlacement, false);
+
             boolean ret = this.schematicPlacements.remove(loadedPlacement);
+            this.removeVisiblePlacement(loadedPlacement);
+
             this.removeTouchedChunksFor(loadedPlacement);
 
             if (ret)
@@ -330,7 +367,7 @@ public class SchematicPlacementManager
 
                 if (update)
                 {
-                    this.updateOverlayRenderer(loadedPlacement);
+                    this.updateOverlayRendererIfEnabled(loadedPlacement);
                 }
             }
 
@@ -347,10 +384,8 @@ public class SchematicPlacementManager
     {
         List<SchematicPlacement> list = new ArrayList<>();
 
-        for (int i = 0; i < this.schematicPlacements.size(); ++i)
+        for (SchematicPlacement placement : this.allVisibleSchematicPlacements)
         {
-            SchematicPlacement placement = this.schematicPlacements.get(i);
-
             if (placement.getSchematic() == schematic)
             {
                 list.add(placement);
@@ -389,7 +424,7 @@ public class SchematicPlacementManager
 
     public void setSelectedSchematicPlacement(@Nullable SchematicPlacement placement)
     {
-        if (placement == null || this.schematicPlacements.contains(placement))
+        if (placement == null || this.allVisibleSchematicPlacements.contains(placement))
         {
             this.selectedPlacement = placement;
             OverlayRenderer.getInstance().updatePlacementCache();
@@ -414,6 +449,11 @@ public class SchematicPlacementManager
 
     private void addTouchedChunksFor(SchematicPlacement placement)
     {
+        this.addTouchedChunksFor(placement, true);
+    }
+
+    void addTouchedChunksFor(SchematicPlacement placement, boolean updateOverlay)
+    {
         if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
         {
             Set<ChunkPos> chunks = placement.getTouchedChunks();
@@ -429,12 +469,16 @@ public class SchematicPlacementManager
                 this.chunksToUnload.remove(pos);
             }
 
-            this.markChunksForRebuild(placement);
-            this.updateOverlayRenderer(placement);
+            this.markChunksForRebuild(chunks);
+
+            if (updateOverlay)
+            {
+                this.updateOverlayRendererIfEnabled(placement);
+            }
         }
     }
 
-    private void removeTouchedChunksFor(SchematicPlacement placement)
+    void removeTouchedChunksFor(SchematicPlacement placement)
     {
         if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
         {
@@ -455,6 +499,11 @@ public class SchematicPlacementManager
 
             this.markChunksForRebuild(chunks);
         }
+    }
+
+    public void updateGridPlacementsFor(SchematicPlacement basePlacement)
+    {
+        this.gridManager.updateGridPlacementsFor(basePlacement);
     }
 
     private void onPrePlacementChange(SchematicPlacement placement)
@@ -500,13 +549,13 @@ public class SchematicPlacementManager
         }
 
         this.markChunksForRebuild(toRebuild);
-        this.updateOverlayRenderer(placement);
     }
 
     private void onPlacementModified(SchematicPlacement placement)
     {
         placement.updateEnclosingBox();
         this.onPostPlacementChange(placement);
+        this.gridManager.updateGridPlacementsFor(placement);
         OverlayRenderer.getInstance().updatePlacementCache();
     }
 
@@ -516,7 +565,7 @@ public class SchematicPlacementManager
         this.onPlacementModified(placement);
     }
 
-    private void updateOverlayRenderer(SchematicPlacement placement)
+    private void updateOverlayRendererIfEnabled(SchematicPlacement placement)
     {
         if (placement.isEnabled())
         {
@@ -806,10 +855,8 @@ public class SchematicPlacementManager
 
     public void markAllPlacementsOfSchematicForRebuild(ISchematic schematic)
     {
-        for (int i = 0; i < this.schematicPlacements.size(); ++i)
+        for (SchematicPlacement placement : this.allVisibleSchematicPlacements)
         {
-            SchematicPlacement placement = this.schematicPlacements.get(i);
-
             if (placement.getSchematic() == schematic)
             {
                 this.markChunksForRebuild(placement);
@@ -825,7 +872,7 @@ public class SchematicPlacementManager
         }
     }
 
-    void markChunksForRebuild(Collection<ChunkPos> chunks)
+    private void markChunksForRebuild(Collection<ChunkPos> chunks)
     {
         //System.out.printf("rebuilding %d chunks: %s\n", chunks.size(), chunks);
         this.chunksToRebuild.addAll(chunks);
@@ -838,7 +885,7 @@ public class SchematicPlacementManager
 
     public boolean changeSelection(World world, Entity entity, int maxDistance)
     {
-        if (this.schematicPlacements.size() > 0)
+        if (this.schematicPlacements.isEmpty() == false)
         {
             RayTraceWrapper trace = RayTraceUtils.getWrappedRayTraceFromEntity(world, entity, maxDistance);
 
@@ -1043,7 +1090,9 @@ public class SchematicPlacementManager
     public void clear()
     {
         this.schematicPlacements.clear();
+        this.allVisibleSchematicPlacements.clear();
         this.lightlyLoadedPlacements.clear();
+        this.gridManager.clear();
         this.selectedPlacement = null;
         this.schematicsTouchingChunk.clear();
         this.touchedVolumesInSubChunk.clear();

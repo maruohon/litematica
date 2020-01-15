@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.gui.GuiConfigs;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
+import fi.dy.masa.litematica.gui.GuiPlacementGridSettings;
 import fi.dy.masa.litematica.gui.GuiSchematicLoad;
 import fi.dy.masa.litematica.gui.GuiSchematicLoadedList;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
@@ -70,6 +71,7 @@ public class KeyCallbacks
         Hotkeys.OPEN_GUI_LOADED_SCHEMATICS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.OPEN_GUI_PLACEMENT_GRID_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeybind().setCallback(callbackHotkeys);
@@ -257,6 +259,23 @@ public class KeyCallbacks
             if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
                 GuiBase.openGui(new GuiMainMenu());
+                return true;
+            }
+            else if (key == Hotkeys.OPEN_GUI_PLACEMENT_GRID_SETTINGS.getKeybind())
+            {
+                SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+                if (placement != null)
+                {
+                    if (placement.isRepeatedPlacement() == false)
+                    {
+                        GuiBase.openGui(new GuiPlacementGridSettings(placement, null));
+                    }
+                    else
+                    {
+                        InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
+                    }
+                }
                 return true;
             }
             else if (key == Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeybind())

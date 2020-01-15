@@ -122,6 +122,9 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         y += 21;
 
         this.createButton(x, y, width, ButtonListener.Type.RESET_SUB_REGIONS);
+        y += 21;
+
+        this.createButtonOnOff(x, y, width, this.placement.getGridSettings().isEnabled(), ButtonListener.Type.GRID_SETTINGS);
 
         ButtonListenerChangeMenu.ButtonType type;
 
@@ -443,6 +446,21 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     GuiBase.openGui(gui);
                     break;
                 }
+
+                case GRID_SETTINGS:
+                {
+                    if (GuiBase.isShiftDown())
+                    {
+                        this.placement.getGridSettings().toggleEnabled();
+                        this.manager.updateGridPlacementsFor(this.placement);
+                    }
+                    else
+                    {
+                        GuiPlacementGridSettings gui = new GuiPlacementGridSettings(this.placement, this.parent);
+                        GuiBase.openGui(gui);
+                    }
+                    break;
+                }
             }
 
             this.parent.initGui(); // Re-create buttons/text fields
@@ -454,6 +472,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             ROTATE                  ("litematica.gui.button.rotation_value"),
             MIRROR                  ("litematica.gui.button.mirror_value"),
             MOVE_TO_PLAYER          ("litematica.gui.button.move_to_player"),
+            GRID_SETTINGS           ("litematica.gui.button.schematic_placement.grid_settings", "litematica.gui.button.schematic_placement.hover.grid_settings_shift_to_toggle"),
             NUDGE_COORD_X           (""),
             NUDGE_COORD_Y           (""),
             NUDGE_COORD_Z           (""),

@@ -111,9 +111,8 @@ public class OverlayRenderer
     public void updatePlacementCache()
     {
         this.placements.clear();
-        List<SchematicPlacement> list = DataManager.getSchematicPlacementManager().getEnabledSchematicPlacements();
 
-        for (SchematicPlacement placement : list)
+        for (SchematicPlacement placement : DataManager.getSchematicPlacementManager().getVisibleSchematicPlacements())
         {
             if (placement.isEnabled())
             {
@@ -200,10 +199,9 @@ public class OverlayRenderer
 
                     if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX.getBooleanValue())
                     {
-                        Box box = schematicPlacement.getEclosingBox();
-
-                        if (schematicPlacement.shouldRenderEnclosingBox() && box != null)
+                        if (schematicPlacement.shouldRenderEnclosingBox())
                         {
+                            Box box = schematicPlacement.getEclosingBox();
                             RenderUtils.renderAreaOutline(box.getPos1(), box.getPos2(), 1f, color, color, color, renderViewEntity, partialTicks);
 
                             if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX_SIDES.getBooleanValue())

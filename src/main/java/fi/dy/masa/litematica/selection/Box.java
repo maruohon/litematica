@@ -131,6 +131,90 @@ public class Box
         this.setPosition(pos, corner);
     }
 
+    public boolean intersects(Box other)
+    {
+        if ((this.pos1 == null && this.pos2 == null) || (other.pos1 == null && other.pos2 == null))
+        {
+            return false;
+        }
+
+        BlockPos thisPos1 = this.pos1 != null ? this.pos1 : this.pos2;
+        BlockPos thisPos2 = this.pos2 != null ? this.pos2 : this.pos1;
+        BlockPos otherPos1 = other.pos1 != null ? other.pos1 : other.pos2;
+        BlockPos otherPos2 = other.pos2 != null ? other.pos2 : other.pos1;
+        int thisMinX = Math.min(thisPos1.getX(), thisPos2.getX());
+        int thisMinY = Math.min(thisPos1.getY(), thisPos2.getY());
+        int thisMinZ = Math.min(thisPos1.getZ(), thisPos2.getZ());
+        int thisMaxX = Math.max(thisPos1.getX(), thisPos2.getX());
+        int thisMaxY = Math.max(thisPos1.getY(), thisPos2.getY());
+        int thisMaxZ = Math.max(thisPos1.getZ(), thisPos2.getZ());
+        int otherMinX = Math.min(otherPos1.getX(), otherPos2.getX());
+        int otherMinY = Math.min(otherPos1.getY(), otherPos2.getY());
+        int otherMinZ = Math.min(otherPos1.getZ(), otherPos2.getZ());
+        int otherMaxX = Math.max(otherPos1.getX(), otherPos2.getX());
+        int otherMaxY = Math.max(otherPos1.getY(), otherPos2.getY());
+        int otherMaxZ = Math.max(otherPos1.getZ(), otherPos2.getZ());
+
+        if (thisMaxX < otherMinX ||
+            thisMaxY < otherMinY ||
+            thisMaxZ < otherMinZ ||
+            thisMinX > otherMaxX ||
+            thisMinY > otherMaxY ||
+            thisMinZ > otherMaxZ)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Nullable
+    public Box createIntersectingBox(Box other)
+    {
+        if ((this.pos1 == null && this.pos2 == null) || (other.pos1 == null && other.pos2 == null))
+        {
+            return null;
+        }
+
+        BlockPos thisPos1 = this.pos1 != null ? this.pos1 : this.pos2;
+        BlockPos thisPos2 = this.pos2 != null ? this.pos2 : this.pos1;
+        BlockPos otherPos1 = other.pos1 != null ? other.pos1 : other.pos2;
+        BlockPos otherPos2 = other.pos2 != null ? other.pos2 : other.pos1;
+        int thisMinX = Math.min(thisPos1.getX(), thisPos2.getX());
+        int thisMinY = Math.min(thisPos1.getY(), thisPos2.getY());
+        int thisMinZ = Math.min(thisPos1.getZ(), thisPos2.getZ());
+        int thisMaxX = Math.max(thisPos1.getX(), thisPos2.getX());
+        int thisMaxY = Math.max(thisPos1.getY(), thisPos2.getY());
+        int thisMaxZ = Math.max(thisPos1.getZ(), thisPos2.getZ());
+        int otherMinX = Math.min(otherPos1.getX(), otherPos2.getX());
+        int otherMinY = Math.min(otherPos1.getY(), otherPos2.getY());
+        int otherMinZ = Math.min(otherPos1.getZ(), otherPos2.getZ());
+        int otherMaxX = Math.max(otherPos1.getX(), otherPos2.getX());
+        int otherMaxY = Math.max(otherPos1.getY(), otherPos2.getY());
+        int otherMaxZ = Math.max(otherPos1.getZ(), otherPos2.getZ());
+
+        if (thisMaxX >= otherMinX &&
+            thisMaxY >= otherMinY &&
+            thisMaxZ >= otherMinZ &&
+            thisMinX <= otherMaxX &&
+            thisMinY <= otherMaxY &&
+            thisMinZ <= otherMaxZ)
+        {
+            int minX = Math.max(thisMinX, otherMinX);
+            int minY = Math.max(thisMinY, otherMinY);
+            int minZ = Math.max(thisMinZ, otherMinZ);
+            int maxX = Math.min(thisMaxX, otherMaxX);
+            int maxY = Math.min(thisMaxY, otherMaxY);
+            int maxZ = Math.min(thisMaxZ, otherMaxZ);
+            BlockPos pos1 = new BlockPos(minX, minY, minZ);
+            BlockPos pos2 = new BlockPos(maxX, maxY, maxZ);
+
+            return new Box(pos1, pos2);
+        }
+
+        return null;
+    }
+
     @Nullable
     public JsonObject toJson()
     {

@@ -1,0 +1,323 @@
+package fi.dy.masa.litematica.gui;
+
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.schematic.placement.GridSettings;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.litematica.util.PositionUtils.IntBoxCoordType;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.GuiDialogBase;
+import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
+import fi.dy.masa.malilib.gui.button.ButtonBase;
+import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.ButtonOnOff;
+import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
+import fi.dy.masa.malilib.util.StringUtils;
+
+public class GuiPlacementGridSettings extends GuiDialogBase
+{
+    private final SchematicPlacementManager manager;
+    private final SchematicPlacement placement;
+    private final GridSettings cachedSettings = new GridSettings();
+    private int repeatElementsWidth;
+
+    public GuiPlacementGridSettings(SchematicPlacement placement, GuiScreen parent)
+    {
+        this.setParent(parent);
+
+        this.manager = DataManager.getSchematicPlacementManager();
+        this.placement = placement;
+        GridSettings settings = placement.getGridSettings();
+
+        if (settings.getSize().equals(Vec3i.NULL_VECTOR))
+        {
+            Box box = this.placement.getEclosingBox();
+            Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPosition(box.getPos2().subtract(box.getPos1()));
+            settings.setSize(size);
+        }
+
+        this.cachedSettings.copyFrom(settings);
+        this.title = StringUtils.translate("litematica.gui.title.schematic_placement_grid_settings", placement.getName());
+        this.useTitleHierarchy = false;
+        this.zLevel = 1f;
+
+        this.setWidthAndHeight(360, 200);
+        this.centerOnScreen();
+
+        this.setWorldAndResolution(this.mc, this.dialogWidth, this.dialogHeight);
+    }
+
+    @Override
+    public void initGui()
+    {
+        this.clearElements();
+
+        int x = this.dialogLeft + 10;
+        int y = this.dialogTop + 20;
+        int width = 50;
+
+        boolean on = this.placement.getGridSettings().isEnabled();
+        ButtonOnOff button = new ButtonOnOff(x, y, -1, false, "litematica.gui.button.schematic_placement.grid_settings", on);
+        this.addButton(button, (btn, mb) -> {
+            this.placement.getGridSettings().toggleEnabled();
+            this.updatePlacementManager();
+            this.initGui();
+        });
+
+        y += 30;
+        this.addLabel(x, y, width, 20, 0xFFFFFFFF, "litematica.gui.label.placement_grid.grid_size");
+        y += 14;
+        this.addSizeInputElements(x, y     , width, CoordinateType.X);
+        this.addSizeInputElements(x, y + 16, width, CoordinateType.Y);
+        this.addSizeInputElements(x, y + 32, width, CoordinateType.Z);
+
+        y += 60;
+        this.addLabel(x, y, width, 20, 0xFFFFFFFF, "litematica.gui.label.placement_grid.repeat_count");
+        y += 14;
+        this.addRepeatInputElements(x, y     , width, IntBoxCoordType.MIN_X);
+        this.addRepeatInputElements(x, y + 16, width, IntBoxCoordType.MIN_Y);
+        this.addRepeatInputElements(x, y + 32, width, IntBoxCoordType.MIN_Z);
+
+        x += this.repeatElementsWidth + 20;
+        this.addRepeatInputElements(x, y     , width, IntBoxCoordType.MAX_X);
+        this.addRepeatInputElements(x, y + 16, width, IntBoxCoordType.MAX_Y);
+        this.addRepeatInputElements(x, y + 32, width, IntBoxCoordType.MAX_Z);
+    }
+
+    @Override
+    public void onGuiClosed()
+    {
+        super.onGuiClosed();
+    }
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
+        if (this.getParent() != null)
+        {
+            this.getParent().drawScreen(mouseX, mouseY, partialTicks);
+        }
+
+        super.drawScreen(mouseX, mouseY, partialTicks);
+    }
+
+    @Override
+    protected void drawScreenBackground(int mouseX, int mouseY)
+    {
+        RenderUtils.drawOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0x90000000, COLOR_HORIZONTAL_BAR);
+    }
+
+    @Override
+    protected void drawTitle(int mouseX, int mouseY, float partialTicks)
+    {
+        this.drawStringWithShadow(this.title, this.dialogLeft + 10, this.dialogTop + 6, COLOR_WHITE);
+    }
+
+    private void updatePlacementManager()
+    {
+        if (this.cachedSettings.equals(this.placement.getGridSettings()) == false)
+        {
+            this.manager.updateGridPlacementsFor(this.placement);
+            this.cachedSettings.copyFrom(this.placement.getGridSettings());
+        }
+    }
+
+    private String getRepeatTranslationKey(IntBoxCoordType type)
+    {
+        switch (type)
+        {
+            case MIN_X: return "litematica.gui.label.placement_grid_settings.min_x";
+            case MIN_Y: return "litematica.gui.label.placement_grid_settings.min_y";
+            case MIN_Z: return "litematica.gui.label.placement_grid_settings.min_z";
+            case MAX_X: return "litematica.gui.label.placement_grid_settings.max_x";
+            case MAX_Y: return "litematica.gui.label.placement_grid_settings.max_y";
+            case MAX_Z: return "litematica.gui.label.placement_grid_settings.max_z";
+        }
+
+        return "";
+    }
+
+    private String getSizeTranslationKey(CoordinateType type)
+    {
+        switch (type)
+        {
+            case X: return "litematica.gui.label.placement_grid_settings.size_x";
+            case Y: return "litematica.gui.label.placement_grid_settings.size_y";
+            case Z: return "litematica.gui.label.placement_grid_settings.size_z";
+        }
+
+        return "";
+    }
+
+    private void addRepeatInputElements(int x, int y, int width, IntBoxCoordType type)
+    {
+        String label = StringUtils.translate(this.getRepeatTranslationKey(type)) + ":";
+        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
+        int labelWidth = this.getStringWidth(label) + 4;
+
+        IntBoundingBox repeat = this.placement.getGridSettings().getRepeatCounts();
+        String text = String.valueOf(PositionUtils.getIntBoxValue(repeat, type));
+
+        x += labelWidth;
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(x, y + 2, width, 14, this.textRenderer);
+        textField.setText(text);
+        this.addTextField(textField, new TextFieldListenerRepeat(type, this.placement, this));
+
+        x += width + 4;
+        String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
+        ButtonGeneric button = new ButtonGeneric(x, y + 1, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+
+        this.addButton(button, new ButtonListenerRepeat(type, this.placement, this));
+
+        this.repeatElementsWidth = labelWidth + width + button.getWidth() + 6;
+    }
+
+    private void addSizeInputElements(int x, int y, int width, CoordinateType type)
+    {
+        String label = StringUtils.translate(this.getSizeTranslationKey(type)) + ":";
+        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
+        int offset = this.getStringWidth(label) + 4;
+
+        Vec3i size = this.placement.getGridSettings().getSize();
+        String text = String.valueOf(PositionUtils.getCoordinate(size, type));
+
+        x += offset;
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(x, y + 2, width, 14, this.textRenderer);
+        textField.setText(text);
+        this.addTextField(textField, new TextFieldListenerSize(type, this.placement, this));
+
+        x += width + 4;
+        String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
+        ButtonGeneric button = new ButtonGeneric(x, y + 1, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+
+        this.addButton(button, new ButtonListenerSize(type, this.placement, this));
+    }
+
+    private static class TextFieldListenerRepeat implements ITextFieldListener<GuiTextFieldInteger>
+    {
+        private final GuiPlacementGridSettings parent;
+        private final SchematicPlacement placement;
+        private final IntBoxCoordType type;
+
+        public TextFieldListenerRepeat(IntBoxCoordType type, SchematicPlacement placement, GuiPlacementGridSettings parent)
+        {
+            this.parent = parent;
+            this.placement = placement;
+            this.type = type;
+        }
+
+        @Override
+        public boolean onTextChange(GuiTextFieldInteger textField)
+        {
+            try
+            {
+                int value = Math.max(0, Integer.parseInt(textField.getText()));
+                IntBoundingBox old = this.placement.getGridSettings().getRepeatCounts();
+                this.placement.getGridSettings().setRepeatCounts(PositionUtils.setIntBoxValue(old, this.type, value));
+                this.parent.updatePlacementManager();
+            }
+            catch (NumberFormatException e)
+            {
+            }
+
+            return false;
+        }
+    }
+
+    private static class ButtonListenerRepeat implements IButtonActionListener
+    {
+        private final GuiPlacementGridSettings parent;
+        private final SchematicPlacement placement;
+        private final IntBoxCoordType type;
+
+        public ButtonListenerRepeat(IntBoxCoordType type, SchematicPlacement placement, GuiPlacementGridSettings parent)
+        {
+            this.parent = parent;
+            this.placement = placement;
+            this.type = type;
+        }
+
+        @Override
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        {
+            int amount = mouseButton == 1 ? -1 : 1;
+            if (GuiBase.isShiftDown()) { amount *= 8; }
+            if (GuiBase.isAltDown()) { amount *= 4; }
+
+            IntBoundingBox old = this.placement.getGridSettings().getRepeatCounts();
+            int newValue = Math.max(0, PositionUtils.getIntBoxValue(old, this.type) + amount);
+            this.placement.getGridSettings().setRepeatCounts(PositionUtils.setIntBoxValue(old, this.type, newValue));
+            this.parent.updatePlacementManager();
+
+            this.parent.initGui(); // Re-create buttons/text fields
+        }
+    }
+
+    private static class TextFieldListenerSize implements ITextFieldListener<GuiTextFieldInteger>
+    {
+        private final GuiPlacementGridSettings parent;
+        private final SchematicPlacement placement;
+        private final CoordinateType type;
+
+        public TextFieldListenerSize(CoordinateType type, SchematicPlacement placement, GuiPlacementGridSettings parent)
+        {
+            this.parent = parent;
+            this.placement = placement;
+            this.type = type;
+        }
+
+        @Override
+        public boolean onTextChange(GuiTextFieldInteger textField)
+        {
+            try
+            {
+                int value = Math.max(0, Integer.parseInt(textField.getText()));
+                Vec3i size = this.placement.getGridSettings().getSize();
+                this.placement.getGridSettings().setSize(PositionUtils.getModifiedPosition(size, value, this.type));
+                this.parent.updatePlacementManager();
+            }
+            catch (NumberFormatException e)
+            {
+            }
+
+            return false;
+        }
+    }
+
+    private static class ButtonListenerSize implements IButtonActionListener
+    {
+        private final GuiPlacementGridSettings parent;
+        private final SchematicPlacement placement;
+        private final CoordinateType type;
+
+        public ButtonListenerSize(CoordinateType type, SchematicPlacement placement, GuiPlacementGridSettings parent)
+        {
+            this.parent = parent;
+            this.placement = placement;
+            this.type = type;
+        }
+
+        @Override
+        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        {
+            int amount = mouseButton == 1 ? -1 : 1;
+            if (GuiBase.isShiftDown()) { amount *= 8; }
+            if (GuiBase.isAltDown()) { amount *= 4; }
+
+            Vec3i size = this.placement.getGridSettings().getSize();
+            int newValue = Math.max(0, PositionUtils.getCoordinate(this.placement.getGridSettings().getSize(), this.type) + amount);
+            this.placement.getGridSettings().setSize(PositionUtils.getModifiedPosition(size, newValue, this.type));
+            this.parent.updatePlacementManager();
+
+            this.parent.initGui(); // Re-create buttons/text fields
+        }
+    }
+}
