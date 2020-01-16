@@ -22,6 +22,7 @@ import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.schematic.util.SchematicUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
@@ -513,12 +514,12 @@ public class KeyCallbacks
                 }
                 else if (mode == ToolMode.PASTE_SCHEMATIC)
                 {
-                    DataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
+                    SchematicPlacingUtils.pasteCurrentPlacementToWorld(this.mc);
                     return true;
                 }
                 else if (mode == ToolMode.GRID_PASTE)
                 {
-                    DataManager.getSchematicPlacementManager().gridPasteCurrentPlacementToWorld(this.mc);
+                    SchematicPlacingUtils.gridPasteCurrentPlacementToWorld(this.mc);
                     return true;
                 }
                 else if (mode == ToolMode.FILL && mode.getPrimaryBlock() != null)

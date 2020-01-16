@@ -11,7 +11,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -26,7 +25,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -34,9 +32,6 @@ import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
-import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkDirect;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
@@ -55,10 +50,8 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
-import fi.dy.masa.malilib.util.WorldUtils;
 
 public class SchematicPlacementManager
 {
@@ -435,6 +428,11 @@ public class SchematicPlacementManager
         }
     }
 
+    public List<SchematicPlacement> getGridPlacementsForBasePlacement(SchematicPlacement basePlacement)
+    {
+        return this.gridManager.getGridPlacementsForBasePlacement(basePlacement);
+    }
+
     public void unloadCurrentlySelectedSchematic()
     {
         SchematicPlacement placement = this.getSelectedSchematicPlacement();
@@ -593,7 +591,6 @@ public class SchematicPlacementManager
                 loadedPlacement.toggleEnabled();
                 this.addSchematicPlacement(loadedPlacement, false);
                 this.lightlyLoadedPlacements.remove(placement);
-                this.addTouchedChunksFor(loadedPlacement);
             }
             else
             {
@@ -1010,127 +1007,6 @@ public class SchematicPlacementManager
                 BlockPos old = schematicPlacement.getOrigin();
                 this.setOrigin(schematicPlacement, old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
             }
-        }
-    }
-
-    public void pasteCurrentPlacementToWorld(Minecraft mc)
-    {
-        this.pastePlacementToWorld(this.getSelectedSchematicPlacement(), mc);
-    }
-
-    public void gridPasteCurrentPlacementToWorld(Minecraft mc)
-    {
-        SchematicPlacement placement = this.getSelectedSchematicPlacement();
-
-        if (placement != null)
-        {
-            // Only do the Grid paste when the base placement is selected
-            if (placement.isRepeatedPlacement() == false && placement.getGridSettings().isEnabled())
-            {
-                ArrayList<SchematicPlacement> placements = new ArrayList<>();
-                placements.add(placement);
-                placements.addAll(this.gridManager.getGridPlacementsForBasePlacement(placement));
-
-                this.pastePlacementsToWorld(placements, true, true, mc);
-            }
-            else
-            {
-                this.pastePlacementToWorld(placement, mc);
-                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, 8000, "litematica.message.grid_paste.warning.select_base_placement_for_grid_paste");
-            }
-        }
-        else
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
-        }
-    }
-
-    public void pastePlacementToWorld(@Nullable SchematicPlacement placement, Minecraft mc)
-    {
-        this.pastePlacementToWorld(placement, true, mc);
-    }
-
-    public void pastePlacementToWorld(@Nullable SchematicPlacement placement, boolean changedBlocksOnly, Minecraft mc)
-    {
-        if (placement != null)
-        {
-            this.pastePlacementsToWorld(Lists.newArrayList(placement), changedBlocksOnly, true, mc);
-        }
-        else
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
-        }
-    }
-
-    public void pastePlacementsToWorld(List<SchematicPlacement> placements, boolean changedBlocksOnly, boolean printMessage, Minecraft mc)
-    {
-        if (mc.player != null && mc.player.capabilities.isCreativeMode)
-        {
-            if (placements.isEmpty() == false)
-            {
-                LayerRange range = DataManager.getRenderLayerRange().copy();
-
-                if (mc.isSingleplayer())
-                {
-                    if (placements.size() == 1)
-                    {
-                        this.directPaste(placements.get(0), range, printMessage, mc);
-                    }
-                    else
-                    {
-                        TaskPasteSchematicPerChunkDirect task = new TaskPasteSchematicPerChunkDirect(placements, range, changedBlocksOnly);
-                        TaskScheduler.getInstanceServer().scheduleTask(task, 20);
-
-                        if (printMessage)
-                        {
-                            InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
-                        }
-                    }
-                }
-                else
-                {
-                    TaskPasteSchematicPerChunkCommand task = new TaskPasteSchematicPerChunkCommand(placements, range, changedBlocksOnly);
-                    TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
-
-                    if (printMessage)
-                    {
-                        InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
-                    }
-                }
-            }
-            else
-            {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
-            }
-        }
-        else
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
-        }
-    }
-
-    private void directPaste(SchematicPlacement placement, LayerRange range, boolean printMessage, Minecraft mc)
-    {
-        final WorldServer world = mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld()));
-
-        world.addScheduledTask(() ->
-        {
-            if (SchematicPlacingUtils.placeToWorld(placement, world, range, false))
-            {
-                if (printMessage)
-                {
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
-                }
-            }
-            else
-            {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
-            }
-        });
-
-        if (printMessage)
-        {
-            InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
         }
     }
 

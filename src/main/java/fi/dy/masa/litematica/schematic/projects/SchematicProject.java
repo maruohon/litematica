@@ -18,6 +18,7 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
+import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
@@ -245,7 +246,7 @@ public class SchematicProject
 
             ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, () ->
             {
-                DataManager.getSchematicPlacementManager().pastePlacementToWorld(this.currentPlacement, false, mc);
+                SchematicPlacingUtils.pastePlacementToWorld(this.currentPlacement, false, mc);
             }, mc);
         }
     }
