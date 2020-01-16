@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.schematic.placement;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,19 @@ public class GridPlacementManager
     {
         this.gridPlacementsPerPlacement.clear();
         this.basePlacements.clear();
+    }
+
+    public ArrayList<SchematicPlacement> getGridPlacementsForBasePlacement(SchematicPlacement basePlacement)
+    {
+        ArrayList<SchematicPlacement> gridPlacements = new ArrayList<>();
+        HashMap<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.get(basePlacement);
+
+        if (map != null)
+        {
+            gridPlacements.addAll(map.values());
+        }
+
+        return gridPlacements;
     }
 
     void updateGridPlacementsFor(SchematicPlacement basePlacement)

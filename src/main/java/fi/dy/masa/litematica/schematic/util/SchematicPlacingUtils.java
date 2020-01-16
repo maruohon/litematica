@@ -39,10 +39,11 @@ import fi.dy.masa.malilib.util.LayerRange;
 
 public class SchematicPlacingUtils
 {
-    public static boolean placeToWorld(ISchematic schematic, World world, SchematicPlacement schematicPlacement, LayerRange range, boolean notifyNeighbors)
+    public static boolean placeToWorld(SchematicPlacement schematicPlacement, World world, LayerRange range, boolean notifyNeighbors)
     {
         WorldUtils.setShouldPreventOnBlockAdded(true);
 
+        ISchematic schematic = schematicPlacement.getSchematic();
         ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
         BlockPos origin = schematicPlacement.getOrigin();
 
@@ -285,54 +286,56 @@ public class SchematicPlacingUtils
         }
     }
 
-    public static boolean placeToWorldWithinChunk(ISchematic schematic, World world, ChunkPos chunkPos, SchematicPlacement schematicPlacement, boolean notifyNeighbors)
+    public static boolean placeToWorldWithinChunk(SchematicPlacement schematicPlacement, ChunkPos chunkPos, World world, boolean notifyNeighbors)
     {
+        ISchematic schematic = schematicPlacement.getSchematic();
         Set<String> regionsTouchingChunk = schematicPlacement.getRegionsTouchingChunk(chunkPos.x, chunkPos.z);
         BlockPos origin = schematicPlacement.getOrigin();
+        boolean allSuccess = true;
 
         for (String regionName : regionsTouchingChunk)
         {
             SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
             ISchematicRegion region = schematic.getSchematicRegion(regionName);
 
-            if (placement.isEnabled() && region != null)
+            if (region == null)
             {
-                BlockPos regionPos = placement.getPos();
-                Vec3i regionSize = region.getSize();
-                ILitematicaBlockStateContainer container = region.getBlockStateContainer();
-                Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
-                List<EntityInfo> entityList = region.getEntityList();
+                allSuccess = false;
+                continue;
+            }
 
-                if (regionPos != null && regionSize != null && container != null && blockEntityMap != null)
+            if (placement.isEnabled())
+            {
+                if (placeBlocksWithinChunk(world, chunkPos, regionName, region, origin, schematicPlacement, placement, notifyNeighbors) == false)
                 {
-                    placeBlocksWithinChunk(world, chunkPos, regionName, origin, regionPos, regionSize, schematicPlacement, placement, container, blockEntityMap, notifyNeighbors);
-                }
-                else
-                {
+                    allSuccess = false;
                     LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
                 }
 
-                if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
+                if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false)
                 {
-                    placeEntitiesToWorldWithinChunk(world, chunkPos, origin, regionPos, regionSize, schematicPlacement, placement, entityList);
+                    placeEntitiesToWorldWithinChunk(world, chunkPos, region, origin, schematicPlacement, placement);
                 }
             }
         }
 
-        return true;
+        return allSuccess;
     }
 
-    public static void placeBlocksWithinChunk(World world, ChunkPos chunkPos, String regionName,
-            BlockPos origin, BlockPos regionPos, Vec3i regionSize,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement,
-            ILitematicaBlockStateContainer container, Map<BlockPos, NBTTagCompound> tileMap, boolean notifyNeighbors)
+    public static boolean placeBlocksWithinChunk(World world, ChunkPos chunkPos, String regionName, ISchematicRegion region,
+            BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement, boolean notifyNeighbors)
     {
         IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
+        ILitematicaBlockStateContainer container = region.getBlockStateContainer();
+        Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
 
-        if (bounds == null)
+        if (bounds == null || container == null || blockEntityMap == null)
         {
-            return;
+            return false;
         }
+
+        BlockPos regionPos = placement.getPos();
+        Vec3i regionSize = region.getSize();
 
         // These are the untransformed relative positions
         BlockPos posEndRel = (new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize))).add(regionPos);
@@ -374,7 +377,7 @@ public class SchematicPlacingUtils
         {
             System.out.printf("DEBUG ============= OUT OF BOUNDS - region: %s, sx: %d, sz: %d, ex: %d, ez: %d - size x: %d z: %d =============\n",
                     regionName, startX, startZ, endX, endZ, container.getSize().getX(), container.getSize().getZ());
-            return;
+            return false;
         }
 
         final Rotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation());
@@ -403,7 +406,7 @@ public class SchematicPlacingUtils
                     }
 
                     posMutable.setPos(x, y, z);
-                    NBTTagCompound teNBT = tileMap.get(posMutable);
+                    NBTTagCompound teNBT = blockEntityMap.get(posMutable);
 
                     posMutable.setPos(  posMinRel.getX() + x - regionPos.getX(),
                                         posMinRel.getY() + y - regionPos.getY(),
@@ -477,11 +480,21 @@ public class SchematicPlacingUtils
                 }
             }
         }
+
+        return true;
     }
 
-    public static void placeEntitiesToWorldWithinChunk(World world, ChunkPos chunkPos, BlockPos origin, BlockPos regionPos, Vec3i regionSize,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement, List<EntityInfo> entityList)
+    public static void placeEntitiesToWorldWithinChunk(World world, ChunkPos chunkPos, ISchematicRegion region,
+            BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
+        BlockPos regionPos = placement.getPos();
+        List<EntityInfo> entityList = region.getEntityList();
+
+        if (entityList == null)
+        {
+            return;
+        }
+
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         final int offX = regionPosRelTransformed.getX() + origin.getX();
         final int offY = regionPosRelTransformed.getY() + origin.getY();

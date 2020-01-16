@@ -14,7 +14,8 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskBase;
 import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
 import fi.dy.masa.litematica.scheduler.tasks.TaskFillArea;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicDirect;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkBase;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -161,7 +162,7 @@ public class ToolUtils
         if ((currentTime - areaMovedTime) < 400 ||
             scheduler.hasTask(TaskSaveSchematic.class) ||
             scheduler.hasTask(TaskDeleteArea.class) ||
-            scheduler.hasTask(TaskPasteSchematicSetblock.class) ||
+            scheduler.hasTask(TaskPasteSchematicPerChunkBase.class) ||
             scheduler.hasTask(TaskPasteSchematicDirect.class))
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.move.pending_tasks");
@@ -198,7 +199,7 @@ public class ToolUtils
                     }
                     else
                     {
-                        taskPaste = new TaskPasteSchematicSetblock(placement, range, false);
+                        taskPaste = new TaskPasteSchematicPerChunkCommand(ImmutableList.of(placement), range, false);
                     }
 
                     taskPaste.disableCompletionMessage();

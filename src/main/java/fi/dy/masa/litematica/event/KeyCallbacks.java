@@ -516,6 +516,11 @@ public class KeyCallbacks
                     DataManager.getSchematicPlacementManager().pasteCurrentPlacementToWorld(this.mc);
                     return true;
                 }
+                else if (mode == ToolMode.GRID_PASTE)
+                {
+                    DataManager.getSchematicPlacementManager().gridPasteCurrentPlacementToWorld(this.mc);
+                    return true;
+                }
                 else if (mode == ToolMode.FILL && mode.getPrimaryBlock() != null)
                 {
                     ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), null);

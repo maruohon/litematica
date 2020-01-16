@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -34,7 +35,8 @@ import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkDirect;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
@@ -168,7 +170,7 @@ public class SchematicPlacementManager
                         {
                             if (placement.isEnabled())
                             {
-                                SchematicPlacingUtils.placeToWorldWithinChunk(placement.getSchematic(), worldSchematic, pos, placement, false);
+                                SchematicPlacingUtils.placeToWorldWithinChunk(placement, pos, worldSchematic, false);
                             }
                         }
 
@@ -1016,58 +1018,78 @@ public class SchematicPlacementManager
         this.pastePlacementToWorld(this.getSelectedSchematicPlacement(), mc);
     }
 
-    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, Minecraft mc)
+    public void gridPasteCurrentPlacementToWorld(Minecraft mc)
     {
-        this.pastePlacementToWorld(schematicPlacement, true, mc);
+        SchematicPlacement placement = this.getSelectedSchematicPlacement();
+
+        if (placement != null)
+        {
+            // Only do the Grid paste when the base placement is selected
+            if (placement.isRepeatedPlacement() == false && placement.getGridSettings().isEnabled())
+            {
+                ArrayList<SchematicPlacement> placements = new ArrayList<>();
+                placements.add(placement);
+                placements.addAll(this.gridManager.getGridPlacementsForBasePlacement(placement));
+
+                this.pastePlacementsToWorld(placements, true, true, mc);
+            }
+            else
+            {
+                this.pastePlacementToWorld(placement, mc);
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, 8000, "litematica.message.grid_paste.warning.select_base_placement_for_grid_paste");
+            }
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+        }
     }
 
-    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, Minecraft mc)
+    public void pastePlacementToWorld(@Nullable SchematicPlacement placement, Minecraft mc)
     {
-        this.pastePlacementToWorld(schematicPlacement, changedBlocksOnly, true, mc);
+        this.pastePlacementToWorld(placement, true, mc);
     }
 
-    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, boolean printMessage, Minecraft mc)
+    public void pastePlacementToWorld(@Nullable SchematicPlacement placement, boolean changedBlocksOnly, Minecraft mc)
+    {
+        if (placement != null)
+        {
+            this.pastePlacementsToWorld(Lists.newArrayList(placement), changedBlocksOnly, true, mc);
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+        }
+    }
+
+    public void pastePlacementsToWorld(List<SchematicPlacement> placements, boolean changedBlocksOnly, boolean printMessage, Minecraft mc)
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
-            if (schematicPlacement != null)
+            if (placements.isEmpty() == false)
             {
-                if (PositionUtils.isPlacementWithinWorld(mc.world, schematicPlacement, false) == false)
-                {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.placement_paste_outside_world");
-                    return;
-                }
+                LayerRange range = DataManager.getRenderLayerRange().copy();
 
                 if (mc.isSingleplayer())
                 {
-                    final WorldServer world = mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld()));
-                    final ISchematic schematic = schematicPlacement.getSchematic();
-                    final LayerRange range = DataManager.getRenderLayerRange().copy();
-
-                    world.addScheduledTask(() ->
+                    if (placements.size() == 1)
                     {
-                        if (SchematicPlacingUtils.placeToWorld(schematic, world, schematicPlacement, range, false))
-                        {
-                            if (printMessage)
-                            {
-                                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
-                            }
-                        }
-                        else
-                        {
-                            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
-                        }
-                    });
-
-                    if (printMessage)
+                        this.directPaste(placements.get(0), range, printMessage, mc);
+                    }
+                    else
                     {
-                        InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                        TaskPasteSchematicPerChunkDirect task = new TaskPasteSchematicPerChunkDirect(placements, range, changedBlocksOnly);
+                        TaskScheduler.getInstanceServer().scheduleTask(task, 20);
+
+                        if (printMessage)
+                        {
+                            InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                        }
                     }
                 }
                 else
                 {
-                    final LayerRange range = DataManager.getRenderLayerRange().copy();
-                    TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblock(schematicPlacement, range, changedBlocksOnly);
+                    TaskPasteSchematicPerChunkCommand task = new TaskPasteSchematicPerChunkCommand(placements, range, changedBlocksOnly);
                     TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
 
                     if (printMessage)
@@ -1084,6 +1106,31 @@ public class SchematicPlacementManager
         else
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+        }
+    }
+
+    private void directPaste(SchematicPlacement placement, LayerRange range, boolean printMessage, Minecraft mc)
+    {
+        final WorldServer world = mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(mc.player.getEntityWorld()));
+
+        world.addScheduledTask(() ->
+        {
+            if (SchematicPlacingUtils.placeToWorld(placement, world, range, false))
+            {
+                if (printMessage)
+                {
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
+                }
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
+            }
+        });
+
+        if (printMessage)
+        {
+            InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
         }
     }
 
