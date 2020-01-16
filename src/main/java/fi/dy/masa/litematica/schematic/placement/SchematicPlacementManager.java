@@ -1182,6 +1182,12 @@ public class SchematicPlacementManager
                 {
                     this.addSchematicPlacement(loadedPlacement, false, true);
                 }
+                // Failed to load the schematic, or it did not have a file (that should never happen)
+                else
+                {
+                    placement.enabled = false;
+                    this.lightlyLoadedPlacements.add(placement);
+                }
             }
             else
             {
