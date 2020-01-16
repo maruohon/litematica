@@ -17,18 +17,20 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
     private final ISchematic schematic;
     private final WidgetDropDownList<SchematicType<?>> widgetOutputType;
 
-    public GuiSchematicSaveConvert(ISchematic schematic, String inputFileName)
+    public GuiSchematicSaveConvert(ISchematic schematic, String inputName)
     {
         super(schematic, 10, 83);
 
         this.schematic = schematic;
-        this.defaultText = FileUtils.getNameWithoutExtension(inputFileName);
+        boolean hasSchematicExtension = SchematicType.getPossibleTypesFromFileName(inputName).isEmpty() == false;
+        this.defaultText = hasSchematicExtension ? FileUtils.getNameWithoutExtension(inputName) : inputName;
 
-        this.title = StringUtils.translate("litematica.gui.title.convert_schematic_format", inputFileName);
+        this.title = StringUtils.translate("litematica.gui.title.convert_schematic_format", inputName);
         this.useTitleHierarchy = false;
 
         this.widgetOutputType = new WidgetDropDownList<>(9, 57, -1, 22, 200, 10, SchematicType.KNOWN_TYPES, (entry) -> entry.getDisplayName());
         this.widgetOutputType.setIconProvider(new SchematicIconProvider());
+        this.widgetOutputType.setSelectedEntry(SchematicType.LITEMATICA);
     }
 
     @Override

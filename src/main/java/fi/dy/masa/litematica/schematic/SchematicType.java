@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NBTTagCompound;
 import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
 
 public class SchematicType<S extends ISchematic>
@@ -130,7 +131,12 @@ public class SchematicType<S extends ISchematic>
 
     public static List<SchematicType<?>> getPossibleTypesFromFileName(File file)
     {
-        String extension = "." + org.apache.logging.log4j.core.util.FileUtils.getFileExtension(file);
+        return getPossibleTypesFromFileName(file.getName());
+    }
+
+    public static List<SchematicType<?>> getPossibleTypesFromFileName(String fileName)
+    {
+        String extension = "." + FileUtils.getFileNameExtension(fileName);
         List<SchematicType<?>> list = new ArrayList<>();
 
         for (SchematicType<?> type : KNOWN_TYPES)

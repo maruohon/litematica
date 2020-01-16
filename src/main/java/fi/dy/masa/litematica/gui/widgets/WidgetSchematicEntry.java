@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.gui.GuiSchematicSave;
+import fi.dy.masa.litematica.gui.GuiSchematicSaveConvert;
 import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
@@ -180,8 +180,9 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
             }
             else if (this.type == Type.SAVE_TO_FILE)
             {
-                ISchematic entry = this.widget.schematic;
-                GuiSchematicSave gui = new GuiSchematicSave(entry);
+                ISchematic schematic = this.widget.schematic;
+                String name = schematic.getFile() != null ? schematic.getFile().getName() : schematic.getMetadata().getName();
+                GuiSchematicSaveConvert gui = new GuiSchematicSaveConvert(schematic, name);
                 gui.setParent(GuiUtils.getCurrentScreen());
                 GuiBase.openGui(gui);
             }

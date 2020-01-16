@@ -25,6 +25,18 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     private final SelectionManager selectionManager;
     protected WidgetCheckBox checkboxIgnoreEntities;
 
+    public static String generateFilename(String nameIn)
+    {
+        String name = FileUtils.generateSafeFileName(nameIn);
+
+        if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue())
+        {
+            name = FileUtils.generateSimpleSafeFileName(name);
+        }
+
+        return name;
+    }
+
     public GuiSchematicSave()
     {
         this(null);
@@ -49,12 +61,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
 
         if (area != null)
         {
-            this.defaultText = FileUtils.generateSafeFileName(area.getName());
-
-            if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue())
-            {
-                this.defaultText = FileUtils.generateSimpleSafeFileName(this.defaultText);
-            }
+            this.defaultText = generateFilename(area.getName());
         }
     }
 
