@@ -249,6 +249,18 @@ public class SchematicPlacementManager
         this.addSchematicPlacement(placement, printMessages, false);
     }
 
+    public void duplicateSchematicPlacement(SchematicPlacementUnloaded placement)
+    {
+        if (placement.isLoaded())
+        {
+            this.addSchematicPlacement(((SchematicPlacement) placement).copyAsFullyLoaded(false), false);
+        }
+        else
+        {
+            this.lightlyLoadedPlacements.add(placement.copyAsUnloaded());
+        }
+    }
+
     void addVisiblePlacement(SchematicPlacement placement)
     {
         this.allVisibleSchematicPlacements.add(placement);

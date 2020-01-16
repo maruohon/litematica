@@ -45,10 +45,10 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         this.subRegionCount = schematic.getSubRegionCount();
     }
 
-    public SchematicPlacement copy(boolean isRepeatedPlacement)
+    public SchematicPlacement copyAsFullyLoaded(boolean isRepeatedPlacement)
     {
         SchematicPlacement copy = new SchematicPlacement(this.schematic, null, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
-        copy.copyFrom(this);
+        copy.copyFrom(this, ! isRepeatedPlacement);
         copy.isRepeatedPlacement = isRepeatedPlacement;
         return copy;
     }

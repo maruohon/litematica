@@ -58,6 +58,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         {
             posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.REMOVE);
             posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.SAVE);
+            posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.DUPLICATE);
             posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
             posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.CONFIGURE);
         }
@@ -65,6 +66,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         {
             posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.REMOVE);
             posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.SAVE);
+            posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.DUPLICATE);
             posX = this.createButtonOnOff(posX, posY, this.placement.isEnabled(), ButtonListener.ButtonType.TOGGLE_ENABLED);
             posX = this.createButtonGeneric(posX, posY, ButtonListener.ButtonType.CONFIGURE);
         }
@@ -112,7 +114,8 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
-        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        String key = this.gui.useIconButtons() ? "%s" : type.getTranslationKey();
+        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, key, isCurrentlyOn);
         String hover = type.getHoverKey();
 
         if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
@@ -280,6 +283,11 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
                 DataManager.getSchematicPlacementManager().toggleEnabled(this.widget.placement);
                 this.widget.parent.refreshEntries();
             }
+            else if (this.type == ButtonType.DUPLICATE)
+            {
+                DataManager.getSchematicPlacementManager().duplicateSchematicPlacement(this.widget.placement);
+                this.widget.parent.refreshEntries();
+            }
             else if (this.widget.placement.isLoaded())
             {
                 if (this.type == ButtonType.CONFIGURE)
@@ -294,6 +302,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         public enum ButtonType
         {
             CONFIGURE       (LitematicaGuiIcons.CONFIGURATION,  "litematica.gui.button.schematic_placements.configure", "litematica.gui.hover.schematic_placement.button.configure"),
+            DUPLICATE       (LitematicaGuiIcons.DUPLICATE,      "litematica.gui.button.schematic_placements.duplicate", "litematica.gui.hover.schematic_placement.button.duplicate"),
             REMOVE          (LitematicaGuiIcons.TRASH_CAN,      "litematica.gui.button.schematic_placements.remove", "litematica.gui.hover.schematic_placement.button.remove"),
             SAVE            (LitematicaGuiIcons.SAVE_DISK,      "litematica.gui.button.schematic_placements.save", "litematica.gui.hover.schematic_placement.button.save"),
             TOGGLE_ENABLED  (null,                              "litematica.gui.button.schematic_placements.placement_enabled", "litematica.gui.hover.schematic_placement.button.toggle_enabled");

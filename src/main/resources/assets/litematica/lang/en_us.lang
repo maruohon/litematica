@@ -164,6 +164,7 @@ litematica.gui.button.schematic_placement.hover.lock=§7Locking a placement prev
 litematica.gui.button.schematic_placement.hover.rendering=§7Rendering: %s\n§7Note that this works a bit funky\n§7and doesn't prevent entity rendering.\n§7Usually you should just disable\n§7the placement entirely
 
 litematica.gui.button.schematic_placements.configure=Configure
+litematica.gui.button.schematic_placements.duplicate=Duplicate
 litematica.gui.button.schematic_placements.disable=Disable
 litematica.gui.button.schematic_placements.load=Load
 litematica.gui.button.schematic_placements.locked=Locked: %s
@@ -224,6 +225,7 @@ litematica.gui.button.unlocked=Unlocked
 
 litematica.gui.hover.schematic_placement.button.load=§7Load this placement to the list of "active placements"
 litematica.gui.hover.schematic_placement.button.configure=§7Edit the properties of this placement,\n§7such as the position, rotation and mirror values etc.
+litematica.gui.hover.schematic_placement.button.duplicate=§7Creates a new identical copy of this placement
 litematica.gui.hover.schematic_placement.button.remove=§7Removes this placement.\n§6If you may need the placement later on,\n§6you can save it first using the Save button.\n§7Removing a placement won't unload the schematic\n§7itself from memory. To unload the schematic too,\n§7unload it from the Loaded Schematics list.\n§7Unloading the schematic will automatically remove all\n§7placements of it.
 litematica.gui.hover.schematic_placement.button.save=§7Save this placement to a separate file on disk.\n§7This allows you to remove it from this list,\n§7but still reload it via the Placement Browser\n§7later if you need it again.
 litematica.gui.hover.schematic_placement.button.toggle_enabled=§7Turns this placement on/off.\n§7Disabling a placement is the recommended\n§7way of "not seeing it" while you don't need it,\n§7as it will remove it from the schematic world,\n§7and thus decreases the work the mod has to do\n§7when the player moves around.

@@ -193,7 +193,7 @@ public class SchematicPlacementUnloaded
         }
     }
 
-    protected void copyFrom(SchematicPlacementUnloaded other)
+    protected void copyFrom(SchematicPlacementUnloaded other, boolean copyGridSettings)
     {
         this.relativeSubRegionPlacements.clear();
         other.relativeSubRegionPlacements.entrySet().forEach((entry) -> this.relativeSubRegionPlacements.put(entry.getKey(), entry.getValue().copy())); 
@@ -216,7 +216,18 @@ public class SchematicPlacementUnloaded
         this.enclosingBox = other.enclosingBox != null ? other.enclosingBox.copy() : null;
         this.selectedSubRegionName = other.selectedSubRegionName;
         this.materialListData = other.materialListData != null ? JsonUtils.deepCopy(other.materialListData) : null;
-        this.gridSettings.copyFrom(other.gridSettings);
+
+        if (copyGridSettings)
+        {
+            this.gridSettings.copyFrom(other.gridSettings);
+        }
+    }
+
+    public SchematicPlacementUnloaded copyAsUnloaded()
+    {
+        SchematicPlacementUnloaded placement = new SchematicPlacementUnloaded(null, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
+        placement.copyFrom(this, true);
+        return placement;
     }
 
     @Nullable
@@ -230,7 +241,7 @@ public class SchematicPlacementUnloaded
             {
                 SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, this.placementSaveFile, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
 
-                schematicPlacement.copyFrom(this);
+                schematicPlacement.copyFrom(this, true);
                 schematicPlacement.checkAreSubRegionsModified();
                 schematicPlacement.updateEnclosingBox();
 

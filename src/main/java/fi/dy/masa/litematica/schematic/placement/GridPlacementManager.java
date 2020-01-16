@@ -174,7 +174,7 @@ public class GridPlacementManager
 
             for (Vec3i point : gridPoints)
             {
-                SchematicPlacement placement = basePlacement.copy(true);
+                SchematicPlacement placement = basePlacement.copyAsFullyLoaded(true);
                 placement.setOrigin(baseOrigin.add(point.getX() * sizeX, point.getY() * sizeY, point.getZ() * sizeZ));
                 placement.updateEnclosingBox();
                 placements.put(point, placement);
