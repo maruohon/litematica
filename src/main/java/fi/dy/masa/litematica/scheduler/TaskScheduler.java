@@ -182,8 +182,16 @@ public class TaskScheduler
     {
         synchronized (this)
         {
-            task.stop();
-            return this.tasks.remove(task);
+            int index = this.tasks.indexOf(task);
+
+            if (index >= 0)
+            {
+                task.stop();
+                this.tasks.remove(index);
+                return true;
+            }
+
+            return false;
         }
     }
 
