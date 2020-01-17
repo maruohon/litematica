@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
@@ -31,19 +32,19 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
 {
     private final SchematicPlacementManager manager;
     private final GuiSchematicPlacementsList gui;
-    private final WidgetListSchematicPlacements parent;
+    private final WidgetListSchematicPlacements listWidget;
     private final SchematicPlacementUnloaded placement;
     @Nullable private final SchematicPlacement loadedPlacement;
     private final boolean isOdd;
     private int buttonsStartX;
 
     public WidgetSchematicPlacementEntry(int x, int y, int width, int height, boolean isOdd,
-            SchematicPlacementUnloaded placement, int listIndex, WidgetListSchematicPlacements parent)
+            SchematicPlacementUnloaded placement, int listIndex, WidgetListSchematicPlacements listWidget, GuiSchematicPlacementsList gui)
     {
         super(x, y, width, height, placement, listIndex);
 
-        this.gui = parent.getParentGui();
-        this.parent = parent;
+        this.gui = gui;
+        this.listWidget = listWidget;
         this.placement = placement;
         this.loadedPlacement = placement.isLoaded() ? (SchematicPlacement) placement : null;
         this.isOdd = isOdd;
@@ -54,7 +55,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
 
         // Note: These are placed from right to left
 
-        if (this.gui.useIconButtons())
+        if (this.useIconButtons())
         {
             posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.REMOVE);
             posX = this.createButtonIconOnly(posX, posY, ButtonListener.ButtonType.SAVE);
@@ -72,6 +73,11 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         }
 
         this.buttonsStartX = posX;
+    }
+
+    private boolean useIconButtons()
+    {
+        return Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue();
     }
 
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
@@ -114,7 +120,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
-        String key = this.gui.useIconButtons() ? "%s" : type.getTranslationKey();
+        String key = this.useIconButtons() ? "%s" : type.getTranslationKey();
         ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, key, isCurrentlyOn);
         String hover = type.getHoverKey();
 
@@ -123,7 +129,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             button.setHoverStrings(hover);
         }
 
-        return this.addButton(button, new ButtonListener(type, this)).getX() - 2;
+        return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
     }
 
     @Override
@@ -259,41 +265,41 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             {
                 if (this.widget.placement.isLocked() && GuiBase.isShiftDown() == false)
                 {
-                    this.widget.parent.getParentGui().addMessage(MessageType.ERROR, "litematica.error.schematic_placements.remove_fail_locked");
+                    this.widget.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_placements.remove_fail_locked");
                 }
                 else
                 {
                     this.widget.manager.removeSchematicPlacement(this.widget.placement);
-                    this.widget.parent.refreshEntries();
+                    this.widget.listWidget.refreshEntries();
                 }
             }
             else if (this.type == ButtonType.SAVE)
             {
                 if (this.widget.placement.saveToFileIfChanged())
                 {
-                    this.widget.parent.getParentGui().addMessage(MessageType.SUCCESS, "litematica.gui.label.schematic_placement.saved_to_file");
+                    this.widget.gui.addMessage(MessageType.SUCCESS, "litematica.gui.label.schematic_placement.saved_to_file");
                 }
                 else
                 {
-                    this.widget.parent.getParentGui().addMessage(MessageType.ERROR, "litematica.error.schematic_placements.save_failed");
+                    this.widget.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_placements.save_failed");
                 }
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)
             {
                 DataManager.getSchematicPlacementManager().toggleEnabled(this.widget.placement);
-                this.widget.parent.refreshEntries();
+                this.widget.listWidget.refreshEntries();
             }
             else if (this.type == ButtonType.DUPLICATE)
             {
                 DataManager.getSchematicPlacementManager().duplicateSchematicPlacement(this.widget.placement);
-                this.widget.parent.refreshEntries();
+                this.widget.listWidget.refreshEntries();
             }
             else if (this.widget.placement.isLoaded())
             {
                 if (this.type == ButtonType.CONFIGURE)
                 {
                     GuiPlacementConfiguration gui = new GuiPlacementConfiguration((SchematicPlacement) this.widget.placement);
-                    gui.setParent(this.widget.parent.getParentGui());
+                    gui.setParent(this.widget.gui);
                     GuiBase.openGui(gui);
                 }
             }
@@ -307,17 +313,18 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             SAVE            (LitematicaGuiIcons.SAVE_DISK,      "litematica.gui.button.schematic_placements.save", "litematica.gui.hover.schematic_placement.button.save"),
             TOGGLE_ENABLED  (null,                              "litematica.gui.button.schematic_placements.placement_enabled", "litematica.gui.hover.schematic_placement.button.toggle_enabled");
 
-            private final IGuiIcon icon;
+            @Nullable private final IGuiIcon icon;
             private final String translationKey;
             private final String hoverKey;
 
-            private ButtonType(IGuiIcon icon, String translationKey, String hoverKey)
+            private ButtonType(@Nullable IGuiIcon icon, String translationKey, String hoverKey)
             {
                 this.icon = icon;
                 this.translationKey = translationKey;
                 this.hoverKey = hoverKey;
             }
 
+            @Nullable
             public IGuiIcon getIcon()
             {
                 return this.icon;

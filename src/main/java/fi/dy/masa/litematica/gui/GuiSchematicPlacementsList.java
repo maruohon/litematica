@@ -13,7 +13,6 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicPlacementsList
@@ -21,7 +20,6 @@ public class GuiSchematicPlacementsList
         implements ISelectionListener<SchematicPlacementUnloaded>
 {
     private final SchematicPlacementManager manager;
-    protected WidgetCheckBox widgetUseIconButtons;
 
     public GuiSchematicPlacementsList()
     {
@@ -29,12 +27,6 @@ public class GuiSchematicPlacementsList
 
         this.title = StringUtils.translate("litematica.gui.title.manage_schematic_placements");
         this.manager = DataManager.getSchematicPlacementManager();
-
-        // The position is updated in initGui() when the GUI width is known
-        this.widgetUseIconButtons = new WidgetCheckBox(20, 36,
-                LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, "", "litematica.gui.hover.schematic_placement.checkmark.use_icon_buttons");
-        this.widgetUseIconButtons.setChecked(Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue());
-        this.widgetUseIconButtons.setListener((widget) -> { Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.setBooleanValue(widget.isChecked()); this.initGui(); });
     }
 
     @Override
@@ -56,33 +48,26 @@ public class GuiSchematicPlacementsList
 
         int x = 12;
         int y = this.height - 26;
-        int buttonWidth;
-        String label;
         ButtonGeneric button;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS;
-        label = StringUtils.translate(type.getLabelKey());
-        buttonWidth = this.getStringWidth(label) + 30;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
+        button = new ButtonGeneric(x, y, -1, 20, type.getLabelKey(), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+        x += button.getWidth() + 2;
 
-        type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        label = StringUtils.translate(type.getLabelKey());
-        buttonWidth = this.getStringWidth(label) + 20;
-        x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
-        this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
-
-        button = new ButtonGeneric(this.width - 8, 10, -1, true, "litematica.gui.label.schematic_placement.open_placement_browser");
+        button = new ButtonGeneric(x, y, -1, 20, "litematica.gui.label.schematic_placement.open_placement_browser");
         this.addButton(button, (btn, mbtn) -> { GuiBase.openGui((new GuiSchematicPlacementFileBrowser()).setParent(this)); });
 
-        this.widgetUseIconButtons.setPosition(this.width - 20, this.widgetUseIconButtons.getY());
-        this.addWidget(this.widgetUseIconButtons);
-    }
+        type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
+        button = new ButtonGeneric(this.width - 10, y, -1, true, type.getLabelKey());
+        this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
-    public boolean useIconButtons()
-    {
-        return this.widgetUseIconButtons.isChecked();
+        x = this.width - 22;
+        y = 10;
+        String val = Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue() ? "litematica.gui.label.misc.icons" : "litematica.gui.label.misc.text";
+        button = new ButtonGeneric(x, y, -1, true, StringUtils.translate("litematica.gui.button.buttons_val", StringUtils.translate(val)));
+        button.setHoverStrings("litematica.gui.button.hover.use_text_or_icon_buttons");
+        this.addButton(button, (btn, mbtn) -> { Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue(); this.initGui(); });
     }
 
     @Override

@@ -37,6 +37,8 @@ public class LitematicaGuiIcons extends GuiIconBase
     public static final LitematicaGuiIcons CONFIGURATION                  = new LitematicaGuiIcons(102,  84, 14, 14);
     public static final LitematicaGuiIcons DUPLICATE                      = new LitematicaGuiIcons(102, 168, 14, 14);
     public static final LitematicaGuiIcons LOADED_SCHEMATICS              = new LitematicaGuiIcons(102,  14, 14, 14);
+    public static final LitematicaGuiIcons PLACEMENT                      = new LitematicaGuiIcons(102, 196, 14, 14);
+    public static final LitematicaGuiIcons RELOAD                         = new LitematicaGuiIcons(102, 182, 14, 14);
     public static final LitematicaGuiIcons SAVE_DISK                      = new LitematicaGuiIcons(102, 140, 14, 14);
     public static final LitematicaGuiIcons SCHEMATIC_BROWSER              = new LitematicaGuiIcons(102,  28, 14, 14);
     public static final LitematicaGuiIcons SCHEMATIC_MANAGER              = new LitematicaGuiIcons(102,  56, 14, 14);

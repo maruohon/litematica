@@ -14,21 +14,16 @@ import fi.dy.masa.malilib.util.HorizontalAlignment;
 
 public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacementUnloaded, WidgetSchematicPlacementEntry>
 {
-    private final GuiSchematicPlacementsList parent;
+    private final GuiSchematicPlacementsList gui;
 
-    public WidgetListSchematicPlacements(int x, int y, int width, int height, GuiSchematicPlacementsList parent)
+    public WidgetListSchematicPlacements(int x, int y, int width, int height, GuiSchematicPlacementsList gui)
     {
-        super(x, y, width, height, parent);
+        super(x, y, width, height, gui);
 
-        this.parent = parent;
+        this.gui = gui;
         this.browserEntryHeight = 22;
         this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 17, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT);
         this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
-    }
-
-    public GuiSchematicPlacementsList getParentGui()
-    {
-        return this.parent;
     }
 
     @Override
@@ -55,6 +50,6 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
     protected WidgetSchematicPlacementEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SchematicPlacementUnloaded entry)
     {
         return new WidgetSchematicPlacementEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                isOdd, entry, listIndex, this);
+                isOdd, entry, listIndex, this, this.gui);
     }
 }

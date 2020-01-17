@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSaveConvert;
@@ -45,16 +46,33 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
         this.isOdd = isOdd;
         y += 1;
 
-        int posX = x + width;
+        int posX = x + width - 2;
 
-        posX -= this.addButton(posX, y, ButtonListener.Type.UNLOAD);
-        posX -= this.addButton(posX, y, ButtonListener.Type.RELOAD);
-        posX -= this.addButton(posX, y, ButtonListener.Type.SAVE_TO_FILE);
-        posX -= this.addButton(posX, y, ButtonListener.Type.CREATE_PLACEMENT);
+        // Note: These are placed from right to left
+
+        if (this.useIconButtons())
+        {
+            posX -= this.createButtonIconOnly(posX, y, ButtonListener.Type.UNLOAD);
+            posX -= this.createButtonIconOnly(posX, y, ButtonListener.Type.RELOAD);
+            posX -= this.createButtonIconOnly(posX, y, ButtonListener.Type.SAVE_TO_FILE);
+            posX -= this.createButtonIconOnly(posX, y, ButtonListener.Type.CREATE_PLACEMENT);
+        }
+        else
+        {
+            posX -= this.addButton(posX, y, ButtonListener.Type.UNLOAD);
+            posX -= this.addButton(posX, y, ButtonListener.Type.RELOAD);
+            posX -= this.addButton(posX, y, ButtonListener.Type.SAVE_TO_FILE);
+            posX -= this.addButton(posX, y, ButtonListener.Type.CREATE_PLACEMENT);
+        }
 
         this.buttonsStartX = posX;
         this.typeIconX = this.x + 2;
         this.typeIconY = y + 4;
+    }
+
+    private boolean useIconButtons()
+    {
+        return Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.getBooleanValue();
     }
 
     private int addButton(int x, int y, ButtonListener.Type type)
@@ -69,7 +87,34 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
 
         this.addButton(button, listener);
 
-        return button.getWidth() + 2;
+        return button.getWidth() + 1;
+    }
+
+    private int createButtonIconOnly(int xRight, int y, ButtonListener.Type type)
+    {
+        IGuiIcon icon = type.getIcon();
+        ButtonGeneric button;
+        int size = 20;
+
+        if (icon != null)
+        {
+            button = new ButtonGeneric(xRight - size, y, size, size, "", icon, type.getHoverKey());
+        }
+        else
+        {
+            button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName(), type.getHoverKey());
+        }
+
+        String hover = type.getHoverKey();
+
+        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
+        {
+            button.setHoverStrings(hover);
+        }
+
+        this.addButton(button, new ButtonListener(type, this));
+
+        return button.getWidth() + 1;
     }
 
     @Override
@@ -201,23 +246,25 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
 
         public enum Type
         {
-            CREATE_PLACEMENT    ("litematica.gui.button.create_placement"),
-            RELOAD              ("litematica.gui.button.reload", "litematica.gui.button.hover.schematic_list.reload_schematic"),
-            SAVE_TO_FILE        ("litematica.gui.button.save_to_file"),
-            UNLOAD              ("litematica.gui.button.unload");
+            CREATE_PLACEMENT    (LitematicaGuiIcons.PLACEMENT,  "litematica.gui.button.create_placement",   "litematica.gui.button.hover.schematic_list.create_new_placement_shift_to_disable"),
+            RELOAD              (LitematicaGuiIcons.RELOAD,     "litematica.gui.button.reload",             "litematica.gui.button.hover.schematic_list.reload_schematic"),
+            SAVE_TO_FILE        (LitematicaGuiIcons.SAVE_DISK,  "litematica.gui.button.save_to_file",       "litematica.gui.button.hover.schematic_list.save_to_file"),
+            UNLOAD              (LitematicaGuiIcons.TRASH_CAN,  "litematica.gui.button.unload",             "litematica.gui.button.hover.schematic_list.unload");
 
+            private final IGuiIcon icon;
             private final String translationKey;
             @Nullable private final String hoverKey;
 
-            private Type(String translationKey)
+            private Type(IGuiIcon icon, String translationKey, @Nullable String hoverKey)
             {
-                this(translationKey, null);
-            }
-
-            private Type(String translationKey, @Nullable String hoverKey)
-            {
+                this.icon = icon;
                 this.translationKey = translationKey;
                 this.hoverKey = hoverKey;
+            }
+
+            public IGuiIcon getIcon()
+            {
+                return this.icon;
             }
 
             @Nullable

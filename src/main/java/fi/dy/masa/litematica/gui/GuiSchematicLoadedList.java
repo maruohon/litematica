@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListLoadedSchematics;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicEntry;
@@ -36,34 +37,33 @@ public class GuiSchematicLoadedList extends GuiListBase<ISchematic, WidgetSchema
 
         int x = 12;
         int y = this.height - 26;
-        int buttonWidth;
-        String label;
         ButtonGeneric button;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOAD_SCHEMATICS;
-        label = StringUtils.translate(type.getLabelKey());
-        buttonWidth = this.getStringWidth(label) + 30;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
+        button = new ButtonGeneric(x, y, -1, 20, type.getLabelKey(), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
-        x += buttonWidth + 4;
+        x += button.getWidth() + 4;
 
         type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
-        label = StringUtils.translate(type.getLabelKey());
-        buttonWidth = this.getStringWidth(label) + 30;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
+        button = new ButtonGeneric(x, y, -1, 20, type.getLabelKey(), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        label = StringUtils.translate(type.getLabelKey());
-        buttonWidth = this.getStringWidth(label) + 20;
-        x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+        x = this.width - 10;
+        button = new ButtonGeneric(x, y, -1, true, type.getLabelKey());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
+
+        x = this.width - 22;
+        y = 10;
+        String val = Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.getBooleanValue() ? "litematica.gui.label.misc.icons" : "litematica.gui.label.misc.text";
+        button = new ButtonGeneric(x, y, -1, true, StringUtils.translate("litematica.gui.button.buttons_val", StringUtils.translate(val)));
+        button.setHoverStrings("litematica.gui.button.hover.use_text_or_icon_buttons");
+        this.addButton(button, (btn, mbtn) -> { Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.toggleBooleanValue(); this.initGui(); });
     }
 
     @Override
     protected WidgetListLoadedSchematics createListWidget(int listX, int listY)
     {
-        return new WidgetListLoadedSchematics(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), null);
+        return new WidgetListLoadedSchematics(listX, listY, this.getBrowserWidth(), this.getBrowserHeight());
     }
 }
