@@ -361,7 +361,7 @@ public class SchematicPlacementManager
         {
             SchematicPlacement loadedPlacement = (SchematicPlacement) placement;
 
-            this.gridManager.removeAllGridPlacementsOf(loadedPlacement, false);
+            this.gridManager.removeAllGridPlacementsOf(loadedPlacement);
 
             boolean ret = this.schematicPlacements.remove(loadedPlacement);
             this.removeVisiblePlacement(loadedPlacement);

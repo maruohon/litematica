@@ -60,6 +60,7 @@ public class GridPlacementManager
         }
 
         boolean existedBefore = this.basePlacements.contains(basePlacement);
+        boolean modified = false;
 
         // Grid repeating was enabled, or setting were changed
         if (basePlacement.isEnabled() && basePlacement.getGridSettings().isEnabled())
@@ -67,20 +68,25 @@ public class GridPlacementManager
             // Grid settings changed for an existing grid placement
             if (existedBefore)
             {
-                this.removeAllGridPlacementsOf(basePlacement, false);
+                modified |= this.removeAllGridPlacementsOf(basePlacement);
             }
             else
             {
                 this.basePlacements.add(basePlacement);
             }
 
-            this.addGridPlacementsWithinLoadedAreaFor(basePlacement, true);
+            modified |= this.addGridPlacementsWithinLoadedAreaFor(basePlacement);
         }
         // Grid repeating disabled
         else if (existedBefore)
         {
-            this.removeAllGridPlacementsOf(basePlacement, true);
+            modified |= this.removeAllGridPlacementsOf(basePlacement);
             this.basePlacements.remove(basePlacement);
+        }
+
+        if (modified)
+        {
+            OverlayRenderer.getInstance().updatePlacementCache();
         }
     }
 
@@ -215,17 +221,31 @@ public class GridPlacementManager
         }
     }
 
-    private void addGridPlacementsWithinLoadedAreaFor(SchematicPlacement basePlacement, boolean updateOverlay)
+    /**
+     * Creates and adds all the grid placements within the loaded area
+     * for the provided normal placement
+     * @param basePlacement
+     * @return true if some placements were added
+     */
+    private boolean addGridPlacementsWithinLoadedAreaFor(SchematicPlacement basePlacement)
     {
         HashMap<Vec3i, SchematicPlacement> placements = this.createGridPlacementsWithinLoadedAreaFor(basePlacement);
 
         if (placements.isEmpty() == false)
         {
-            this.addGridPlacements(basePlacement, placements, updateOverlay);
+            return this.addGridPlacements(basePlacement, placements);
         }
+
+        return false;
     }
 
-    void removeAllGridPlacementsOf(SchematicPlacement basePlacement, boolean updateOverlay)
+    /**
+     * Removes all repeated grid placements of the provided normal placement
+     * @param basePlacement
+     * @param updateOverlay
+     * @return true if some placements were removed
+     */
+    boolean removeAllGridPlacementsOf(SchematicPlacement basePlacement)
     {
         HashMap<Vec3i, SchematicPlacement> placements = this.gridPlacementsPerPlacement.get(basePlacement);
 
@@ -233,18 +253,25 @@ public class GridPlacementManager
         {
             // Create a copy of the key set to avoid CME
             HashSet<Vec3i> points = new HashSet<>(placements.keySet());
-            this.removeGridPlacements(basePlacement, points, updateOverlay);
+            return this.removeGridPlacements(basePlacement, points);
         }
+
+        return false;
     }
 
-    void createOrRemoveGridPlacementsForLoadedArea()
+    /**
+     * Updates the grid placements for the provided normal placement,
+     * adding or removing placements as needed so that the current
+     * loaded area has all the required grid placements.
+     * @return true if some placements were added or removed
+     */
+    boolean createOrRemoveGridPlacementsForLoadedArea()
     {
         Box currentArea = this.getCurrentLoadedArea(1);
+        boolean modified = false;
 
         if (currentArea != null)
         {
-            boolean modified = false;
-
             for (SchematicPlacement basePlacement : this.basePlacements)
             {
                 HashSet<Vec3i> currentGridPoints = this.getGridPointsWithinAreaFor(basePlacement, currentArea);
@@ -254,27 +281,36 @@ public class GridPlacementManager
 
                 if (outOfRangePoints.isEmpty() == false)
                 {
-                    this.removeGridPlacements(basePlacement, outOfRangePoints, false);
-                    modified = true;
+                    modified |= this.removeGridPlacements(basePlacement, outOfRangePoints);
                 }
 
                 if (newPoints.isEmpty() == false)
                 {
                     HashMap<Vec3i, SchematicPlacement> placements = this.createGridPlacementsForPoints(basePlacement, newPoints);
-                    this.addGridPlacements(basePlacement, placements, false);
-                    modified = true;
+                    modified |= this.addGridPlacements(basePlacement, placements);
                 }
             }
-
-            if (modified)
-            {
-                OverlayRenderer.getInstance().updatePlacementCache();
-            }
         }
+
+        if (modified)
+        {
+            OverlayRenderer.getInstance().updatePlacementCache();
+        }
+
+        return modified;
     }
 
-    private void addGridPlacements(SchematicPlacement basePlacement, HashMap<Vec3i, SchematicPlacement> placements, boolean updateOverlay)
+    /**
+     * Adds the provided grid placements for the provided normal placement,
+     * if there are no grid placements yet for those grid points.
+     * @param basePlacement
+     * @param placements
+     * @return true if some placements were added
+     */
+    private boolean addGridPlacements(SchematicPlacement basePlacement, HashMap<Vec3i, SchematicPlacement> placements)
     {
+        boolean modified = false;
+
         if (placements.isEmpty() == false)
         {
             HashMap<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.get(basePlacement);
@@ -295,19 +331,25 @@ public class GridPlacementManager
                     map.put(point, placement);
                     this.schematicPlacementManager.addVisiblePlacement(placement);
                     this.schematicPlacementManager.addTouchedChunksFor(placement, false);
+                    modified = true;
                 }
             }
-
-            if (updateOverlay)
-            {
-                OverlayRenderer.getInstance().updatePlacementCache();
-            }
         }
+
+        return modified;
     }
 
-    private void removeGridPlacements(SchematicPlacement basePlacement, Collection<Vec3i> gridPoints, boolean updateOverlay)
+    /**
+     * Removes the grid placements of the provided normal placement
+     * from the requested grid points, if they exist
+     * @param basePlacement
+     * @param gridPoints
+     * @return true if some placements were removed
+     */
+    private boolean removeGridPlacements(SchematicPlacement basePlacement, Collection<Vec3i> gridPoints)
     {
         HashMap<Vec3i, SchematicPlacement> map = this.gridPlacementsPerPlacement.get(basePlacement);
+        boolean modified = false;
 
         if (gridPoints.isEmpty() == false && map != null)
         {
@@ -320,14 +362,12 @@ public class GridPlacementManager
                     this.schematicPlacementManager.removeTouchedChunksFor(placement);
                     this.schematicPlacementManager.removeVisiblePlacement(placement);
                     map.remove(point);
+                    modified = true;
                 }
             }
-
-            if (updateOverlay)
-            {
-                OverlayRenderer.getInstance().updatePlacementCache();
-            }
         }
+
+        return modified;
     }
 
     @Nullable
