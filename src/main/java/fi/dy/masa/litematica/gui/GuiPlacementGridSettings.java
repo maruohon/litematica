@@ -65,9 +65,16 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         int width = 50;
 
         boolean on = this.placement.getGridSettings().isEnabled();
-        ButtonOnOff button = new ButtonOnOff(x, y, -1, false, "litematica.gui.button.schematic_placement.grid_settings", on);
-        this.addButton(button, (btn, mb) -> {
+        ButtonOnOff buttonOnOff = new ButtonOnOff(x, y, -1, false, "litematica.gui.button.schematic_placement.grid_settings", on);
+        this.addButton(buttonOnOff, (btn, mb) -> {
             this.placement.getGridSettings().toggleEnabled();
+            this.updatePlacementManager();
+            this.initGui();
+        });
+
+        ButtonGeneric button = new ButtonGeneric(x + buttonOnOff.getWidth() + 4, y, -1, 20, "litematica.gui.button.schematic_placement.reset_grid_size");
+        this.addButton(button, (btn, mb) -> {
+            this.placement.getGridSettings().resetSize();
             this.updatePlacementManager();
             this.initGui();
         });
@@ -123,10 +130,12 @@ public class GuiPlacementGridSettings extends GuiDialogBase
 
     private void updatePlacementManager()
     {
-        if (this.cachedSettings.equals(this.placement.getGridSettings()) == false)
+        GridSettings currentSettings = this.placement.getGridSettings();
+
+        if (this.cachedSettings.equals(currentSettings) == false)
         {
             this.manager.updateGridPlacementsFor(this.placement);
-            this.cachedSettings.copyFrom(this.placement.getGridSettings());
+            this.cachedSettings.copyFrom(currentSettings);
         }
     }
 
@@ -280,8 +289,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
             try
             {
                 int value = Math.max(0, Integer.parseInt(textField.getText()));
-                Vec3i size = this.placement.getGridSettings().getSize();
-                this.placement.getGridSettings().setSize(PositionUtils.getModifiedPosition(size, value, this.type));
+                this.placement.getGridSettings().setSize(this.type, value);
                 this.parent.updatePlacementManager();
             }
             catch (NumberFormatException e)
@@ -312,9 +320,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
             if (GuiBase.isShiftDown()) { amount *= 8; }
             if (GuiBase.isAltDown()) { amount *= 4; }
 
-            Vec3i size = this.placement.getGridSettings().getSize();
-            int newValue = Math.max(0, PositionUtils.getCoordinate(this.placement.getGridSettings().getSize(), this.type) + amount);
-            this.placement.getGridSettings().setSize(PositionUtils.getModifiedPosition(size, newValue, this.type));
+            this.placement.getGridSettings().modifySize(this.type, amount);
             this.parent.updatePlacementManager();
 
             this.parent.initGui(); // Re-create buttons/text fields

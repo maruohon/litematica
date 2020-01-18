@@ -225,6 +225,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         if (pos1 != null && pos2 != null)
         {
             this.enclosingBox = new Box(pos1, pos2);
+            this.gridSettings.setDefaultSize(PositionUtils.getAreaSizeFromRelativeEndPosition(pos2.subtract(pos1)));
         }
     }
 

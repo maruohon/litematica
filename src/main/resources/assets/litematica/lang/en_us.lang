@@ -160,6 +160,7 @@ litematica.gui.button.schematic_placement.abbr.rendering=R
 litematica.gui.button.schematic_placement.grid_settings=Grid/repeat: %s
 litematica.gui.button.schematic_placement.ignore_entities=Ignore entities: %s
 litematica.gui.button.schematic_placement.region_enabled=Region: %s
+litematica.gui.button.schematic_placement.reset_grid_size=Reset Size
 litematica.gui.button.schematic_placement.reset_sub_region_placements=Reset all sub-regions
 litematica.gui.button.schematic_placement.toggle_all_off=All §cOFF§r
 litematica.gui.button.schematic_placement.toggle_all_on=All §aON§r

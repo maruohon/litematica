@@ -4,13 +4,16 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class GridSettings
 {
     private IntBoundingBox repeat = new IntBoundingBox(0, 0, 0, 0, 0, 0);
     private Vec3i size = Vec3i.NULL_VECTOR;
+    private Vec3i defaultSize = Vec3i.NULL_VECTOR;
     private boolean enabled;
     private boolean initialized;
 
@@ -41,6 +44,26 @@ public class GridSettings
         return this.enabled;
     }
 
+    public void resetSize()
+    {
+        this.setSize(this.defaultSize);
+    }
+
+    public void setDefaultSize(Vec3i size)
+    {
+        this.defaultSize = size;
+
+        if (size.getX() > this.size.getX() ||
+            size.getY() > this.size.getY() ||
+            size.getZ() > this.size.getZ())
+        {
+            int x = Math.max(size.getX(), this.size.getX());
+            int y = Math.max(size.getY(), this.size.getY());
+            int z = Math.max(size.getZ(), this.size.getZ());
+            this.setSize(new Vec3i(x, y, z));
+        }
+    }
+
     public void setSize(Vec3i size)
     {
         this.size = size;
@@ -51,6 +74,24 @@ public class GridSettings
     {
         this.repeat = repeat;
         this.initialized = true;
+    }
+
+    public void setSize(CoordinateType coord, int value)
+    {
+        Vec3i oldSize = this.getSize();
+        int defaultValue = PositionUtils.getCoordinate(this.defaultSize, coord);
+        // Don't allow shrinking the grid size smaller than the placement enclosing box
+        int newValue = Math.max(defaultValue, value);
+
+        this.setSize(PositionUtils.getModifiedPosition(oldSize, newValue, coord));
+    }
+
+    public void modifySize(CoordinateType coord, int amount)
+    {
+        Vec3i oldSize = this.getSize();
+        int oldValue = PositionUtils.getCoordinate(oldSize, coord);
+        int newValue = Math.max(1, oldValue + amount);
+        this.setSize(coord, newValue);
     }
 
     public GridSettings copy()
@@ -68,6 +109,7 @@ public class GridSettings
     {
         this.repeat = other.repeat;
         this.size = other.size;
+        this.defaultSize = other.defaultSize;
         this.enabled = other.enabled;
         this.initialized = other.initialized;
     }
