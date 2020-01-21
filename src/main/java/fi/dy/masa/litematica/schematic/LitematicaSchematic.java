@@ -743,7 +743,7 @@ public class LitematicaSchematic
         if (mirrorSub != BlockMirror.NONE)          { rotationYaw = entity.applyMirror(mirrorSub); }
         if (rotationCombined != BlockRotation.NONE) { rotationYaw += entity.yaw - entity.applyRotation(rotationCombined); }
 
-        entity.setPositionAndAngles(x, y, z, rotationYaw, entity.pitch);
+        entity.refreshPositionAndAngles(x, y, z, rotationYaw, entity.pitch);
         EntityUtils.setEntityRotations(entity, rotationYaw, entity.pitch);
     }
 

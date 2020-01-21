@@ -309,7 +309,7 @@ public class SchematicaSchematic
             {
                 float rotationYaw = entity.applyMirror(mirror);
                 rotationYaw = rotationYaw + (entity.yaw - entity.applyRotation(rotation));
-                entity.setPositionAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.pitch);
+                entity.refreshPositionAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.pitch);
                 EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
             }
         }

@@ -215,7 +215,7 @@ public class EntityUtils
         {
             for (Entity passenger : entity.getPassengerList())
             {
-                passenger.setPositionAndAngles(
+                passenger.refreshPositionAndAngles(
                         entity.getX(),
                         entity.getY() + entity.getMountedHeightOffset() + passenger.getHeightOffset(),
                         entity.getZ(),
