@@ -45,7 +45,6 @@ import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import fi.dy.masa.malilib.hotkeys.KeyCallbackToggleBooleanConfigWithMessage;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.util.InfoUtils;
 
 public class KeyCallbacks
@@ -457,7 +456,7 @@ public class KeyCallbacks
             {
                 if (EntityUtils.shouldPickBlock(this.mc.player))
                 {
-                    return WorldUtils.doSchematicWorldPickBlock(true, this.mc);
+                    return WorldUtils.pickBlockFirst(this.mc);
                 }
 
                 return false;
@@ -466,12 +465,7 @@ public class KeyCallbacks
             {
                 if (EntityUtils.shouldPickBlock(this.mc.player))
                 {
-                    // Only do the pick block here, if it's not bound to the use button.
-                    // If it's bound to the use button, then it will be done from the input handling.
-                    if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, this.mc.gameSettings.keyBindUseItem) == false)
-                    {
-                        WorldUtils.doSchematicWorldPickBlock(false, this.mc);
-                    }
+                    WorldUtils.pickBlockLast(true, this.mc);
                 }
 
                 return false;

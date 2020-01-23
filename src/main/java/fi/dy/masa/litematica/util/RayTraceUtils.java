@@ -429,7 +429,7 @@ public class RayTraceUtils
     }
 
     @Nullable
-    public static BlockPos getFurthestSchematicWorldTrace(World worldClient, Entity entity, double maxRange)
+    public static BlockPos getPickBlockLastTrace(World worldClient, Entity entity, double maxRange, boolean adjacentOnly)
     {
         Vec3d eyesPos = entity.getPositionEyes(1f);
         Vec3d rangedLookRot = entity.getLook(1f).scale(maxRange);
@@ -449,15 +449,18 @@ public class RayTraceUtils
         List<RayTraceResult> list = rayTraceSchematicWorldBlocksToList(worldSchematic, eyesPos, lookEndPos, false, false, false, true, 200);
         RayTraceResult furthestTrace = null;
         double furthestDist = -1D;
+        boolean vanillaPosReplaceable = worldClient.getBlockState(closestVanillaPos).getBlock().isReplaceable(worldClient, closestVanillaPos);
 
         if (list.isEmpty() == false)
         {
             for (RayTraceResult trace : list)
             {
                 double dist = trace.hitVec.squareDistanceTo(eyesPos);
+                BlockPos pos = trace.getBlockPos();
 
-                if ((furthestDist < 0 || dist > furthestDist) && (dist < closestVanilla || closestVanilla < 0) &&
-                     trace.getBlockPos().equals(closestVanillaPos) == false)
+                if ((furthestDist < 0 || dist > furthestDist) &&
+                    (closestVanilla < 0 || dist < closestVanilla || (pos.equals(closestVanillaPos) && vanillaPosReplaceable)) &&
+                     (vanillaPosReplaceable || pos.equals(closestVanillaPos) == false))
                 {
                     furthestDist = dist;
                     furthestTrace = trace;
@@ -490,7 +493,26 @@ public class RayTraceUtils
             }
         }
 
-        return furthestTrace != null ? furthestTrace.getBlockPos() : null;
+        // Traced to schematic blocks, check that the furthest position
+        // is next to a vanilla block, ie. in a position where it could be placed normally
+        if (furthestTrace != null)
+        {
+            BlockPos pos = furthestTrace.getBlockPos();
+
+            if (adjacentOnly)
+            {
+                BlockPos placementPos = vanillaPosReplaceable ? closestVanillaPos : closestVanillaPos.offset(traceVanilla.sideHit);
+
+                if (pos.equals(placementPos) == false)
+                {
+                    return null;
+                }
+            }
+
+            return pos;
+        }
+
+        return null;
     }
 
     @Nonnull

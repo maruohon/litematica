@@ -119,61 +119,70 @@ public class WorldUtils
 
     /**
      * Does a ray trace to the schematic world, and returns either the closest or the furthest hit block.
-     * @param closest
+     * @param adjacentOnly whether to only accept traced schematic world position that are adjacent to a client world block, ie. normally placeable
      * @param mc
      * @return true if the correct item was or is in the player's hand after the pick block
      */
-    public static boolean doSchematicWorldPickBlock(boolean closest, Minecraft mc)
+    public static boolean pickBlockFirst(Minecraft mc)
     {
-        BlockPos pos = null;
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-
-        if (closest)
-        {
-            pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, entity, 6);
-        }
-        else
-        {
-            pos = RayTraceUtils.getFurthestSchematicWorldTrace(mc.world, entity, 6);
-        }
+        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, entity, 6);
 
         if (pos != null)
         {
-            World world = SchematicWorldHandler.getSchematicWorld();
-            IBlockState state = world.getBlockState(pos);
-            ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
-            boolean ignoreNBT = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
-
-            if (stack.isEmpty() == false)
-            {
-                InventoryPlayer inv = mc.player.inventory;
-                int slotNum = InventoryUtils.findSlotWithItem(inv, stack, false, ignoreNBT);
-
-                if (mc.player.capabilities.isCreativeMode)
-                {
-                    TileEntity te = world.getTileEntity(pos);
-
-                    // The creative mode pick block with NBT only works correctly
-                    // if the server world doesn't have a TileEntity in that position.
-                    // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
-                    {
-                        ItemUtils.storeTEInStack(stack, te);
-                    }
-
-                    InventoryUtils.setPickedItemToHand(slotNum, stack, ignoreNBT, mc);
-                    mc.playerController.sendSlotPacket(mc.player.getHeldItem(EnumHand.MAIN_HAND), 36 + inv.currentItem);
-                }
-                else if (slotNum != -1 && inv.currentItem != slotNum)
-                {
-                    InventoryUtils.setPickedItemToHand(slotNum, stack, ignoreNBT, mc);
-                }
-            }
-
+            doPickBlockForPosition(pos, mc);
             return true;
         }
 
         return false;
+    }
+
+    public static boolean pickBlockLast(boolean adjacentOnly, Minecraft mc)
+    {
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        BlockPos pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, 6, adjacentOnly);
+
+        if (pos != null)
+        {
+            doPickBlockForPosition(pos, mc);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static void doPickBlockForPosition(BlockPos pos, Minecraft mc)
+    {
+        World world = SchematicWorldHandler.getSchematicWorld();
+        IBlockState state = world.getBlockState(pos);
+        ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
+        boolean ignoreNBT = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
+
+        if (stack.isEmpty() == false)
+        {
+            InventoryPlayer inv = mc.player.inventory;
+            int slotNum = InventoryUtils.findSlotWithItem(inv, stack, false, ignoreNBT);
+
+            if (mc.player.capabilities.isCreativeMode)
+            {
+                TileEntity te = world.getTileEntity(pos);
+
+                // The creative mode pick block with NBT only works correctly
+                // if the server world doesn't have a TileEntity in that position.
+                // Otherwise it would try to write whatever that TE is into the picked ItemStack.
+                if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
+                {
+                    ItemUtils.storeTEInStack(stack, te);
+                }
+
+                InventoryUtils.setPickedItemToHand(slotNum, stack, ignoreNBT, mc);
+                mc.playerController.sendSlotPacket(mc.player.getHeldItem(EnumHand.MAIN_HAND), 36 + inv.currentItem);
+            }
+            else if (slotNum != -1 && inv.currentItem != slotNum)
+            {
+                InventoryUtils.setPickedItemToHand(slotNum, stack, ignoreNBT, mc);
+            }
+        }
     }
 
     public static void insertSignTextFromSchematic(TileEntitySign teClient)
@@ -271,7 +280,7 @@ public class WorldUtils
                 }
 
                 // Abort if the required item was not able to be pick-block'd
-                if (doSchematicWorldPickBlock(true, mc) == false)
+                if (pickBlockFirst(mc) == false)
                 {
                     return EnumActionResult.FAIL;
                 }
