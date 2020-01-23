@@ -221,6 +221,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             SchematicMetadata metadata = this.loadedPlacement != null ? this.loadedPlacement.getSchematic().getMetadata() : null;
             String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.hover.in_memory");
             List<String> text = new ArrayList<>();
+            boolean saved = this.placement.isSavedToFile();
 
             if (metadata != null)
             {
@@ -229,6 +230,16 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
 
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_loaded", Messages.getYesNoColored(this.placement.isLoaded(), false)));
+
+            // Get a cached value, to not query and read the file every rendered frame...
+            if (saved && this.gui.getCachedWasModifiedSinceSaved(this.placement))
+            {
+                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_saved_to_file_modified"));
+            }
+            else
+            {
+                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_saved_to_file_not_modified", Messages.getYesNoColored(saved, false)));
+            }
 
             BlockPos o = this.placement.getOrigin();
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.origin", o.getX(), o.getY(), o.getZ()));
@@ -275,11 +286,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             }
             else if (this.type == ButtonType.SAVE)
             {
-                if (this.widget.placement.saveToFileIfChanged())
-                {
-                    this.widget.gui.addMessage(MessageType.SUCCESS, "litematica.gui.label.schematic_placement.saved_to_file");
-                }
-                else
+                if (this.widget.placement.saveToFileIfChanged(this.widget.gui) == false)
                 {
                     this.widget.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_placements.save_failed");
                 }

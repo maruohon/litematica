@@ -47,6 +47,7 @@ public class GridSettings
     public void resetSize()
     {
         this.setSize(this.defaultSize);
+        this.initialized = true;
     }
 
     public void setDefaultSize(Vec3i size)
@@ -67,7 +68,6 @@ public class GridSettings
     public void setSize(Vec3i size)
     {
         this.size = size;
-        this.initialized = true;
     }
 
     public void setRepeatCounts(IntBoundingBox repeat)
@@ -84,6 +84,7 @@ public class GridSettings
         int newValue = Math.max(defaultValue, value);
 
         this.setSize(PositionUtils.getModifiedPosition(oldSize, newValue, coord));
+        this.initialized = true;
     }
 
     public void modifySize(CoordinateType coord, int amount)

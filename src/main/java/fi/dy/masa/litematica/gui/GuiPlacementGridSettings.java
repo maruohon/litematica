@@ -6,7 +6,6 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.GridSettings;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.IntBoxCoordType;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -36,13 +35,6 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         this.manager = DataManager.getSchematicPlacementManager();
         this.placement = placement;
         GridSettings settings = placement.getGridSettings();
-
-        if (settings.getSize().equals(Vec3i.NULL_VECTOR))
-        {
-            Box box = this.placement.getEclosingBox();
-            Vec3i size = PositionUtils.getAreaSizeFromRelativeEndPosition(box.getPos2().subtract(box.getPos1()));
-            settings.setSize(size);
-        }
 
         this.cachedSettings.copyFrom(settings);
         this.title = StringUtils.translate("litematica.gui.title.schematic_placement_grid_settings", placement.getName());

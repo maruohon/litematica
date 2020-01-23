@@ -20,6 +20,8 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
+import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
+import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -50,7 +52,6 @@ public class SchematicPlacementUnloaded
     protected boolean regionPlacementsModified;
     protected boolean locked;
     protected boolean shouldBeSaved = true;
-    protected boolean isSavedToFile;
     protected int coordinateLockMask;
     protected int boxesBBColor;
     @Nullable protected Box enclosingBox;
@@ -65,6 +66,8 @@ public class SchematicPlacementUnloaded
         this.name = name;
         this.enabled = enabled;
         this.enableRender = enableRender;
+
+        this.setShouldBeSaved(this.schematicFile != null);
     }
 
     public boolean isLoaded()
@@ -75,6 +78,11 @@ public class SchematicPlacementUnloaded
     public boolean isEnabled()
     {
         return this.enabled;
+    }
+
+    public boolean isSavedToFile()
+    {
+        return this.placementSaveFile != null;
     }
 
     public boolean isRenderingEnabled()
@@ -210,7 +218,6 @@ public class SchematicPlacementUnloaded
         this.regionPlacementsModified = other.regionPlacementsModified;
         this.locked = other.locked;
         this.shouldBeSaved = other.shouldBeSaved;
-        this.isSavedToFile = other.isSavedToFile;
         this.coordinateLockMask = other.coordinateLockMask;
         this.boxesBBColor = other.boxesBBColor;
         this.enclosingBox = other.enclosingBox != null ? other.enclosingBox.copy() : null;
@@ -285,6 +292,11 @@ public class SchematicPlacementUnloaded
             if (this.placementSaveFile != null)
             {
                 obj.add("storage_file", new JsonPrimitive(this.placementSaveFile));
+            }
+
+            if (this.materialListData != null)
+            {
+                obj.add("material_list", this.materialListData);
             }
 
             if (this.gridSettings.isInitialized())
@@ -423,7 +435,6 @@ public class SchematicPlacementUnloaded
 
             if (placement != null)
             {
-                placement.isSavedToFile = true;
                 placement.placementSaveFile = file.getName();
             }
 
@@ -433,10 +444,11 @@ public class SchematicPlacementUnloaded
         return null;
     }
 
-    public boolean saveToFileIfChanged()
+    public boolean saveToFileIfChanged(IMessageConsumer feedback)
     {
         if (this.shouldBeSaved == false)
         {
+            feedback.addMessage(MessageType.WARNING, "litematica.message.error.schematic_placement.save.should_not_save");
             return false;
         }
 
@@ -453,41 +465,62 @@ public class SchematicPlacementUnloaded
 
         if (file == null)
         {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.error.schematic_placement.save.failed_to_get_save_file");
             return false;
         }
 
-        if (this.isSavedToFile == false || file.exists() == false)
+        if (this.placementSaveFile == null || file.exists() == false || this.wasModifiedSinceSaved())
         {
             JsonObject obj = this.toJson();
-            return obj != null && this.saveToFile(file, obj);
-        }
 
-        // Only the fully loaded placements can be modified
-        if (this.isLoaded() && this.schematicFile != null)
-        {
-            JsonElement el = JsonUtils.parseJsonFile(file);
-
-            if (el != null && el.isJsonObject())
+            if (obj != null)
             {
-                JsonObject obj = this.toJson();
-
-                if (obj != null && el.getAsJsonObject().equals(obj) == false)
-                {
-                    return this.saveToFile(file, obj);
-                }
-                else
-                {
-                    return true;
-                }
+                return this.saveToFile(file, obj, feedback);
             }
-
-            return false;
+            else
+            {
+                feedback.addMessage(MessageType.ERROR, "litematica.message.error.schematic_placement.save.failed_to_serialize");
+                return false;
+            }
+        }
+        else
+        {
+            feedback.addMessage(MessageType.WARNING, "litematica.message.error.schematic_placement.save.no_changes");
         }
 
         return true;
     }
 
-    protected boolean saveToFile(File file, JsonObject obj)
+    public boolean wasModifiedSinceSaved()
+    {
+        if (this.placementSaveFile != null)
+        {
+            File file = new File(getSaveDirectory(), this.placementSaveFile);
+            JsonElement el = JsonUtils.parseJsonFile(file);
+
+            if (el != null && el.isJsonObject())
+            {
+                JsonObject objOther = el.getAsJsonObject();
+                JsonObject objThis = this.toJson();
+
+                // Ignore some stuff that doesn't matter
+                objOther.remove("enabled");
+                objOther.remove("material_list");
+                objOther.remove("storage_file");
+                objThis.remove("enabled");
+                objThis.remove("material_list");
+                objThis.remove("storage_file");
+
+                return objOther.equals(objThis) == false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected boolean saveToFile(File file, JsonObject obj, IMessageConsumer feedback)
     {
         boolean success = JsonUtils.writeJsonToFile(obj, file);
 
@@ -498,7 +531,7 @@ public class SchematicPlacementUnloaded
                 this.placementSaveFile = file.getName();
             }
 
-            this.isSavedToFile = true;
+            feedback.addMessage(MessageType.SUCCESS, "litematica.gui.label.schematic_placement.saved_to_file", file.getName());
         }
 
         return success;

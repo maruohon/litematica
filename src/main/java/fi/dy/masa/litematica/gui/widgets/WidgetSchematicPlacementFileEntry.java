@@ -109,6 +109,7 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
             String mir = PositionUtils.getMirrorName(placement.getMirror());
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.name", placement.getName()));
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", placement.getSchematicFile().getName()));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.placement_file", this.entry.getName()));
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.origin", o.getX(), o.getY(), o.getZ()));
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.rotation_mirror", rot, mir));
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enabled", Messages.getOnOffColored(placement.isEnabled(), true)));

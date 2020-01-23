@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
+import java.util.HashMap;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -20,6 +21,7 @@ public class GuiSchematicPlacementsList
         implements ISelectionListener<SchematicPlacementUnloaded>
 {
     private final SchematicPlacementManager manager;
+    private final HashMap<SchematicPlacementUnloaded, Boolean> modifiedCache = new HashMap<>();
 
     public GuiSchematicPlacementsList()
     {
@@ -45,6 +47,7 @@ public class GuiSchematicPlacementsList
     public void initGui()
     {
         super.initGui();
+        this.modifiedCache.clear();
 
         int x = 12;
         int y = this.height - 26;
@@ -89,5 +92,18 @@ public class GuiSchematicPlacementsList
     protected WidgetListSchematicPlacements createListWidget(int listX, int listY)
     {
         return new WidgetListSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+    }
+
+    public boolean getCachedWasModifiedSinceSaved(SchematicPlacementUnloaded placement)
+    {
+        Boolean modified = this.modifiedCache.get(placement);
+
+        if (modified == null)
+        {
+            modified = placement.wasModifiedSinceSaved();
+            this.modifiedCache.put(placement, modified);
+        }
+
+        return modified.booleanValue();
     }
 }
