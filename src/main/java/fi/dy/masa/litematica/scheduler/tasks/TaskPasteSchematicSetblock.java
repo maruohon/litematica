@@ -32,21 +32,21 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
 {
-    private final ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks = ArrayListMultimap.create();
-    private final List<IntBoundingBox> boxesInCurrentChunk = new ArrayList<>();
-    private final List<ChunkPos> chunks = new ArrayList<>();
-    private final ChunkPosComparator comparator;
-    private final int maxCommandsPerTick;
-    private final boolean changedBlockOnly;
-    private final ReplaceBehavior replace;
-    private int sentCommandsThisTick;
-    private int sentCommandsTotal;
-    private int currentX;
-    private int currentY;
-    private int currentZ;
-    private int currentIndex;
-    private int boxVolume;
-    private boolean boxInProgress;
+    protected final ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks = ArrayListMultimap.create();
+    protected final List<IntBoundingBox> boxesInCurrentChunk = new ArrayList<>();
+    protected final List<ChunkPos> chunks = new ArrayList<>();
+    protected final ChunkPosComparator comparator;
+    protected final int maxCommandsPerTick;
+    protected final boolean changedBlockOnly;
+    protected final ReplaceBehavior replace;
+    protected int sentCommandsThisTick;
+    protected int sentCommandsTotal;
+    protected int currentX;
+    protected int currentY;
+    protected int currentZ;
+    protected int currentIndex;
+    protected int boxVolume;
+    protected boolean boxInProgress;
 
     public TaskPasteSchematicSetblock(SchematicPlacement placement, boolean changedBlocksOnly)
     {
@@ -57,6 +57,12 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         this.replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
         this.name = StringUtils.translate("litematica.gui.label.task_name.paste");
 
+        InfoHud.getInstance().addInfoHudRenderer(this, true);
+        this.addTouchedBoxes(placement);
+    }
+
+    protected void addTouchedBoxes(SchematicPlacement placement)
+    {
         Set<ChunkPos> touchedChunks = placement.getTouchedChunks();
 
         for (ChunkPos pos : touchedChunks)
@@ -66,8 +72,6 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         }
 
         this.sortChunkList();
-
-        InfoHud.getInstance().addInfoHudRenderer(this, true);
         this.updateInfoHudLines();
     }
 
@@ -220,26 +224,9 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
             ++this.currentIndex;
 
-            BlockState stateSchematic = chunkSchematic.getBlockState(posMutable);
-            BlockState stateClient = chunkClient.getBlockState(posMutable);
-
-            if (stateSchematic.isAir() == false || stateClient.isAir() == false)
+            if (this.handleBlock(posMutable, chunkSchematic, chunkClient, player))
             {
-                if (this.changedBlockOnly == false || stateClient != stateSchematic)
-                {
-                    if ((this.replace == ReplaceBehavior.NONE && stateClient.isAir() == false) ||
-                        (this.replace == ReplaceBehavior.WITH_NON_AIR && stateSchematic.isAir()))
-                    {
-                        continue;
-                    }
-
-                    this.sendSetBlockCommand(posMutable.getX(), posMutable.getY(), posMutable.getZ(), stateSchematic, player);
-
-                    if (++this.sentCommandsThisTick >= this.maxCommandsPerTick)
-                    {
-                        break;
-                    }
-                }
+                break;
             }
         }
 
@@ -254,7 +241,42 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         return false;
     }
 
-    private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, ClientPlayerEntity player)
+    /**
+     * Checks and pastes the block in the given position
+     * @param pos
+     * @param chunkSchematic
+     * @param chunkClient
+     * @param player
+     * @return true if the commands per tick limit was hit
+     */
+    protected boolean handleBlock(BlockPos pos, Chunk chunkSchematic, Chunk chunkClient, ClientPlayerEntity player)
+    {
+        BlockState stateSchematic = chunkSchematic.getBlockState(pos);
+        BlockState stateClient = chunkClient.getBlockState(pos);
+
+        if (stateSchematic.isAir() == false || stateClient.isAir() == false)
+        {
+            if (this.changedBlockOnly == false || stateClient != stateSchematic)
+            {
+                if ((this.replace == ReplaceBehavior.NONE && stateClient.isAir() == false) ||
+                    (this.replace == ReplaceBehavior.WITH_NON_AIR && stateSchematic.isAir()))
+                {
+                    return false;
+                }
+
+                this.sendSetBlockCommand(pos.getX(), pos.getY(), pos.getZ(), stateSchematic, player);
+
+                if (++this.sentCommandsThisTick >= this.maxCommandsPerTick)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, ClientPlayerEntity player)
     {
         net.minecraft.util.math.Box bb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
         List<Entity> entities = worldSchematic.getEntities((Entity) null, bb, null);
@@ -284,7 +306,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         }
     }
 
-    private void sendSetBlockCommand(int x, int y, int z, BlockState state, ClientPlayerEntity player)
+    protected void sendSetBlockCommand(int x, int y, int z, BlockState state, ClientPlayerEntity player)
     {
         String cmdName = Configs.Generic.PASTE_COMMAND_SETBLOCK.getStringValue();
         String blockString = BlockArgumentParser.stringifyBlockState(state);
@@ -316,7 +338,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         super.stop();
     }
 
-    private void updateInfoHudLines()
+    protected void updateInfoHudLines()
     {
         List<String> hudLines = new ArrayList<>();
 

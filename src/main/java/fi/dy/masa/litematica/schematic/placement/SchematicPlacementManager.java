@@ -14,6 +14,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerTask;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -23,6 +35,7 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblockLinear;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -40,18 +53,6 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerMode;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerTask;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 
 public class SchematicPlacementManager
 {
@@ -668,7 +669,17 @@ public class SchematicPlacementManager
                     return;
                 }
 
-                if (mc.isIntegratedServerRunning())
+                if (Configs.Generic.PASTE_LINEAR.getBooleanValue())
+                {
+                    TaskPasteSchematicSetblockLinear task = new TaskPasteSchematicSetblockLinear(schematicPlacement, changedBlocksOnly, new BlockPos(mc.player));
+                    TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
+
+                    if (printMessage)
+                    {
+                        InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                    }
+                }
+                else if (mc.isIntegratedServerRunning())
                 {
                     final ServerWorld world = mc.getServer().getWorld(mc.player.getEntityWorld().dimension.getType());
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();

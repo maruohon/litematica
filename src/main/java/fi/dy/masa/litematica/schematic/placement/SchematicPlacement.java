@@ -13,6 +13,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.structure.StructurePlacementData;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -33,11 +38,6 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
-import net.minecraft.structure.StructurePlacementData;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
 public class SchematicPlacement
 {
@@ -389,7 +389,12 @@ public class SchematicPlacement
 
     private void updateEnclosingBox()
     {
-        if (this.shouldRenderEnclosingBox())
+        this.updateEnclosingBox(false);
+    }
+
+    public void updateEnclosingBox(boolean forceUpdate)
+    {
+        if (forceUpdate || this.shouldRenderEnclosingBox())
         {
             ImmutableMap<String, Box> boxes = this.getSubRegionBoxes(RequiredEnabled.ANY);
             BlockPos pos1 = null;

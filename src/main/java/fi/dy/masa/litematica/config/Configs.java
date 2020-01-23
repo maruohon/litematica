@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblockLinear.PasteAxis;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.InventoryUtils;
@@ -40,6 +41,9 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       PASTE_COMMAND_INTERVAL  = new ConfigInteger(    "pasteCommandInterval", 1, 1, 1000, "The interval in game ticks the Paste schematic task runs at,\nin the command-based mode");
         public static final ConfigInteger       PASTE_COMMAND_LIMIT     = new ConfigInteger(    "pasteCommandLimit", 64, 1, 1000000, "Max number of commands sent per game tick,\nwhen using the Paste schematic feature in the\ncommand mode on a server");
         public static final ConfigString        PASTE_COMMAND_SETBLOCK  = new ConfigString(     "pasteCommandNameSetblock", "setblock", "The setblock command name to use for the\nPaste schematic feature on servers, when\nusing the command-based paste mode");
+        public static final ConfigBoolean       PASTE_LINEAR            = new ConfigBoolean(    "pasteLinear", false, "This uses a separate \"cinematic\"/\"linear\" paste task,\nwhich works within a limited area ('pasteLinearChunkRadius') and pastes\nthe blocks using /setblock commands, iterating linearly either\nx or z coordinate first ('pasteLinearFirstAxis'), going in layers from bottom to top.\n§6If this is enabled, then this task is used even in single player.");
+        public static final ConfigOptionList    PASTE_LINEAR_AXIS       = new ConfigOptionList( "pasteLinearFirstAxis", PasteAxis.X, "This controls the iteration order in the \"linear\" paste mode");
+        public static final ConfigInteger       PASTE_LINEAR_CHUNK_RAD  = new ConfigInteger(    "pasteLinearChunkRadius", -1, -1, 64, "The maximum Chunk radius from the player within which to paste things.\nUse -1 for automatic, render distance based radius.");
         public static final ConfigOptionList    PASTE_REPLACE_BEHAVIOR  = new ConfigOptionList( "pasteReplaceBehavior", ReplaceBehavior.NONE, "The behavior of replacing existing blocks\nin the Paste schematic tool mode");
         public static final ConfigBoolean       PICK_BLOCK_ENABLED      = new ConfigBoolean(    "pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
         public static final ConfigString        PICK_BLOCKABLE_SLOTS    = new ConfigString(     "pickBlockableSlots", "1,2,3,4,5", "The hotbar slots that are allowed to be\nused for the schematic pick block");
@@ -59,18 +63,21 @@ public class Configs implements IConfigHandler
                 EXECUTE_REQUIRE_TOOL,
                 FIX_RAIL_ROTATION,
                 LOAD_ENTIRE_SCHEMATICS,
+                PASTE_LINEAR,
                 PICK_BLOCK_ENABLED,
                 PLACEMENT_RESTRICTION,
                 RENDER_MATERIALS_IN_GUI,
                 RENDER_THREAD_NO_TIMEOUT,
                 TOOL_ITEM_ENABLED,
 
+                PASTE_LINEAR_AXIS,
                 PASTE_REPLACE_BEHAVIOR,
                 SELECTION_CORNERS_MODE,
 
                 PASTE_COMMAND_INTERVAL,
                 PASTE_COMMAND_LIMIT,
                 PASTE_COMMAND_SETBLOCK,
+                PASTE_LINEAR_CHUNK_RAD,
                 PICK_BLOCKABLE_SLOTS,
                 TOOL_ITEM
         );
