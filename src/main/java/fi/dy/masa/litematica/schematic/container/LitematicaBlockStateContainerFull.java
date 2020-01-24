@@ -65,6 +65,7 @@ public class LitematicaBlockStateContainerFull extends LitematicaBlockStateConta
     {
         int id = this.palette.idFor(state);
         this.storage.setAt(this.getIndex(x, y, z), id);
+        this.hasSetBlockCounts = false; // Force a re-count when next queried
     }
 
     @Override
@@ -92,6 +93,7 @@ public class LitematicaBlockStateContainerFull extends LitematicaBlockStateConta
     {
         int id = this.palette.idFor(state);
         this.storage.setAt(index, id);
+        this.hasSetBlockCounts = false; // Force a re-count when next queried
     }
 
     protected int getIndex(int x, int y, int z)
@@ -132,16 +134,7 @@ public class LitematicaBlockStateContainerFull extends LitematicaBlockStateConta
     {
         if (this.hasSetBlockCounts == false)
         {
-            long[] counts = new long[1 << this.bits];
-            LitematicaBitArray storage = this.storage;
-            final long length = storage.size();
-
-            for (long i = 0; i < length; ++i)
-            {
-                int id = storage.getAt(i);
-                ++counts[id];
-            }
-
+            long[] counts = this.storage.getValueCounts();
             this.setBlockCounts(counts);
         }
     }

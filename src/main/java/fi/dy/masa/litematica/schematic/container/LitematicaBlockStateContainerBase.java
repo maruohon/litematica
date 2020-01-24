@@ -59,7 +59,7 @@ public abstract class LitematicaBlockStateContainerBase implements ILitematicaBl
         ILitematicaBlockStatePalette palette = this.getPalette();
         IBlockState air = Blocks.AIR.getDefaultState();
         final int length = this.blockCounts.length;
-        int count = 0;
+        long count = 0;
 
         for (int id = 0; id < length; ++id)
         {
@@ -79,7 +79,7 @@ public abstract class LitematicaBlockStateContainerBase implements ILitematicaBl
     {
         this.calculateBlockCountsIfNeeded();
 
-        Map<IBlockState, Long> map = new Object2LongOpenHashMap<>(this.blockCounts.length);
+        Object2LongOpenHashMap<IBlockState> map = new Object2LongOpenHashMap<>(this.blockCounts.length);
         ILitematicaBlockStatePalette palette = this.getPalette();
         final int length = Math.min(palette.getPaletteSize(), this.blockCounts.length);
 
@@ -96,7 +96,7 @@ public abstract class LitematicaBlockStateContainerBase implements ILitematicaBl
         return map;
     }
 
-    public void setBlockCounts(long[] blockCounts)
+    protected void setBlockCounts(long[] blockCounts)
     {
         final int length = blockCounts.length;
 

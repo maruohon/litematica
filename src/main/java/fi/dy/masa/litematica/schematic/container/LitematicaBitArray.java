@@ -77,6 +77,19 @@ public class LitematicaBitArray
         }
     }
 
+    public long[] getValueCounts()
+    {
+        long[] counts = new long[(int) this.maxEntryValue + 1];
+        final long size = this.arraySize;
+
+        for (long i = 0; i < size; ++i)
+        {
+            ++counts[this.getAt(i)];
+        }
+
+        return counts;
+    }
+
     public long[] getBackingLongArray()
     {
         return this.longArray;
