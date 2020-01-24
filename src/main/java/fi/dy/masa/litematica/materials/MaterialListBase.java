@@ -8,10 +8,10 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.util.math.MathHelper;
 
 public abstract class MaterialListBase implements IMaterialList
 {
@@ -92,7 +92,7 @@ public abstract class MaterialListBase implements IMaterialList
         for (int i = 0; i < this.materialListPreFiltered.size(); ++i)
         {
             MaterialListEntry entry = this.materialListPreFiltered.get(i);
-            int countMissing = this.multiplier == 1 ? entry.getCountMissing() : this.multiplier * entry.getCountTotal();
+            int countMissing = this.getMultipliedMissingCount(entry);
 
             if (entry.getCountAvailable() < countMissing)
             {
@@ -106,6 +106,20 @@ public abstract class MaterialListBase implements IMaterialList
                 --i;
             }
         }
+    }
+
+    public int getMultipliedMissingCount(MaterialListEntry entry)
+    {
+        int multiplier = this.getMultiplier();
+        int missing = entry.getCountMissing();
+
+        if (multiplier > 1)
+        {
+            int total = entry.getCountTotal();
+            return (multiplier - 1) * total + missing;
+        }
+
+        return missing;
     }
 
     public void ignoreEntry(MaterialListEntry entry)
@@ -242,7 +256,7 @@ public abstract class MaterialListBase implements IMaterialList
         obj.add("sort_criteria", new JsonPrimitive(this.sortCriteria.name()));
         obj.add("sort_reverse", new JsonPrimitive(this.reverse));
         obj.add("hide_available", new JsonPrimitive(this.hideAvailable));
-        obj.add("multiplier", new JsonPrimitive(this.multiplier));
+        obj.add("multiplier", new JsonPrimitive(this.getMultiplier()));
 
         return obj;
     }
@@ -261,7 +275,7 @@ public abstract class MaterialListBase implements IMaterialList
 
         this.reverse = JsonUtils.getBooleanOrDefault(obj, "sort_reverse", false);
         this.hideAvailable = JsonUtils.getBooleanOrDefault(obj, "hide_available", false);
-        this.multiplier = JsonUtils.getIntegerOrDefault(obj, "multiplier", 1);
+        this.setMultiplier(JsonUtils.getIntegerOrDefault(obj, "multiplier", 1));
     }
 
     public enum SortCriteria

@@ -1,21 +1,32 @@
 package fi.dy.masa.litematica.materials;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.malilib.config.values.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.util.InventoryScreenUtils;
+import fi.dy.masa.malilib.util.ItemType;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 
 public class MaterialListHudRenderer implements IInfoHudRenderer
 {
+    protected final Minecraft mc = Minecraft.getMinecraft();
     protected final MaterialListBase materialList;
     protected final MaterialListSorter sorter;
     protected boolean shouldRender;
@@ -56,24 +67,25 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         return Collections.emptyList();
     }
 
-    @Override
-    public int render(int xOffset, int yOffset, HudAlignment alignment)
+    protected void refreshList(long refreshInterval)
     {
-        Minecraft mc = Minecraft.getMinecraft();
         long currentTime = System.currentTimeMillis();
-        List<MaterialListEntry> list;
 
-        if (currentTime - this.lastUpdateTime > 2000)
+        if (currentTime - this.lastUpdateTime > refreshInterval && this.mc.player != null)
         {
-            MaterialListUtils.updateAvailableCounts(this.materialList.getMaterialsAll(), mc.player);
-            list = this.materialList.getMaterialsMissingOnly(true);
+            MaterialListUtils.updateAvailableCounts(this.materialList.getMaterialsAll(), this.mc.player);
+            List<MaterialListEntry> list = this.materialList.getMaterialsMissingOnly(true);
             Collections.sort(list, this.sorter);
             this.lastUpdateTime = currentTime;
         }
-        else
-        {
-            list = this.materialList.getMaterialsMissingOnly(false);
-        }
+    }
+
+    @Override
+    public int render(int xOffset, int yOffset, HudAlignment alignment)
+    {
+        this.refreshList(2000L);
+
+        List<MaterialListEntry> list = this.materialList.getMaterialsMissingOnly(false);
 
         if (list.size() == 0)
         {
@@ -239,5 +251,80 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         }
 
         return String.format("%d", count);
+    }
+
+    public static void renderSlotHilights(GuiContainer gui)
+    {
+        MaterialListBase materialList = DataManager.getMaterialList();
+
+        if (materialList != null)
+        {
+            materialList.getHudRenderer().refreshList(2000L);
+            List<MaterialListEntry> list = materialList.getMaterialsMissingOnly(false);
+
+            if (list.isEmpty() == false)
+            {
+                HashMap<ItemType, MaterialListEntry> map = new HashMap<>();
+                list.forEach((entry) -> map.put(entry.getItemType(), entry));
+                List<Pair<Slot, Color4f>> hilightedSlots = getHilightedSlots(gui, map);
+
+                if (hilightedSlots.isEmpty() == false)
+                {
+                    GlStateManager.disableTexture2D();
+                    RenderUtils.setupBlend();
+                    int guiX = InventoryScreenUtils.getGuiPosX(gui);
+                    int guiY = InventoryScreenUtils.getGuiPosY(gui);
+
+                    for (Pair<Slot, Color4f> pair : hilightedSlots)
+                    {
+                        Slot slot = pair.getLeft();
+                        Color4f color = pair.getRight();
+                        RenderUtils.drawOutlinedBox(guiX + slot.xPos + 1, guiY + slot.yPos + 1, 14, 14, color.intValue, color.intValue | 0xFF000000, 1f);
+                    }
+
+                    GlStateManager.enableTexture2D();
+                }
+            }
+        }
+    }
+
+    private static List<Pair<Slot, Color4f>> getHilightedSlots(GuiContainer gui, HashMap<ItemType, MaterialListEntry> materialListEntries)
+    {
+        List<Pair<Slot, Color4f>> hilightedSlots = new ArrayList<>();
+
+        for (int slotNum = 0; slotNum < gui.inventorySlots.inventorySlots.size(); ++slotNum)
+        {
+            Slot slot = gui.inventorySlots.inventorySlots.get(slotNum);
+
+            if (slot.isEnabled() && slot.getHasStack() && (slot.inventory instanceof InventoryPlayer) == false)
+            {
+                ItemType type = new ItemType(slot.getStack(), false, false);
+                MaterialListEntry entry = materialListEntries.get(type);
+
+                // The item in the slot is on the material list's missing items list
+                if (entry != null)
+                {
+                    int available = entry.getCountAvailable();
+                    Color4f color;
+
+                    if (available == 0)
+                    {
+                        color = Configs.Colors.MATERIAL_LIST_SLOT_HL_NONE.getColor();
+                    }
+                    else if (available < entry.getStack().getMaxStackSize())
+                    {
+                        color = Configs.Colors.MATERIAL_LIST_SLOT_HL_LT_STACK.getColor();
+                    }
+                    else
+                    {
+                        color = Configs.Colors.MATERIAL_LIST_SLOT_HL_NOT_ENOUGH.getColor();
+                    }
+
+                    hilightedSlots.add(Pair.of(slot, color));
+                }
+            }
+        }
+
+        return hilightedSlots;
     }
 }

@@ -172,6 +172,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       MATERIAL_LIST_HUD_MAX_LINES         = new ConfigInteger(    "materialListHudMaxLines", 10, 1, 128, "The maximum number of items to show on\nthe Material List Info HUD at once");
         public static final ConfigDouble        MATERIAL_LIST_HUD_SCALE             = new ConfigDouble(     "materialListHudScale", 1, 0.1, 4, "Scale factor for the Material List Info HUD");
         public static final ConfigBoolean       MATERIAL_LIST_HUD_STACKS            = new ConfigBoolean(    "materialListHudStacks", true, "Whether or not the number of stacks should be shown\non the Material List HUD, or only the total count");
+        public static final ConfigBoolean       MATERIAL_LIST_SLOT_HIGHLIGHT        = new ConfigBoolean(    "materialListSlotHighlight", true, "Highlight inventory slots containing items that are\ncurrently missing or running low in the player's inventory\naccording to the currently active Material List");
         public static final ConfigBoolean       STATUS_INFO_HUD                     = new ConfigBoolean(    "statusInfoHud", false, "Enable a status info HUD renderer,\nwhich renders a few bits of status info, such as\nthe current layer mode and renderers enabled state");
         public static final ConfigBoolean       STATUS_INFO_HUD_AUTO                = new ConfigBoolean(    "statusInfoHudAuto", true, "Allow automatically momentarily enabling the status info HUD \"when needed\",\nfor example when creating a placement and having rendering disabled");
         public static final ConfigOptionList    TOOL_HUD_ALIGNMENT                  = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
@@ -188,6 +189,7 @@ public class Configs implements IConfigHandler
                 BLOCK_INFO_LINES_ENABLED,
                 BLOCK_INFO_OVERLAY_ENABLED,
                 MATERIAL_LIST_HUD_STACKS,
+                MATERIAL_LIST_SLOT_HIGHLIGHT,
                 STATUS_INFO_HUD,
                 STATUS_INFO_HUD_AUTO,
                 TOOL_HUD_ALWAYS_VISIBLE,
@@ -220,18 +222,24 @@ public class Configs implements IConfigHandler
 
     public static class Colors
     {
-        public static final ConfigColor AREA_SELECTION_BOX_SIDE_COLOR       = new ConfigColor("areaSelectionBoxSideColor",          "0x30FFFFFF", "The color of the area selection boxes, when they are unselected");
-        public static final ConfigColor MATERIAL_LIST_HUD_ITEM_COUNTS       = new ConfigColor("materialListHudItemCountsColor",     "0xFFFFAA00", "The color of the item count text in the Material List info HUD");
+        public static final ConfigColor AREA_SELECTION_BOX_SIDE_COLOR       = new ConfigColor("areaSelectionBoxSideColor",              "0x30FFFFFF", "The color of the area selection boxes, when they are unselected");
+        public static final ConfigColor MATERIAL_LIST_HUD_ITEM_COUNTS       = new ConfigColor("materialListHudItemCountsColor",         "0xFFFFAA00", "The color of the item count text in the Material List info HUD");
+        public static final ConfigColor MATERIAL_LIST_SLOT_HL_LT_STACK      = new ConfigColor("materialListSlotHighlightLessThanStack", "0x80FF40D0", "The color for the \"less than one stack available\" slot highlight");
+        public static final ConfigColor MATERIAL_LIST_SLOT_HL_NONE          = new ConfigColor("materialListSlotHighlightNone",          "0x80FF2000", "The color for the \"completely out\" slot highlight");
+        public static final ConfigColor MATERIAL_LIST_SLOT_HL_NOT_ENOUGH    = new ConfigColor("materialListSlotHighlightNotEnough",     "0x80FFE040", "The color for the \"not enough\" slot highlight");
         public static final ConfigColor REBUILD_BREAK_OVERLAY_COLOR         = new ConfigColor("schematicRebuildBreakPlaceOverlayColor", "0x4C33CC33", "The color of Schematic Rebuild mode's break or place blocks selector overlay");
         public static final ConfigColor REBUILD_REPLACE_OVERLAY_COLOR       = new ConfigColor("schematicRebuildReplaceOverlayColor",    "0x4CF0A010", "The color of Schematic Rebuild mode's replace selector overlay");
-        public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_EXTRA       = new ConfigColor("schematicOverlayColorExtra",         "0x4CFF4CE6", "The color of the blocks overlay for extra blocks");
-        public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_MISSING     = new ConfigColor("schematicOverlayColorMissing",       "0x2C33B3E6", "The color of the blocks overlay for missing blocks");
-        public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK = new ConfigColor("schematicOverlayColorWrongBlock",    "0x4CFF3333", "The color of the blocks overlay for wrong blocks");
-        public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_WRONG_STATE = new ConfigColor("schematicOverlayColorWrongState",    "0x4CFF9010", "The color of the blocks overlay for wrong block states");
+        public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_EXTRA       = new ConfigColor("schematicOverlayColorExtra",             "0x4CFF4CE6", "The color of the blocks overlay for extra blocks");
+        public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_MISSING     = new ConfigColor("schematicOverlayColorMissing",           "0x2C33B3E6", "The color of the blocks overlay for missing blocks");
+        public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK = new ConfigColor("schematicOverlayColorWrongBlock",        "0x4CFF3333", "The color of the blocks overlay for wrong blocks");
+        public static final ConfigColor SCHEMATIC_OVERLAY_COLOR_WRONG_STATE = new ConfigColor("schematicOverlayColorWrongState",        "0x4CFF9010", "The color of the blocks overlay for wrong block states");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 AREA_SELECTION_BOX_SIDE_COLOR,
                 MATERIAL_LIST_HUD_ITEM_COUNTS,
+                MATERIAL_LIST_SLOT_HL_LT_STACK,
+                MATERIAL_LIST_SLOT_HL_NONE,
+                MATERIAL_LIST_SLOT_HL_NOT_ENOUGH,
                 REBUILD_BREAK_OVERLAY_COLOR,
                 REBUILD_REPLACE_OVERLAY_COLOR,
                 SCHEMATIC_OVERLAY_COLOR_EXTRA,

@@ -216,7 +216,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         {
             int multiplier = this.materialList.getMultiplier();
             int countTotal = this.entry.getCountTotal() * multiplier;
-            int countMissing = multiplier == 1 ? this.entry.getCountMissing() : countTotal;
+            int countMissing = this.materialList.getMultipliedMissingCount(this.entry);
             int countAvailable = this.entry.getCountAvailable();
             String green = GuiBase.TXT_GREEN;
             String gold = GuiBase.TXT_GOLD;
@@ -267,7 +267,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             String stackName = stack.getDisplayName();
             int multiplier = this.materialList.getMultiplier();
             int total = this.entry.getCountTotal() * multiplier;
-            int missing = multiplier == 1 ? this.entry.getCountMissing() : total;
+            int missing = this.materialList.getMultipliedMissingCount(this.entry);
             String strCountTotal = this.getFormattedCountString(total, stack.getMaxStackSize());
             String strCountMissing = this.getFormattedCountString(missing, stack.getMaxStackSize());
 

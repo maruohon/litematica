@@ -15,6 +15,7 @@
         "MixinChunk",
         "MixinChunkProviderClient",
         "MixinEntityRenderer",
+        "MixinGuiContainer",
         "MixinGuiEditSign",
         "MixinIntegratedServer",
         "MixinMinecraft",

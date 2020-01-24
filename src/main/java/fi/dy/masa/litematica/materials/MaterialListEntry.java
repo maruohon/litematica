@@ -20,6 +20,11 @@ public class MaterialListEntry
         this.countAvailable = countAvailable;
     }
 
+    public ItemType getItemType()
+    {
+        return this.item;
+    }
+
     public ItemStack getStack()
     {
         return this.item.getStack();
