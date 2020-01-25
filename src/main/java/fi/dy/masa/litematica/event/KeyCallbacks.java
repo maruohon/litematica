@@ -463,7 +463,10 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
             {
-                if (EntityUtils.shouldPickBlock(this.mc.player))
+                // Don't use pick block last in the Rebuild mode, as that will interfere
+                // with all the rebuild actions...
+                if (DataManager.getToolMode() != ToolMode.REBUILD &&
+                    EntityUtils.shouldPickBlock(this.mc.player))
                 {
                     WorldUtils.pickBlockLast(true, this.mc);
                 }
