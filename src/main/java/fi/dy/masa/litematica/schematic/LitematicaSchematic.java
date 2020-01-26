@@ -532,19 +532,19 @@ public class LitematicaSchematic extends SchematicBase
         @Override
         public Map<BlockPos, NBTTagCompound> getBlockEntityMap()
         {
-            return this.schematic.blockEntities.get(this.regionName);
+            return this.schematic.blockEntities.computeIfAbsent(this.regionName, (name) -> { return new HashMap<>(); });
         }
 
         @Override
         public List<EntityInfo> getEntityList()
         {
-            return this.schematic.entities.get(this.regionName);
+            return this.schematic.entities.computeIfAbsent(this.regionName, (name) -> { return new ArrayList<>(); });
         }
 
         @Override
         public Map<BlockPos, NextTickListEntry> getBlockTickMap()
         {
-            return this.schematic.pendingBlockTicks.get(this.regionName);
+            return this.schematic.pendingBlockTicks.computeIfAbsent(this.regionName, (name) -> { return new HashMap<>(); });
         }
     }
 }
