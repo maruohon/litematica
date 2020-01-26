@@ -238,6 +238,8 @@ litematica.gui.hover.schematic_placement.button.remove=§7Removes this placement
 litematica.gui.hover.schematic_placement.button.save=§7Save this placement to a separate file on disk.\n§7This allows you to remove it from this list,\n§7but still reload it via the Placement Browser\n§7later if you need it again.
 litematica.gui.hover.schematic_placement.button.toggle_enabled=§7Turns this placement on/off.\n§7Disabling a placement is the recommended\n§7way of "not seeing it" while you don't need it,\n§7as it will remove it from the schematic world,\n§7and thus decreases the work the mod has to do\n§7when the player moves around.
 
+litematica.gui.hover.schematic_save.update_dependent_placements=§7Select whether or not to update all or just the currently\n§7selected placement of this schematic to point to the new file\n§7instead, so that when the placements are next reloaded from file, they\n§7will load the currently being saved version of the schematic\n§7instead of the original. This can be useful especially when\n§7using the Schematic Rebuild/Edit mode on a schematic.
+
 litematica.gui.label.area_editor.box_name=Sub-region box name
 litematica.gui.label.area_editor.selection_name=Selection name
 litematica.gui.label.area_editor.corner_1=Corner 1
@@ -310,6 +312,10 @@ litematica.gui.label.render_layers.hover.hotkey=The next/previous layer hotkeys 
 litematica.gui.label.replace_behavior.all=All
 litematica.gui.label.replace_behavior.none=None
 litematica.gui.label.replace_behavior.with_non_air=With non-air
+
+litematica.gui.label.schematic_save.upldate_placements_option.dont_update=Don't update any placements
+litematica.gui.label.schematic_save.upldate_placements_option.update_all=Update all dependent placements
+litematica.gui.label.schematic_save.upldate_placements_option.update_selected=Update currently selected placement
 
 litematica.gui.label.schematic_info.schematic_author=Schematic by: §f%s§r
 litematica.gui.label.schematic_info.description=Description:
@@ -414,10 +420,8 @@ litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.rename_area_sub_region=Rename Sub Region
 litematica.gui.title.rename_schematic=Rename Schematic
 litematica.gui.title.create_schematic_from_selection=Save the currently selected area as a Schematic
-litematica.gui.title.save_exported_schematic=Save an exported %s of '%s'
-litematica.gui.title.save_imported_schematic=Save an imported Schematic
+litematica.gui.title.save_schematic_convert=Save schematic '%s' (optionally in a different format)
 litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
-litematica.gui.title.save_schematic_filename=Schematic File Name
 litematica.gui.title.schematic_browser=Schematic Browser
 litematica.gui.title.schematic_manager=Schematic Manager
 litematica.gui.title.schematic_placement_browser=Saved Schematic Placements

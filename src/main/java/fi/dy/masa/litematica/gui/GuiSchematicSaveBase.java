@@ -1,8 +1,12 @@
 package fi.dy.masa.litematica.gui;
 
+import java.io.File;
 import javax.annotation.Nullable;
 import org.lwjgl.input.Keyboard;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
@@ -17,10 +21,11 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
+    @Nullable protected final ISchematic schematic;
     protected GuiTextFieldGeneric textField;
     protected String lastText = "";
     protected String defaultText = "";
-    @Nullable protected final ISchematic schematic;
+    protected boolean updatePlacementsOption;
 
     public GuiSchematicSaveBase(@Nullable ISchematic schematic)
     {
@@ -36,6 +41,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         this.textField = new GuiTextFieldGeneric(10, 32, 160, 20, this.textRenderer);
         this.textField.setMaxStringLength(256);
         this.textField.setFocused(true);
+    }
+
+    public void setUpdatePlacementsOption(boolean updatePlacements)
+    {
+        this.updatePlacementsOption = updatePlacements;
     }
 
     @Override
@@ -113,6 +123,31 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     protected String getTextFieldText()
     {
         return this.textField.getText();
+    }
+
+    protected void updateDependentPlacements(File newSchematicFile, boolean selectedOnly)
+    {
+        if (this.schematic != null)
+        {
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+
+            if (selectedOnly)
+            {
+                SchematicPlacement placement = manager.getSelectedSchematicPlacement();
+
+                if (placement != null && placement.getSchematic() == this.schematic)
+                {
+                    placement.setSchematicFile(newSchematicFile);
+                }
+            }
+            else
+            {
+                for (SchematicPlacement placement : manager.getAllPlacementsOfSchematic(this.schematic))
+                {
+                    placement.setSchematicFile(newSchematicFile);
+                }
+            }
+        }
     }
 
     protected abstract void saveSchematic();

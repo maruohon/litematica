@@ -34,7 +34,7 @@ public class SchematicPlacementUnloaded
     protected static final Set<Integer> USED_COLORS = new HashSet<>();
     protected static int nextColorIndex;
 
-    @Nullable protected final File schematicFile;
+    @Nullable protected File schematicFile;
     protected final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
     protected final GridSettings gridSettings = new GridSettings();
 
@@ -152,6 +152,11 @@ public class SchematicPlacementUnloaded
     public GridSettings getGridSettings()
     {
         return this.gridSettings;
+    }
+
+    public void setSchematicFile(@Nullable File schematicFile)
+    {
+        this.schematicFile = schematicFile;
     }
 
     public void setName(String name)

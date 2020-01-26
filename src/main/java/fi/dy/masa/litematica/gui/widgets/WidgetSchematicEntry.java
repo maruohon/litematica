@@ -25,6 +25,7 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
@@ -227,7 +228,14 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
             {
                 ISchematic schematic = this.widget.schematic;
                 String name = schematic.getFile() != null ? schematic.getFile().getName() : schematic.getMetadata().getName();
+
+                if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue() && schematic.getFile() == null)
+                {
+                    name = FileUtils.generateSimpleSafeFileName(name);
+                }
+
                 GuiSchematicSaveConvert gui = new GuiSchematicSaveConvert(schematic, name);
+                gui.setUpdatePlacementsOption(true);
                 gui.setParent(GuiUtils.getCurrentScreen());
                 GuiBase.openGui(gui);
             }
