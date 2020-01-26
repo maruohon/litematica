@@ -67,6 +67,7 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
         {
             this.widgetUpdatePlacements = new WidgetRadioButton<UpdatePlacementsOption>(x, y - 2,
                     UpdatePlacementsOption.asList(), (val) -> val.getDisplayString(), "litematica.gui.hover.schematic_save.update_dependent_placements");
+            this.widgetUpdatePlacements.setSelection(UpdatePlacementsOption.NONE, false);
             this.addWidget(this.widgetUpdatePlacements);
         }
     }

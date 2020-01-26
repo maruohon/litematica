@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.Vec3i;
 import io.netty.buffer.Unpooled;
@@ -38,6 +39,9 @@ public class LitematicaBlockStateContainerFull extends LitematicaBlockStateConta
             {
                 this.palette = new LitematicaBlockStatePaletteHashMap(this.bits, this);
             }
+
+            // Always reserve ID 0 for air, so that the container doesn't need to be filled with air separately
+            this.palette.idFor(Blocks.AIR.getDefaultState());
         }
     }
 
@@ -105,13 +109,6 @@ public class LitematicaBlockStateContainerFull extends LitematicaBlockStateConta
         this.storage = newArray;
 
         return this.palette.idFor(state);
-    }
-
-    protected void set(int index, IBlockState state)
-    {
-        int id = this.palette.idFor(state);
-        this.storage.setAt(index, id);
-        this.hasSetBlockCounts = false; // Force a re-count when next queried
     }
 
     protected int getIndex(int x, int y, int z)
