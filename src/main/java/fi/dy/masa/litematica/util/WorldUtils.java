@@ -43,6 +43,7 @@ import fi.dy.masa.malilib.config.values.InfoType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.systems.BlockPlacementPositionHandler;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
@@ -141,14 +142,25 @@ public class WorldUtils
 
     public static boolean pickBlockLast(boolean adjacentOnly, Minecraft mc)
     {
-        double reach = mc.playerController.getBlockReachDistance();
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        BlockPos pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, reach, adjacentOnly);
+        BlockPos pos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
+
+        // No overrides by other mods
+        if (pos == null)
+        {
+            double reach = mc.playerController.getBlockReachDistance();
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, reach, adjacentOnly);
+        }
 
         if (pos != null)
         {
-            doPickBlockForPosition(pos, mc);
-            return true;
+            IBlockState state = mc.world.getBlockState(pos);
+
+            if (state.getBlock().isReplaceable(mc.world, pos) || state.getMaterial().isReplaceable())
+            {
+                doPickBlockForPosition(pos, mc);
+                return true;
+            }
         }
 
         return false;
