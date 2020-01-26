@@ -91,6 +91,18 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
     }
 
     @Override
+    public boolean overrideMapping(int id, IBlockState state)
+    {
+        if (id >= 0 && id < this.states.length)
+        {
+            this.states[id] = state;
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public LitematicaBlockStatePaletteLinear copy(IPaletteResizeHandler resizeHandler)
     {
         LitematicaBlockStatePaletteLinear copy = new LitematicaBlockStatePaletteLinear(this.bits, resizeHandler);

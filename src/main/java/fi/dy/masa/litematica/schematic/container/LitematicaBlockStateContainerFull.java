@@ -71,20 +71,38 @@ public class LitematicaBlockStateContainerFull extends LitematicaBlockStateConta
     @Override
     public int onResize(int bits, IBlockState state, ILitematicaBlockStatePalette oldPalette)
     {
-        LitematicaBitArray bitArray = this.storage;
-        ILitematicaBlockStatePalette statePaletteOld = this.palette;
-        this.setBits(bits);
-        this.setBackingArray(null);
+        long[] counts = this.storage.getValueCounts();
+        final int countsSize = counts.length;
 
-        for (int index = 0; index < bitArray.size(); ++index)
+        // Check if there are any IDs that are not in use anymore
+        for (int id = 0; id < countsSize; ++id)
         {
-            IBlockState stateTmp = statePaletteOld.getBlockState(bitArray.getAt(index));
-
-            if (stateTmp != null)
+            // Found an ID that is not in use anymore, use that instead of increasing the palette size
+            if (counts[id] == 0)
             {
-                this.set(index, stateTmp);
+                if (this.palette.overrideMapping(id, state))
+                {
+                    return id;
+                }
             }
         }
+
+        LitematicaBitArray oldArray = this.storage;
+        LitematicaBitArray newArray = new LitematicaBitArray(bits, this.totalVolume);
+
+        // This creates the new palette with the increased size
+        this.setBits(bits);
+        // Copy over the full old palette mapping
+        this.palette.setMapping(oldPalette.getMapping());
+
+        final long size = oldArray.size();
+
+        for (long index = 0; index < size; ++index)
+        {
+            newArray.setAt(index, oldArray.getAt(index));
+        }
+
+        this.storage = newArray;
 
         return this.palette.idFor(state);
     }

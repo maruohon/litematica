@@ -79,6 +79,22 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     }
 
     @Override
+    public boolean overrideMapping(int id, IBlockState state)
+    {
+        List<IBlockState> mapping = this.getMapping();
+
+        if (id >= 0 && id < mapping.size())
+        {
+            // The put method of the map doesn't work for this, it increases the size etc. :/
+            mapping.set(id, state);
+            this.setMapping(mapping);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public LitematicaBlockStatePaletteHashMap copy(IPaletteResizeHandler resizeHandler)
     {
         LitematicaBlockStatePaletteHashMap copy = new LitematicaBlockStatePaletteHashMap(this.bits, resizeHandler);
