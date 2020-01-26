@@ -39,7 +39,13 @@ public class MaterialListUtils
                 {
                     for (Map.Entry<IBlockState, Long> entry : container.getBlockCountsMap().entrySet())
                     {
-                        countsTotal.addTo(entry.getKey(), (int) entry.getValue().longValue());
+                        long total = entry.getValue().longValue();
+
+                        // Don't include stale entries from the palette due to Rebuild operations etc.
+                        if (total > 0)
+                        {
+                            countsTotal.addTo(entry.getKey(), (int) total);
+                        }
                     }
                 }
                 else
