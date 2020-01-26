@@ -85,8 +85,9 @@ public class WorldUtils
     public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
     {
         IBlockState state = Blocks.AIR.getDefaultState();
+        double reach = mc.playerController.getBlockReachDistance();
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6, true);
+        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true);
 
         if (wrapper != null)
         {
@@ -125,8 +126,9 @@ public class WorldUtils
      */
     public static boolean pickBlockFirst(Minecraft mc)
     {
+        double reach = mc.playerController.getBlockReachDistance();
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, entity, 6);
+        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, entity, reach);
 
         if (pos != null)
         {
@@ -139,8 +141,9 @@ public class WorldUtils
 
     public static boolean pickBlockLast(boolean adjacentOnly, Minecraft mc)
     {
+        double reach = mc.playerController.getBlockReachDistance();
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        BlockPos pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, 6, adjacentOnly);
+        BlockPos pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, reach, adjacentOnly);
 
         if (pos != null)
         {
@@ -241,8 +244,9 @@ public class WorldUtils
 
     private static EnumActionResult doEasyPlaceAction(Minecraft mc)
     {
+        double reach = mc.playerController.getBlockReachDistance();
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6, true);
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true);
 
         if (traceWrapper == null)
         {
@@ -252,7 +256,7 @@ public class WorldUtils
         if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
             RayTraceResult trace = traceWrapper.getRayTraceResult();
-            RayTraceResult traceVanilla = RayTraceUtils.getRayTraceFromEntity(mc.world, entity, false, 6);
+            RayTraceResult traceVanilla = RayTraceUtils.getRayTraceFromEntity(mc.world, entity, false, reach);
             BlockPos pos = trace.getBlockPos();
             World world = SchematicWorldHandler.getSchematicWorld();
             IBlockState stateSchematic = world.getBlockState(pos);
