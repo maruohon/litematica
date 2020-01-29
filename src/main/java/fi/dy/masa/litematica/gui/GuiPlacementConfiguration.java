@@ -196,13 +196,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
         ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
-        String hoverString = type.getHoverText();
-
-        if (hoverString != null)
-        {
-            button.setHoverStrings(hoverString);
-        }
-
+        button.addHoverString(type.getHoverText());
         this.addButton(button, new ButtonListener(type, this.placement, this));
 
         return button.getWidth();
@@ -514,7 +508,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             @Nullable
             public String getHoverText()
             {
-                return this.hoverText != null ? StringUtils.translate(this.hoverText) : null;
+                return this.hoverText;
             }
         }
     }

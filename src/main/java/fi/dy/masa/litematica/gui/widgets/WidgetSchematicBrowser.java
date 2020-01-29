@@ -18,6 +18,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.SchematicType;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
@@ -44,7 +45,6 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
                 parent.getDefaultDirectory(), null);
 
         this.parentSelectionListener = selectionListener;
-        this.title = StringUtils.translate("litematica.gui.title.schematic_browser");
         this.infoWidth = 170;
         this.infoHeight = 290;
         this.parent = parent;
@@ -85,6 +85,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
     }
 
     @Override
+    @Nullable
     public IGuiIcon getIconForFile(File file)
     {
         CachedSchematicData data = this.getCachedSchematicData(file);
@@ -139,11 +140,11 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
 
     protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry)
     {
-        int x = this.posX + this.totalWidth - this.infoWidth;
-        int y = this.posY;
+        int x = this.x + this.width - this.infoWidth;
+        int y = this.y;
         int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
         if (entry == null)
         {
@@ -162,62 +163,62 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
             int valueColor = 0xC0FFFFFF;
 
             String str = StringUtils.translate("litematica.gui.label.schematic_info.name");
-            this.drawString(str, x, y, textColor);
+            this.drawString(x, y, textColor, str);
             y += 12;
 
-            this.drawString(meta.getName(), x + 4, y, valueColor);
+            this.drawString(x + 4, y, valueColor, meta.getName());
             y += 12;
 
             str = StringUtils.translate("litematica.gui.label.schematic_info.schematic_author", meta.getAuthor());
-            this.drawString(str, x, y, textColor);
+            this.drawString(x, y, textColor, str);
             y += 12;
 
             String strDate = DATE_FORMAT.format(new Date(meta.getTimeCreated()));
             str = StringUtils.translate("litematica.gui.label.schematic_info.time_created", strDate);
-            this.drawString(str, x, y, textColor);
+            this.drawString(x, y, textColor, str);
             y += 12;
 
             if (meta.hasBeenModified())
             {
                 strDate = DATE_FORMAT.format(new Date(meta.getTimeModified()));
                 str = StringUtils.translate("litematica.gui.label.schematic_info.time_modified", strDate);
-                this.drawString(str, x, y, textColor);
+                this.drawString(x, y, textColor, str);
                 y += 12;
             }
 
             str = StringUtils.translate("litematica.gui.label.schematic_info.region_count", meta.getRegionCount());
-            this.drawString(str, x, y, textColor);
+            this.drawString(x, y, textColor, str);
             y += 12;
 
             if (this.parent.height >= 340)
             {
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_volume", meta.getTotalVolume());
-                this.drawString(str, x, y, textColor);
+                this.drawString(x, y, textColor, str);
                 y += 12;
 
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_blocks", meta.getTotalBlocks());
-                this.drawString(str, x, y, textColor);
+                this.drawString(x, y, textColor, str);
                 y += 12;
 
                 str = StringUtils.translate("litematica.gui.label.schematic_info.enclosing_size");
-                this.drawString(str, x, y, textColor);
+                this.drawString(x, y, textColor, str);
                 y += 12;
 
                 Vec3i areaSize = meta.getEnclosingSize();
-                String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
-                this.drawString(tmp, x + 4, y, valueColor);
+                str = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
+                this.drawString(x + 4, y, valueColor, str);
                 y += 12;
             }
             else
             {
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_blocks_and_volume", meta.getTotalBlocks(), meta.getTotalVolume());
-                this.drawString(str, x, y, textColor);
+                this.drawString(x, y, textColor, str);
                 y += 12;
 
                 Vec3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
                 str = StringUtils.translate("litematica.gui.label.schematic_info.enclosing_size_value", tmp);
-                this.drawString(str, x, y, textColor);
+                this.drawString(x, y, textColor, str);
                 y += 12;
             }
 
@@ -238,10 +239,10 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
 
                 if (needsScaling)
                 {
-                    iconSize = height - y + this.posY - 6;
+                    iconSize = height - y + this.y - 6;
                 }
 
-                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
+                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
                 this.bindTexture(data.iconName);
                 Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);

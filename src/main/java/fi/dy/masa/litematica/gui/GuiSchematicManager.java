@@ -133,16 +133,9 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             this.nextY += 22;
         }
 
-        String label = type.getLabel();
-        String hover = type.getHoverText();
-        int buttonWidth = this.getStringWidth(label) + 10;
-        ButtonGeneric button = new ButtonGeneric(this.nextX, this.nextY, buttonWidth, 20, label);
-        this.nextX += buttonWidth + 2;
-
-        if (hover != null)
-        {
-            button.setHoverStrings(hover);
-        }
+        ButtonGeneric button = new ButtonGeneric(this.nextX, this.nextY, -1, 20, type.getLabel());
+        button.addHoverString(type.getHoverText());
+        this.nextX += button.getWidth() + 2;
 
         this.addButton(button, new ButtonListener(type, this));
 
@@ -275,8 +268,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             SET_PREVIEW         ("litematica.gui.button.set_preview", "litematica.info.schematic_manager.preview.right_click_to_cancel");
 
             private final String label;
-            @Nullable
-            private final String hoverText;
+            @Nullable private final String hoverText;
 
             private Type(String label)
             {
@@ -297,7 +289,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             @Nullable
             public String getHoverText()
             {
-                return this.hoverText != null ? StringUtils.translate(this.hoverText) : null;
+                return this.hoverText;
             }
         }
     }

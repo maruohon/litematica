@@ -153,7 +153,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             button.setEnabled(false);
-            button.setHoverStrings("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+            button.addHoverString("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
         }
 
         x += this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent())).getWidth() + 4;
@@ -333,11 +333,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
 
         ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
-
-        if (hover != null)
-        {
-            button.setHoverStrings(hover);
-        }
+        button.addHoverString(hover);
 
         this.addButton(button, new ButtonListener(type, corner, null, this));
 

@@ -80,11 +80,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
     {
         ButtonListener listener = new ButtonListener(type, this);
         ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
-
-        if (type.getHoverKey() != null)
-        {
-            button.setHoverStrings(type.getHoverKey());
-        }
+        button.addHoverString(type.getHoverKey());
 
         this.addButton(button, listener);
 
@@ -103,14 +99,8 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
         }
         else
         {
-            button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName(), type.getHoverKey());
-        }
-
-        String hover = type.getHoverKey();
-
-        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
-        {
-            button.setHoverStrings(hover);
+            button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
+            button.addHoverString(type.getHoverKey());
         }
 
         this.addButton(button, new ButtonListener(type, this));

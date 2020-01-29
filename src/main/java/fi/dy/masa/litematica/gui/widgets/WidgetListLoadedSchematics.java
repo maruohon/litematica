@@ -18,8 +18,7 @@ public class WidgetListLoadedSchematics extends WidgetListBase<ISchematic, Widge
         super(x, y, width, height, null);
 
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT);
-        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
+        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override

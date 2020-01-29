@@ -70,10 +70,10 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
     @Override
     protected void drawAdditionalContents(int mouseX, int mouseY)
     {
-        int x = this.posX + this.totalWidth - this.infoWidth + 4;
-        int y = this.posY + 4;
+        int x = this.x + this.width - this.infoWidth + 4;
+        int y = this.y + 4;
         int infoHeight = 100;
-        RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
         SchematicProject project = this.selectedProject;
 
@@ -85,26 +85,26 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
             int color = 0xFFB0B0B0;
 
             str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
-            this.drawString(str, x, y, color);
+            this.drawString(x, y, color, str);
             y += 12;
-            this.drawString(w + project.getName() + r, x + 8, y, color);
+            this.drawString(x + 8, y, color, w + project.getName() + r);
             y += 12;
             int versionId = project .getCurrentVersionId();
             String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
             str = StringUtils.translate("litematica.gui.label.schematic_projects.version", strVer, w + project.getVersionCount() + r);
-            this.drawString(str, x, y, color);
+            this.drawString(x, y, color, str);
             y += 12;
             SchematicVersion version = project.getCurrentVersion();
 
             if (version != null)
             {
                 str = StringUtils.translate("litematica.gui.label.schematic_projects.origin");
-                this.drawString(str, x, y, color);
+                this.drawString(x, y, color, str);
                 y += 12;
 
                 BlockPos o = project.getOrigin();
                 str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
-                this.drawString(str, x + 8, y, color);
+                this.drawString(x + 8, y, color, str);
             }
         }
     }

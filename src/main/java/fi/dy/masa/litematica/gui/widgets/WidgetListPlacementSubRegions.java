@@ -22,12 +22,12 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
 
         this.parent = parent;
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT);
-        //this.widgetSearchBar.setSearchOpen(true);
-        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
         this.shouldSortList = true;
+
+        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT));
     }
 
+    @Override
     public GuiPlacementConfiguration getParentGui()
     {
         return this.parent;

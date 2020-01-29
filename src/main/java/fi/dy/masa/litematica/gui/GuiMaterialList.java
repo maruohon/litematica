@@ -172,11 +172,11 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         if (type == ButtonListener.Type.CLEAR_CACHE)
         {
-            button.setHoverStrings("litematica.gui.button.hover.material_list.clear_cache");
+            button.addHoverString("litematica.gui.button.hover.material_list.clear_cache");
         }
         else if (type == ButtonListener.Type.WRITE_TO_FILE)
         {
-            button.setHoverStrings("litematica.gui.button.hover.material_list.write_hold_shift_for_csv");
+            button.addHoverString("litematica.gui.button.hover.material_list.write_hold_shift_for_csv");
         }
 
         this.addButton(button, listener);

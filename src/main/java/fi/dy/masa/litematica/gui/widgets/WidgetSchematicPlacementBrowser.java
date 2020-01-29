@@ -25,7 +25,7 @@ public class WidgetSchematicPlacementBrowser extends WidgetFileBrowserBase
 
         this.browserEntryHeight = 22;
         this.allowKeyboardNavigation = false;
-        this.setParent(parent);
+        this.setParentGui(parent);
     }
 
     @Nullable

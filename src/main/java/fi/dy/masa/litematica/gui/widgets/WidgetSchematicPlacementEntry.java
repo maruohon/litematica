@@ -83,12 +83,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
         ButtonGeneric button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
-        String hover = type.getHoverKey();
-
-        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
-        {
-            button.setHoverStrings(hover);
-        }
+        button.addHoverString(type.getHoverKey());
 
         return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
     }
@@ -105,14 +100,8 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         }
         else
         {
-            button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName(), type.getHoverKey());
-        }
-
-        String hover = type.getHoverKey();
-
-        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
-        {
-            button.setHoverStrings(hover);
+            button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
+            button.addHoverString(type.getHoverKey());
         }
 
         return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
@@ -122,12 +111,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
     {
         String key = this.useIconButtons() ? "%s" : type.getTranslationKey();
         ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, key, isCurrentlyOn);
-        String hover = type.getHoverKey();
-
-        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
-        {
-            button.setHoverStrings(hover);
-        }
+        button.addHoverString(type.getHoverKey());
 
         return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
     }

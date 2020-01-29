@@ -22,8 +22,8 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
 
         this.gui = gui;
         this.browserEntryHeight = 22;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 4, width - 17, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT);
-        this.browserEntriesOffsetY = this.widgetSearchBar.getHeight() + 3;
+
+        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 17, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override

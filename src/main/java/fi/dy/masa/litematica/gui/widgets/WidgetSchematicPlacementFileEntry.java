@@ -54,12 +54,7 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
     private int createButton(int xRight, int y, ButtonListener.ButtonType type)
     {
         ButtonGeneric button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
-        String hover = type.getHoverKey();
-
-        if (org.apache.commons.lang3.StringUtils.isBlank(hover) == false)
-        {
-            button.setHoverStrings(hover);
-        }
+        button.addHoverString(type.getHoverKey());
 
         this.addButton(button, new ButtonListener(type, this));
 

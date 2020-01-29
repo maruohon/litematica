@@ -101,7 +101,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         if (type == ButtonListener.Type.MATERIAL_LIST)
         {
-            button.setHoverStrings(StringUtils.translate("litematica.gui.button.hover.material_list_shift_to_select_sub_regions"));
+            button.addHoverString("litematica.gui.button.hover.material_list_shift_to_select_sub_regions");
         }
 
         this.addButton(button, listener);

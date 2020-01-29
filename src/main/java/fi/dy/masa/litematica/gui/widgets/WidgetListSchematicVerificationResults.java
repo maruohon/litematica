@@ -3,20 +3,21 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.schematic.verifier.VerifierResultSorter;
 import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.util.ItemType;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 
 public class WidgetListSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
 {
@@ -34,7 +35,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
         this.guiSchematicVerifier = parent;
         this.allowMultiSelection = true;
         this.sorter = new VerifierResultSorter(parent.getPlacement().getSchematicVerifier());
-        this.setParent(parent);
+        this.setParentGui(parent);
     }
 
     @Override
@@ -62,12 +63,12 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
         }
 
         MismatchType type = this.guiSchematicVerifier.getResultMode();
-        String strExpected = TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_EXPECTED) + TXT_RST;
+        String strExpected = GuiBase.TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_EXPECTED) + GuiBase.TXT_RST;
         BlockMismatchEntry entry;
 
         if (type != MismatchType.CORRECT_STATE)
         {
-            String strFound = TXT_WHITE + TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_FOUND) + TXT_RST;
+            String strFound = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_FOUND) + GuiBase.TXT_RST;
             entry = new BlockMismatchEntry(strExpected, strFound);
         }
         else
@@ -110,7 +111,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
 
     private void addEntriesForType(MismatchType type)
     {
-        String title = type.getFormattingCode() + type.getDisplayname() + TXT_RST;
+        String title = type.getFormattingCode() + type.getDisplayname() + GuiBase.TXT_RST;
         this.listContents.add(new BlockMismatchEntry(type, title));
         List<BlockMismatch> list;
 

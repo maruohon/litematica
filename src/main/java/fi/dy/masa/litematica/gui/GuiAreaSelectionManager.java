@@ -33,7 +33,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     {
         super(10, 50);
 
-        this.title = StringUtils.translate("litematica.gui.title.area_selection_manager");
+        this.title = StringUtils.translate("litematica.gui.title.area_selection_browser");
         this.selectionManager = DataManager.getSelectionManager();
     }
 
@@ -105,11 +105,11 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
 
         if (type == ButtonListener.ButtonType.UNSELECT)
         {
-            button.setHoverStrings("litematica.gui.button.hover.area_selections.unselect");
+            button.addHoverString("litematica.gui.button.hover.area_selections.unselect");
         }
         else if (type == ButtonListener.ButtonType.FROM_PLACEMENT)
         {
-            button.setHoverStrings("litematica.gui.button.hover.area_selections.from_placement");
+            button.addHoverString("litematica.gui.button.hover.area_selections.from_placement");
         }
 
         this.addButton(button, new ButtonListener(type, this));
@@ -168,7 +168,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     {
         // The width and height will be set to the actual values in initGui()
         WidgetAreaSelectionBrowser widget = new WidgetAreaSelectionBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
-        widget.setParent(this);
+        widget.setParentGui(this);
         return widget;
     }
 

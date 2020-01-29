@@ -77,7 +77,7 @@ public class GuiMainMenu extends GuiBase
             DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             button.setEnabled(false);
-            button.setHoverStrings("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+            button.addHoverString("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
         }
 
         this.addButton(button, new ButtonListenerChangeMenu(type, this));

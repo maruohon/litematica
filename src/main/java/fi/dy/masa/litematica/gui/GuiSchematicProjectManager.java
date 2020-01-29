@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVersions;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVersion;
@@ -19,8 +21,6 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>
                                         implements ISelectionListener<SchematicVersion>, ICompletionListener
@@ -75,12 +75,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
     {
         ButtonGeneric button = new ButtonGeneric(x, y, -1, rightAlign, type.getTranslationKey());
-        String hover = type.getHoverText();
-
-        if (hover != null)
-        {
-            button.setHoverStrings(hover);
-        }
+        button.addHoverString(type.getHoverText());
 
         this.addButton(button, new ButtonListener(type, this));
 
@@ -223,7 +218,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
             @Nullable
             public String getHoverText()
             {
-                return this.hoverText != null ? StringUtils.translate(this.hoverText) : null;
+                return this.hoverText;
             }
         }
     }

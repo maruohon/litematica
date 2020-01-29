@@ -28,14 +28,13 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     {
         super(x, y, width, height, null);
 
-        this.browserEntryHeight = 22;
         this.gui = parent;
-        this.widgetSearchBar = new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.RIGHT);
-        this.widgetSearchBar.setZLevel(1);
-        this.sorter = new MaterialListSorter(parent.getMaterialList());
+        this.browserEntryHeight = 22;
         this.shouldSortList = true;
+        this.sorter = new MaterialListSorter(parent.getMaterialList());
 
-        this.setParent(parent);
+        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.RIGHT)).setZLevel(1);
+        this.setParentGui(parent);
     }
 
     @Override

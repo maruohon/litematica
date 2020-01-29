@@ -69,7 +69,7 @@ public class GuiSchematicPlacementsList
         y = 10;
         String val = Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue() ? "litematica.gui.label.misc.icons" : "litematica.gui.label.misc.text";
         button = new ButtonGeneric(x, y, -1, true, StringUtils.translate("litematica.gui.button.buttons_val", StringUtils.translate(val)));
-        button.setHoverStrings("litematica.gui.button.hover.use_text_or_icon_buttons");
+        button.addHoverString("litematica.gui.button.hover.use_text_or_icon_buttons");
         this.addButton(button, (btn, mbtn) -> { Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue(); this.initGui(); });
     }
 

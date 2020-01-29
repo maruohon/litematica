@@ -88,12 +88,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
     {
         ButtonGeneric button = new ButtonGeneric(x, y, -1, rightAlign, type.getTranslationKey());
-        String hover = type.getHoverText();
-
-        if (hover != null)
-        {
-            button.setHoverStrings(hover);
-        }
+        button.addHoverString(type.getHoverText());
 
         this.addButton(button, new ButtonListener(type, this));
 
@@ -219,7 +214,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
             @Nullable
             public String getHoverText()
             {
-                return this.hoverText != null ? StringUtils.translate(this.hoverText) : null;
+                return this.hoverText;
             }
         }
     }

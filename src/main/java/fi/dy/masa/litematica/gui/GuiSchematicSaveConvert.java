@@ -32,7 +32,7 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
         this.title = StringUtils.translate("litematica.gui.title.save_schematic_convert", inputName);
         this.useTitleHierarchy = false;
 
-        this.widgetOutputType = new WidgetDropDownList<>(9, 57, -1, 22, 200, 10, SchematicType.KNOWN_TYPES, (entry) -> entry.getDisplayName());
+        this.widgetOutputType = new WidgetDropDownList<>(9, 57, -1, 19, 200, 10, SchematicType.KNOWN_TYPES, (entry) -> entry.getDisplayName());
         this.widgetOutputType.setIconProvider(new SchematicIconProvider());
         this.widgetOutputType.setSelectedEntry(SchematicType.LITEMATICA);
     }
@@ -60,7 +60,7 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
     {
         this.addWidget(this.widgetOutputType);
         int x = this.widgetOutputType.getX() + this.widgetOutputType.getWidth() + 4;
-        int y = this.widgetOutputType.getY() + 1;
+        int y = this.widgetOutputType.getY() - 1;
         x = this.createButton(x, y, ButtonType.SAVE);
 
         if (this.updatePlacementsOption)
