@@ -74,7 +74,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
 
         String label = StringUtils.translate("litematica.gui.label.schematic_placement.sub_regions", this.placement.getSubRegionCount());
-        this.addLabel(x + 2, y + 26, -1, 20, 0xFFFFFFFF, label);
+        this.addLabel(x + 2, y + 31, 0xFFFFFFFF, label);
 
         x = scaledWidth - 154;
         x -= this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_OFF) + 2;
@@ -92,12 +92,12 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         y += 21;
 
         this.createButtonOnOff(x, y, width, this.placement.ignoreEntities(), ButtonListener.Type.TOGGLE_ENTITIES);
-        y += 21;
+        y += 26;
         x += 2;
 
         label = StringUtils.translate("litematica.gui.label.placement_settings.placement_origin");
-        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
-        y += 14;
+        this.addLabel(x, y, 0xFFFFFFFF, label);
+        y += 9;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
         this.createButton(x + 85, y + 1, -1, ButtonListener.Type.NUDGE_COORD_X);
@@ -166,9 +166,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
     private void createCoordinateInput(int x, int y, int width, CoordinateType type)
     {
-        String label = type.name() + ":";
-        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
-        int offset = this.getStringWidth(label) + 4;
+        x += this.addLabel(x, y + 5, 0xFFFFFFFF, type.name() + ":").getWidth() + 4;
 
         BlockPos pos = this.placement.getOrigin();
         String text = "";
@@ -180,13 +178,13 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             case Z: text = String.valueOf(pos.getZ()); break;
         }
 
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y + 2, width, 14, this.textRenderer);
+        GuiTextFieldInteger textField = new GuiTextFieldInteger(x, y + 2, width, 14, this.textRenderer);
         textField.setText(text);
         TextFieldListener listener = new TextFieldListener(type, this.placement, this);
         this.addTextField(textField, listener);
 
         String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
-        x = x + offset + width + 20;
+        x += width + 20;
         WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, "", hover);
         cb.setChecked(this.placement.isCoordinateLocked(type), false);
         cb.setListener(new CoordinateLockListener(type, this.placement));

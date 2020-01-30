@@ -35,7 +35,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     {
         x = 12;
         String label = StringUtils.translate("litematica.gui.label.area_editor.box_name");
-        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
+        this.addLabel(x, y + 5, 0xFFFFFFFF, label);
         y += 13;
 
         boolean currentlyOn = this.selection.getExplicitOrigin() != null;

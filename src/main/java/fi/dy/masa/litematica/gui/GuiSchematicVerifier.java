@@ -93,12 +93,12 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         x += this.createButton(x, y, -1, ButtonListener.Type.SET_RESULT_MODE_MISSING) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SET_RESULT_MODE_CORRECT) + 4;
 
-        y = this.height - 36;
+        y = this.height - 32;
 
         if (this.verifier.isActive())
         {
             String str = StringUtils.translate("litematica.gui.label.schematic_verifier.status.verifying", this.verifier.getUnseenChunks(), this.verifier.getTotalChunks());
-            this.addLabel(12, y, 100, 12, 0xFFF0F0F0, str);
+            this.addLabel(12, y, 0xFFF0F0F0, str);
         }
         else if (this.verifier.isFinished())
         {
@@ -109,9 +109,9 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             Integer c = this.verifier.getCorrectStatesCount();
             Integer t = this.verifier.getSchematicTotalBlocks();
             String str = StringUtils.translate("litematica.gui.label.schematic_verifier.status.done_errors", wb, ws, m, e);
-            this.addLabel(12, y, 100, 12, 0xFFF0F0F0, str);
+            this.addLabel(12, y, 0xFFF0F0F0, str);
             str = StringUtils.translate("litematica.gui.label.schematic_verifier.status.done_correct_total", c, t);
-            this.addLabel(12, y + 14, 100, 12, 0xFFF0F0F0, str);
+            this.addLabel(12, y + 12, 0xFFF0F0F0, str);
         }
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;

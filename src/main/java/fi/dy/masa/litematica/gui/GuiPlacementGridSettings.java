@@ -72,14 +72,14 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         });
 
         y += 30;
-        this.addLabel(x, y, width, 20, 0xFFFFFFFF, "litematica.gui.label.placement_grid.grid_size");
+        this.addLabel(x, y + 5, 0xFFFFFFFF, "litematica.gui.label.placement_grid.grid_size");
         y += 14;
         this.addSizeInputElements(x, y     , width, CoordinateType.X);
         this.addSizeInputElements(x, y + 16, width, CoordinateType.Y);
         this.addSizeInputElements(x, y + 32, width, CoordinateType.Z);
 
         y += 60;
-        this.addLabel(x, y, width, 20, 0xFFFFFFFF, "litematica.gui.label.placement_grid.repeat_count");
+        this.addLabel(x, y + 5, 0xFFFFFFFF, "litematica.gui.label.placement_grid.repeat_count");
         y += 14;
         this.addRepeatInputElements(x, y     , width, IntBoxCoordType.MIN_X);
         this.addRepeatInputElements(x, y + 16, width, IntBoxCoordType.MIN_Y);
@@ -161,7 +161,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
     private void addRepeatInputElements(int x, int y, int width, IntBoxCoordType type)
     {
         String label = StringUtils.translate(this.getRepeatTranslationKey(type)) + ":";
-        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y + 5, 0xFFFFFFFF, label);
         int labelWidth = this.getStringWidth(label) + 4;
 
         IntBoundingBox repeat = this.placement.getGridSettings().getRepeatCounts();
@@ -184,7 +184,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
     private void addSizeInputElements(int x, int y, int width, CoordinateType type)
     {
         String label = StringUtils.translate(this.getSizeTranslationKey(type)) + ":";
-        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y + 5, 0xFFFFFFFF, label);
         int offset = this.getStringWidth(label) + 4;
 
         Vec3i size = this.placement.getGridSettings().getSize();

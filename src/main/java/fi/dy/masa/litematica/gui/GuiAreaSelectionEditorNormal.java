@@ -87,7 +87,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
         else
         {
-            this.addLabel(20, 30, 120, 12, 0xFFFFAA00, StringUtils.translate("litematica.error.area_editor.no_selection"));
+            this.addLabel(20, 30, 0xFFFFAA00, StringUtils.translate("litematica.error.area_editor.no_selection"));
         }
     }
 
@@ -102,10 +102,10 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.xOrigin = x;
 
         x = xLeft;
-        y += 20;
+        y += 25;
 
-        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, StringUtils.translate("litematica.gui.label.area_editor.selection_name"));
-        y += 13;
+        this.addLabel(x, y, 0xFFFFFFFF, StringUtils.translate("litematica.gui.label.area_editor.selection_name"));
+        y += 8;
 
         int width = 202;
         this.textFieldSelectionName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
@@ -140,10 +140,11 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         x = 12;
         y = this.getListY() - 12;
         String str = String.valueOf(this.selection.getAllSubRegionNames().size());
-        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.label.area_editor.sub_regions", str));
+        x += this.addLabel(x, y + 3, 0xFFFFFFFF, GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.label.area_editor.sub_regions", str)).getWidth() + 16;
 
-        this.addRenderingDisabledWarning(120, y + 2);
+        this.addRenderingDisabledWarning(x, y);
 
+        x = 12;
         y = this.height - 26;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
@@ -182,7 +183,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             List<String> lines = new ArrayList<>();
             int maxLineLength = this.width - x - 20;
             StringUtils.splitTextToLines(lines, str, maxLineLength);
-            this.addLabel(x, y, maxLineLength, lines.size() * (StringUtils.getFontHeight() + 1), 0xFFFFAA00, lines);
+            this.addLabel(x, y, 0xFFFFAA00, lines);
         }
     }
 
@@ -245,7 +246,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected void createCoordinateInput(int x, int y, int width, CoordinateType coordType, Corner corner)
     {
         String label = coordType.name() + ":";
-        this.addLabel(x, y, 20, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y + 6, 0xFFFFFFFF, label);
         int offset = 12;
 
         y += 2;

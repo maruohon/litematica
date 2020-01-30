@@ -44,10 +44,10 @@ public class GuiSubRegionConfiguration extends GuiBase
 
         int width = 120;
         int x = this.width - width - 10;
-        int y = 26;
+        int y = 32;
 
         String label = StringUtils.translate("litematica.gui.label.placement_sub.region_name", this.placement.getName());
-        this.addLabel(20, y, -1, 16, 0xFFFFFFFF, label);
+        this.addLabel(20, y, 0xFFFFFFFF, label);
 
         y = 10;
         this.createButtonOnOff(x, y, width - 22, this.placement.isEnabled(), ButtonListener.Type.TOGGLE_ENABLED);
@@ -55,11 +55,11 @@ public class GuiSubRegionConfiguration extends GuiBase
         y += 21;
 
         this.createButtonOnOff(x, y, width, this.placement.ignoreEntities(), ButtonListener.Type.TOGGLE_ENTITIES);
-        y += 18;
+        y += 23;
 
         label = StringUtils.translate("litematica.gui.label.placement_sub.region_position");
-        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
-        y += 14;
+        this.addLabel(x, y, 0xFFFFFFFF, label);
+        y += 9;
         x += 2;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
@@ -110,7 +110,7 @@ public class GuiSubRegionConfiguration extends GuiBase
     private void createCoordinateInput(int x, int y, int width, CoordinateType type)
     {
         String label = type.name() + ":";
-        this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
+        this.addLabel(x, y + 5, 0xFFFFFFFF, label);
         int offset = this.getStringWidth(label) + 4;
 
         // The sub-region placements are relative

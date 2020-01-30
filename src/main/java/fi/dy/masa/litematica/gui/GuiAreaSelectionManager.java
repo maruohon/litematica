@@ -89,8 +89,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             {
                 currentSelection = FileUtils.getNameWithoutExtension(currentSelection.substring(len + 1));
                 String str = StringUtils.translate("litematica.gui.label.area_selection_manager.current_selection", currentSelection);
-                int w = this.getStringWidth(str);
-                this.addLabel(10, this.height - 15, w, 14, 0xFFFFFFFF, str);
+                this.addLabel(10, this.height - 14, 0xFFFFFFFF, str);
             }
         }
     }

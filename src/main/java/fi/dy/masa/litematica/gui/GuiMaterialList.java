@@ -84,7 +84,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
         String str = StringUtils.translate("litematica.gui.label.material_list.multiplier");
         int w = this.getStringWidth(str);
-        this.addLabel(this.width - w - 56, y + 5, w, 12, 0xFFFFFFFF, str);
+        this.addLabel(this.width - w - 56, y + 6, 0xFFFFFFFF, str);
 
         GuiTextFieldInteger tf = new GuiTextFieldInteger(this.width - 52, y + 2, 40, 16, this.textRenderer);
         tf.setText(String.valueOf(this.materialList.getMultiplier()));
@@ -149,8 +149,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             }
 
             str = strt + " / " + StringUtils.translate("litematica.gui.label.material_list.progress", strp);
-            w = this.getStringWidth(str);
-            this.addLabel(12, this.height - 36, w, 12, 0xFFFFFFFF, str);
+            this.addLabel(12, this.height - 34, 0xFFFFFFFF, str);
         }
     }
 

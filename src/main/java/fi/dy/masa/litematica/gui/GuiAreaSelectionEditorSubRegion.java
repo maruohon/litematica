@@ -31,7 +31,7 @@ public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimpl
         x = 12;
         y = 24;
         String label = StringUtils.translate("litematica.gui.label.area_editor.box_name");
-        this.addLabel(x, y, -1, 16, 0xFFFFFFFF, label);
+        this.addLabel(x, y + 5, 0xFFFFFFFF, label); 
         y += 13;
 
         int width = 202;

@@ -185,6 +185,8 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 {
                     this.widget.parent.getSelectionManagerGui().initGui();
                 }
+
+                this.widget.parent.refreshEntries();
             }
             else if (this.type == ButtonType.CONFIGURE)
             {
@@ -198,8 +200,6 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                     GuiBase.openGui(gui);
                 }
             }
-
-            this.widget.parent.refreshEntries();
         }
 
         public enum ButtonType
