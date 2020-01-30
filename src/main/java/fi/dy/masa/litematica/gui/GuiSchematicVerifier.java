@@ -47,7 +47,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
 
         SchematicVerifier verifier = placement.getSchematicVerifier();
 
-        if (verifier != verifierLast)
+        if (verifier != verifierLast || verifier.isActive())
         {
             WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined());
             verifierLast = verifier;
@@ -237,11 +237,16 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     @Override
     public void onTaskCompleted()
     {
-        if (GuiUtils.getCurrentScreen() == this)
+        net.minecraft.client.gui.GuiScreen gui = GuiUtils.getCurrentScreen();
+
+        if (gui == this || gui == null)
         {
-            SchematicVerifier verifier = this.verifier;
-            WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined());
-            this.initGui();
+            WidgetSchematicVerificationResult.setMaxNameLengths(this.verifier.getMismatchOverviewCombined());
+
+            if (gui == this)
+            {
+                this.initGui();
+            }
         }
     }
 
