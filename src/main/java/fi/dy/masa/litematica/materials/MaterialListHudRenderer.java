@@ -144,8 +144,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             yOffset = (int) (yOffset / scale);
         }
 
-        posY = RenderUtils.getHudPosY(posY, yOffset, contentHeight, scale, alignment);
-        posY += RenderUtils.getHudOffsetForPotions(alignment, scale, mc.player);
+        posY = GuiUtils.getHudPosY(posY, yOffset, contentHeight, scale, alignment);
+        posY += GuiUtils.getHudOffsetForPotions(alignment, scale, mc.player);
 
         if (scale != 1d)
         {
@@ -156,7 +156,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         if (useBackground)
         {
             RenderUtils.drawRect(posX - bgMargin, posY - bgMargin,
-                         maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor);
+                         maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor, 0);
         }
 
         String title = GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + GuiBase.TXT_RST;

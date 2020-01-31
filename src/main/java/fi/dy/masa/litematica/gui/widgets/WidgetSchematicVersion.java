@@ -28,29 +28,34 @@ public class WidgetSchematicVersion extends WidgetListEntryBase<SchematicVersion
         RenderUtils.color(1f, 1f, 1f, 1f);
 
         boolean versionSelected = this.project.getCurrentVersion() == this.entry;
+        int x = this.getX();
+        int y = this.getY();
+        int z = this.getZLevel();
+        int width = this.getWidth();
+        int height = this.getHeight();
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || versionSelected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0707070);
+            RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0101010);
+            RenderUtils.drawRect(x, y, width, height, 0xA0101010, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0303030);
+            RenderUtils.drawRect(x, y, width, height, 0xA0303030, z);
         }
 
         if (versionSelected)
         {
-            RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
+            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
         }
 
         String str = StringUtils.translate("litematica.gui.label.schematic_projects.version_entry", this.entry.getVersion(), this.entry.getName());
-        this.drawString(this.x + 4, this.y + 4, 0xFFFFFFFF, str);
+        this.drawString(x + 4, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, str);
     }
 
     @Override
@@ -70,6 +75,6 @@ public class WidgetSchematicVersion extends WidgetListEntryBase<SchematicVersion
         text.add(StringUtils.translate("litematica.gui.label.schematic_placement.enclosing_size", strSize));
         */
 
-        RenderUtils.drawHoverText(mouseX, mouseY, text);
+        RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
     }
 }

@@ -449,7 +449,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     else
                     {
                         GuiPlacementGridSettings gui = new GuiPlacementGridSettings(this.placement, this.parent);
-                        GuiBase.openGui(gui);
+                        GuiBase.openPopupGui(gui);
                     }
                     break;
                 }

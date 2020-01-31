@@ -189,7 +189,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_area_selection";
-                GuiBase.openGui(new GuiTextInput(256, title, "", this.gui, new SelectionCreator(dir, this.gui)));
+                GuiBase.openPopupGui(new GuiTextInput(256, title, "", this.gui, new SelectionCreator(dir, this.gui)));
             }
             else if (this.type == ButtonType.FROM_PLACEMENT)
             {

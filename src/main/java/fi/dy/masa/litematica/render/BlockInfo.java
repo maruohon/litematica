@@ -1,11 +1,6 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
-import fi.dy.masa.litematica.util.ItemUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -13,6 +8,11 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class BlockInfo
 {
@@ -58,13 +58,13 @@ public class BlockInfo
         return this.totalHeight;
     }
 
-    public void render(int x, int y, Minecraft mc)
+    public void render(int x, int y, int zLevel, Minecraft mc)
     {
         if (this.state != null)
         {
             GlStateManager.pushMatrix();
 
-            RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
+            RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR, zLevel);
 
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;
@@ -77,11 +77,13 @@ public class BlockInfo
             GlStateManager.disableLighting();
             RenderUtils.enableGuiItemLighting();
 
-            //mc.getRenderItem().zLevel += 100;
-            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
+            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF, zLevel); // light background for the item
+
+            float origZ = mc.getRenderItem().zLevel;
+            mc.getRenderItem().zLevel = zLevel + 1;
             mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, this.stack, x1, y);
             mc.getRenderItem().renderItemOverlayIntoGUI(textRenderer, this.stack, x1, y, null);
-            //mc.getRenderItem().zLevel -= 100;
+            mc.getRenderItem().zLevel = origZ;
 
             //GlStateManager.disableBlend();
             RenderUtils.disableItemLighting();

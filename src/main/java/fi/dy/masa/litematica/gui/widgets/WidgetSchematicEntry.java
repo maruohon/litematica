@@ -67,7 +67,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
         }
 
         this.buttonsStartX = posX;
-        this.typeIconX = this.x + 2;
+        this.typeIconX = x + 2;
         this.typeIconY = y + 4;
     }
 
@@ -113,25 +113,31 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
+        int x = this.getX();
+        int y = this.getY();
+        int z = this.getZLevel();
+        int width = this.getWidth();
+        int height = this.getHeight();
+
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x70FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x20FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x20FFFFFF, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x50FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x50FFFFFF, z);
         }
 
         boolean modified = this.schematic.getMetadata().wasModifiedSinceSaved();
         String schematicName = this.schematic.getMetadata().getName();
         int color = modified ? 0xFFFF9010 : 0xFFFFFFFF;
-        this.drawString(this.x + 20, this.y + 7, color, schematicName);
+        this.drawString(x + 20, y + 7, color, schematicName);
 
         GlStateManager.disableBlend();
 
@@ -146,11 +152,11 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
             icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
         }
 
-        icon.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
+        icon.renderAt(this.typeIconX, this.typeIconY, z + 0.1f, false, false);
 
         if (modified)
         {
-            LitematicaGuiIcons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, this.y + 6, this.zLevel, false, false);
+            LitematicaGuiIcons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, y + 6, z + 0.1f, false, false);
         }
 
         this.drawSubWidgets(mouseX, mouseY);
@@ -164,13 +170,18 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
+        int x = this.getX();
+        int y = this.getY();
+        int z = this.getZLevel() + 1;
+        int height = this.getHeight();
+
         if (this.schematic.getMetadata().wasModifiedSinceSaved() &&
-            GuiBase.isMouseOver(mouseX, mouseY, this.buttonsStartX - 13, this.y + 6, 11, 11))
+            GuiBase.isMouseOver(mouseX, mouseY, this.buttonsStartX - 13, y + 6, 11, 11))
         {
             String str = WidgetFileBrowserBase.DATE_FORMAT.format(new Date(this.schematic.getMetadata().getTimeModified()));
-            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str)));
+            RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str)));
         }
-        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
+        else if (GuiBase.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 12, height))
         {
             List<String> lines = new ArrayList<>();
             File schematicFile = this.schematic.getFile();
@@ -180,7 +191,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
             lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
             lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_type", this.schematic.getType().getDisplayName()));
 
-            RenderUtils.drawHoverText(mouseX, mouseY, lines);
+            RenderUtils.drawHoverText(mouseX, mouseY, z, lines);
         }
 
         RenderUtils.color(1f, 1f, 1f, 1f);

@@ -112,9 +112,9 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
 
         int offset = 12;
 
-        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
+        if (GuiBase.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, text);
+            RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
     }
 

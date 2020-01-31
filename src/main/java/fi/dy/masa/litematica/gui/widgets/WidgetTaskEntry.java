@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import net.minecraft.client.renderer.GlStateManager;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -8,7 +9,6 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.renderer.GlStateManager;
 
 public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
 {
@@ -33,23 +33,29 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
+        int x = this.getX();
+        int y = this.getY();
+        int z = this.getZLevel();
+        int width = this.getWidth();
+        int height = this.getHeight();
+
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x70FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x20FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x20FFFFFF, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x50FFFFFF);
+            RenderUtils.drawRect(x, y, width, height, 0x50FFFFFF, z);
         }
 
         String name = this.getEntry().getDisplayName();
-        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name);
+        this.drawString(x + 4, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, name);
 
         this.drawSubWidgets(mouseX, mouseY);
 

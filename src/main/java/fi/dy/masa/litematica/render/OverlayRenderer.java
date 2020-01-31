@@ -509,7 +509,7 @@ public class OverlayRenderer
         boolean useBackground = true;
         boolean useShadow = false;
 
-        fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
+        fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, 0, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
     }
 
     private boolean renderVerifierOverlay(Minecraft mc)
@@ -530,7 +530,7 @@ public class OverlayRenderer
                 if (mismatch != null)
                 {
                     BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                    info.render(GuiUtils.getScaledWindowWidth() / 2 - info.getTotalWidth() / 2, GuiUtils.getScaledWindowHeight() / 2 + 6, mc);
+                    info.render(GuiUtils.getScaledWindowWidth() / 2 - info.getTotalWidth() / 2, GuiUtils.getScaledWindowHeight() / 2 + 6, 0, mc);
                     return true;
                 }
             }
@@ -563,7 +563,7 @@ public class OverlayRenderer
         {
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
-            info.render(this.blockInfoX, this.blockInfoY, mc);
+            info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
             RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
         }
@@ -571,7 +571,7 @@ public class OverlayRenderer
         {
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
-            info.render(this.blockInfoX, this.blockInfoY, mc);
+            info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
             RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldClient, pos, mc);
         }
@@ -583,7 +583,7 @@ public class OverlayRenderer
             {
                 BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
-                info.render(this.blockInfoX, this.blockInfoY, mc);
+                info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
                 RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
             }
@@ -591,7 +591,7 @@ public class OverlayRenderer
             {
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
-                info.render(this.blockInfoX, this.blockInfoY, mc);
+                info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
                 RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldSchematic, pos, mc);
             }
@@ -725,7 +725,7 @@ public class OverlayRenderer
         int y = height >= width ? (height - width) / 2 : 0;
         int longerSide = Math.min(width, height);
 
-        fi.dy.masa.malilib.render.RenderUtils.drawOutline(x, y, longerSide, longerSide, 2, 0xFFFFFFFF);
+        fi.dy.masa.malilib.render.RenderUtils.drawOutline(x, y, longerSide, longerSide, 2, 0xFFFFFFFF, 0);
     }
 
     private enum BoxType

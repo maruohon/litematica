@@ -64,28 +64,33 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         RenderUtils.color(1f, 1f, 1f, 1f);
 
         selected = this.entry.equals(this.selection.getCurrentSubRegionBoxName());
+        int x = this.getX();
+        int y = this.getY();
+        int z = this.getZLevel();
+        int width = this.getWidth();
+        int height = this.getHeight();
 
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0707070);
+            RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0101010);
+            RenderUtils.drawRect(x, y, width, height, 0xA0101010, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0303030);
+            RenderUtils.drawRect(x, y, width, height, 0xA0303030, z);
         }
 
         if (selected)
         {
-            RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0, 0.001f);
+            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z + 1);
         }
 
-        this.drawString(this.x + 2, this.y + 7, 0xFFFFFFFF, this.entry);
+        this.drawString(x + 2, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, this.entry);
 
         super.render(mouseX, mouseY, selected);
     }
@@ -122,9 +127,9 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
         int offset = 12;
 
-        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
+        if (GuiBase.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, text);
+            RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
     }
 
@@ -147,7 +152,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
                 String title = "litematica.gui.title.rename_area_sub_region";
                 String name = this.widget.box != null ? this.widget.box.getName() : "<error>";
                 BoxRenamer renamer = new BoxRenamer(this.widget.selection, this.widget);
-                GuiBase.openGui(new GuiTextInputFeedback(160, title, name, this.widget.parent.getEditorGui(), renamer));
+                GuiBase.openPopupGui(new GuiTextInputFeedback(160, title, name, this.widget.parent.getEditorGui(), renamer));
             }
             else if (this.type == ButtonType.REMOVE)
             {

@@ -140,11 +140,12 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
 
     protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry)
     {
-        int x = this.x + this.width - this.infoWidth;
-        int y = this.y;
+        int x = this.getX() + this.getWidth() - this.infoWidth;
+        int y = this.getY();
+        int z = this.getZLevel();
         int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, z);
 
         if (entry == null)
         {
@@ -239,10 +240,10 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
 
                 if (needsScaling)
                 {
-                    iconSize = height - y + this.y - 6;
+                    iconSize = height - y + this.getY() - 6;
                 }
 
-                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR);
+                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, z);
 
                 this.bindTexture(data.iconName);
                 Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);

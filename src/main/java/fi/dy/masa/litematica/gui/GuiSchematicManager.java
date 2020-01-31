@@ -221,7 +221,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 if (type.getHasName())
                 {
                     String oldName = data.schematic.getMetadata().getName();
-                    GuiBase.openGui(new GuiTextInputFeedback(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
+                    GuiBase.openPopupGui(new GuiTextInputFeedback(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
                 }
                 else
                 {

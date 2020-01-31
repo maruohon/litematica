@@ -120,7 +120,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     @Override
     protected int getColumnPosX(int column)
     {
-        int x1 = this.x + 4;
+        int x1 = this.getX() + 4;
         int x2 = x1 + maxNameLength + 40; // item icon plus offset
         int x3 = x2 + maxCountLength1 + 20;
         int x4 = x3 + maxCountLength2 + 20;
@@ -178,26 +178,32 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     @Override
     public void render(int mouseX, int mouseY, boolean selected)
     {
+        int x = this.getX();
+        int y = this.getY();
+        int z = this.getZLevel();
+        int width = this.getWidth();
+        int height = this.getHeight();
+
         // Draw a lighter background for the hovered and the selected entry
         if (this.header1 == null && (selected || this.isMouseOver(mouseX, mouseY)))
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0707070);
+            RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0101010);
+            RenderUtils.drawRect(x, y, width, height, 0xA0101010, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0xA0303030);
+            RenderUtils.drawRect(x, y, width, height, 0xA0303030, z);
         }
 
         int x1 = this.getColumnPosX(0);
         int x2 = this.getColumnPosX(1);
         int x3 = this.getColumnPosX(2);
         int x4 = this.getColumnPosX(3);
-        int y = this.y + 7;
+        y = this.getY() + 7;
         int color = 0xFFFFFFFF;
 
         if (this.header1 != null)
@@ -232,16 +238,18 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             pre = countAvailable >= countMissing ? green : red;
             this.drawString(x4, y, color, pre + String.valueOf(countAvailable));
 
+            y = this.getY() + 3;
+            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF, z); // light background for the item
+
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
             RenderUtils.enableGuiItemLighting();
 
-            //mc.getRenderItem().zLevel -= 110;
-            y = this.y + 3;
-            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
+            float origZ = this.mc.getRenderItem().zLevel;
+            this.mc.getRenderItem().zLevel = z;
             this.mc.getRenderItem().renderItemAndEffectIntoGUI(this.mc.player, this.entry.getStack(), x1, y);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, this.entry.getStack(), x1, y, null);
-            //mc.getRenderItem().zLevel += 110;
+            this.mc.getRenderItem().zLevel = origZ;
 
             GlStateManager.disableBlend();
             RenderUtils.disableItemLighting();
@@ -257,7 +265,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         if (this.entry != null)
         {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0, 0, 200);
+            //GlStateManager.translate(0, 0, 200);
 
             String header1 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]);
             String header2 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]);
@@ -278,18 +286,21 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int x = mouseX + 10;
             int y = mouseY - 10;
 
-            if (x + totalWidth - 20 >= this.width)
+            if (x + totalWidth - 20 >= this.getWidth())
             {
                 x -= totalWidth + 20;
             }
 
             int x1 = x + 10;
             int x2 = x1 + w1 + 20;
+            int y1 = y + 6;
+            int z = this.getZLevel() + 1;
 
-            RenderUtils.drawOutlinedBox(x, y, totalWidth, 60, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
-            y += 6;
-            int y1 = y;
-            y += 4;
+            RenderUtils.drawOutlinedBox(x, y, totalWidth, 60, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR, z);
+            RenderUtils.drawRect(x2, y1, 16, 16, 0x20FFFFFF, z); // light background for the item
+            y += 10;
+
+            GlStateManager.translate(0f, 0f, z + 0.1f);
 
             this.drawString(x1     , y, 0xFFFFFFFF, header1);
             this.drawString(x2 + 20, y, 0xFFFFFFFF, stackName);
@@ -302,15 +313,14 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             this.drawString(x1, y, 0xFFFFFFFF, header3);
             this.drawString(x2, y, 0xFFFFFFFF, strCountMissing);
 
-            RenderUtils.drawRect(x2, y1, 16, 16, 0x20FFFFFF); // light background for the item
-
             GlStateManager.disableLighting();
             RenderUtils.enableGuiItemLighting();
 
-            //mc.getRenderItem().zLevel += 100;
+            float origZ = this.mc.getRenderItem().zLevel;
+            this.mc.getRenderItem().zLevel = z;
             this.mc.getRenderItem().renderItemAndEffectIntoGUI(this.mc.player, stack, x2, y1);
             //mc.getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, x1, y, null);
-            //mc.getRenderItem().zLevel -= 100;
+            this.mc.getRenderItem().zLevel = origZ;
             //GlStateManager.disableBlend();
 
             RenderUtils.disableItemLighting();

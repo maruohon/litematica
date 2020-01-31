@@ -70,10 +70,10 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
     @Override
     protected void drawAdditionalContents(int mouseX, int mouseY)
     {
-        int x = this.x + this.width - this.infoWidth + 4;
-        int y = this.y + 4;
+        int x = this.getX() + this.getWidth() - this.infoWidth + 4;
+        int y = this.getY() + 4;
         int infoHeight = 100;
-        RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR);
+        RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, this.getZLevel());
 
         SchematicProject project = this.selectedProject;
 

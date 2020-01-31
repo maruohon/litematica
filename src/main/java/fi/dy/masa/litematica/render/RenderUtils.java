@@ -560,6 +560,8 @@ public class RenderUtils
     {
         int xInv = 0;
         int yInv = 0;
+        int z = 0;
+        int zItems = z + 1;
 
         switch (align)
         {
@@ -578,8 +580,8 @@ public class RenderUtils
 
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, props.slotsPerRow, props.totalSlots, mc);
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, props.slotsPerRow, 0, -1, mc);
+        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, z, props.slotsPerRow, props.totalSlots, mc);
+        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, zItems, props.slotsPerRow, 0, -1, mc);
 
         return props.height;
     }
