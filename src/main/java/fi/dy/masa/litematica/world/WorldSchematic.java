@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -36,7 +37,7 @@ public class WorldSchematic extends ClientWorld
     private int nextEntityId;
 
     public WorldSchematic(ClientPlayNetworkHandler netHandler, LevelInfo settings,
-            DimensionType dimType, Profiler profilerIn)
+            DimensionType dimType, Supplier<Profiler> profilerIn)
     {
         super(netHandler, settings, dimType, 1, profilerIn, null);
 
