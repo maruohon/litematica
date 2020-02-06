@@ -1,7 +1,24 @@
+buildscript {
+    repositories {
+        jcenter()    
+        maven {
+            name = "Fabric"
+            url = "https://maven.fabricmc.net/"
+        }
+    }
+    dependencies {
+        classpath 'net.fabricmc:fabric-loom:0.2.6-SNAPSHOT'
+    }
+}
+
+apply plugin: "fabric-loom"
+
+/*
 plugins {
     id 'fabric-loom' version '0.2.6-SNAPSHOT'
     id 'maven-publish'
 }
+*/
 
 repositories {
     maven {
