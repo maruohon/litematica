@@ -2,9 +2,7 @@ package fi.dy.masa.litematica.schematic.placement;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -15,7 +13,6 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
@@ -31,8 +28,7 @@ import fi.dy.masa.malilib.util.WorldUtils;
 
 public class SchematicPlacementUnloaded
 {
-    protected static final Set<Integer> USED_COLORS = new HashSet<>();
-    protected static int nextColorIndex;
+    protected static int lastColor;
 
     @Nullable protected File schematicFile;
     protected final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
@@ -53,7 +49,6 @@ public class SchematicPlacementUnloaded
     protected boolean locked;
     protected boolean shouldBeSaved = true;
     protected int coordinateLockMask;
-    protected int boxesBBColor;
     @Nullable protected Box enclosingBox;
     @Nullable protected String selectedSubRegionName;
     @Nullable protected JsonObject materialListData;
@@ -166,9 +161,7 @@ public class SchematicPlacementUnloaded
 
     public void setBoxesBBColor(int color)
     {
-        this.boxesBBColor = color;
         this.boxesBBColorVec = Color4f.fromColor(color, 1f);
-        USED_COLORS.add(color);
     }
 
     public BlockPos getOrigin()
@@ -198,12 +191,6 @@ public class SchematicPlacementUnloaded
 
     public void onRemoved()
     {
-        USED_COLORS.remove(this.boxesBBColor);
-
-        if (USED_COLORS.isEmpty())
-        {
-            nextColorIndex = 0;
-        }
     }
 
     protected void copyFrom(SchematicPlacementUnloaded other, boolean copyGridSettings)
@@ -224,7 +211,6 @@ public class SchematicPlacementUnloaded
         this.locked = other.locked;
         this.shouldBeSaved = other.shouldBeSaved;
         this.coordinateLockMask = other.coordinateLockMask;
-        this.boxesBBColor = other.boxesBBColor;
         this.enclosingBox = other.enclosingBox != null ? other.enclosingBox.copy() : null;
         this.selectedSubRegionName = other.selectedSubRegionName;
         this.materialListData = other.materialListData != null ? JsonUtils.deepCopy(other.materialListData) : null;
@@ -286,7 +272,7 @@ public class SchematicPlacementUnloaded
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
             obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
-            obj.add("bb_color", new JsonPrimitive(this.boxesBBColor));
+            obj.add("bb_color", new JsonPrimitive(this.boxesBBColorVec.intValue));
             obj.add("verifier_type", new JsonPrimitive(this.verifierType.getStringValue()));
 
             if (this.selectedSubRegionName != null)
@@ -604,21 +590,8 @@ public class SchematicPlacementUnloaded
 
     protected static int getNextBoxColor()
     {
-        int length = OverlayRenderer.KELLY_COLORS.length;
-        int color = OverlayRenderer.KELLY_COLORS[nextColorIndex];
-        nextColorIndex = (nextColorIndex + 1) % length;
-
-        for (int i = 0; i < length; ++i)
-        {
-            if (USED_COLORS.contains(color) == false)
-            {
-                return color;
-            }
-
-            color = OverlayRenderer.KELLY_COLORS[nextColorIndex];
-            nextColorIndex = (nextColorIndex + 1) % length;
-        }
-
+        int color = Color4f.getColorFromHue(lastColor);
+        lastColor += 40;
         return color;
     }
 }
