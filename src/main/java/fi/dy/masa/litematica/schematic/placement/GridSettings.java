@@ -32,6 +32,11 @@ public class GridSettings
         return this.size;
     }
 
+    public Vec3i getDefaultSize()
+    {
+        return this.defaultSize;
+    }
+
     public IntBoundingBox getRepeatCounts()
     {
         return this.repeat;

@@ -11,7 +11,6 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
@@ -21,6 +20,7 @@ import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -55,11 +55,11 @@ public class GuiSubRegionConfiguration extends GuiBase
         y += 21;
 
         this.createButtonOnOff(x, y, width, this.placement.ignoreEntities(), ButtonListener.Type.TOGGLE_ENTITIES);
-        y += 23;
+        y += 22;
 
         label = StringUtils.translate("litematica.gui.label.placement_sub.region_position");
         this.addLabel(x, y, 0xFFFFFFFF, label);
-        y += 9;
+        y += 10;
         x += 2;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
@@ -117,19 +117,11 @@ public class GuiSubRegionConfiguration extends GuiBase
         BlockPos pos = this.placement.getPos();
         pos = PositionUtils.getTransformedBlockPos(pos, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
         pos = pos.add(this.schematicPlacement.getOrigin());
-        String text = "";
 
-        switch (type)
-        {
-            case X: text = String.valueOf(pos.getX()); break;
-            case Y: text = String.valueOf(pos.getY()); break;
-            case Z: text = String.valueOf(pos.getZ()); break;
-        }
-
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y + 2, width, 14, this.textRenderer);
-        textField.setText(text);
-        TextFieldListener listener = new TextFieldListener(type, this.schematicPlacement, this.placement, this);
-        this.addTextField(textField, listener);
+        int value = PositionUtils.getCoordinate(pos, type);
+        WidgetTextFieldInteger textField = new WidgetTextFieldInteger(x + offset, y + 1, width, 16, value);
+        textField.setUpdateListenerAlways(true);
+        this.addTextField(textField, new TextFieldListener(type, this.schematicPlacement, this.placement, this));
 
         String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x = x + offset + width + 20;
@@ -350,7 +342,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
     }
 
-    private static class TextFieldListener implements ITextFieldListener<GuiTextFieldInteger>
+    private static class TextFieldListener implements ITextFieldListener
     {
         private final GuiSubRegionConfiguration parent;
         private final SchematicPlacementManager manager;
@@ -368,11 +360,11 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
 
         @Override
-        public boolean onTextChange(GuiTextFieldInteger textField)
+        public void onTextChange(String newText)
         {
             try
             {
-                int value = Integer.parseInt(textField.getText());
+                int value = Integer.parseInt(newText);
                 // The sub-region placements are relative (but the setter below uses the
                 // absolute position and subtracts the placement origin internally)
                 BlockPos posOld = this.placement.getPos();
@@ -391,11 +383,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 this.manager.moveSubRegionTo(this.schematicPlacement, this.placement.getName(), pos, this.parent);
                 this.parent.updateElements();
             }
-            catch (NumberFormatException e)
-            {
-            }
-
-            return false;
+            catch (NumberFormatException e) {}
         }
     }
 

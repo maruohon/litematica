@@ -418,6 +418,7 @@ litematica.gui.title.material_list.schematic=Material List for schematic '%s' (%
 litematica.gui.title.material_list.select_schematic_regions=Select the sub-regions for the Material List for '%s'
 litematica.gui.title.rename_area_selection=Rename Area Selection
 litematica.gui.title.rename_area_sub_region=Rename Sub Region
+litematica.gui.title.rename_file=Rename File
 litematica.gui.title.rename_schematic=Rename Schematic
 litematica.gui.title.create_schematic_from_selection=Save the currently selected area as a Schematic
 litematica.gui.title.save_schematic_convert=Save schematic '%s' (optionally in a different format)

@@ -23,17 +23,16 @@ import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
-import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -42,7 +41,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                                           implements ISelectionListener<String>
 {
     protected final AreaSelection selection;
-    protected GuiTextFieldGeneric textFieldSelectionName;
+    protected WidgetTextFieldBase textFieldSelectionName;
     protected WidgetCheckBox checkBoxOrigin;
     protected WidgetCheckBox checkBoxCorner1;
     protected WidgetCheckBox checkBoxCorner2;
@@ -102,15 +101,15 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         this.xOrigin = x;
 
         x = xLeft;
-        y += 25;
+        y += 23;
 
         this.addLabel(x, y, 0xFFFFFFFF, StringUtils.translate("litematica.gui.label.area_editor.selection_name"));
-        y += 8;
+        y += 10;
 
         int width = 202;
-        this.textFieldSelectionName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
-        this.textFieldSelectionName.setText(this.selection.getName());
-        this.addTextField(this.textFieldSelectionName, new TextFieldListenerDummy());
+        this.textFieldSelectionName = new WidgetTextFieldBase(x, y + 1, width, 18, this.selection.getName());
+        this.textFieldSelectionName.setFocused(true);
+        this.addWidget(this.textFieldSelectionName);
         x += width + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.SET_SELECTION_NAME) + 10;
         y += 20;
@@ -251,29 +250,28 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
         y += 2;
         BlockPos pos = corner == Corner.NONE ? this.selection.getEffectiveOrigin() : this.getBox().getPosition(corner);
-        String text = "";
+        int value = 0;
         ButtonListener.Type type = null;
 
         switch (coordType)
         {
             case X:
-                text = String.valueOf(pos.getX());
+                value = pos.getX();
                 type = ButtonListener.Type.NUDGE_COORD_X;
                 break;
             case Y:
-                text = String.valueOf(pos.getY());
+                value = pos.getY();
                 type = ButtonListener.Type.NUDGE_COORD_Y;
                 break;
             case Z:
-                text = String.valueOf(pos.getZ());
+                value = pos.getZ();
                 type = ButtonListener.Type.NUDGE_COORD_Z;
                 break;
         }
 
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(x + offset, y, width, 16, this.textRenderer);
-        TextFieldListener listener = new TextFieldListener(coordType, corner, this);
-        textField.setText(text);
-        this.addTextField(textField, listener);
+        WidgetTextFieldInteger textField = new WidgetTextFieldInteger(x + offset, y, width, 16, value);
+        textField.setUpdateListenerAlways(true);
+        this.addTextField(textField, (newText) -> this.updatePosition(textField.getText(), corner, coordType));
 
         this.createCoordinateButton(x + offset + width + 4, y, corner, coordType, type);
     }
@@ -503,9 +501,9 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
                 case CREATE_SUB_REGION:
                 {
-                    GuiTextInput gui = new GuiTextInput(512, "litematica.gui.title.area_editor.sub_region_name", "", null, new SubRegionCreator(this.parent));
+                    GuiTextInput gui = new GuiTextInput("litematica.gui.title.area_editor.sub_region_name", "", null, new SubRegionCreator(this.parent));
                     gui.setParent(this.parent);
-                    GuiBase.openGui(gui);
+                    GuiBase.openPopupGui(gui);
                     break;
                 }
 
@@ -592,36 +590,6 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             {
                 return StringUtils.translate(this.translationKey, args);
             }
-        }
-    }
-
-    protected static class TextFieldListener implements ITextFieldListener<GuiTextFieldGeneric>
-    {
-        private final GuiAreaSelectionEditorNormal parent;
-        private final CoordinateType type;
-        private final Corner corner;
-
-        public TextFieldListener(CoordinateType type, Corner corner, GuiAreaSelectionEditorNormal parent)
-        {
-            this.type = type;
-            this.corner = corner;
-            this.parent = parent;
-        }
-
-        @Override
-        public boolean onTextChange(GuiTextFieldGeneric textField)
-        {
-            this.parent.updatePosition(textField.getText(), this.corner, this.type);
-            return false;
-        }
-    }
-
-    public static class TextFieldListenerDummy implements ITextFieldListener<GuiTextFieldGeneric>
-    {
-        @Override
-        public boolean onTextChange(GuiTextFieldGeneric textField)
-        {
-            return false;
         }
     }
 

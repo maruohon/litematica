@@ -152,7 +152,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
                 String title = "litematica.gui.title.rename_area_sub_region";
                 String name = this.widget.box != null ? this.widget.box.getName() : "<error>";
                 BoxRenamer renamer = new BoxRenamer(this.widget.selection, this.widget);
-                GuiBase.openPopupGui(new GuiTextInputFeedback(160, title, name, this.widget.parent.getEditorGui(), renamer));
+                GuiBase.openPopupGui(new GuiTextInputFeedback(title, name, this.widget.parent.getEditorGui(), renamer));
             }
             else if (this.type == ButtonType.REMOVE)
             {

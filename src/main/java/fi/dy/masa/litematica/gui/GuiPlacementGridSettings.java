@@ -10,12 +10,13 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.IntBoxCoordType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiDialogBase;
-import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
@@ -92,32 +93,9 @@ public class GuiPlacementGridSettings extends GuiDialogBase
     }
 
     @Override
-    public void onGuiClosed()
-    {
-        super.onGuiClosed();
-    }
-
-    @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
-        if (this.getParent() != null)
-        {
-            this.getParent().drawScreen(mouseX, mouseY, partialTicks);
-        }
-
-        super.drawScreen(mouseX, mouseY, partialTicks);
-    }
-
-    @Override
     protected void drawScreenBackground(int mouseX, int mouseY)
     {
         RenderUtils.drawOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0x90000000, COLOR_HORIZONTAL_BAR, (int) this.zLevel);
-    }
-
-    @Override
-    protected void drawTitle(int mouseX, int mouseY, float partialTicks)
-    {
-        this.drawStringWithShadow(this.title, this.dialogLeft + 10, this.dialogTop + 6, COLOR_WHITE);
     }
 
     private void updatePlacementManager()
@@ -168,8 +146,9 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         String text = String.valueOf(PositionUtils.getIntBoxValue(repeat, type));
 
         x += labelWidth;
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(x, y + 2, width, 14, this.textRenderer);
-        textField.setText(text);
+        WidgetTextFieldBase textField = new WidgetTextFieldBase(x, y + 2, width, 14, text);
+        textField.setTextValidator(new WidgetTextFieldInteger.IntValidator(0, Integer.MAX_VALUE));
+        textField.setUpdateListenerAlways(true);
         this.addTextField(textField, new TextFieldListenerRepeat(type, this.placement, this));
 
         x += width + 4;
@@ -191,8 +170,10 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         String text = String.valueOf(PositionUtils.getCoordinate(size, type));
 
         x += offset;
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(x, y + 2, width, 14, this.textRenderer);
-        textField.setText(text);
+        int defaultSize = PositionUtils.getCoordinate(this.placement.getGridSettings().getDefaultSize(), type);
+        WidgetTextFieldBase textField = new WidgetTextFieldBase(x, y + 2, width, 14, text);
+        textField.setTextValidator(new WidgetTextFieldInteger.IntValidator(defaultSize, Integer.MAX_VALUE));
+        textField.setUpdateListenerAlways(true);
         this.addTextField(textField, new TextFieldListenerSize(type, this.placement, this));
 
         x += width + 4;
@@ -202,7 +183,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         this.addButton(button, new ButtonListenerSize(type, this.placement, this));
     }
 
-    private static class TextFieldListenerRepeat implements ITextFieldListener<GuiTextFieldInteger>
+    private static class TextFieldListenerRepeat implements ITextFieldListener
     {
         private final GuiPlacementGridSettings parent;
         private final SchematicPlacement placement;
@@ -216,20 +197,16 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         }
 
         @Override
-        public boolean onTextChange(GuiTextFieldInteger textField)
+        public void onTextChange(String newText)
         {
             try
             {
-                int value = Math.max(0, Integer.parseInt(textField.getText()));
+                int value = Math.max(0, Integer.parseInt(newText));
                 IntBoundingBox old = this.placement.getGridSettings().getRepeatCounts();
                 this.placement.getGridSettings().setRepeatCounts(PositionUtils.setIntBoxValue(old, this.type, value));
                 this.parent.updatePlacementManager();
             }
-            catch (NumberFormatException e)
-            {
-            }
-
-            return false;
+            catch (NumberFormatException e) {}
         }
     }
 
@@ -262,7 +239,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         }
     }
 
-    private static class TextFieldListenerSize implements ITextFieldListener<GuiTextFieldInteger>
+    private static class TextFieldListenerSize implements ITextFieldListener
     {
         private final GuiPlacementGridSettings parent;
         private final SchematicPlacement placement;
@@ -276,19 +253,15 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         }
 
         @Override
-        public boolean onTextChange(GuiTextFieldInteger textField)
+        public void onTextChange(String newText)
         {
             try
             {
-                int value = Math.max(0, Integer.parseInt(textField.getText()));
+                int value = Math.max(0, Integer.parseInt(newText));
                 this.placement.getGridSettings().setSize(this.type, value);
                 this.parent.updatePlacementManager();
             }
-            catch (NumberFormatException e)
-            {
-            }
-
-            return false;
+            catch (NumberFormatException e) {}
         }
     }
 

@@ -68,7 +68,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     @Override
     protected void createCustomElements()
     {
-        int x = this.textField.x + this.textField.getWidth() + 12;
+        int x = this.textField.getX() + this.textField.getWidth() + 12;
         int y = 32;
 
         String str = StringUtils.translate("litematica.gui.label.schematic_save.checkbox.ignore_entities");

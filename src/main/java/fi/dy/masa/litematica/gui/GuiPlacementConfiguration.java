@@ -16,8 +16,6 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
-import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
@@ -28,6 +26,8 @@ import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -36,7 +36,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 {
     private final SchematicPlacement placement;
     private ButtonGeneric buttonResetPlacement;
-    private GuiTextFieldGeneric textFieldRename;
+    private WidgetTextFieldBase textFieldRename;
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
     {
@@ -67,10 +67,8 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         int x = 12;
         int y = 22;
 
-        this.textFieldRename = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
-        this.textFieldRename.setMaxStringLength(256);
-        this.textFieldRename.setText(this.placement.getName());
-        this.addTextField(this.textFieldRename, null);
+        this.textFieldRename = new WidgetTextFieldBase(x, y + 1, width, 18, this.placement.getName());
+        this.addWidget(this.textFieldRename);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
 
         String label = StringUtils.translate("litematica.gui.label.schematic_placement.sub_regions", this.placement.getSubRegionCount());
@@ -92,12 +90,12 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         y += 21;
 
         this.createButtonOnOff(x, y, width, this.placement.ignoreEntities(), ButtonListener.Type.TOGGLE_ENTITIES);
-        y += 26;
+        y += 23;
         x += 2;
 
         label = StringUtils.translate("litematica.gui.label.placement_settings.placement_origin");
         this.addLabel(x, y, 0xFFFFFFFF, label);
-        y += 9;
+        y += 10;
 
         this.createCoordinateInput(x, y, 70, CoordinateType.X);
         this.createButton(x + 85, y + 1, -1, ButtonListener.Type.NUDGE_COORD_X);
@@ -169,19 +167,11 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         x += this.addLabel(x, y + 5, 0xFFFFFFFF, type.name() + ":").getWidth() + 4;
 
         BlockPos pos = this.placement.getOrigin();
-        String text = "";
+        int value = PositionUtils.getCoordinate(pos, type);
 
-        switch (type)
-        {
-            case X: text = String.valueOf(pos.getX()); break;
-            case Y: text = String.valueOf(pos.getY()); break;
-            case Z: text = String.valueOf(pos.getZ()); break;
-        }
-
-        GuiTextFieldInteger textField = new GuiTextFieldInteger(x, y + 2, width, 14, this.textRenderer);
-        textField.setText(text);
-        TextFieldListener listener = new TextFieldListener(type, this.placement, this);
-        this.addTextField(textField, listener);
+        WidgetTextFieldInteger textField = new WidgetTextFieldInteger(x, y + 1, width, 16, value);
+        textField.setUpdateListenerAlways(true);
+        this.addTextField(textField, new TextFieldListener(type, this.placement, this));
 
         String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x += width + 20;
@@ -511,7 +501,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         }
     }
 
-    private static class TextFieldListener implements ITextFieldListener<GuiTextFieldInteger>
+    private static class TextFieldListener implements ITextFieldListener
     {
         private final GuiPlacementConfiguration parent;
         private final SchematicPlacementManager manager;
@@ -527,11 +517,11 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         }
 
         @Override
-        public boolean onTextChange(GuiTextFieldInteger textField)
+        public void onTextChange(String newText)
         {
             try
             {
-                int value = Integer.parseInt(textField.getText());
+                int value = Integer.parseInt(newText);
                 BlockPos posOld = this.placement.getOrigin();
                 this.parent.setNextMessageType(MessageType.ERROR);
 
@@ -544,11 +534,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
                 this.parent.updateElements();
             }
-            catch (NumberFormatException e)
-            {
-            }
-
-            return false;
+            catch (NumberFormatException e) {}
         }
     }
 

@@ -7,22 +7,20 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
     @Nullable protected final ISchematic schematic;
-    protected GuiTextFieldGeneric textField;
+    protected WidgetTextFieldBase textField;
     protected String lastText = "";
     protected String defaultText = "";
     protected boolean updatePlacementsOption;
@@ -38,8 +36,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         this.schematic = schematic;
 
-        this.textField = new GuiTextFieldGeneric(10, 32, 160, 20, this.textRenderer);
-        this.textField.setMaxStringLength(256);
+        this.textField = new WidgetTextFieldBase(10, 32, 160, 20);
         this.textField.setFocused(true);
     }
 
@@ -65,13 +62,8 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         super.initGui();
 
-        boolean focused = this.textField.isFocused();
-        String text = this.textField.getText();
-        int pos = this.textField.getCursorPosition();
-        this.textField = new GuiTextFieldGeneric(10, 32, this.width - 196, 20, this.textRenderer);
-        this.textField.setText(text);
-        this.textField.setCursorPosition(pos);
-        this.textField.setFocused(focused);
+        this.textField.setWidth(this.width - 196);
+        this.addWidget(this.textField);
 
         DirectoryEntry entry = this.getListWidget().getLastSelectedEntry();
 
@@ -107,7 +99,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
     protected void createCustomElements()
     {
-        int x = this.textField.x + this.textField.getWidth() + 12;
+        int x = this.textField.getX() + this.textField.getWidth() + 12;
         int y = 32;
 
         this.createButton(x, y, ButtonType.SAVE);
@@ -117,7 +109,6 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         this.lastText = text;
         this.textField.setText(text);
-        this.textField.setCursorPositionEnd();
     }
 
     protected String getTextFieldText()
@@ -168,7 +159,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
             button = new ButtonGeneric(x, y, width, 20, label);
         }
 
-        this.addButton(button, new ButtonListenerSave(this));
+        this.addButton(button, (btn, mbtn) -> this.saveSchematic());
 
         return x + width + 4;
     }
@@ -178,14 +169,6 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         this.setNextMessageType(MessageType.ERROR);
         super.setString(string);
-    }
-
-    @Override
-    public void drawContents(int mouseX, int mouseY, float partialTicks)
-    {
-        super.drawContents(mouseX, mouseY, partialTicks);
-
-        this.textField.drawTextBox();
     }
 
     @Override
@@ -204,17 +187,6 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
-    {
-        if (this.textField.mouseClicked(mouseX, mouseY, mouseButton))
-        {
-            return true;
-        }
-
-        return super.onMouseClicked(mouseX, mouseY, mouseButton);
-    }
-
-    @Override
     public boolean onKeyTyped(char typedChar, int keyCode)
     {
         if (this.textField.isFocused() && keyCode == Keyboard.KEY_RETURN)
@@ -222,34 +194,13 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
             this.saveSchematic();
             return true;
         }
-        else if (this.textField.textboxKeyTyped(typedChar, keyCode))
+        else if (this.textField.onKeyTyped(typedChar, keyCode))
         {
             this.getListWidget().clearSelection();
             return true;
         }
-        else if (keyCode == Keyboard.KEY_TAB)
-        {
-            this.textField.setFocused(! this.textField.isFocused());
-            return true;
-        }
 
         return super.onKeyTyped(typedChar, keyCode);
-    }
-
-    private static class ButtonListenerSave implements IButtonActionListener
-    {
-        protected final GuiSchematicSaveBase gui;
-
-        public ButtonListenerSave(GuiSchematicSaveBase gui)
-        {
-            this.gui = gui;
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
-        {
-            this.gui.saveSchematic();
-        }
     }
 
     public enum ButtonType

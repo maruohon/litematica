@@ -20,7 +20,6 @@ import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.data.DataDump;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.GuiTextFieldInteger;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
@@ -29,6 +28,7 @@ import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -86,10 +86,10 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         int w = this.getStringWidth(str);
         this.addLabel(this.width - w - 56, y + 6, 0xFFFFFFFF, str);
 
-        GuiTextFieldInteger tf = new GuiTextFieldInteger(this.width - 52, y + 2, 40, 16, this.textRenderer);
-        tf.setText(String.valueOf(this.materialList.getMultiplier()));
-        MultiplierListener listener = new MultiplierListener(this.materialList, this);
-        this.addTextField(tf, listener);
+        WidgetTextFieldBase textField = new WidgetTextFieldBase(this.width - 52, y + 2, 40, 16, String.valueOf(this.materialList.getMultiplier()));
+        textField.setTextValidator(WidgetTextFieldBase.VALIDATOR_INTEGER_POSITIVE);
+        textField.setUpdateListenerAlways(true);
+        this.addTextField(textField, new MultiplierListener(this.materialList, this));
 
         this.addWidget(new WidgetInfoIcon(this.width - 23, 10, LitematicaGuiIcons.INFO_11, "litematica.info.material_list"));
 
@@ -363,7 +363,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         }
     }
 
-    private static class MultiplierListener implements ITextFieldListener<GuiTextFieldInteger>
+    private static class MultiplierListener implements ITextFieldListener
     {
         private final MaterialListBase materialList;
         private final GuiMaterialList gui;
@@ -375,17 +375,16 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         }
 
         @Override
-        public boolean onTextChange(GuiTextFieldInteger textField)
+        public void onTextChange(String newText)
         {
             try
             {
-                int multiplier = Integer.parseInt(textField.getText());
+                int multiplier = Integer.parseInt(newText);
 
                 if (multiplier != this.materialList.getMultiplier())
                 {
                     this.materialList.setMultiplier(multiplier);
                     this.gui.getListWidget().refreshEntries();
-                    return true;
                 }
             }
             catch (Exception e)
@@ -393,8 +392,6 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                 this.materialList.setMultiplier(1);
                 this.gui.getListWidget().refreshEntries();
             }
-
-            return false;
         }
     }
 }

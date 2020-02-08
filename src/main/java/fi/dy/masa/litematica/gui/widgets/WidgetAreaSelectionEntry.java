@@ -158,7 +158,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
                 String name = selection != null ? selection.getName() : "<error>";
                 SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, false);
-                GuiBase.openPopupGui(new GuiTextInputFeedback(160, title, name, this.widget.parent.getSelectionManagerGui(), renamer));
+                GuiBase.openPopupGui(new GuiTextInputFeedback(title, name, this.widget.parent.getSelectionManagerGui(), renamer));
             }
             else if (this.type == ButtonType.COPY)
             {
@@ -168,7 +168,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 {
                     String title = StringUtils.translate("litematica.gui.title.copy_area_selection", selection.getName());
                     SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, true);
-                    GuiBase.openGui(new GuiTextInputFeedback(160, title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
+                    GuiBase.openPopupGui(new GuiTextInputFeedback(title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
                 }
                 else
                 {

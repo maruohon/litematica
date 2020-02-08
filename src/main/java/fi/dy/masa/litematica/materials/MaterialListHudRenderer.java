@@ -279,7 +279,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                     {
                         Slot slot = pair.getLeft();
                         Color4f color = pair.getRight();
-                        RenderUtils.drawOutlinedBox(guiX + slot.xPos + 1, guiY + slot.yPos + 1, 14, 14, color.intValue, color.intValue | 0xFF000000, 1f);
+                        RenderUtils.drawOutlinedBox(guiX + slot.xPos, guiY + slot.yPos, 16, 16, color.intValue, color.intValue | 0xFF000000, 1f);
                     }
 
                     GlStateManager.enableTexture2D();

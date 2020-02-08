@@ -221,7 +221,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 if (type.getHasName())
                 {
                     String oldName = data.schematic.getMetadata().getName();
-                    GuiBase.openPopupGui(new GuiTextInputFeedback(256, "litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
+                    GuiBase.openPopupGui(new GuiTextInputFeedback("litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
                 }
                 else
                 {
@@ -231,12 +231,12 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             else if (this.type == Type.RENAME_FILE)
             {
                 String oldName = FileUtils.getNameWithoutExtension(entry.getName());
-                GuiBase.openGui(new GuiTextInputFeedback(256, "litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
+                GuiBase.openPopupGui(new GuiTextInputFeedback("litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
             }
             else if (this.type == Type.DELETE_FILE)
             {
                 FileDeleter deleter = new FileDeleter(entry.getFullPath());
-                GuiBase.openGui(new GuiConfirmAction(400, "litematica.gui.title.confirm_file_deletion", deleter, this.gui, "litematica.gui.message.confirm_file_deletion", entry.getName()));
+                GuiBase.openPopupGui(new GuiConfirmAction(400, "litematica.gui.title.confirm_file_deletion", deleter, this.gui, "litematica.gui.message.confirm_file_deletion", entry.getName()));
             }
             else if (this.type == Type.CONVERT_FORMAT)
             {

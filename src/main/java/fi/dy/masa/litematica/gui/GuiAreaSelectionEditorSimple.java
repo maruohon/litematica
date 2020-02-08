@@ -9,12 +9,12 @@ import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
+import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
 {
-    protected GuiTextFieldGeneric textFieldBoxName;
+    protected WidgetTextFieldBase textFieldBoxName;
 
     public GuiAreaSelectionEditorSimple(AreaSelection selection)
     {
@@ -35,16 +35,15 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     {
         x = 12;
         String label = StringUtils.translate("litematica.gui.label.area_editor.box_name");
-        this.addLabel(x, y + 5, 0xFFFFFFFF, label);
+        this.addLabel(x, y + 3, 0xFFFFFFFF, label);
         y += 13;
 
         boolean currentlyOn = this.selection.getExplicitOrigin() != null;
         this.createButtonOnOff(this.xOrigin, 24, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED);
 
         int width = 202;
-        this.textFieldBoxName = new GuiTextFieldGeneric(x, y + 2, width, 16, this.textRenderer);
-        this.textFieldBoxName.setText(this.getBox().getName());
-        this.addTextField(this.textFieldBoxName, new TextFieldListenerDummy());
+        this.textFieldBoxName = new WidgetTextFieldBase(x, y + 1, width, 18, this.getBox().getName());
+        this.addWidget(this.textFieldBoxName);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.SET_BOX_NAME);
         y += 20;
 

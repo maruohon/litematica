@@ -164,8 +164,8 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
             else if (this.type == Type.CREATE_PROJECT)
             {
                 ProjectCreator creator = new ProjectCreator(this.gui.getListWidget().getCurrentDirectory(), this.gui);
-                GuiTextInput gui = new GuiTextInput(256, "litematica.gui.title.create_schematic_project", "", GuiUtils.getCurrentScreen(), creator);
-                GuiBase.openGui(gui);
+                GuiTextInput gui = new GuiTextInput("litematica.gui.title.create_schematic_project", "", GuiUtils.getCurrentScreen(), creator);
+                GuiBase.openPopupGui(gui);
             }
             else if (this.type == Type.CLOSE_PROJECT)
             {
