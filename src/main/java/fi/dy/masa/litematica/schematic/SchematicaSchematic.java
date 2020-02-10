@@ -55,6 +55,30 @@ public class SchematicaSchematic extends SingleRegionSchematic
     }
 
     @Override
+    @Nullable
+    protected Vec3i readSizeFromTag(NBTTagCompound tag)
+    {
+        if (isValidSchematic(tag))
+        {
+            return readSizeFromTagImpl(tag);
+        }
+
+        return null;
+    }
+
+    @Override
+    protected Map<BlockPos, NBTTagCompound> readBlockEntitiesFromTag(NBTTagCompound tag)
+    {
+        return this.readBlockEntitiesFromListTag(tag.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND));
+    }
+
+    @Override
+    protected List<EntityInfo> readEntitiesFromTag(NBTTagCompound tag)
+    {
+        return this.readEntitiesFromListTag(tag.getTagList("Entities", Constants.NBT.TAG_COMPOUND));
+    }
+
+    @Override
     public NBTTagCompound toTag()
     {
         NBTTagCompound nbt = new NBTTagCompound();
@@ -182,25 +206,6 @@ public class SchematicaSchematic extends SingleRegionSchematic
                 }
             }
         }
-    }
-
-    @Override
-    protected Vec3i readSizeFromTag(NBTTagCompound tag)
-    {
-        if (tag.hasKey("Blocks", Constants.NBT.TAG_BYTE_ARRAY) &&
-            tag.hasKey("Data", Constants.NBT.TAG_BYTE_ARRAY) &&
-            tag.hasKey("Width", Constants.NBT.TAG_SHORT) &&
-            tag.hasKey("Height", Constants.NBT.TAG_SHORT) &&
-            tag.hasKey("Length", Constants.NBT.TAG_SHORT))
-        {
-            final int sizeX = tag.getShort("Width");
-            final int sizeY = tag.getShort("Height");
-            final int sizeZ = tag.getShort("Length");
-
-            return new Vec3i(sizeX, sizeY, sizeZ);
-        }
-
-        return null;
     }
 
     @SuppressWarnings("deprecation")
@@ -331,18 +336,6 @@ public class SchematicaSchematic extends SingleRegionSchematic
         }
 
         return true;
-    }
-
-    @Override
-    protected Map<BlockPos, NBTTagCompound> readBlockEntitiesFromTag(NBTTagCompound tag)
-    {
-        return this.readBlockEntitiesFromListTag(tag.getTagList("TileEntities", Constants.NBT.TAG_COMPOUND));
-    }
-
-    @Override
-    protected List<EntityInfo> readEntitiesFromTag(NBTTagCompound tag)
-    {
-        return this.readEntitiesFromListTag(tag.getTagList("Entities", Constants.NBT.TAG_COMPOUND));
     }
 
     protected void createPalette()

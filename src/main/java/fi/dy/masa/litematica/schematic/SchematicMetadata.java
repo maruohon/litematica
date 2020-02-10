@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -256,8 +255,15 @@ public class SchematicMetadata
             this.timeModified = tag.getLong("TimeModified");
         }
 
-        Vec3i size = NBTUtils.readBlockPos(tag.getCompoundTag("EnclosingSize"));
-        this.enclosingSize = size != null ? size : BlockPos.ORIGIN;
+        if (tag.hasKey("EnclosingSize", Constants.NBT.TAG_COMPOUND))
+        {
+            Vec3i size = NBTUtils.readBlockPos(tag.getCompoundTag("EnclosingSize"));
+
+            if (size != null)
+            {
+                this.enclosingSize = size;
+            }
+        }
 
         if (tag.hasKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
         {

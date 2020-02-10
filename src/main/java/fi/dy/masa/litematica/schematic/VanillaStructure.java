@@ -163,8 +163,7 @@ public class VanillaStructure extends SingleRegionSchematic
 
     protected void writeMetadataToTag(NBTTagCompound tag)
     {
-        NBTTagCompound metaTag = this.getMetadata().toTag();
-        tag.setTag("Metadata", metaTag);
+        tag.setTag("Metadata", this.getMetadata().toTag());
         tag.setString("author", this.getMetadata().getAuthor());
     }
 

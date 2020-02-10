@@ -157,6 +157,9 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
                 {
                     this.setSize(size, regions.size() > 1);
                     this.readFrom(regions);
+
+                    this.getMetadata().copyFrom(other.getMetadata());
+                    this.getMetadata().setRegionCount(1);
                 }
                 catch (Exception e)
                 {
@@ -164,9 +167,6 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
                 }
             }
         }
-
-        this.getMetadata().copyFrom(other.getMetadata());
-        this.getMetadata().setRegionCount(1);
     }
 
     protected void readFrom(ImmutableMap<String, ISchematicRegion> regions)
