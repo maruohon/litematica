@@ -2,7 +2,8 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
@@ -18,7 +19,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
 
 public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchematic>
 {
@@ -92,7 +92,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, schematicName);
 
         RenderUtils.color(1f, 1f, 1f, 1f);
-        GlStateManager.disableBlend();
+        RenderSystem.disableBlend();
 
         File schematicFile = this.schematic.getFile();
         String fileName = schematicFile != null ? schematicFile.getName() : null;
@@ -122,7 +122,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         }
 
         RenderUtils.disableDiffuseLighting();
-        GlStateManager.disableLighting();
+        RenderSystem.disableLighting();
     }
 
     private static class ButtonListener implements IButtonActionListener
