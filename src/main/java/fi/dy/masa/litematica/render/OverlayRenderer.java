@@ -136,12 +136,13 @@ public class OverlayRenderer
 
         if (renderAreas || renderPlacements || isProjectMode)
         {
-            GlStateManager.depthMask(true);
             GlStateManager.disableLighting();
             GlStateManager.disableTexture();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
             GlStateManager.pushMatrix();
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(true);
 
             if (renderAreas)
             {
