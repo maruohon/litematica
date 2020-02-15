@@ -29,7 +29,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -39,8 +39,8 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         int width = this.getWidth();
         int height = this.getHeight();
 
-        // Draw a lighter background for the hovered and the selected entry
-        if (selected || this.isMouseOver(mouseX, mouseY))
+        // Draw a lighter background for the hovered entry
+        if (this.isMouseOver(mouseX, mouseY))
         {
             RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
         }
@@ -57,7 +57,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         String name = this.getEntry().getDisplayName();
         this.drawString(x + 4, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, name);
 
-        this.drawSubWidgets(mouseX, mouseY);
+        this.drawSubWidgets(mouseX, mouseY, isActiveGui, hoveredWidgetId);
 
         RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();

@@ -38,9 +38,9 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     }
 
     @Override
-    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
-        super.drawContents(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, isActiveGui, hoveredWidgetId);
         lastScrollbarPosition = this.scrollBar.getValue();
     }
 

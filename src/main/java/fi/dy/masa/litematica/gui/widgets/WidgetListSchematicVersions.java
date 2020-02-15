@@ -28,18 +28,29 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
         this.project = project;
         this.browserEntryHeight = 16;
         this.infoWidth = 180;
+        this.setBackgroundColor(0xB0000000);
+        this.setBorderColor(GuiBase.COLOR_HORIZONTAL_BAR);
+        this.setBackgroundEnabled(true);
 
         this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override
-    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    protected int getBackgroundWidth()
     {
-        // Draw an outline around the entire entry list
-        RenderUtils.drawOutlinedBox(this.getX(), this.getY(), this.browserWidth, this.browserHeight, 0xB0000000, GuiBase.COLOR_HORIZONTAL_BAR, this.getZLevel());
+        return this.browserWidth;
+    }
 
-        super.drawContents(mouseX, mouseY, partialTicks);
+    @Override
+    protected int getBackgroundHeight()
+    {
+        return this.browserHeight;
+    }
 
+    @Override
+    public void render(int mouseX, int mouseY, boolean isActiveGui, boolean hovered)
+    {
+        super.render(mouseX, mouseY, isActiveGui, hovered);
         this.drawAdditionalContents(mouseX, mouseY);
     }
 

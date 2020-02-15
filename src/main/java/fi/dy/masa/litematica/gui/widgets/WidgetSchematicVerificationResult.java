@@ -223,7 +223,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId, boolean selected)
     {
         selected = this.shouldRenderAsSelected();
 
@@ -235,7 +235,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         {
             color = 0xA0707070;
         }
-        else if (this.isMouseOver(mouseX, mouseY))
+        else if (isActiveGui && this.getId() == hoveredWidgetId)
         {
             color = 0xA0505050;
         }
@@ -341,11 +341,11 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             GlStateManager.popMatrix();
         }
 
-        super.render(mouseX, mouseY, selected);
+        super.render(mouseX, mouseY, isActiveGui, hoveredWidgetId, selected);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.getX())
         {

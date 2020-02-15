@@ -145,7 +145,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
         int z = this.getZLevel();
         int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x, y, this.infoWidth, height, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, z);
+        RenderUtils.drawOutlinedBox(x + 1, y, this.infoWidth, height, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, z);
 
         if (entry == null)
         {
@@ -158,7 +158,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
         {
             SchematicMetadata meta = data.schematic.getMetadata();
 
-            x += 3;
+            x += 5;
             y += 3;
             int textColor = 0xC0C0C0C0;
             int valueColor = 0xC0FFFFFF;

@@ -59,11 +59,11 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, boolean hovered)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
-        selected = this.entry.equals(this.selection.getCurrentSubRegionBoxName());
+        boolean selected = this.entry.equals(this.selection.getCurrentSubRegionBoxName());
         int x = this.getX();
         int y = this.getY();
         int z = this.getZLevel();
@@ -92,11 +92,13 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
         this.drawString(x + 2, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, this.entry);
 
-        super.render(mouseX, mouseY, selected);
+        super.render(mouseX, mouseY, isActiveGui, hovered);
+
+        RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         List<String> text = new ArrayList<>();
 
@@ -131,6 +133,8 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         {
             RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
+
+        RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
     private static class ButtonListener implements IButtonActionListener

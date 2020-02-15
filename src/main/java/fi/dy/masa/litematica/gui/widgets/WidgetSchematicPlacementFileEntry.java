@@ -92,7 +92,7 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         List<String> text = new ArrayList<>();
         SchematicPlacementUnloaded placement = this.getPlacement();

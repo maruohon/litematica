@@ -70,10 +70,10 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
     @Override
     protected void drawAdditionalContents(int mouseX, int mouseY)
     {
-        int x = this.getX() + this.getWidth() - this.infoWidth + 4;
+        int x = this.getX() + this.getWidth() - this.infoWidth;
         int y = this.getY() + 4;
         int infoHeight = 100;
-        RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, this.getZLevel());
+        RenderUtils.drawOutlinedBox(x + 1, y - 4, this.infoWidth, infoHeight, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, this.getZLevel());
 
         SchematicProject project = this.selectedProject;
 
@@ -84,6 +84,7 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
             String r = GuiBase.TXT_RST;
             int color = 0xFFB0B0B0;
 
+            x += 5;
             str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
             this.drawString(x, y, color, str);
             y += 12;

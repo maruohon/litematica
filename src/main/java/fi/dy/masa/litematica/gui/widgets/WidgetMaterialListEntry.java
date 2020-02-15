@@ -176,7 +176,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId, boolean selected)
     {
         int x = this.getX();
         int y = this.getY();
@@ -185,7 +185,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         int height = this.getHeight();
 
         // Draw a lighter background for the hovered and the selected entry
-        if (this.header1 == null && (selected || this.isMouseOver(mouseX, mouseY)))
+        if (this.header1 == null && (selected || (isActiveGui && this.getId() == hoveredWidgetId)))
         {
             RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
         }
@@ -255,12 +255,12 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             RenderUtils.disableItemLighting();
             GlStateManager.popMatrix();
 
-            super.render(mouseX, mouseY, selected);
+            super.render(mouseX, mouseY, isActiveGui, hoveredWidgetId, selected);
         }
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         if (this.entry != null)
         {

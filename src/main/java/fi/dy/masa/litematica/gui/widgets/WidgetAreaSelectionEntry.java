@@ -73,16 +73,16 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId, boolean selected)
     {
         if (this.entry.getType() == DirectoryEntryType.FILE && this.fileType == FileType.JSON)
         {
             selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentNormalSelectionId());
-            super.render(mouseX, mouseY, selected);
+            super.render(mouseX, mouseY, isActiveGui, hoveredWidgetId, selected);
         }
         else
         {
-            super.render(mouseX, mouseY, selected);
+            super.render(mouseX, mouseY, isActiveGui, hoveredWidgetId, selected);
         }
     }
 
@@ -100,7 +100,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         List<String> text = new ArrayList<>();
         AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(this.getDirectoryEntry().getFullPath().getAbsolutePath());

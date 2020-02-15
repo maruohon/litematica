@@ -109,7 +109,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -119,8 +119,8 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
         int width = this.getWidth();
         int height = this.getHeight();
 
-        // Draw a lighter background for the hovered and the selected entry
-        if (selected || this.isMouseOver(mouseX, mouseY))
+        // Draw a lighter background for the hovered entry
+        if (this.isMouseOver(mouseX, mouseY))
         {
             RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
         }
@@ -159,14 +159,15 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
             LitematicaGuiIcons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, y + 6, z + 0.1f, false, false);
         }
 
-        this.drawSubWidgets(mouseX, mouseY);
+        this.drawSubWidgets(mouseX, mouseY, isActiveGui, hoveredWidgetId);
 
         RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();
+        RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -194,9 +195,9 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
             RenderUtils.drawHoverText(mouseX, mouseY, z, lines);
         }
 
-        RenderUtils.color(1f, 1f, 1f, 1f);
+        super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
 
-        super.postRenderHovered(mouseX, mouseY, selected);
+        RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
     private static class ButtonListener implements IButtonActionListener

@@ -79,7 +79,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId, boolean selected)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -91,7 +91,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         int height = this.getHeight();
 
         // Draw a lighter background for the hovered and the selected entry
-        if (selected || placementSelected || this.isMouseOver(mouseX, mouseY))
+        if (placementSelected || (isActiveGui && this.getId() == hoveredWidgetId))
         {
             RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
         }
@@ -133,11 +133,11 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             icon.renderAt(this.buttonsStartX - icon.getWidth() - 2, y + 6, z, false, false);
         }
 
-        super.render(mouseX, mouseY, placementSelected);
+        super.render(mouseX, mouseY, isActiveGui, hoveredWidgetId, placementSelected);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         ISchematic schematic = this.schematicPlacement.getSchematic();
         File schematicFile = schematic.getFile();

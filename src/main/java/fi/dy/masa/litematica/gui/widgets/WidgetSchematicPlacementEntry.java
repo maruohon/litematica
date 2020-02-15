@@ -123,7 +123,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean isActiveGui, boolean hovered)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -135,7 +135,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         int height = this.getHeight();
 
         // Draw a lighter background for the hovered and the selected entry
-        if (selected || placementSelected || this.isMouseOver(mouseX, mouseY))
+        if (placementSelected || this.isMouseOver(mouseX, mouseY))
         {
             RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
         }
@@ -186,11 +186,11 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             icon.renderAt(this.buttonsStartX - 26, y + 6, z + 0.1f, false, false);
         }
 
-        super.render(mouseX, mouseY, placementSelected);
+        super.render(mouseX, mouseY, isActiveGui, placementSelected);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         int x = this.getX();
         int y = this.getY();
@@ -249,7 +249,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             RenderUtils.drawHoverText(mouseX, mouseY, z, text);
         }
 
-        super.postRenderHovered(mouseX, mouseY, selected);
+        super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
     }
 
     static class ButtonListener implements IButtonActionListener
