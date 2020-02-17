@@ -44,6 +44,8 @@ litematica.error.schematic_placements.load_fail=Failed to load the placement fro
 litematica.error.schematic_placements.load_fail.already_loaded=Failed to load the placement '%s' from file, that placement seems to already be loaded
 litematica.error.schematic_placements.remove_fail_locked=The placement is locked!\n- Hold Shift to force remove it
 litematica.error.schematic_placements.save_failed=Failed to save the placement to file
+litematica.error.schematic_placements.settings_load.invalid_data=Failed to load placement settings, invalid (non-JSON?) data
+litematica.error.schematic_placements.settings_load.missing_data=Failed to load placement settings, missing some of the required data!
 
 litematica.error.schematic_projects.empty_selection=Empty Area Selection (0 sub-regions)
 litematica.error.schematic_projects.failed_to_load_project=Failed to load project
@@ -133,6 +135,8 @@ litematica.gui.button.hover.schematic_list.save_to_file=§7Save this schematic t
 litematica.gui.button.hover.schematic_list.unload=§7Unload this schematic from memory.\n§6Note: Unloading a schematic will also remove\n§6all the placements created from it.
 
 litematica.gui.button.hover.schematic_manager.convert_format=Convert the selected schematic to another schematic format
+
+litematica.gui.button.hover.schematic_placement.copy_paste_settings=§6Copy or Paste placement settings\n- Click to open a text field where you can copy\n   or paste the setting string from/to\n- Shift + Left click to copy the settings directly to the clip board\n- Ctrl + Shift + Right click to directly paste the settings from the clip board
 
 litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode=There is currently a Schematic Project open.\nThe Schematic Project overrides the normal area selection functionality
 litematica.gui.button.hover.schematic_projects.delete_area=§6Delete the last placed or saved area§r
@@ -424,6 +428,7 @@ litematica.gui.title.create_schematic_from_selection=Save the currently selected
 litematica.gui.title.save_schematic_convert=Save schematic '%s' (optionally in a different format)
 litematica.gui.title.save_schematic_from_memory=Save an in-memory Schematic to a file
 litematica.gui.title.schematic_manager=Schematic Manager
+litematica.gui.title.schematic_placement.copy_or_load_settings=Copy or load placement settings
 litematica.gui.title.schematic_placement_browser=Saved Schematic Placements
 litematica.gui.title.schematic_placement_grid_settings=Grid/Repeat settings for placement '%s'
 litematica.gui.title.schematic_project_manager=Schematic Project Manager
@@ -543,6 +548,8 @@ litematica.message.moved_selection=Moved the current selection from %s => %s
 litematica.message.placement.cant_modify_is_locked=§cThe placement is locked and can't be modified§r
 litematica.message.placement.moved_placement_origin=Moved placement origin from %s => %s
 litematica.message.placement.moved_subregion_to=Moved sub-region to %s
+litematica.message.placement.settings_copied_to_clipboard=Settings copied to clip board
+litematica.message.placement.settings_loaded_from_clipboard=Settings loaded from clip board
 litematica.message.placement_restriction_fail=Action prevented by Placement Restriction mode
 litematica.message.removed_area_origin=Removed the explicit/manual area origin point
 litematica.message.removed_selection_box=Removed selection box %s

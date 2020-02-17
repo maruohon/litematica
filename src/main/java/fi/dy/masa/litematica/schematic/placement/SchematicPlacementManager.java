@@ -824,6 +824,37 @@ public class SchematicPlacementManager
         }
     }
 
+    public boolean loadPlacementSettings(SchematicPlacement placement, String str, IMessageConsumer feedback)
+    {
+        JsonElement el = JsonUtils.parseJsonFromString(str);
+
+        if (el != null && el.isJsonObject())
+        {
+            return this.loadPlacementSettings(placement, el.getAsJsonObject(), feedback);
+        }
+
+        feedback.addMessage(MessageType.ERROR, "litematica.error.schematic_placements.settings_load.invalid_data");
+
+        return false;
+    }
+
+    public boolean loadPlacementSettings(SchematicPlacement placement, JsonObject obj, IMessageConsumer feedback)
+    {
+        if (placement.isLocked())
+        {
+            feedback.addMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+            return false;
+        }
+
+        this.onPrePlacementChange(placement);
+
+        boolean success = placement.readBaseSettingsFromJson(obj);
+
+        this.onPlacementModified(placement);
+
+        return success;
+    }
+
     private void updateTouchedBoxesInChunk(ChunkPos pos)
     {
         for (int y = 0; y < 16; ++y)

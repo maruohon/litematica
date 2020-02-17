@@ -34,9 +34,9 @@ public class SchematicPlacementUnloaded
     protected final Map<String, SubRegionPlacement> relativeSubRegionPlacements = new HashMap<>();
     protected final GridSettings gridSettings = new GridSettings();
 
-    protected String placementSaveFile;
-    protected BlockPos origin;
-    protected String name;
+    @Nullable protected String placementSaveFile;
+    protected BlockPos origin = BlockPos.ORIGIN;
+    protected String name = "?";
     protected Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
     protected Rotation rotation = Rotation.NONE;
     protected Mirror mirror = Mirror.NONE;
@@ -52,6 +52,12 @@ public class SchematicPlacementUnloaded
     @Nullable protected Box enclosingBox;
     @Nullable protected String selectedSubRegionName;
     @Nullable protected JsonObject materialListData;
+
+    protected SchematicPlacementUnloaded(@Nullable String storageFile, @Nullable File schematicFile)
+    {
+        this.placementSaveFile = storageFile;
+        this.schematicFile = schematicFile;
+    }
 
     protected SchematicPlacementUnloaded(@Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled, boolean enableRender)
     {
@@ -254,19 +260,110 @@ public class SchematicPlacementUnloaded
         return null;
     }
 
+    boolean readBaseSettingsFromJson(JsonObject obj)
+    {
+        if (hasBaseSettings(obj))
+        {
+            BlockPos origin = JsonUtils.blockPosFromJson(obj, "origin");
+            Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
+            Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
+
+            if (origin == null || rotation == null || mirror == null)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_placements.settings_load.missing_data");
+                String name = this.schematicFile != null ? this.schematicFile.getAbsolutePath() : "<null>";
+                LiteModLitematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", name);
+                return false;
+            }
+
+            String name = obj.get("name").getAsString();
+
+            if (name != null)
+            {
+                this.name = name;
+            }
+
+            this.origin = origin;
+            this.rotation = rotation;
+            this.mirror = mirror;
+            this.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
+
+            if (JsonUtils.hasObject(obj, "grid"))
+            {
+                this.gridSettings.fromJson(JsonUtils.getNestedObject(obj, "grid", false));
+            }
+
+            JsonArray placementArr = obj.get("placements").getAsJsonArray();
+
+            for (int i = 0; i < placementArr.size(); ++i)
+            {
+                JsonElement el = placementArr.get(i);
+
+                if (el.isJsonObject())
+                {
+                    JsonObject placementObj = el.getAsJsonObject();
+
+                    if (JsonUtils.hasString(placementObj, "name") &&
+                        JsonUtils.hasObject(placementObj, "placement"))
+                    {
+                        SubRegionPlacement placement = SubRegionPlacement.fromJson(placementObj.get("placement").getAsJsonObject());
+
+                        if (placement != null)
+                        {
+                            String placementName = placementObj.get("name").getAsString();
+                            this.relativeSubRegionPlacements.put(placementName, placement);
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public JsonObject baseSettingsToJson()
+    {
+        JsonObject obj = new JsonObject();
+
+        obj.add("name", new JsonPrimitive(this.name));
+        obj.add("origin", JsonUtils.blockPosToJson(this.origin));
+        obj.add("rotation", new JsonPrimitive(this.rotation.name()));
+        obj.add("mirror", new JsonPrimitive(this.mirror.name()));
+        obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities()));
+
+        if (this.gridSettings.isInitialized())
+        {
+            obj.add("grid", this.gridSettings.toJson());
+        }
+
+        if (this.relativeSubRegionPlacements.isEmpty() == false)
+        {
+            JsonArray arr = new JsonArray();
+
+            for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
+            {
+                JsonObject placementObj = new JsonObject();
+                placementObj.add("name", new JsonPrimitive(entry.getKey()));
+                placementObj.add("placement", entry.getValue().toJson());
+                arr.add(placementObj);
+            }
+
+            obj.add("placements", arr);
+        }
+
+        return obj;
+    }
+
     @Nullable
     public JsonObject toJson()
     {
         if (this.schematicFile != null)
         {
-            JsonObject obj = new JsonObject();
+            JsonObject obj = this.baseSettingsToJson();
 
             obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
-            obj.add("name", new JsonPrimitive(this.name));
-            obj.add("origin", JsonUtils.blockPosToJson(this.origin));
-            obj.add("rotation", new JsonPrimitive(this.rotation.name()));
-            obj.add("mirror", new JsonPrimitive(this.mirror.name()));
-            obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities()));
             obj.add("enabled", new JsonPrimitive(this.isEnabled()));
             obj.add("enable_render", new JsonPrimitive(this.enableRender));
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
@@ -290,26 +387,6 @@ public class SchematicPlacementUnloaded
                 obj.add("material_list", this.materialListData);
             }
 
-            if (this.gridSettings.isInitialized())
-            {
-                obj.add("grid", this.gridSettings.toJson());
-            }
-
-            if (this.relativeSubRegionPlacements.isEmpty() == false)
-            {
-                JsonArray arr = new JsonArray();
-
-                for (Map.Entry<String, SubRegionPlacement> entry : this.relativeSubRegionPlacements.entrySet())
-                {
-                    JsonObject placementObj = new JsonObject();
-                    placementObj.add("name", new JsonPrimitive(entry.getKey()));
-                    placementObj.add("placement", entry.getValue().toJson());
-                    arr.add(placementObj);
-                }
-
-                obj.add("placements", arr);
-            }
-
             return obj;
         }
 
@@ -318,37 +395,32 @@ public class SchematicPlacementUnloaded
         return null;
     }
 
+    protected static boolean hasBaseSettings(JsonObject obj)
+    {
+        return JsonUtils.hasString(obj, "name") &&
+               JsonUtils.hasArray(obj, "origin") &&
+               JsonUtils.hasString(obj, "rotation") &&
+               JsonUtils.hasString(obj, "mirror") &&
+               JsonUtils.hasArray(obj, "placements");
+    }
+
     @Nullable
     public static SchematicPlacementUnloaded fromJson(JsonObject obj)
     {
-        if (JsonUtils.hasString(obj, "schematic") &&
-            JsonUtils.hasString(obj, "name") &&
-            JsonUtils.hasArray(obj, "origin") &&
-            JsonUtils.hasString(obj, "rotation") &&
-            JsonUtils.hasString(obj, "mirror") &&
-            JsonUtils.hasArray(obj, "placements"))
+        if (JsonUtils.hasString(obj, "schematic") && hasBaseSettings(obj))
         {
             File schematicFile = new File(obj.get("schematic").getAsString());
-            BlockPos pos = JsonUtils.blockPosFromJson(obj, "origin");
+            SchematicPlacementUnloaded schematicPlacement = new SchematicPlacementUnloaded(null, schematicFile);
 
-            if (pos == null)
+            if (schematicPlacement.readBaseSettingsFromJson(obj) == false)
             {
-                LiteModLitematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", schematicFile.getAbsolutePath());
                 return null;
             }
 
-            String name = obj.get("name").getAsString();
-            Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
-            Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
-            boolean enabled = JsonUtils.getBoolean(obj, "enabled");
-            boolean enableRender = JsonUtils.getBoolean(obj, "enable_render");
-
-            SchematicPlacementUnloaded schematicPlacement = new SchematicPlacementUnloaded(null, schematicFile, pos, name, enabled, enableRender);
-            schematicPlacement.rotation = rotation;
-            schematicPlacement.mirror = mirror;
+            schematicPlacement.enabled = JsonUtils.getBoolean(obj, "enabled");
+            schematicPlacement.enableRender = JsonUtils.getBoolean(obj, "enable_render");
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
             schematicPlacement.renderEnclosingBox = JsonUtils.getBoolean(obj, "render_enclosing_box");
-            schematicPlacement.locked = JsonUtils.getBoolean(obj, "locked");
             schematicPlacement.coordinateLockMask = JsonUtils.getInteger(obj, "locked_coords");
 
             if (JsonUtils.hasInteger(obj, "bb_color"))
@@ -380,34 +452,7 @@ public class SchematicPlacementUnloaded
                 schematicPlacement.placementSaveFile = JsonUtils.getString(obj, "storage_file");
             }
 
-            if (JsonUtils.hasObject(obj, "grid"))
-            {
-                schematicPlacement.gridSettings.fromJson(JsonUtils.getNestedObject(obj, "grid", false));
-            }
-
-            JsonArray placementArr = obj.get("placements").getAsJsonArray();
-
-            for (int i = 0; i < placementArr.size(); ++i)
-            {
-                JsonElement el = placementArr.get(i);
-
-                if (el.isJsonObject())
-                {
-                    JsonObject placementObj = el.getAsJsonObject();
-
-                    if (JsonUtils.hasString(placementObj, "name") &&
-                        JsonUtils.hasObject(placementObj, "placement"))
-                    {
-                        SubRegionPlacement placement = SubRegionPlacement.fromJson(placementObj.get("placement").getAsJsonObject());
-
-                        if (placement != null)
-                        {
-                            String placementName = placementObj.get("name").getAsString();
-                            schematicPlacement.relativeSubRegionPlacements.put(placementName, placement);
-                        }
-                    }
-                }
-            }
+            schematicPlacement.locked = JsonUtils.getBoolean(obj, "locked");
 
             return schematicPlacement;
         }

@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +17,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
@@ -28,6 +30,8 @@ import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
+import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -75,6 +79,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.addLabel(x + 2, y + 31, 0xFFFFFFFF, label);
 
         x = scaledWidth - 154;
+        x -= this.createButton(x, y + 22, -1, ButtonListener.Type.COPY_PASTE_SETTINGS) + 2;
         x -= this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_OFF) + 2;
         this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_ON);
 
@@ -245,6 +250,12 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 return width;
             }
 
+            case COPY_PASTE_SETTINGS:
+            {
+                ButtonGeneric button = new ButtonGeneric(x - 20, y, 20, 20, "", LitematicaGuiIcons.DUPLICATE, type.getHoverText());
+                return this.addButton(button, listener).getWidth();
+            }
+
             default:
                 label = type.getDisplayName();
         }
@@ -360,6 +371,48 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     break;
                 }
 
+                case COPY_PASTE_SETTINGS:
+                {
+                    if (isShiftDown())
+                    {
+                        if (mouseButton == 1)
+                        {
+                            // Ctrl + Shift + Right click: load settings from clip board
+                            if (isCtrlDown())
+                            {
+                                String str = GuiScreen.getClipboardString();
+
+                                if (this.manager.loadPlacementSettings(this.placement, str, this.parent))
+                                {
+                                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
+                                }
+                            }
+                        }
+                        // Shift + left click: Copy settings to clip board
+                        else
+                        {
+                            String str = JsonUtils.jsonToString(this.placement.baseSettingsToJson(), true);
+                            GuiScreen.setClipboardString(str);
+                            InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_copied_to_clipboard");
+                        }
+                    }
+                    else
+                    {
+                        String currentStr = JsonUtils.jsonToString(this.placement.baseSettingsToJson(), true);
+                        openPopupGui(new GuiTextInput("litematica.gui.title.schematic_placement.copy_or_load_settings", currentStr, this.parent, (str) -> {
+                            if (currentStr.equals(str) == false)
+                            {
+                                if (this.manager.loadPlacementSettings(this.placement, str, this.parent))
+                                {
+                                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
+                                }
+                            }
+                        }));
+                    }
+
+                    break;
+                }
+
                 case MOVE_TO_PLAYER:
                 {
                     BlockPos pos = new BlockPos(mc.player.getPositionVector());
@@ -453,6 +506,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             RENAME_PLACEMENT        ("litematica.gui.button.rename"),
             ROTATE                  ("litematica.gui.button.rotation_value"),
             MIRROR                  ("litematica.gui.button.mirror_value"),
+            COPY_PASTE_SETTINGS     ("", "litematica.gui.button.hover.schematic_placement.copy_paste_settings"),
             MOVE_TO_PLAYER          ("litematica.gui.button.move_to_player"),
             GRID_SETTINGS           ("litematica.gui.button.schematic_placement.grid_settings", "litematica.gui.button.schematic_placement.hover.grid_settings_shift_to_toggle"),
             NUDGE_COORD_X           (""),
