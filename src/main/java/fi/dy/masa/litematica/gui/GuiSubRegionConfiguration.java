@@ -49,9 +49,8 @@ public class GuiSubRegionConfiguration extends GuiBase
         String label = StringUtils.translate("litematica.gui.label.placement_sub.region_name", this.placement.getName());
         this.addLabel(20, y, 0xFFFFFFFF, label);
 
-        y = 10;
-        this.createButtonOnOff(x, y, width - 22, this.placement.isEnabled(), ButtonListener.Type.TOGGLE_ENABLED);
-        this.createButton(x + width - 20, y, 20, ButtonListener.Type.TOGGLE_RENDERING);
+        y = 22;
+        this.createButtonOnOff(x, y, width, this.placement.isEnabled(), ButtonListener.Type.TOGGLE_ENABLED);
         y += 21;
 
         this.createButtonOnOff(x, y, width, this.placement.ignoreEntities(), ButtonListener.Type.TOGGLE_ENTITIES);
@@ -145,18 +144,6 @@ public class GuiSubRegionConfiguration extends GuiBase
 
         switch (type)
         {
-            case TOGGLE_RENDERING:
-            {
-                boolean enabled = this.placement.isRenderingEnabled();
-                String pre = enabled ? TXT_GREEN : TXT_RED;
-                label = pre + type.getDisplayName() + TXT_RST;
-                String str = pre + StringUtils.translate("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
-                String hover = StringUtils.translate("litematica.gui.button.schematic_placement.hover.rendering", str);
-
-                this.addButton(new ButtonGeneric(x, y, width, 20, label, hover), listener);
-                break;
-            }
-
             case NUDGE_COORD_X:
             case NUDGE_COORD_Y:
             case NUDGE_COORD_Z:
@@ -282,10 +269,6 @@ public class GuiSubRegionConfiguration extends GuiBase
                     this.manager.toggleSubRegionEnabled(this.schematicPlacement, this.subRegionName, this.parent);
                     break;
 
-                case TOGGLE_RENDERING:
-                    this.manager.toggleSubRegionRenderingEnabled(this.schematicPlacement, this.subRegionName);
-                    break;
-
                 case TOGGLE_ENTITIES:
                     this.manager.toggleSubRegionIgnoreEntities(this.schematicPlacement, this.subRegionName, this.parent);
                     break;
@@ -305,7 +288,6 @@ public class GuiSubRegionConfiguration extends GuiBase
         {
             PLACEMENT_CONFIGURATION (""),
             TOGGLE_ENABLED          ("litematica.gui.button.schematic_placement.region_enabled"),
-            TOGGLE_RENDERING        ("litematica.gui.button.schematic_placement.abbr.rendering"),
             TOGGLE_ENTITIES         ("litematica.gui.button.schematic_placement.ignore_entities"),
             MOVE_TO_PLAYER          ("litematica.gui.button.move_to_player"),
             NUDGE_COORD_X           (""),

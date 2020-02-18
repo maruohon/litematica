@@ -155,7 +155,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                     boolean enabled = GuiBase.isShiftDown() == false;
 
                     SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-                    SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, enabled, enabled);
+                    SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, enabled);
                     manager.addSchematicPlacement(placement, true);
                     manager.setSelectedSchematicPlacement(placement);
                 }

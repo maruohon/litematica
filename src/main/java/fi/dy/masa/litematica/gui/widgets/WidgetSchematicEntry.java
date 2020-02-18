@@ -222,7 +222,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
                 boolean enabled = GuiBase.isShiftDown() == false;
 
                 SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-                SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name, enabled, enabled);
+                SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name, enabled);
                 manager.addSchematicPlacement(placement, true);
                 manager.setSelectedSchematicPlacement(placement);
             }

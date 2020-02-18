@@ -43,7 +43,6 @@ public class SchematicPlacementUnloaded
     protected BlockInfoListType verifierType = BlockInfoListType.ALL;
     protected boolean ignoreEntities;
     protected boolean enabled;
-    protected boolean enableRender;
     protected boolean renderEnclosingBox;
     protected boolean regionPlacementsModified;
     protected boolean locked;
@@ -59,14 +58,13 @@ public class SchematicPlacementUnloaded
         this.schematicFile = schematicFile;
     }
 
-    protected SchematicPlacementUnloaded(@Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    protected SchematicPlacementUnloaded(@Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled)
     {
         this.placementSaveFile = storageFile;
         this.schematicFile = schematicFile;
         this.origin = origin;
         this.name = name;
         this.enabled = enabled;
-        this.enableRender = enableRender;
 
         this.setShouldBeSaved(this.schematicFile != null);
     }
@@ -84,11 +82,6 @@ public class SchematicPlacementUnloaded
     public boolean isSavedToFile()
     {
         return this.placementSaveFile != null;
-    }
-
-    public boolean isRenderingEnabled()
-    {
-        return this.isEnabled() && this.enableRender;
     }
 
     public boolean isLocked()
@@ -125,7 +118,7 @@ public class SchematicPlacementUnloaded
             case PLACEMENT_ENABLED:
                 return this.isEnabled();
             default:
-                return this.isEnabled() && this.enableRender;
+                return this.isEnabled();
         }
     }
 
@@ -207,7 +200,6 @@ public class SchematicPlacementUnloaded
         this.mirror = other.mirror;
         this.ignoreEntities = other.ignoreEntities;
         this.enabled = other.enabled;
-        this.enableRender = other.enableRender;
         this.renderEnclosingBox = other.renderEnclosingBox;
         this.regionPlacementsModified = other.regionPlacementsModified;
         this.locked = other.locked;
@@ -225,7 +217,7 @@ public class SchematicPlacementUnloaded
 
     public SchematicPlacementUnloaded copyAsUnloaded()
     {
-        SchematicPlacementUnloaded placement = new SchematicPlacementUnloaded(null, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
+        SchematicPlacementUnloaded placement = new SchematicPlacementUnloaded(null, this.schematicFile, this.origin, this.name, this.enabled);
         placement.copyFrom(this, true);
         return placement;
     }
@@ -239,7 +231,7 @@ public class SchematicPlacementUnloaded
 
             if (schematic != null)
             {
-                SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, this.placementSaveFile, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
+                SchematicPlacement schematicPlacement = new SchematicPlacement(schematic, this.placementSaveFile, this.schematicFile, this.origin, this.name, this.enabled);
 
                 schematicPlacement.copyFrom(this, true);
                 schematicPlacement.checkAreSubRegionsModified();
@@ -409,7 +401,6 @@ public class SchematicPlacementUnloaded
 
             obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
             obj.add("enabled", new JsonPrimitive(this.isEnabled()));
-            obj.add("enable_render", new JsonPrimitive(this.enableRender));
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
             obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
@@ -458,7 +449,6 @@ public class SchematicPlacementUnloaded
             }
 
             schematicPlacement.enabled = JsonUtils.getBoolean(obj, "enabled");
-            schematicPlacement.enableRender = JsonUtils.getBoolean(obj, "enable_render");
             schematicPlacement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
             schematicPlacement.renderEnclosingBox = JsonUtils.getBoolean(obj, "render_enclosing_box");
             schematicPlacement.coordinateLockMask = JsonUtils.getInteger(obj, "locked_coords");

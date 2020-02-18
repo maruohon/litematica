@@ -604,14 +604,6 @@ public class SchematicPlacementManager
         }
     }
 
-    public void toggleRenderingEnabled(SchematicPlacement placement)
-    {
-        // Marks the currently touched chunks before doing the modification
-        this.onPrePlacementChange(placement);
-        placement.toggleRenderingEnabled();
-        this.onPlacementModified(placement);
-    }
-
     public void toggleIgnoreEntities(SchematicPlacement placement, IMessageConsumer feedback)
     {
         this.onPrePlacementChange(placement);
@@ -704,18 +696,6 @@ public class SchematicPlacementManager
         this.onPrePlacementChange(placement);
         placement.setSubRegionsEnabledState(enabled, subRegions);
         this.onPlacementRegionModified(placement);
-    }
-
-    public void toggleSubRegionRenderingEnabled(SchematicPlacement placement, String regionName)
-    {
-        SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
-
-        if (subPlacement != null)
-        {
-            this.onPrePlacementChange(placement);
-            placement.toggleSubRegionRenderingEnabled(regionName);
-            this.onPlacementRegionModified(placement);
-        }
     }
 
     public void setSubRegionRotation(SchematicPlacement placement, String regionName, Rotation rotation, IMessageConsumer feedback)
@@ -862,7 +842,7 @@ public class SchematicPlacementManager
         {
             for (SchematicPlacement placement : placements)
             {
-                if (placement.matchesRequirement(RequiredEnabled.RENDERING_ENABLED))
+                if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
                 {
                     Map<String, IntBoundingBox> boxMap = placement.getBoxesWithinChunk(pos.x, pos.z);
 

@@ -182,7 +182,7 @@ public class ToolUtils
 
             taskSave.setCompletionListener(() ->
             {
-                SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, "-", true, true);
+                SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, "-", true);
                 DataManager.getSchematicPlacementManager().addSchematicPlacement(placement, false);
 
                 TaskDeleteArea taskDelete = new TaskDeleteArea(area.getAllSubRegionBoxes(), true);
@@ -249,7 +249,7 @@ public class ToolUtils
                     origin = new BlockPos(entity);
                 }
 
-                SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, true);
+                SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true);
 
                 manager.addSchematicPlacement(placement, false);
                 manager.setSelectedSchematicPlacement(placement);

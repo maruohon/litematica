@@ -37,9 +37,9 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     @Nullable protected SchematicVerifier verifier;
     @Nullable protected MaterialListBase materialList;
 
-    protected SchematicPlacement(ISchematic schematic, @Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    protected SchematicPlacement(ISchematic schematic, @Nullable String storageFile, @Nullable File schematicFile, BlockPos origin, String name, boolean enabled)
     {
-        super(storageFile, schematicFile, origin, name, enabled, enableRender);
+        super(storageFile, schematicFile, origin, name, enabled);
 
         this.schematic = schematic;
         this.subRegionCount = schematic.getSubRegionCount();
@@ -47,7 +47,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
 
     public SchematicPlacement copyAsFullyLoaded(boolean isRepeatedPlacement)
     {
-        SchematicPlacement copy = new SchematicPlacement(this.schematic, null, this.schematicFile, this.origin, this.name, this.enabled, this.enableRender);
+        SchematicPlacement copy = new SchematicPlacement(this.schematic, null, this.schematicFile, this.origin, this.name, this.enabled);
         copy.copyFrom(this, ! isRepeatedPlacement);
         copy.isRepeatedPlacement = isRepeatedPlacement;
         return copy;
@@ -408,11 +408,6 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         this.enabled = ! this.enabled;
     }
 
-    void toggleRenderingEnabled()
-    {
-        this.enableRender = ! this.enableRender;
-    }
-
     void toggleIgnoreEntities()
     {
         this.ignoreEntities = ! this.ignoreEntities;
@@ -440,16 +435,6 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         if (subRegion != null)
         {
             subRegion.toggleEnabled();
-        }
-    }
-
-    void toggleSubRegionRenderingEnabled(String regionName)
-    {
-        SubRegionPlacement placement = this.relativeSubRegionPlacements.get(regionName);
-
-        if (placement != null)
-        {
-            placement.toggleRenderingEnabled();
         }
     }
 
@@ -574,9 +559,9 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         return null;
     }
 
-    public static SchematicPlacement createFor(ISchematic schematic, BlockPos origin, String name, boolean enabled, boolean enableRender)
+    public static SchematicPlacement createFor(ISchematic schematic, BlockPos origin, String name, boolean enabled)
     {
-        SchematicPlacement placement = new SchematicPlacement(schematic, null, schematic.getFile(), origin, name, enabled, enableRender);
+        SchematicPlacement placement = new SchematicPlacement(schematic, null, schematic.getFile(), origin, name, enabled);
         placement.setBoxesBBColorNext();
         placement.resetAllSubRegionsToSchematicValues();
 

@@ -159,8 +159,6 @@ litematica.gui.button.placement_sub.placement_configuration=Placement configurat
 litematica.gui.button.placement_sub.reset_sub_region_placement=Reset sub-region
 litematica.gui.button.placement_sub.slice_type=Slice: %s
 
-litematica.gui.button.schematic_placement.abbr.rendering=R
-
 litematica.gui.button.schematic_placement.grid_settings=Grid/repeat: %s
 litematica.gui.button.schematic_placement.ignore_entities=Ignore entities: %s
 litematica.gui.button.schematic_placement.region_enabled=Region: %s
@@ -172,7 +170,6 @@ litematica.gui.button.schematic_placement.toggle_all_on=All §aON§r
 litematica.gui.button.schematic_placement.hover.enclosing_box=§7Enclosing box rendering: %s
 litematica.gui.button.schematic_placement.hover.grid_settings_shift_to_toggle=§7Hold shift to just toggle the grid repeat on/off
 litematica.gui.button.schematic_placement.hover.lock=§7Locking a placement prevents moving or\n§7otherwise changing it (accidentally)
-litematica.gui.button.schematic_placement.hover.rendering=§7Rendering: %s\n§7Note that this works a bit funky\n§7and doesn't prevent entity rendering.\n§7Usually you should just disable\n§7the placement entirely
 
 litematica.gui.button.schematic_placements.configure=Configure
 litematica.gui.button.schematic_placements.duplicate=Duplicate

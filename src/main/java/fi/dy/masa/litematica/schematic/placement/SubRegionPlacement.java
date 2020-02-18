@@ -19,7 +19,6 @@ public class SubRegionPlacement
     private Rotation rotation = Rotation.NONE;
     private Mirror mirror = Mirror.NONE;
     private boolean enabled = true;
-    private boolean renderingEnabled = true;
     private boolean ignoreEntities;
     private int coordinateLockMask;
 
@@ -43,7 +42,6 @@ public class SubRegionPlacement
         copy.rotation = this.rotation;
         copy.mirror = this.mirror;
         copy.enabled = this.enabled;
-        copy.renderingEnabled = this.renderingEnabled;
         copy.ignoreEntities = this.ignoreEntities;
         copy.coordinateLockMask = this.coordinateLockMask;
 
@@ -53,11 +51,6 @@ public class SubRegionPlacement
     public boolean isEnabled()
     {
         return this.enabled;
-    }
-
-    public boolean isRenderingEnabled()
-    {
-        return this.renderingEnabled;
     }
 
     public boolean ignoreEntities()
@@ -87,17 +80,12 @@ public class SubRegionPlacement
 
     public boolean matchesRequirement(RequiredEnabled required)
     {
-        if (required == RequiredEnabled.ANY)
+        switch (required)
         {
-            return true;
+            case ANY:               return true;
+            case PLACEMENT_ENABLED: return this.isEnabled();
+            default:                return this.isEnabled();
         }
-
-        if (required == RequiredEnabled.PLACEMENT_ENABLED)
-        {
-            return this.isEnabled();
-        }
-
-        return this.isEnabled() && this.isRenderingEnabled();
     }
 
     public String getName()
@@ -118,16 +106,6 @@ public class SubRegionPlacement
     public Mirror getMirror()
     {
         return this.mirror;
-    }
-
-    public void setRenderingEnabled(boolean renderingEnabled)
-    {
-        this.renderingEnabled = renderingEnabled;
-    }
-
-    public void toggleRenderingEnabled()
-    {
-        this.setRenderingEnabled(! this.isRenderingEnabled());
     }
 
     void setEnabled(boolean enabled)
@@ -194,7 +172,6 @@ public class SubRegionPlacement
         obj.add("mirror", new JsonPrimitive(this.mirror.name()));
         obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
         obj.add("enabled", new JsonPrimitive(this.enabled));
-        obj.add("rendering_enabled", new JsonPrimitive(this.renderingEnabled));
         obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities));
 
         return obj;
@@ -225,7 +202,6 @@ public class SubRegionPlacement
 
             SubRegionPlacement placement = new SubRegionPlacement(pos, defaultPos, obj.get("name").getAsString());
             placement.setEnabled(JsonUtils.getBoolean(obj, "enabled"));
-            placement.setRenderingEnabled(JsonUtils.getBoolean(obj, "rendering_enabled"));
             placement.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
             placement.coordinateLockMask = JsonUtils.getInteger(obj, "locked_coords");
 
@@ -251,7 +227,6 @@ public class SubRegionPlacement
     public enum RequiredEnabled
     {
         ANY,
-        PLACEMENT_ENABLED,
-        RENDERING_ENABLED;
+        PLACEMENT_ENABLED;
     }
 }

@@ -81,7 +81,6 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.addLabel(x + 2, y + 31, 0xFFFFFFFF, label);
 
         x = scaledWidth - 154;
-        x -= this.createButton(x, y + 22, -1, ButtonListener.Type.COPY_PASTE_SETTINGS) + 2;
         x -= this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_OFF) + 2;
         this.createButton(x, y + 22, -1, ButtonListener.Type.TOGGLE_ALL_REGIONS_ON);
 
@@ -89,7 +88,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         x = this.width - width - 10;
 
         this.createButtonOnOff(x, y, width - 22, this.placement.isEnabled(), ButtonListener.Type.TOGGLE_ENABLED);
-        this.createButton(x + width - 20, y, 20, ButtonListener.Type.TOGGLE_RENDERING);
+        this.createButton(x + width - 20, y, -1, ButtonListener.Type.COPY_PASTE_SETTINGS);
         y += 21;
 
         this.createButtonOnOff(x, y, width - 22, this.placement.isLocked(), ButtonListener.Type.TOGGLE_LOCKED);
@@ -216,18 +215,6 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 return icon.getWidth();
             }
 
-            case TOGGLE_RENDERING:
-            {
-                boolean enabled = this.placement.isRenderingEnabled();
-                String pre = enabled ? TXT_GREEN : TXT_RED;
-                label = pre + type.getDisplayName() + TXT_RST;
-                String str = pre + StringUtils.translate("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
-                String hover = StringUtils.translate("litematica.gui.button.schematic_placement.hover.rendering", str);
-
-                this.addButton(new ButtonGeneric(x, y, width, 20, label, hover), listener);
-                break;
-            }
-
             case ROTATE:
             {
                 String value = PositionUtils.getRotationNameShort(this.placement.getRotation());
@@ -254,7 +241,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
             case COPY_PASTE_SETTINGS:
             {
-                ButtonGeneric button = new ButtonGeneric(x - 20, y, 20, 20, "", LitematicaGuiIcons.DUPLICATE, type.getHoverText());
+                ButtonGeneric button = new ButtonGeneric(x, y, 20, 20, "", LitematicaGuiIcons.DUPLICATE, type.getHoverText());
                 return this.addButton(button, listener).getWidth();
             }
 
@@ -441,10 +428,6 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     this.manager.toggleEnabled(this.placement);
                     break;
 
-                case TOGGLE_RENDERING:
-                    this.manager.toggleRenderingEnabled(this.placement);
-                    break;
-
                 case TOGGLE_LOCKED:
                     this.placement.toggleLocked();
                     break;
@@ -518,7 +501,6 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             NUDGE_COORD_Y           (""),
             NUDGE_COORD_Z           (""),
             TOGGLE_ENABLED          ("litematica.gui.button.schematic_placements.placement_enabled"),
-            TOGGLE_RENDERING        ("litematica.gui.button.schematic_placement.abbr.rendering"),
             TOGGLE_LOCKED           ("litematica.gui.button.schematic_placements.locked", "litematica.gui.button.schematic_placement.hover.lock"),
             TOGGLE_ENTITIES         ("litematica.gui.button.schematic_placement.ignore_entities"),
             TOGGLE_ENCLOSING_BOX    (""),
