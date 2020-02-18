@@ -360,22 +360,15 @@ public class SchematicPlacementManager
         if (placement.isLoaded())
         {
             SchematicPlacement loadedPlacement = (SchematicPlacement) placement;
-
-            this.gridManager.removeAllGridPlacementsOf(loadedPlacement);
-
             boolean ret = this.schematicPlacements.remove(loadedPlacement);
-            this.removeVisiblePlacement(loadedPlacement);
 
+            this.gridManager.onPlacementRemoved(loadedPlacement);
+            this.removeVisiblePlacement(loadedPlacement);
             this.removeTouchedChunksFor(loadedPlacement);
 
-            if (ret)
+            if (ret && update)
             {
-                loadedPlacement.onRemoved();
-
-                if (update)
-                {
-                    this.updateOverlayRendererIfEnabled(loadedPlacement);
-                }
+                this.updateOverlayRendererIfEnabled(loadedPlacement);
             }
 
             return ret;

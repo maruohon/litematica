@@ -240,12 +240,23 @@ public class GridPlacementManager
     }
 
     /**
+     * Removes all grid placements of the provided placement, and the base placement itself
+     * so that the automatic updating doesn't re-create them.
+     * @param basePlacement
+     */
+    void onPlacementRemoved(SchematicPlacement basePlacement)
+    {
+        this.removeAllGridPlacementsOf(basePlacement);
+        this.basePlacements.remove(basePlacement);
+    }
+
+    /**
      * Removes all repeated grid placements of the provided normal placement
      * @param basePlacement
      * @param updateOverlay
      * @return true if some placements were removed
      */
-    boolean removeAllGridPlacementsOf(SchematicPlacement basePlacement)
+    private boolean removeAllGridPlacementsOf(SchematicPlacement basePlacement)
     {
         HashMap<Vec3i, SchematicPlacement> placements = this.gridPlacementsPerPlacement.get(basePlacement);
 

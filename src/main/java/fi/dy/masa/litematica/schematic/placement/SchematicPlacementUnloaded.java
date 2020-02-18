@@ -195,10 +195,6 @@ public class SchematicPlacementUnloaded
         this.setBoxesBBColor(getNextBoxColor());
     }
 
-    public void onRemoved()
-    {
-    }
-
     protected void copyFrom(SchematicPlacementUnloaded other, boolean copyGridSettings)
     {
         this.relativeSubRegionPlacements.clear();
