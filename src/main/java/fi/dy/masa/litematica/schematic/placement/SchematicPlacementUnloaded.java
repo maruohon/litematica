@@ -261,10 +261,8 @@ public class SchematicPlacementUnloaded
         if (hasBaseSettings(obj))
         {
             BlockPos origin = JsonUtils.blockPosFromJson(obj, "origin");
-            Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
-            Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
 
-            if (origin == null || rotation == null || mirror == null)
+            if (origin == null)
             {
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_placements.settings_load.missing_data");
                 String name = this.schematicFile != null ? this.schematicFile.getAbsolutePath() : "<null>";
@@ -272,42 +270,68 @@ public class SchematicPlacementUnloaded
                 return false;
             }
 
-            String name = obj.get("name").getAsString();
+            this.origin = origin;
+            this.rotation = Rotation.NONE;
+            this.mirror = Mirror.NONE;
+            this.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
 
-            if (name != null)
+            if (JsonUtils.hasString(obj, "rotation"))
             {
-                this.name = name;
+                Rotation rotation = Rotation.valueOf(obj.get("rotation").getAsString());
+
+                if (rotation != null)
+                {
+                    this.rotation = rotation;
+                }
             }
 
-            this.origin = origin;
-            this.rotation = rotation;
-            this.mirror = mirror;
-            this.ignoreEntities = JsonUtils.getBoolean(obj, "ignore_entities");
+            if (JsonUtils.hasString(obj, "mirror"))
+            {
+                Mirror mirror = Mirror.valueOf(obj.get("mirror").getAsString());
+
+                if (mirror != null)
+                {
+                    this.mirror = mirror;
+                }
+            }
+
+            if (JsonUtils.hasString(obj, "name"))
+            {
+                String name = obj.get("name").getAsString();
+
+                if (name != null)
+                {
+                    this.name = name;
+                }
+            }
 
             if (JsonUtils.hasObject(obj, "grid"))
             {
                 this.gridSettings.fromJson(JsonUtils.getNestedObject(obj, "grid", false));
             }
 
-            JsonArray placementArr = obj.get("placements").getAsJsonArray();
-
-            for (int i = 0; i < placementArr.size(); ++i)
+            if (JsonUtils.hasArray(obj, "placements"))
             {
-                JsonElement el = placementArr.get(i);
+                JsonArray placementArr = obj.get("placements").getAsJsonArray();
 
-                if (el.isJsonObject())
+                for (int i = 0; i < placementArr.size(); ++i)
                 {
-                    JsonObject placementObj = el.getAsJsonObject();
+                    JsonElement el = placementArr.get(i);
 
-                    if (JsonUtils.hasString(placementObj, "name") &&
-                        JsonUtils.hasObject(placementObj, "placement"))
+                    if (el.isJsonObject())
                     {
-                        SubRegionPlacement placement = SubRegionPlacement.fromJson(placementObj.get("placement").getAsJsonObject());
+                        JsonObject placementObj = el.getAsJsonObject();
 
-                        if (placement != null)
+                        if (JsonUtils.hasString(placementObj, "name") &&
+                            JsonUtils.hasObject(placementObj, "placement"))
                         {
-                            String placementName = placementObj.get("name").getAsString();
-                            this.relativeSubRegionPlacements.put(placementName, placement);
+                            SubRegionPlacement placement = SubRegionPlacement.fromJson(placementObj.get("placement").getAsJsonObject());
+
+                            if (placement != null)
+                            {
+                                String placementName = placementObj.get("name").getAsString();
+                                this.relativeSubRegionPlacements.put(placementName, placement);
+                            }
                         }
                     }
                 }
@@ -319,22 +343,46 @@ public class SchematicPlacementUnloaded
         return false;
     }
 
-    public JsonObject baseSettingsToJson()
+    /**
+     * Writes the most important/basic settings to JSON.
+     * If <b>minimal</b> is true, then only non-default rotation, mirror etc. values are included,
+     * and the name is not included. This is meant for sharing the settings string with other people.
+     * @param minimal
+     * @return
+     */
+    public JsonObject baseSettingsToJson(boolean minimal)
     {
         JsonObject obj = new JsonObject();
+        boolean all = minimal == false;
 
-        obj.add("name", new JsonPrimitive(this.name));
         obj.add("origin", JsonUtils.blockPosToJson(this.origin));
-        obj.add("rotation", new JsonPrimitive(this.rotation.name()));
-        obj.add("mirror", new JsonPrimitive(this.mirror.name()));
-        obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities()));
 
-        if (this.gridSettings.isInitialized())
+        if (all)
+        {
+            obj.add("name", new JsonPrimitive(this.name));
+        }
+
+        if (this.rotation != Rotation.NONE)
+        {
+            obj.add("rotation", new JsonPrimitive(this.rotation.name()));
+        }
+
+        if (this.mirror != Mirror.NONE)
+        {
+            obj.add("mirror", new JsonPrimitive(this.mirror.name()));
+        }
+
+        if (this.ignoreEntities())
+        {
+            obj.add("ignore_entities", new JsonPrimitive(this.ignoreEntities()));
+        }
+
+        if (this.gridSettings.isInitialized() && this.gridSettings.isAtDefaultValues() == false)
         {
             obj.add("grid", this.gridSettings.toJson());
         }
 
-        if (this.relativeSubRegionPlacements.isEmpty() == false)
+        if ((all || this.isRegionPlacementModified()) && this.relativeSubRegionPlacements.isEmpty() == false)
         {
             JsonArray arr = new JsonArray();
 
@@ -357,7 +405,7 @@ public class SchematicPlacementUnloaded
     {
         if (this.schematicFile != null)
         {
-            JsonObject obj = this.baseSettingsToJson();
+            JsonObject obj = this.baseSettingsToJson(false);
 
             obj.add("schematic", new JsonPrimitive(this.schematicFile.getAbsolutePath()));
             obj.add("enabled", new JsonPrimitive(this.isEnabled()));
@@ -393,11 +441,7 @@ public class SchematicPlacementUnloaded
 
     protected static boolean hasBaseSettings(JsonObject obj)
     {
-        return JsonUtils.hasString(obj, "name") &&
-               JsonUtils.hasArray(obj, "origin") &&
-               JsonUtils.hasString(obj, "rotation") &&
-               JsonUtils.hasString(obj, "mirror") &&
-               JsonUtils.hasArray(obj, "placements");
+        return JsonUtils.hasArray(obj, "origin");
     }
 
     @Nullable

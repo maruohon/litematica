@@ -11,7 +11,9 @@ import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class GridSettings
 {
-    private IntBoundingBox repeat = new IntBoundingBox(0, 0, 0, 0, 0, 0);
+    private static final IntBoundingBox NO_REPEAT = new IntBoundingBox(0, 0, 0, 0, 0, 0);
+
+    private IntBoundingBox repeat = NO_REPEAT;
     private Vec3i size = Vec3i.NULL_VECTOR;
     private Vec3i defaultSize = Vec3i.NULL_VECTOR;
     private boolean enabled;
@@ -25,6 +27,11 @@ public class GridSettings
     public boolean isEnabled()
     {
         return this.enabled;
+    }
+
+    public boolean isAtDefaultValues()
+    {
+        return (this.size.equals(Vec3i.NULL_VECTOR) || this.size.equals(this.defaultSize)) && this.repeat.equals(NO_REPEAT);
     }
 
     public Vec3i getSize()
@@ -122,10 +129,7 @@ public class GridSettings
 
     public void fromJson(JsonObject obj)
     {
-        if (JsonUtils.hasBoolean(obj, "enabled"))
-        {
-            this.enabled = JsonUtils.getBoolean(obj, "enabled");
-        }
+        this.enabled = JsonUtils.getBoolean(obj, "enabled");
 
         if (JsonUtils.hasArray(obj, "repeat"))
         {
@@ -136,6 +140,10 @@ public class GridSettings
                 this.repeat = repeat;
             }
         }
+        else
+        {
+            this.repeat = NO_REPEAT;
+        }
 
         BlockPos pos = JsonUtils.blockPosFromJson(obj, "size");
 
@@ -143,8 +151,12 @@ public class GridSettings
         {
             this.size = pos;
         }
+        else
+        {
+            this.size = this.defaultSize;
+        }
 
-        this.initialized = true;
+        this.initialized = this.isAtDefaultValues() == false;
     }
 
     public JsonObject toJson()

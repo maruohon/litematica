@@ -541,6 +541,18 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     }
 
     @Override
+    boolean readBaseSettingsFromJson(JsonObject obj)
+    {
+        if (super.readBaseSettingsFromJson(obj))
+        {
+            this.checkAreSubRegionsModified();
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     @Nullable
     public JsonObject toJson()
     {

@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.Mirror;
@@ -391,18 +393,21 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                         // Shift + left click: Copy settings to clip board
                         else
                         {
-                            String str = JsonUtils.jsonToString(this.placement.baseSettingsToJson(), true);
+                            String str = JsonUtils.jsonToString(this.placement.baseSettingsToJson(true), true);
                             GuiScreen.setClipboardString(str);
                             InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_copied_to_clipboard");
                         }
                     }
                     else
                     {
-                        String currentStr = JsonUtils.jsonToString(this.placement.baseSettingsToJson(), true);
-                        openPopupGui(new GuiTextInput("litematica.gui.title.schematic_placement.copy_or_load_settings", currentStr, this.parent, (str) -> {
-                            if (currentStr.equals(str) == false)
+                        JsonObject origJson = this.placement.baseSettingsToJson(true);
+
+                        openPopupGui(new GuiTextInput("litematica.gui.title.schematic_placement.copy_or_load_settings", origJson.toString(), this.parent, (str) -> {
+                            JsonElement el = JsonUtils.parseJsonFromString(str);
+
+                            if (el != null && el.isJsonObject() && el.getAsJsonObject().equals(origJson) == false)
                             {
-                                if (this.manager.loadPlacementSettings(this.placement, str, this.parent))
+                                if (this.manager.loadPlacementSettings(this.placement, el.getAsJsonObject(), this.parent))
                                 {
                                     InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
                                 }
