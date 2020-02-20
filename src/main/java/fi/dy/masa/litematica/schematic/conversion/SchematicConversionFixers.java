@@ -15,7 +15,7 @@ import net.minecraft.block.FenceBlock;
 import net.minecraft.block.FenceGateBlock;
 import net.minecraft.block.FireBlock;
 import net.minecraft.block.GourdBlock;
-import net.minecraft.block.HorizontalConnectedBlock;
+import net.minecraft.block.HorizontalConnectingBlock;
 import net.minecraft.block.NoteBlock;
 import net.minecraft.block.PaneBlock;
 import net.minecraft.block.RedstoneWireBlock;
@@ -50,7 +50,7 @@ import fi.dy.masa.malilib.util.Constants;
 
 public class SchematicConversionFixers
 {
-    private static final BooleanProperty[] FENCE_WALL_PROP_MAP = new BooleanProperty[] { null, null, HorizontalConnectedBlock.NORTH, HorizontalConnectedBlock.SOUTH, HorizontalConnectedBlock.WEST, HorizontalConnectedBlock.EAST };
+    private static final BooleanProperty[] FENCE_WALL_PROP_MAP = new BooleanProperty[] { null, null, HorizontalConnectingBlock.NORTH, HorizontalConnectingBlock.SOUTH, HorizontalConnectingBlock.WEST, HorizontalConnectingBlock.EAST };
 
     public static final IStateFixer FIXER_BANNER = (reader, state, pos) -> {
         CompoundTag tag = reader.getBlockEntityData(pos);
