@@ -139,7 +139,7 @@ public class OverlayRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             RenderSystem.enableDepthTest();
-            RenderSystem.depthMask(true);
+            RenderSystem.depthMask(false);
             RenderSystem.disableTexture();
             RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
 
