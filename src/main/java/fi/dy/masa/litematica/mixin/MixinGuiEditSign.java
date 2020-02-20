@@ -10,7 +10,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.util.WorldUtils;
 
 @Mixin(value = net.minecraft.client.gui.inventory.GuiEditSign.class, priority = 999)
-public class MixinGuiEditSign
+public abstract class MixinGuiEditSign
 {
     @Shadow @Final private net.minecraft.tileentity.TileEntitySign tileSign;
 

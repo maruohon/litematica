@@ -52,16 +52,16 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 public class WorldUtils
 {
     private static final List<PositionCache> EASY_PLACE_POSITIONS = new ArrayList<>();
-    private static boolean preventOnBlockAdded;
+    private static boolean preventBlockUpdates;
 
-    public static boolean shouldPreventOnBlockAdded()
+    public static boolean shouldPreventBlockUpdates()
     {
-        return preventOnBlockAdded;
+        return preventBlockUpdates;
     }
 
-    public static void setShouldPreventOnBlockAdded(boolean prevent)
+    public static void setShouldPreventBlockUpdates(boolean prevent)
     {
-        preventOnBlockAdded = prevent;
+        preventBlockUpdates = prevent;
     }
 
     public static void loadChunksClientWorld(WorldClient world, BlockPos origin, Vec3i areaSize)

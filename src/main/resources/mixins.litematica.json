@@ -21,6 +21,7 @@
         "MixinMinecraft",
         "MixinNetHandlerPlayClient",
         "MixinRenderGlobal",
+        "MixinWorld",
         "MixinWorldClient"
     ],
     "injectors": {

@@ -149,7 +149,7 @@ public class SchematicPlacingUtils
 
         world.addScheduledTask(() ->
         {
-            if (SchematicPlacingUtils.placeToWorld(placement, world, range, false))
+            if (placeToWorld(placement, world, range, false))
             {
                 if (printMessage)
                 {
@@ -170,7 +170,7 @@ public class SchematicPlacingUtils
 
     public static boolean placeToWorld(SchematicPlacement schematicPlacement, World world, LayerRange range, boolean notifyNeighbors)
     {
-        WorldUtils.setShouldPreventOnBlockAdded(true);
+        WorldUtils.setShouldPreventBlockUpdates(true);
 
         ISchematic schematic = schematicPlacement.getSchematic();
         ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
@@ -206,7 +206,7 @@ public class SchematicPlacingUtils
             }
         }
 
-        WorldUtils.setShouldPreventOnBlockAdded(false);
+        WorldUtils.setShouldPreventBlockUpdates(false);
 
         return true;
     }
@@ -422,6 +422,11 @@ public class SchematicPlacingUtils
         BlockPos origin = schematicPlacement.getOrigin();
         boolean allSuccess = true;
 
+        if (notifyNeighbors == false)
+        {
+            WorldUtils.setShouldPreventBlockUpdates(true);
+        }
+
         for (String regionName : regionsTouchingChunk)
         {
             SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
@@ -447,6 +452,8 @@ public class SchematicPlacingUtils
                 }
             }
         }
+
+        WorldUtils.setShouldPreventBlockUpdates(false);
 
         return allSuccess;
     }

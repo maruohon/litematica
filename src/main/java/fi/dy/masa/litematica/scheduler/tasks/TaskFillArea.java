@@ -131,7 +131,7 @@ public class TaskFillArea extends TaskProcessChunkBase
 
         try
         {
-            WorldUtils.setShouldPreventOnBlockAdded(true);
+            WorldUtils.setShouldPreventBlockUpdates(true);
 
             IBlockState barrier = Blocks.BARRIER.getDefaultState();
             BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
@@ -163,7 +163,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         }
         finally
         {
-            WorldUtils.setShouldPreventOnBlockAdded(false);
+            WorldUtils.setShouldPreventBlockUpdates(false);
         }
     }
 
