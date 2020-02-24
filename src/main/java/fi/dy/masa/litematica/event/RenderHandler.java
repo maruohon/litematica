@@ -25,8 +25,6 @@ public class RenderHandler implements IRenderer
             RenderSystem.pushMatrix();
             RenderSystem.multMatrix(matrices.peek().getModel());
 
-            OverlayRenderer.getInstance().renderBoxes(matrices, partialTicks);
-
             if (Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue())
             {
                 OverlayRenderer.getInstance().renderSchematicVerifierMismatches(matrices, partialTicks);
