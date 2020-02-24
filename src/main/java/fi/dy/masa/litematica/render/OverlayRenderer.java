@@ -139,14 +139,16 @@ public class OverlayRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             RenderSystem.enableDepthTest();
-            RenderSystem.depthMask(false);
+            RenderSystem.disableLighting();
+            RenderSystem.depthMask(true);
             RenderSystem.disableTexture();
             RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
 
             if (renderAreas)
             {
                 RenderSystem.enablePolygonOffset();
-                RenderSystem.polygonOffset(-1.2f, -0.2f);
+                RenderSystem.polygonOffset(-5f, -0.5f);
+                RenderSystem.depthMask(false);
 
                 Box currentBox = currentSelection.getSelectedSubRegionBox();
 
@@ -170,6 +172,7 @@ public class OverlayRenderer
                     RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, this.mc);
                 }
 
+                RenderSystem.depthMask(true);
                 RenderSystem.polygonOffset(0f, 0f);
                 RenderSystem.disablePolygonOffset();
             }
@@ -225,10 +228,11 @@ public class OverlayRenderer
                 }
             }
 
-            RenderSystem.popMatrix();
             RenderSystem.enableTexture();
             RenderSystem.enableCull();
             RenderSystem.enableLighting();
+            RenderSystem.popMatrix();
+            RenderSystem.depthMask(true);
         }
     }
 
