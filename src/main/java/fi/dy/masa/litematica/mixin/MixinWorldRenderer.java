@@ -5,9 +5,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
-import fi.dy.masa.litematica.render.OverlayRenderer;
 
 @Mixin(net.minecraft.client.render.WorldRenderer.class)
 public abstract class MixinWorldRenderer
@@ -91,7 +89,7 @@ public abstract class MixinWorldRenderer
     }
 
     @Inject(method = "render",
-            at = @At(value = "INVOKE_STRING", args = "ldc=weather",
+            at = @At(value = "INVOKE_STRING", args = "ldc=blockentities",
                      target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V"))
     private void onPostRenderEntities(
             net.minecraft.client.util.math.MatrixStack matrices,
@@ -103,10 +101,6 @@ public abstract class MixinWorldRenderer
             CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewiseRenderEntities(matrices, tickDelta);
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue())
-        {
-            OverlayRenderer.getInstance().renderBoxes(matrices, tickDelta);
-        }
     }
 
     /*
