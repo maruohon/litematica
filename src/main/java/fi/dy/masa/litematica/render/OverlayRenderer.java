@@ -227,8 +227,7 @@ public class OverlayRenderer
 
             RenderSystem.popMatrix();
             RenderSystem.enableTexture();
-            RenderSystem.enableCull();
-            RenderSystem.enableLighting();
+            RenderSystem.depthMask(true);
         }
     }
 
