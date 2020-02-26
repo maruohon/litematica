@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -54,7 +54,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         this.drawSubWidgets(mouseX, mouseY);
 
         RenderUtils.disableDiffuseLighting();
-        GlStateManager.disableLighting();
+        RenderSystem.disableLighting();
     }
 
     private static class ButtonListener implements IButtonActionListener

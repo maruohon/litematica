@@ -2,7 +2,9 @@ package fi.dy.masa.litematica.materials;
 
 import java.util.Collections;
 import java.util.List;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
@@ -11,8 +13,6 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 
 public class MaterialListHudRenderer implements IInfoHudRenderer
 {
@@ -137,8 +137,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         if (scale != 1d)
         {
-            GlStateManager.pushMatrix();
-            GlStateManager.scaled(scale, scale, scale);
+            RenderSystem.pushMatrix();
+            RenderSystem.scaled(scale, scale, scale);
         }
 
         if (useBackground)
@@ -191,7 +191,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         x = posX;
         y = posY;
 
-        GlStateManager.enableRescaleNormal();
+        RenderSystem.enableRescaleNormal();
         RenderUtils.setupBlend();
         RenderUtils.enableDiffuseLightingGui3D();
 
@@ -202,12 +202,12 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         }
 
         RenderUtils.disableDiffuseLighting();
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.disableBlend();
+        RenderSystem.disableRescaleNormal();
+        RenderSystem.disableBlend();
 
         if (scale != 1d)
         {
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
         }
 
         return contentHeight + 4;

@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.render;
 import java.util.List;
 import java.util.Random;
 import org.lwjgl.opengl.GL11;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -119,7 +118,7 @@ public class RenderUtils
         final double maxY = pos.getY() - dy + expand + 1;
         final double maxZ = pos.getZ() - dz + expand + 1;
 
-        GlStateManager.lineWidth(lineWidth);
+        RenderSystem.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -170,7 +169,7 @@ public class RenderUtils
     public static void renderAreaOutline(BlockPos pos1, BlockPos pos2, float lineWidth,
             Color4f colorX, Color4f colorY, Color4f colorZ, MinecraftClient mc)
     {
-        GlStateManager.lineWidth(lineWidth);
+        RenderSystem.lineWidth(lineWidth);
 
         Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
@@ -247,8 +246,8 @@ public class RenderUtils
 
     public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, MatrixStack matrices, MinecraftClient mc)
     {
-        GlStateManager.enableBlend();
-        GlStateManager.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.disableCull();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -258,8 +257,8 @@ public class RenderUtils
 
         tessellator.draw();
 
-        GlStateManager.enableCull();
-        GlStateManager.disableBlend();
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
     }
 
     /**
@@ -314,7 +313,7 @@ public class RenderUtils
 
         int start, end;
 
-        GlStateManager.lineWidth(lineWidth);
+        RenderSystem.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();

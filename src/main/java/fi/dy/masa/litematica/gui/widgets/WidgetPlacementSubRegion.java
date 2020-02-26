@@ -4,7 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -19,8 +21,6 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 
 public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlacement>
 {
@@ -100,9 +100,9 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
 
         if (placementSelected)
         {
-            GlStateManager.translatef(0, 0, 1);
+            RenderSystem.translatef(0, 0, 1);
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
-            GlStateManager.translatef(0, 0, -1);
+            RenderSystem.translatef(0, 0, -1);
         }
 
         String name = this.placement.getName();
