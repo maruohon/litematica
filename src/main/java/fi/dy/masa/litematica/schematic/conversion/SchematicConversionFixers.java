@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.schematic.conversion;
 
 import net.minecraft.block.AbstractBannerBlock;
+import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.AbstractRedstoneGateBlock;
 import net.minecraft.block.AbstractSkullBlock;
 import net.minecraft.block.AttachedStemBlock;
@@ -13,7 +14,6 @@ import net.minecraft.block.ChorusPlantBlock;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.block.FenceBlock;
 import net.minecraft.block.FenceGateBlock;
-import net.minecraft.block.FireBlock;
 import net.minecraft.block.GourdBlock;
 import net.minecraft.block.HorizontalConnectingBlock;
 import net.minecraft.block.NoteBlock;
@@ -252,8 +252,7 @@ public class SchematicConversionFixers
     };
 
     public static final IStateFixer FIXER_FIRE = (reader, state, pos) -> {
-        FireBlock fire = (FireBlock) state.getBlock();
-        return fire.getStateForPosition(reader, pos);
+        return AbstractFireBlock.getState(reader, pos);
     };
 
     public static final IStateFixer FIXER_FLOWER_POT = (reader, state, pos) -> {
@@ -508,7 +507,7 @@ public class SchematicConversionFixers
     {
         Block block = state.getBlock();
         boolean flag1 = state.isSideSolidFullSquare(world, pos, side);
-        boolean flag2 = block.matches(BlockTags.WALLS) || block instanceof FenceGateBlock && FenceGateBlock.canWallConnect(state, side);
+        boolean flag2 = block.isIn(BlockTags.WALLS) || block instanceof FenceGateBlock && FenceGateBlock.canWallConnect(state, side);
         return ! WallBlock.cannotConnect(block) && flag1 || flag2;
     }
 
