@@ -3,9 +3,12 @@ package fi.dy.masa.litematica.render.infohud;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
@@ -23,10 +26,6 @@ import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 
 public class ToolHud extends InfoHud
 {
@@ -253,6 +252,15 @@ public class ToolHud extends InfoHud
 
                 lines.add(StringUtils.translate("litematica.hud.area_selection.origin", green + str + rst));
 
+                BlockState state = mode.getPrimaryBlock();
+                ItemStack stack = this.mc.player.getMainHandStack();
+
+                if (state != null && mode == ToolMode.REBUILD &&
+                    (stack.isEmpty() || EntityUtils.areStacksEqualIgnoreDurability(stack, DataManager.getToolItem())))
+                {
+                    lines.add(StringUtils.translate("litematica.tool_hud.block_1", this.getBlockString(state)));
+                }
+
                 SubRegionPlacement placement = schematicPlacement.getSelectedSubRegionPlacement();
 
                 if (placement != null)
@@ -312,13 +320,12 @@ public class ToolHud extends InfoHud
 
     protected String getBlockString(BlockState state)
     {
-        ItemStack stack = MaterialCache.getInstance().getItemForState(state);
         String strBlock;
 
         String green = GuiBase.TXT_GREEN;
         String rst = GuiBase.TXT_RST;
 
-        strBlock = green + stack.getName().getString() + rst;
+        strBlock = green + state.getBlock().getName().asString() + rst;
         Direction facing = BlockUtils.getFirstPropertyFacingValue(state);
 
         if (facing != null)

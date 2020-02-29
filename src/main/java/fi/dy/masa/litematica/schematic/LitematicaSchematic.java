@@ -41,6 +41,7 @@ import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.conversion.SchematicConversionMaps;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -60,6 +61,9 @@ import fi.dy.masa.malilib.util.StringUtils;
 public class LitematicaSchematic
 {
     public static final String FILE_EXTENSION = ".litematic";
+    public static final int SCHEMATIC_VERSION_1_13_2 = 5;
+    public static final int MINECRAFT_DATA_VERSION_1_13_2 = 1631; // MC 1.13.2
+
     public static final int SCHEMATIC_VERSION = 5;
     public static final int MINECRAFT_DATA_VERSION = SharedConstants.getGameVersion().getWorldVersion();
 
@@ -1184,11 +1188,12 @@ public class LitematicaSchematic
         if (nbt.contains("Version", Constants.NBT.TAG_INT))
         {
             final int version = nbt.getInt("Version");
+            final int minecraftDataVersion = nbt.getInt("MinecraftDataVersion");
 
             if (version >= 1 && version <= SCHEMATIC_VERSION)
             {
                 this.metadata.readFromNBT(nbt.getCompound("Metadata"));
-                this.readSubRegionsFromNBT(nbt.getCompound("Regions"), version);
+                this.readSubRegionsFromNBT(nbt.getCompound("Regions"), version, minecraftDataVersion);
 
                 return true;
             }
@@ -1205,7 +1210,7 @@ public class LitematicaSchematic
         return false;
     }
 
-    private void readSubRegionsFromNBT(CompoundTag tag, int version)
+    private void readSubRegionsFromNBT(CompoundTag tag, int version, int minecraftDataVersion)
     {
         for (String regionName : tag.getKeys())
         {
@@ -1256,12 +1261,33 @@ public class LitematicaSchematic
                         BlockPos posMax = PositionUtils.getMaxCorner(regionPos, posEndRel);
                         BlockPos size = posMax.subtract(posMin).add(1, 1, 1);
 
+                        palette = this.convertBlockStatePalette_1_12_to_1_13_2(palette, version, minecraftDataVersion);
                         LitematicaBlockStateContainer container = LitematicaBlockStateContainer.createFrom(palette, blockStateArr, size);
                         this.blockContainers.put(regionName, container);
                     }
                 }
             }
         }
+    }
+
+    private ListTag convertBlockStatePalette_1_12_to_1_13_2(ListTag oldPalette, int version, int minecraftDataVersion)
+    {
+        // The Minecraft data version didn't yet exist in the first 1.13.2 builds, so only
+        // consider it if it actually exists in the file, ie. is larger than the default value of 0.
+        if (version < SCHEMATIC_VERSION_1_13_2 || (minecraftDataVersion < MINECRAFT_DATA_VERSION_1_13_2 && minecraftDataVersion > 0))
+        {
+            ListTag newPalette = new ListTag();
+            final int count = oldPalette.size();
+
+            for (int i = 0; i < count; ++i)
+            {
+                newPalette.add(SchematicConversionMaps.get_1_13_2_StateTagFor_1_12_Tag(oldPalette.getCompound(i)));
+            }
+
+            return newPalette;
+        }
+
+        return oldPalette;
     }
 
     private List<EntityInfo> readEntitiesFromNBT(ListTag tagList)

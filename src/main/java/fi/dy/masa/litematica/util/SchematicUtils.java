@@ -250,7 +250,8 @@ public class SchematicUtils
     {
         ItemStack stack = mc.player.getMainHandStack();
 
-        if (stack.isEmpty() == false && (stack.getItem() instanceof BlockItem))
+        if ((stack.isEmpty() == false && (stack.getItem() instanceof BlockItem)) ||
+            (stack.isEmpty() && ToolMode.REBUILD.getPrimaryBlock() != null))
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
@@ -277,6 +278,10 @@ public class SchematicUtils
                     mc.player.world = worldClient;
 
                     stateNew = ((BlockItem) stack.getItem()).getBlock().getPlacementState(ctx);
+                }
+                else if (ToolMode.REBUILD.getPrimaryBlock() != null)
+                {
+                    stateNew = ToolMode.REBUILD.getPrimaryBlock();
                 }
 
                 return new ReplacementInfo(pos, side, hitVec, stateOriginal, stateNew);

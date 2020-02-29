@@ -16,7 +16,7 @@ public enum ToolMode
     GRID_PASTE          ("litematica.tool_mode.name.grid_paste",            true, true),
     MOVE                ("litematica.tool_mode.name.move",                  true, false),
     DELETE              ("litematica.tool_mode.name.delete",                true, false),
-    REBUILD             ("litematica.tool_mode.name.rebuild",               false, true);
+    REBUILD             ("litematica.tool_mode.name.rebuild",               false, true, true, false);
 
     private final String unlocName;
     private final boolean creativeOnly;
