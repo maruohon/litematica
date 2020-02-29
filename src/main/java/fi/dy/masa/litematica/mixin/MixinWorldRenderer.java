@@ -88,8 +88,9 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderTranslucent(matrices, tickDelta);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 0,
-                target = "Lnet/minecraft/client/render/WorldRenderer;checkEmpty(Lnet/minecraft/client/util/math/MatrixStack;)V"))
+    @Inject(method = "render",
+            at = @At(value = "INVOKE_STRING", args = "ldc=blockentities",
+                     target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V"))
     private void onPostRenderEntities(
             net.minecraft.client.util.math.MatrixStack matrices,
             float tickDelta, long limitTime, boolean renderBlockOutline,

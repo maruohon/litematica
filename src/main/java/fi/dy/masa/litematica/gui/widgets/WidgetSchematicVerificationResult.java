@@ -2,7 +2,18 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
@@ -21,17 +32,6 @@ import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<BlockMismatchEntry>
 {
@@ -293,7 +293,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.mismatchInfo.stateExpected.getBlock() == Blocks.FLOWER_POT);
             boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.mismatchInfo.stateFound.getBlock() == Blocks.FLOWER_POT);
 
-            GlStateManager.pushMatrix();
+            RenderSystem.pushMatrix();
             RenderUtils.enableDiffuseLightingGui3D();
 
             BakedModel model;
@@ -326,8 +326,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             }
 
             RenderUtils.disableDiffuseLighting();
-            GlStateManager.disableBlend();
-            GlStateManager.popMatrix();
+            RenderSystem.disableBlend();
+            RenderSystem.popMatrix();
         }
 
         super.render(mouseX, mouseY, selected);
@@ -338,8 +338,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     {
         if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.getX())
         {
-            GlStateManager.pushMatrix();
-            GlStateManager.translatef(0f, 0f, 200f);
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(0f, 0f, 200f);
 
             int x = mouseX + 10;
             int y = mouseY;
@@ -358,7 +358,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
             this.mismatchInfo.render(x, y, this.mc);
 
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
         }
     }
 
@@ -432,7 +432,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         {
             if (this.stateExpected != null && this.stateFound != null)
             {
-                GlStateManager.pushMatrix();
+                RenderSystem.pushMatrix();
 
                 RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
@@ -449,7 +449,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
                 y += 12;
 
-                GlStateManager.disableLighting();
+                RenderSystem.disableLighting();
                 RenderUtils.enableDiffuseLightingGui3D();
 
                 boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
@@ -491,7 +491,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
                 //mc.getRenderItem().zLevel -= 100;
 
-                //GlStateManager.disableBlend();
+                //RenderSystem.disableBlend();
                 RenderUtils.disableDiffuseLighting();
 
                 textRenderer.draw(this.nameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
@@ -507,7 +507,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 RenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected);
                 RenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound);
 
-                GlStateManager.popMatrix();
+                RenderSystem.popMatrix();
             }
         }
     }

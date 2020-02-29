@@ -1,18 +1,18 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
-import com.mojang.blaze3d.platform.GlStateManager;
-import fi.dy.masa.litematica.util.ItemUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.StringUtils;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import fi.dy.masa.litematica.util.ItemUtils;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class BlockInfo
 {
@@ -62,7 +62,7 @@ public class BlockInfo
     {
         if (this.state != null)
         {
-            GlStateManager.pushMatrix();
+            RenderSystem.pushMatrix();
 
             RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
@@ -74,7 +74,7 @@ public class BlockInfo
 
             y += 12;
 
-            GlStateManager.disableLighting();
+            RenderSystem.disableLighting();
             RenderUtils.enableDiffuseLightingGui3D();
 
             //mc.getRenderItem().zLevel += 100;
@@ -83,7 +83,7 @@ public class BlockInfo
             mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
 
-            //GlStateManager.disableBlend();
+            //RenderSystem.disableBlend();
             RenderUtils.disableDiffuseLighting();
 
             textRenderer.draw(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
@@ -94,7 +94,7 @@ public class BlockInfo
 
             RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props);
 
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
         }
     }
 }

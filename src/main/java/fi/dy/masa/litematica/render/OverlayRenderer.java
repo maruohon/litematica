@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -136,18 +135,18 @@ public class OverlayRenderer
 
         if (renderAreas || renderPlacements || isProjectMode)
         {
-            GlStateManager.depthMask(true);
-            GlStateManager.disableLighting();
-            GlStateManager.disableTexture();
-            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01F);
-            GlStateManager.pushMatrix();
+            RenderSystem.pushMatrix();
+
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(false);
+            RenderSystem.disableTexture();
+            RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
 
             if (renderAreas)
             {
-                GlStateManager.enablePolygonOffset();
-                GlStateManager.polygonOffset(-1.2f, -0.2f);
-                GlStateManager.depthMask(false);
+                RenderSystem.enablePolygonOffset();
+                RenderSystem.polygonOffset(-1.2f, -0.2f);
 
                 Box currentBox = currentSelection.getSelectedSubRegionBox();
 
@@ -171,9 +170,8 @@ public class OverlayRenderer
                     RenderUtils.renderBlockOutline(origin, expand, lineWidthBlockBox, color, this.mc);
                 }
 
-                GlStateManager.depthMask(true);
-                GlStateManager.polygonOffset(0f, 0f);
-                GlStateManager.disablePolygonOffset();
+                RenderSystem.polygonOffset(0f, 0f);
+                RenderSystem.disablePolygonOffset();
             }
 
             if (renderPlacements)
@@ -227,11 +225,9 @@ public class OverlayRenderer
                 }
             }
 
-            GlStateManager.popMatrix();
-            GlStateManager.enableTexture();
-            GlStateManager.enableCull();
-            GlStateManager.enableLighting();
-            GlStateManager.depthMask(true);
+            RenderSystem.popMatrix();
+            RenderSystem.enableTexture();
+            RenderSystem.depthMask(true);
         }
     }
 
@@ -372,13 +368,13 @@ public class OverlayRenderer
 
     private void renderSchematicMismatches(List<MismatchRenderPos> posList, @Nullable BlockPos lookPos, MatrixStack matrices, float partialTicks)
     {
-        GlStateManager.disableDepthTest();
-        GlStateManager.depthMask(false);
-        GlStateManager.disableLighting();
-        GlStateManager.disableTexture();
-        GlStateManager.pushMatrix();
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+        RenderSystem.disableLighting();
+        RenderSystem.disableTexture();
+        RenderSystem.pushMatrix();
 
-        GlStateManager.lineWidth(2f);
+        RenderSystem.lineWidth(2f);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -418,7 +414,7 @@ public class OverlayRenderer
             tessellator.draw();
             buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
-            GlStateManager.lineWidth(6f);
+            RenderSystem.lineWidth(6f);
             RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, this.mc);
         }
 
@@ -426,8 +422,8 @@ public class OverlayRenderer
 
         if (Configs.Visuals.RENDER_ERROR_MARKER_SIDES.getBooleanValue())
         {
-            GlStateManager.enableBlend();
-            GlStateManager.disableCull();
+            RenderSystem.enableBlend();
+            RenderSystem.disableCull();
 
             buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
             float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_ALPHA.getDoubleValue();
@@ -441,15 +437,15 @@ public class OverlayRenderer
 
             tessellator.draw();
 
-            GlStateManager.disableBlend();
+            RenderSystem.disableBlend();
         }
 
-        GlStateManager.popMatrix();
-        GlStateManager.enableTexture();
-        GlStateManager.enableCull();
-        GlStateManager.enableLighting();
-        GlStateManager.depthMask(true);
-        GlStateManager.enableDepthTest();
+        RenderSystem.popMatrix();
+        RenderSystem.enableTexture();
+        RenderSystem.enableCull();
+        RenderSystem.enableLighting();
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
     }
 
     public void renderHoverInfo(MinecraftClient mc)
@@ -686,10 +682,10 @@ public class OverlayRenderer
             BlockHitResult trace = traceWrapper.getBlockHitResult();
             BlockPos pos = trace.getBlockPos();
 
-            GlStateManager.depthMask(false);
-            GlStateManager.disableLighting();
-            GlStateManager.disableCull();
-            GlStateManager.disableTexture();
+            RenderSystem.depthMask(false);
+            RenderSystem.disableLighting();
+            RenderSystem.disableCull();
+            RenderSystem.disableTexture();
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             RenderSystem.enablePolygonOffset();
             RenderSystem.polygonOffset(-0.8f, -1.8f);
@@ -706,11 +702,11 @@ public class OverlayRenderer
             }
 
             RenderSystem.disablePolygonOffset();
-            GlStateManager.enableTexture();
-            //GlStateManager.enableDepth();
-            GlStateManager.disableBlend();
-            GlStateManager.enableCull();
-            GlStateManager.depthMask(true);
+            RenderSystem.enableTexture();
+            //RenderSystem.enableDepth();
+            RenderSystem.disableBlend();
+            RenderSystem.enableCull();
+            RenderSystem.depthMask(true);
         }
     }
 

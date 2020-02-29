@@ -12,11 +12,11 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.litematica.world.ChunkProviderSchematic;
 
-@Mixin(ClientPlayNetworkHandler.class)
+@Mixin(net.minecraft.client.network.ClientPlayNetworkHandler.class)
 public abstract class MixinClientPlayNetworkHandler
 {
     @Inject(method = "onChunkData", at = @At("RETURN"))
-    private void onChunkData(ChunkDataS2CPacket packetIn, CallbackInfo ci)
+    private void onChunkData(net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket packetIn, CallbackInfo ci)
     {
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
             Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
@@ -26,7 +26,7 @@ public abstract class MixinClientPlayNetworkHandler
     }
 
     @Inject(method = "onUnloadChunk", at = @At("RETURN"))
-    private void onChunkUnload(UnloadChunkS2CPacket packet, CallbackInfo ci)
+    private void onChunkUnload(net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket packet, CallbackInfo ci)
     {
         if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() == false &&
             ((Object) this instanceof ChunkProviderSchematic) == false)
