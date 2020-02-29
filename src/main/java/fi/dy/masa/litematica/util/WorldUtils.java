@@ -254,7 +254,7 @@ public class WorldUtils
         litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
 
         Structure template = new Structure();
-        template.method_15174(world, BlockPos.ORIGIN, size, ignoreEntities == false, Blocks.STRUCTURE_VOID); // takeBlocksFromWorld
+        template.saveFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities == false, Blocks.STRUCTURE_VOID);
 
         return template;
     }

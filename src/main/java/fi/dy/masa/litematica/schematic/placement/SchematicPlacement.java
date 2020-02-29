@@ -328,7 +328,7 @@ public class SchematicPlacement
     {
         StructurePlacementData placement = new StructurePlacementData();
 
-        placement.setMirrored(this.mirror);
+        placement.setMirror(this.mirror);
         placement.setRotation(this.rotation);
         placement.setIgnoreEntities(this.ignoreEntities);
 

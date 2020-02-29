@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
@@ -130,5 +131,11 @@ public class ChunkCacheSchematic implements BlockRenderView
     public int getColor(BlockPos pos, ColorResolver colorResolver)
     {
         return colorResolver.getColor(this.worldClient.getBiome(pos), (double)pos.getX(), (double)pos.getZ());
+    }
+
+    @Override
+    public float method_24852(Direction direction, boolean bl)
+    {
+        return this.worldClient.method_24852(direction, bl); // AO brightness on face
     }
 }
