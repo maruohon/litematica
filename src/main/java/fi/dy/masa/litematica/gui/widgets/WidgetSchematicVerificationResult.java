@@ -296,7 +296,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             boolean hasModelExpected = this.mismatchInfo.stateExpected.getRenderType() == EnumBlockRenderType.MODEL;
             boolean hasModelFound    = this.mismatchInfo.stateFound.getRenderType() == EnumBlockRenderType.MODEL;
             boolean isAirItemExpected = this.mismatchInfo.stackExpected.isEmpty();
-            boolean isAirItemFound    = this.mismatchInfo.stackExpected.isEmpty();
+            boolean isAirItemFound    = this.mismatchInfo.stackFound.isEmpty();
             boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.mismatchInfo.stateExpected.getBlock() == Blocks.FLOWER_POT);
             boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.mismatchInfo.stateFound.getBlock() == Blocks.FLOWER_POT);
 
@@ -471,7 +471,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 boolean hasModelExpected = this.stateExpected.getRenderType() == EnumBlockRenderType.MODEL;
                 boolean hasModelFound    = this.stateFound.getRenderType() == EnumBlockRenderType.MODEL;
                 boolean isAirItemExpected = this.stackExpected.isEmpty();
-                boolean isAirItemFound    = this.stackExpected.isEmpty();
+                boolean isAirItemFound    = this.stackFound.isEmpty();
                 boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.stateExpected.getBlock() == Blocks.FLOWER_POT);
                 boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.stateFound.getBlock() == Blocks.FLOWER_POT);
                 BlockModelShapes blockModelShapes = mc.getBlockRendererDispatcher().getBlockModelShapes();
