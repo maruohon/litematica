@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -34,7 +35,6 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.util.math.BlockPos;
 
 public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
                                           implements ISelectionListener<String>
@@ -190,7 +190,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
     protected void createOrigin()
     {
-        BlockPos origin = new BlockPos(this.mc.player);
+        BlockPos origin = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.mc.player);
         this.selection.setExplicitOrigin(origin);
     }
 
@@ -511,7 +511,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                 case MOVE_TO_PLAYER:
                     if (this.parent.mc.player != null)
                     {
-                        BlockPos pos = new BlockPos(this.parent.mc.player);
+                        BlockPos pos = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.parent.mc.player);
 
                         if (this.corner == Corner.NONE)
                         {

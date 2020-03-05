@@ -165,7 +165,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         {
             if (this.mc.player != null)
             {
-                this.comparator.setReferencePosition(new BlockPos(this.mc.player));
+                this.comparator.setReferencePosition(fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.mc.player));
                 Collections.sort(this.chunks, this.comparator);
             }
 

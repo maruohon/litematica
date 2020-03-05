@@ -301,7 +301,8 @@ public class SchematicUtils
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
         LayerRange range = DataManager.getRenderLayerRange();
         BlockState stateStart = world.getBlockState(startPos);
-        BlockPos.Mutable posMutable = new BlockPos.Mutable(startPos);
+        BlockPos.Mutable posMutable = new BlockPos.Mutable();
+        posMutable.set(startPos);
 
         while (maxBlocks-- > 0)
         {
@@ -724,7 +725,7 @@ public class SchematicUtils
 
                 if (origin == null)
                 {
-                    origin = new BlockPos(mc.player);
+                    origin = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(mc.player);
                 }
 
                 SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, true);
