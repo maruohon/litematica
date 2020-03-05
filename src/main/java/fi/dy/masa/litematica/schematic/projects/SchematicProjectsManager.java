@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectsBrowser;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -12,8 +13,6 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
 
 public class SchematicProjectsManager
 {
@@ -56,7 +55,7 @@ public class SchematicProjectsManager
 
         this.currentProject = new SchematicProject(dir, new File(dir, projectName + ".json"));
         this.currentProject.setName(projectName);
-        this.currentProject.setOrigin(new BlockPos(this.mc.player));
+        this.currentProject.setOrigin(fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.mc.player));
         this.currentProject.saveToFile();
     }
 

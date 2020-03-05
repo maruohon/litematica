@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVersions;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVersion;
@@ -19,8 +20,6 @@ import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
 
 public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>
                                         implements ISelectionListener<SchematicVersion>, ICompletionListener
@@ -179,7 +178,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
 
                 if (project != null)
                 {
-                    project.setOrigin(new BlockPos(this.gui.mc.player));
+                    project.setOrigin(fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.gui.mc.player));
                     this.gui.reCreateGuiElements();
                 }
             }
