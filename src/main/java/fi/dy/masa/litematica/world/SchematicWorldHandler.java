@@ -20,7 +20,7 @@ public class SchematicWorldHandler
 
     public static WorldSchematic createSchematicWorld()
     {
-        LevelInfo info = new LevelInfo(0, GameMode.CREATIVE, false, false, LevelGeneratorType.FLAT);
+        LevelInfo info = new LevelInfo(0, GameMode.CREATIVE, false, false, LevelGeneratorType.FLAT.method_25957());
         return new WorldSchematic(null, info, DimensionType.THE_END, MinecraftClient.getInstance()::getProfiler);
     }
 

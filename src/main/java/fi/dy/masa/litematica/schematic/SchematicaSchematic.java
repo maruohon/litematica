@@ -104,7 +104,7 @@ public class SchematicaSchematic
                         BlockPos pos = new BlockPos(x, y, z);
                         CompoundTag teNBT = this.tiles.get(pos);
 
-                        pos = Structure.method_15171(placement, pos).add(posStart);
+                        pos = Structure.transform(placement, pos).add(posStart);
 
                         state = state.mirror(mirror);
                         state = state.rotate(rotation);
@@ -162,7 +162,7 @@ public class SchematicaSchematic
                             BlockPos pos = new BlockPos(x, y, z);
                             CompoundTag teNBT = this.tiles.get(pos);
 
-                            pos = Structure.method_15171(placement, pos).add(posStart);
+                            pos = Structure.transform(placement, pos).add(posStart);
                             world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
 
                             if (teNBT != null)
@@ -327,7 +327,7 @@ public class SchematicaSchematic
                 StructureBlockMode.valueOf(tag.getString("mode")) == StructureBlockMode.DATA)
             {
                 BlockPos pos = entry.getKey();
-                pos = Structure.method_15171(placement, pos).add(posStart);
+                pos = Structure.transform(placement, pos).add(posStart);
                 map.put(pos, tag.getString("metadata"));
             }
         }
