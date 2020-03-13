@@ -192,6 +192,13 @@ public class WorldUtils
 
             InventoryUtils.switchItemToHand(stack, ignoreNbt, mc);
         }
+
+        EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
+
+        if (hand != null)
+        {
+            fi.dy.masa.malilib.util.InventoryUtils.preRestockHand(player, hand, 6, true);
+        }
     }
 
     public static void insertSignTextFromSchematic(TileEntitySign teClient)
