@@ -84,7 +84,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         Minecraft mc = Minecraft.getMinecraft();
 
-        // Tool enabled, and not in a GUI
+        // Not in a GUI
         if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null)
         {
             if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode() + 100)
@@ -296,7 +296,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             sm.moveGrabbedElement(mc.player);
         }
-        else
+        else if (GuiUtils.getCurrentScreen() == null)
         {
             WorldUtils.easyPlaceOnUseTick(mc);
         }
