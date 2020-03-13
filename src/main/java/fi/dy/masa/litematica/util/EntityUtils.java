@@ -4,13 +4,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InventoryUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -23,6 +16,13 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.InventoryUtils;
 
 public class EntityUtils
 {
@@ -67,21 +67,35 @@ public class EntityUtils
      * This means, that it must either be in the main hand, or the main hand must be empty and the item is in the offhand.
      * @param player
      * @param stack
+     * @param lenient if true, then NBT tags and also damage of damageable items are ignored
      * @return
      */
     @Nullable
-    public static EnumHand getUsedHandForItem(EntityPlayer player, ItemStack stack)
+    public static EnumHand getUsedHandForItem(EntityPlayer player, ItemStack stack, boolean lenient)
     {
         EnumHand hand = null;
 
-        if (InventoryUtils.areStacksEqual(player.getHeldItemMainhand(), stack))
+        if (lenient)
         {
-            hand = EnumHand.MAIN_HAND;
+            if (ItemStack.areItemsEqualIgnoreDurability(player.getHeldItemMainhand(), stack))
+            {
+                hand = EnumHand.MAIN_HAND;
+            }
+            else if (player.getHeldItemMainhand().isEmpty() && ItemStack.areItemsEqualIgnoreDurability(player.getHeldItemOffhand(), stack))
+            {
+                hand = EnumHand.OFF_HAND;
+            }
         }
-        else if (player.getHeldItemMainhand().isEmpty() &&
-                 InventoryUtils.areStacksEqual(player.getHeldItemOffhand(), stack))
+        else
         {
-            hand = EnumHand.OFF_HAND;
+            if (InventoryUtils.areStacksEqual(player.getHeldItemMainhand(), stack))
+            {
+                hand = EnumHand.MAIN_HAND;
+            }
+            else if (player.getHeldItemMainhand().isEmpty() && InventoryUtils.areStacksEqual(player.getHeldItemOffhand(), stack))
+            {
+                hand = EnumHand.OFF_HAND;
+            }
         }
 
         return hand;

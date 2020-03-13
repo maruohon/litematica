@@ -10,6 +10,7 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.item.ItemStack;
@@ -111,76 +112,59 @@ public class InventoryUtils
         return inv;
     }
 
-    /**
-     * Finds a slot with an identical item than <b>stackReference</b>, ignoring the NBT data if <b>ignoreNBT</b> is true.
-     * @param inv
-     * @param stackReference
-     * @param reverse
-     * @param ignoreNBT
-     * @return the slot number, or -1 if none were found
-     */
-    public static int findSlotWithItem(InventoryPlayer inv, ItemStack stackReference, boolean reverse, boolean ignoreNBT)
-    {
-        final int startSlot = reverse ? inv.getSizeInventory() - 1 : 0;
-        final int endSlot = reverse ? -1 : inv.getSizeInventory();
-        final int increment = reverse ? -1 : 1;
-
-        for (int slotNum = startSlot; slotNum != endSlot; slotNum += increment)
-        {
-            ItemStack stack = inv.getStackInSlot(slotNum);
-
-            if (ignoreNBT && ItemStack.areItemsEqual(stack, stackReference))
-            {
-                return slotNum;
-            }
-            else if (ignoreNBT == false && fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(stack, stackReference))
-            {
-                return slotNum;
-            }
-        }
-
-        return -1;
-    }
-
-    public static void setPickedItemToHand(int slotNum, ItemStack stack, boolean ignoreNBT, Minecraft mc)
+    public static void switchItemToHand(ItemStack stack, boolean ignoreNbt, Minecraft mc)
     {
         EntityPlayer player = mc.player;
         InventoryPlayer inventory = player.inventory;
+        boolean isCreativeMode = player.capabilities.isCreativeMode;
+        int slotWithItem = fi.dy.masa.malilib.util.InventoryUtils.findPlayerInventorySlotWithItem(player.openContainer, stack, ignoreNbt, false);
 
-        if (InventoryPlayer.isHotbar(slotNum))
+        if (slotWithItem >= 36 && slotWithItem < 45)
         {
-            player.inventory.currentItem = slotNum;
+            inventory.currentItem = slotWithItem - 36;
+            return;
         }
-        else
+
+        // No item or no place to put it
+        if ((slotWithItem == -1 && isCreativeMode == false) || PICK_BLOCKABLE_SLOTS.size() == 0)
         {
-            if (PICK_BLOCKABLE_SLOTS.size() == 0)
-            {
-                return;
-            }
+            return;
+        }
 
-            if (slotNum == -1 || InventoryPlayer.isHotbar(slotNum) == false)
-            {
-                slotNum = getEmptyPickBlockableHotbarSlot(inventory);
-            }
+        int hotbarSlot = getEmptyPickBlockableHotbarSlot(inventory);
 
-            if (slotNum == -1)
-            {
-                slotNum = getNextPickBlockableHotbarSlot(inventory);
-            }
+        if (hotbarSlot == -1)
+        {
+            hotbarSlot = getNextPickBlockableHotbarSlot(inventory);
+        }
 
-            if (slotNum != -1)
-            {
-                inventory.currentItem = slotNum;
+        int slotNum = hotbarSlot + 36;
 
-                if (player.capabilities.isCreativeMode)
+        if (slotWithItem != -1)
+        {
+            fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotWithItem, hotbarSlot);
+        }
+        else if (isCreativeMode && InventoryPlayer.isHotbar(hotbarSlot))
+        {
+            // First try to put the current hotbar item into an empty slot in the player's inventory
+            if (inventory.getStackInSlot(hotbarSlot).isEmpty() == false)
+            {
+                // Shift click the stack
+                mc.playerController.windowClick(player.openContainer.windowId, slotNum, 0, ClickType.QUICK_MOVE, player);
+
+                // Wasn't able to move the items out, but the off hand is empty
+                if (inventory.getStackInSlot(hotbarSlot).isEmpty() == false && player.getHeldItemOffhand().isEmpty())
                 {
-                    inventory.mainInventory.set(slotNum, stack.copy());
-                }
-                else
-                {
-                    fi.dy.masa.malilib.util.InventoryUtils.swapItemToMainHand(stack, mc);
+                    fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                    fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, 45, 0);
+                    fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
                 }
             }
+
+            inventory.currentItem = hotbarSlot;
+
+            inventory.mainInventory.set(hotbarSlot, stack.copy());
+            mc.playerController.sendSlotPacket(stack.copy(), slotNum);
         }
     }
 

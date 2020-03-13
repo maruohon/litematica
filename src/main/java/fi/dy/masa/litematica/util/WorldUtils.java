@@ -14,7 +14,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -171,13 +171,11 @@ public class WorldUtils
         World world = SchematicWorldHandler.getSchematicWorld();
         IBlockState state = world.getBlockState(pos);
         ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
-        boolean ignoreNBT = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
+        EntityPlayer player = mc.player;
+        boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
 
-        if (stack.isEmpty() == false)
+        if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(player, stack, ignoreNbt) == null)
         {
-            InventoryPlayer inv = mc.player.inventory;
-            int slotNum = InventoryUtils.findSlotWithItem(inv, stack, false, ignoreNBT);
-
             if (mc.player.capabilities.isCreativeMode)
             {
                 TileEntity te = world.getTileEntity(pos);
@@ -187,16 +185,12 @@ public class WorldUtils
                 // Otherwise it would try to write whatever that TE is into the picked ItemStack.
                 if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
                 {
+                    stack = stack.copy();
                     ItemUtils.storeTEInStack(stack, te);
                 }
+            }
 
-                InventoryUtils.setPickedItemToHand(slotNum, stack, ignoreNBT, mc);
-                mc.playerController.sendSlotPacket(mc.player.getHeldItem(EnumHand.MAIN_HAND), 36 + inv.currentItem);
-            }
-            else if (slotNum != -1 && inv.currentItem != slotNum)
-            {
-                InventoryUtils.setPickedItemToHand(slotNum, stack, ignoreNBT, mc);
-            }
+            InventoryUtils.switchItemToHand(stack, ignoreNbt, mc);
         }
     }
 
@@ -301,7 +295,7 @@ public class WorldUtils
                     return EnumActionResult.FAIL;
                 }
 
-                EnumHand hand = EntityUtils.getUsedHandForItem(mc.player, stack);
+                EnumHand hand = EntityUtils.getUsedHandForItem(mc.player, stack, true);
 
                 // Abort if a wrong item is in the player's hand
                 if (hand == null)
@@ -546,7 +540,7 @@ public class WorldUtils
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
-            if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(mc.player, stack) == null)
+            if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(mc.player, stack, true) == null)
             {
                 return true;
             }
