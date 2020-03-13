@@ -248,7 +248,7 @@ public class WorldUtils
 
         if (result == EnumActionResult.FAIL)
         {
-            InfoUtils.showMessage((InfoType) Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, "litematica.message.easy_place_fail");
+            InfoUtils.showMessage((InfoType) Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
             return true;
         }
 
@@ -507,7 +507,8 @@ public class WorldUtils
      */
     private static boolean placementRestrictionInEffect(Minecraft mc)
     {
-        RayTraceResult trace = mc.objectMouseOver;
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, entity, false, mc.playerController.getBlockReachDistance());
 
         if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
@@ -520,6 +521,12 @@ public class WorldUtils
                 stateClient = mc.world.getBlockState(pos);
             }
 
+            // The targeted position is far enough from any schematic sub-regions to not need handling
+            if (isPositionWithinRangeOfSchematicRegions(pos, 2) == false)
+            {
+                return false;
+            }
+
             // Placement position is already occupied
             if (stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
                 stateClient.getMaterial().isLiquid() == false)
@@ -530,15 +537,8 @@ public class WorldUtils
             World worldSchematic = SchematicWorldHandler.getSchematicWorld();
             LayerRange range = DataManager.getRenderLayerRange();
 
-            // The targeted position is outside the current render range
-            if (worldSchematic.isAirBlock(pos) == false && range.isPositionWithinRange(pos) == false)
-            {
-                return true;
-            }
-
-            // There should not be anything in the targeted position,
-            // and the position is within or close to a schematic sub-region
-            if (worldSchematic.isAirBlock(pos) && isPositionWithinRangeOfSchematicRegions(pos, 2))
+            // The targeted position should be air or it's outside the current render range
+            if (worldSchematic.isAirBlock(pos) || range.isPositionWithinRange(pos) == false)
             {
                 return true;
             }
