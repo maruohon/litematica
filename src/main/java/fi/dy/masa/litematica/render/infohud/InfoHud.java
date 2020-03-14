@@ -170,7 +170,7 @@ public class InfoHud
 
     protected HudAlignment getHudAlignment()
     {
-        return (HudAlignment) Configs.InfoOverlays.INFO_HUD_ALIGNMENT.getOptionListValue();
+        return Configs.InfoOverlays.INFO_HUD_ALIGNMENT.getOptionListValue();
     }
 
     protected void updateHudText()

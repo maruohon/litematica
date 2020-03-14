@@ -62,7 +62,7 @@ public class ToolHud extends InfoHud
     @Override
     protected HudAlignment getHudAlignment()
     {
-        return (HudAlignment) Configs.InfoOverlays.TOOL_HUD_ALIGNMENT.getOptionListValue();
+        return Configs.InfoOverlays.TOOL_HUD_ALIGNMENT.getOptionListValue();
     }
 
     @Override
@@ -287,7 +287,7 @@ public class ToolHud extends InfoHud
 
                 if (mode == ToolMode.PASTE_SCHEMATIC)
                 {
-                    ReplaceBehavior replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
+                    ReplaceBehavior replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
                     str = replace.getDisplayName();
 
                     if (replace == ReplaceBehavior.NONE)

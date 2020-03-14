@@ -54,8 +54,8 @@ public class KeyCallbacks
         IHotkeyCallback callbackHotkeys = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
 
-        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((config) -> { InventoryUtils.setPickBlockableSlots(config.getStringValue()); });
-        Configs.Generic.TOOL_ITEM.setValueChangeCallback((config) -> { DataManager.setToolItem(config.getStringValue()); });
+        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((newValue, oldValue) -> { InventoryUtils.setPickBlockableSlots(newValue); });
+        Configs.Generic.TOOL_ITEM.setValueChangeCallback((newValue, oldValue) -> { DataManager.setToolItem(newValue); });
 
         Hotkeys.CLONE_SELECTION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(callbackHotkeys);
@@ -666,11 +666,11 @@ public class KeyCallbacks
                 }
                 else if (mode == ToolMode.PASTE_SCHEMATIC)
                 {
-                    Configs.Generic.PASTE_REPLACE_BEHAVIOR.setOptionListValue(Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue().cycle(false));
+                    Configs.Generic.PASTE_REPLACE_BEHAVIOR.cycleValue(false);
                 }
                 else if (mode.getUsesAreaSelection())
                 {
-                    Configs.Generic.SELECTION_CORNERS_MODE.setOptionListValue(Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().cycle(false));
+                    Configs.Generic.SELECTION_CORNERS_MODE.cycleValue(false);
                 }
 
                 return true;

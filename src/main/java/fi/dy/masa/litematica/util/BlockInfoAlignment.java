@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.util;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum BlockInfoAlignment implements IConfigOptionListEntry
+public enum BlockInfoAlignment implements IConfigOptionListEntry<BlockInfoAlignment>
 {
     CENTER      ("center",      "litematica.label.alignment.center"),
     TOP_CENTER  ("top_center",  "litematica.label.alignment.top_center");
@@ -30,7 +30,7 @@ public enum BlockInfoAlignment implements IConfigOptionListEntry
     }
 
     @Override
-    public IConfigOptionListEntry cycle(boolean forward)
+    public BlockInfoAlignment cycle(boolean forward)
     {
         int id = this.ordinal();
 

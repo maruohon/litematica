@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.util;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum ReplaceBehavior implements IConfigOptionListEntry
+public enum ReplaceBehavior implements IConfigOptionListEntry<ReplaceBehavior>
 {
     NONE            ("none",            "litematica.gui.label.replace_behavior.none"),
     ALL             ("all",             "litematica.gui.label.replace_behavior.all"),
@@ -31,7 +31,7 @@ public enum ReplaceBehavior implements IConfigOptionListEntry
     }
 
     @Override
-    public IConfigOptionListEntry cycle(boolean forward)
+    public ReplaceBehavior cycle(boolean forward)
     {
         int id = this.ordinal();
 

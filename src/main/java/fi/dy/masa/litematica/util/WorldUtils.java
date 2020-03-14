@@ -39,7 +39,6 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.config.values.InfoType;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
@@ -248,7 +247,7 @@ public class WorldUtils
 
         if (result == EnumActionResult.FAIL)
         {
-            InfoUtils.showMessage((InfoType) Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
+            InfoUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
             return true;
         }
 
@@ -489,7 +488,7 @@ public class WorldUtils
 
         if (cancel)
         {
-            InfoUtils.showMessage((InfoType) Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, "litematica.message.placement_restriction_fail");
+            InfoUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, "litematica.message.placement_restriction_fail");
         }
 
         return cancel;

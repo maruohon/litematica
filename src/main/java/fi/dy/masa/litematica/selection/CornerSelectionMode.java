@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.selection;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum CornerSelectionMode implements IConfigOptionListEntry
+public enum CornerSelectionMode implements IConfigOptionListEntry<CornerSelectionMode>
 {
     CORNERS     ("corners",     "litematica.hud.area_selection.mode.corners"),
     EXPAND      ("expand",      "litematica.hud.area_selection.mode.expand");
@@ -30,7 +30,7 @@ public enum CornerSelectionMode implements IConfigOptionListEntry
     }
 
     @Override
-    public IConfigOptionListEntry cycle(boolean forward)
+    public CornerSelectionMode cycle(boolean forward)
     {
         int id = this.ordinal();
 

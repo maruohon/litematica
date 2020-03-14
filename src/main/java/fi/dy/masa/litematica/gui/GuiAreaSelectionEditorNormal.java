@@ -19,7 +19,6 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
@@ -301,7 +300,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
         else if (type == ButtonListener.Type.CHANGE_CORNER_MODE)
         {
-            IConfigOptionListEntry mode = Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue();
+            CornerSelectionMode mode = Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue();
             label = type.getDisplayName(mode.getDisplayName());
 
             if (mode == CornerSelectionMode.EXPAND)
@@ -482,7 +481,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     break;
 
                 case CHANGE_CORNER_MODE:
-                    Configs.Generic.SELECTION_CORNERS_MODE.setOptionListValue(Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().cycle(false));
+                    Configs.Generic.SELECTION_CORNERS_MODE.cycleValue(false);
                     break;
 
                 case CREATE_SCHEMATIC:

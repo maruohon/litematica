@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.util;
 import fi.dy.masa.malilib.config.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum BlockInfoListType implements IConfigOptionListEntry
+public enum BlockInfoListType implements IConfigOptionListEntry<BlockInfoListType>
 {
     ALL             ("all",             "litematica.gui.label.block_info_list_type.all"),
     RENDER_LAYERS   ("render_layers",   "litematica.gui.label.block_info_list_type.render_layers");
@@ -30,7 +30,7 @@ public enum BlockInfoListType implements IConfigOptionListEntry
     }
 
     @Override
-    public IConfigOptionListEntry cycle(boolean forward)
+    public BlockInfoListType cycle(boolean forward)
     {
         int id = this.ordinal();
 

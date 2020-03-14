@@ -480,7 +480,7 @@ public class OverlayRenderer
         double fontScale = Configs.InfoOverlays.BLOCK_INFO_LINES_FONT_SCALE.getDoubleValue();
         int textColor = 0xFFFFFFFF;
         int bgColor = 0xA0505050;
-        HudAlignment alignment = (HudAlignment) Configs.InfoOverlays.BLOCK_INFO_LINES_ALIGNMENT.getOptionListValue();
+        HudAlignment alignment = Configs.InfoOverlays.BLOCK_INFO_LINES_ALIGNMENT.getOptionListValue();
         boolean useBackground = true;
         boolean useShadow = false;
 
@@ -528,7 +528,7 @@ public class OverlayRenderer
         stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
 
         int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
-        BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
 
         ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
         ItemUtils.setItemForBlock(mc.world, pos, stateClient);
@@ -575,7 +575,7 @@ public class OverlayRenderer
 
     protected void getOverlayPosition(int width, int height, int offY, Minecraft mc)
     {
-        BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
 
         switch (align)
         {

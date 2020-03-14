@@ -39,17 +39,18 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       PASTE_COMMAND_INTERVAL  = new ConfigInteger(    "pasteCommandInterval", 1, 1, 1000, "The interval in game ticks the Paste schematic task runs at,\nin the command-based mode");
         public static final ConfigInteger       PASTE_COMMAND_LIMIT     = new ConfigInteger(    "pasteCommandLimit", 64, 1, 1000000, "Max number of commands sent per game tick,\nwhen using the Paste schematic feature in the\ncommand mode on a server");
         public static final ConfigString        PASTE_COMMAND_SETBLOCK  = new ConfigString(     "pasteCommandNameSetblock", "setblock", "The setblock command name to use for the\nPaste schematic feature on servers, when\nusing the command-based paste mode");
-        public static final ConfigOptionList    PASTE_REPLACE_BEHAVIOR  = new ConfigOptionList( "pasteReplaceBehavior", ReplaceBehavior.NONE, "The behavior of replacing existing blocks\nin the Paste schematic tool mode");
         public static final ConfigBoolean       PICK_BLOCK_ENABLED      = new ConfigBoolean(    "pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
         public static final ConfigBoolean       PICK_BLOCK_IGNORE_NBT   = new ConfigBoolean(    "pickBlockIgnoreNBT", true, "Ignores the NBT data on the expected vs. found items for pick block.\nAllows the pick block to work for example with renamed items.");
         public static final ConfigString        PICK_BLOCKABLE_SLOTS    = new ConfigString(     "pickBlockableSlots", "1-9", "The hotbar slots that are allowed to be\nused for the schematic pick block.\nCan use comma separated individual slots and dash\nseparated slot ranges (no spaces anywhere).\nExample: 2,4-6,9");
         public static final ConfigBoolean       PLACEMENT_RESTRICTION   = new ConfigBoolean(    "placementRestriction", false, "When enabled, the use key can only be used\nwhen holding the correct item for the targeted position,\nand the targeted position must have a missing block in the schematic", "Placement Restriction");
         public static final ConfigBoolean       RENDER_MATERIALS_IN_GUI = new ConfigBoolean(    "renderMaterialListInGuis", true, "Whether or not the material list should\nbe rendered inside GUIs");
         public static final ConfigBoolean       RENDER_THREAD_NO_TIMEOUT = new ConfigBoolean(   "renderThreadNoTimeout", true, "Removes the timeout from the rendering worker threads.\nIf you get very stuttery rendering when moving around\nor dealing with large schematics, try disabling this. It will however make\nthe schematic rendering a lot slower in some cases.");
-        public static final ConfigOptionList    SELECTION_CORNERS_MODE  = new ConfigOptionList( "selectionCornersMode", CornerSelectionMode.CORNERS, "The Area Selection corners mode to use (Corners, or Expand)");
         public static final ConfigBoolean       SIGN_TEXT_PASTE         = new ConfigBoolean(    "signTextPaste", true, "Automatically set the text in the sign GUIs from the schematic");
         public static final ConfigString        TOOL_ITEM               = new ConfigString(     "toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
         public static final ConfigBoolean       TOOL_ITEM_ENABLED       = new ConfigBoolean(    "toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.", "Tool Item Enabled");
+
+        public static final ConfigOptionList<ReplaceBehavior>           PASTE_REPLACE_BEHAVIOR  = new ConfigOptionList<ReplaceBehavior>( "pasteReplaceBehavior", ReplaceBehavior.NONE, "The behavior of replacing existing blocks\nin the Paste schematic tool mode");
+        public static final ConfigOptionList<CornerSelectionMode>       SELECTION_CORNERS_MODE  = new ConfigOptionList<CornerSelectionMode>( "selectionCornersMode", CornerSelectionMode.CORNERS, "The Area Selection corners mode to use (Corners, or Expand)");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 AREAS_PER_WORLD,
@@ -155,16 +156,12 @@ public class Configs implements IConfigHandler
 
     public static class InfoOverlays
     {
-        public static final ConfigOptionList    BLOCK_INFO_LINES_ALIGNMENT          = new ConfigOptionList( "blockInfoLinesAlignment", HudAlignment.TOP_RIGHT, "The alignment of the block info lines overlay");
         public static final ConfigBoolean       BLOCK_INFO_LINES_ENABLED            = new ConfigBoolean(    "blockInfoLinesEnabled", true, "If enabled, then MiniHUD-style block info overlay\nis rendered for the looked-at block");
         public static final ConfigDouble        BLOCK_INFO_LINES_FONT_SCALE         = new ConfigDouble(     "blockInfoLinesFontScale", 0.5, 0, 10, "The font scale for the block info lines");
         public static final ConfigInteger       BLOCK_INFO_LINES_OFFSET_X           = new ConfigInteger(    "blockInfoLinesOffsetX", 4, 0, 2000, "The x offset of the block info lines from the selected edge");
         public static final ConfigInteger       BLOCK_INFO_LINES_OFFSET_Y           = new ConfigInteger(    "blockInfoLinesOffsetY", 4, 0, 2000, "The y offset of the block info lines from the selected edge");
-        public static final ConfigOptionList    BLOCK_INFO_OVERLAY_ALIGNMENT        = new ConfigOptionList( "blockInfoOverlayAlignment", BlockInfoAlignment.TOP_CENTER, "The alignment of the Block Info Overlay");
         public static final ConfigInteger       BLOCK_INFO_OVERLAY_OFFSET_Y         = new ConfigInteger(    "blockInfoOverlayOffsetY", 6, -2000, 2000, "The y offset of the block info overlay from the selected edge");
         public static final ConfigBoolean       BLOCK_INFO_OVERLAY_ENABLED          = new ConfigBoolean(    "blockInfoOverlayEnabled", true, "Enable Block Info Overlay rendering to show info\nabout the looked-at block or verifier error marker,\nwhile holding the 'renderInfoOverlay' key", "Block Info Overlay Rendering");
-        public static final ConfigOptionList    EASY_PLACE_WARNINGS                 = new ConfigOptionList( "easyPlaceWarnings", InfoType.MESSAGE_OVERLAY, "Whether to show the \"Action prevented by *\"\nwarnings for the Easy Place and Placement Restriction modes");
-        public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"Info HUD\",\nused for the Material List, Schematic Verifier mismatch positions etc.");
         public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger(    "infoHudMaxLines", 10, 1, 128, "The maximum number of info lines to show on the HUD at once");
         public static final ConfigInteger       INFO_HUD_OFFSET_X                   = new ConfigInteger(    "infoHudOffsetX", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
         public static final ConfigInteger       INFO_HUD_OFFSET_Y                   = new ConfigInteger(    "infoHudOffsetY", 1, 0, 32000, "The Y offset of the Info HUD from the screen edge");
@@ -175,7 +172,6 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       MATERIAL_LIST_SLOT_HIGHLIGHT        = new ConfigBoolean(    "materialListSlotHighlight", true, "Highlight inventory slots containing items that are\ncurrently missing or running low in the player's inventory\naccording to the currently active Material List");
         public static final ConfigBoolean       STATUS_INFO_HUD                     = new ConfigBoolean(    "statusInfoHud", false, "Enable a status info HUD renderer,\nwhich renders a few bits of status info, such as\nthe current layer mode and renderers enabled state");
         public static final ConfigBoolean       STATUS_INFO_HUD_AUTO                = new ConfigBoolean(    "statusInfoHudAuto", true, "Allow automatically momentarily enabling the status info HUD \"when needed\",\nfor example when creating a placement and having rendering disabled");
-        public static final ConfigOptionList    TOOL_HUD_ALIGNMENT                  = new ConfigOptionList( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
         public static final ConfigBoolean       TOOL_HUD_ALWAYS_VISIBLE             = new ConfigBoolean(    "toolHudAlwaysVisible", false, "Whether or not the tool HUD should always be rendered,\neven when not holding the tool item");
         public static final ConfigInteger       TOOL_HUD_OFFSET_X                   = new ConfigInteger(    "toolHudOffsetX", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
         public static final ConfigInteger       TOOL_HUD_OFFSET_Y                   = new ConfigInteger(    "toolHudOffsetY", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
@@ -184,6 +180,12 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       VERIFIER_ERROR_HILIGHT_MAX_POSITIONS = new ConfigInteger(   "verifierErrorHilightMaxPositions", 1000, 1, 1000000, "The maximum number of mismatched positions to render\nat once in the Schematic Verifier overlay.");
         public static final ConfigBoolean       VERIFIER_OVERLAY_ENABLED            = new ConfigBoolean(    "verifierOverlayEnabled", true, "Enable Schematic Verifier marker overlay rendering", "Verifier Overlay Rendering");
         public static final ConfigBoolean       WARN_DISABLED_RENDERING             = new ConfigBoolean(    "warnDisabledRendering", true, "Should the warning message about being in a layer mode\nor having some of the rendering options disabled\nbe shown when loading a new schematic\nor creating a new placement");
+
+        public static final ConfigOptionList<HudAlignment>          BLOCK_INFO_LINES_ALIGNMENT      = new ConfigOptionList<HudAlignment>( "blockInfoLinesAlignment", HudAlignment.TOP_RIGHT, "The alignment of the block info lines overlay");
+        public static final ConfigOptionList<BlockInfoAlignment>    BLOCK_INFO_OVERLAY_ALIGNMENT    = new ConfigOptionList<BlockInfoAlignment>( "blockInfoOverlayAlignment", BlockInfoAlignment.TOP_CENTER, "The alignment of the Block Info Overlay");
+        public static final ConfigOptionList<InfoType>              EASY_PLACE_WARNINGS             = new ConfigOptionList<InfoType>( "easyPlaceWarnings", InfoType.MESSAGE_OVERLAY, "Whether to show the \"Action prevented by *\"\nwarnings for the Easy Place and Placement Restriction modes");
+        public static final ConfigOptionList<HudAlignment>          INFO_HUD_ALIGNMENT              = new ConfigOptionList<HudAlignment>( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"Info HUD\",\nused for the Material List, Schematic Verifier mismatch positions etc.");
+        public static final ConfigOptionList<HudAlignment>          TOOL_HUD_ALIGNMENT              = new ConfigOptionList<HudAlignment>( "toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 BLOCK_INFO_LINES_ENABLED,
