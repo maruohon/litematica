@@ -175,6 +175,7 @@ public class SchematicPlacingUtils
         ISchematic schematic = schematicPlacement.getSchematic();
         ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
         BlockPos origin = schematicPlacement.getOrigin();
+        boolean success = true;
 
         for (String regionName : relativePlacements.keySet())
         {
@@ -192,7 +193,12 @@ public class SchematicPlacingUtils
 
                 if (regionPos != null && regionSize != null && container != null && blockEntityMap != null)
                 {
-                    placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, container, blockEntityMap, scheduledBlockTicks, range, notifyNeighbors);
+                    if (placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement,
+                            container, blockEntityMap, scheduledBlockTicks, range, notifyNeighbors) == false)
+                    {
+                        success = false;
+                        InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed_region", regionName);
+                    }
                 }
                 else
                 {
@@ -208,7 +214,7 @@ public class SchematicPlacingUtils
 
         WorldUtils.setShouldPreventBlockUpdates(false);
 
-        return true;
+        return success;
     }
 
     public static boolean placeBlocksToWorld(World world, BlockPos origin, BlockPos regionPos, Vec3i regionSize,
@@ -219,7 +225,7 @@ public class SchematicPlacingUtils
         // These are the untransformed relative positions
         BlockPos posEndRelSub = new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize));
         BlockPos posEndRel = posEndRelSub.add(regionPos);
-        BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
+        BlockPos posMinRel = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(regionPos, posEndRel);
 
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         BlockPos posEndAbs = PositionUtils.getTransformedBlockPos(posEndRelSub, placement.getMirror(), placement.getRotation()).add(regionPosTransformed).add(origin);
@@ -239,7 +245,7 @@ public class SchematicPlacingUtils
 
         final IBlockState barrier = Blocks.BARRIER.getDefaultState();
         BlockPos.MutableBlockPos posMutable = new BlockPos.MutableBlockPos();
-        ReplaceBehavior replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
+        ReplaceBehavior replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
 
         final Rotation rotationCombined = schematicPlacement.getRotation().add(placement.getRotation());
         final Mirror mirrorMain = schematicPlacement.getMirror();
@@ -475,7 +481,7 @@ public class SchematicPlacingUtils
 
         // These are the untransformed relative positions
         BlockPos posEndRel = (new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize))).add(regionPos);
-        BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
+        BlockPos posMinRel = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(regionPos, posEndRel);
 
         // The transformed sub-region origin position
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
@@ -495,8 +501,8 @@ public class SchematicPlacingUtils
         boxMinRel = boxMinRel.subtract(posMinRel.subtract(regionPos));
         boxMaxRel = boxMaxRel.subtract(posMinRel.subtract(regionPos));
 
-        BlockPos posMin = PositionUtils.getMinCorner(boxMinRel, boxMaxRel);
-        BlockPos posMax = PositionUtils.getMaxCorner(boxMinRel, boxMaxRel);
+        BlockPos posMin = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(boxMinRel, boxMaxRel);
+        BlockPos posMax = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(boxMinRel, boxMaxRel);
 
         final int startX = posMin.getX();
         final int startZ = posMin.getZ();

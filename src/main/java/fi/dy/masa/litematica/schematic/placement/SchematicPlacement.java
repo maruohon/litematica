@@ -199,7 +199,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         for (SelectionBox box : boxes.values())
         {
             BlockPos tmp;
-            tmp = PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+            tmp = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
 
             if (pos1 == null)
             {
@@ -207,10 +207,10 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
             }
             else if (tmp.getX() < pos1.getX() || tmp.getY() < pos1.getY() || tmp.getZ() < pos1.getZ())
             {
-                pos1 = PositionUtils.getMinCorner(tmp, pos1);
+                pos1 = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(tmp, pos1);
             }
 
-            tmp = PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
+            tmp = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
 
             if (pos2 == null)
             {
@@ -218,7 +218,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
             }
             else if (tmp.getX() > pos2.getX() || tmp.getY() > pos2.getY() || tmp.getZ() > pos2.getZ())
             {
-                pos2 = PositionUtils.getMaxCorner(tmp, pos2);
+                pos2 = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(tmp, pos2);
             }
         }
 

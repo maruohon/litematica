@@ -110,7 +110,7 @@ public class SchematicUtils
 
         // These are the untransformed relative positions
         BlockPos posEndRel = (new BlockPos(PositionUtils.getRelativeEndPositionFromAreaSize(regionSize))).add(regionPos);
-        BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
+        BlockPos posMinRel = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(regionPos, posEndRel);
 
         // The transformed sub-region origin position
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
@@ -154,8 +154,8 @@ public class SchematicUtils
             return null;
         }
 
-        BlockPos posMinReversed = PositionUtils.getMinCorner(pos1, pos2);
-        BlockPos posMaxReversed = PositionUtils.getMaxCorner(pos1, pos2);
+        BlockPos posMinReversed = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(pos1, pos2);
+        BlockPos posMaxReversed = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(pos1, pos2);
 
         final int startX = Math.max(posMinReversed.getX(), 0);
         final int startY = Math.max(posMinReversed.getY(), 0);

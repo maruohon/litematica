@@ -275,7 +275,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         BlockPos regionPos = region.getPosition();
         Vec3i endRel = PositionUtils.getRelativeEndPositionFromAreaSize(region.getSize());
         BlockPos regionEnd = regionPos.add(endRel);
-        BlockPos regionMin = PositionUtils.getMinCorner(regionPos, regionEnd);
+        BlockPos regionMin = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(regionPos, regionEnd);
         BlockPos regionOffset = regionMin.subtract(minCorner);
 
         return regionOffset;

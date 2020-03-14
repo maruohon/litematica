@@ -138,23 +138,6 @@ public class PositionUtils
         return vec.getX() >= threshold && vec.getY() >= threshold && vec.getZ() >= threshold;
     }
 
-    public static BlockPos getMinCorner(BlockPos pos1, BlockPos pos2)
-    {
-        return new BlockPos(Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
-    }
-
-    public static BlockPos getMaxCorner(BlockPos pos1, BlockPos pos2)
-    {
-        return new BlockPos(Math.max(pos1.getX(), pos2.getX()), Math.max(pos1.getY(), pos2.getY()), Math.max(pos1.getZ(), pos2.getZ()));
-    }
-
-    public static boolean isPositionInsideArea(BlockPos pos, BlockPos posMin, BlockPos posMax)
-    {
-        return pos.getX() >= posMin.getX() && pos.getX() <= posMax.getX() &&
-               pos.getY() >= posMin.getY() && pos.getY() <= posMax.getY() &&
-               pos.getZ() >= posMin.getZ() && pos.getZ() <= posMax.getZ();
-    }
-
     public static BlockPos getTransformedPlacementPosition(BlockPos posWithinSub, SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
         BlockPos pos = posWithinSub;
@@ -385,8 +368,8 @@ public class PositionUtils
         {
             if (isBoxValid(box))
             {
-                BlockPos min = getMinCorner(box.getPos1(), box.getPos2());
-                BlockPos max = getMaxCorner(box.getPos1(), box.getPos2());
+                BlockPos min = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(box.getPos1(), box.getPos2());
+                BlockPos max = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(box.getPos1(), box.getPos2());
                 volume += (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
             }
         }
