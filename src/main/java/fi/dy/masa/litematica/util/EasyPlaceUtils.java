@@ -209,7 +209,10 @@ public class EasyPlaceUtils
                 }
 
                 //System.out.printf("pos: %s side: %s, hit: %s\n", pos, side, hitPos);
-                mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand);
+                if (mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand) == EnumActionResult.PASS)
+                {
+                    return mc.playerController.processRightClick(mc.player, mc.world, hand);
+                }
 
                 if (stateSchematic.getBlock() instanceof BlockSlab && ((BlockSlab) stateSchematic.getBlock()).isDouble())
                 {
@@ -418,7 +421,7 @@ public class EasyPlaceUtils
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
-            if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(mc.player, stack, true) == null)
+            if (stack.isEmpty() || EntityUtils.getUsedHandForItem(mc.player, stack, true) == null)
             {
                 return true;
             }
