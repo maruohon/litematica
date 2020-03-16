@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica;
 
+import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
@@ -15,7 +16,6 @@ import fi.dy.masa.malilib.event.TickHandler;
 import fi.dy.masa.malilib.event.WorldLoadHandler;
 import fi.dy.masa.malilib.interfaces.IInitializationHandler;
 import fi.dy.masa.malilib.interfaces.IRenderer;
-import net.minecraft.client.Minecraft;
 
 public class InitHandler implements IInitializationHandler
 {
@@ -25,7 +25,6 @@ public class InitHandler implements IInitializationHandler
         ConfigManager.getInstance().registerConfigHandler(Reference.MOD_ID, new Configs());
 
         InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());
-        InputEventHandler.getInputManager().registerKeyboardInputHandler(InputHandler.getInstance());
         InputEventHandler.getInputManager().registerMouseInputHandler(InputHandler.getInstance());
 
         IRenderer renderer = new RenderHandler();

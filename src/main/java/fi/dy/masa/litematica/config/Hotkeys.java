@@ -39,6 +39,7 @@ public class Hotkeys
     public static final ConfigHotkey PICK_BLOCK_FIRST                   = new ConfigHotkey("pickBlockFirst",                    "BUTTON2", KeybindSettings.PRESS_ALLOWEXTRA, "A key to pick block the first\nschematic block ray traced to");
     public static final ConfigHotkey PICK_BLOCK_LAST                    = new ConfigHotkey("pickBlockLast",                     "",      KeybindSettings.MODIFIER_INGAME, "A key to pick block the last schematic block\nray traced to, before the first (possible) client world\nblock ray traced to. Basically this would get\nyou the block you could place against an existing block.");
     public static final ConfigHotkey PICK_BLOCK_TOGGLE                  = new ConfigHotkey("pickBlockToggle",                   "M,BUTTON2", "A hotkey to toggle the pick block toggle option in the\nGeneric configs. This is provided as a quick way to enable\nor disable the pick block keys, if they interfere with something.");
+    public static final ConfigHotkey PICK_BLOCK_TOGGLE_AUTO             = new ConfigHotkey("pickBlockToggleAuto",               "", "A hotkey to toggle the pickBlockAuto option in the Generic configs.");
     public static final ConfigHotkey RENDER_INFO_OVERLAY                = new ConfigHotkey("renderInfoOverlay",                 "I", KeybindSettings.PRESS_ALLOWEXTRA, "The key that enables rendering the block info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in the Visuals\nconfigs to disable the overlay completely.");
     public static final ConfigHotkey RENDER_OVERLAY_THROUGH_BLOCKS      = new ConfigHotkey("renderOverlayThroughBlocks",        "RCONTROL", KeybindSettings.PRESS_ALLOWEXTRA, "A hotkey to allow the overlays to render through blocks.\nThis is just a quicker way to temporarily enable\nthe same thing that the 'schematicOverlayRenderThroughBlocks' option in Visuals does.");
     public static final ConfigHotkey RERENDER_SCHEMATIC                 = new ConfigHotkey("rerenderSchematic",                 "F3,M", "Hotkey to refresh/redraw only the schematic, instead of\nhaving to refresh the vanilla terrain too with F3 + A");
@@ -61,6 +62,7 @@ public class Hotkeys
     public static final ConfigHotkey SELECTION_MODE_CYCLE               = new ConfigHotkey("selectionModeCycle",                "LCONTROL,M", "Change the mode between Corners and Cuboid\nin the Area Selection mode");
     public static final ConfigHotkey SELECTION_SHRINK_HOTKEY            = new ConfigHotkey("selectionShrink",                   "",     "The action hotkey to shrink the selection box so that there\nisn't any empty space (empty layers) on any side");
     public static final ConfigHotkey SET_AREA_ORIGIN                    = new ConfigHotkey("setAreaOrigin",                     "",     "Set/move the origin point of the current\narea selection to the player's position");
+    public static final ConfigHotkey SET_SCHEMATIC_PREVIEW              = new ConfigHotkey("setSchematicPreview",               "F2",   "Sets the schematic thumbnail/preview image by taking a screenshot,\nwhen a preview task has been started via the Schematic Manager");
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_1       = new ConfigHotkey("setSelectionBoxPosition1",          "",     "Set the first position of the currently selected\nbox to the player's position");
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_2       = new ConfigHotkey("setSelectionBoxPosition2",          "",     "Set the second position of the currently selected\nbox to the player's position");
     public static final ConfigHotkey TOGGLE_ALL_RENDERING               = new ConfigHotkey("toggleAllRendering",                "M,R",  "Toggle all rendering on/off", "All Rendering");
@@ -119,6 +121,7 @@ public class Hotkeys
             PICK_BLOCK_FIRST,
             PICK_BLOCK_LAST,
             PICK_BLOCK_TOGGLE,
+            PICK_BLOCK_TOGGLE_AUTO,
             RENDER_INFO_OVERLAY,
             RENDER_OVERLAY_THROUGH_BLOCKS,
             RERENDER_SCHEMATIC,
@@ -141,6 +144,7 @@ public class Hotkeys
             SELECTION_MODE_CYCLE,
             SELECTION_SHRINK_HOTKEY,
             SET_AREA_ORIGIN,
+            SET_SCHEMATIC_PREVIEW,
             SET_SELECTION_BOX_POSITION_1,
             SET_SELECTION_BOX_POSITION_2,
             TOGGLE_ALL_RENDERING,

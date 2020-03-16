@@ -18,8 +18,10 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinItemBlockSpecial;
+import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
@@ -42,12 +44,66 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class SchematicEditUtils
 {
-    public static boolean breakSchematicBlock(Minecraft mc)
+    public static boolean rebuildHandleBlockBreak(Minecraft mc)
+    {
+        if (mc.player != null &&
+            DataManager.getToolMode() == ToolMode.REBUILD &&
+            RenderUtils.areSchematicBlocksCurrentlyRendered())
+        {
+            if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
+            {
+                return breakSchematicBlocks(mc);
+            }
+            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
+            {
+                return breakAllIdenticalSchematicBlocks(mc);
+            }
+            else
+            {
+                return breakSchematicBlock(mc);
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean rebuildHandleBlockPlace(Minecraft mc)
+    {
+        if (mc.player != null &&
+            DataManager.getToolMode() == ToolMode.REBUILD &&
+            RenderUtils.areSchematicBlocksCurrentlyRendered())
+        {
+            if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
+            {
+                return replaceSchematicBlocksInDirection(mc);
+            }
+            else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
+            {
+                return replaceAllIdenticalSchematicBlocks(mc);
+            }
+            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
+            {
+                return placeSchematicBlocksInDirection(mc);
+            }
+            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
+            {
+                return fillAirWithBlocks(mc);
+            }
+            else
+            {
+                return placeSchematicBlock(mc);
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean breakSchematicBlock(Minecraft mc)
     {
         return setTargetedSchematicBlockState(mc, Blocks.AIR.getDefaultState());
     }
 
-    public static boolean placeSchematicBlock(Minecraft mc)
+    private static boolean placeSchematicBlock(Minecraft mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -67,7 +123,7 @@ public class SchematicEditUtils
         return true;
     }
 
-    public static boolean replaceSchematicBlocksInDirection(Minecraft mc)
+    private static boolean replaceSchematicBlocksInDirection(Minecraft mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -90,7 +146,7 @@ public class SchematicEditUtils
         return false;
     }
 
-    public static boolean replaceAllIdenticalSchematicBlocks(Minecraft mc)
+    private static boolean replaceAllIdenticalSchematicBlocks(Minecraft mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -103,7 +159,7 @@ public class SchematicEditUtils
         return false;
     }
 
-    public static boolean breakSchematicBlocks(Minecraft mc)
+    private static boolean breakSchematicBlocks(Minecraft mc)
     {
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
         RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 20);
@@ -129,7 +185,7 @@ public class SchematicEditUtils
         return false;
     }
 
-    public static boolean breakAllIdenticalSchematicBlocks(Minecraft mc)
+    private static boolean breakAllIdenticalSchematicBlocks(Minecraft mc)
     {
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
         RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 20);
@@ -147,7 +203,7 @@ public class SchematicEditUtils
         return false;
     }
 
-    public static boolean placeSchematicBlocksInDirection(Minecraft mc)
+    private static boolean placeSchematicBlocksInDirection(Minecraft mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -168,7 +224,7 @@ public class SchematicEditUtils
         return false;
     }
 
-    public static boolean fillAirWithBlocks(Minecraft mc)
+    private static boolean fillAirWithBlocks(Minecraft mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
 
@@ -259,7 +315,7 @@ public class SchematicEditUtils
         return posMutable.toImmutable();
     }
 
-    public static boolean setTargetedSchematicBlockState(Minecraft mc, IBlockState state)
+    private static boolean setTargetedSchematicBlockState(Minecraft mc, IBlockState state)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();

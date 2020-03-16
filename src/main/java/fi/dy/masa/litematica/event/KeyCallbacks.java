@@ -15,6 +15,7 @@ import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiPlacementGridSettings;
 import fi.dy.masa.litematica.gui.GuiSchematicLoad;
 import fi.dy.masa.litematica.gui.GuiSchematicLoadedList;
+import fi.dy.masa.litematica.gui.GuiSchematicManager;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
@@ -81,6 +82,7 @@ public class KeyCallbacks
         Hotkeys.PICK_BLOCK_FIRST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_LAST.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.PICK_BLOCK_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PICK_BLOCK_ENABLED));
+        Hotkeys.PICK_BLOCK_TOGGLE_AUTO.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PICK_BLOCK_AUTO));
         Hotkeys.RERENDER_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.ROTATE_PLACEMENT_CW.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.ROTATE_PLACEMENT_CCW.getKeybind().setCallback(callbackHotkeys);
@@ -90,6 +92,7 @@ public class KeyCallbacks
         Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SELECTION_GROW_HOTKEY.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SELECTION_SHRINK_HOTKEY.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.SET_SCHEMATIC_PREVIEW.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_MODE_CYCLE_FORWARD.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_MODE_CYCLE_BACKWARD.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.TOOL_PLACE_CORNER_1.getKeybind().setCallback(callbackHotkeys);
@@ -465,7 +468,10 @@ public class KeyCallbacks
             {
                 // Don't use pick block last in the Rebuild mode, as that will interfere
                 // with all the rebuild actions...
+                // Also don't do the pick block from here if pickBlockAuto is enabled,
+                // since in that case it's done from the vanilla right click handling code.
                 if (DataManager.getToolMode() != ToolMode.REBUILD &&
+                    Configs.Generic.PICK_BLOCK_AUTO.getBooleanValue() == false &&
                     EntityUtils.shouldPickBlock(this.mc.player))
                 {
                     WorldUtils.pickBlockLast(true, this.mc);
@@ -573,6 +579,14 @@ public class KeyCallbacks
             {
                 DataManager.getSchematicPlacementManager().unloadCurrentlySelectedSchematic();
                 return true;
+            }
+            else if (key == Hotkeys.SET_SCHEMATIC_PREVIEW.getKeybind())
+            {
+                if (GuiSchematicManager.hasPendingPreviewTask())
+                {
+                    GuiSchematicManager.setPreviewImage();
+                    return true;
+                }
             }
 
             return false;

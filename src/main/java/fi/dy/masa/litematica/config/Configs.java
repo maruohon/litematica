@@ -39,6 +39,7 @@ public class Configs implements IConfigHandler
         public static final ConfigInteger       PASTE_COMMAND_INTERVAL  = new ConfigInteger(    "pasteCommandInterval", 1, 1, 1000, "The interval in game ticks the Paste schematic task runs at,\nin the command-based mode");
         public static final ConfigInteger       PASTE_COMMAND_LIMIT     = new ConfigInteger(    "pasteCommandLimit", 64, 1, 1000000, "Max number of commands sent per game tick,\nwhen using the Paste schematic feature in the\ncommand mode on a server");
         public static final ConfigString        PASTE_COMMAND_SETBLOCK  = new ConfigString(     "pasteCommandNameSetblock", "setblock", "The setblock command name to use for the\nPaste schematic feature on servers, when\nusing the command-based paste mode");
+        public static final ConfigBoolean       PICK_BLOCK_AUTO         = new ConfigBoolean(    "pickBlockAuto", false, "Automatically pick block before every placed block");
         public static final ConfigBoolean       PICK_BLOCK_ENABLED      = new ConfigBoolean(    "pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
         public static final ConfigBoolean       PICK_BLOCK_IGNORE_NBT   = new ConfigBoolean(    "pickBlockIgnoreNBT", true, "Ignores the NBT data on the expected vs. found items for pick block.\nAllows the pick block to work for example with renamed items.");
         public static final ConfigString        PICK_BLOCKABLE_SLOTS    = new ConfigString(     "pickBlockableSlots", "1-9", "The hotbar slots that are allowed to be\nused for the schematic pick block.\nCan use comma separated individual slots and dash\nseparated slot ranges (no spaces anywhere).\nExample: 2,4-6,9");
@@ -64,6 +65,7 @@ public class Configs implements IConfigHandler
                 LAYER_MODE_DYNAMIC,
                 LOAD_ENTIRE_SCHEMATICS,
                 MATERIALS_FROM_CONTAINER,
+                PICK_BLOCK_AUTO,
                 PICK_BLOCK_ENABLED,
                 PICK_BLOCK_IGNORE_NBT,
                 PLACEMENT_RESTRICTION,

@@ -112,7 +112,7 @@ public class InventoryUtils
         return inv;
     }
 
-    public static void switchItemToHand(ItemStack stack, boolean ignoreNbt, Minecraft mc)
+    public static boolean switchItemToHand(ItemStack stack, boolean ignoreNbt, Minecraft mc)
     {
         EntityPlayer player = mc.player;
         InventoryPlayer inventory = player.inventory;
@@ -122,13 +122,13 @@ public class InventoryUtils
         if (slotWithItem >= 36 && slotWithItem < 45)
         {
             inventory.currentItem = slotWithItem - 36;
-            return;
+            return true;
         }
 
         // No item or no place to put it
         if ((slotWithItem == -1 && isCreativeMode == false) || PICK_BLOCKABLE_SLOTS.size() == 0)
         {
-            return;
+            return false;
         }
 
         int hotbarSlot = getEmptyPickBlockableHotbarSlot(inventory);
@@ -143,6 +143,7 @@ public class InventoryUtils
         if (slotWithItem != -1)
         {
             fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotWithItem, hotbarSlot);
+            return true;
         }
         else if (isCreativeMode && InventoryPlayer.isHotbar(hotbarSlot))
         {
@@ -165,7 +166,10 @@ public class InventoryUtils
 
             inventory.mainInventory.set(hotbarSlot, stack.copy());
             mc.playerController.sendSlotPacket(stack.copy(), slotNum);
+            return true;
         }
+
+        return false;
     }
 
     private static int getEmptyPickBlockableHotbarSlot(InventoryPlayer inventory)

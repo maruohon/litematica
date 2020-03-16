@@ -19,6 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -31,6 +33,29 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class RenderUtils
 {
+    /**
+     * Returns true if the main rendering is on, and the schematic rendering is on,
+     * taking into account the invert rendering hotkey.
+     * This method does not check the schematic <i>block</i> rendering!
+     * @return
+     */
+    public static boolean isSchematicCurrentlyRendered()
+    {
+        return Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+               Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
+    }
+
+    /**
+     * Returns true if the main, schematic and block rendering are all on,
+     * taking into account the invert rendering hotkey.
+     * @return
+     */
+    public static boolean areSchematicBlocksCurrentlyRendered()
+    {
+        return isSchematicCurrentlyRendered() &&
+               Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue();
+    }
+
     public static int getMaxStringRenderLength(List<String> list)
     {
         int length = 0;

@@ -10,27 +10,24 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.GuiSchematicManager;
-import fi.dy.masa.litematica.schematic.util.SchematicEditUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.litematica.util.EasyPlaceUtils;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
-import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
 import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
-import fi.dy.masa.malilib.hotkeys.IKeyboardInputHandler;
 import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
 import fi.dy.masa.malilib.hotkeys.KeybindCategory;
 import fi.dy.masa.malilib.util.InfoUtils;
 
-public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IMouseInputHandler
+public class InputHandler implements IKeybindProvider, IMouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -56,50 +53,14 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     }
 
     @Override
-    public boolean onKeyInput(int eventKey, boolean eventKeyState)
-    {
-        if (eventKeyState)
-        {
-            Minecraft mc = Minecraft.getMinecraft();
-
-            if (eventKey == mc.gameSettings.keyBindUseItem.getKeyCode())
-            {
-                return this.handleUseKey(mc);
-            }
-            else if (eventKey == mc.gameSettings.keyBindAttack.getKeyCode())
-            {
-                return this.handleAttackKey(mc);
-            }
-            else if (eventKey == mc.gameSettings.keyBindScreenshot.getKeyCode() && GuiSchematicManager.hasPendingPreviewTask())
-            {
-                return GuiSchematicManager.setPreviewImage();
-            }
-        }
-
-        return false;
-    }
-
-    @Override
     public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
     {
         Minecraft mc = Minecraft.getMinecraft();
 
         // Not in a GUI
-        if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null)
+        if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null && dWheel != 0)
         {
-            if (eventButtonState && eventButton == mc.gameSettings.keyBindUseItem.getKeyCode() + 100)
-            {
-                return this.handleUseKey(mc);
-            }
-            else if (eventButtonState && eventButton == mc.gameSettings.keyBindAttack.getKeyCode() + 100)
-            {
-                return this.handleAttackKey(mc);
-            }
-
-            if (dWheel != 0)
-            {
-                return this.handleMouseScroll(dWheel, mc);
-            }
+            return this.handleMouseScroll(dWheel, mc);
         }
 
         return false;
@@ -225,69 +186,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return true;
     }
 
-    private boolean handleAttackKey(Minecraft mc)
-    {
-        if (mc.player != null && DataManager.getToolMode() == ToolMode.REBUILD)
-        {
-            if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
-            {
-                return SchematicEditUtils.breakSchematicBlocks(mc);
-            }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
-            {
-                return SchematicEditUtils.breakAllIdenticalSchematicBlocks(mc);
-            }
-            else
-            {
-                return SchematicEditUtils.breakSchematicBlock(mc);
-            }
-        }
-
-        return false;
-    }
-
-    private boolean handleUseKey(Minecraft mc)
-    {
-        if (mc.player != null)
-        {
-            if (DataManager.getToolMode() == ToolMode.REBUILD)
-            {
-                if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
-                {
-                    return SchematicEditUtils.replaceSchematicBlocksInDirection(mc);
-                }
-                else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
-                {
-                    return SchematicEditUtils.replaceAllIdenticalSchematicBlocks(mc);
-                }
-                else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
-                {
-                    return SchematicEditUtils.placeSchematicBlocksInDirection(mc);
-                }
-                else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
-                {
-                    return SchematicEditUtils.fillAirWithBlocks(mc);
-                }
-                else
-                {
-                    return SchematicEditUtils.placeSchematicBlock(mc);
-                }
-            }
-            else if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-                     Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
-            {
-                return WorldUtils.handleEasyPlace(mc);
-            }
-
-            if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
-            {
-                return WorldUtils.handlePlacementRestriction(mc);
-            }
-        }
-
-        return false;
-    }
-
     public static void onTick(Minecraft mc)
     {
         SelectionManager sm = DataManager.getSelectionManager();
@@ -298,7 +196,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         }
         else if (GuiUtils.getCurrentScreen() == null)
         {
-            WorldUtils.easyPlaceOnUseTick(mc);
+            EasyPlaceUtils.easyPlaceOnUseTick(mc);
         }
     }
 

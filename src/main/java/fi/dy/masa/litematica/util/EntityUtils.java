@@ -17,8 +17,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.malilib.util.Constants;
@@ -232,30 +232,7 @@ public class EntityUtils
     public static boolean shouldPickBlock(EntityPlayer player)
     {
         return Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue() &&
-                areSchematicBlocksCurrentlyRendered() &&
+                RenderUtils.areSchematicBlocksCurrentlyRendered() &&
                 (Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue() == false || hasToolItem(player) == false);
-    }
-
-    /**
-     * Returns true if the main rendering is on, and the schematic rendering is on,
-     * taking into account the invert rendering hotkey.
-     * This method does not check the schematic <i>block</i> rendering!
-     * @return
-     */
-    public static boolean isSchematicCurrentlyRendered()
-    {
-        return Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-               Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
-    }
-
-    /**
-     * Returns true if the main, schematic and block rendering are all on,
-     * taking into account the invert rendering hotkey.
-     * @return
-     */
-    public static boolean areSchematicBlocksCurrentlyRendered()
-    {
-        return isSchematicCurrentlyRendered() &&
-               Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue();
     }
 }
