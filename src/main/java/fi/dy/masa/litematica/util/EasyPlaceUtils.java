@@ -36,6 +36,7 @@ import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class EasyPlaceUtils
@@ -97,7 +98,7 @@ public class EasyPlaceUtils
 
         double reach = mc.playerController.getBlockReachDistance();
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true);
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, RayTraceFluidHandling.ANY, reach, true, false);
 
         if (traceWrapper == null && overriddenPos == null)
         {
@@ -106,7 +107,7 @@ public class EasyPlaceUtils
 
         if (overriddenPos != null || (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK))
         {
-            RayTraceResult traceVanilla = RayTraceUtils.getRayTraceFromEntity(mc.world, entity, false, reach);
+            RayTraceResult traceVanilla = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
             BlockPos pos;
             Vec3d hitPos;
             EnumFacing sideOrig;
@@ -382,7 +383,8 @@ public class EasyPlaceUtils
     private static boolean placementRestrictionInEffect(Minecraft mc)
     {
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, entity, false, mc.playerController.getBlockReachDistance());
+        double reach = mc.playerController.getBlockReachDistance();
+        RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
 
         if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {

@@ -50,6 +50,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
+import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
 
@@ -938,7 +939,7 @@ public class SchematicPlacementManager
         if (schematicPlacement != null)
         {
             Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-            RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, entity, false, maxDistance);
+            RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, maxDistance);
 
             if (trace.typeOfHit != RayTraceResult.Type.BLOCK)
             {
