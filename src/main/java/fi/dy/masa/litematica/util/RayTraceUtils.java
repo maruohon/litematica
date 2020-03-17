@@ -468,7 +468,10 @@ public class RayTraceUtils
                 double dist = trace.hitVec.squareDistanceTo(eyesPos);
                 BlockPos pos = trace.getBlockPos();
 
-                if ((furthestDist < 0 || dist > furthestDist) &&
+                // Comparing with >= instead of > fixes the case where the player's head is inside the first schematic block,
+                // in which case the distance to the block at index 0 is the same as the block at index 1, since
+                // the trace leaves the first block at the same point where it enters the second block.
+                if ((furthestDist < 0 || dist >= furthestDist) &&
                     (closestVanilla < 0 || dist < closestVanilla || (pos.equals(closestVanillaPos) && vanillaPosReplaceable)) &&
                      (vanillaPosReplaceable || pos.equals(closestVanillaPos) == false))
                 {
