@@ -1,32 +1,17 @@
 package fi.dy.masa.litematica.util;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.materials.MaterialCache;
-import fi.dy.masa.litematica.tool.ToolMode;
-import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
-import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.systems.BlockPlacementPositionHandler;
 
 public class WorldUtils
 {
@@ -59,126 +44,6 @@ public class WorldUtils
                 world.getChunkProvider().loadChunk(cx, cz);
             }
         }
-    }
-
-    public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
-    {
-        IBlockState state = Blocks.AIR.getDefaultState();
-        double reach = mc.playerController.getBlockReachDistance();
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true);
-
-        if (wrapper != null)
-        {
-            RayTraceResult trace = wrapper.getRayTraceResult();
-
-            if (trace != null)
-            {
-                BlockPos pos = trace.getBlockPos();
-
-                if (wrapper.getHitType() == HitType.SCHEMATIC_BLOCK)
-                {
-                    state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
-                }
-                else if (wrapper.getHitType() == HitType.VANILLA)
-                {
-                    state = mc.world.getBlockState(pos).getActualState(mc.world, pos);
-                }
-            }
-        }
-
-        if (primary)
-        {
-            mode.setPrimaryBlock(state);
-        }
-        else
-        {
-            mode.setSecondaryBlock(state);
-        }
-    }
-
-    /**
-     * Does a ray trace to the schematic world, and returns either the closest or the furthest hit block.
-     * @param adjacentOnly whether to only accept traced schematic world position that are adjacent to a client world block, ie. normally placeable
-     * @param mc
-     * @return true if the correct item was or is in the player's hand after the pick block
-     */
-    public static boolean pickBlockFirst(Minecraft mc)
-    {
-        double reach = mc.playerController.getBlockReachDistance();
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, entity, reach);
-
-        if (pos != null)
-        {
-            doPickBlockForPosition(pos, mc);
-            return true;
-        }
-
-        return false;
-    }
-
-    public static boolean pickBlockLast(boolean adjacentOnly, Minecraft mc)
-    {
-        BlockPos pos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
-
-        // No overrides by other mods
-        if (pos == null)
-        {
-            double reach = mc.playerController.getBlockReachDistance();
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-            pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, reach, adjacentOnly);
-        }
-
-        if (pos != null)
-        {
-            IBlockState state = mc.world.getBlockState(pos);
-
-            if (state.getBlock().isReplaceable(mc.world, pos) || state.getMaterial().isReplaceable())
-            {
-                return doPickBlockForPosition(pos, mc);
-            }
-        }
-
-        return false;
-    }
-
-    private static boolean doPickBlockForPosition(BlockPos pos, Minecraft mc)
-    {
-        World world = SchematicWorldHandler.getSchematicWorld();
-        EntityPlayer player = mc.player;
-        IBlockState state = world.getBlockState(pos);
-        ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
-        boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
-        boolean picked = false;
-
-        if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(player, stack, ignoreNbt) == null)
-        {
-            if (mc.player.capabilities.isCreativeMode)
-            {
-                TileEntity te = world.getTileEntity(pos);
-
-                // The creative mode pick block with NBT only works correctly
-                // if the server world doesn't have a TileEntity in that position.
-                // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
-                {
-                    stack = stack.copy();
-                    ItemUtils.storeTEInStack(stack, te);
-                }
-            }
-
-            picked = InventoryUtils.switchItemToHand(stack, ignoreNbt, mc);
-        }
-
-        EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
-
-        if (hand != null)
-        {
-            fi.dy.masa.malilib.util.InventoryUtils.preRestockHand(player, hand, 6, true);
-        }
-
-        return picked;
     }
 
     public static void insertSignTextFromSchematic(TileEntitySign teClient)

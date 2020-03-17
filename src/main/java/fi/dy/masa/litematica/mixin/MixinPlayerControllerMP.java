@@ -10,7 +10,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.util.EasyPlaceUtils;
 import fi.dy.masa.litematica.util.EntityUtils;
-import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.litematica.util.InventoryUtils;
 
 @Mixin(net.minecraft.client.multiplayer.PlayerControllerMP.class)
 public abstract class MixinPlayerControllerMP
@@ -47,7 +47,7 @@ public abstract class MixinPlayerControllerMP
                 if (Configs.Generic.PICK_BLOCK_AUTO.getBooleanValue() &&
                     EntityUtils.shouldPickBlock(player))
                 {
-                    WorldUtils.pickBlockLast(true, this.mc);
+                    InventoryUtils.pickBlockLast(true, this.mc);
                 }
 
                 if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())

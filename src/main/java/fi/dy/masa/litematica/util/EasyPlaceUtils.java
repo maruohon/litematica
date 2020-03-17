@@ -162,7 +162,7 @@ public class EasyPlaceUtils
                 }
 
                 // Abort if the required item was not able to be pick-block'd
-                if (WorldUtils.pickBlockFirst(mc) == false)
+                if (InventoryUtils.pickBlockFirst(mc) == false)
                 {
                     return EnumActionResult.FAIL;
                 }

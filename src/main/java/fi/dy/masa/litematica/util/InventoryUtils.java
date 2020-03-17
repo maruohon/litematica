@@ -7,7 +7,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -17,10 +19,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityLockableLoot;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.materials.MaterialCache;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.systems.BlockPlacementPositionHandler;
 
 public class InventoryUtils
 {
@@ -170,6 +178,90 @@ public class InventoryUtils
         }
 
         return false;
+    }
+
+    /**
+     * Does a ray trace to the schematic world, and returns either the closest or the furthest hit block.
+     * @param adjacentOnly whether to only accept traced schematic world position that are adjacent to a client world block, ie. normally placeable
+     * @param mc
+     * @return true if the correct item was or is in the player's hand after the pick block
+     */
+    public static boolean pickBlockFirst(Minecraft mc)
+    {
+        double reach = mc.playerController.getBlockReachDistance();
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        BlockPos pos = RayTraceUtils.getSchematicWorldTraceIfClosest(mc.world, entity, reach);
+
+        if (pos != null)
+        {
+            doPickBlockForPosition(pos, mc);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean pickBlockLast(boolean adjacentOnly, Minecraft mc)
+    {
+        BlockPos pos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
+
+        // No overrides by other mods
+        if (pos == null)
+        {
+            double reach = mc.playerController.getBlockReachDistance();
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            pos = RayTraceUtils.getPickBlockLastTrace(mc.world, entity, reach, adjacentOnly);
+        }
+
+        if (pos != null)
+        {
+            IBlockState state = mc.world.getBlockState(pos);
+
+            if (state.getBlock().isReplaceable(mc.world, pos) || state.getMaterial().isReplaceable())
+            {
+                return doPickBlockForPosition(pos, mc);
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean doPickBlockForPosition(BlockPos pos, Minecraft mc)
+    {
+        World world = SchematicWorldHandler.getSchematicWorld();
+        EntityPlayer player = mc.player;
+        IBlockState state = world.getBlockState(pos);
+        ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
+        boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
+        boolean picked = false;
+
+        if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(player, stack, ignoreNbt) == null)
+        {
+            if (mc.player.capabilities.isCreativeMode)
+            {
+                TileEntity te = world.getTileEntity(pos);
+
+                // The creative mode pick block with NBT only works correctly
+                // if the server world doesn't have a TileEntity in that position.
+                // Otherwise it would try to write whatever that TE is into the picked ItemStack.
+                if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
+                {
+                    stack = stack.copy();
+                    ItemUtils.storeTEInStack(stack, te);
+                }
+            }
+
+            picked = switchItemToHand(stack, ignoreNbt, mc);
+        }
+
+        EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
+
+        if (hand != null)
+        {
+            fi.dy.masa.malilib.util.InventoryUtils.preRestockHand(player, hand, 6, true);
+        }
+
+        return picked;
     }
 
     private static int getEmptyPickBlockableHotbarSlot(InventoryPlayer inventory)

@@ -36,7 +36,6 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.ToolUtils;
-import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.config.options.IConfigBoolean;
 import fi.dy.masa.malilib.config.values.LayerMode;
@@ -176,12 +175,12 @@ public class KeyCallbacks
             {
                 if (mode.getUsesBlockPrimary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeybind().isKeybindHeld())
                 {
-                    WorldUtils.setToolModeBlockState(mode, true, this.mc);
+                    ToolUtils.setToolModeBlockState(mode, true, this.mc);
                     return true;
                 }
                 else if (mode.getUsesBlockSecondary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeybind().isKeybindHeld())
                 {
-                    WorldUtils.setToolModeBlockState(mode, false, this.mc);
+                    ToolUtils.setToolModeBlockState(mode, false, this.mc);
                     return true;
                 }
             }
@@ -459,7 +458,7 @@ public class KeyCallbacks
             {
                 if (EntityUtils.shouldPickBlock(this.mc.player))
                 {
-                    return WorldUtils.pickBlockFirst(this.mc);
+                    return InventoryUtils.pickBlockFirst(this.mc);
                 }
 
                 return false;
@@ -474,7 +473,7 @@ public class KeyCallbacks
                     Configs.Generic.PICK_BLOCK_AUTO.getBooleanValue() == false &&
                     EntityUtils.shouldPickBlock(this.mc.player))
                 {
-                    WorldUtils.pickBlockLast(true, this.mc);
+                    InventoryUtils.pickBlockLast(true, this.mc);
                 }
 
                 return false;

@@ -6,7 +6,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
@@ -26,6 +28,9 @@ import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -34,6 +39,42 @@ import fi.dy.masa.malilib.util.LayerRange;
 public class ToolUtils
 {
     private static long areaMovedTime;
+
+    public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
+    {
+        IBlockState state = Blocks.AIR.getDefaultState();
+        double reach = mc.playerController.getBlockReachDistance();
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, reach, true);
+
+        if (wrapper != null)
+        {
+            RayTraceResult trace = wrapper.getRayTraceResult();
+
+            if (trace != null)
+            {
+                BlockPos pos = trace.getBlockPos();
+
+                if (wrapper.getHitType() == HitType.SCHEMATIC_BLOCK)
+                {
+                    state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+                }
+                else if (wrapper.getHitType() == HitType.VANILLA)
+                {
+                    state = mc.world.getBlockState(pos).getActualState(mc.world, pos);
+                }
+            }
+        }
+
+        if (primary)
+        {
+            mode.setPrimaryBlock(state);
+        }
+        else
+        {
+            mode.setSecondaryBlock(state);
+        }
+    }
 
     public static void fillSelectionVolumes(Minecraft mc, IBlockState state, @Nullable IBlockState stateToReplace)
     {
