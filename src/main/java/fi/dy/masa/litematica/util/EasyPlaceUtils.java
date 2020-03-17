@@ -96,7 +96,7 @@ public class EasyPlaceUtils
     {
         BlockPos overriddenPos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
 
-        double reach = mc.playerController.getBlockReachDistance();
+        double reach = Math.max(6, mc.playerController.getBlockReachDistance());
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
         RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, RayTraceFluidHandling.ANY, reach, true, false);
 
