@@ -49,12 +49,12 @@ public class InventoryUtils
 
                 if (matcher.matches())
                 {
-                    int slotStart = Integer.parseInt(matcher.group("start"));
-                    int slotEnd = Integer.parseInt(matcher.group("end"));
+                    int slotStart = Integer.parseInt(matcher.group("start")) - 1;
+                    int slotEnd = Integer.parseInt(matcher.group("end")) - 1;
 
                     if (slotStart <= slotEnd &&
-                        InventoryPlayer.isHotbar(slotStart - 1) &&
-                        InventoryPlayer.isHotbar(slotEnd - 1))
+                        InventoryPlayer.isHotbar(slotStart) &&
+                        InventoryPlayer.isHotbar(slotEnd))
                     {
                         for (int slotNum = slotStart; slotNum <= slotEnd; ++slotNum)
                         {
@@ -67,9 +67,9 @@ public class InventoryUtils
                 }
                 else
                 {
-                    int slotNum = Integer.parseInt(str);
+                    int slotNum = Integer.parseInt(str) - 1;
 
-                    if (InventoryPlayer.isHotbar(slotNum - 1) &&
+                    if (InventoryPlayer.isHotbar(slotNum) &&
                         PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
                     {
                         PICK_BLOCKABLE_SLOTS.add(slotNum);
@@ -122,21 +122,26 @@ public class InventoryUtils
 
     public static boolean switchItemToHand(ItemStack stack, boolean ignoreNbt, Minecraft mc)
     {
+        if (PICK_BLOCKABLE_SLOTS.size() == 0)
+        {
+            return false;
+        }
+
         EntityPlayer player = mc.player;
         InventoryPlayer inventory = player.inventory;
         boolean isCreativeMode = player.capabilities.isCreativeMode;
-        int slotWithItem = fi.dy.masa.malilib.util.InventoryUtils.findPlayerInventorySlotWithItem(player.openContainer, stack, ignoreNbt, false);
+        int slotWithItem = fi.dy.masa.malilib.util.InventoryUtils.findSlotWithItemToPickBlock(player.openContainer, stack, ignoreNbt);
+
+        // No item or no place to put it
+        if (slotWithItem == -1 && isCreativeMode == false)
+        {
+            return false;
+        }
 
         if (slotWithItem >= 36 && slotWithItem < 45)
         {
             inventory.currentItem = slotWithItem - 36;
             return true;
-        }
-
-        // No item or no place to put it
-        if ((slotWithItem == -1 && isCreativeMode == false) || PICK_BLOCKABLE_SLOTS.size() == 0)
-        {
-            return false;
         }
 
         int hotbarSlot = getEmptyPickBlockableHotbarSlot(inventory);
@@ -146,27 +151,34 @@ public class InventoryUtils
             hotbarSlot = getNextPickBlockableHotbarSlot(inventory);
         }
 
-        int slotNum = hotbarSlot + 36;
-
         if (slotWithItem != -1)
         {
             fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotWithItem, hotbarSlot);
+            inventory.currentItem = hotbarSlot;
             return true;
         }
         else if (isCreativeMode && InventoryPlayer.isHotbar(hotbarSlot))
         {
+            int slotNum = hotbarSlot + 36;
+
             // First try to put the current hotbar item into an empty slot in the player's inventory
             if (inventory.getStackInSlot(hotbarSlot).isEmpty() == false)
             {
                 // Shift click the stack
                 mc.playerController.windowClick(player.openContainer.windowId, slotNum, 0, ClickType.QUICK_MOVE, player);
 
-                // Wasn't able to move the items out, but the off hand is empty
-                if (inventory.getStackInSlot(hotbarSlot).isEmpty() == false && player.getHeldItemOffhand().isEmpty())
+                // Wasn't able to move the items out
+                if (inventory.getStackInSlot(hotbarSlot).isEmpty() == false)
                 {
-                    fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
-                    fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, 45, 0);
-                    fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                    // TODO try to combine partial stacks
+
+                    // The off-hand slot is empty, move the current stack to it
+                    if (player.getHeldItemOffhand().isEmpty())
+                    {
+                        fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                        fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, 45, 0);
+                        fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                    }
                 }
             }
 
@@ -267,7 +279,7 @@ public class InventoryUtils
     private static int getEmptyPickBlockableHotbarSlot(InventoryPlayer inventory)
     {
         // First check the current slot
-        if (PICK_BLOCKABLE_SLOTS.contains(inventory.currentItem + 1) &&
+        if (PICK_BLOCKABLE_SLOTS.contains(inventory.currentItem) &&
             inventory.mainInventory.get(inventory.currentItem).isEmpty())
         {
             return inventory.currentItem;
@@ -277,7 +289,7 @@ public class InventoryUtils
         // an empty slot among the allowed pick-blockable slots.
         for (int i = 0; i < PICK_BLOCKABLE_SLOTS.size(); ++i)
         {
-            int slotNum = PICK_BLOCKABLE_SLOTS.get(i) - 1;
+            int slotNum = PICK_BLOCKABLE_SLOTS.get(i);
 
             if (slotNum >= 0 && slotNum < inventory.mainInventory.size())
             {
@@ -295,7 +307,7 @@ public class InventoryUtils
 
     private static int getNextPickBlockableHotbarSlot(InventoryPlayer inventory)
     {
-        if (PICK_BLOCKABLE_SLOTS.contains(inventory.currentItem + 1))
+        if (PICK_BLOCKABLE_SLOTS.contains(inventory.currentItem))
         {
             ItemStack stack = inventory.mainInventory.get(inventory.currentItem);
 
@@ -315,7 +327,7 @@ public class InventoryUtils
         // Try to find the next pick-blockable slot that doesn't have a tool in it
         for (int i = 0; i < PICK_BLOCKABLE_SLOTS.size(); ++i)
         {
-            slotNum = PICK_BLOCKABLE_SLOTS.get(nextPickSlotIndex) - 1;
+            slotNum = PICK_BLOCKABLE_SLOTS.get(nextPickSlotIndex);
 
             if (++nextPickSlotIndex >= PICK_BLOCKABLE_SLOTS.size())
             {
