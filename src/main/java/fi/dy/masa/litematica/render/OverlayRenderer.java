@@ -324,21 +324,22 @@ public class OverlayRenderer
 
     public void renderSchematicVerifierMismatches(float partialTicks)
     {
-        SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+        List<SchematicVerifier> activeVerifiers = SchematicVerifier.getActiveVerifiers();
 
-        if (placement != null && placement.hasVerifier())
+        if (activeVerifiers.isEmpty() == false)
         {
-            SchematicVerifier verifier = placement.getSchematicVerifier();
-
-            List<MismatchRenderPos> list = verifier.getSelectedMismatchPositionsForRender();
-
-            if (list.isEmpty() == false)
+            for (SchematicVerifier verifier : activeVerifiers)
             {
-                List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
-                BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
-                this.renderSchematicMismatches(list, posLook, partialTicks);
+                List<MismatchRenderPos> list = verifier.getSelectedMismatchPositionsForRender();
+
+                if (list.isEmpty() == false)
+                {
+                    List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
+                    Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                    RayTraceResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
+                    BlockPos posLook = trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK ? trace.getBlockPos() : null;
+                    this.renderSchematicMismatches(list, posLook, partialTicks);
+                }
             }
         }
     }
@@ -489,32 +490,34 @@ public class OverlayRenderer
 
     private boolean renderVerifierOverlay(Minecraft mc)
     {
-        SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+        List<SchematicVerifier> activeVerifiers = SchematicVerifier.getActiveVerifiers();
 
-        if (placement != null && placement.hasVerifier())
+        if (activeVerifiers.isEmpty() == false)
         {
-            SchematicVerifier verifier = placement.getSchematicVerifier();
-            List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-            RayTraceResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
-
-            if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
+            for (SchematicVerifier verifier : activeVerifiers)
             {
-                BlockPos pos = trace.getBlockPos();
-                BlockMismatch mismatch = verifier.getMismatchForPosition(pos);
+                List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
+                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, entity, 32);
 
-                if (mismatch != null)
+                if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
                 {
-                    int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
-                    BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                    this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
-                    info.render(this.blockInfoX, this.blockInfoY, 0, mc);
+                    BlockPos pos = trace.getBlockPos();
+                    BlockMismatch mismatch = verifier.getMismatchForPosition(pos);
 
-                    World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-                    World worldClient = WorldUtils.getBestWorld(mc);
-                    BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
-                    RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
-                    return true;
+                    if (mismatch != null)
+                    {
+                        int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
+                        BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
+                        this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
+                        info.render(this.blockInfoX, this.blockInfoY, 0, mc);
+
+                        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+                        World worldClient = WorldUtils.getBestWorld(mc);
+                        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+                        RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
+                        return true;
+                    }
                 }
             }
         }

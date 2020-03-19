@@ -394,19 +394,25 @@ public class RayTraceUtils
             }
         }
 
-        SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
-
-        if (includeVerifier && placement != null && placement.hasVerifier())
+        if (includeVerifier)
         {
-            SchematicVerifier verifier = placement.getSchematicVerifier();
-            List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-            RayTraceResult traceMismatch = traceToPositions(posList, entity, range);
+            List<SchematicVerifier> activeVerifiers = SchematicVerifier.getActiveVerifiers();
 
-            // Mismatch overlay has priority over other hits
-            if (traceMismatch != null)
+            if (activeVerifiers.isEmpty() == false)
             {
-                trace = traceMismatch;
-                type = HitType.MISMATCH_OVERLAY;
+                for (SchematicVerifier verifier : activeVerifiers)
+                {
+                    List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
+                    RayTraceResult traceMismatch = traceToPositions(posList, entity, range);
+
+                    // Mismatch overlay has priority over other hits
+                    if (traceMismatch != null)
+                    {
+                        trace = traceMismatch;
+                        type = HitType.MISMATCH_OVERLAY;
+                        break;
+                    }
+                }
             }
         }
 

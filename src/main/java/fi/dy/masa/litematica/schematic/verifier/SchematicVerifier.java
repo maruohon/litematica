@@ -101,6 +101,11 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         }
     }
 
+    public static List<SchematicVerifier> getActiveVerifiers()
+    {
+        return ACTIVE_VERIFIERS;
+    }
+
     @Override
     public boolean getShouldRenderText(RenderPhase phase)
     {
