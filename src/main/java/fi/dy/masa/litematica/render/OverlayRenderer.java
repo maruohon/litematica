@@ -500,12 +500,20 @@ public class OverlayRenderer
 
             if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
             {
-                BlockMismatch mismatch = verifier.getMismatchForPosition(trace.getBlockPos());
+                BlockPos pos = trace.getBlockPos();
+                BlockMismatch mismatch = verifier.getMismatchForPosition(pos);
 
                 if (mismatch != null)
                 {
+                    int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
                     BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                    info.render(GuiUtils.getScaledWindowWidth() / 2 - info.getTotalWidth() / 2, GuiUtils.getScaledWindowHeight() / 2 + 6, 0, mc);
+                    this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
+                    info.render(this.blockInfoX, this.blockInfoY, 0, mc);
+
+                    World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+                    World worldClient = WorldUtils.getBestWorld(mc);
+                    BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+                    RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
                     return true;
                 }
             }
