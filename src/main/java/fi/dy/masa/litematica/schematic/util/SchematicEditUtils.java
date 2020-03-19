@@ -521,24 +521,26 @@ public class SchematicEditUtils
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
         ISchematic schematic = schematicPlacement.getSchematic();
-        String selected = schematicPlacement.getSelectedSubRegionName();
+        String selectedRegionName = schematicPlacement.getSelectedSubRegionName();
         List<String> regions = new ArrayList<>();
 
-        // Some sub-region selected, only replace in that region
-        if (selected != null)
+        // If there is a sub-region selected, check that it's the currently targeted region
+        if (selectedRegionName != null)
         {
-            regions.add(selected);
+            if (selectedRegionName.equals(part.getSubRegionName()))
+            {
+                regions.add(selectedRegionName);
+            }
+            else
+            {
+                InfoUtils.showInGameMessage(MessageType.WARNING, 20000, "litematica.message.warn.schematic_rebuild.subregion_not_selected");
+                return false;
+            }
         }
-        // The entire placement is selected, replace in all sub-regions
-        else if (manager.getSelectedSchematicPlacement() == schematicPlacement)
-        {
-            regions.addAll(schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).keySet());
-        }
-        // Nothing from the targeted placement is selected, don't replace anything
+        // No sub-regions selected, replace in the entire schematic
         else
         {
-            InfoUtils.showInGameMessage(MessageType.WARNING, 20000, "litematica.message.warn.schematic_rebuild_placement_not_selected");
-            return false;
+            regions.addAll(schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).keySet());
         }
 
         LayerRange range = DataManager.getRenderLayerRange();
