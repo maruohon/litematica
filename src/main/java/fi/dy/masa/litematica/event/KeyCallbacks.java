@@ -539,39 +539,43 @@ public class KeyCallbacks
                 ToolUtils.cloneSelectionArea(this.mc);
                 return true;
             }
-            else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind() && ((hasTool && toolEnabled) || Configs.Generic.EXECUTE_REQUIRE_TOOL.getBooleanValue() == false))
+            else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind())
             {
+                if ((hasTool == false || toolEnabled == false) && Configs.Generic.EXECUTE_REQUIRE_TOOL.getBooleanValue())
+                {
+                    String keyRenderToggle = Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().getKeysDisplayString();
+                    String keyToolToggle = Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().getKeysDisplayString();
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, "litematica.error.execute_operation_no_tool", keyRenderToggle, keyToolToggle);
+                    return true;
+                }
+
                 if (DataManager.getSchematicProjectsManager().hasProjectOpen())
                 {
                     DataManager.getSchematicProjectsManager().pasteCurrentVersionToWorld();
-                    return true;
                 }
                 else if (mode == ToolMode.PASTE_SCHEMATIC)
                 {
                     SchematicPlacingUtils.pasteCurrentPlacementToWorld(this.mc);
-                    return true;
                 }
                 else if (mode == ToolMode.GRID_PASTE)
                 {
                     SchematicPlacingUtils.gridPasteCurrentPlacementToWorld(this.mc);
-                    return true;
                 }
                 else if (mode == ToolMode.FILL && mode.getPrimaryBlock() != null)
                 {
                     ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), null);
-                    return true;
                 }
                 else if (mode == ToolMode.REPLACE_BLOCK && mode.getPrimaryBlock() != null && mode.getSecondaryBlock() != null)
                 {
                     ToolUtils.fillSelectionVolumes(this.mc, mode.getPrimaryBlock(), mode.getSecondaryBlock());
-                    return true;
                 }
                 else if (mode == ToolMode.DELETE)
                 {
                     boolean removeEntities = true; // TODO
                     ToolUtils.deleteSelectionVolumes(removeEntities, this.mc);
-                    return true;
                 }
+
+                return true;
             }
             else if (key == Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeybind() ||
                      key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind())

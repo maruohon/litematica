@@ -22,6 +22,8 @@ litematica.error.area_editor.open_gui.no_selection=Currently in Selection Mode: 
 litematica.error.area_editor.rename_sub_region.exists=Failed to rename the sub-region:\nA sub-region already exists by the name '%s'
 litematica.error.area_editor.switch_mode.no_selection=Can't switch to Selection Mode: Normal, because there is currently no area selected.\nSelect an area or create a new selection in the Area Selection browser
 
+litematica.error.execute_operation_no_tool=As a safety measure the executeOperation hotkey requires you to hold the tool item, and the main rendering toggle option and the tool item both need to be enabled (Visuals -> 'enableRendering' ['%s'] and Generic -> 'toolItemEnabled' ['%s']). This requirement can be disabled in Generic -> 'executeRequireHoldingTool'.
+
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=Failed to create the Litematica schematic
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
 litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the Structure to a Litematica Schematic
