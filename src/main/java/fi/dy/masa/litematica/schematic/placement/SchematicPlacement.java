@@ -400,7 +400,6 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     {
         int mask = 0x1 << coord.ordinal();
         return (this.coordinateLockMask & mask) != 0;
-
     }
 
     void toggleEnabled()

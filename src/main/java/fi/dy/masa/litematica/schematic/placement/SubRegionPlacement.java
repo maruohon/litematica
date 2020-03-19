@@ -8,6 +8,8 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
@@ -125,7 +127,16 @@ public class SubRegionPlacement
 
     void setPos(BlockPos pos)
     {
-        this.pos = PositionUtils.getModifiedPartiallyLockedPosition(this.pos, pos, this.coordinateLockMask);
+        BlockPos newPos = PositionUtils.getModifiedPartiallyLockedPosition(this.pos, pos, this.coordinateLockMask);
+
+        if (newPos.equals(this.pos) == false)
+        {
+            this.pos = newPos;
+        }
+        else if (pos.equals(this.pos) == false && this.coordinateLockMask != 0)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 2000, "litematica.error.schematic_placements.coordinate_locked");
+        }
     }
 
     void setRotation(Rotation rotation)

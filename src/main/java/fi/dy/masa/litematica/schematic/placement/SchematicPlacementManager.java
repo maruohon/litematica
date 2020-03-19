@@ -621,13 +621,17 @@ public class SchematicPlacementManager
         }
 
         BlockPos oldOrigin = placement.getOrigin();
-        origin = PositionUtils.getModifiedPartiallyLockedPosition(oldOrigin, origin, placement.coordinateLockMask);
+        BlockPos newOrigin = PositionUtils.getModifiedPartiallyLockedPosition(oldOrigin, origin, placement.coordinateLockMask);
 
-        if (oldOrigin.equals(origin) == false)
+        if (oldOrigin.equals(newOrigin) == false)
         {
             this.onPrePlacementChange(placement);
-            placement.setOrigin(origin);
+            placement.setOrigin(newOrigin);
             this.onPlacementModified(placement);
+        }
+        else if (origin.equals(oldOrigin) == false && placement.coordinateLockMask != 0)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 2000, "litematica.error.schematic_placements.coordinate_locked");
         }
     }
 
