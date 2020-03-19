@@ -40,7 +40,7 @@ public class BlockModelRendererSchematic
     {
         boolean ao = MinecraftClient.isAmbientOcclusionEnabled() && stateIn.getLuminance() == 0 && modelIn.useAmbientOcclusion();
 
-        Vec3d offset = stateIn.getOffsetPos(worldIn, posIn);
+        Vec3d offset = stateIn.getModelOffset(worldIn, posIn);
         matrices.translate(offset.x, offset.y, offset.z);
         int overlay = OverlayTexture.DEFAULT_UV;
 
