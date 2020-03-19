@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
@@ -283,14 +284,23 @@ public class ToolUtils
                 SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
                 String name = schematic.getMetadata().getName();
                 Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-                BlockPos origin = RayTraceUtils.getTargetedPosition(mc.world, entity, 6, false);
+                BlockPos origin;
 
-                if (origin == null)
+                if (Configs.Generic.CLONE_AT_ORIGINAL_POS.getBooleanValue())
                 {
-                    origin = new BlockPos(entity);
+                    origin = area.getEffectiveOrigin();
+                }
+                else
+                {
+                    origin = RayTraceUtils.getTargetedPosition(mc.world, entity, 6, false);
+
+                    if (origin == null)
+                    {
+                        origin = new BlockPos(entity);
+                    }
                 }
 
-                SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true);
+                SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, false);
 
                 manager.addSchematicPlacement(placement, false);
                 manager.setSelectedSchematicPlacement(placement);
