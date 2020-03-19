@@ -26,6 +26,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSave;
@@ -948,11 +949,20 @@ public class SchematicUtils
             TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, info);
             taskSave.disableCompletionMessage();
             Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-            BlockPos originTmp = RayTraceUtils.getTargetedPosition(mc.world, entity, 6, false);
+            BlockPos originTmp;
 
-            if (originTmp == null)
+            if (Configs.Generic.CLONE_AT_ORIGINAL_POS.getBooleanValue())
             {
-                originTmp = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(entity);
+                originTmp = area.getEffectiveOrigin();
+            }
+            else
+            {
+                originTmp = RayTraceUtils.getTargetedPosition(mc.world, entity, 6, false);
+
+                if (originTmp == null)
+                {
+                    originTmp = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(entity);
+                }
             }
 
             final BlockPos origin = originTmp;

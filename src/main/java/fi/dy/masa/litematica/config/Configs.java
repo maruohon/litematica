@@ -35,6 +35,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       AREAS_PER_WORLD         = new ConfigBoolean(    "areaSelectionsPerWorld", true, "Use per-world or server root directories for the area selections\n§6NOTE: Don't switch this OFF while you are live streaming,\n§6as then the Area Selection browser will show the server IP\n§6in the navigation widget and also in the current selection name/path\n§6until you change the current directory and selection again");
         public static final ConfigBoolean       BETTER_RENDER_ORDER     = new ConfigBoolean(    "betterRenderOrder", true, "If enabled, then the schematic rendering is done\nby injecting the different render call into the vanilla\nrendering code. This should result in better translucent block\nrendering/ordering and schematic blocks not getting rendered\nthrough the client world blocks/terrain.\nIf the rendering doesn't work (for example with Optifine),\ntry disabling this option.");
         public static final ConfigBoolean       CHANGE_SELECTED_CORNER  = new ConfigBoolean(    "changeSelectedCornerOnMove", true, "If true, then the selected corner of an area selection\nis always set to the last moved corner,\nwhen using the set corner hotkeys");
+        public static final ConfigBoolean       CLONE_AT_ORIGINAL_POS   = new ConfigBoolean(    "cloneAtOriginalPosition", false, "If enabled, then using the Clone Selection hotkey will create\nthe placement at the original area selection position,\ninstead of at the player's current position");
         public static final ConfigBoolean       CUSTOM_SCHEMATIC_BASE_DIRECTORY_ENABLED = new ConfigBoolean("customSchematicBaseDirectoryEnabled", false, "If enabled, then the directory set in 'customSchematicBaseDirectory'\nwill be used as the root/base schematic directory,\ninstead of the normal '.minecraft/schematics/' directory");
         public static final ConfigString        CUSTOM_SCHEMATIC_BASE_DIRECTORY         = new ConfigString( "customSchematicBaseDirectory", DataManager.getDefaultBaseSchematicDirectory().getAbsolutePath(), "The root/base schematic directory to use,\nif 'customSchematicBaseDirectoryEnabled' is enabled");
         public static final ConfigBoolean       DEBUG_LOGGING           = new ConfigBoolean(    "debugLogging", false, "Enables some debug log messages in the game console,\nfor debugging certain issues or crashes.");
@@ -76,6 +77,7 @@ public class Configs implements IConfigHandler
                 AREAS_PER_WORLD,
                 //BETTER_RENDER_ORDER,
                 CHANGE_SELECTED_CORNER,
+                CLONE_AT_ORIGINAL_POS,
                 CUSTOM_SCHEMATIC_BASE_DIRECTORY_ENABLED,
                 DEBUG_LOGGING,
                 EASY_PLACE_FIRST,
