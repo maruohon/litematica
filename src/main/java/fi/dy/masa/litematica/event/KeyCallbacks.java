@@ -23,6 +23,7 @@ import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
+import fi.dy.masa.litematica.schematic.util.SchematicEditUtils;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.schematic.util.SchematicUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -87,6 +88,7 @@ public class KeyCallbacks
         Hotkeys.ROTATE_PLACEMENT_CCW.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.SCHEMATIC_REBUILD_ACCEPT_REPLACEMENT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.SELECTION_GROW_HOTKEY.getKeybind().setCallback(callbackHotkeys);
@@ -622,6 +624,11 @@ public class KeyCallbacks
                     GuiSchematicManager.setPreviewImage();
                     return true;
                 }
+            }
+            else if (key == Hotkeys.SCHEMATIC_REBUILD_ACCEPT_REPLACEMENT.getKeybind())
+            {
+                SchematicEditUtils.rebuildAcceptReplacement(this.mc);
+                return true;
             }
 
             return false;

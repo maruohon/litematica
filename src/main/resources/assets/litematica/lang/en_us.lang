@@ -564,6 +564,7 @@ litematica.message.schematic_placement_loaded=Placement '%s' loaded from file
 litematica.message.schematic_placements_pasted=All Schematic Placements successfully pasted in the world
 litematica.message.schematic_preview_cancelled=Preview task cancelled
 litematica.message.schematic_read_from_file_success=Schematic loaded from file '%s'
+litematica.message.schematic_rebuild.accepted_replacement=Schematic Edit: Accepted the replacement block
 litematica.message.schematic_rendering_refreshed=Schematic rendering refreshed
 litematica.message.schematic_saved_as=Schematic saved as '%s'
 litematica.message.schematic_save_task_created=Schematic saving task created

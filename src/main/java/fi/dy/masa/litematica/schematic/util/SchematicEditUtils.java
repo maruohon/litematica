@@ -40,6 +40,7 @@ import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
+import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class SchematicEditUtils
@@ -154,6 +155,31 @@ public class SchematicEditUtils
         if (info != null && info.stateNew != null)
         {
             return setAllIdenticalSchematicBlockStates(info.pos, info.stateOriginal, info.stateNew);
+        }
+
+        return false;
+    }
+
+    public static boolean rebuildAcceptReplacement(Minecraft mc)
+    {
+        WorldSchematic schematicWorld = SchematicWorldHandler.getSchematicWorld();
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceResult trace = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.ANY, false, 5);
+
+        if (schematicWorld != null && trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
+        {
+            BlockPos pos = trace.getBlockPos();
+            IBlockState stateOriginal = schematicWorld.getBlockState(pos);
+            IBlockState stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
+
+            if (stateOriginal != stateClient)
+            {
+                if (setAllIdenticalSchematicBlockStates(pos, stateOriginal, stateClient))
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_rebuild.accepted_replacement");
+                    return true;
+                }
+            }
         }
 
         return false;
