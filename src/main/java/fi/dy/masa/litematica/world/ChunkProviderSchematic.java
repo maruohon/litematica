@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.TypeFilterableList;
+import net.minecraft.util.collection.TypeFilterableList;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;

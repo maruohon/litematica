@@ -301,13 +301,13 @@ public class SchematicUtils
 
         while (maxBlocks-- > 0)
         {
-            posMutable.setOffset(direction);
+            posMutable.move(direction);
 
             if (range.isPositionWithinRange(posMutable) == false ||
                 world.getChunkProvider().isChunkLoaded(posMutable.getX() >> 4, posMutable.getZ() >> 4) == false ||
                 world.getBlockState(posMutable) != stateStart)
             {
-                posMutable.setOffset(direction.getOpposite());
+                posMutable.move(direction.getOpposite());
                 break;
             }
         }
