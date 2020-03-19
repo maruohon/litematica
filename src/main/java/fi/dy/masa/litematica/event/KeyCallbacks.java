@@ -123,6 +123,38 @@ public class KeyCallbacks
         Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeybind().setCallback(new RenderToggle(Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT));
         Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED));
         Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.TOOL_ITEM_ENABLED));
+
+        assignRendererRefreshCallbacks();
+    }
+
+    private static void assignRendererRefreshCallbacks()
+    {
+        Configs.Visuals.ENABLE_RENDERING.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.GHOST_BLOCK_ALPHA.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.IGNORE_FLUIDS_AS_EXTRA.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.OVERLAY_REDUCED_INNER_SIDES.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_EXTRA.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_MISSING.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_STATE.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+    }
+
+    private static void refreshRenderer()
+    {
+        SchematicWorldRenderingNotifier.INSTANCE.updateAll();
     }
 
     private static class RenderToggle extends KeyCallbackToggleBooleanConfigWithMessage
