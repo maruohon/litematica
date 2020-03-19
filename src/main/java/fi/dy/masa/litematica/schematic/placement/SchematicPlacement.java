@@ -561,9 +561,20 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
 
     public static SchematicPlacement createFor(ISchematic schematic, BlockPos origin, String name, boolean enabled)
     {
+        return createFor(schematic, origin, name, enabled, true);
+    }
+
+    public static SchematicPlacement createFor(ISchematic schematic, BlockPos origin, String name, boolean enabled, boolean offsetToInfrontOfPlayer)
+    {
         SchematicPlacement placement = new SchematicPlacement(schematic, null, schematic.getFile(), origin, name, enabled);
+
         placement.setBoxesBBColorNext();
         placement.resetAllSubRegionsToSchematicValues();
+
+        if (offsetToInfrontOfPlayer)
+        {
+            placement.origin = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(origin, placement);
+        }
 
         return placement;
     }

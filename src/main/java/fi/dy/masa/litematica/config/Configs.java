@@ -44,6 +44,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       PICK_BLOCK_IGNORE_NBT   = new ConfigBoolean(    "pickBlockIgnoreNBT", true, "Ignores the NBT data on the expected vs. found items for pick block.\nAllows the pick block to work for example with renamed items.");
         public static final ConfigString        PICK_BLOCKABLE_SLOTS    = new ConfigString(     "pickBlockableSlots", "1-9", "The hotbar slots that are allowed to be\nused for the schematic pick block.\nCan use comma separated individual slots and dash\nseparated slot ranges (no spaces anywhere).\nExample: 2,4-6,9");
         public static final ConfigBoolean       PLACEMENT_RESTRICTION   = new ConfigBoolean(    "placementRestriction", false, "When enabled, the use key can only be used\nwhen holding the correct item for the targeted position,\nand the targeted position must have a missing block in the schematic", "Placement Restriction");
+        public static final ConfigBoolean       PLACEMENTS_INFRONT      = new ConfigBoolean(    "placementInfrontOfPlayer", false, "When enabled, created placements or moved placements are\npositioned so that they are fully infront of the player,\ninstead of the placement's origin point being at the player's location");
         public static final ConfigBoolean       RENDER_MATERIALS_IN_GUI = new ConfigBoolean(    "renderMaterialListInGuis", true, "Whether or not the material list should\nbe rendered inside GUIs");
         public static final ConfigBoolean       RENDER_THREAD_NO_TIMEOUT = new ConfigBoolean(   "renderThreadNoTimeout", true, "Removes the timeout from the rendering worker threads.\nIf you get very stuttery rendering when moving around\nor dealing with large schematics, try disabling this. It will however make\nthe schematic rendering a lot slower in some cases.");
         public static final ConfigBoolean       SIGN_TEXT_PASTE         = new ConfigBoolean(    "signTextPaste", true, "Automatically set the text in the sign GUIs from the schematic");
@@ -69,6 +70,7 @@ public class Configs implements IConfigHandler
                 PICK_BLOCK_ENABLED,
                 PICK_BLOCK_IGNORE_NBT,
                 PLACEMENT_RESTRICTION,
+                PLACEMENTS_INFRONT,
                 RENDER_MATERIALS_IN_GUI,
                 RENDER_THREAD_NO_TIMEOUT,
                 SIGN_TEXT_PASTE,

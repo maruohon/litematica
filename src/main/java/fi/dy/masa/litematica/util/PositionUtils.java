@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -23,9 +24,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -33,6 +36,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.util.EntityUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
@@ -765,6 +769,74 @@ public class PositionUtils
             area.setSelectedSubRegionCornerPos(boxNew.getPos1(), Corner.CORNER_1);
             area.setSelectedSubRegionCornerPos(boxNew.getPos2(), Corner.CORNER_2);
         }
+    }
+
+    public static BlockPos getPlacementPositionOffsetToInfrontOfPlayer(BlockPos origPos)
+    {
+        SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+        SchematicPlacement placement = manager.getSelectedSchematicPlacement();
+
+        return getPlacementPositionOffsetToInfrontOfPlayer(origPos, placement);
+    }
+
+    public static BlockPos getPlacementPositionOffsetToInfrontOfPlayer(BlockPos newOrigin, @Nullable SchematicPlacement placement)
+    {
+        if (Configs.Generic.PLACEMENTS_INFRONT.getBooleanValue())
+        {
+            Entity entity = EntityUtils.getCameraEntity();
+
+            if (placement != null && entity != null)
+            {
+                SubRegionPlacement sub = placement.getSelectedSubRegionPlacement();
+                Box box = null;
+
+                if (sub != null)
+                {
+                    String regionName = placement.getSelectedSubRegionName();
+                    ImmutableMap<String, SelectionBox> map = placement.getSubRegionBoxFor(regionName, RequiredEnabled.PLACEMENT_ENABLED);
+                    box = map.get(regionName);
+                }
+                else
+                {
+                    box = placement.getEclosingBox();
+                }
+
+                if (box != null)
+                {
+                    BlockPos originOffset = newOrigin.subtract(placement.getOrigin());
+                    BlockPos corner1 = box.getPos1().add(originOffset);
+                    BlockPos corner2 = box.getPos2().add(originOffset);
+                    BlockPos entityPos = new BlockPos(entity);
+                    EnumFacing entityFrontDirection = entity.getHorizontalFacing();
+                    EnumFacing entitySideDirection = fi.dy.masa.malilib.util.PositionUtils.getClosestSideDirection(entity);
+                    Vec3i alignmentFrontOffset = getOffsetToMoveBoxInfrontOfEntityPos(entityPos, entityFrontDirection, corner1, corner2);
+                    Vec3i alignmentSideOffset = getOffsetToMoveBoxInfrontOfEntityPos(entityPos, entitySideDirection, corner1, corner2);
+
+                    return newOrigin.add(alignmentFrontOffset).add(alignmentSideOffset);
+                }
+            }
+        }
+
+        return newOrigin;
+    }
+
+    public static Vec3i getOffsetToMoveBoxInfrontOfEntityPos(BlockPos entityPos, EnumFacing entityHorizontalFacing, BlockPos corner1, BlockPos corner2)
+    {
+        BlockPos minPos = fi.dy.masa.malilib.util.PositionUtils.getMinCorner(corner1, corner2);
+        BlockPos maxPos = fi.dy.masa.malilib.util.PositionUtils.getMaxCorner(corner1, corner2);
+        int offX = 0;
+        int offZ = 0;
+
+        switch (entityHorizontalFacing)
+        {
+            case EAST:  offX = entityPos.getX() - minPos.getX() + 1; break;
+            case WEST:  offX = entityPos.getX() - maxPos.getX() - 1; break;
+            case SOUTH: offZ = entityPos.getZ() - minPos.getZ() + 1; break;
+            case NORTH: offZ = entityPos.getZ() - maxPos.getZ() - 1; break;
+            default:
+        }
+
+        return new Vec3i(offX, 0, offZ);
     }
 
     /**

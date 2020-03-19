@@ -667,6 +667,7 @@ public class KeyCallbacks
                 else if (mode.getUsesSchematic())
                 {
                     BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
+                    pos = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(pos);
                     DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
                     return true;
                 }
