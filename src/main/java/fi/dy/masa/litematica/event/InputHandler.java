@@ -140,13 +140,8 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
     {
         if (mode.getUsesAreaSelection())
         {
-            SelectionManager sm = DataManager.getSelectionManager();
-
-            if (sm.hasSelectedElement())
-            {
-                sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), amount);
-                return true;
-            }
+            DataManager.getSelectionManager().moveSelectedElement(EntityUtils.getClosestLookingDirection(player), amount);
+            return true;
         }
         else if (mode.getUsesSchematic())
         {

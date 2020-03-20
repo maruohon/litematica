@@ -364,6 +364,11 @@ public class AreaSelection
                 this.setSubRegionCornerPos(box, Corner.CORNER_2, pos);
             }
         }
+        else
+        {
+            BlockPos newOrigin = this.getEffectiveOrigin().offset(direction, amount);
+            this.moveEntireSelectionTo(newOrigin, false);
+        }
     }
 
     public void setSelectedSubRegionCornerPos(BlockPos pos, Corner corner)
