@@ -97,6 +97,17 @@ public class EasyPlaceUtils
         return result != EnumActionResult.PASS;
     }
 
+    public static void onRightClickTail(Minecraft mc)
+    {
+        // If the click wasn't handled yet, handle it now.
+        // This is only called when right clicking on air with an empty hand,
+        // as in that case neither the processRightClickBlock nor the processRightClick method get called.
+        if (isFirstClick)
+        {
+            handleEasyPlaceWithMessage(mc, true);
+        }
+    }
+
     private static EnumActionResult handleEasyPlace(Minecraft mc)
     {
         BlockPos overriddenPos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();

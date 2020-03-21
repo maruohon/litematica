@@ -71,7 +71,7 @@ public abstract class MixinPlayerControllerMP
         {
             if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
                 Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() &&
-                EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, false))
+                EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, true))
             {
                 cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
             }

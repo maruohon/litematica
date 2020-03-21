@@ -28,6 +28,12 @@ public abstract class MixinMinecraft
         }
     }
 
+    @Inject(method = "rightClickMouse", at = @At("TAIL"))
+    private void onRightClickMouseTail(CallbackInfo ci)
+    {
+        EasyPlaceUtils.onRightClickTail((net.minecraft.client.Minecraft)(Object) this);
+    }
+
     @Inject(method = "clickMouse", cancellable = true, at = @At(value = "FIELD", ordinal = 0,
             target = "Lnet/minecraft/util/math/RayTraceResult;typeOfHit:Lnet/minecraft/util/math/RayTraceResult$Type;"))
     private void onLeftClickMouseStart(CallbackInfo ci)
