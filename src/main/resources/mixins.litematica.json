@@ -22,8 +22,7 @@
         "MixinNetHandlerPlayClient",
         "MixinPlayerControllerMP",
         "MixinRenderGlobal",
-        "MixinWorld",
-        "MixinWorldClient"
+        "MixinWorld"
     ],
     "injectors": {
         "defaultRequire": 1

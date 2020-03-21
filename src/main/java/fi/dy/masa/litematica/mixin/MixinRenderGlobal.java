@@ -5,24 +5,42 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.RenderGlobal;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 
-@Mixin(RenderGlobal.class)
+@Mixin(net.minecraft.client.renderer.RenderGlobal.class)
 public abstract class MixinRenderGlobal
 {
-    @Shadow
-    private WorldClient world;
+    @Shadow private net.minecraft.client.multiplayer.WorldClient world;
 
     @Inject(method = "loadRenderers()V", at = @At("RETURN"))
     private void onLoadRenderers(CallbackInfo ci)
     {
         // Also (re-)load our renderer when the vanilla renderer gets reloaded
-        if (this.world != null && this.world == Minecraft.getMinecraft().world)
+        if (this.world != null && this.world == net.minecraft.client.Minecraft.getMinecraft().world)
         {
             LitematicaRenderer.getInstance().loadRenderers();
+        }
+    }
+
+    @Inject(method = "notifyBlockUpdate", at = @At("RETURN"))
+    private void onNotifyBlockUpdate(
+            net.minecraft.world.World worldIn,
+            net.minecraft.util.math.BlockPos pos,
+            net.minecraft.block.state.IBlockState oldState,
+            net.minecraft.block.state.IBlockState newState, int flags, CallbackInfo ci)
+    {
+        if (oldState != newState)
+        {
+            SchematicVerifier.markVerifierBlockChanges(pos);
+
+            if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+                Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
+            {
+                SchematicWorldRenderingNotifier.markSchematicChunkForRenderUpdate(pos);
+            }
         }
     }
 }
