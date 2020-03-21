@@ -25,7 +25,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -106,30 +105,18 @@ public class SchematicPlacingUtils
 
                 if (mc.isSingleplayer())
                 {
-                    if (placements.size() == 1)
-                    {
-                        directPaste(placements.get(0), range, printMessage, mc);
-                    }
-                    else
-                    {
-                        TaskPasteSchematicPerChunkDirect task = new TaskPasteSchematicPerChunkDirect(placements, range, changedBlocksOnly);
-                        TaskScheduler.getInstanceServer().scheduleTask(task, 20);
-
-                        if (printMessage)
-                        {
-                            InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
-                        }
-                    }
+                    TaskPasteSchematicPerChunkDirect task = new TaskPasteSchematicPerChunkDirect(placements, range, changedBlocksOnly);
+                    TaskScheduler.getInstanceServer().scheduleTask(task, 20);
                 }
                 else
                 {
                     TaskPasteSchematicPerChunkCommand task = new TaskPasteSchematicPerChunkCommand(placements, range, changedBlocksOnly);
                     TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
+                }
 
-                    if (printMessage)
-                    {
-                        InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
-                    }
+                if (printMessage)
+                {
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }
             }
             else
@@ -140,31 +127,6 @@ public class SchematicPlacingUtils
         else
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
-        }
-    }
-
-    private static void directPaste(SchematicPlacement placement, LayerRange range, boolean printMessage, Minecraft mc)
-    {
-        final WorldServer world = mc.getIntegratedServer().getWorld(fi.dy.masa.malilib.util.WorldUtils.getDimensionId(mc.player.getEntityWorld()));
-
-        world.addScheduledTask(() ->
-        {
-            if (placeToWorld(placement, world, range, false))
-            {
-                if (printMessage)
-                {
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
-                }
-            }
-            else
-            {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
-            }
-        });
-
-        if (printMessage)
-        {
-            InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
         }
     }
 
