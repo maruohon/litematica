@@ -66,7 +66,8 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
 
                 for (SchematicPlacement placement : placements)
                 {
-                    if (SchematicPlacingUtils.placeToWorldWithinChunk(placement, pos, world, false))
+                    if (placement.isInvalidated() ||
+                        SchematicPlacingUtils.placeToWorldWithinChunk(placement, pos, world, false))
                     {
                         this.placementsPerChunk.remove(pos, placement);
                         ++processed;

@@ -358,6 +358,8 @@ public class SchematicPlacementManager
             this.selectedPlacement = null;
         }
 
+        placement.invalidate();
+
         if (placement.isLoaded())
         {
             SchematicPlacement loadedPlacement = (SchematicPlacement) placement;

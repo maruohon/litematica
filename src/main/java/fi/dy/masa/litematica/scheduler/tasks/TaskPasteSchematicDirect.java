@@ -22,7 +22,10 @@ public class TaskPasteSchematicDirect extends TaskBase
     @Override
     public boolean canExecute()
     {
-        return this.mc.world != null && this.mc.player != null && this.mc.isSingleplayer();
+        return this.placement.isInvalidated() == false &&
+               this.mc.world != null &&
+               this.mc.player != null &&
+               this.mc.isSingleplayer();
     }
 
     @Override

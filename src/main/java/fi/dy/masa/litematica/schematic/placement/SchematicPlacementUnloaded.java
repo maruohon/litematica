@@ -47,6 +47,7 @@ public class SchematicPlacementUnloaded
     protected boolean regionPlacementsModified;
     protected boolean locked;
     protected boolean shouldBeSaved = true;
+    protected boolean invalidated;
     protected int coordinateLockMask;
     @Nullable protected Box enclosingBox;
     @Nullable protected String selectedSubRegionName;
@@ -94,6 +95,11 @@ public class SchematicPlacementUnloaded
         return this.renderEnclosingBox;
     }
 
+    public boolean isInvalidated()
+    {
+        return this.invalidated;
+    }
+
     /**
      * Returns whether or not this placement should be saved by the SchematicPlacementManager
      * when it saves the list of placements.
@@ -107,6 +113,11 @@ public class SchematicPlacementUnloaded
     public void setShouldBeSaved(boolean shouldbeSaved)
     {
         this.shouldBeSaved = shouldbeSaved;
+    }
+
+    public void invalidate()
+    {
+        this.invalidated = true;
     }
 
     public boolean matchesRequirement(RequiredEnabled required)
