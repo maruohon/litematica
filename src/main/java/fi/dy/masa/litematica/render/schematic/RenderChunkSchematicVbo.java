@@ -433,7 +433,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     }
                     else
                     {
-                        RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, pos, this.overlayColor, 0, bufferOverlayOutlines);
+                        RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, pos, this.overlayColor, bufferOverlayOutlines);
                     }
                 }
                 else
@@ -447,7 +447,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 if (missing && Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue())
                 {
                     IBakedModel bakedModel = this.renderGlobal.getModelForState(stateSchematic);
-                    RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, pos, this.overlayColor, 0, bufferOverlayOutlines);
+                    RenderUtils.drawBlockModelOutlinesBatched(bakedModel, stateSchematic, pos, this.overlayColor, bufferOverlayOutlines);
                 }
                 else
                 {
