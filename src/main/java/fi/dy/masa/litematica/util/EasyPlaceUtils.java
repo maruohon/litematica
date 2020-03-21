@@ -56,11 +56,6 @@ public class EasyPlaceUtils
         isHandling = handling;
     }
 
-    public static boolean isFirstClick()
-    {
-        return isFirstClick;
-    }
-
     public static void setIsFirstClick(boolean isFirst)
     {
         isFirstClick = isFirst;
@@ -82,17 +77,27 @@ public class EasyPlaceUtils
 
     public static boolean handleEasyPlaceWithMessage(Minecraft mc, boolean printFailMessage)
     {
-        EnumActionResult result = handleEasyPlace(mc);
+        if (isHandling)
+        {
+            return false;
+        }
 
-        if (printFailMessage && result == EnumActionResult.FAIL)
+        isHandling = true;
+        EnumActionResult result = handleEasyPlace(mc);
+        isHandling = false;
+
+        // Only print the warning message once per right click
+        if (printFailMessage && isFirstClick && result == EnumActionResult.FAIL)
         {
             InfoUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
         }
 
+        isFirstClick = false;
+
         return result != EnumActionResult.PASS;
     }
 
-    public static EnumActionResult handleEasyPlace(Minecraft mc)
+    private static EnumActionResult handleEasyPlace(Minecraft mc)
     {
         BlockPos overriddenPos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
 
@@ -210,9 +215,10 @@ public class EasyPlaceUtils
                 }
 
                 //System.out.printf("pos: %s side: %s, hit: %s\n", pos, side, hitPos);
-                if (mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand) == EnumActionResult.PASS)
+                if (mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand) == EnumActionResult.SUCCESS)
                 {
-                    return mc.playerController.processRightClick(mc.player, mc.world, hand);
+                    mc.player.swingArm(hand);
+                    mc.entityRenderer.itemRenderer.resetEquippedProgress(hand);
                 }
 
                 if (stateSchematic.getBlock() instanceof BlockSlab && ((BlockSlab) stateSchematic.getBlock()).isDouble())

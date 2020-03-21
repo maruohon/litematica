@@ -17,8 +17,6 @@ public abstract class MixinPlayerControllerMP
 {
     @Shadow @Final private net.minecraft.client.Minecraft mc;
 
-    @Shadow private void syncCurrentPlayItem() {}
-
     @Inject(method = "processRightClickBlock", at = @At("HEAD"), cancellable = true)
     private void onProcessRightlickBlock(
             net.minecraft.client.entity.EntityPlayerSP player,
@@ -32,14 +30,12 @@ public abstract class MixinPlayerControllerMP
         // Prevent recursion, since the Easy Place mode can call this code again
         if (EasyPlaceUtils.isHandling() == false)
         {
-            EasyPlaceUtils.setHandling(true);
-
             if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
                 Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
             {
-                if (EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, EasyPlaceUtils.isFirstClick()))
+                if (EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, true))
                 {
-                    cir.setReturnValue(net.minecraft.util.EnumActionResult.SUCCESS);
+                    cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
                 }
             }
             else
@@ -54,12 +50,10 @@ public abstract class MixinPlayerControllerMP
                 {
                     if (EasyPlaceUtils.handlePlacementRestriction(this.mc))
                     {
-                        cir.setReturnValue(net.minecraft.util.EnumActionResult.SUCCESS);
+                        cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
                     }
                 }
             }
-
-            EasyPlaceUtils.setHandling(false);
         }
     }
 
@@ -75,16 +69,12 @@ public abstract class MixinPlayerControllerMP
         // Prevent recursion, since the Easy Place mode can call this code again
         if (EasyPlaceUtils.isHandling() == false)
         {
-            EasyPlaceUtils.setHandling(true);
-
             if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
                 Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() &&
                 EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, false))
             {
-                cir.setReturnValue(net.minecraft.util.EnumActionResult.PASS);
+                cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
             }
-
-            EasyPlaceUtils.setHandling(false);
         }
     }
 }
