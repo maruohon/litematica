@@ -11,6 +11,7 @@
         "IMixinNBTTagLongArray",
         "IMixinViewFrustum",
         "IMixinWorldClient",
+        "MixinBlock",
         "MixinBlockRail",
         "MixinChunk",
         "MixinChunkProviderClient",

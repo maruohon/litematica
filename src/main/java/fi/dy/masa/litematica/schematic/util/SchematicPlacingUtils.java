@@ -170,49 +170,55 @@ public class SchematicPlacingUtils
 
     public static boolean placeToWorld(SchematicPlacement schematicPlacement, World world, LayerRange range, boolean notifyNeighbors)
     {
-        WorldUtils.setShouldPreventBlockUpdates(true);
-
-        ISchematic schematic = schematicPlacement.getSchematic();
-        ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
-        BlockPos origin = schematicPlacement.getOrigin();
         boolean success = true;
 
-        for (String regionName : relativePlacements.keySet())
+        try
         {
-            SubRegionPlacement placement = relativePlacements.get(regionName);
-            ISchematicRegion region = schematic.getSchematicRegion(regionName);
+            WorldUtils.setShouldPreventBlockUpdates(true);
 
-            if (placement.isEnabled() && region != null)
+            ISchematic schematic = schematicPlacement.getSchematic();
+            ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
+            BlockPos origin = schematicPlacement.getOrigin();
+
+            for (String regionName : relativePlacements.keySet())
             {
-                BlockPos regionPos = placement.getPos();
-                Vec3i regionSize = region.getSize();
-                ILitematicaBlockStateContainer container = region.getBlockStateContainer();
-                Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
-                List<EntityInfo> entityList = region.getEntityList();
-                Map<BlockPos, NextTickListEntry> scheduledBlockTicks = region.getBlockTickMap();
+                SubRegionPlacement placement = relativePlacements.get(regionName);
+                ISchematicRegion region = schematic.getSchematicRegion(regionName);
 
-                if (regionPos != null && regionSize != null && container != null && blockEntityMap != null)
+                if (placement.isEnabled() && region != null)
                 {
-                    if (placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement,
-                            container, blockEntityMap, scheduledBlockTicks, range, notifyNeighbors) == false)
+                    BlockPos regionPos = placement.getPos();
+                    Vec3i regionSize = region.getSize();
+                    ILitematicaBlockStateContainer container = region.getBlockStateContainer();
+                    Map<BlockPos, NBTTagCompound> blockEntityMap = region.getBlockEntityMap();
+                    List<EntityInfo> entityList = region.getEntityList();
+                    Map<BlockPos, NextTickListEntry> scheduledBlockTicks = region.getBlockTickMap();
+
+                    if (regionPos != null && regionSize != null && container != null && blockEntityMap != null)
                     {
-                        success = false;
-                        InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed_region", regionName);
+                        if (placeBlocksToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement,
+                                container, blockEntityMap, scheduledBlockTicks, range, notifyNeighbors) == false)
+                        {
+                            success = false;
+                            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed_region", regionName);
+                        }
                     }
-                }
-                else
-                {
-                    LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
-                }
+                    else
+                    {
+                        LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
+                    }
 
-                if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
-                {
-                    placeEntitiesToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, entityList, range);
+                    if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
+                    {
+                        placeEntitiesToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, entityList, range);
+                    }
                 }
             }
         }
-
-        WorldUtils.setShouldPreventBlockUpdates(false);
+        finally
+        {
+            WorldUtils.setShouldPreventBlockUpdates(false);
+        }
 
         return success;
     }
@@ -428,38 +434,43 @@ public class SchematicPlacingUtils
         BlockPos origin = schematicPlacement.getOrigin();
         boolean allSuccess = true;
 
-        if (notifyNeighbors == false)
+        try
         {
-            WorldUtils.setShouldPreventBlockUpdates(true);
-        }
-
-        for (String regionName : regionsTouchingChunk)
-        {
-            SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
-            ISchematicRegion region = schematic.getSchematicRegion(regionName);
-
-            if (region == null)
+            if (notifyNeighbors == false)
             {
-                allSuccess = false;
-                continue;
+                WorldUtils.setShouldPreventBlockUpdates(true);
             }
 
-            if (placement.isEnabled())
+            for (String regionName : regionsTouchingChunk)
             {
-                if (placeBlocksWithinChunk(world, chunkPos, regionName, region, origin, schematicPlacement, placement, notifyNeighbors) == false)
+                SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+                ISchematicRegion region = schematic.getSchematicRegion(regionName);
+
+                if (region == null)
                 {
                     allSuccess = false;
-                    LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
+                    continue;
                 }
 
-                if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false)
+                if (placement.isEnabled())
                 {
-                    placeEntitiesToWorldWithinChunk(world, chunkPos, region, origin, schematicPlacement, placement);
+                    if (placeBlocksWithinChunk(world, chunkPos, regionName, region, origin, schematicPlacement, placement, notifyNeighbors) == false)
+                    {
+                        allSuccess = false;
+                        LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
+                    }
+
+                    if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false)
+                    {
+                        placeEntitiesToWorldWithinChunk(world, chunkPos, region, origin, schematicPlacement, placement);
+                    }
                 }
             }
         }
-
-        WorldUtils.setShouldPreventBlockUpdates(false);
+        finally
+        {
+            WorldUtils.setShouldPreventBlockUpdates(false);
+        }
 
         return allSuccess;
     }
