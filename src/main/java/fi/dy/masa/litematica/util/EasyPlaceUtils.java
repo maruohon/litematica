@@ -179,7 +179,7 @@ public class EasyPlaceUtils
                 }
 
                 // Abort if the required item was not able to be pick-block'd
-                if (InventoryUtils.pickBlockFirst(mc) == false)
+                if (InventoryUtils.doPickBlockForStack(stack, mc) == false)
                 {
                     return EnumActionResult.FAIL;
                 }

@@ -245,7 +245,6 @@ public class InventoryUtils
         IBlockState state = world.getBlockState(pos);
         ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
-        boolean picked = false;
 
         if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(player, stack, ignoreNbt) == null)
         {
@@ -263,6 +262,20 @@ public class InventoryUtils
                 }
             }
 
+            return doPickBlockForStack(stack, mc);
+        }
+
+        return false;
+    }
+
+    public static boolean doPickBlockForStack(ItemStack stack, Minecraft mc)
+    {
+        EntityPlayer player = mc.player;
+        boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
+        boolean picked = false;
+
+        if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(player, stack, ignoreNbt) == null)
+        {
             picked = switchItemToHand(stack, ignoreNbt, mc);
         }
 
