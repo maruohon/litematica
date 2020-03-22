@@ -152,6 +152,7 @@ public class EasyPlaceUtils
                 }
             }
 
+            BlockPos clickPos = pos;
             World world = SchematicWorldHandler.getSchematicWorld();
             IBlockState stateSchematic = world.getBlockState(pos);
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
@@ -191,42 +192,76 @@ public class EasyPlaceUtils
                     return EnumActionResult.FAIL;
                 }
 
-                // If there is a block in the world right behind the targeted schematic block, then use
-                // that block as the click position
-                if (traceVanilla != null && traceVanilla.typeOfHit == RayTraceResult.Type.BLOCK)
+                boolean foundClickPosition = false;
+
+                if (Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue())
                 {
-                    BlockPos posVanilla = traceVanilla.getBlockPos();
-                    IBlockState stateVanilla = mc.world.getBlockState(posVanilla);
-
-                    if (stateVanilla.getBlock().isReplaceable(mc.world, posVanilla) == false)
+                    // If there is a block in the world right behind the targeted schematic block, then use
+                    // that block as the click position
+                    if (traceVanilla != null && traceVanilla.typeOfHit == RayTraceResult.Type.BLOCK)
                     {
-                        posVanilla = posVanilla.offset(traceVanilla.sideHit);
+                        BlockPos posVanilla = traceVanilla.getBlockPos();
+                        IBlockState stateVanilla = mc.world.getBlockState(posVanilla);
 
-                        if (pos.equals(posVanilla))
+                        if (stateVanilla.getBlock().isReplaceable(mc.world, posVanilla) == false &&
+                            stateVanilla.getMaterial().isReplaceable() == false &&
+                            pos.equals(posVanilla.offset(traceVanilla.sideHit)))
                         {
                             hitPos = traceVanilla.hitVec;
                             sideOrig = traceVanilla.sideHit;
+                            clickPos = posVanilla;
+                            foundClickPosition = true;
                         }
                     }
+
+                    if (foundClickPosition == false)
+                    {
+                        for (EnumFacing side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
+                        {
+                            BlockPos posSide = pos.offset(side);
+                            IBlockState stateSide = mc.world.getBlockState(posSide);
+
+                            if (stateSide.getBlock().isReplaceable(mc.world, posSide) == false &&
+                                stateSide.getMaterial().isReplaceable() == false)
+                            {
+                                hitPos = new Vec3d(posSide.getX() + 0.5, posSide.getY() + 0.5, posSide.getZ() + 0.5);
+                                sideOrig = side.getOpposite();
+                                clickPos = posSide;
+                                foundClickPosition = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (foundClickPosition == false)
+                    {
+                        return EnumActionResult.FAIL;
+                    }
                 }
-
-                EnumFacing side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
-
-                // Carpet Accurate Placement protocol support, plus BlockSlab support
-                hitPos = applyCarpetProtocolHitVec(pos, stateSchematic, hitPos);
 
                 // Mark that this position has been handled (use the non-offset position that is checked above)
                 cacheEasyPlacePosition(pos);
 
-                // Fluid _blocks_ are not replaceable... >_>
-                if (stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
-                    stateClient.getMaterial().isLiquid())
+                EnumFacing side = sideOrig;
+
+                if (foundClickPosition == false || stateSchematic.getBlock() instanceof BlockSlab)
                 {
-                    pos = pos.offset(side, -1);
+                    side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
                 }
 
+                // Fluid _blocks_ are not replaceable... >_>
+                if (foundClickPosition == false &&
+                    stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
+                    stateClient.getMaterial().isLiquid())
+                {
+                    clickPos = clickPos.offset(side, -1);
+                }
+
+                // Carpet Accurate Placement protocol support, plus BlockSlab support
+                hitPos = applyCarpetProtocolHitVec(clickPos, stateSchematic, hitPos);
+
                 //System.out.printf("pos: %s side: %s, hit: %s\n", pos, side, hitPos);
-                if (mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand) == EnumActionResult.SUCCESS)
+                if (mc.playerController.processRightClickBlock(mc.player, mc.world, clickPos, side, hitPos, hand) == EnumActionResult.SUCCESS)
                 {
                     mc.player.swingArm(hand);
                     mc.entityRenderer.itemRenderer.resetEquippedProgress(hand);

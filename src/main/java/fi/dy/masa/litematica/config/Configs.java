@@ -29,7 +29,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       BETTER_RENDER_ORDER     = new ConfigBoolean(    "betterRenderOrder", true, "If enabled, then the schematic rendering is done\nby injecting the different render call into the vanilla\nrendering code. This should result in better translucent block\nrendering/ordering and schematic blocks not getting rendered\nthrough the client world blocks/terrain.\nIf the rendering doesn't work (for example with Optifine),\ntry disabling this option.");
         public static final ConfigBoolean       CHANGE_SELECTED_CORNER  = new ConfigBoolean(    "changeSelectedCornerOnMove", true, "If true, then the selected corner of an area selection\nis always set to the last moved corner,\nwhen using the set corner hotkeys");
         public static final ConfigBoolean       CLONE_AT_ORIGINAL_POS   = new ConfigBoolean(    "cloneAtOriginalPosition", false, "If enabled, then using the Clone Area hotkey will create\nthe placement at the original area selection position,\ninstead of at the player's current position");
-        public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place\nthat block in that position");
+        public static final ConfigBoolean       EASY_PLACE_CLICK_ADJACENT = new ConfigBoolean(  "easyPlaceClickAdjacent", false, "If enabled, then the Easy Place mode will try to\nclick on existing adjacent blocks. This may help on Spigot\nor similar servers, which don't allow clicking on air blocks.");
+        public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place that block in that position");
         public static final ConfigBoolean       EASY_PLACE_HOLD_ENABLED = new ConfigBoolean(    "easyPlaceHoldEnabled", false, "When enabled, then simply holding down the use key\nand looking at different schematic blocks will place them");
         public static final ConfigBoolean       EXECUTE_REQUIRE_TOOL    = new ConfigBoolean(    "executeRequireHoldingTool", true, "Require holding an enabled tool item\nfor the executeOperation hotkey to work");
         public static final ConfigBoolean       FIX_RAIL_ROTATION       = new ConfigBoolean(    "fixRailRotation", true, "If true, then a fix is applied for the vanilla bug in rails,\nwhere the 180 degree rotations of straight north-south and\neast-west rails rotate 90 degrees counterclockwise instead >_>");
@@ -60,6 +61,7 @@ public class Configs implements IConfigHandler
                 BETTER_RENDER_ORDER,
                 CHANGE_SELECTED_CORNER,
                 CLONE_AT_ORIGINAL_POS,
+                EASY_PLACE_CLICK_ADJACENT,
                 EASY_PLACE_MODE,
                 EASY_PLACE_HOLD_ENABLED,
                 EXECUTE_REQUIRE_TOOL,
