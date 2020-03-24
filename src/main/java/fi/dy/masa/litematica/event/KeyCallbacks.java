@@ -136,7 +136,7 @@ public class KeyCallbacks
         Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
         Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
         Configs.Visuals.GHOST_BLOCK_ALPHA.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
-        Configs.Visuals.IGNORE_FLUIDS_AS_EXTRA.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
+        Configs.Visuals.IGNORE_EXISTING_FLUIDS.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
         Configs.Visuals.OVERLAY_REDUCED_INNER_SIDES.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
         Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());
         Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.setValueChangeCallback((newValue, oldValue) -> KeyCallbacks.refreshRenderer());

@@ -60,7 +60,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
     private boolean hasOverlay = false;
 
-    private boolean ignoreFluidsAsExtra;
+    private boolean ignoreClientWorldFluids;
     private boolean overlayEnabled;
     private boolean overlayLinesEnabled;
     private boolean overlayModelLines;
@@ -558,11 +558,11 @@ public class RenderChunkSchematicVbo extends RenderChunk
 
             if (schematicHasAir)
             {
-                return (clientHasAir || (this.ignoreFluidsAsExtra && stateClient.getMaterial().isLiquid())) ? OverlayType.NONE : OverlayType.EXTRA;
+                return (clientHasAir || (this.ignoreClientWorldFluids && stateClient.getMaterial().isLiquid())) ? OverlayType.NONE : OverlayType.EXTRA;
             }
             else
             {
-                if (clientHasAir)
+                if (clientHasAir || (this.ignoreClientWorldFluids && stateClient.getMaterial().isLiquid()))
                 {
                     return OverlayType.MISSING;
                 }
@@ -751,7 +751,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
     {
         synchronized (this.boxes)
         {
-            this.ignoreFluidsAsExtra = Configs.Visuals.IGNORE_FLUIDS_AS_EXTRA.getBooleanValue();
+            this.ignoreClientWorldFluids = Configs.Visuals.IGNORE_EXISTING_FLUIDS.getBooleanValue();
             this.overlayEnabled = Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue();
             this.overlayReducedInnerSides = Configs.Visuals.OVERLAY_REDUCED_INNER_SIDES.getBooleanValue();
             this.overlayLinesEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue();
