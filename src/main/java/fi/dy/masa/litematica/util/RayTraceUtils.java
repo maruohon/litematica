@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -340,6 +339,7 @@ public class RayTraceUtils
         LayerRange layerRange = respectRenderRange ? DataManager.getRenderLayerRange() : null;
 
         return fi.dy.masa.malilib.util.RayTraceUtils.rayTraceBlocks(world, start, end,
+                fi.dy.masa.malilib.util.RayTraceUtils::checkRayCollision,
                 fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling.SOURCE_ONLY,
                 fi.dy.masa.malilib.util.RayTraceUtils.BLOCK_FILTER_NON_AIR,
                 false, true, layerRange, 200);
@@ -544,22 +544,16 @@ public class RayTraceUtils
 
         RayTraceCalcsData data = new RayTraceCalcsData(start, end, RayTraceFluidHandling.SOURCE_ONLY,
                 fi.dy.masa.malilib.util.RayTraceUtils.BLOCK_FILTER_NON_AIR, DataManager.getRenderLayerRange());
-
-        IBlockState blockState = world.getBlockState(data.blockPos);
-        //FluidState fluidState = world.getFluidState(data.blockPos);
         List<RayTraceResult> hits = new ArrayList<>();
 
         while (--maxSteps >= 0)
         {
-            blockState = world.getBlockState(data.blockPos);
-            //fluidState = world.getFluidState(data.blockPos);
-
-            if (fi.dy.masa.malilib.util.RayTraceUtils.checkCollision(data, world, blockState, /*fluidState,*/ false))
+            if (fi.dy.masa.malilib.util.RayTraceUtils.checkRayCollision(data, world, false))
             {
                 hits.add(data.trace);
             }
 
-            if (fi.dy.masa.malilib.util.RayTraceUtils.rayTraceStep(data))
+            if (fi.dy.masa.malilib.util.RayTraceUtils.rayTraceAdvance(data))
             {
                 break;
             }
