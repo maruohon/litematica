@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -98,7 +99,7 @@ public class OverlayRenderer
 
     public void renderBoxes(float partialTicks)
     {
-        Entity renderViewEntity = this.mc.getRenderViewEntity();
+        Entity renderViewEntity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
         boolean renderAreas = currentSelection != null && Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue();
@@ -700,6 +701,52 @@ public class OverlayRenderer
             GlStateManager.disableBlend();
             GlStateManager.enableCull();
             GlStateManager.depthMask(true);
+        }
+    }
+
+    public void renderHoveredSchematicBlock(Minecraft mc, float partialTicks)
+    {
+        RayTraceResult trace = mc.objectMouseOver;
+        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+
+        if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK && worldSchematic != null)
+        {
+            BlockPos pos = trace.getBlockPos();
+            IBlockState stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
+            IBlockState stateSchematic = worldSchematic.getBlockState(pos);
+
+            if (stateClient != stateSchematic && stateClient.getMaterial() != Material.AIR)
+            {
+                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                double dx = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks;
+                double dy = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks;
+                double dz = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks;
+
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(-dx, -dy, -dz);
+                GlStateManager.enablePolygonOffset();
+                GlStateManager.doPolygonOffset(-0.8f, -0.4f);
+                fi.dy.masa.malilib.render.RenderUtils.setupBlend();
+                GlStateManager.disableDepth();
+                GlStateManager.depthMask(false);
+
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder buffer = tessellator.getBuffer();
+
+                LitematicaRenderer.enableAlphaShader(Configs.Visuals.GHOST_BLOCK_ALPHA.getFloatValue());
+
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+                LitematicaRenderer.getInstance().getWorldRenderer().renderBlock(stateSchematic, pos, worldSchematic, buffer);
+                tessellator.draw();
+
+                LitematicaRenderer.disableAlphaShader();
+
+                GlStateManager.depthMask(true);
+                GlStateManager.enableDepth();
+                GlStateManager.doPolygonOffset(0f, 0f);
+                GlStateManager.disablePolygonOffset();
+                GlStateManager.popMatrix();
+            }
         }
     }
 

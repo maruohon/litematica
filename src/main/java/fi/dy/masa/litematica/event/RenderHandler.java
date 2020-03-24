@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.event;
 
+import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -11,7 +12,6 @@ import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.interfaces.IRenderer;
-import net.minecraft.client.Minecraft;
 
 public class RenderHandler implements IRenderer
 {
@@ -22,7 +22,7 @@ public class RenderHandler implements IRenderer
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
-            boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
+            boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.isHeld();
 
             if (Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert &&
                 Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() == false)
@@ -35,6 +35,17 @@ public class RenderHandler implements IRenderer
             if (Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue())
             {
                 OverlayRenderer.getInstance().renderSchematicVerifierMismatches(partialTicks);
+            }
+
+            if (Configs.Visuals.RENDER_COLLIDING_BLOCK_AT_CURSOR.getBooleanValue())
+            {
+                boolean render = Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() &&
+                                 Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
+
+                if (render)
+                {
+                    OverlayRenderer.getInstance().renderHoveredSchematicBlock(mc, partialTicks);
+                }
             }
 
             if (DataManager.getToolMode() == ToolMode.REBUILD)

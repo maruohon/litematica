@@ -105,6 +105,7 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        PLACEMENT_BOX_SIDE_ALPHA            = new ConfigDouble( "placementBoxSideAlpha", 0.2, 0, 1, "The alpha value of the sub-region boxes' side");
         public static final ConfigBoolean       RENDER_AREA_SELECTION_BOX_SIDES     = new ConfigBoolean("renderAreaSelectionBoxSides", true, "If enabled, then the area selection boxes will\nhave their side quads rendered");
         public static final ConfigBoolean       RENDER_BLOCKS_AS_TRANSLUCENT        = new ConfigBoolean("renderBlocksAsTranslucent", false, "If enabled, then the schematics are rendered\nusing translucent \"ghost blocks\"", "Translucent Schematic Block Rendering");
+        public static final ConfigBoolean       RENDER_COLLIDING_BLOCK_AT_CURSOR    = new ConfigBoolean("renderCollidingBlockAtCursor", false, "If enabled, then the expected block in the schematic is rendered\nat the hovered block, if it's not currently correct");
         public static final ConfigBoolean       RENDER_COLLIDING_SCHEMATIC_BLOCKS   = new ConfigBoolean("renderCollidingSchematicBlocks", false, "If enabled, then blocks in the schematics are rendered\nalso when there is already a (wrong) block in the client world.\nProbably mostly useful when trying to build\nsomething where there are snow layers or water in the way.");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_CONNECTIONS     = new ConfigBoolean("renderErrorMarkerConnections", false, "Render connecting lines between subsequent verifier hilight box corners.\nThis was a rendering bug that some people experienced, but at least some players\nliked it and requested for it to stay, so this options \"restores\" it");
         public static final ConfigBoolean       RENDER_ERROR_MARKER_SIDES           = new ConfigBoolean("renderErrorMarkerSides", true, "If enabled, then the error markers in the Schematic Verifier\nwill have (translucent) sides rendered instead of just the outline");
@@ -137,6 +138,7 @@ public class Configs implements IConfigHandler
                 OVERLAY_REDUCED_INNER_SIDES,
                 RENDER_AREA_SELECTION_BOX_SIDES,
                 RENDER_BLOCKS_AS_TRANSLUCENT,
+                RENDER_COLLIDING_BLOCK_AT_CURSOR,
                 RENDER_COLLIDING_SCHEMATIC_BLOCKS,
                 RENDER_ERROR_MARKER_CONNECTIONS,
                 RENDER_ERROR_MARKER_SIDES,

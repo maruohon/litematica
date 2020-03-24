@@ -3,10 +3,6 @@ package fi.dy.masa.litematica.render;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
-import fi.dy.masa.malilib.render.shader.ShaderProgram;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
@@ -16,6 +12,10 @@ import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockRenderLayer;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.render.schematic.RenderGlobalSchematic;
+import fi.dy.masa.malilib.render.shader.ShaderProgram;
 
 public class LitematicaRenderer
 {
@@ -257,15 +257,30 @@ public class LitematicaRenderer
 
         if (this.translucentSchematic)
         {
-            float alpha = (float) Configs.Visuals.GHOST_BLOCK_ALPHA.getDoubleValue();
-            GL20.glUseProgram(SHADER_ALPHA.getProgram());
-            GL20.glUniform1f(GL20.glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), alpha);
+            enableAlphaShader(Configs.Visuals.GHOST_BLOCK_ALPHA.getFloatValue());
         }
     }
 
     public void disableShader()
     {
         if (this.translucentSchematic)
+        {
+            disableAlphaShader();
+        }
+    }
+
+    public static void enableAlphaShader(float alpha)
+    {
+        if (OpenGlHelper.shadersSupported)
+        {
+            GL20.glUseProgram(SHADER_ALPHA.getProgram());
+            GL20.glUniform1f(GL20.glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), alpha);
+        }
+    }
+
+    public static void disableAlphaShader()
+    {
+        if (OpenGlHelper.shadersSupported)
         {
             GL20.glUseProgram(0);
         }
