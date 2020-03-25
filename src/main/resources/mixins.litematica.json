@@ -8,7 +8,6 @@
         "IMixinCompiledChunk",
         "IMixinDataFixer",
         "IMixinItemBlockSpecial",
-        "IMixinNBTTagLongArray",
         "IMixinViewFrustum",
         "IMixinWorldClient",
         "MixinBlock",
