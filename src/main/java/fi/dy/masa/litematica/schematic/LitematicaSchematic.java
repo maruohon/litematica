@@ -392,7 +392,7 @@ public class LitematicaSchematic
 
                             try
                             {
-                                te.fromTag(teNBT);
+                                te.fromTag(state, teNBT);
 
                                 if (mirrorMain != BlockMirror.NONE) { te.applyMirror(mirrorMain); }
                                 if (mirrorSub != BlockMirror.NONE)  { te.applyMirror(mirrorSub); }
@@ -654,7 +654,7 @@ public class LitematicaSchematic
 
                             try
                             {
-                                te.fromTag(teNBT);
+                                te.fromTag(state, teNBT);
 
                                 if (mirrorMain != BlockMirror.NONE) { te.applyMirror(mirrorMain); }
                                 if (mirrorSub != BlockMirror.NONE)  { te.applyMirror(mirrorSub); }

@@ -160,7 +160,7 @@ public class WorldUtils
 
             StructurePlacementData placementSettings = new StructurePlacementData();
             placementSettings.setIgnoreEntities(ignoreEntities);
-            template.place(world, BlockPos.ORIGIN, placementSettings, 0x12);
+            template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, 0x12);
 
             String subRegionName = FileUtils.getNameWithoutExtension(structureFileName) + " (Converted Structure)";
             AreaSelection area = new AreaSelection();

@@ -134,8 +134,8 @@ public class ChunkCacheSchematic implements BlockRenderView
     }
 
     @Override
-    public float method_24852(Direction direction, boolean bl)
+    public float getBrightness(Direction direction, boolean bl)
     {
-        return this.worldClient.method_24852(direction, bl); // AO brightness on face
+        return this.worldClient.getBrightness(direction, bl); // AO brightness on face
     }
 }
