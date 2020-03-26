@@ -145,7 +145,7 @@ public class SchematicaSchematic
 
                                 try
                                 {
-                                    te.fromTag(teNBT);
+                                    te.fromTag(state, teNBT);
                                     te.applyMirror(mirror);
                                     te.applyRotation(rotation);
                                 }
@@ -282,7 +282,7 @@ public class SchematicaSchematic
 
                                         try
                                         {
-                                            te.fromTag(teNBT);
+                                            te.fromTag(state, teNBT);
                                             te.applyMirror(mirror);
                                             te.applyRotation(rotation);
                                         }
