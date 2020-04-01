@@ -155,7 +155,7 @@ public class EasyPlaceUtils
             BlockPos clickPos = pos;
             World world = SchematicWorldHandler.getSchematicWorld();
             IBlockState stateSchematic = world.getBlockState(pos);
-            ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
+            ItemStack requiredStack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // Already placed to that position, possible server sync delay
             if (easyPlaceIsPositionCached(pos))
@@ -163,7 +163,7 @@ public class EasyPlaceUtils
                 return EnumActionResult.FAIL;
             }
 
-            if (stack.isEmpty() == false)
+            if (requiredStack.isEmpty() == false)
             {
                 IBlockState stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
 
@@ -178,15 +178,9 @@ public class EasyPlaceUtils
                     return EnumActionResult.FAIL;
                 }
 
+                EnumHand hand = InventoryUtils.doPickBlockForStack(requiredStack, mc);
+
                 // Abort if the required item was not able to be pick-block'd
-                if (InventoryUtils.doPickBlockForStack(stack, mc) == false)
-                {
-                    return EnumActionResult.FAIL;
-                }
-
-                EnumHand hand = EntityUtils.getUsedHandForItem(mc.player, stack, true);
-
-                // Abort if a wrong item is in the player's hand
                 if (hand == null)
                 {
                     return EnumActionResult.FAIL;

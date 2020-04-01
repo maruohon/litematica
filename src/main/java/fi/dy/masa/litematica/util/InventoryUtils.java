@@ -213,7 +213,8 @@ public class InventoryUtils
         return false;
     }
 
-    public static boolean pickBlockLast(boolean adjacentOnly, Minecraft mc)
+    @Nullable
+    public static EnumHand pickBlockLast(boolean adjacentOnly, Minecraft mc)
     {
         BlockPos pos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
 
@@ -235,10 +236,11 @@ public class InventoryUtils
             }
         }
 
-        return false;
+        return null;
     }
 
-    private static boolean doPickBlockForPosition(BlockPos pos, Minecraft mc)
+    @Nullable
+    public static EnumHand doPickBlockForPosition(BlockPos pos, Minecraft mc)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
         EntityPlayer player = mc.player;
@@ -246,47 +248,54 @@ public class InventoryUtils
         ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
 
-        if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(player, stack, ignoreNbt) == null)
+        if (stack.isEmpty() == false)
         {
-            if (mc.player.capabilities.isCreativeMode)
-            {
-                TileEntity te = world.getTileEntity(pos);
+            EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
 
-                // The creative mode pick block with NBT only works correctly
-                // if the server world doesn't have a TileEntity in that position.
-                // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
+            if (hand == null)
+            {
+                if (mc.player.capabilities.isCreativeMode)
                 {
-                    stack = stack.copy();
-                    ItemUtils.storeTEInStack(stack, te);
+                    TileEntity te = world.getTileEntity(pos);
+
+                    // The creative mode pick block with NBT only works correctly
+                    // if the server world doesn't have a TileEntity in that position.
+                    // Otherwise it would try to write whatever that TE is into the picked ItemStack.
+                    if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
+                    {
+                        stack = stack.copy();
+                        ItemUtils.storeTEInStack(stack, te);
+                    }
                 }
+
+                return doPickBlockForStack(stack, mc);
             }
 
-            return doPickBlockForStack(stack, mc);
+            return hand;
         }
 
-        return false;
+        return null;
     }
 
-    public static boolean doPickBlockForStack(ItemStack stack, Minecraft mc)
+    @Nullable
+    public static EnumHand doPickBlockForStack(ItemStack stack, Minecraft mc)
     {
         EntityPlayer player = mc.player;
         boolean ignoreNbt = Configs.Generic.PICK_BLOCK_IGNORE_NBT.getBooleanValue();
-        boolean picked = false;
-
-        if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(player, stack, ignoreNbt) == null)
-        {
-            picked = switchItemToHand(stack, ignoreNbt, mc);
-        }
-
         EnumHand hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
+
+        if (stack.isEmpty() == false && hand == null)
+        {
+            switchItemToHand(stack, ignoreNbt, mc);
+            hand = EntityUtils.getUsedHandForItem(player, stack, ignoreNbt);
+        }
 
         if (hand != null)
         {
             fi.dy.masa.malilib.util.InventoryUtils.preRestockHand(player, hand, 6, true);
         }
 
-        return picked;
+        return hand;
     }
 
     private static int getEmptyPickBlockableHotbarSlot(InventoryPlayer inventory)
