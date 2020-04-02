@@ -617,7 +617,7 @@ public class RenderUtils
         if (inv != null)
         {
             final InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
-            final InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, inv.getInvSize());
+            final InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, inv.size());
 
             return renderInventoryOverlay(align, side, offY, inv, type, props, mc);
         }
