@@ -6,9 +6,11 @@ import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
@@ -19,10 +21,13 @@ import fi.dy.masa.malilib.util.WorldUtils;
 public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunkBase
 {
     private final ArrayListMultimap<ChunkPos, SchematicPlacement> placementsPerChunk = ArrayListMultimap.create();
+    private final ReplaceBehavior replace;
 
     public TaskPasteSchematicPerChunkDirect(Collection<SchematicPlacement> placements, LayerRange range, boolean changedBlocksOnly)
     {
         super(placements, range, changedBlocksOnly);
+
+        this.replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
     }
 
     @Override
@@ -67,7 +72,7 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
                 for (SchematicPlacement placement : placements)
                 {
                     if (placement.isInvalidated() ||
-                        SchematicPlacingUtils.placeToWorldWithinChunk(placement, pos, world, false))
+                        SchematicPlacingUtils.placeToWorldWithinChunk(placement, pos, world, this.replace, false))
                     {
                         this.placementsPerChunk.remove(pos, placement);
                         ++processed;

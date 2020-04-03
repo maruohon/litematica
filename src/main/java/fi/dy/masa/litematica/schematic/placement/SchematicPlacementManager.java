@@ -40,6 +40,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
@@ -164,7 +165,7 @@ public class SchematicPlacementManager
                         {
                             if (placement.isEnabled())
                             {
-                                SchematicPlacingUtils.placeToWorldWithinChunk(placement, pos, worldSchematic, false);
+                                SchematicPlacingUtils.placeToWorldWithinChunk(placement, pos, worldSchematic, ReplaceBehavior.ALL, false);
                             }
                         }
 

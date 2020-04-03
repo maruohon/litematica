@@ -389,7 +389,7 @@ public class SchematicPlacingUtils
         }
     }
 
-    public static boolean placeToWorldWithinChunk(SchematicPlacement schematicPlacement, ChunkPos chunkPos, World world, boolean notifyNeighbors)
+    public static boolean placeToWorldWithinChunk(SchematicPlacement schematicPlacement, ChunkPos chunkPos, World world, ReplaceBehavior replace, boolean notifyNeighbors)
     {
         ISchematic schematic = schematicPlacement.getSchematic();
         Set<String> regionsTouchingChunk = schematicPlacement.getRegionsTouchingChunk(chunkPos.x, chunkPos.z);
@@ -416,7 +416,7 @@ public class SchematicPlacingUtils
 
                 if (placement.isEnabled())
                 {
-                    if (placeBlocksWithinChunk(world, chunkPos, regionName, region, origin, schematicPlacement, placement, notifyNeighbors) == false)
+                    if (placeBlocksWithinChunk(world, chunkPos, regionName, region, origin, schematicPlacement, placement, replace, notifyNeighbors) == false)
                     {
                         allSuccess = false;
                         LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
@@ -438,7 +438,7 @@ public class SchematicPlacingUtils
     }
 
     public static boolean placeBlocksWithinChunk(World world, ChunkPos chunkPos, String regionName, ISchematicRegion region,
-            BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement, boolean notifyNeighbors)
+            BlockPos origin, SchematicPlacement schematicPlacement, SubRegionPlacement placement, ReplaceBehavior replace, boolean notifyNeighbors)
     {
         IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
         ILitematicaBlockStateContainer container = region.getBlockStateContainer();
@@ -515,7 +515,7 @@ public class SchematicPlacingUtils
                 {
                     IBlockState state = container.getBlockState(x, y, z);
 
-                    if (state.getBlock() == Blocks.AIR)
+                    if (state.getBlock() == Blocks.STRUCTURE_VOID)
                     {
                         continue;
                     }
@@ -530,28 +530,33 @@ public class SchematicPlacingUtils
                     BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
                     pos = pos.add(regionPosTransformed).add(origin);
 
+                    IBlockState stateOld = world.getBlockState(pos).getActualState(world, pos);
+
+                    if ((replace == ReplaceBehavior.NONE && stateOld.getMaterial() != Material.AIR) ||
+                        (replace == ReplaceBehavior.WITH_NON_AIR && state.getMaterial() == Material.AIR))
+                    {
+                        continue;
+                    }
+
                     if (mirrorMain != Mirror.NONE) { state = state.withMirror(mirrorMain); }
                     if (mirrorSub != Mirror.NONE)  { state = state.withMirror(mirrorSub); }
                     if (rotationCombined != Rotation.NONE) { state = state.withRotation(rotationCombined); }
 
-                    if (teNBT != null)
+                    TileEntity te = world.getTileEntity(pos);
+
+                    if (te != null)
                     {
-                        TileEntity te = world.getTileEntity(pos);
-
-                        if (te != null)
+                        if (te instanceof IInventory)
                         {
-                            if (te instanceof IInventory)
-                            {
-                                ((IInventory) te).clear();
-                            }
-
-                            world.setBlockState(pos, barrier, 0x14);
+                            ((IInventory) te).clear();
                         }
+
+                        world.setBlockState(pos, barrier, 0x14);
                     }
 
                     if (world.setBlockState(pos, state, 0x12) && teNBT != null)
                     {
-                        TileEntity te = world.getTileEntity(pos);
+                        te = world.getTileEntity(pos);
 
                         if (te != null)
                         {
