@@ -655,7 +655,7 @@ public class SchematicPlacementManager
 
     public void rotateBy(SchematicPlacement placement, Rotation rotation)
     {
-        this.setRotation(placement, rotation, InfoUtils.INGAME_MESSAGE_CONSUMER);
+        this.setRotation(placement, placement.getRotation().add(rotation), InfoUtils.INGAME_MESSAGE_CONSUMER);
     }
 
     public void setMirror(SchematicPlacement placement, Mirror mirror, IMessageConsumer feedback)
