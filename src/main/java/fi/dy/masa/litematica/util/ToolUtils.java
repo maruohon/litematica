@@ -268,15 +268,15 @@ public class ToolUtils
         }
     }
 
-    public static void cloneSelectionArea(Minecraft mc)
+    public static boolean cloneSelectionArea(final Minecraft mc)
     {
-        SelectionManager sm = DataManager.getSelectionManager();
-        AreaSelection area = sm.getCurrentSelection();
+        final SelectionManager sm = DataManager.getSelectionManager();
+        final AreaSelection area = sm.getCurrentSelection();
 
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
-            LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(area, mc.player.getName());
-            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
+            final LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(area, mc.player.getName());
+            final TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
             taskSave.disableCompletionMessage();
 
             taskSave.setCompletionListener(() ->
@@ -312,10 +312,14 @@ public class ToolUtils
             });
 
             TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(taskSave, 10);
+
+            return true;
         }
         else
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
         }
+
+        return false;
     }
 }

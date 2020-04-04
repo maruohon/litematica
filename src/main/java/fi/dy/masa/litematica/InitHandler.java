@@ -2,9 +2,9 @@ package fi.dy.masa.litematica;
 
 import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.HotkeyCallbacks;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
-import fi.dy.masa.litematica.event.KeyCallbacks;
 import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.event.WorldLoadListener;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
@@ -37,7 +37,7 @@ public class InitHandler implements IInitializationHandler
         WorldLoadHandler.getInstance().registerWorldLoadPreHandler(listener);
         WorldLoadHandler.getInstance().registerWorldLoadPostHandler(listener);
 
-        KeyCallbacks.init(Minecraft.getMinecraft());
+        HotkeyCallbacks.init(Minecraft.getMinecraft());
         StatusInfoRenderer.init();
 
         DataManager.getAreaSelectionsBaseDirectory();
