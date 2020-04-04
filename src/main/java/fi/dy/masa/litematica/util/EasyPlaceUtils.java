@@ -3,12 +3,14 @@ package fi.dy.masa.litematica.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.BlockTrapDoor;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
@@ -36,8 +38,11 @@ import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.PlacementUtils;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.SubChunkPos;
+import fi.dy.masa.malilib.util.data.HitPosition;
 
 public class EasyPlaceUtils
 {
@@ -108,208 +113,319 @@ public class EasyPlaceUtils
         }
     }
 
-    private static EnumActionResult handleEasyPlace(Minecraft mc)
+    @Nullable
+    private static HitPosition getTargetPosition(@Nullable RayTraceWrapper traceWrapper, Minecraft mc)
     {
         BlockPos overriddenPos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
 
-        double reach = Math.max(6, mc.playerController.getBlockReachDistance());
-        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, RayTraceFluidHandling.ANY, reach, true, false);
-
-        if (traceWrapper == null && overriddenPos == null)
+        if (overriddenPos != null)
         {
-            return EnumActionResult.PASS;
-        }
-
-        if (overriddenPos != null || (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK))
-        {
-            RayTraceResult traceVanilla = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(mc.world, entity, RayTraceFluidHandling.NONE, false, reach);
-            BlockPos pos;
+            double reach = Math.max(6, mc.playerController.getBlockReachDistance());
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            RayTraceResult trace = RayTraceUtils.traceToPositions(Arrays.asList(overriddenPos), entity, reach);
+            BlockPos pos = overriddenPos;
             Vec3d hitPos;
-            EnumFacing sideOrig;
+            EnumFacing side;
 
-            if (traceWrapper != null)
+            if (trace != null)
             {
-                RayTraceResult trace = traceWrapper.getRayTraceResult();
-                pos = trace.getBlockPos();
                 hitPos = trace.hitVec;
-                sideOrig = trace.sideHit;
+                side = trace.sideHit;
             }
             else
             {
-                RayTraceResult trace = RayTraceUtils.traceToPositions(Arrays.asList(overriddenPos), entity, reach);
-                pos = overriddenPos;
-
-                if (trace != null)
-                {
-                    hitPos = trace.hitVec;
-                    sideOrig = trace.sideHit;
-                }
-                else
-                {
-                    hitPos = new Vec3d(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
-                    sideOrig = EnumFacing.UP;
-                }
+                hitPos = new Vec3d(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
+                side = EnumFacing.UP;
             }
 
-            BlockPos clickPos = pos;
-            World world = SchematicWorldHandler.getSchematicWorld();
-            IBlockState stateSchematic = world.getBlockState(pos);
-            ItemStack requiredStack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
-
-            // Already placed to that position, possible server sync delay
-            if (easyPlaceIsPositionCached(pos))
-            {
-                return EnumActionResult.FAIL;
-            }
-
-            if (requiredStack.isEmpty() == false)
-            {
-                IBlockState stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
-
-                if (stateSchematic == stateClient)
-                {
-                    return EnumActionResult.FAIL;
-                }
-
-                // Abort if there is already a block in the target position
-                if (easyPlaceBlockChecksCancel(stateSchematic, stateClient, mc.world, pos))
-                {
-                    return EnumActionResult.FAIL;
-                }
-
-                EnumHand hand = InventoryUtils.doPickBlockForStack(requiredStack, mc);
-
-                // Abort if the required item was not able to be pick-block'd
-                if (hand == null)
-                {
-                    return EnumActionResult.FAIL;
-                }
-
-                boolean foundClickPosition = false;
-
-                if (Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue())
-                {
-                    // If there is a block in the world right behind the targeted schematic block, then use
-                    // that block as the click position
-                    if (traceVanilla != null && traceVanilla.typeOfHit == RayTraceResult.Type.BLOCK)
-                    {
-                        BlockPos posVanilla = traceVanilla.getBlockPos();
-                        IBlockState stateVanilla = mc.world.getBlockState(posVanilla);
-
-                        if (stateVanilla.getBlock().isReplaceable(mc.world, posVanilla) == false &&
-                            stateVanilla.getMaterial().isReplaceable() == false &&
-                            pos.equals(posVanilla.offset(traceVanilla.sideHit)))
-                        {
-                            hitPos = traceVanilla.hitVec;
-                            sideOrig = traceVanilla.sideHit;
-                            clickPos = posVanilla;
-                            foundClickPosition = true;
-                        }
-                    }
-
-                    if (foundClickPosition == false)
-                    {
-                        for (EnumFacing side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
-                        {
-                            BlockPos posSide = pos.offset(side);
-                            IBlockState stateSide = mc.world.getBlockState(posSide);
-
-                            if (stateSide.getBlock().isReplaceable(mc.world, posSide) == false &&
-                                stateSide.getMaterial().isReplaceable() == false)
-                            {
-                                hitPos = new Vec3d(posSide.getX() + 0.5, posSide.getY() + 0.5, posSide.getZ() + 0.5);
-                                sideOrig = side.getOpposite();
-                                clickPos = posSide;
-                                foundClickPosition = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (foundClickPosition == false)
-                    {
-                        return EnumActionResult.FAIL;
-                    }
-                }
-
-                // Mark that this position has been handled (use the non-offset position that is checked above)
-                cacheEasyPlacePosition(pos);
-
-                EnumFacing side = sideOrig;
-
-                if (foundClickPosition == false || stateSchematic.getBlock() instanceof BlockSlab)
-                {
-                    side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
-                }
-
-                // Fluid _blocks_ are not replaceable... >_>
-                if (foundClickPosition == false &&
-                    stateClient.getBlock().isReplaceable(mc.world, pos) == false &&
-                    stateClient.getMaterial().isLiquid())
-                {
-                    clickPos = clickPos.offset(side, -1);
-                }
-
-                // Carpet Accurate Placement protocol support, plus BlockSlab support
-                hitPos = applyCarpetProtocolHitVec(clickPos, stateSchematic, hitPos);
-
-                //System.out.printf("pos: %s side: %s, hit: %s\n", pos, side, hitPos);
-                if (mc.playerController.processRightClickBlock(mc.player, mc.world, clickPos, side, hitPos, hand) == EnumActionResult.SUCCESS)
-                {
-                    mc.player.swingArm(hand);
-                    mc.entityRenderer.itemRenderer.resetEquippedProgress(hand);
-                }
-
-                if (stateSchematic.getBlock() instanceof BlockSlab && ((BlockSlab) stateSchematic.getBlock()).isDouble())
-                {
-                    stateClient = mc.world.getBlockState(pos).getActualState(mc.world, pos);
-
-                    if (stateClient.getBlock() instanceof BlockSlab && ((BlockSlab) stateClient.getBlock()).isDouble() == false)
-                    {
-                        side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
-                        //System.out.printf("slab - pos: %s side: %s, hit: %s\n", pos, side, hitPos);
-                        mc.playerController.processRightClickBlock(mc.player, mc.world, pos, side, hitPos, hand);
-                    }
-                }
-            }
-
-            return EnumActionResult.SUCCESS;
+            return HitPosition.of(pos, hitPos, side);
         }
-        else if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
+        else if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            return placementRestrictionInEffect(mc) ? EnumActionResult.FAIL : EnumActionResult.PASS;
+            RayTraceResult trace = traceWrapper.getRayTraceResult();
+            return HitPosition.of(trace.getBlockPos(), trace.hitVec, trace.sideHit);
         }
 
-        return EnumActionResult.PASS;
+        return null;
     }
 
-    private static boolean easyPlaceBlockChecksCancel(IBlockState stateSchematic, IBlockState stateClient, World worldClient, BlockPos pos)
+    @Nullable
+    private static HitPosition getAdjacentClickPosition(final BlockPos targetPos, Minecraft mc)
     {
-        Block blockSchematic = stateSchematic.getBlock();
+        World world = mc.world;
+        double reach = Math.max(6, mc.playerController.getBlockReachDistance());
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceResult traceVanilla = fi.dy.masa.malilib.util.RayTraceUtils.getRayTraceFromEntity(world, entity, RayTraceFluidHandling.NONE, false, reach);
 
-        if (blockSchematic instanceof BlockSlab && ((BlockSlab) blockSchematic).isDouble())
+        if (traceVanilla != null && traceVanilla.typeOfHit == RayTraceResult.Type.BLOCK)
         {
-            if (stateClient.getBlock() instanceof BlockSlab && ((BlockSlab) stateClient.getBlock()).isDouble() == false)
-            {
-                IProperty<?> propSchematic = ((BlockSlab) stateSchematic.getBlock()).getVariantProperty();
-                IProperty<?> propClient = ((BlockSlab) stateClient.getBlock()).getVariantProperty();
+            BlockPos posVanilla = traceVanilla.getBlockPos();
 
-                return propSchematic != propClient || stateSchematic.getValue(propSchematic) != stateClient.getValue(propClient);
+            // If there is a block in the world right behind the targeted schematic block, then use
+            // that block as the click position
+            if (PlacementUtils.isReplaceable(world, posVanilla, true) == false &&
+                targetPos.equals(posVanilla.offset(traceVanilla.sideHit)))
+            {
+                return HitPosition.of(posVanilla, traceVanilla.hitVec, traceVanilla.sideHit);
             }
         }
 
-        if (stateClient.getBlock().isReplaceable(worldClient, pos) == false &&
-            stateClient.getMaterial().isLiquid() == false)
+        for (EnumFacing side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
         {
-            return true;
+            BlockPos posSide = targetPos.offset(side);
+
+            if (PlacementUtils.isReplaceable(world, posSide, true) == false)
+            {
+                Vec3d hitPos = new Vec3d(posSide.getX(), posSide.getY() + 1.0, posSide.getZ());
+                return HitPosition.of(posSide, hitPos, side.getOpposite());
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static HitPosition getClickPosition(HitPosition targetPosition, IBlockState stateSchematic, IBlockState stateClient, Minecraft mc)
+    {
+        boolean isSlab = stateSchematic.getBlock() instanceof BlockSlab;
+
+        if (isSlab)
+        {
+            return getClickPositionForSlab(targetPosition, stateSchematic, stateClient, mc);
+        }
+
+        BlockPos targetBlockPos = targetPosition.getBlockPos();
+        boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue();
+
+        return requireAdjacent ? getAdjacentClickPosition(targetBlockPos, mc) : targetPosition;
+    }
+
+    @Nullable
+    private static HitPosition getClickPositionForSlab(HitPosition targetPosition, IBlockState stateSchematic, IBlockState stateClient, Minecraft mc)
+    {
+        BlockSlab slab = (BlockSlab) stateSchematic.getBlock();
+        BlockPos targetBlockPos = targetPosition.getBlockPos();
+        World worldClient = mc.world;
+        boolean isDouble = slab.isDouble();
+
+        if (isDouble)
+        {
+            if (clientBlockIsSameMaterialSingleSlab(stateSchematic, stateClient))
+            {
+                boolean isTop = stateClient.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP;
+                EnumFacing side = isTop ? EnumFacing.DOWN : EnumFacing.UP;
+                Vec3d hitPos = targetPosition.getExactPos();
+                return HitPosition.of(targetBlockPos, new Vec3d(hitPos.x, targetBlockPos.getY() + 0.5, hitPos.z), side);
+            }
+            else if (PlacementUtils.isReplaceable(worldClient, targetBlockPos, true))
+            {
+                HitPosition pos = getClickPositionForSlabHalf(targetPosition, stateSchematic, false, worldClient);
+                return pos != null ? pos : getClickPositionForSlabHalf(targetPosition, stateSchematic, true, worldClient);
+            }
+        }
+        // Single slab required, so the target position must be replaceable
+        else if (isDouble == false && PlacementUtils.isReplaceable(worldClient, targetBlockPos, true))
+        {
+            boolean isTop = stateSchematic.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP;
+            return getClickPositionForSlabHalf(targetPosition, stateSchematic, isTop, worldClient);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static HitPosition getClickPositionForSlabHalf(HitPosition targetPosition, IBlockState stateSchematic, boolean isTop, World worldClient)
+    {
+        BlockPos targetBlockPos = targetPosition.getBlockPos();
+        boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue();
+
+        // Can click on air blocks as well
+        if (requireAdjacent == false)
+        {
+            EnumFacing clickSide = isTop ? EnumFacing.DOWN : EnumFacing.UP;
+            BlockPos posOffset = targetBlockPos.offset(clickSide);
+            IBlockState stateSide = worldClient.getBlockState(posOffset);
+
+            // Clicking on the target position itself does not create a double slab above or below, so just click on the position itself
+            if (clientBlockIsSameMaterialSingleSlab(stateSchematic, stateSide) == false)
+            {
+                Vec3d hitPos = targetPosition.getExactPos();
+                return HitPosition.of(targetBlockPos, new Vec3d(hitPos.x, targetBlockPos.getY() + 0.5, hitPos.z), clickSide);
+            }
+        }
+
+        // Required to be clicking on an existing adjacent block,
+        // or couldn't click on the target position itself without creating an adjacent double slab
+        return getAdjacentClickPositionForSlab(targetBlockPos, stateSchematic, isTop, worldClient);
+    }
+
+    @Nullable
+    private static HitPosition getAdjacentClickPositionForSlab(BlockPos targetBlockPos, IBlockState stateSchematic, boolean isTop, World worldClient)
+    {
+        BlockSlab.EnumBlockHalf requiredHalf = isTop ? BlockSlab.EnumBlockHalf.TOP : BlockSlab.EnumBlockHalf.BOTTOM;
+        EnumFacing clickSide = isTop ? EnumFacing.DOWN : EnumFacing.UP;
+
+        BlockPos posSide = targetBlockPos.offset(clickSide.getOpposite());
+        IBlockState stateSide = worldClient.getBlockState(posSide);
+
+        // Can click on the existing block above or below
+        if (PlacementUtils.isReplaceable(worldClient, posSide, true) == false &&
+            (clientBlockIsSameMaterialSingleSlab(stateSchematic, stateSide) == false
+             || stateSide.getValue(BlockSlab.HALF) != requiredHalf))
+        {
+            return HitPosition.of(posSide, new Vec3d(posSide.getX(), posSide.getY() + 0.5, posSide.getZ()), clickSide);
+        }
+        // Try the sides
+        else
+        {
+            for (EnumFacing side : PositionUtils.HORIZONTAL_DIRECTIONS)
+            {
+                posSide = targetBlockPos.offset(side);
+                stateSide = worldClient.getBlockState(posSide);
+
+                // TODO Also check that the side block doesn't have a use action
+                if (PlacementUtils.isReplaceable(worldClient, posSide, true) == false)
+                {
+                    double y = isTop ? 0.9 : 0.1;
+                    return HitPosition.of(posSide, new Vec3d(posSide.getX(), posSide.getY() + y, posSide.getZ()), side.getOpposite());
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static EnumActionResult handleEasyPlace(Minecraft mc)
+    {
+        double reach = Math.max(6, mc.playerController.getBlockReachDistance());
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, RayTraceFluidHandling.ANY, reach, true, false);
+        HitPosition targetPosition = getTargetPosition(traceWrapper, mc);
+
+        // No position override, and didn't ray trace to a schematic block
+        if (targetPosition == null)
+        {
+            if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
+            {
+                return placementRestrictionInEffect(mc) ? EnumActionResult.FAIL : EnumActionResult.PASS;
+            }
+
+            return EnumActionResult.PASS;
+        }
+
+        final BlockPos targetBlockPos = targetPosition.getBlockPos();
+        World schematicWorld = SchematicWorldHandler.getSchematicWorld();
+        IBlockState stateSchematic = schematicWorld.getBlockState(targetBlockPos);
+        IBlockState stateClient = mc.world.getBlockState(targetBlockPos).getActualState(mc.world, targetBlockPos);
+        ItemStack requiredStack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
+
+        // The block is correct already, or it was recently placed, or some of the checks failed
+        if (stateSchematic == stateClient || requiredStack.isEmpty() ||
+            easyPlaceIsPositionCached(targetBlockPos) ||
+            canPlaceBlock(targetBlockPos, mc.world, stateSchematic, stateClient) == false)
+        {
+            return EnumActionResult.FAIL;
+        }
+
+        HitPosition clickPosition = getClickPosition(targetPosition, stateSchematic, stateClient, mc);
+        EnumHand hand = InventoryUtils.doPickBlockForStack(requiredStack, mc);
+
+        // Didn't find a valid or safe click position, or was unable to pick block
+        if (clickPosition == null || hand == null)
+        {
+            return EnumActionResult.FAIL;
+        }
+
+        boolean isSlab = stateSchematic.getBlock() instanceof BlockSlab;
+        boolean usingAdjacentClickPosition = clickPosition.getBlockPos().equals(targetBlockPos) == false;
+        BlockPos clickPos = clickPosition.getBlockPos();
+        Vec3d hitPos = clickPosition.getExactPos();
+        EnumFacing side = clickPosition.getSide();
+
+        if (usingAdjacentClickPosition == false && isSlab == false)
+        {
+            side = applyPlacementFacing(stateSchematic, side, stateClient);
+
+            // Fluid _blocks_ are not replaceable... >_>
+            if (stateClient.getBlock().isReplaceable(mc.world, targetBlockPos) == false &&
+                stateClient.getMaterial().isLiquid())
+            {
+                clickPos = clickPos.offset(side, -1);
+            }
+
+            hitPos = applyCarpetProtocolHitVec(clickPos, stateSchematic, hitPos);
+        }
+
+        //System.out.printf("targetPos: %s, clickPos: %s side: %s, hit: %s\n", targetBlockPos, clickPos, side, hitPos);
+        if (mc.playerController.processRightClickBlock(mc.player, mc.world, clickPos, side, hitPos, hand) == EnumActionResult.SUCCESS)
+        {
+            // Mark that this position has been handled (use the non-offset position that is checked above)
+            cacheEasyPlacePosition(targetBlockPos);
+
+            mc.player.swingArm(hand);
+            mc.entityRenderer.itemRenderer.resetEquippedProgress(hand);
+
+            if (isSlab && ((BlockSlab) stateSchematic.getBlock()).isDouble())
+            {
+                stateClient = mc.world.getBlockState(targetBlockPos).getActualState(mc.world, targetBlockPos);
+
+                if (stateClient.getBlock() instanceof BlockSlab && ((BlockSlab) stateClient.getBlock()).isDouble() == false)
+                {
+                    side = stateClient.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP ? EnumFacing.DOWN : EnumFacing.UP;
+                    hitPos = new Vec3d(targetBlockPos.getX(), targetBlockPos.getY() + 0.5, targetBlockPos.getZ());
+                    //System.out.printf("slab - pos: %s side: %s, hit: %s\n", pos, side, hitPos);
+                    mc.playerController.processRightClickBlock(mc.player, mc.world, targetBlockPos, side, hitPos, hand);
+                }
+            }
+        }
+
+        return EnumActionResult.SUCCESS;
+    }
+
+    private static boolean clientBlockIsSameMaterialSingleSlab(IBlockState stateSchematic, IBlockState stateClient)
+    {
+        Block blockSchematic = stateSchematic.getBlock();
+        Block blockClient = stateClient.getBlock();
+
+        if ((blockSchematic instanceof BlockSlab) &&
+            (blockClient instanceof BlockSlab) &&
+            ((BlockSlab) blockClient).isDouble() == false)
+        {
+            IProperty<?> propSchematic = ((BlockSlab) blockSchematic).getVariantProperty();
+            IProperty<?> propClient = ((BlockSlab) blockClient).getVariantProperty();
+
+            return propSchematic == propClient && stateSchematic.getValue(propSchematic) == stateClient.getValue(propClient);
         }
 
         return false;
     }
 
-    public static Vec3d applyCarpetProtocolHitVec(BlockPos pos, IBlockState state, Vec3d hitVecIn)
+    private static boolean canPlaceBlock(BlockPos targetPos, World worldClient, IBlockState stateSchematic, IBlockState stateClient)
     {
+        boolean isSlab = stateSchematic.getBlock() instanceof BlockSlab;
+
+        if (isSlab)
+        {
+            if (stateClient.getMaterial() != Material.AIR &&
+                (((BlockSlab) stateSchematic.getBlock()).isDouble() == false
+                || clientBlockIsSameMaterialSingleSlab(stateSchematic, stateClient) == false))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        return PlacementUtils.isReplaceable(worldClient, targetPos, true);
+    }
+
+    private static Vec3d applyCarpetProtocolHitVec(BlockPos pos, IBlockState state, Vec3d hitVecIn)
+    {
+        if (state.getBlock() instanceof BlockSlab)
+        {
+            return applySlabHitVec(pos, state, hitVecIn);
+        }
+
         double x = hitVecIn.x;
         double y = hitVecIn.y;
         double z = hitVecIn.z;
@@ -337,58 +453,40 @@ public class EasyPlaceUtils
         {
             x += 10;
         }
-        else if (block instanceof BlockSlab && ((BlockSlab) block).isDouble() == false)
-        {
-            //x += 10; // Doesn't actually exist (yet?)
 
-            // Do it via vanilla
+        return new Vec3d(x, y, z);
+    }
+
+    public static Vec3d applySlabHitVec(BlockPos pos, IBlockState state, Vec3d hitVecIn)
+    {
+        Block block = state.getBlock();
+
+        if (block instanceof BlockSlab && ((BlockSlab) block).isDouble() == false)
+        {
+            double y = hitVecIn.y;
+
             if (state.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP)
             {
                 y = pos.getY() + 0.9;
             }
             else
             {
-                y = pos.getY();
+                y = pos.getY() + 0.1;
             }
+
+            return new Vec3d(hitVecIn.x, y, hitVecIn.z);
         }
 
-        return new Vec3d(x, y, z);
+        return hitVecIn;
     }
 
     private static EnumFacing applyPlacementFacing(IBlockState stateSchematic, EnumFacing side, IBlockState stateClient)
     {
-        Block blockSchematic = stateSchematic.getBlock();
-        Block blockClient = stateClient.getBlock();
+        PropertyDirection prop = BlockUtils.getFirstDirectionProperty(stateSchematic);
 
-        if (blockSchematic instanceof BlockSlab)
+        if (prop != null)
         {
-            if (((BlockSlab) blockSchematic).isDouble() &&
-                blockClient instanceof BlockSlab &&
-                ((BlockSlab) blockClient).isDouble() == false)
-            {
-                if (stateClient.getValue(BlockSlab.HALF) == BlockSlab.EnumBlockHalf.TOP)
-                {
-                    return EnumFacing.DOWN;
-                }
-                else
-                {
-                    return EnumFacing.UP;
-                }
-            }
-            // Single slab
-            else
-            {
-                return EnumFacing.NORTH;
-            }
-        }
-        else
-        {
-            PropertyDirection prop = BlockUtils.getFirstDirectionProperty(stateSchematic);
-
-            if (prop != null)
-            {
-                side = stateSchematic.getValue(prop).getOpposite();
-            }
+            side = stateSchematic.getValue(prop).getOpposite();
         }
 
         return side;
