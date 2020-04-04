@@ -37,7 +37,7 @@ public class SchematicPlacementUnloaded
     @Nullable protected String placementSaveFile;
     protected BlockPos origin = BlockPos.ORIGIN;
     protected String name = "?";
-    protected Color4f boxesBBColorVec = new Color4f(0xFF, 0xFF, 0xFF);
+    protected Color4f boundingBoxColor = new Color4f(0xFF, 0xFF, 0xFF);
     protected Rotation rotation = Rotation.NONE;
     protected Mirror mirror = Mirror.NONE;
     protected BlockInfoListType verifierType = BlockInfoListType.ALL;
@@ -110,29 +110,6 @@ public class SchematicPlacementUnloaded
         return this.shouldBeSaved;
     }
 
-    public void setShouldBeSaved(boolean shouldbeSaved)
-    {
-        this.shouldBeSaved = shouldbeSaved;
-    }
-
-    public void invalidate()
-    {
-        this.invalidated = true;
-    }
-
-    public boolean matchesRequirement(RequiredEnabled required)
-    {
-        switch (required)
-        {
-            case ANY:
-                return true;
-            case PLACEMENT_ENABLED:
-                return this.isEnabled();
-            default:
-                return this.isEnabled();
-        }
-    }
-
     public boolean isRegionPlacementModified()
     {
         return this.regionPlacementsModified;
@@ -159,21 +136,6 @@ public class SchematicPlacementUnloaded
         return this.gridSettings;
     }
 
-    public void setSchematicFile(@Nullable File schematicFile)
-    {
-        this.schematicFile = schematicFile;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public void setBoxesBBColor(int color)
-    {
-        this.boxesBBColorVec = Color4f.fromColor(color, 1f);
-    }
-
     public BlockPos getOrigin()
     {
         return origin;
@@ -189,14 +151,52 @@ public class SchematicPlacementUnloaded
         return mirror;
     }
 
-    public Color4f getBoxesBBColor()
+    public Color4f getBoundingBoxColor()
     {
-        return this.boxesBBColorVec;
+        return this.boundingBoxColor;
     }
 
-    protected void setBoxesBBColorNext()
+    public boolean matchesRequirement(RequiredEnabled required)
     {
-        this.setBoxesBBColor(getNextBoxColor());
+        switch (required)
+        {
+            case ANY:
+                return true;
+            case PLACEMENT_ENABLED:
+                return this.isEnabled();
+            default:
+                return this.isEnabled();
+        }
+    }
+
+    public void setSchematicFile(@Nullable File schematicFile)
+    {
+        this.schematicFile = schematicFile;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public void setShouldBeSaved(boolean shouldbeSaved)
+    {
+        this.shouldBeSaved = shouldbeSaved;
+    }
+
+    public void invalidate()
+    {
+        this.invalidated = true;
+    }
+
+    public void setBoundingBoxColor(int color)
+    {
+        this.boundingBoxColor = Color4f.fromColor(color, 1f);
+    }
+
+    public void setBoundingBoxColorToNext()
+    {
+        this.setBoundingBoxColor(getNextBoxColor());
     }
 
     protected void copyFrom(SchematicPlacementUnloaded other, boolean copyGridSettings)
@@ -206,7 +206,7 @@ public class SchematicPlacementUnloaded
 
         this.origin = other.origin;
         this.name = other.name;
-        this.boxesBBColorVec = other.boxesBBColorVec;
+        this.boundingBoxColor = other.boundingBoxColor;
         this.rotation = other.rotation;
         this.mirror = other.mirror;
         this.ignoreEntities = other.ignoreEntities;
@@ -415,7 +415,7 @@ public class SchematicPlacementUnloaded
             obj.add("render_enclosing_box", new JsonPrimitive(this.shouldRenderEnclosingBox()));
             obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
-            obj.add("bb_color", new JsonPrimitive(this.boxesBBColorVec.intValue));
+            obj.add("bb_color", new JsonPrimitive(this.boundingBoxColor.intValue));
             obj.add("verifier_type", new JsonPrimitive(this.verifierType.getStringValue()));
 
             if (this.selectedSubRegionName != null)
@@ -466,11 +466,11 @@ public class SchematicPlacementUnloaded
 
             if (JsonUtils.hasInteger(obj, "bb_color"))
             {
-                schematicPlacement.setBoxesBBColor(JsonUtils.getInteger(obj, "bb_color"));
+                schematicPlacement.setBoundingBoxColor(JsonUtils.getInteger(obj, "bb_color"));
             }
             else
             {
-                schematicPlacement.setBoxesBBColorNext();
+                schematicPlacement.setBoundingBoxColorToNext();
             }
 
             if (JsonUtils.hasObject(obj, "material_list"))

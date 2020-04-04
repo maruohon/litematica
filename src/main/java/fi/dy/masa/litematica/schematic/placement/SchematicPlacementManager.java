@@ -255,7 +255,10 @@ public class SchematicPlacementManager
     {
         if (placement.isLoaded())
         {
-            this.addSchematicPlacement(((SchematicPlacement) placement).copyAsFullyLoaded(false), false);
+            SchematicPlacement duplicate = ((SchematicPlacement) placement).copyAsFullyLoaded(false);
+            duplicate.setBoundingBoxColorToNext();
+            this.addSchematicPlacement(duplicate, false);
+            this.setSelectedSchematicPlacement(duplicate);
         }
         else
         {

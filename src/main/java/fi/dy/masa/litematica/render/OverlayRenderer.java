@@ -170,7 +170,7 @@ public class OverlayRenderer
                         this.renderSelectionBox(entryBox.getValue(), type, expand, 1f, 1f, renderViewEntity, partialTicks, schematicPlacement);
                     }
 
-                    Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoxesBBColor();
+                    Color4f color = schematicPlacement == currentPlacement && origin ? this.colorSelectedCorner : schematicPlacement.getBoundingBoxColor();
                     RenderUtils.renderBlockOutline(schematicPlacement.getOrigin(), expand, lineWidthBlockBox, color, renderViewEntity, partialTicks);
 
                     if (Configs.Visuals.RENDER_PLACEMENT_ENCLOSING_BOX.getBooleanValue())
@@ -243,7 +243,7 @@ public class OverlayRenderer
                 colorZ = this.colorBoxPlacementSelected;
                 break;
             case PLACEMENT_UNSELECTED:
-                Color4f color = placement.getBoxesBBColor();
+                Color4f color = placement.getBoundingBoxColor();
                 colorX = color;
                 colorY = color;
                 colorZ = color;
@@ -263,7 +263,7 @@ public class OverlayRenderer
         }
         else if (boxType == BoxType.PLACEMENT_UNSELECTED)
         {
-            color1 = placement.getBoxesBBColor();
+            color1 = placement.getBoundingBoxColor();
             color2 = color1;
             float alpha = (float) Configs.Visuals.PLACEMENT_BOX_SIDE_ALPHA.getDoubleValue();
             sideColor = new Color4f(color1.r, color1.g, color1.b, alpha);

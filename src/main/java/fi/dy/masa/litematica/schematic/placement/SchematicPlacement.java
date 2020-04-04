@@ -567,7 +567,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     {
         SchematicPlacement placement = new SchematicPlacement(schematic, null, schematic.getFile(), origin, name, enabled);
 
-        placement.setBoxesBBColorNext();
+        placement.setBoundingBoxColorToNext();
         placement.resetAllSubRegionsToSchematicValues();
 
         if (offsetToInfrontOfPlayer)
