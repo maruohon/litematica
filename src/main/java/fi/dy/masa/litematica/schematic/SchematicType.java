@@ -31,6 +31,7 @@ public class SchematicType<S extends ISchematic>
             .setExtension(SchematicaSchematic.FILE_NAME_EXTENSION)
             .setExtensionValidator(SchematicaSchematic.FILE_NAME_EXTENSION::equals)
             .setIcon(LitematicaGuiIcons.FILE_ICON_SCHEMATIC)
+            .setHasName(true)
             .build();
 
     public static final SchematicType<SpongeSchematic> SPONGE = SchematicType.<SpongeSchematic>builder()
