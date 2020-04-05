@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -128,6 +130,19 @@ public class EntityUtils
         }
 
         return getHorizontalLookingDirection(entity);
+    }
+
+    public static boolean setFakedSneakingState(Minecraft mc, boolean sneaking)
+    {
+        if (mc.player != null && mc.player.isSneaking() != sneaking)
+        {
+            CPacketEntityAction.Action action = sneaking ? CPacketEntityAction.Action.START_SNEAKING : CPacketEntityAction.Action.STOP_SNEAKING;
+            mc.player.connection.sendPacket(new CPacketEntityAction(mc.player, action));
+            mc.player.movementInput.sneak = sneaking;
+            return true;
+        }
+
+        return false;
     }
 
     @Nullable
