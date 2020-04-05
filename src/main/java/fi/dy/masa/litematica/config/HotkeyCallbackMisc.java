@@ -159,7 +159,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
         }
         else if (key == Hotkeys.LAYER_SET_HERE.getKeybind())
         {
-            DataManager.getRenderLayerRange().setToPosition(this.mc.player);
+            DataManager.getRenderLayerRange().setSingleBoundaryToPosition(this.mc.player);
             return true;
         }
         else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())

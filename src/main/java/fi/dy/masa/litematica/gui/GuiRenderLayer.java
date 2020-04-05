@@ -14,6 +14,13 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiRenderLayer extends GuiRenderLayerEditBase
 {
+    public GuiRenderLayer()
+    {
+        super();
+
+        this.addPlayerFollowingOptions = true;
+    }
+
     @Override
     public void initGui()
     {
