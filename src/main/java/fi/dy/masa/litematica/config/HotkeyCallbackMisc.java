@@ -92,6 +92,18 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 }
             }
         }
+        else if (key == Hotkeys.DUPLICATE_PLACEMENT.getKeybind())
+        {
+            if (DataManager.getSchematicPlacementManager().duplicateSelectedPlacement())
+            {
+                BlockPos pos = new BlockPos(this.mc.player);
+                pos = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(pos);
+                DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
+                InfoUtils.printActionbarMessage("litematica.message.duplicated_selected_placement");
+            }
+
+            return true;
+        }
         else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind())
         {
             boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
@@ -225,6 +237,11 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
 
             return false;
         }
+        else if (key == Hotkeys.REMOVE_SELECTED_PLACEMENT.getKeybind())
+        {
+            DataManager.getSchematicPlacementManager().removeSelectedSchematicPlacement();
+            return true;
+        }
         else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
         {
             SchematicWorldRenderingNotifier.INSTANCE.updateAll();
@@ -332,6 +349,11 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                     return true;
                 }
             }
+        }
+        else if (key == Hotkeys.SET_HELD_ITEM_AS_TOOL.getKeybind())
+        {
+            DataManager.setHeldItemAsTool();
+            return true;
         }
         else if (key == Hotkeys.SET_SCHEMATIC_PREVIEW.getKeybind())
         {

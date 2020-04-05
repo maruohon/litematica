@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -36,6 +37,7 @@ import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -509,5 +511,36 @@ public class DataManager implements IDirectoryCache
         toolItem = new ItemStack(Items.STICK);
 
         Configs.Generic.TOOL_ITEM.setValueFromString(Item.REGISTRY.getNameForObject(Items.STICK).toString());
+    }
+
+    public static void setHeldItemAsTool()
+    {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+
+        if (player != null)
+        {
+            ItemStack stack = player.getHeldItemMainhand();
+            toolItem = stack.isEmpty() ? ItemStack.EMPTY : stack.copy();
+            String cfgStr = "";
+
+            if (stack.isEmpty() == false)
+            {
+                cfgStr = Item.REGISTRY.getNameForObject(stack.getItem()).toString();
+                NBTTagCompound nbt = stack.getTagCompound();
+
+                if (stack.isItemStackDamageable() == false || nbt != null)
+                {
+                    cfgStr += "@" + stack.getMetadata();
+
+                    if (nbt != null)
+                    {
+                        cfgStr += nbt.toString();
+                    }
+                }
+            }
+
+            Configs.Generic.TOOL_ITEM.setValueFromString(cfgStr);
+            InfoUtils.printActionbarMessage("litematica.message.set_currently_held_item_as_tool");
+        }
     }
 }

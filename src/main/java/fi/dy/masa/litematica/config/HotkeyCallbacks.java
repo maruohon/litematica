@@ -42,6 +42,7 @@ public class HotkeyCallbacks
         Hotkeys.ADD_SELECTION_BOX.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.CLONE_SELECTION.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.DELETE_SELECTION_BOX.getKeybind().setCallback(hotkeyCallbackMisc);
+        Hotkeys.DUPLICATE_PLACEMENT.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.LAYER_MODE_NEXT.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.LAYER_MODE_PREVIOUS.getKeybind().setCallback(hotkeyCallbackMisc);
@@ -53,6 +54,7 @@ public class HotkeyCallbacks
         Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.PICK_BLOCK_FIRST.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.PICK_BLOCK_LAST.getKeybind().setCallback(hotkeyCallbackMisc);
+        Hotkeys.REMOVE_SELECTED_PLACEMENT.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.RERENDER_SCHEMATIC.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.ROTATE_PLACEMENT_CW.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.ROTATE_PLACEMENT_CCW.getKeybind().setCallback(hotkeyCallbackMisc);
@@ -65,6 +67,7 @@ public class HotkeyCallbacks
         Hotkeys.SELECTION_MODE_CYCLE.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SELECTION_SHRINK.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SET_AREA_ORIGIN.getKeybind().setCallback(hotkeyCallbackMisc);
+        Hotkeys.SET_HELD_ITEM_AS_TOOL.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SET_SCHEMATIC_PREVIEW.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind().setCallback(hotkeyCallbackMisc);

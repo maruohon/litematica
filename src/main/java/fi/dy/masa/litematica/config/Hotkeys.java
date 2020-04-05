@@ -10,6 +10,7 @@ public class Hotkeys
     public static final ConfigHotkey ADD_SELECTION_BOX                  = new ConfigHotkey("addSelectionBox",                   "M,A",  "Add a new selection box (position 1) here");
     public static final ConfigHotkey CLONE_SELECTION                    = new ConfigHotkey("cloneSelection",                    "",    "Quickly clone the current area selection.\nThis basically just creates an in-memory-only schematic,\nand then creates a placement of that schematic and selects it,\nand also switches the tool mode to the Paste mode.");
     public static final ConfigHotkey DELETE_SELECTION_BOX               = new ConfigHotkey("deleteSelectionBox",                "",    "Delete the currently selected box");
+    public static final ConfigHotkey DUPLICATE_PLACEMENT                = new ConfigHotkey("duplicatePlacement",                "",    "Creates a duplicate of the currently selected placement,\nand selects that newly created placement");
     public static final ConfigHotkey EASY_PLACE_ACTIVATION              = new ConfigHotkey("easyPlaceActivation",               "",    KeybindSettings.MODIFIER_INGAME_EMPTY, "When the easyPlaceMode is enabled, this key must\nbe held to enable placing the blocks when\nusing the vanilla Use key");
     public static final ConfigHotkey EASY_PLACE_TOGGLE                  = new ConfigHotkey("easyPlaceToggle",                   "",    "Allows quickly toggling on/off the Easy Place mode");
     public static final ConfigHotkey EXECUTE_OPERATION                  = new ConfigHotkey("executeOperation",                  "",    "Execute the currently selected tool operation with the\ncurrent selection or placement in the Fill, Replace,\nPaste Schematic etc. modes");
@@ -40,6 +41,7 @@ public class Hotkeys
     public static final ConfigHotkey PICK_BLOCK_LAST                    = new ConfigHotkey("pickBlockLast",                     "",      KeybindSettings.MODIFIER_INGAME, "A key to pick block the last schematic block\nray traced to, before the first (possible) client world\nblock ray traced to. Basically this would get\nyou the block you could place against an existing block.");
     public static final ConfigHotkey PICK_BLOCK_TOGGLE                  = new ConfigHotkey("pickBlockToggle",                   "M,BUTTON2", "A hotkey to toggle the pick block toggle option in the\nGeneric configs. This is provided as a quick way to enable\nor disable the pick block keys, if they interfere with something.");
     public static final ConfigHotkey PICK_BLOCK_TOGGLE_AUTO             = new ConfigHotkey("pickBlockToggleAuto",               "", "A hotkey to toggle the pickBlockAuto option in the Generic configs.");
+    public static final ConfigHotkey REMOVE_SELECTED_PLACEMENT          = new ConfigHotkey("removeSelectedPlacement",           "", "Removes the currently selected placement\n(without unloading the schematic)");
     public static final ConfigHotkey RENDER_INFO_OVERLAY                = new ConfigHotkey("renderInfoOverlay",                 "I", KeybindSettings.PRESS_ALLOWEXTRA, "The key that enables rendering the block info overlay.\nUse NONE for not requiring a key to be pressed.\nDisable the similarly named option in the Visuals\nconfigs to disable the overlay completely.");
     public static final ConfigHotkey RENDER_OVERLAY_THROUGH_BLOCKS      = new ConfigHotkey("renderOverlayThroughBlocks",        "RCONTROL", KeybindSettings.PRESS_ALLOWEXTRA, "A hotkey to allow the overlays to render through blocks.\nThis is just a quicker way to temporarily enable\nthe same thing that the 'schematicOverlayRenderThroughBlocks' option in Visuals does.");
     public static final ConfigHotkey RERENDER_SCHEMATIC                 = new ConfigHotkey("rerenderSchematic",                 "F3,M", "Hotkey to refresh/redraw only the schematic, instead of\nhaving to refresh the vanilla terrain too with F3 + A");
@@ -63,6 +65,7 @@ public class Hotkeys
     public static final ConfigHotkey SELECTION_MODE_CYCLE               = new ConfigHotkey("selectionModeCycle",                "LCONTROL,M", "Change the mode between Corners and Cuboid\nin the Area Selection mode");
     public static final ConfigHotkey SELECTION_SHRINK                   = new ConfigHotkey("selectionShrink",                   "",     "The action hotkey to shrink the selection box so that there\nisn't any empty space (empty layers) on any side");
     public static final ConfigHotkey SET_AREA_ORIGIN                    = new ConfigHotkey("setAreaOrigin",                     "",     "Set/move the origin point of the current\narea selection to the player's position");
+    public static final ConfigHotkey SET_HELD_ITEM_AS_TOOL              = new ConfigHotkey("setHeldItemAsTool",                 "",     "Sets the currently held item as the tool item");
     public static final ConfigHotkey SET_SCHEMATIC_PREVIEW              = new ConfigHotkey("setSchematicPreview",               "F2",   "Sets the schematic thumbnail/preview image by taking a screenshot,\nwhen a preview task has been started via the Schematic Manager");
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_1       = new ConfigHotkey("setSelectionBoxPosition1",          "",     "Set the first position of the currently selected\nbox to the player's position");
     public static final ConfigHotkey SET_SELECTION_BOX_POSITION_2       = new ConfigHotkey("setSelectionBoxPosition2",          "",     "Set the second position of the currently selected\nbox to the player's position");
@@ -93,6 +96,7 @@ public class Hotkeys
             ADD_SELECTION_BOX,
             CLONE_SELECTION,
             DELETE_SELECTION_BOX,
+            DUPLICATE_PLACEMENT,
             EASY_PLACE_ACTIVATION,
             EASY_PLACE_TOGGLE,
             EXECUTE_OPERATION,
@@ -123,6 +127,7 @@ public class Hotkeys
             PICK_BLOCK_LAST,
             PICK_BLOCK_TOGGLE,
             PICK_BLOCK_TOGGLE_AUTO,
+            REMOVE_SELECTED_PLACEMENT,
             RENDER_INFO_OVERLAY,
             RENDER_OVERLAY_THROUGH_BLOCKS,
             RERENDER_SCHEMATIC,
@@ -146,6 +151,7 @@ public class Hotkeys
             SELECTION_MODE_CYCLE,
             SELECTION_SHRINK,
             SET_AREA_ORIGIN,
+            SET_HELD_ITEM_AS_TOOL,
             SET_SCHEMATIC_PREVIEW,
             SET_SELECTION_BOX_POSITION_1,
             SET_SELECTION_BOX_POSITION_2,

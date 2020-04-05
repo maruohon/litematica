@@ -251,6 +251,19 @@ public class SchematicPlacementManager
         this.addSchematicPlacement(placement, printMessages, false);
     }
 
+    public boolean duplicateSelectedPlacement()
+    {
+        SchematicPlacementUnloaded placement = this.getSelectedSchematicPlacement();
+
+        if (placement != null)
+        {
+            this.duplicateSchematicPlacement(placement);
+            return true;
+        }
+
+        return false;
+    }
+
     public void duplicateSchematicPlacement(SchematicPlacementUnloaded placement)
     {
         if (placement.isLoaded())
@@ -348,6 +361,19 @@ public class SchematicPlacementManager
         {
             InfoUtils.showGuiAndInGameMessage(MessageType.ERROR, "litematica.error.duplicate_schematic_placement");
         }
+    }
+
+    public boolean removeSelectedSchematicPlacement()
+    {
+        SchematicPlacementUnloaded placement = this.getSelectedSchematicPlacement();
+
+        if (placement != null)
+        {
+            this.removeSchematicPlacement(placement);
+            return true;
+        }
+
+        return false;
     }
 
     public boolean removeSchematicPlacement(SchematicPlacementUnloaded placement)
