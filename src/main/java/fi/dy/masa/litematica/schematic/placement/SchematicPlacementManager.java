@@ -367,6 +367,12 @@ public class SchematicPlacementManager
         if (placement.isLoaded())
         {
             SchematicPlacement loadedPlacement = (SchematicPlacement) placement;
+
+            if (loadedPlacement.hasVerifier())
+            {
+                loadedPlacement.getSchematicVerifier().reset();
+            }
+
             boolean ret = this.schematicPlacements.remove(loadedPlacement);
 
             this.gridManager.onPlacementRemoved(loadedPlacement);
