@@ -82,9 +82,9 @@ litematica.error.structure_write_to_file_failed.exists=Failed to write the struc
 litematica.hotkeys.category.generic_hotkeys=Generic hotkeys
 
 litematica.info.schematic_load.schematic_loaded=Schematic '%s' successfully loaded to memory
-litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the button to cancel a pending preview operation
-litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot=Use the normal screenshot key to set the preview.\nOr right click the Set preview button to cancel setting the preview.
-litematica.info.schematic_manager.preview.success=Preview image successfully set
+litematica.info.schematic_manager.preview.info=Use the '%s' hotkey ['%s'] to set the schematic preview.\nOr right click the Set preview button to cancel the preview task.
+litematica.info.schematic_manager.preview.right_click_to_cancel=Right click the button to cancel a pending preview task
+litematica.info.schematic_manager.preview.success=Schematic preview image successfully set
 
 litematica.gui.button.area_editor.analyze_area=Analyze Area
 litematica.gui.button.area_editor.change_corner_mode=Corner Mode: %s

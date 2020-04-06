@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ScreenShotHelper;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
@@ -250,7 +251,9 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 {
                     previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
                     GuiBase.openGui(null);
-                    InfoUtils.showGuiAndInGameMessage(MessageType.INFO, "litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot");
+                    String hotkeyName = Hotkeys.SET_SCHEMATIC_PREVIEW.getName();
+                    String hotkeyValue = Hotkeys.SET_SCHEMATIC_PREVIEW.getKeybind().getKeysDisplayString();
+                    InfoUtils.showGuiAndInGameMessage(MessageType.INFO, 8000, "litematica.info.schematic_manager.preview.info", hotkeyName, hotkeyValue);
                 }
                 else
                 {
