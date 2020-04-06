@@ -6,9 +6,11 @@ import fi.dy.masa.malilib.util.JsonUtils;
 
 public class ToolModeData
 {
-    public static final DeleteModeData DELETE = new DeleteModeData();
+    // TODO change these into a nicer system with something like INamedJsonSerializable
+    public static final ActionTargetData DELETE = new ActionTargetData();
+    public static final ActionTargetData UPDATE_BLOCKS = new ActionTargetData();
 
-    public static class DeleteModeData
+    public static class ActionTargetData
     {
         private boolean usePlacement;
 

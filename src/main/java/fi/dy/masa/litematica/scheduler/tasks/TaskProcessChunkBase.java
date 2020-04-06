@@ -26,6 +26,8 @@ public abstract class TaskProcessChunkBase extends TaskBase
 
     protected TaskProcessChunkBase(String nameOnHud)
     {
+        super();
+
         this.worldClient = this.mc.world;
         this.world = WorldUtils.getBestWorld(this.mc);
         this.isClientWorld = (this.world == this.mc.world);
@@ -46,9 +48,13 @@ public abstract class TaskProcessChunkBase extends TaskBase
             {
                 ChunkPos pos = iter.next();
 
-                if (this.canProcessChunk(pos))
+                if (this.canProcessChunk(pos) == false)
                 {
-                    this.processChunk(pos);
+                    continue;
+                }
+
+                if (this.processChunk(pos))
+                {
                     iter.remove();
                     processed++;
                 }

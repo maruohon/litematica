@@ -389,6 +389,7 @@ litematica.gui.label.task_name.fill=Fill task
 litematica.gui.label.task_name.material_list=Material List
 litematica.gui.label.task_name.paste=Paste Schematic
 litematica.gui.label.task_name.save_schematic=Save Schematic
+litematica.gui.label.task_name.update_blocks=Update Blocks
 litematica.gui.label.task_name.verifier=Verifier
 
 litematica.gui.message.confirm_file_deletion=Do you want to delete the file '%s'?
@@ -531,6 +532,7 @@ litematica.message.error.schematic_save.missing_container=One of the data contai
 litematica.message.error.schematic_save.missing_entity_list=Entity list not found for sub-region '%s'
 litematica.message.error.schematic_save_no_area_selected=§cSchematic saving failed - no area selected§r
 litematica.message.error.schematic_write.schematica.palette.invalid_id=SchematicaSchematic: Block id %s for block '%s' is out of range, max = %s
+litematica.message.error.update_blocks_aborted=Aborted updating the blocks in the area
 
 litematica.message.added_selection_box=Added a new selection box at %s
 litematica.message.area_clear_fail=§cFailed to clear the area(s)§r
@@ -538,6 +540,7 @@ litematica.message.area_cleared=Area cleared
 litematica.message.area_filled=Area filled
 litematica.message.area_fill_fail=Failed to fill the area
 litematica.message.area_selections.selection_created_from_placement=Created a new selection from placement '%s'
+litematica.message.blocks_updated=Updated the blocks within the area
 litematica.message.duplicated_selected_placement=Duplicated the selected placement
 litematica.message.easy_place_fail=Action prevented by the Easy Place mode
 litematica.message.grabbed_element_for_moving=Grabbed an element to move

@@ -76,6 +76,7 @@ public class HotkeyCallbacks
         Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeybind().setCallback(hotkeyCallbackMisc);
         Hotkeys.UNLOAD_CURRENT_SCHEMATIC.getKeybind().setCallback(hotkeyCallbackMisc);
+        Hotkeys.UPDATE_BLOCKS.getKeybind().setCallback(hotkeyCallbackMisc);
 
         Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().setCallback(new RenderToggle(Configs.Visuals.ENABLE_RENDERING));
         Hotkeys.TOGGLE_SCHEMATIC_RENDERING.getKeybind().setCallback(new RenderToggle(Configs.Visuals.ENABLE_SCHEMATIC_RENDERING));

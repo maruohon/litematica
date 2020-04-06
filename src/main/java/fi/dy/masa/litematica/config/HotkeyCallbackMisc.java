@@ -403,6 +403,11 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
             DataManager.getSchematicPlacementManager().unloadCurrentlySelectedSchematic();
             return true;
         }
+        else if (key == Hotkeys.UPDATE_BLOCKS.getKeybind())
+        {
+            ToolUtils.updateSelectionVolumes(this.mc);
+            return true;
+        }
 
         return false;
     }

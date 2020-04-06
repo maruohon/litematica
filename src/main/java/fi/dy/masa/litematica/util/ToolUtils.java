@@ -20,6 +20,7 @@ import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicDirect;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkBase;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
+import fi.dy.masa.litematica.scheduler.tasks.TaskUpdateBlocks;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
@@ -160,6 +161,57 @@ public class ToolUtils
                 }
 
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
+
+                InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.empty_area_selection");
+            }
+        }
+        else
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+        }
+    }
+
+    public static void updateSelectionVolumes(Minecraft mc)
+    {
+        AreaSelection area = null;
+
+        if (ToolModeData.UPDATE_BLOCKS.getUsePlacement())
+        {
+            SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
+
+            if (placement != null)
+            {
+                area = AreaSelection.fromPlacement(placement);
+            }
+        }
+        else
+        {
+            area = DataManager.getSelectionManager().getCurrentSelection();
+        }
+
+        updateSelectionVolumes(area, mc);
+    }
+
+    public static void updateSelectionVolumes(@Nullable final AreaSelection area, Minecraft mc)
+    {
+        if (mc.player != null && mc.player.capabilities.isCreativeMode && mc.isSingleplayer())
+        {
+            if (area == null)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                return;
+            }
+
+            if (area.getAllSubRegionBoxes().size() > 0)
+            {
+                SelectionBox currentBox = area.getSelectedSubRegionBox();
+                final ImmutableList<SelectionBox> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
+                TaskUpdateBlocks task = new TaskUpdateBlocks(boxes);
+                TaskScheduler.getInstanceServer().scheduleTask(task, 20);
 
                 InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
             }

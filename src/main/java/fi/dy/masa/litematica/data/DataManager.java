@@ -373,6 +373,7 @@ public class DataManager implements IDirectoryCache
     {
         JsonObject obj = new JsonObject();
         obj.add("delete", ToolModeData.DELETE.toJson());
+        obj.add("update_blocks", ToolModeData.UPDATE_BLOCKS.toJson());
         return obj;
     }
 
@@ -381,6 +382,11 @@ public class DataManager implements IDirectoryCache
         if (JsonUtils.hasObject(obj, "delete"))
         {
             ToolModeData.DELETE.fromJson(obj.get("delete").getAsJsonObject());
+        }
+
+        if (JsonUtils.hasObject(obj, "update_blocks"))
+        {
+            ToolModeData.UPDATE_BLOCKS.fromJson(obj.get("update_blocks").getAsJsonObject());
         }
     }
 

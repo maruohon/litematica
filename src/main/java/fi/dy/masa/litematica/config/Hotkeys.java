@@ -91,6 +91,7 @@ public class Hotkeys
     public static final ConfigHotkey TOOL_SELECT_MODIFIER_BLOCK_1       = new ConfigHotkey("toolSelectModifierBlock1",          "LMENU", KeybindSettings.MODIFIER_INGAME, "The modifier key to hold while using the 'toolSelectElements'\nhotkey, to select the primary block type to use in some of the tool modes");
     public static final ConfigHotkey TOOL_SELECT_MODIFIER_BLOCK_2       = new ConfigHotkey("toolSelectModifierBlock2",          "LSHIFT", KeybindSettings.MODIFIER_INGAME, "The modifier key to hold while using the 'toolSelectElements'\nhotkey, to select the secondary block type to use in some of the tool modes");
     public static final ConfigHotkey UNLOAD_CURRENT_SCHEMATIC           = new ConfigHotkey("unloadCurrentSchematic",            "",    "Unloads the schematic of the currently selected placement,and thus also removes all placements created from it\n");
+    public static final ConfigHotkey UPDATE_BLOCKS                      = new ConfigHotkey("updateBlocks",                      "",    "Updates all the blocks inside the current area selection.\n(So basically causes a block update for each position.)");
 
     public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
             ADD_SELECTION_BOX,
@@ -176,6 +177,7 @@ public class Hotkeys
             TOOL_SELECT_ELEMENTS,
             TOOL_SELECT_MODIFIER_BLOCK_1,
             TOOL_SELECT_MODIFIER_BLOCK_2,
-            UNLOAD_CURRENT_SCHEMATIC
+            UNLOAD_CURRENT_SCHEMATIC,
+            UPDATE_BLOCKS
     );
 }
