@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.event;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 
 public class WorldLoadListener implements IWorldLoadListener
 {
@@ -15,7 +15,8 @@ public class WorldLoadListener implements IWorldLoadListener
         // Save the settings before the integrated server gets shut down
         if (worldBefore != null)
         {
-            DataManager.save();
+            boolean isDimensionChange = worldAfter != null;
+            DataManager.save(isDimensionChange);
         }
     }
 
@@ -26,7 +27,8 @@ public class WorldLoadListener implements IWorldLoadListener
 
         if (worldAfter != null)
         {
-            DataManager.load();
+            boolean isDimensionChange = worldBefore != null;
+            DataManager.load(isDimensionChange);
         }
         else
         {

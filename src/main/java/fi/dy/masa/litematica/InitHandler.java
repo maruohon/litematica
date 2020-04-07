@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.HotkeyCallbacks;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.data.FileMigrationUtils;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.event.WorldLoadListener;
@@ -36,6 +37,8 @@ public class InitHandler implements IInitializationHandler
         WorldLoadListener listener = new WorldLoadListener();
         WorldLoadHandler.getInstance().registerWorldLoadPreHandler(listener);
         WorldLoadHandler.getInstance().registerWorldLoadPostHandler(listener);
+
+        FileMigrationUtils.tryMigrateOldPerWorldData();
 
         HotkeyCallbacks.init(Minecraft.getMinecraft());
         StatusInfoRenderer.init();

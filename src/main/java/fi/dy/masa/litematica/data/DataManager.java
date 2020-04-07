@@ -21,7 +21,6 @@ import fi.dy.masa.litematica.LiteModLitematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiConfigs;
-import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -52,6 +51,7 @@ public class DataManager implements IDirectoryCache
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)$");
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
 
+    private static ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static IConfigGuiTab configGuiTab = GuiConfigs.VISUALS;
     private static boolean canSave;
@@ -61,7 +61,6 @@ public class DataManager implements IDirectoryCache
     private final SchematicPlacementManager schematicPlacementManager = new SchematicPlacementManager();
     private final SchematicProjectsManager schematicProjectsManager = new SchematicProjectsManager();
     private LayerRange renderRange = new LayerRange(SchematicWorldRenderingNotifier.INSTANCE);
-    private ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private AreaSelectionSimple areaSimple = new AreaSelectionSimple(true);
     @Nullable
     private MaterialListBase materialList;
@@ -146,12 +145,12 @@ public class DataManager implements IDirectoryCache
 
     public static ToolMode getToolMode()
     {
-        return getInstance().operationMode;
+        return operationMode;
     }
 
     public static void setToolMode(ToolMode mode)
     {
-        getInstance().operationMode = mode;
+        operationMode = mode;
     }
 
     public static LayerRange getRenderLayerRange()
@@ -177,11 +176,43 @@ public class DataManager implements IDirectoryCache
         LAST_DIRECTORIES.put(context, dir);
     }
 
-    public static void load()
+    public static void clear()
     {
-        LAST_DIRECTORIES.clear();
+        TaskScheduler.getInstanceClient().clearTasks();
+        SchematicVerifier.clearActiveVerifiers();
+        InfoHud.getInstance().reset(); // remove the line providers and clear the data
+
+        getInstance().clearData(true);
+    }
+
+    private void clearData(boolean isLogout)
+    {
+        this.selectionManager.clear();
+        this.schematicPlacementManager.clear();
+        this.schematicProjectsManager.clear();
+        this.areaSimple = new AreaSelectionSimple(true);
+
+        if (isLogout || (this.materialList != null && this.materialList.isForPlacement()))
+        {
+            setMaterialList(null);
+        }
+    }
+
+    public static void load(boolean isDimensionChange)
+    {
+        if (isDimensionChange == false)
+        {
+            loadPerWorldData();
+        }
 
         getInstance().loadPerDimensionData();
+
+        canSave = true;
+    }
+
+    private static void loadPerWorldData()
+    {
+        LAST_DIRECTORIES.clear();
 
         File file = getCurrentStorageFile(true);
         JsonElement element = JsonUtils.parseJsonFile(file);
@@ -189,6 +220,21 @@ public class DataManager implements IDirectoryCache
         if (element != null && element.isJsonObject())
         {
             JsonObject root = element.getAsJsonObject();
+
+            if (JsonUtils.hasString(root, "config_gui_tab"))
+            {
+                configGuiTab = IConfigGuiTab.getTabByNameOrDefault(root.get("config_gui_tab").getAsString(), GuiConfigs.TABS, GuiConfigs.VISUALS);
+            }
+
+            if (JsonUtils.hasString(root, "operation_mode"))
+            {
+                operationMode = ToolMode.fromString(root.get("operation_mode").getAsString());
+            }
+
+            if (JsonUtils.hasObject(root, "tool_mode_data"))
+            {
+                toolModeDataFromJson(root.get("tool_mode_data").getAsJsonObject());
+            }
 
             if (JsonUtils.hasObject(root, "last_directories"))
             {
@@ -210,86 +256,6 @@ public class DataManager implements IDirectoryCache
                     }
                 }
             }
-
-            if (JsonUtils.hasString(root, "config_gui_tab"))
-            {
-                configGuiTab = GuiConfigs.VISUALS;
-                String tabName = root.get("config_gui_tab").getAsString();
-
-                for (IConfigGuiTab tab : GuiConfigs.TABS)
-                {
-                    if (tabName.equalsIgnoreCase(tab.getName()))
-                    {
-                        configGuiTab = tab;
-                        break;
-                    }
-                }
-            }
-        }
-
-        canSave = true;
-    }
-
-    public static void save()
-    {
-        save(false);
-        MaterialCache.getInstance().writeToFile();
-    }
-
-    public static void save(boolean forceSave)
-    {
-        if (canSave == false && forceSave == false)
-        {
-            return;
-        }
-
-        getInstance().savePerDimensionData();
-
-        JsonObject root = new JsonObject();
-        JsonObject objDirs = new JsonObject();
-
-        for (Map.Entry<String, File> entry : LAST_DIRECTORIES.entrySet())
-        {
-            objDirs.add(entry.getKey(), new JsonPrimitive(entry.getValue().getAbsolutePath()));
-        }
-
-        root.add("last_directories", objDirs);
-        root.add("config_gui_tab", new JsonPrimitive(configGuiTab.getName()));
-
-        File file = getCurrentStorageFile(true);
-        JsonUtils.writeJsonToFile(root, file);
-
-        canSave = false;
-    }
-
-    public static void clear()
-    {
-        TaskScheduler.getInstanceClient().clearTasks();
-        SchematicVerifier.clearActiveVerifiers();
-        InfoHud.getInstance().reset(); // remove the line providers and clear the data
-
-        getInstance().clearData(true);
-    }
-
-    private void savePerDimensionData()
-    {
-        this.schematicProjectsManager.saveCurrentProject();
-        JsonObject root = this.toJson();
-
-        File file = getCurrentStorageFile(false);
-        JsonUtils.writeJsonToFile(root, file);
-    }
-
-    private void clearData(boolean isLogout)
-    {
-        this.selectionManager.clear();
-        this.schematicPlacementManager.clear();
-        this.schematicProjectsManager.clear();
-        this.areaSimple = new AreaSelectionSimple(true);
-
-        if (isLogout || (this.materialList != null && this.materialList.isForPlacement()))
-        {
-            setMaterialList(null);
         }
     }
 
@@ -329,29 +295,54 @@ public class DataManager implements IDirectoryCache
             this.renderRange = LayerRange.createFromJson(JsonUtils.getNestedObject(obj, "render_range", false), SchematicWorldRenderingNotifier.INSTANCE);
         }
 
-        if (JsonUtils.hasString(obj, "operation_mode"))
-        {
-            try
-            {
-                this.operationMode = ToolMode.valueOf(obj.get("operation_mode").getAsString());
-            }
-            catch (Exception e) {}
-
-            if (this.operationMode == null)
-            {
-                this.operationMode = ToolMode.AREA_SELECTION;
-            }
-        }
-
         if (JsonUtils.hasObject(obj, "area_simple"))
         {
             this.areaSimple = AreaSelectionSimple.fromJson(obj.get("area_simple").getAsJsonObject());
         }
+    }
 
-        if (JsonUtils.hasObject(obj, "tool_mode_data"))
+    public static void save(boolean isDimensionChange)
+    {
+        if (canSave == false)
         {
-            this.toolModeDataFromJson(obj.get("tool_mode_data").getAsJsonObject());
+            return;
         }
+
+        getInstance().savePerDimensionData();
+
+        if (isDimensionChange == false)
+        {
+            savePerWorldData();
+        }
+
+        canSave = false;
+    }
+
+    private static void savePerWorldData()
+    {
+        JsonObject root = new JsonObject();
+        JsonObject objDirs = new JsonObject();
+
+        for (Map.Entry<String, File> entry : LAST_DIRECTORIES.entrySet())
+        {
+            objDirs.add(entry.getKey(), new JsonPrimitive(entry.getValue().getAbsolutePath()));
+        }
+
+        root.add("config_gui_tab", new JsonPrimitive(configGuiTab.getName()));
+        root.add("operation_mode", new JsonPrimitive(operationMode.name()));
+        root.add("tool_mode_data", toolModeDataToJson());
+        root.add("last_directories", objDirs);
+
+        File file = getCurrentStorageFile(true);
+        JsonUtils.writeJsonToFile(root, file);
+    }
+
+    private void savePerDimensionData()
+    {
+        this.schematicProjectsManager.saveCurrentProject();
+
+        File file = getCurrentStorageFile(false);
+        JsonUtils.writeJsonToFile(this.toJson(), file);
     }
 
     private JsonObject toJson()
@@ -361,15 +352,13 @@ public class DataManager implements IDirectoryCache
         obj.add("selections", this.selectionManager.toJson());
         obj.add("placements", this.schematicPlacementManager.toJson());
         obj.add("schematic_projects_manager", this.schematicProjectsManager.toJson());
-        obj.add("operation_mode", new JsonPrimitive(this.operationMode.name()));
         obj.add("render_range", this.renderRange.toJson());
         obj.add("area_simple", this.areaSimple.toJson());
-        obj.add("tool_mode_data", this.toolModeDataToJson());
 
         return obj;
     }
 
-    private JsonObject toolModeDataToJson()
+    private static JsonObject toolModeDataToJson()
     {
         JsonObject obj = new JsonObject();
         obj.add("delete", ToolModeData.DELETE.toJson());
@@ -377,7 +366,7 @@ public class DataManager implements IDirectoryCache
         return obj;
     }
 
-    private void toolModeDataFromJson(JsonObject obj)
+    private static void toolModeDataFromJson(JsonObject obj)
     {
         if (JsonUtils.hasObject(obj, "delete"))
         {
@@ -442,9 +431,37 @@ public class DataManager implements IDirectoryCache
         return dir;
     }
 
+    public static File getPerWorldDataBaseDirectory()
+    {
+        return getDataBaseDirectory("world_specific_data");
+    }
+
+    public static File getDataBaseDirectory(String dirName)
+    {
+        File dir = new File(new File(FileUtils.getMinecraftDirectory(), "litematica"), dirName);
+
+        if (dir.exists() == false && dir.mkdirs() == false)
+        {
+            InfoUtils.printErrorMessage("Failed to create directory '%s'", dir.getAbsolutePath());
+        }
+
+        return dir;
+    }
+
     private static File getCurrentStorageFile(boolean globalData)
     {
-        File dir = getCurrentConfigDirectory();
+        File dir;
+        String worldName = StringUtils.getWorldOrServerName();
+
+        if (worldName != null)
+        {
+            dir = new File(getPerWorldDataBaseDirectory(), worldName);
+        }
+        // Fall back to a common set of files at the base directory
+        else
+        {
+            dir = getPerWorldDataBaseDirectory();
+        }
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
@@ -457,21 +474,7 @@ public class DataManager implements IDirectoryCache
     private static String getStorageFileName(boolean globalData)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        String name = StringUtils.getWorldOrServerName();
-
-        if (name != null)
-        {
-            if (globalData)
-            {
-                return Reference.MOD_ID + "_" + name + ".json";
-            }
-            else
-            {
-                return Reference.MOD_ID + "_" + name + "_dim" + WorldUtils.getDimensionId(mc.world) + ".json";
-            }
-        }
-
-        return Reference.MOD_ID + "_default.json";
+        return globalData ? "data_common.json" : "data_dim_" + WorldUtils.getDimensionId(mc.world) + ".json";
     }
 
     public static void setToolItem(String itemNameIn)

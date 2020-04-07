@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.tool;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public enum ToolMode
 {
@@ -123,5 +123,17 @@ public enum ToolMode
         }
 
         return this;
+    }
+
+    public static ToolMode fromString(String name)
+    {
+        ToolMode mode = ToolMode.valueOf(name);
+
+        if (mode == null)
+        {
+            mode = AREA_SELECTION;
+        }
+
+        return mode;
     }
 }
