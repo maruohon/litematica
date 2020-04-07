@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
@@ -30,7 +29,6 @@ import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
 import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
-import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
@@ -288,7 +286,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
                     break;
 
                 case WRITE_TO_FILE:
-                    File dir = new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
+                    File dir = DataManager.getDataBaseDirectory("material_lists");
                     boolean csv = GuiBase.isShiftDown();
                     String ext = csv ? ".csv" : ".txt";
                     File file = DataDump.dumpDataToFile(dir, "material_list", ext, this.getMaterialListDump(materialList, csv).getLines());
