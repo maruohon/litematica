@@ -397,7 +397,18 @@ public class DataManager implements IDirectoryCache
 
     public static File getSchematicsBaseDirectory()
     {
-        File dir = FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics"));
+        boolean custom = Configs.Generic.CUSTOM_SCHEMATIC_DIRECTORY_ENABLED.getBooleanValue();
+        File dir = null;
+
+        if (custom)
+        {
+            dir = Configs.Generic.CUSTOM_SCHEMATIC_DIRECTORY.getFile();
+        }
+
+        if (custom == false || dir == null)
+        {
+            dir = FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics"));
+        }
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {

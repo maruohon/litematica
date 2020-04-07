@@ -20,8 +20,8 @@ public class WidgetSchematicPlacementBrowser extends WidgetFileBrowserBase
 
     public WidgetSchematicPlacementBrowser(int x, int y, int width, int height, GuiSchematicPlacementFileBrowser parent)
     {
-        super(x, y, width, height, DataManager.getDirectoryCache(), parent.getBrowserContext(),
-                parent.getDefaultDirectory(), null);
+        super(x, y, width, height, parent.getDefaultDirectory(), SchematicPlacementUnloaded.getSaveDirectory(),
+                DataManager.getDirectoryCache(), parent.getBrowserContext(), null);
 
         this.browserEntryHeight = 22;
         this.allowKeyboardNavigation = false;
@@ -72,12 +72,6 @@ public class WidgetSchematicPlacementBrowser extends WidgetFileBrowserBase
         {
             return ImmutableList.of(fileName);
         }
-    }
-
-    @Override
-    protected File getRootDirectory()
-    {
-        return SchematicPlacementUnloaded.getSaveDirectory();
     }
 
     @Override

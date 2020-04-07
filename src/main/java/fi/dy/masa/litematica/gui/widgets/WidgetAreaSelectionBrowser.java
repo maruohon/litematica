@@ -16,8 +16,8 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     public WidgetAreaSelectionBrowser(int x, int y, int width, int height,
             GuiAreaSelectionManager parent, ISelectionListener<DirectoryEntry> selectionListener)
     {
-        super(x, y, width, height, DataManager.getDirectoryCache(), parent.getBrowserContext(),
-                parent.getDefaultDirectory(), selectionListener);
+        super(x, y, width, height, parent.getDefaultDirectory(), DataManager.getAreaSelectionsBaseDirectory(),
+                DataManager.getDirectoryCache(), parent.getBrowserContext(), selectionListener);
 
         this.browserEntryHeight = 22;
         this.guiAreaSelectionManager = parent;
@@ -27,12 +27,6 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     public GuiAreaSelectionManager getSelectionManagerGui()
     {
         return this.guiAreaSelectionManager;
-    }
-
-    @Override
-    protected File getRootDirectory()
-    {
-        return DataManager.getAreaSelectionsBaseDirectory();
     }
 
     @Override

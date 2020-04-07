@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.io.File;
 import java.io.FileFilter;
 import javax.annotation.Nullable;
 import net.minecraft.util.math.BlockPos;
@@ -22,19 +21,13 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
 
     public WidgetSchematicProjectBrowser(int x, int y, int width, int height, ISelectionListener<DirectoryEntry> selectionListener)
     {
-        super(x, y, width, height, DataManager.getDirectoryCache(), "version_control",
-                DataManager.getSchematicsBaseDirectory(), null);
+        super(x, y, width, height, DataManager.getSchematicsBaseDirectory(), DataManager.getSchematicsBaseDirectory(),
+                DataManager.getDirectoryCache(), "version_control", null);
 
         this.selectionListener = selectionListener;
         this.browserEntryHeight = 14;
         this.infoWidth = 170;
         this.setSelectionListener(this);
-    }
-
-    @Override
-    protected File getRootDirectory()
-    {
-        return DataManager.getSchematicsBaseDirectory();
     }
 
     @Override

@@ -41,8 +41,8 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
 
     public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
-        super(x, y, width, height, DataManager.getDirectoryCache(), parent.getBrowserContext(),
-                parent.getDefaultDirectory(), null);
+        super(x, y, width, height, parent.getDefaultDirectory(), DataManager.getSchematicsBaseDirectory(),
+                DataManager.getDirectoryCache(), parent.getBrowserContext(), null);
 
         this.parentSelectionListener = selectionListener;
         this.infoWidth = 170;
@@ -64,12 +64,6 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
         super.onGuiClosed();
 
         this.clearSchematicMetadataCache();
-    }
-
-    @Override
-    protected File getRootDirectory()
-    {
-        return DataManager.getSchematicsBaseDirectory();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.config;
 
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.malilib.config.IConfigHandler;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
+import fi.dy.masa.malilib.config.options.ConfigDirectory;
 import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigOptionList;
@@ -20,6 +22,7 @@ import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.config.options.IConfigBase;
 import fi.dy.masa.malilib.config.values.HudAlignment;
 import fi.dy.masa.malilib.config.values.InfoType;
+import fi.dy.masa.malilib.util.FileUtils;
 
 public class Configs implements IConfigHandler
 {
@@ -29,6 +32,8 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       BETTER_RENDER_ORDER     = new ConfigBoolean(    "betterRenderOrder", true, "If enabled, then the schematic rendering is done\nby injecting the different render call into the vanilla\nrendering code. This should result in better translucent block\nrendering/ordering and schematic blocks not getting rendered\nthrough the client world blocks/terrain.\nIf the rendering doesn't work (for example with Optifine),\ntry disabling this option.");
         public static final ConfigBoolean       CHANGE_SELECTED_CORNER  = new ConfigBoolean(    "changeSelectedCornerOnMove", true, "If true, then the selected corner of an area selection\nis always set to the last moved corner,\nwhen using the set corner hotkeys");
         public static final ConfigBoolean       CLONE_AT_ORIGINAL_POS   = new ConfigBoolean(    "cloneAtOriginalPosition", false, "If enabled, then using the Clone Area hotkey will create\nthe placement at the original area selection position,\ninstead of at the player's current position");
+        public static final ConfigBoolean       CUSTOM_SCHEMATIC_DIRECTORY_ENABLED = new ConfigBoolean("customSchematicDirectoryEnabled", false, "If enabled, then the directory set in 'customSchematicDirectory'\nwill be used as the root/base schematic directory,\ninstead of the normal '.minecraft/schematics/' directory");
+        public static final ConfigDirectory     CUSTOM_SCHEMATIC_DIRECTORY = new ConfigDirectory("customSchematicDirectory", FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics")), "The root/base schematic directory to use, if 'customSchematicDirectoryEnabled' is enabled");
         public static final ConfigBoolean       EASY_PLACE_CLICK_ADJACENT = new ConfigBoolean(  "easyPlaceClickAdjacent", false, "If enabled, then the Easy Place mode will try to\nclick on existing adjacent blocks. This may help on Spigot\nor similar servers, which don't allow clicking on air blocks.");
         public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place that block in that position");
         public static final ConfigBoolean       EASY_PLACE_HOLD_ENABLED = new ConfigBoolean(    "easyPlaceHoldEnabled", false, "When enabled, then simply holding down the use key\nand looking at different schematic blocks will place them");
@@ -60,6 +65,7 @@ public class Configs implements IConfigHandler
                 BETTER_RENDER_ORDER,
                 CHANGE_SELECTED_CORNER,
                 CLONE_AT_ORIGINAL_POS,
+                CUSTOM_SCHEMATIC_DIRECTORY_ENABLED,
                 EASY_PLACE_CLICK_ADJACENT,
                 EASY_PLACE_MODE,
                 EASY_PLACE_HOLD_ENABLED,
@@ -81,6 +87,7 @@ public class Configs implements IConfigHandler
                 PASTE_REPLACE_BEHAVIOR,
                 SELECTION_CORNERS_MODE,
 
+                CUSTOM_SCHEMATIC_DIRECTORY,
                 PASTE_COMMAND_INTERVAL,
                 PASTE_COMMAND_LIMIT,
                 PASTE_COMMAND_SETBLOCK,
