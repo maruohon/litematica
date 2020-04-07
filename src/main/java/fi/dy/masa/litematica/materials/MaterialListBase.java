@@ -25,7 +25,7 @@ public abstract class MaterialListBase implements IMaterialList
     protected BlockInfoListType materialListType = BlockInfoListType.ALL;
     protected boolean reverse;
     protected boolean hideAvailable;
-    protected int multiplier = 1;
+    protected long multiplier = 1L;
     protected long countTotal;
     protected long countMissing;
     protected long countMismatched;
@@ -92,7 +92,7 @@ public abstract class MaterialListBase implements IMaterialList
         for (int i = 0; i < this.materialListPreFiltered.size(); ++i)
         {
             MaterialListEntry entry = this.materialListPreFiltered.get(i);
-            int countMissing = this.getMultipliedMissingCount(entry);
+            long countMissing = this.getMultipliedMissingCount(entry);
 
             if (entry.getCountAvailable() < countMissing)
             {
@@ -108,15 +108,15 @@ public abstract class MaterialListBase implements IMaterialList
         }
     }
 
-    public int getMultipliedMissingCount(MaterialListEntry entry)
+    public long getMultipliedMissingCount(MaterialListEntry entry)
     {
-        int multiplier = this.getMultiplier();
-        int missing = entry.getCountMissing();
+        long multiplier = this.getMultiplier();
+        long missing = entry.getCountMissing();
 
-        if (multiplier > 1)
+        if (multiplier > 1L)
         {
-            int total = entry.getCountTotal();
-            return (multiplier - 1) * total + missing;
+            long total = entry.getCountTotal();
+            return (multiplier - 1L) * total + missing;
         }
 
         return missing;
@@ -186,7 +186,7 @@ public abstract class MaterialListBase implements IMaterialList
         return this.hideAvailable;
     }
 
-    public int getMultiplier()
+    public long getMultiplier()
     {
         return this.multiplier;
     }

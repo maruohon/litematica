@@ -11,7 +11,7 @@ import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 
-public class TaskCountBlocksPlacement extends TaskCountBlocksBase
+public class TaskCountBlocksPlacement extends TaskCountBlocksMaterialList
 {
     protected final SchematicPlacement schematicPlacement;
     protected final WorldSchematic worldSchematic;
@@ -34,6 +34,7 @@ public class TaskCountBlocksPlacement extends TaskCountBlocksBase
         return super.canExecute() && this.worldSchematic != null;
     }
 
+    @Override
     protected void countAtPosition(BlockPos pos)
     {
         IBlockState stateSchematic = this.worldSchematic.getBlockState(pos).getActualState(this.worldSchematic, pos);

@@ -118,8 +118,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         {
             MaterialListEntry entry = list.get(i);
             maxTextLength = Math.max(maxTextLength, font.getStringWidth(entry.getStack().getDisplayName()));
-            int multiplier = this.materialList.getMultiplier();
-            int count = multiplier == 1 ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
+            long multiplier = this.materialList.getMultiplier();
+            long count = multiplier == 1L ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
             count *= multiplier;
             String strCount = GuiBase.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + GuiBase.TXT_RST;
             maxCountLength = Math.max(maxCountLength, font.getStringWidth(strCount));
@@ -179,8 +179,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         {
             MaterialListEntry entry = list.get(i);
             String text = entry.getStack().getDisplayName();
-            int multiplier = this.materialList.getMultiplier();
-            int count = multiplier == 1 ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
+            long multiplier = this.materialList.getMultiplier();
+            long count = multiplier == 1L ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
             count *= multiplier;
             String strCount = this.getFormattedCountString(count, entry.getStack().getMaxStackSize());
             int cntLen = font.getStringWidth(strCount);
@@ -225,10 +225,10 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         return contentHeight + 4;
     }
 
-    protected String getFormattedCountString(int count, int maxStackSize)
+    protected String getFormattedCountString(long count, int maxStackSize)
     {
-        int stacks = count / maxStackSize;
-        int remainder = count % maxStackSize;
+        long stacks = count / maxStackSize;
+        long remainder = count % maxStackSize;
         double boxCount = (double) count / (27D * maxStackSize);
 
         if (count > maxStackSize)
@@ -304,10 +304,10 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                 // The item in the slot is on the material list's missing items list
                 if (entry != null)
                 {
-                    int available = entry.getCountAvailable();
+                    long available = entry.getCountAvailable();
                     Color4f color;
 
-                    if (available == 0)
+                    if (available == 0L)
                     {
                         color = Configs.Colors.MATERIAL_LIST_SLOT_HL_NONE.getColor();
                     }

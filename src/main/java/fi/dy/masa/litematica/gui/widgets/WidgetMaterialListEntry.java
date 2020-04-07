@@ -80,7 +80,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         return this.addButton(new ButtonGeneric(xRight, y, -1, true, label), listener).getX();
     }
 
-    public static void setMaxNameLength(List<MaterialListEntry> materials, int multiplier)
+    public static void setMaxNameLength(List<MaterialListEntry> materials, long multiplier)
     {
         maxNameLength   = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]) + GuiBase.TXT_RST);
         maxCountLength1 = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]) + GuiBase.TXT_RST);
@@ -89,8 +89,8 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
 
         for (MaterialListEntry entry : materials)
         {
-            int countTotal = entry.getCountTotal() * multiplier;
-            int countMissing = multiplier == 1 ? entry.getCountMissing() : countTotal;
+            long countTotal = entry.getCountTotal() * multiplier;
+            long countMissing = multiplier == 1L ? entry.getCountMissing() : countTotal;
 
             maxNameLength   = Math.max(maxNameLength,   StringUtils.getStringWidth(entry.getStack().getDisplayName()));
             maxCountLength1 = Math.max(maxCountLength1, StringUtils.getStringWidth(String.valueOf(countTotal)));
@@ -220,10 +220,10 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         }
         else if (this.entry != null)
         {
-            int multiplier = this.materialList.getMultiplier();
-            int countTotal = this.entry.getCountTotal() * multiplier;
-            int countMissing = this.materialList.getMultipliedMissingCount(this.entry);
-            int countAvailable = this.entry.getCountAvailable();
+            long multiplier = this.materialList.getMultiplier();
+            long countTotal = this.entry.getCountTotal() * multiplier;
+            long countMissing = this.materialList.getMultipliedMissingCount(this.entry);
+            long countAvailable = this.entry.getCountAvailable();
             String green = GuiBase.TXT_GREEN;
             String gold = GuiBase.TXT_GOLD;
             String red = GuiBase.TXT_RED;
@@ -273,9 +273,9 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
 
             ItemStack stack = this.entry.getStack();
             String stackName = stack.getDisplayName();
-            int multiplier = this.materialList.getMultiplier();
-            int total = this.entry.getCountTotal() * multiplier;
-            int missing = this.materialList.getMultipliedMissingCount(this.entry);
+            long multiplier = this.materialList.getMultiplier();
+            long total = this.entry.getCountTotal() * multiplier;
+            long missing = this.materialList.getMultipliedMissingCount(this.entry);
             String strCountTotal = this.getFormattedCountString(total, stack.getMaxStackSize());
             String strCountMissing = this.getFormattedCountString(missing, stack.getMaxStackSize());
 
@@ -328,10 +328,10 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         }
     }
 
-    private String getFormattedCountString(int total, int maxStackSize)
+    private String getFormattedCountString(long total, int maxStackSize)
     {
-        int stacks = total / maxStackSize;
-        int remainder = total % maxStackSize;
+        long stacks = total / maxStackSize;
+        long remainder = total % maxStackSize;
         double boxCount = (double) total / (27D * maxStackSize);
         String strCount;
 
@@ -339,7 +339,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         {
             if (maxStackSize > 1)
             {
-                if (remainder > 0)
+                if (remainder > 0L)
                 {
                     strCount = String.format("%d = %d x %d + %d = %.2f %s", total, stacks, maxStackSize, remainder, boxCount, this.shulkerBoxAbbr);
                 }

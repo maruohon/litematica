@@ -306,7 +306,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         private DataDump getMaterialListDump(MaterialListBase materialList, boolean csv)
         {
             DataDump dump = new DataDump(4, csv ? DataDump.Format.CSV : DataDump.Format.ASCII);
-            int multiplier = materialList.getMultiplier();
+            long multiplier = materialList.getMultiplier();
 
             ArrayList<MaterialListEntry> list = new ArrayList<>();
             list.addAll(materialList.getMaterialsFiltered(false));
@@ -314,13 +314,13 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
             for (MaterialListEntry entry : list)
             {
-                int total = entry.getCountTotal() * multiplier;
-                int missing = multiplier > 1 ? total : entry.getCountMissing();
-                int available = entry.getCountAvailable();
+                long total = entry.getCountTotal() * multiplier;
+                long missing = multiplier > 1L ? total : entry.getCountMissing();
+                long available = entry.getCountAvailable();
                 dump.addData(entry.getStack().getDisplayName(), String.valueOf(total), String.valueOf(missing), String.valueOf(available));
             }
 
-            String titleTotal = multiplier > 1 ? String.format("Total (x%d)", multiplier) : "Total";
+            String titleTotal = multiplier > 1L ? String.format("Total (x%d)", multiplier) : "Total";
             dump.addTitle("Item", titleTotal, "Missing", "Available");
             dump.addHeader(materialList.getTitle());
             dump.setColumnProperties(1, DataDump.Alignment.RIGHT, true); // total

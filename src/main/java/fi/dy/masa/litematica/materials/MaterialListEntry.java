@@ -1,17 +1,17 @@
 package fi.dy.masa.litematica.materials;
 
-import fi.dy.masa.malilib.util.ItemType;
 import net.minecraft.item.ItemStack;
+import fi.dy.masa.malilib.util.ItemType;
 
 public class MaterialListEntry
 {
     private final ItemType item;
-    private final int countTotal;
-    private final int countMissing;
-    private final int countMismatched;
-    private int countAvailable;
+    private final long countTotal;
+    private final long countMissing;
+    private final long countMismatched;
+    private long countAvailable;
 
-    public MaterialListEntry(ItemStack stack, int countTotal, int countMissing, int countMismatched, int countAvailable)
+    public MaterialListEntry(ItemStack stack, long countTotal, long countMissing, long countMismatched, long countAvailable)
     {
         this.item = new ItemType(stack, false, false);
         this.countTotal = countTotal;
@@ -34,7 +34,7 @@ public class MaterialListEntry
      * Returns the total number of required items of this type in the counted area.
      * @return
      */
-    public int getCountTotal()
+    public long getCountTotal()
     {
         return this.countTotal;
     }
@@ -44,22 +44,22 @@ public class MaterialListEntry
      * in the counted area for this item type.
      * @return
      */
-    public int getCountMissing()
+    public long getCountMissing()
     {
         return this.countMissing;
     }
 
-    public int getCountMismatched()
+    public long getCountMismatched()
     {
         return this.countMismatched;
     }
 
-    public int getCountAvailable()
+    public long getCountAvailable()
     {
         return this.countAvailable;
     }
 
-    public void setCountAvailable(int countAvailable)
+    public void setCountAvailable(long countAvailable)
     {
         this.countAvailable = countAvailable;
     }

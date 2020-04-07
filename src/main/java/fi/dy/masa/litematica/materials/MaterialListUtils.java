@@ -16,6 +16,7 @@ import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.ItemType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 
 public class MaterialListUtils
 {
@@ -26,7 +27,7 @@ public class MaterialListUtils
 
     public static List<MaterialListEntry> createMaterialListFor(ISchematic schematic, Collection<String> subRegions)
     {
-        Object2IntOpenHashMap<IBlockState> countsTotal = new Object2IntOpenHashMap<>();
+        Object2LongOpenHashMap<IBlockState> countsTotal = new Object2LongOpenHashMap<>();
 
         for (String regionName : subRegions)
         {
@@ -72,13 +73,13 @@ public class MaterialListUtils
 
         Minecraft mc = Minecraft.getMinecraft();
 
-        return getMaterialList(countsTotal, countsTotal, new Object2IntOpenHashMap<>(), mc.player);
+        return getMaterialList(countsTotal, countsTotal, new Object2LongOpenHashMap<>(), mc.player);
     }
 
     public static List<MaterialListEntry> getMaterialList(
-            Object2IntOpenHashMap<IBlockState> countsTotal,
-            Object2IntOpenHashMap<IBlockState> countsMissing,
-            Object2IntOpenHashMap<IBlockState> countsMismatch,
+            Object2LongOpenHashMap<IBlockState> countsTotal,
+            Object2LongOpenHashMap<IBlockState> countsMissing,
+            Object2LongOpenHashMap<IBlockState> countsMismatch,
             EntityPlayer player)
     {
         List<MaterialListEntry> list = new ArrayList<>();
@@ -86,9 +87,9 @@ public class MaterialListUtils
         if (countsTotal.isEmpty() == false)
         {
             MaterialCache cache = MaterialCache.getInstance();
-            Object2IntOpenHashMap<ItemType> itemTypesTotal = new Object2IntOpenHashMap<>();
-            Object2IntOpenHashMap<ItemType> itemTypesMissing = new Object2IntOpenHashMap<>();
-            Object2IntOpenHashMap<ItemType> itemTypesMismatch = new Object2IntOpenHashMap<>();
+            Object2LongOpenHashMap<ItemType> itemTypesTotal = new Object2LongOpenHashMap<>();
+            Object2LongOpenHashMap<ItemType> itemTypesMissing = new Object2LongOpenHashMap<>();
+            Object2LongOpenHashMap<ItemType> itemTypesMismatch = new Object2LongOpenHashMap<>();
 
             convertStatesToStacks(countsTotal, itemTypesTotal, cache);
             convertStatesToStacks(countsMissing, itemTypesMissing, cache);
@@ -99,9 +100,9 @@ public class MaterialListUtils
             for (ItemType type : itemTypesTotal.keySet())
             {
                 list.add(new MaterialListEntry(type.getStack().copy(),
-                        itemTypesTotal.getInt(type),
-                        itemTypesMissing.getInt(type),
-                        itemTypesMismatch.getInt(type),
+                        itemTypesTotal.getLong(type),
+                        itemTypesMissing.getLong(type),
+                        itemTypesMismatch.getLong(type),
                         playerInvItems.getInt(type)));
             }
         }
@@ -110,8 +111,8 @@ public class MaterialListUtils
     }
 
     private static void convertStatesToStacks(
-            Object2IntOpenHashMap<IBlockState> blockStatesIn,
-            Object2IntOpenHashMap<ItemType> itemTypesOut,
+            Object2LongOpenHashMap<IBlockState> blockStatesIn,
+            Object2LongOpenHashMap<ItemType> itemTypesOut,
             MaterialCache cache)
     {
         // Convert from counts per IBlockState to counts per different stacks
@@ -122,7 +123,7 @@ public class MaterialListUtils
                 for (ItemStack stack : cache.getItems(state))
                 {
                     ItemType type = new ItemType(stack, false, true);
-                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
+                    itemTypesOut.addTo(type, blockStatesIn.getLong(state) * stack.getCount());
                 }
             }
             else
@@ -132,7 +133,7 @@ public class MaterialListUtils
                 if (stack.isEmpty() == false)
                 {
                     ItemType type = new ItemType(stack, false, true);
-                    itemTypesOut.addTo(type, blockStatesIn.getInt(state) * stack.getCount());
+                    itemTypesOut.addTo(type, blockStatesIn.getLong(state) * stack.getCount());
                 }
             }
         }

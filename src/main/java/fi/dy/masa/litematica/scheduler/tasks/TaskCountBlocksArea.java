@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
-import fi.dy.masa.litematica.materials.IMaterialList;
-import fi.dy.masa.litematica.selection.AreaSelection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
+import fi.dy.masa.litematica.materials.IMaterialList;
+import fi.dy.masa.litematica.selection.AreaSelection;
 
-public class TaskCountBlocksArea extends TaskCountBlocksBase
+public class TaskCountBlocksArea extends TaskCountBlocksMaterialList
 {
     protected final AreaSelection selection;
 
@@ -18,6 +18,7 @@ public class TaskCountBlocksArea extends TaskCountBlocksBase
         this.updateInfoHudLinesMissingChunks(this.requiredChunks);
     }
 
+    @Override
     protected void countAtPosition(BlockPos pos)
     {
         IBlockState stateClient = this.worldClient.getBlockState(pos).getActualState(this.worldClient, pos);
