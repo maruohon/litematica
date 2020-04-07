@@ -1,15 +1,15 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import java.io.File;
 import java.io.FileFilter;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
+import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
 {
-    public static final FileFilter JSON_FILTER = new FileFilterJson();
+    public static final FileFilter JSON_FILTER = (file) -> file.getName().endsWith(".json");
 
     private final GuiAreaSelectionManager guiAreaSelectionManager;
 
@@ -36,18 +36,15 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     }
 
     @Override
+    protected String getRootDirectoryDisplayName()
+    {
+        return StringUtils.translate("litematica.gui.label.area_selection_browser.selections");
+    }
+
+    @Override
     protected WidgetAreaSelectionEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, DirectoryEntry entry)
     {
         return new WidgetAreaSelectionEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), isOdd,
                 entry, listIndex, this.guiAreaSelectionManager.getSelectionManager(), this, this.iconProvider);
-    }
-
-    public static class FileFilterJson implements FileFilter
-    {
-        @Override
-        public boolean accept(File pathName)
-        {
-            return pathName.getName().endsWith(".json");
-        }
     }
 }

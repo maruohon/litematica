@@ -7,12 +7,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.LiteModLitematica;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.FileUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.BlockDoor;
@@ -38,6 +32,12 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.util.WorldUtils;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.FileUtils;
 
 public class MaterialCache
 {
@@ -62,10 +62,12 @@ public class MaterialCache
 
     public static MaterialCache getInstance()
     {
+        /*
         if (INSTANCE.hasReadFromFile == false)
         {
             INSTANCE.readFromFile();
         }
+        */
 
         return INSTANCE;
     }

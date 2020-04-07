@@ -254,6 +254,7 @@ litematica.gui.label.area_editor.pos1=Corner 1
 litematica.gui.label.area_editor.pos2=Corner 2
 litematica.gui.label.area_editor.sub_regions=Sub-regions (%s)
 
+litematica.gui.label.area_selection_browser.selections=selections
 litematica.gui.label.area_selection_manager.current_selection=§7Selected area: §b%s
 
 litematica.gui.label.area_selection.hover.box_count=§7Boxes: §6%d

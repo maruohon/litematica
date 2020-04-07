@@ -12,6 +12,7 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
@@ -616,10 +617,8 @@ public class SchematicPlacementUnloaded
 
     public static File getSaveDirectory()
     {
-        String sep = File.separator;
         String worldAndDimPath = getWorldAndDimPath();
-        String path = "litematica" + sep + "placements" + sep + worldAndDimPath;
-        File dir = new File(FileUtils.getMinecraftDirectory(), path);
+        File dir = new File(DataManager.getDataBaseDirectory("placements"), worldAndDimPath);
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {

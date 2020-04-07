@@ -411,16 +411,17 @@ public class DataManager implements IDirectoryCache
     {
         File dir;
         String name = StringUtils.getWorldOrServerName();
+        File baseDir = getDataBaseDirectory("area_selections");
 
         if (Configs.Generic.AREAS_PER_WORLD.getBooleanValue() && name != null)
         {
             // The 'area_selections' sub-directory is to prevent showing the world name or server IP in the browser,
             // as the root directory name is shown in the navigation widget
-            dir = FileUtils.getCanonicalFileIfPossible(new File(new File(new File(getCurrentConfigDirectory(), "area_selections_per_world"), name), "area_selections"));
+            dir = FileUtils.getCanonicalFileIfPossible(new File(new File(baseDir, "per_world"), name));
         }
         else
         {
-            dir = FileUtils.getCanonicalFileIfPossible(new File(getCurrentConfigDirectory(), "area_selections"));
+            dir = FileUtils.getCanonicalFileIfPossible(new File(baseDir, "global"));
         }
 
         if (dir.exists() == false && dir.mkdirs() == false)

@@ -339,8 +339,7 @@ public class SelectionManager
 
     public boolean createNewSubRegion(Minecraft mc, boolean printMessage)
     {
-        SelectionManager sm = DataManager.getSelectionManager();
-        AreaSelection selection = sm.getCurrentSelection();
+        AreaSelection selection = this.getCurrentSelection();
 
         if (selection != null && mc.player != null)
         {
@@ -363,8 +362,7 @@ public class SelectionManager
 
     public boolean createNewSubRegionIfDoesntExist(String name, Minecraft mc, IMessageConsumer feedback)
     {
-        SelectionManager sm = DataManager.getSelectionManager();
-        AreaSelection selection = sm.getCurrentSelection();
+        AreaSelection selection = this.getCurrentSelection();
 
         if (selection != null && mc.player != null)
         {

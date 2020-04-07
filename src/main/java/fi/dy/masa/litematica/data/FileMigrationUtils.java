@@ -76,4 +76,71 @@ public class FileMigrationUtils
             }
         }
     }
+
+    public static void tryMigrateOldAreaSelections()
+    {
+        File oldDirPerWorldBase = new File(DataManager.getCurrentConfigDirectory(), "area_selections_per_world");
+        File newDirPerWorldBase = new File(DataManager.getDataBaseDirectory("area_selections"), "per_world");
+
+        if (oldDirPerWorldBase.exists() && oldDirPerWorldBase.isDirectory() && oldDirPerWorldBase.canRead())
+        {
+            if (newDirPerWorldBase.exists() == false && newDirPerWorldBase.mkdirs() == false)
+            {
+                InfoUtils.printErrorMessage("Failed to create directory '" + newDirPerWorldBase.getAbsolutePath() + "'");
+            }
+            else
+            {
+                for (File file : oldDirPerWorldBase.listFiles((f) -> f.isDirectory()))
+                {
+                    File oldDir = new File(file, "area_selections");
+
+                    if (oldDir.exists() && oldDir.isDirectory() && oldDir.canRead())
+                    {
+                        File newDir = new File(newDirPerWorldBase, file.getName());
+
+                        if (newDir.exists() == false)
+                        {
+                            try
+                            {
+                                System.out.printf("Moving '%s' => '%s'\n", oldDir, newDir);
+                                Files.move(oldDir, newDir);
+                            }
+                            catch (Exception e)
+                            {
+                                InfoUtils.printErrorMessage("Failed to move directory '" + oldDir.getAbsolutePath() + "' to '" + newDir.getAbsolutePath() + "'");
+                            }
+                        }
+
+                        if (file.list().length == 0)
+                        {
+                            System.out.printf("Deleting '%s'\n", file);
+                            file.delete();
+                        }
+                    }
+                }
+
+                if (oldDirPerWorldBase.list().length == 0)
+                {
+                    System.out.printf("Deleting '%s'\n", oldDirPerWorldBase);
+                    oldDirPerWorldBase.delete();
+                }
+            }
+        }
+
+        File oldDirGlobal = new File(DataManager.getCurrentConfigDirectory(), "area_selections");
+        File newDirGlobal = new File(DataManager.getDataBaseDirectory("area_selections"), "global");
+
+        if (oldDirGlobal.exists() && oldDirGlobal.isDirectory() && oldDirGlobal.canRead() && newDirGlobal.exists() == false)
+        {
+            try
+            {
+                System.out.printf("Moving '%s' => '%s'\n", oldDirGlobal, newDirGlobal);
+                Files.move(oldDirGlobal, newDirGlobal);
+            }
+            catch (Exception e)
+            {
+                InfoUtils.printErrorMessage("Failed to move directory '" + oldDirGlobal.getAbsolutePath() + "' to '" + newDirGlobal.getAbsolutePath() + "'");
+            }
+        }
+    }
 }

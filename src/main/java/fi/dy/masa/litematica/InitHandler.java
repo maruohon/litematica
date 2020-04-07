@@ -39,6 +39,7 @@ public class InitHandler implements IInitializationHandler
         WorldLoadHandler.getInstance().registerWorldLoadPostHandler(listener);
 
         FileMigrationUtils.tryMigrateOldPerWorldData();
+        FileMigrationUtils.tryMigrateOldAreaSelections();
 
         HotkeyCallbacks.init(Minecraft.getMinecraft());
         StatusInfoRenderer.init();
