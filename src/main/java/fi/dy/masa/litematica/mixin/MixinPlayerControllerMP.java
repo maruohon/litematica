@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.util.EasyPlaceUtils;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.InventoryUtils;
@@ -30,8 +29,7 @@ public abstract class MixinPlayerControllerMP
         // Prevent recursion, since the Easy Place mode can call this code again
         if (EasyPlaceUtils.isHandling() == false)
         {
-            if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-                Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
+            if (EasyPlaceUtils.shouldDoEasyPlaceActions())
             {
                 if (EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, true))
                 {
@@ -69,8 +67,7 @@ public abstract class MixinPlayerControllerMP
         // Prevent recursion, since the Easy Place mode can call this code again
         if (EasyPlaceUtils.isHandling() == false)
         {
-            if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-                Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() &&
+            if (EasyPlaceUtils.shouldDoEasyPlaceActions() &&
                 EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, true))
             {
                 cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);

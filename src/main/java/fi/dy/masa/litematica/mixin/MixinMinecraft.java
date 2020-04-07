@@ -4,8 +4,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.util.SchematicEditUtils;
 import fi.dy.masa.litematica.util.EasyPlaceUtils;
@@ -17,8 +15,7 @@ public abstract class MixinMinecraft
             target = "Lnet/minecraft/client/Minecraft;rightClickMouse()V"))
     private void onRightClickMouse(CallbackInfo ci)
     {
-        if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
+        if (EasyPlaceUtils.shouldDoEasyPlaceActions())
         {
             EasyPlaceUtils.setIsFirstClick(true);
         }
@@ -37,8 +34,7 @@ public abstract class MixinMinecraft
     @Inject(method = "rightClickMouse", at = @At("TAIL"))
     private void onRightClickMouseTail(CallbackInfo ci)
     {
-        if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
+        if (EasyPlaceUtils.shouldDoEasyPlaceActions())
         {
             EasyPlaceUtils.onRightClickTail((net.minecraft.client.Minecraft)(Object) this);
         }

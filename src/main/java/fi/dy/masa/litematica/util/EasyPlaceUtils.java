@@ -32,6 +32,7 @@ import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.gui.util.Message.MessageType;
@@ -95,12 +96,17 @@ public class EasyPlaceUtils
         return val.booleanValue();
     }
 
+    public static boolean shouldDoEasyPlaceActions()
+    {
+        return Configs.Generic.EASY_PLACE_MODE.getBooleanValue() && DataManager.getToolMode() != ToolMode.REBUILD &&
+               Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld();
+    }
+
     public static void easyPlaceOnUseTick(Minecraft mc)
     {
         if (mc.player != null && isHandling == false &&
+            shouldDoEasyPlaceActions() &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
-            Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() &&
             KeybindMulti.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
         {
             isHandling = true;
@@ -620,7 +626,7 @@ public class EasyPlaceUtils
         return false;
     }
 
-    public static boolean isPositionWithinRangeOfSchematicRegions(BlockPos pos, int range)
+    private static boolean isPositionWithinRangeOfSchematicRegions(BlockPos pos, int range)
     {
         SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
         final int minCX = (pos.getX() - range) >> 4;
@@ -659,7 +665,7 @@ public class EasyPlaceUtils
         return false;
     }
 
-    public static boolean easyPlaceIsPositionCached(BlockPos pos)
+    private static boolean easyPlaceIsPositionCached(BlockPos pos)
     {
         long currentTime = System.nanoTime();
         boolean cached = false;
