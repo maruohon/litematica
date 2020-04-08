@@ -15,17 +15,17 @@ import net.minecraft.server.WorldGenerationProgressListenerFactory;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.UserCache;
-import net.minecraft.world.level.storage.LevelStorage.class_5143;
+import net.minecraft.world.level.storage.LevelStorage.Session;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer extends MinecraftServer
 {
-    private MixinIntegratedServer(class_5143 arg, Proxy proxy, DataFixer dataFixer, CommandManager commandManager,
+    private MixinIntegratedServer(Session session, Proxy proxy, DataFixer dataFixer, CommandManager commandManager,
             MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository,
             UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory)
     {
-        super(arg, proxy, dataFixer, commandManager, minecraftSessionService, gameProfileRepository, userCache,
+        super(session, proxy, dataFixer, commandManager, minecraftSessionService, gameProfileRepository, userCache,
                 worldGenerationProgressListenerFactory);
     }
 
