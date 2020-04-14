@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.block.BlockState;
@@ -73,9 +74,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     @Override
     public boolean canExecute()
     {
-        // Only use this command-based task in multiplayer
-        return this.boxesInChunks.isEmpty() == false && this.mc.world != null &&
-               this.mc.player != null && this.mc.isIntegratedServerRunning() == false;
+        return this.boxesInChunks.isEmpty() == false && this.mc.world != null && this.mc.player != null;
     }
 
     @Override
@@ -271,7 +270,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                 String nbtString = nbt.toString();
                 */
 
-                String strCommand = String.format("/summon %s %f %f %f", id, entity.getX(), entity.getY(), entity.getZ());
+                String strCommand = String.format(Locale.ROOT, "/summon %s %f %f %f", id, entity.getX(), entity.getY(), entity.getZ());
                 /*
                 String strCommand = String.format("/summon %s %f %f %f %s", entityName, entity.posX, entity.posY, entity.posZ, nbtString);
                 System.out.printf("entity: %s\n", entity);

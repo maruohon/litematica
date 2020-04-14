@@ -593,6 +593,11 @@ public class WorldRendererSchematic
 
     public BakedModel getModelForState(BlockState state)
     {
+        if (state.getRenderType() == BlockRenderType.ENTITYBLOCK_ANIMATED)
+        {
+            return this.blockRenderManager.getModels().getModelManager().getMissingModel();
+        }
+
         return this.blockRenderManager.getModel(state);
     }
 

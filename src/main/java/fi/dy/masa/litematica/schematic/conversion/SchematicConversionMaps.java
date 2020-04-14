@@ -7,6 +7,7 @@ import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.Dynamic;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.LogBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.datafixer.TypeReferences;
@@ -14,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.util.math.Direction;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -98,6 +100,15 @@ public class SchematicConversionMaps
         BlockState air = Blocks.AIR.getDefaultState();
         BLOCKSTATE_TO_ID_META.put(air, 0);
         ID_META_TO_BLOCKSTATE.put(0, air);
+
+        int idOldLog = (17 << 4) | 12;
+        int idNewLog = (162 << 4) | 12;
+        ID_META_TO_BLOCKSTATE.put(idOldLog | 0, Blocks.OAK_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idOldLog | 1, Blocks.SPRUCE_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idOldLog | 2, Blocks.BIRCH_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idOldLog | 3, Blocks.JUNGLE_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idNewLog | 0, Blocks.ACACIA_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idNewLog | 1, Blocks.DARK_OAK_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
 
         // These will get converted to the correct type in the state fixers
         ID_META_TO_UPDATED_NAME.put(1648, "minecraft:melon");
