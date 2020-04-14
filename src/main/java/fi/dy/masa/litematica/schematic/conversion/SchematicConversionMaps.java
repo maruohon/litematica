@@ -7,7 +7,7 @@ import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.Dynamic;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.LogBlock;
+import net.minecraft.block.PillarBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.datafixer.TypeReferences;
@@ -103,12 +103,12 @@ public class SchematicConversionMaps
 
         int idOldLog = (17 << 4) | 12;
         int idNewLog = (162 << 4) | 12;
-        ID_META_TO_BLOCKSTATE.put(idOldLog | 0, Blocks.OAK_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
-        ID_META_TO_BLOCKSTATE.put(idOldLog | 1, Blocks.SPRUCE_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
-        ID_META_TO_BLOCKSTATE.put(idOldLog | 2, Blocks.BIRCH_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
-        ID_META_TO_BLOCKSTATE.put(idOldLog | 3, Blocks.JUNGLE_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
-        ID_META_TO_BLOCKSTATE.put(idNewLog | 0, Blocks.ACACIA_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
-        ID_META_TO_BLOCKSTATE.put(idNewLog | 1, Blocks.DARK_OAK_WOOD.getDefaultState().with(LogBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idOldLog | 0, Blocks.OAK_WOOD.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idOldLog | 1, Blocks.SPRUCE_WOOD.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idOldLog | 2, Blocks.BIRCH_WOOD.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idOldLog | 3, Blocks.JUNGLE_WOOD.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idNewLog | 0, Blocks.ACACIA_WOOD.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.Y));
+        ID_META_TO_BLOCKSTATE.put(idNewLog | 1, Blocks.DARK_OAK_WOOD.getDefaultState().with(PillarBlock.AXIS, Direction.Axis.Y));
 
         // These will get converted to the correct type in the state fixers
         ID_META_TO_UPDATED_NAME.put(1648, "minecraft:melon");
