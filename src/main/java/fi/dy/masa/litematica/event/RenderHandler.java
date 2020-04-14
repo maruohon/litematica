@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.event;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import fi.dy.masa.litematica.config.Configs;
@@ -22,17 +21,12 @@ public class RenderHandler implements IRenderer
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
-            RenderSystem.pushMatrix();
-            RenderSystem.multMatrix(matrices.peek().getModel());
-
             OverlayRenderer.getInstance().renderBoxes(matrices, partialTicks);
 
             if (Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue())
             {
                 OverlayRenderer.getInstance().renderSchematicVerifierMismatches(matrices, partialTicks);
             }
-
-            RenderSystem.popMatrix();
 
             if (DataManager.getToolMode() == ToolMode.REBUILD)
             {
