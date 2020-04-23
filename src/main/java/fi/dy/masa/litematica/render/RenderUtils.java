@@ -438,7 +438,7 @@ public class RenderUtils
      */
     public static void drawBlockModelOutlinesBatched(BakedModel model, BlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
-        for (final Direction side : PositionUtils.FACING_ALL)
+        for (final Direction side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
         {
             renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, RAND));
         }
@@ -487,7 +487,7 @@ public class RenderUtils
 
     public static void drawBlockModelQuadOverlayBatched(BakedModel model, BlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
-        for (final Direction side : PositionUtils.FACING_ALL)
+        for (final Direction side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
         {
             renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, RAND));
         }

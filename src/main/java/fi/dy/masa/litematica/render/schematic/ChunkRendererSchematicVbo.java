@@ -451,7 +451,7 @@ public class ChunkRendererSchematicVbo
 
                 for (int i = 0; i < 6; ++i)
                 {
-                    Direction side = PositionUtils.FACING_ALL[i];
+                    Direction side = fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS[i];
                     posMutable.set(pos.getX() + side.getOffsetX(), pos.getY() + side.getOffsetY(), pos.getZ() + side.getOffsetZ());
                     BlockState adjStateSchematic = this.schematicWorldView.getBlockState(posMutable);
                     BlockState adjStateClient    = this.clientWorldView.getBlockState(posMutable);
