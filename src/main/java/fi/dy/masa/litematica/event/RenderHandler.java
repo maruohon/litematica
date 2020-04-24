@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica.event;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import fi.dy.masa.litematica.config.Configs;
@@ -22,8 +21,6 @@ public class RenderHandler implements IRenderer
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
-            RenderSystem.pushMatrix();
-            RenderSystem.multMatrix(matrices.peek().getModel());
 
             OverlayRenderer.getInstance().renderBoxes(matrices, partialTicks);
 
@@ -31,8 +28,6 @@ public class RenderHandler implements IRenderer
             {
                 OverlayRenderer.getInstance().renderSchematicVerifierMismatches(matrices, partialTicks);
             }
-
-            RenderSystem.popMatrix();
 
             if (DataManager.getToolMode() == ToolMode.REBUILD)
             {
@@ -42,19 +37,19 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderGameOverlayPost(float partialTicks)
+    public void onRenderGameOverlayPost(float partialTicks, MatrixStack matrixStack)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
             // The Info HUD renderers can decide if they want to be rendered in GUIs
-            InfoHud.getInstance().renderHud();
+            InfoHud.getInstance().renderHud(matrixStack);
 
             if (GuiUtils.getCurrentScreen() == null)
             {
-                ToolHud.getInstance().renderHud();
-                OverlayRenderer.getInstance().renderHoverInfo(mc);
+                ToolHud.getInstance().renderHud(matrixStack);
+                OverlayRenderer.getInstance().renderHoverInfo(mc, matrixStack);
 
                 if (GuiSchematicManager.hasPendingPreviewTask())
                 {

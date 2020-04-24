@@ -20,6 +20,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
 public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
@@ -70,16 +71,16 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         if (this.entry.getType() == DirectoryEntryType.FILE && FileType.fromFile(this.entry.getFullPath()) == FileType.JSON)
         {
             selected = this.entry.getFullPath().getAbsolutePath().equals(this.selectionManager.getCurrentNormalSelectionId());
-            super.render(mouseX, mouseY, selected);
+            super.render(mouseX, mouseY, selected, matrixStack);
         }
         else
         {
-            super.render(mouseX, mouseY, selected);
+            super.render(mouseX, mouseY, selected, matrixStack);
         }
     }
 
@@ -97,7 +98,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         List<String> text = new ArrayList<>();
         AreaSelection selection = this.selectionManager.getOrLoadSelectionReadOnly(this.getDirectoryEntry().getFullPath().getAbsolutePath());
@@ -128,7 +129,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, text);
+            RenderUtils.drawHoverText(mouseX, mouseY, text, matrixStack);
         }
     }
 

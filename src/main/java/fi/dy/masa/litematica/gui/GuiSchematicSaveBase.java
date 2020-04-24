@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.KeyCodes;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.util.math.MatrixStack;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
@@ -131,11 +132,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.drawContents(mouseX, mouseY, partialTicks);
+        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
 
-        this.textField.render(mouseX, mouseY, partialTicks);
+        this.textField.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override

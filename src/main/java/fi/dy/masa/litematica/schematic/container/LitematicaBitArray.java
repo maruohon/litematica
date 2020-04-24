@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
-import net.minecraft.util.math.MathHelper;
 
 public class LitematicaBitArray
 {
@@ -17,6 +16,7 @@ public class LitematicaBitArray
     private final long maxEntryValue;
     /** Number of entries in this array (<b>not</b> the length of the long array that internally backs this array) */
     private final int arraySize;
+    private final int storageLength;
 
     public LitematicaBitArray(int bitsPerEntryIn, int arraySizeIn)
     {
@@ -29,14 +29,14 @@ public class LitematicaBitArray
         this.arraySize = arraySizeIn;
         this.bitsPerEntry = bitsPerEntryIn;
         this.maxEntryValue = (1L << bitsPerEntryIn) - 1L;
-
+        this.storageLength = (char)(64 / bitsPerEntryIn);
         if (longArrayIn != null)
         {
             this.longArray = longArrayIn;
         }
         else
         {
-            this.longArray = new long[MathHelper.roundUp(arraySizeIn * bitsPerEntryIn, 64) / 64];
+            this.longArray = new long[(arraySizeIn + this.storageLength - 1) / this.storageLength];
         }
     }
 

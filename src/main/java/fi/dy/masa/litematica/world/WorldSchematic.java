@@ -6,6 +6,7 @@ import java.util.IdentityHashMap;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import net.minecraft.class_5217;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -25,7 +26,6 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.LevelInfo;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 
@@ -36,7 +36,7 @@ public class WorldSchematic extends ClientWorld
     private ChunkProviderSchematic chunkProviderSchematic;
     private int nextEntityId;
 
-    public WorldSchematic(ClientPlayNetworkHandler netHandler, LevelInfo settings,
+    public WorldSchematic(ClientPlayNetworkHandler netHandler, class_5217 settings,
             DimensionType dimType, Supplier<Profiler> profilerIn)
     {
         super(netHandler, settings, dimType, 1, profilerIn, null);

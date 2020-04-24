@@ -16,6 +16,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
 public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
@@ -58,7 +59,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -84,13 +85,13 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0, 0.001f);
         }
 
-        this.drawString(this.x + 2, this.y + 7, 0xFFFFFFFF, this.entry);
+        this.drawString(this.x + 2, this.y + 7, 0xFFFFFFFF, this.entry, matrixStack);
 
-        super.render(mouseX, mouseY, selected);
+        super.render(mouseX, mouseY, selected, matrixStack);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         List<String> text = new ArrayList<>();
 
@@ -123,7 +124,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, text);
+            RenderUtils.drawHoverText(mouseX, mouseY, text, matrixStack);
         }
     }
 

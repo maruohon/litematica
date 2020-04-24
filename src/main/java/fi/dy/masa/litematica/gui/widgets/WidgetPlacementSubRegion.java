@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
@@ -77,7 +78,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -107,7 +108,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
 
         String name = this.placement.getName();
         String pre = this.placement.isEnabled() ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
-        this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name);
+        this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name, matrixStack);
 
         Icons icon;
 
@@ -131,11 +132,11 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             icon.renderAt(this.buttonsStartX - icon.getWidth() - 2, this.y + 6, this.zLevel, false, false);
         }
 
-        super.render(mouseX, mouseY, placementSelected);
+        super.render(mouseX, mouseY, placementSelected, matrixStack);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         LitematicaSchematic schematic = this.schematicPlacement.getSchematic();
         File schematicFile = schematic.getFile();
@@ -145,7 +146,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 25, this.y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_sub_region_modified");
-            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str), matrixStack);
         }
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 14, this.height))
         {
@@ -167,7 +168,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
                 text.add(StringUtils.translate("litematica.gui.label.placement_sub.region_size", strSize));
             }
 
-            RenderUtils.drawHoverText(mouseX, mouseY, text);
+            RenderUtils.drawHoverText(mouseX, mouseY, text, matrixStack);
         }
     }
 

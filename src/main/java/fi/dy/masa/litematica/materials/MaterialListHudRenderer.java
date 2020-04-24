@@ -5,6 +5,7 @@ import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
@@ -57,7 +58,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     }
 
     @Override
-    public int render(int xOffset, int yOffset, HudAlignment alignment)
+    public int render(int xOffset, int yOffset, HudAlignment alignment, MatrixStack matrixStack)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
         long currentTime = System.currentTimeMillis();
@@ -151,11 +152,11 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         if (useShadow)
         {
-            font.drawWithShadow(title, posX + 2, posY + 2, textColor);
+            font.drawWithShadow(matrixStack, title, posX + 2, posY + 2, textColor);
         }
         else
         {
-            font.draw(title, posX + 2, posY + 2, textColor);
+            font.draw(matrixStack, title, posX + 2, posY + 2, textColor);
         }
 
         posY += 12;
@@ -176,13 +177,13 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
             if (useShadow)
             {
-                font.drawWithShadow(text, x, y, textColor);
-                font.drawWithShadow(strCount, cntPosX, y, itemCountTextColor);
+                font.drawWithShadow(matrixStack, text, x, y, textColor);
+                font.drawWithShadow(matrixStack, strCount, cntPosX, y, itemCountTextColor);
             }
             else
             {
-                font.draw(text, x, y, textColor);
-                font.draw(strCount, cntPosX, y, itemCountTextColor);
+                font.draw(matrixStack, text, x, y, textColor);
+                font.draw(matrixStack, strCount, cntPosX, y, itemCountTextColor);
             }
 
             y += lineHeight;
