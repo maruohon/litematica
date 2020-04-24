@@ -185,8 +185,9 @@ public class WorldUtils
 
             return litematicaSchematic;
         }
-        catch (Throwable t)
+        catch (Exception e)
         {
+            feedback.setString("Exception while trying to load the vanilla structure: " + e.getMessage());
         }
 
         return null;
