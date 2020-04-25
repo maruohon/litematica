@@ -16,7 +16,6 @@ public class LitematicaBitArray
     private final long maxEntryValue;
     /** Number of entries in this array (<b>not</b> the length of the long array that internally backs this array) */
     private final int arraySize;
-    private final int storageLength;
 
     public LitematicaBitArray(int bitsPerEntryIn, int arraySizeIn)
     {
@@ -29,14 +28,14 @@ public class LitematicaBitArray
         this.arraySize = arraySizeIn;
         this.bitsPerEntry = bitsPerEntryIn;
         this.maxEntryValue = (1L << bitsPerEntryIn) - 1L;
-        this.storageLength = (char)(64 / bitsPerEntryIn);
+
         if (longArrayIn != null)
         {
             this.longArray = longArrayIn;
         }
         else
         {
-            this.longArray = new long[(arraySizeIn + this.storageLength - 1) / this.storageLength];
+            this.longArray = new long[roundUp(arraySizeIn * bitsPerEntryIn, 64) / 64];
         }
     }
 
@@ -85,5 +84,28 @@ public class LitematicaBitArray
     public int size()
     {
         return this.arraySize;
+    }
+
+    public static int roundUp(int value, int interval)
+    {
+        if (interval == 0)
+        {
+            return 0;
+        }
+        else if (value == 0)
+        {
+            return interval;
+        }
+        else
+        {
+            if (value < 0)
+            {
+                interval *= -1;
+            }
+
+            int remainder = value % interval;
+
+            return remainder == 0 ? value : value + interval - remainder;
+        }
     }
 }
