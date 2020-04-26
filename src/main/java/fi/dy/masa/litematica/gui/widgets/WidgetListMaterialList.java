@@ -12,6 +12,7 @@ import fi.dy.masa.litematica.materials.MaterialListSorter;
 import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -39,9 +40,9 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     }
 
     @Override
-    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.drawContents(mouseX, mouseY, partialTicks);
+        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
         lastScrollbarPosition = this.scrollBar.getValue();
     }
 
