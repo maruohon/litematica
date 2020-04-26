@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
-import net.minecraft.util.math.MathHelper;
 
 public class LitematicaBitArray
 {
@@ -36,7 +35,7 @@ public class LitematicaBitArray
         }
         else
         {
-            this.longArray = new long[MathHelper.roundUp(arraySizeIn * bitsPerEntryIn, 64) / 64];
+            this.longArray = new long[roundUp(arraySizeIn * bitsPerEntryIn, 64) / 64];
         }
     }
 
@@ -85,5 +84,28 @@ public class LitematicaBitArray
     public int size()
     {
         return this.arraySize;
+    }
+
+    public static int roundUp(int value, int interval)
+    {
+        if (interval == 0)
+        {
+            return 0;
+        }
+        else if (value == 0)
+        {
+            return interval;
+        }
+        else
+        {
+            if (value < 0)
+            {
+                interval *= -1;
+            }
+
+            int remainder = value % interval;
+
+            return remainder == 0 ? value : value + interval - remainder;
+        }
     }
 }

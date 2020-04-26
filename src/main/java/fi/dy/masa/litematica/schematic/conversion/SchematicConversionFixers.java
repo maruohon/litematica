@@ -45,7 +45,6 @@ import fi.dy.masa.litematica.mixin.IMixinFenceGateBlock;
 import fi.dy.masa.litematica.mixin.IMixinRedstoneWireBlock;
 import fi.dy.masa.litematica.mixin.IMixinStairsBlock;
 import fi.dy.masa.litematica.mixin.IMixinVineBlock;
-import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.Constants;
 
 public class SchematicConversionFixers
@@ -220,7 +219,7 @@ public class SchematicConversionFixers
     public static final IStateFixer FIXER_FENCE = (reader, state, pos) -> {
         FenceBlock fence = (FenceBlock) state.getBlock();
 
-        for (Direction side : PositionUtils.FACING_HORIZONTALS)
+        for (Direction side : fi.dy.masa.malilib.util.PositionUtils.HORIZONTAL_DIRECTIONS)
         {
             BlockPos posAdj = pos.offset(side);
             BlockState stateAdj = reader.getBlockState(posAdj);
@@ -321,7 +320,7 @@ public class SchematicConversionFixers
     public static final IStateFixer FIXER_PANE = (reader, state, pos) -> {
         PaneBlock pane = (PaneBlock) state.getBlock();
 
-        for (Direction side : PositionUtils.FACING_HORIZONTALS)
+        for (Direction side : fi.dy.masa.malilib.util.PositionUtils.HORIZONTAL_DIRECTIONS)
         {
             BlockPos posAdj = pos.offset(side);
             BlockState stateAdj = reader.getBlockState(posAdj);
@@ -451,7 +450,7 @@ public class SchematicConversionFixers
         StemBlock stem = (StemBlock) state.getBlock();
         GourdBlock crop = stem.getGourdBlock();
 
-        for (Direction side : PositionUtils.FACING_HORIZONTALS)
+        for (Direction side : fi.dy.masa.malilib.util.PositionUtils.HORIZONTAL_DIRECTIONS)
         {
             BlockPos posAdj = pos.offset(side);
             BlockState stateAdj = reader.getBlockState(posAdj);
@@ -484,7 +483,7 @@ public class SchematicConversionFixers
     public static final IStateFixer FIXER_WALL = (reader, state, pos) -> {
         boolean[] sides = new boolean[6];
 
-        for (Direction side : PositionUtils.FACING_HORIZONTALS)
+        for (Direction side : fi.dy.masa.malilib.util.PositionUtils.HORIZONTAL_DIRECTIONS)
         {
             BlockPos posAdj = pos.offset(side);
             BlockState stateAdj = reader.getBlockState(posAdj);

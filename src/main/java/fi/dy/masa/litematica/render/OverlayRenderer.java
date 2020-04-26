@@ -450,7 +450,7 @@ public class OverlayRenderer
         RenderSystem.enableDepthTest();
     }
 
-    public void renderHoverInfo(MinecraftClient mc)
+    public void renderHoverInfo(MinecraftClient mc, MatrixStack matrixStack)
     {
         if (mc.world != null && mc.player != null)
         {
@@ -461,7 +461,7 @@ public class OverlayRenderer
                 Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue() &&
                 Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue())
             {
-                verifierOverlayRendered = this.renderVerifierOverlay(mc);
+                verifierOverlayRendered = this.renderVerifierOverlay(mc, matrixStack);
             }
 
             boolean renderBlockInfoLines = Configs.InfoOverlays.BLOCK_INFO_LINES_ENABLED.getBooleanValue();
@@ -479,18 +479,18 @@ public class OverlayRenderer
             {
                 if (renderBlockInfoLines)
                 {
-                    this.renderBlockInfoLines(traceWrapper, mc);
+                    this.renderBlockInfoLines(traceWrapper, mc, matrixStack);
                 }
 
                 if (renderInfoOverlay)
                 {
-                    this.renderBlockInfoOverlay(traceWrapper, mc);
+                    this.renderBlockInfoOverlay(traceWrapper, mc, matrixStack);
                 }
             }
         }
     }
 
-    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, MinecraftClient mc)
+    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, MinecraftClient mc, MatrixStack matrixStack)
     {
         long currentTime = System.currentTimeMillis();
 
@@ -510,10 +510,10 @@ public class OverlayRenderer
         boolean useBackground = true;
         boolean useShadow = false;
 
-        fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
+        fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines, matrixStack);
     }
 
-    private boolean renderVerifierOverlay(MinecraftClient mc)
+    private boolean renderVerifierOverlay(MinecraftClient mc, MatrixStack matrixStack)
     {
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -530,7 +530,7 @@ public class OverlayRenderer
                 if (mismatch != null)
                 {
                     BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                    info.render(GuiUtils.getScaledWindowWidth() / 2 - info.getTotalWidth() / 2, GuiUtils.getScaledWindowHeight() / 2 + 6, mc);
+                    info.render(GuiUtils.getScaledWindowWidth() / 2 - info.getTotalWidth() / 2, GuiUtils.getScaledWindowHeight() / 2 + 6, mc, matrixStack);
                     return true;
                 }
             }
@@ -539,7 +539,7 @@ public class OverlayRenderer
         return false;
     }
 
-    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, MinecraftClient mc)
+    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, MinecraftClient mc, MatrixStack matrixStack)
     {
         BlockState air = Blocks.AIR.getDefaultState();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
@@ -562,7 +562,7 @@ public class OverlayRenderer
 
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-            info.render(this.blockInfoX, this.blockInfoY, mc);
+            info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA_BLOCK)
         {
@@ -570,7 +570,7 @@ public class OverlayRenderer
 
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-            info.render(this.blockInfoX, this.blockInfoY, mc);
+            info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -582,7 +582,7 @@ public class OverlayRenderer
 
                 BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-                info.render(this.blockInfoX, this.blockInfoY, mc);
+                info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
             }
             else
             {
@@ -590,7 +590,7 @@ public class OverlayRenderer
 
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-                info.render(this.blockInfoX, this.blockInfoY, mc);
+                info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
             }
         }
     }

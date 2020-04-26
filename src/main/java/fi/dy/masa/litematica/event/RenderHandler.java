@@ -36,19 +36,19 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderGameOverlayPost(float partialTicks)
+    public void onRenderGameOverlayPost(float partialTicks, MatrixStack matrixStack)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
             // The Info HUD renderers can decide if they want to be rendered in GUIs
-            InfoHud.getInstance().renderHud();
+            InfoHud.getInstance().renderHud(matrixStack);
 
             if (GuiUtils.getCurrentScreen() == null)
             {
-                ToolHud.getInstance().renderHud();
-                OverlayRenderer.getInstance().renderHoverInfo(mc);
+                ToolHud.getInstance().renderHud(matrixStack);
+                OverlayRenderer.getInstance().renderHoverInfo(mc, matrixStack);
 
                 if (GuiSchematicManager.hasPendingPreviewTask())
                 {
