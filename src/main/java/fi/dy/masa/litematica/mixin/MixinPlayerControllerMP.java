@@ -31,7 +31,7 @@ public abstract class MixinPlayerControllerMP
         {
             if (EasyPlaceUtils.shouldDoEasyPlaceActions())
             {
-                if (EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, true))
+                if (EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc))
                 {
                     cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
                 }
@@ -68,7 +68,7 @@ public abstract class MixinPlayerControllerMP
         if (EasyPlaceUtils.isHandling() == false)
         {
             if (EasyPlaceUtils.shouldDoEasyPlaceActions() &&
-                EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc, true))
+                EasyPlaceUtils.handleEasyPlaceWithMessage(this.mc))
             {
                 cir.setReturnValue(net.minecraft.util.EnumActionResult.FAIL);
             }

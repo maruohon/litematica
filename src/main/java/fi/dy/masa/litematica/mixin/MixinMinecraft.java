@@ -15,10 +15,7 @@ public abstract class MixinMinecraft
             target = "Lnet/minecraft/client/Minecraft;rightClickMouse()V"))
     private void onRightClickMouse(CallbackInfo ci)
     {
-        if (EasyPlaceUtils.shouldDoEasyPlaceActions())
-        {
-            EasyPlaceUtils.setIsFirstClick(true);
-        }
+        EasyPlaceUtils.setIsFirstClick();
     }
 
     @Inject(method = "rightClickMouse", cancellable = true, at = @At(value = "FIELD", ordinal = 0,

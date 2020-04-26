@@ -54,7 +54,8 @@ public class EasyPlaceUtils
     private static final HashMap<Block, Boolean> HAS_USE_ACTION_CACHE = new HashMap<>();
 
     private static boolean isHandling;
-    private static boolean isFirstClick;
+    private static boolean isFirstClickEasyPlace;
+    private static boolean isFirstClickPlacementRestriction;
 
     public static boolean isHandling()
     {
@@ -66,9 +67,17 @@ public class EasyPlaceUtils
         isHandling = handling;
     }
 
-    public static void setIsFirstClick(boolean isFirst)
+    public static void setIsFirstClick()
     {
-        isFirstClick = isFirst;
+        if (shouldDoEasyPlaceActions())
+        {
+            isFirstClickEasyPlace = true;
+        }
+
+        if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
+        {
+            isFirstClickPlacementRestriction = true;
+        }
     }
 
     private static boolean hasUseAction(Block block)
@@ -115,7 +124,7 @@ public class EasyPlaceUtils
         }
     }
 
-    public static boolean handleEasyPlaceWithMessage(Minecraft mc, boolean printFailMessage)
+    public static boolean handleEasyPlaceWithMessage(Minecraft mc)
     {
         if (isHandling)
         {
@@ -127,12 +136,12 @@ public class EasyPlaceUtils
         isHandling = false;
 
         // Only print the warning message once per right click
-        if (printFailMessage && isFirstClick && result == EnumActionResult.FAIL)
+        if (isFirstClickEasyPlace && result == EnumActionResult.FAIL)
         {
             InfoUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
         }
 
-        isFirstClick = false;
+        isFirstClickEasyPlace = false;
 
         return result != EnumActionResult.PASS;
     }
@@ -142,9 +151,9 @@ public class EasyPlaceUtils
         // If the click wasn't handled yet, handle it now.
         // This is only called when right clicking on air with an empty hand,
         // as in that case neither the processRightClickBlock nor the processRightClick method get called.
-        if (isFirstClick)
+        if (isFirstClickEasyPlace)
         {
-            handleEasyPlaceWithMessage(mc, true);
+            handleEasyPlaceWithMessage(mc);
         }
     }
 
@@ -556,10 +565,12 @@ public class EasyPlaceUtils
     {
         boolean cancel = placementRestrictionInEffect(mc);
 
-        if (cancel)
+        if (cancel && isFirstClickPlacementRestriction)
         {
-            InfoUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, "litematica.message.placement_restriction_fail");
+            InfoUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.placement_restriction_fail");
         }
+
+        isFirstClickPlacementRestriction = false;
 
         return cancel;
     }
