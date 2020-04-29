@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.fabricmc:fabric-loom:0.2.6-SNAPSHOT'
+        classpath 'net.fabricmc:fabric-loom:0.2.7-SNAPSHOT'
     }
 }
 
