@@ -461,15 +461,16 @@ public class RenderUtils
         final int x = pos.getX();
         final int y = pos.getY();
         final int z = pos.getZ();
-        float fx[] = new float[4];
-        float fy[] = new float[4];
-        float fz[] = new float[4];
+        final int vertexSize = vertexData.length / 4;
+        final float fx[] = new float[4];
+        final float fy[] = new float[4];
+        final float fz[] = new float[4];
 
         for (int index = 0; index < 4; ++index)
         {
-            fx[index] = x + Float.intBitsToFloat(vertexData[index * 8 + 0]);
-            fy[index] = y + Float.intBitsToFloat(vertexData[index * 8 + 1]);
-            fz[index] = z + Float.intBitsToFloat(vertexData[index * 8 + 2]);
+            fx[index] = x + Float.intBitsToFloat(vertexData[index * vertexSize    ]);
+            fy[index] = y + Float.intBitsToFloat(vertexData[index * vertexSize + 1]);
+            fz[index] = z + Float.intBitsToFloat(vertexData[index * vertexSize + 2]);
         }
 
         buffer.vertex(fx[0], fy[0], fz[0]).color(color.r, color.g, color.b, color.a).next();
@@ -515,13 +516,14 @@ public class RenderUtils
         final int x = pos.getX();
         final int y = pos.getY();
         final int z = pos.getZ();
+        final int vertexSize = vertexData.length / 4;
         float fx, fy, fz;
 
         for (int index = 0; index < 4; ++index)
         {
-            fx = x + Float.intBitsToFloat(vertexData[index * 8 + 0]);
-            fy = y + Float.intBitsToFloat(vertexData[index * 8 + 1]);
-            fz = z + Float.intBitsToFloat(vertexData[index * 8 + 2]);
+            fx = x + Float.intBitsToFloat(vertexData[index * vertexSize    ]);
+            fy = y + Float.intBitsToFloat(vertexData[index * vertexSize + 1]);
+            fz = z + Float.intBitsToFloat(vertexData[index * vertexSize + 2]);
 
             buffer.vertex(fx, fy, fz).color(color.r, color.g, color.b, color.a).next();
         }
