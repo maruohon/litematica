@@ -111,9 +111,9 @@ public class LitematicaBlockStateContainerFull extends LitematicaBlockStateConta
         return this.palette.idFor(state);
     }
 
-    protected int getIndex(int x, int y, int z)
+    protected long getIndex(int x, int y, int z)
     {
-        return (y * this.sizeLayer) + z * this.sizeX + x;
+        return ((long) y * this.sizeLayer) + (long) z * (long) this.sizeX + (long) x;
     }
 
     public long[] getBackingLongArray()

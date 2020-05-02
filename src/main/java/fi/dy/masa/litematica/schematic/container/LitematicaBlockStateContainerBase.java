@@ -16,8 +16,8 @@ public abstract class LitematicaBlockStateContainerBase implements ILitematicaBl
     protected final int sizeX;
     protected final int sizeY;
     protected final int sizeZ;
-    protected final int sizeLayer;
-    protected final int totalVolume;
+    protected final long sizeLayer;
+    protected final long totalVolume;
     protected long[] blockCounts = new long[0];
     protected int bits;
     protected boolean hasSetBlockCounts;
@@ -33,8 +33,8 @@ public abstract class LitematicaBlockStateContainerBase implements ILitematicaBl
         this.sizeX = size.getX();
         this.sizeY = size.getY();
         this.sizeZ = size.getZ();
-        this.totalVolume = this.sizeX * this.sizeY * this.sizeZ;
-        this.sizeLayer = this.sizeX * this.sizeZ;
+        this.totalVolume = (long) this.sizeX * (long) this.sizeY * (long) this.sizeZ;
+        this.sizeLayer = (long) this.sizeX * (long) this.sizeZ;
 
         this.setBits(bits);
     }
