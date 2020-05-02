@@ -195,7 +195,7 @@ public class LitematicaSchematic extends SchematicBase
                 else
                 {
                     Vec3i size = containerOther.getSize();
-                    LitematicaBlockStateContainerFull container = new LitematicaBlockStateContainerFull(size);
+                    LitematicaBlockStateContainerFull container = new LitematicaBlockStateContainerFull(size, false);
                     this.copyContainerContents(containerOther, container);
                     this.blockContainers.put(regionName, container);
                 }

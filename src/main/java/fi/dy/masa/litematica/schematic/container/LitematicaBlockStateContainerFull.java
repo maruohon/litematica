@@ -10,10 +10,18 @@ import io.netty.buffer.Unpooled;
 public class LitematicaBlockStateContainerFull extends LitematicaBlockStateContainerBase implements IPaletteResizeHandler
 {
     protected LitematicaBitArray storage;
+    protected boolean checkForFreedIds = true;
 
     public LitematicaBlockStateContainerFull(Vec3i size)
     {
+        this(size, true);
+    }
+
+    public LitematicaBlockStateContainerFull(Vec3i size, boolean checkForFreedIds)
+    {
         this(size, 2, null);
+
+        this.checkForFreedIds = checkForFreedIds;
     }
 
     protected LitematicaBlockStateContainerFull(Vec3i size, int bits, @Nullable long[] backingLongArray)
@@ -75,18 +83,21 @@ public class LitematicaBlockStateContainerFull extends LitematicaBlockStateConta
     @Override
     public int onResize(int bits, IBlockState state, ILitematicaBlockStatePalette oldPalette)
     {
-        long[] counts = this.storage.getValueCounts();
-        final int countsSize = counts.length;
-
-        // Check if there are any IDs that are not in use anymore
-        for (int id = 0; id < countsSize; ++id)
+        if (this.checkForFreedIds)
         {
-            // Found an ID that is not in use anymore, use that instead of increasing the palette size
-            if (counts[id] == 0)
+            long[] counts = this.storage.getValueCounts();
+            final int countsSize = counts.length;
+
+            // Check if there are any IDs that are not in use anymore
+            for (int id = 0; id < countsSize; ++id)
             {
-                if (this.palette.overrideMapping(id, state))
+                // Found an ID that is not in use anymore, use that instead of increasing the palette size
+                if (counts[id] == 0)
                 {
-                    return id;
+                    if (this.palette.overrideMapping(id, state))
+                    {
+                        return id;
+                    }
                 }
             }
         }
