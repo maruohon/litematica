@@ -36,6 +36,7 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
+import fi.dy.masa.litematica.util.IGenericEventListener;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
@@ -68,6 +69,8 @@ public class SchematicPlacementManager
     private final Set<ChunkPos> chunksToUnload = new HashSet<>();
     private final Set<ChunkPos> chunksPreChange = new HashSet<>();
 
+    private final List<IGenericEventListener> rebuildListeners = new ArrayList<>();
+
     private final GridPlacementManager gridManager;
 
     @Nullable
@@ -87,6 +90,14 @@ public class SchematicPlacementManager
     public boolean hasPendingRebuildFor(ChunkPos pos)
     {
         return this.chunksToRebuild.contains(pos);
+    }
+
+    public void addRebuildListener(IGenericEventListener listener)
+    {
+        if (this.rebuildListeners.contains(listener) == false)
+        {
+            this.rebuildListeners.add(listener);
+        }
     }
 
     public boolean processQueuedChunks()
@@ -934,6 +945,11 @@ public class SchematicPlacementManager
     {
         //System.out.printf("rebuilding %d chunks: %s\n", chunks.size(), chunks);
         this.chunksToRebuild.addAll(chunks);
+
+        for (IGenericEventListener listener : this.rebuildListeners)
+        {
+            listener.onEvent();
+        }
     }
 
     public void markChunkForRebuild(ChunkPos pos)

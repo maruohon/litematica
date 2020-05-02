@@ -10,13 +10,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Lists;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
-import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -54,8 +47,16 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
+import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
+import fi.dy.masa.litematica.util.IGenericEventListener;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 
-public class RenderGlobalSchematic extends RenderGlobal
+public class RenderGlobalSchematic extends RenderGlobal implements IGenericEventListener
 {
     private final Minecraft mc;
     private final RenderManager renderManager;
@@ -64,6 +65,7 @@ public class RenderGlobalSchematic extends RenderGlobal
     private final BlockFluidRenderer fluidRenderer;
     private final Set<TileEntity> setTileEntities = new HashSet<>();
     private final List<RenderChunkSchematicVbo> renderInfos = new ArrayList<>(1024);
+    private final List<SubChunkPos> subChunksWithinRenderRange = new ArrayList<>();
     private Set<RenderChunkSchematicVbo> chunksToUpdate = new LinkedHashSet<>();
     private WorldClient world;
     private ViewFrustum viewFrustum;
@@ -81,6 +83,8 @@ public class RenderGlobalSchematic extends RenderGlobal
     private ChunkRenderDispatcherLitematica renderDispatcher;
     private ChunkRenderContainerSchematic renderContainer;
     private IRenderChunkFactory renderChunkFactory;
+    private final BlockPos.MutableBlockPos viewPosSubChunk = new BlockPos.MutableBlockPos();
+    private BlockPos lastSubChunkUpdatePos;
     //private ShaderGroup entityOutlineShader;
     //private boolean entityOutlinesRendered;
 
@@ -120,11 +124,18 @@ public class RenderGlobalSchematic extends RenderGlobal
         this.blockModelShapes = dispatcher.getBlockModelShapes();
         this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColors());
         this.fluidRenderer = ((IMixinBlockRendererDispatcher) dispatcher).getFluidRenderer();
+
+        DataManager.getSchematicPlacementManager().addRebuildListener(this);
     }
 
     public void markNeedsUpdate()
     {
         this.displayListEntitiesDirty = true;
+    }
+
+    public void onEvent()
+    {
+        this.lastSubChunkUpdatePos = null;
     }
 
     @Override
@@ -298,14 +309,15 @@ public class RenderGlobalSchematic extends RenderGlobal
         double y = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * partialTicks;
         double z = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * partialTicks;
         this.renderContainer.initialize(x, y, z);
+        y = y + (double) viewEntity.getEyeHeight();
 
         world.profiler.endStartSection("culling");
-        BlockPos viewPos = new BlockPos(x, y + (double) viewEntity.getEyeHeight(), z);
-        final int centerChunkX = (viewPos.getX() >> 4);
-        final int centerChunkZ = (viewPos.getZ() >> 4);
+        final int centerChunkX = ((int) MathHelper.floor(x)) >> 4;
+        final int centerChunkY = ((int) MathHelper.floor(y)) >> 4;
+        final int centerChunkZ = ((int) MathHelper.floor(z)) >> 4;
         final int renderDistance = this.mc.gameSettings.renderDistanceChunks;
-        SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ);
-        BlockPos viewPosSubChunk = new BlockPos(viewSubChunk.getX() << 4, viewSubChunk.getY() << 4, viewSubChunk.getZ() << 4);
+        SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, centerChunkY, centerChunkZ);
+        this.viewPosSubChunk.setPos(centerChunkX << 4, centerChunkY << 4, centerChunkZ << 4);
 
         this.displayListEntitiesDirty = this.displayListEntitiesDirty || this.chunksToUpdate.isEmpty() == false ||
                 viewEntity.posX != this.lastViewEntityX ||
@@ -330,23 +342,37 @@ public class RenderGlobalSchematic extends RenderGlobal
 
             Entity.setRenderDistanceWeight(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
 
-            Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
-            List<SubChunkPos> positions = new ArrayList<>(set.size());
-            positions.addAll(set);
-            Collections.sort(positions, new SubChunkPos.DistanceComparator(viewSubChunk));
+            if (this.lastSubChunkUpdatePos == null ||
+                Math.abs(this.viewPosSubChunk.getX() - this.lastSubChunkUpdatePos.getX()) > 32 ||
+                Math.abs(this.viewPosSubChunk.getZ() - this.lastSubChunkUpdatePos.getZ()) > 32)
+            {
+                Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
+                int maxChunkDist = renderDistance + 2;
 
-            //Queue<SubChunkPos> queuePositions = new PriorityQueue<>(new SubChunkPos.DistanceComparator(viewSubChunk));
-            //queuePositions.addAll(set);
+                this.subChunksWithinRenderRange.clear();
+
+                for (SubChunkPos p : set)
+                {
+                    if (Math.abs(p.getX() - centerChunkX) <= maxChunkDist &&
+                        Math.abs(p.getZ() - centerChunkZ) <= maxChunkDist)
+                    {
+                        this.subChunksWithinRenderRange.add(p);
+                    }
+                }
+
+                Collections.sort(this.subChunksWithinRenderRange, new SubChunkPos.DistanceComparator(viewSubChunk));
+                this.lastSubChunkUpdatePos = this.viewPosSubChunk.toImmutable();
+            }
 
             //if (GuiBase.isCtrlDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
             world.profiler.endStartSection("iteration");
 
             //while (queuePositions.isEmpty() == false)
-            for (int i = 0; i < positions.size(); ++i)
+            for (int i = 0; i < this.subChunksWithinRenderRange.size(); ++i)
             {
                 //SubChunkPos subChunk = queuePositions.poll();
-                SubChunkPos subChunk = positions.get(i);
+                SubChunkPos subChunk = this.subChunksWithinRenderRange.get(i);
 
                 // Only render sub-chunks that are within the client's render distance, and that
                 // have been already properly loaded on the client
@@ -362,7 +388,7 @@ public class RenderGlobalSchematic extends RenderGlobal
                         if (renderChunk.setFrameIndex(frameCount) && camera.isBoundingBoxInFrustum(renderChunk.boundingBox))
                         {
                             //if (GuiBase.isCtrlDown()) System.out.printf("add @ %s\n", subChunk);
-                            if (renderChunk.needsUpdate() && subChunkCornerPos.equals(viewPosSubChunk))
+                            if (renderChunk.needsUpdate() && subChunkCornerPos.equals(this.viewPosSubChunk))
                             {
                                 renderChunk.setNeedsUpdate(true);
                             }
@@ -386,7 +412,7 @@ public class RenderGlobalSchematic extends RenderGlobal
             {
                 this.displayListEntitiesDirty = true;
                 BlockPos pos = renderChunkTmp.getPosition().add(8, 8, 8);
-                boolean isNear = pos.distanceSq(viewPos) < 1024.0D;
+                boolean isNear = pos.distanceSq(x, y, z) < 1024.0D;
 
                 if (renderChunkTmp.needsImmediateUpdate() == false && isNear == false)
                 {
