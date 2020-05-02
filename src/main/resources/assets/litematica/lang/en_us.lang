@@ -28,6 +28,7 @@ litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_s
 litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=Failed to load the Schematic
 litematica.error.schematic_conversion.structure_to_litematica_failed=Failed to convert the Structure to a Litematica Schematic
 
+litematica.error.schematic_convert.failed_to_convert=Failed to convert the schematic:
 litematica.error.schematic_convert.failed_to_save=Failed to save the converted schematic as '%s'
 litematica.error.schematic_convert.no_output_type_selected=Select the output type using the dropdown widget
 litematica.error.schematic.create.no_selections=No valid selection regions!

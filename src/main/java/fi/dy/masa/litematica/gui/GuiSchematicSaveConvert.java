@@ -13,6 +13,7 @@ import fi.dy.masa.malilib.gui.util.Message.MessageType;
 import fi.dy.masa.malilib.gui.widgets.WidgetDropDownList;
 import fi.dy.masa.malilib.gui.widgets.WidgetRadioButton;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
@@ -109,7 +110,16 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
             if (outputType != this.schematic.getType())
             {
                 convertedSchematic = outputType.createSchematic(null);
-                convertedSchematic.readFrom(this.schematic);
+
+                try
+                {
+                    convertedSchematic.readFrom(this.schematic);
+                }
+                catch (Exception e)
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, "litematica.error.schematic_convert.failed_to_convert");
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, e.getMessage());
+                }
             }
             else
             {
