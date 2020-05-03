@@ -443,7 +443,7 @@ public class DataManager implements IDirectoryCache
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            InfoUtils.printErrorMessage("Failed to create directory '%s'", dir.getAbsolutePath());
+            InfoUtils.printErrorMessage("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
         }
 
         return dir;

@@ -506,6 +506,7 @@ litematica.message.error.placement_grid_settings.open_gui_selected_is_grid=The s
 litematica.message.error.placement_paste_outside_world=The placement can't be pasted in the current position, because it goes outside the world bounds
 litematica.message.error.schematic_paste_failed=§cSchematic Paste to world failed§r
 litematica.message.error.schematic_paste_failed_region=§cFailed to paste the region '%s'§r
+litematica.message.error.schematic_placement.failed_to_create_directory=Failed to create the directory '%s'
 litematica.message.error.schematic_placement.load_failed=Failed to load the placement '%s' from schematic file '%s'
 litematica.message.error.schematic_placement.save.failed_to_get_save_file=Failed to get the file to save this placement to
 litematica.message.error.schematic_placement.save.failed_to_serialize=Failed to serialize the placement data
