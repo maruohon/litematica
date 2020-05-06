@@ -11,6 +11,6 @@ import net.minecraft.world.BlockView;
 @Mixin(StairsBlock.class)
 public interface IMixinStairsBlock
 {
-    @Invoker("method_10675")
+    @Invoker("getStairShape")
     public static StairShape invokeGetStairShape(BlockState state, BlockView worldIn, BlockPos pos) { return null; }
 }
