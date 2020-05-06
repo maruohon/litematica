@@ -306,7 +306,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             }
             else
             {
-                this.mc.getItemRenderer().renderGuiItem(this.mc.player, this.mismatchInfo.stackExpected, x1, y);
+                this.mc.getItemRenderer().renderGuiItem(this.mismatchInfo.stackExpected, x1, y);
                 this.mc.getItemRenderer().renderGuiItemOverlay(this.textRenderer, this.mismatchInfo.stackExpected, x1, y, null);
             }
 
@@ -321,7 +321,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    this.mc.getItemRenderer().renderGuiItem(this.mc.player, this.mismatchInfo.stackFound, x2, y);
+                    this.mc.getItemRenderer().renderGuiItem(this.mismatchInfo.stackFound, x2, y);
                     this.mc.getItemRenderer().renderGuiItemOverlay(this.textRenderer, this.mismatchInfo.stackFound, x2, y, null);
                 }
             }
@@ -475,7 +475,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    mc.getItemRenderer().renderGuiItem(mc.player, this.stackExpected, x1, y);
+                    mc.getItemRenderer().renderGuiItem(this.stackExpected, x1, y);
                     mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stackExpected, x1, y, null);
                 }
 
@@ -486,7 +486,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    mc.getItemRenderer().renderGuiItem(mc.player, this.stackFound, x2, y);
+                    mc.getItemRenderer().renderGuiItem(this.stackFound, x2, y);
                     mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stackFound, x2, y, null);
                 }
 
