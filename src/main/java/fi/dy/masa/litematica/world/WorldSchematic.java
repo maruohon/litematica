@@ -182,30 +182,30 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void updateListeners(BlockPos blockPos_1, BlockState blockState_1, BlockState blockState_2, int int_1)
+    public void updateListeners(BlockPos blockPos_1, BlockState blockState_1, BlockState blockState_2, int flags)
     {
         // NO-OP
     }
 
     @Override
-    public void playGlobalEvent(int int_1, BlockPos blockPos_1, int int_2)
+    public void syncGlobalEvent(int eventId, BlockPos pos, int data)
     {
         // NO-OP
     }
     
     @Override
-    public void playLevelEvent(@Nullable PlayerEntity playerEntity_1, int int_1, BlockPos blockPos_1, int int_2)
+    public void syncWorldEvent(@Nullable PlayerEntity entity, int id, BlockPos pos, int data)
     {
     }
 
     @Override
-    public void addParticle(ParticleEffect particleParameters_1, double double_1, double double_2, double double_3, double double_4, double     double_5, double double_6)
+    public void addParticle(ParticleEffect particleParameters_1, double double_1, double double_2, double double_3, double double_4, double double_5, double double_6)
     {
         // NO-OP
     }
 
     @Override
-    public void addParticle(ParticleEffect particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3, double   double_4, double double_5, double double_6)
+    public void addParticle(ParticleEffect particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3, double double_4, double double_5, double double_6)
     {
         // NO-OP
     }
