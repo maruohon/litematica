@@ -384,7 +384,7 @@ public class LitematicaSchematic
                     if (mirrorSub != BlockMirror.NONE)  { state = state.mirror(mirrorSub); }
                     if (rotationCombined != BlockRotation.NONE) { state = state.rotate(rotationCombined); }
 
-                    if (stateOld == state)
+                    if (stateOld == state && state.getBlock().hasBlockEntity() == false)
                     {
                         continue;
                     }
