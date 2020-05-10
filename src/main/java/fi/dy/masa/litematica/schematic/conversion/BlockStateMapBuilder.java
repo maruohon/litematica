@@ -144,9 +144,13 @@ public class BlockStateMapBuilder
         }
     }
 
+    /**
+     * Fix post-flattening renames (ie. the "new" names in the flattening map are actually not what 1.13+ uses)
+     * @param oldStateTag
+     * @param newStateTag
+     */
     private void fixStateFromFlatteningMap(NBTTagCompound oldStateTag, NBTTagCompound newStateTag)
     {
-        // Fix post-flattening renames (ie. the "new" names in the flattening map are actually not what 1.13+ uses) 
         if (this.matchesName(newStateTag, "minecraft:portal"))
         {
             newStateTag.putString("Name", "minecraft:nether_portal");
@@ -171,7 +175,8 @@ public class BlockStateMapBuilder
                 propsNew.putString("mode", propsNew.getString("mode").toUpperCase());
             }
             // Fix pre-flattening property value changes for lightBlue => light_blue blocks
-            else if (propsOld.contains("color", Constants.NBT.TAG_STRING) && propsOld.getString("color").equals("light_blue"))
+            else if (propsOld.contains("color", Constants.NBT.TAG_STRING) &&
+                     propsOld.getString("color").equals("light_blue"))
             {
                 propsOld.putString("color", "lightBlue");
             }
@@ -468,6 +473,7 @@ public class BlockStateMapBuilder
 
         if (root == null)
         {
+            System.out.printf("Failed to read the input block state map from '%s'\n", fileIn.getAbsolutePath());
             return;
         }
 
@@ -629,7 +635,7 @@ public class BlockStateMapBuilder
         return null;
     }
 
-    private static List<String> getCustomFormattedJson(JsonObject obj)
+    public static List<String> getCustomFormattedJson(JsonObject obj)
     {
         /*
         StringBuilder sb = new StringBuilder(indentationLevel);

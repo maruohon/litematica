@@ -11,7 +11,7 @@ public class StateTagFixers_1_12_to_1_13_2
         NBTTagCompound newTag = tagIn.copy();
         NBTTagCompound tagProps = newTag.getCompound("Properties");
         String facing = tagProps.getString("facing");
-        String face = facing;
+        String face = "wall";
 
         switch (facing)
         {

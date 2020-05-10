@@ -72,6 +72,12 @@ public class SchematicConversionMaps
         StateTagFixers_1_12_to_1_13_2.init();
     }
 
+    public static String get_1_13_2_NameForIdMeta(int idMeta, String oldName)
+    {
+        String newName = ID_META_TO_UPDATED_NAME.get(idMeta);
+        return newName != null ? newName : oldName;
+    }
+
     @Nullable
     public static IBlockState get_1_13_2_StateForIdMeta(int idMeta)
     {
