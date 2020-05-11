@@ -21,8 +21,7 @@
         "MixinMinecraft",
         "MixinNetHandlerPlayClient",
         "MixinPlayerControllerMP",
-        "MixinRenderGlobal",
-        "MixinWorld"
+        "MixinRenderGlobal"
     ],
     "injectors": {
         "defaultRequire": 1
