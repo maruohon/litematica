@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -216,13 +215,15 @@ public class BlockStateMapBuilder_v2
         HashSet<String> identicalPropNames = new HashSet<>();
         //HashSet<String> nonMatchedBlocks = new HashSet<>();
         Object2IntOpenHashMap<IBlockState> mappedStates113Counts = new Object2IntOpenHashMap<>();
-
-        ArrayList<Pair<JsonObject, String>> statesWithIdenticalProperties = new ArrayList<>();
         ArrayListMultimap<IBlockState, JsonObject> newStateToOldStates = ArrayListMultimap.create();
-        LinkedHashMap<JsonObject, ArrayList<String>> addedProperties = new LinkedHashMap<>();
-        LinkedHashMap<JsonObject, ArrayList<Pair<String, String>>> copiedProperties = new LinkedHashMap<>();
-        LinkedHashMap<JsonObject, ArrayList<Pair<String, String>>> removedProperties = new LinkedHashMap<>();
-        LinkedHashMap<JsonObject, ArrayList<Pair<String, String>>> invalidProperties = new LinkedHashMap<>();
+
+        ArrayList<NBTTagCompound> identicalStates = new ArrayList<>();
+        ArrayList<Pair<NBTTagCompound, NBTTagCompound>> statesWithIdenticalProperties = new ArrayList<>();
+        ArrayList<Pair<JsonObject, ArrayList<String>>> addedProperties = new ArrayList<>();
+        ArrayList<Pair<JsonObject, ArrayList<Pair<String, String>>>> removedProperties = new ArrayList<>();
+
+        ArrayList<Pair<JsonObject, ArrayList<Pair<String, String>>>> copiedProperties = new ArrayList<>();
+        ArrayList<Pair<JsonObject, ArrayList<Pair<String, String>>>> invalidProperties = new ArrayList<>();
 
         IntArrayList ids = new IntArrayList(this._1_12_idMeta_to_1_12_States.keySet());
         Collections.sort(ids);
@@ -251,9 +252,11 @@ public class BlockStateMapBuilder_v2
             }
 
             // Get the first entry, which should be the meta state
-            BlockStateEntryOld entryOld = oldStates.get(0);
-            NBTTagCompound stateTag112 = entryOld.oldStateTag;
+            BlockStateEntryOld firstOldEntry = oldStates.get(0);
+            NBTTagCompound stateTag112 = firstOldEntry.oldStateTag;
             NBTTagCompound stateTag113Orig = entryNew.newStateTag;
+
+            // Account for post-flattening-map changes
             NBTTagCompound stateTag113 = StateTagFixers_1_12_to_1_13_2.fixStateTag(stateTag113Orig.copy());
 
             if (stateTag113.equals(stateTag113Orig) == false)
@@ -268,7 +271,7 @@ public class BlockStateMapBuilder_v2
             stateTag113.putString("Name", newName);
 
             boolean renamed = oldName.equals(newName) == false;
-            boolean isMetaState = JsonUtils.getBooleanOrDefault(entryOld.blockStateEntry, "meta_state", false);
+            boolean isMetaState = JsonUtils.getBooleanOrDefault(firstOldEntry.blockStateEntry, "meta_state", false);
             Block block = null;
 
             try
@@ -306,27 +309,20 @@ public class BlockStateMapBuilder_v2
                 ++this.changedPropertiesStates;
             }
 
-            identicalPropNames.clear();
-            removedPropNames.clear();
-            addedPropNames.clear();
-            getIdenticalPropertyKeys(stateTag113, entryOld.oldStateTag, identicalPropNames);
-            getExtraProperties(stateTag112, stateTag113, removedPropNames);
-            getExtraProperties(stateTag113, stateTag112, addedPropNames);
-
-            for (BlockStateEntryOld oldEntry : oldStates)
+            for (BlockStateEntryOld oldStateEntry : oldStates)
             {
+                NBTTagCompound stateTagOld = oldStateEntry.oldStateTag;
                 NBTTagCompound stateTagNew = stateTag113.copy();
                 NBTTagCompound propsNew = stateTagNew.getCompound("Properties");
-                NBTTagCompound propsOld = oldEntry.oldStateTag.getCompound("Properties");
+                NBTTagCompound propsOld = stateTagOld.getCompound("Properties");
                 boolean flagCopiedProperties = false;
 
-                isMetaState = JsonUtils.getBooleanOrDefault(oldEntry.blockStateEntry, "meta_state", false);
+                fixState(stateTagOld, stateTagNew);
 
-                if (propsNew.equals(propsOld))
-                {
-                    statesWithIdenticalProperties.add(Pair.of(oldEntry.blockStateEntry, stateTagNew.toString()));
-                }
-                else if (identicalPropNames.isEmpty() == false)
+                identicalPropNames.clear();
+                getIdenticalPropertyKeys(stateTagNew, stateTagOld, identicalPropNames);
+
+                if (identicalPropNames.isEmpty() == false)
                 {
                     for (String propName : identicalPropNames)
                     {
@@ -334,39 +330,20 @@ public class BlockStateMapBuilder_v2
 
                         if (isValidPropertyValue(block, propName, propValue))
                         {
-                            ArrayList<Pair<String, String>> list = copiedProperties.computeIfAbsent(oldEntry.blockStateEntry, (e) -> new ArrayList<>());
+                            ArrayList<Pair<String, String>> list = new ArrayList<>();
                             propsNew.putString(propName, propValue);
                             flagCopiedProperties = true;
                             list.add(Pair.of(propName, propValue));
+                            copiedProperties.add(Pair.of(oldStateEntry.blockStateEntry, list));
                         }
                         else
                         {
-                            ArrayList<Pair<String, String>> list = invalidProperties.computeIfAbsent(oldEntry.blockStateEntry, (e) -> new ArrayList<>());
+                            ArrayList<Pair<String, String>> list = new ArrayList<>();
                             list.add(Pair.of(propName, propValue));
+                            invalidProperties.add(Pair.of(oldStateEntry.blockStateEntry, list));
                         }
                     }
                 }
-
-                if (addedPropNames.isEmpty() == false)
-                {
-                    ArrayList<String> list = addedProperties.computeIfAbsent(oldEntry.blockStateEntry, (e) -> new ArrayList<>());
-                    list.addAll(addedPropNames);
-                    Collections.sort(list);
-                }
-
-                if (removedPropNames.isEmpty() == false)
-                {
-                    ArrayList<Pair<String, String>> list = removedProperties.computeIfAbsent(oldEntry.blockStateEntry, (e) -> new ArrayList<>());
-
-                    for (String propName : removedPropNames)
-                    {
-                        list.add(Pair.of(propName, propsOld.getString(propName)));
-                    }
-
-                    Collections.sort(list);
-                }
-
-                fixState(oldEntry.oldStateTag, stateTagNew);
 
                 // Convert the tag to a block state and back to include all the current properties in the tag
                 IBlockState state = NBTUtil.readBlockState(stateTagNew);
@@ -381,6 +358,8 @@ public class BlockStateMapBuilder_v2
                 // Valid block state entry
                 if (state.getBlock() != Blocks.AIR || stateTagNew.getString("Name").equals("minecraft:air"))
                 {
+                    isMetaState = JsonUtils.getBooleanOrDefault(oldStateEntry.blockStateEntry, "meta_state", false);
+
                     if (isMetaState)
                     {
                         ++this.matchedMetaStates;
@@ -395,10 +374,46 @@ public class BlockStateMapBuilder_v2
                         ++this.copiedProperties;
                     }
 
-                    newStateToOldStates.put(state, oldEntry.blockStateEntry);
+                    newStateToOldStates.put(state, oldStateEntry.blockStateEntry);
                     mappedStates113Counts.addTo(state, 1);
                     NBTTagCompound stateTagNewReSerialized = NBTUtil.writeBlockState(state);
-                    JsonObject objEntry = this.blockStates_1_12_stateTagToBlockStateEntryJsonObject.get(oldEntry.oldStateTag);
+
+                    if (stateTagNewReSerialized.equals(stateTagOld))
+                    {
+                        identicalStates.add(stateTagNewReSerialized);
+                    }
+                    else if (stateTagNewReSerialized.getCompound("Properties").equals(propsOld))
+                    {
+                        statesWithIdenticalProperties.add(Pair.of(stateTagOld, stateTagNewReSerialized));
+                    }
+
+                    removedPropNames.clear();
+                    addedPropNames.clear();
+                    getExtraProperties(stateTagOld, stateTagNewReSerialized, removedPropNames);
+                    getExtraProperties(stateTagNewReSerialized, stateTagOld, addedPropNames);
+
+                    if (addedPropNames.isEmpty() == false)
+                    {
+                        ArrayList<String> list = new ArrayList<>();
+                        list.addAll(addedPropNames);
+                        Collections.sort(list);
+                        addedProperties.add(Pair.of(oldStateEntry.blockStateEntry, list));
+                    }
+
+                    if (removedPropNames.isEmpty() == false)
+                    {
+                        ArrayList<Pair<String, String>> list = new ArrayList<>();
+
+                        for (String propName : removedPropNames)
+                        {
+                            list.add(Pair.of(propName, propsOld.getString(propName)));
+                        }
+
+                        Collections.sort(list);
+                        removedProperties.add(Pair.of(oldStateEntry.blockStateEntry, list));
+                    }
+
+                    JsonObject objEntry = this.blockStates_1_12_stateTagToBlockStateEntryJsonObject.get(stateTagOld);
                     objEntry.add("1.13", BlockStateMapBuilder.blockStateTagToJsonObject(stateTagNewReSerialized));
 
                     if (stateTagNewReSerialized.equals(stateTagNew) == false)
@@ -460,7 +475,121 @@ public class BlockStateMapBuilder_v2
 
             System.out.printf("\n");
         }
+        */
 
+        if (identicalStates.size() > 0)
+        {
+            System.out.printf("\n");
+            System.out.printf("===============================\n");
+            System.out.printf(" Identical states (%d):\n", identicalStates.size());
+            System.out.printf("===============================\n");
+
+            for (NBTTagCompound stateTag : identicalStates)
+            {
+                if (stateTag.contains("Properties") == false)
+                    System.out.printf("%s\n", stateTag.getString("Name"));
+            }
+
+            for (NBTTagCompound stateTag : identicalStates)
+            {
+                if (stateTag.contains("Properties"))
+                {
+                    NBTTagCompound props = stateTag.getCompound("Properties");
+                    ArrayList<String> list = new ArrayList<>();
+                    for (String key : props.keySet())
+                    {
+                        list.add(key + "=" + props.getString(key));
+                    }
+                    Collections.sort(list);
+                    System.out.printf("%-40s %s\n", stateTag.getString("Name"), String.join(", ", list));
+                }
+            }
+
+            System.out.printf("\n");
+        }
+
+        if (statesWithIdenticalProperties.size() > 0)
+        {
+            System.out.printf("\n");
+            System.out.printf("===============================\n");
+            System.out.printf(" Identical properties (renamed block) (%d):\n", statesWithIdenticalProperties.size());
+            System.out.printf("===============================\n");
+
+            for (Pair<NBTTagCompound, NBTTagCompound> pair : statesWithIdenticalProperties)
+            {
+                NBTTagCompound old = pair.getLeft();
+                NBTTagCompound nnw = pair.getRight();
+                NBTTagCompound props = old.getCompound("Properties");
+
+                if (props.keySet().isEmpty() == false)
+                {
+                    continue;
+                }
+
+                System.out.printf("%-40s %-40s\n", old.getString("Name"), nnw.getString("Name"));
+            }
+
+            for (Pair<NBTTagCompound, NBTTagCompound> pair : statesWithIdenticalProperties)
+            {
+                NBTTagCompound old = pair.getLeft();
+                NBTTagCompound nnw = pair.getRight();
+                NBTTagCompound props = old.getCompound("Properties");
+
+                if (props.keySet().isEmpty())
+                {
+                    continue;
+                }
+
+                ArrayList<String> list = new ArrayList<>();
+
+                for (String key : props.keySet())
+                {
+                    list.add(key + "=" + props.getString(key));
+                }
+
+                Collections.sort(list);
+                System.out.printf("%-40s %-40s %s\n", old.getString("Name"), nnw.getString("Name"), String.join(", ", list));
+            }
+
+            System.out.printf("\n");
+        }
+
+        if (addedProperties.size() > 0)
+        {
+            System.out.printf("\n");
+            System.out.printf("===============================\n");
+            System.out.printf(" States with new properties (%d):\n", addedProperties.size());
+            System.out.printf("===============================\n");
+
+            for (Pair<JsonObject, ArrayList<String>> pair : addedProperties)
+            {
+                JsonObject oldState = pair.getLeft();
+                ArrayList<String> newProps = pair.getRight();
+                System.out.printf("%-160s added: %s\n", oldState, newProps);
+            }
+
+            System.out.printf("\n");
+        }
+
+        if (removedProperties.size() > 0)
+        {
+            System.out.printf("\n");
+            System.out.printf("===============================\n");
+            System.out.printf(" States with removed properties (%d):\n", removedProperties.size());
+            System.out.printf("===============================\n");
+
+            for (Pair<JsonObject, ArrayList<Pair<String, String>>> pair : removedProperties)
+            {
+                JsonObject oldState = pair.getLeft();
+                ArrayList<Pair<String, String>> remProps = pair.getRight();
+                Collections.sort(remProps, (p1, p2) -> p1.getLeft().compareTo(p2.getLeft()));
+                System.out.printf("%-140s removed: %s\n", oldState, remProps);
+            }
+
+            System.out.printf("\n");
+        }
+
+        /*
         if (statesWithIdenticalProperties.size() > 0)
         {
             System.out.printf("\n");
