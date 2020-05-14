@@ -25,7 +25,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
@@ -167,7 +167,7 @@ public class SchematicPlacingUtils
                     }
                     else
                     {
-                        LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
+                        Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
                     }
 
                     if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
@@ -308,7 +308,7 @@ public class SchematicPlacingUtils
                             }
                             catch (Exception e)
                             {
-                                LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                Litematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
                             }
                         }
                     }
@@ -419,7 +419,7 @@ public class SchematicPlacingUtils
                     if (placeBlocksWithinChunk(world, chunkPos, regionName, region, origin, schematicPlacement, placement, replace, notifyNeighbors) == false)
                     {
                         allSuccess = false;
-                        LiteModLitematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
+                        Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
                     }
 
                     if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false)
@@ -575,7 +575,7 @@ public class SchematicPlacingUtils
                             }
                             catch (Exception e)
                             {
-                                LiteModLitematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
+                                Litematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
                             }
                         }
                     }

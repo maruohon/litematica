@@ -34,6 +34,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       CLONE_AT_ORIGINAL_POS   = new ConfigBoolean(    "cloneAtOriginalPosition", false, "If enabled, then using the Clone Area hotkey will create\nthe placement at the original area selection position,\ninstead of at the player's current position");
         public static final ConfigBoolean       CUSTOM_SCHEMATIC_DIRECTORY_ENABLED = new ConfigBoolean("customSchematicDirectoryEnabled", false, "If enabled, then the directory set in 'customSchematicDirectory'\nwill be used as the root/base schematic directory,\ninstead of the normal '.minecraft/schematics/' directory");
         public static final ConfigDirectory     CUSTOM_SCHEMATIC_DIRECTORY = new ConfigDirectory("customSchematicDirectory", FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics")), "The root/base schematic directory to use, if 'customSchematicDirectoryEnabled' is enabled");
+        public static final ConfigBoolean       DEBUG_MESSAGES          = new ConfigBoolean(    "debugMessages", false, "Enables some debug messages in the game console");
         public static final ConfigBoolean       EASY_PLACE_CLICK_ADJACENT = new ConfigBoolean(  "easyPlaceClickAdjacent", false, "If enabled, then the Easy Place mode will try to\nclick on existing adjacent blocks. This may help on Spigot\nor similar servers, which don't allow clicking on air blocks.");
         public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place that block in that position");
         public static final ConfigBoolean       EASY_PLACE_HOLD_ENABLED = new ConfigBoolean(    "easyPlaceHoldEnabled", false, "When enabled, then simply holding down the use key\nand looking at different schematic blocks will place them");
@@ -66,6 +67,7 @@ public class Configs implements IConfigHandler
                 CHANGE_SELECTED_CORNER,
                 CLONE_AT_ORIGINAL_POS,
                 CUSTOM_SCHEMATIC_DIRECTORY_ENABLED,
+                DEBUG_MESSAGES,
                 EASY_PLACE_CLICK_ADJACENT,
                 EASY_PLACE_MODE,
                 EASY_PLACE_HOLD_ENABLED,

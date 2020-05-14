@@ -22,7 +22,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
@@ -329,7 +329,7 @@ public class SchematicCreationUtils
 
             if (box == null || region == null)
             {
-                LiteModLitematica.logger.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
+                Litematica.logger.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }
 
@@ -340,7 +340,7 @@ public class SchematicCreationUtils
             if (container == null || blockEntityMap == null || tickMap == null)
             {
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
-                LiteModLitematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
+                Litematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }
 

@@ -26,12 +26,12 @@ import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.MathHelper;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public class ChunkRenderDispatcherLitematica
 {
-    private static final Logger LOGGER = LiteModLitematica.logger;
+    private static final Logger LOGGER = Litematica.logger;
     private static final ThreadFactory THREAD_FACTORY = (new ThreadFactoryBuilder()).setNameFormat("Litematica Chunk Batcher %d").setDaemon(true).build();
 
     private final List<Thread> listWorkerThreads = Lists.<Thread>newArrayList();
@@ -52,7 +52,7 @@ public class ChunkRenderDispatcherLitematica
 
         if (threadLimitCPU > 1)
         {
-            LiteModLitematica.logger.info("Creating {} render threads", threadLimitCPU);
+            Litematica.logger.info("Creating {} render threads", threadLimitCPU);
 
             for (int i = 0; i < threadLimitCPU; ++i)
             {
@@ -64,7 +64,7 @@ public class ChunkRenderDispatcherLitematica
             }
         }
 
-        LiteModLitematica.logger.info("Using {} total BufferBuilder caches", this.countRenderBuilders + 1);
+        Litematica.logger.info("Using {} total BufferBuilder caches", this.countRenderBuilders + 1);
 
         this.queueFreeRenderBuilders = Queues.newArrayBlockingQueue(this.countRenderBuilders);
 

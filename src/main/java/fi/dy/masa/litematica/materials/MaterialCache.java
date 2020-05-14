@@ -32,7 +32,7 @@ import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
@@ -364,7 +364,7 @@ public class MaterialCache
         {
             if (dir.exists() == false && dir.mkdirs() == false)
             {
-                LiteModLitematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath());
+                Litematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath());
                 return false;
             }
 
@@ -377,7 +377,7 @@ public class MaterialCache
         }
         catch (Exception e)
         {
-            LiteModLitematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath(), e);
+            Litematica.logger.warn("Failed to write the material list cache to file '{}'", file.getAbsolutePath(), e);
         }
 
         return false;
@@ -407,7 +407,7 @@ public class MaterialCache
         }
         catch (Exception e)
         {
-            LiteModLitematica.logger.warn("Failed to read the material list cache from file '{}'", file.getAbsolutePath(), e);
+            Litematica.logger.warn("Failed to read the material list cache from file '{}'", file.getAbsolutePath(), e);
         }
     }
 }

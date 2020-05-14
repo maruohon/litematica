@@ -9,7 +9,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ScreenShotHelper;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
@@ -402,7 +402,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 }
                 catch (Exception e)
                 {
-                    LiteModLitematica.logger.warn("Exception while creating preview image", e);
+                    Litematica.logger.warn("Exception while creating preview image", e);
                 }
             }
             else

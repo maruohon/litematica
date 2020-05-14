@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.NextTickListEntry;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -163,7 +163,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
                 }
                 catch (Exception e)
                 {
-                    LiteModLitematica.logger.warn("Exception while reading schematic contents from another schematic", e);
+                    Litematica.logger.warn("Exception while reading schematic contents from another schematic", e);
                 }
             }
         }

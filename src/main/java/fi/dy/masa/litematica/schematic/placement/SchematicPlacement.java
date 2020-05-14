@@ -14,7 +14,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.gen.structure.template.PlacementSettings;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListPlacement;
 import fi.dy.masa.litematica.schematic.ISchematic;
@@ -255,7 +255,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
                 }
                 else
                 {
-                    LiteModLitematica.logger.warn("SchematicPlacement.getSubRegionBoxes(): Sub-region '{}' not found in the schematic '{}'", name, this.schematic.getMetadata().getName());
+                    Litematica.logger.warn("SchematicPlacement.getSubRegionBoxes(): Sub-region '{}' not found in the schematic '{}'", name, this.schematic.getMetadata().getName());
                 }
             }
         }
@@ -285,7 +285,7 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
             }
             else
             {
-                LiteModLitematica.logger.warn("SchematicPlacement.getSubRegionBoxFor(): Sub-region '{}' not found in the schematic '{}'", regionName, this.schematic.getMetadata().getName());
+                Litematica.logger.warn("SchematicPlacement.getSubRegionBoxFor(): Sub-region '{}' not found in the schematic '{}'", regionName, this.schematic.getMetadata().getName());
             }
         }
 

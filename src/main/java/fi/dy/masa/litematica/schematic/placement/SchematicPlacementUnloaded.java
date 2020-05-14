@@ -11,7 +11,7 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.ISchematic;
@@ -270,7 +270,7 @@ public class SchematicPlacementUnloaded
             {
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_placements.settings_load.missing_data");
                 String name = this.schematicFile != null ? this.schematicFile.getAbsolutePath() : "<null>";
-                LiteModLitematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", name);
+                Litematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", name);
                 return false;
             }
 

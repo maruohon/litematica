@@ -15,7 +15,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
@@ -258,7 +258,7 @@ public class SelectionManager
                     catch (Exception e)
                     {
                         feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.copy_failed");
-                        LiteModLitematica.logger.warn("Copy failed", e);
+                        Litematica.logger.warn("Copy failed", e);
                         return false;
                     }
 
@@ -771,7 +771,7 @@ public class SelectionManager
         }
         catch (Exception e)
         {
-            LiteModLitematica.logger.warn("Exception while writing area selections to disk", e);
+            Litematica.logger.warn("Exception while writing area selections to disk", e);
         }
 
         AreaSelection current = this.currentSelectionId != null ? this.selections.get(this.currentSelectionId) : null;

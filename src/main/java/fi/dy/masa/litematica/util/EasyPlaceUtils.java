@@ -26,7 +26,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import fi.dy.masa.litematica.LiteModLitematica;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -95,7 +95,7 @@ public class EasyPlaceUtils
             }
             catch (Exception e)
             {
-                LiteModLitematica.logger.warn("EasyPlaceUtils: Failed to reflect method Block::onBlockActivated", e);
+                Litematica.logger.warn("EasyPlaceUtils: Failed to reflect method Block::onBlockActivated", e);
                 val = false;
             }
 
