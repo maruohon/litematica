@@ -21,6 +21,12 @@ apply plugin: 'maven-publish'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.encoding = 'UTF-8'
+}
+
 repositories {
     mavenCentral()
     maven { url 'https://www.jitpack.io' }

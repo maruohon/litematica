@@ -257,7 +257,7 @@ public class BlockStateMapBuilder_v2
             NBTTagCompound stateTag113Orig = entryNew.newStateTag;
 
             // Account for post-flattening-map changes
-            NBTTagCompound stateTag113 = StateTagFixers_1_12_to_1_13_2.fixStateTag(stateTag113Orig.copy());
+            NBTTagCompound stateTag113 = StateTagFixers_1_12_to_1_13_2.fixStateTag(stateTag113Orig);
 
             if (stateTag113.equals(stateTag113Orig) == false)
             {
@@ -344,6 +344,9 @@ public class BlockStateMapBuilder_v2
                         }
                     }
                 }
+
+                // This needs to run again after copying the identical properties (at least for levers and torches)
+                fixState(stateTagOld, stateTagNew);
 
                 // Convert the tag to a block state and back to include all the current properties in the tag
                 IBlockState state = NBTUtil.readBlockState(stateTagNew);
@@ -765,30 +768,56 @@ public class BlockStateMapBuilder_v2
         {
             newStateTag.putString("Name", newStateTag.getString("Name").replace("_bark", "_wood"));
         }
-        else if (oldStateTag.contains("Properties", Constants.NBT.TAG_COMPOUND))
-        {
-            NBTTagCompound propsOld = oldStateTag.getCompound("Properties");
-
-            // Fix property value case mismatch
-            /*if (this.matchesNameAndHasProperty(oldStateTag, "minecraft:structure_block", "mode"))
-            {
-                NBTTagCompound propsNew = newStateTag.getCompound("Properties");
-                propsOld.putString("mode", propsOld.getString("mode").toUpperCase());
-                propsNew.putString("mode", propsNew.getString("mode").toUpperCase());
-            }
-            // Fix pre-flattening property value changes for lightBlue => light_blue blocks
-            else */
-            if (propsOld.contains("color", Constants.NBT.TAG_STRING) &&
-                     propsOld.getString("color").equals("light_blue"))
-            {
-                propsOld.putString("color", "lightBlue");
-            }
-        }
     }
 
     private static void fixState(NBTTagCompound oldStateTag, NBTTagCompound newStateTag)
     {
-        if (matchesName(oldStateTag, "minecraft:leaves") || matchesName(oldStateTag, "minecraft:leaves2"))
+        if (matchesName(newStateTag, "minecraft:lever"))
+        {
+            NBTTagCompound propTagOld = oldStateTag.getCompound("Properties");
+            NBTTagCompound propTagNew = newStateTag.getCompound("Properties");
+            String facing = propTagOld.getString("facing");
+            String face = "wall";
+
+            switch (facing)
+            {
+                case "down_x":
+                    facing = "west";
+                    face = "ceiling";
+                    break;
+                case "down_z":
+                    facing = "north";
+                    face = "ceiling";
+                    break;
+                case "up_x":
+                    facing = "west";
+                    face = "floor";
+                    break;
+                case "up_z":
+                    facing = "north";
+                    face = "floor";
+                    break;
+                default:
+            }
+
+            propTagNew.putString("facing", facing);
+            propTagNew.putString("face", face);
+        }
+        else if (matchesName(oldStateTag, "minecraft:torch") && hasPropertyWithValue(oldStateTag, "facing", "up"))
+        {
+            newStateTag.remove("Properties");
+            newStateTag.putString("Name", "minecraft:torch");
+        }
+        else if ((matchesName(oldStateTag, "minecraft:redstone_torch") || matchesName(oldStateTag, "minecraft:unlit_redstone_torch")) && hasPropertyWithValue(oldStateTag, "facing", "up"))
+        {
+            boolean isLit = oldStateTag.getString("Name").equals("minecraft:redstone_torch");
+            NBTTagCompound propTagNew = newStateTag.getCompound("Properties");
+
+            newStateTag.putString("Name", "minecraft:redstone_torch");
+            propTagNew.putString("lit", isLit ? "true" : "false");
+            propTagNew.remove("facing");
+        }
+        else if (matchesName(oldStateTag, "minecraft:leaves") || matchesName(oldStateTag, "minecraft:leaves2"))
         {
             NBTTagCompound propTagOld = oldStateTag.getCompound("Properties");
             NBTTagCompound propTagNew = newStateTag.getCompound("Properties");

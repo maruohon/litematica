@@ -65,6 +65,7 @@ public class StateTagFixers_1_12_to_1_13_2
 
         if (newTag.getCompound("Properties").getString("facing").equals("up"))
         {
+            newTag.putString("Name", "minecraft:torch");
             newTag.remove("Properties");
         }
         else
