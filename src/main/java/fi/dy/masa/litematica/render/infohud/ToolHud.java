@@ -325,7 +325,7 @@ public class ToolHud extends InfoHud
         String green = GuiBase.TXT_GREEN;
         String rst = GuiBase.TXT_RST;
 
-        strBlock = green + state.getBlock().getName().asString() + rst;
+        strBlock = green + state.getBlock().getName().getString() + rst;
         Direction facing = BlockUtils.getFirstPropertyFacingValue(state);
 
         if (facing != null)
