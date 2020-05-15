@@ -4,6 +4,7 @@ import java.util.Arrays;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -17,6 +18,8 @@ import net.minecraft.world.chunk.WorldChunk;
 
 public class ChunkSchematic extends WorldChunk
 {
+    private static final BlockState AIR = Blocks.AIR.getDefaultState();
+
     private final long timeCreated;
     private boolean isEmpty = true;
 
@@ -25,6 +28,29 @@ public class ChunkSchematic extends WorldChunk
         super(worldIn, pos, new BiomeArray(Util.make(new Biome[BiomeArray.DEFAULT_LENGTH], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
 
         this.timeCreated = worldIn.getTime();
+    }
+
+    @Override
+    public BlockState getBlockState(BlockPos pos)
+    {
+        int x = pos.getX() & 0xF;
+        int y = pos.getY();
+        int z = pos.getZ() & 0xF;
+        int cy = y >> 4;
+
+        ChunkSection[] sections = this.getSectionArray();
+
+        if (cy >= 0 && cy < sections.length)
+        {
+            ChunkSection chunkSection = sections[cy];
+
+            if (ChunkSection.isEmpty(chunkSection) == false)
+            {
+                return chunkSection.getBlockState(x, y & 0xF, z);
+            }
+         }
+
+         return AIR;
     }
 
     @Override

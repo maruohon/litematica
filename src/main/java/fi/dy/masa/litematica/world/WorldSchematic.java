@@ -35,10 +35,9 @@ public class WorldSchematic extends ClientWorld
     private ChunkProviderSchematic chunkProviderSchematic;
     private int nextEntityId;
 
-    public WorldSchematic(ClientPlayNetworkHandler netHandler, ClientWorld.class_5271 levelInfo,
-            DimensionType dimType, Supplier<Profiler> profilerIn)
+    public WorldSchematic(ClientPlayNetworkHandler clientPlayNetworkHandler, class_5271 arg, DimensionType dimensionType, Supplier<Profiler> supplier)
     {
-        super(netHandler, levelInfo, dimType, 1, profilerIn, null);
+        super(clientPlayNetworkHandler, arg, dimensionType, 1, supplier, null, true, 0L);
 
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
@@ -183,6 +182,12 @@ public class WorldSchematic extends ClientWorld
 
     @Override
     public void updateListeners(BlockPos blockPos_1, BlockState blockState_1, BlockState blockState_2, int flags)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void setBlockBreakingInfo(int entityId, BlockPos pos, int progress)
     {
         // NO-OP
     }

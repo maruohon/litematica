@@ -1,10 +1,10 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
+import net.minecraft.server.world.ServerWorld;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.server.world.ServerWorld;
 
 public class TaskPasteSchematicDirect extends TaskBase
 {
@@ -24,7 +24,7 @@ public class TaskPasteSchematicDirect extends TaskBase
     @Override
     public boolean execute()
     {
-        ServerWorld world = this.mc.getServer().getWorld(this.mc.world.dimension.getType());
+        ServerWorld world = this.mc.getServer().getWorld(this.mc.world.method_27983());
         LitematicaSchematic schematic = this.placement.getSchematic();
 
         if (world != null && schematic.placeToWorld(world, this.placement, false))

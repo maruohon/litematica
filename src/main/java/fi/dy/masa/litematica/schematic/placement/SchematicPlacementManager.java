@@ -670,7 +670,7 @@ public class SchematicPlacementManager
 
                 if (mc.isIntegratedServerRunning())
                 {
-                    final ServerWorld world = mc.getServer().getWorld(mc.player.getEntityWorld().dimension.getType());
+                    final ServerWorld world = mc.getServer().getWorld(mc.player.getEntityWorld().method_27983());
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
                     MinecraftServer server = mc.getServer();
 

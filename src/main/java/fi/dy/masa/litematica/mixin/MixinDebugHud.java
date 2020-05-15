@@ -29,7 +29,7 @@ public abstract class MixinDebugHud extends DrawableHelper
 
             WorldRendererSchematic renderer = LitematicaRenderer.getInstance().getWorldRenderer();
 
-            list.add(String.format("%s[Litematica]%s %s", pre, rst, renderer.getDebugInfoRenders()));
+            list.add(String.format("%s[Litematica]%s %s C#: %d", pre, rst, renderer.getDebugInfoRenders(), world.getChunkProvider().getLoadedChunks().size()));
 
             String str = String.format("E: %d TE: %d", world.getRegularEntityCount(), world.blockEntities.size());
             list.add(String.format("%s[Litematica]%s %s %s", pre, rst, renderer.getDebugInfoEntities(), str));

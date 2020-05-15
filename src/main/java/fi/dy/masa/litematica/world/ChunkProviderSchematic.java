@@ -1,14 +1,14 @@
 package fi.dy.masa.litematica.world;
 
 import javax.annotation.Nullable;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.collection.TypeFilterableList;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class ChunkProviderSchematic extends ClientChunkManager
 {
@@ -31,9 +31,16 @@ public class ChunkProviderSchematic extends ClientChunkManager
         return chunk;
     }
 
+    @Override
     public boolean isChunkLoaded(int chunkX, int chunkZ)
     {
         return this.loadedChunks.containsKey(ChunkPos.toLong(chunkX, chunkZ));
+    }
+
+    @Override
+    public int getLoadedChunkCount()
+    {
+        return this.loadedChunks.size();
     }
 
     public Long2ObjectMap<ChunkSchematic> getLoadedChunks()
@@ -48,6 +55,7 @@ public class ChunkProviderSchematic extends ClientChunkManager
         return chunk == null && fallbackToEmpty ? this.blankChunk : chunk;
     }
 
+    @Override
     @Nullable
     public ChunkSchematic getChunk(int chunkX, int chunkZ)
     {
