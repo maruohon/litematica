@@ -399,6 +399,7 @@ public class WorldUtils
             if (stack.isEmpty() == false)
             {
                 PlayerInventory inv = mc.player.inventory;
+                stack = stack.copy();
 
                 if (mc.player.abilities.creativeMode)
                 {
