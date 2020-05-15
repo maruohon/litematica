@@ -463,11 +463,11 @@ public class LitematicaRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
-            this.enableAlphaShader();
+            //this.enableAlphaShader();
 
             this.getWorldRenderer().renderEntities(this.getCamera(), this.frustum, matrices, partialTicks);
 
-            this.disableAlphaShader();
+            //this.disableAlphaShader();
 
             RenderSystem.disableBlend();
 
