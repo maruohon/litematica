@@ -4,7 +4,6 @@
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7",
     "client": [
-        "IMixinBlockModelRenderer",
         "IMixinFenceGateBlock",
         "IMixinRedstoneWireBlock",
         "IMixinStairsBlock",

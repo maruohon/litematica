@@ -21,6 +21,7 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
@@ -87,10 +88,11 @@ public class ChunkRendererSchematicVbo
         this.vertexBufferOverlay = new VertexBuffer[OverlayRenderType.values().length];
         this.position = new BlockPos.Mutable();
         this.chunkRelativePos = new BlockPos.Mutable();
+        VertexFormat formatBlocks = RenderLayer.getSolid().getVertexFormat();
 
         for (RenderLayer layer : RenderLayer.getBlockLayers())
         {
-            this.vertexBufferBlocks.put(layer, new VertexBuffer(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL));
+            this.vertexBufferBlocks.put(layer, new VertexBuffer(formatBlocks));
         }
 
         for (int i = 0; i < OverlayRenderType.values().length; ++i)
@@ -744,7 +746,7 @@ public class ChunkRendererSchematicVbo
 
     private void preRenderBlocks(BufferBuilder buffer)
     {
-        buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
+        buffer.begin(GL11.GL_QUADS, RenderLayer.getSolid().getVertexFormat());
     }
 
     private void postRenderBlocks(RenderLayer layer, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)

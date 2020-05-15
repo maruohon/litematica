@@ -88,7 +88,7 @@ public class InventoryUtils
                 }
                 else
                 {
-                    fi.dy.masa.malilib.util.InventoryUtils.swapItemToMainHand(stack, mc);
+                    fi.dy.masa.malilib.util.InventoryUtils.swapItemToMainHand(stack.copy(), mc);
                 }
             }
         }

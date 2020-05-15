@@ -305,18 +305,21 @@ public class LitematicaSchematic
         BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
 
         BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        BlockPos posEndAbs = PositionUtils.getTransformedBlockPos(posEndRelSub, placement.getMirror(), placement.getRotation()).add(regionPosTransformed).add(origin);
+        //BlockPos posEndAbs = PositionUtils.getTransformedBlockPos(posEndRelSub, placement.getMirror(), placement.getRotation()).add(regionPosTransformed).add(origin);
         BlockPos regionPosAbs = regionPosTransformed.add(origin);
 
+        /*
         if (PositionUtils.arePositionsWithinWorld(world, regionPosAbs, posEndAbs) == false)
         {
             return false;
         }
+        */
 
         final int sizeX = Math.abs(regionSize.getX());
         final int sizeY = Math.abs(regionSize.getY());
         final int sizeZ = Math.abs(regionSize.getZ());
         final BlockState barrier = Blocks.BARRIER.getDefaultState();
+        final boolean ignoreInventories = Configs.Generic.PASTE_IGNORE_INVENTORY.getBooleanValue();
         BlockPos.Mutable posMutable = new BlockPos.Mutable();
         ReplaceBehavior replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
 
@@ -331,7 +334,23 @@ public class LitematicaSchematic
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
         }
 
-        for (int y = 0; y < sizeY; ++y)
+        int tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY();
+        int startY = 0;
+        int endY = sizeY;
+
+        if (tmp < 0)
+        {
+            startY += (0 - tmp);
+        }
+
+        tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY() + (endY - 1);
+
+        if (tmp > 255)
+        {
+            endY -= (tmp - 255);
+        }
+
+        for (int y = startY; y < endY; ++y)
         {
             for (int z = 0; z < sizeZ; ++z)
             {
@@ -366,7 +385,7 @@ public class LitematicaSchematic
                     if (mirrorSub != BlockMirror.NONE)  { state = state.mirror(mirrorSub); }
                     if (rotationCombined != BlockRotation.NONE) { state = state.rotate(rotationCombined); }
 
-                    if (stateOld == state)
+                    if (stateOld == state && state.getBlock().hasBlockEntity() == false)
                     {
                         continue;
                     }
@@ -394,9 +413,19 @@ public class LitematicaSchematic
                             teNBT.putInt("y", pos.getY());
                             teNBT.putInt("z", pos.getZ());
 
+                            if (ignoreInventories)
+                            {
+                                teNBT.remove("Items");
+                            }
+
                             try
                             {
                                 te.fromTag(state, teNBT);
+
+                                if (ignoreInventories && te instanceof Inventory)
+                                {
+                                    ((Inventory) te).clear();
+                                }
 
                                 if (mirrorMain != BlockMirror.NONE) { te.applyMirror(mirrorMain); }
                                 if (mirrorSub != BlockMirror.NONE)  { te.applyMirror(mirrorSub); }
@@ -578,8 +607,8 @@ public class LitematicaSchematic
         final int endX = posMax.getX();
         final int endZ = posMax.getZ();
 
-        final int startY = 0;
-        final int endY = Math.abs(regionSize.getY()) - 1;
+        int startY = 0;
+        int endY = Math.abs(regionSize.getY()) - 1;
         BlockPos.Mutable posMutable = new BlockPos.Mutable();
 
         //System.out.printf("sx: %d, sy: %d, sz: %d => ex: %d, ey: %d, ez: %d\n", startX, startY, startZ, endX, endY, endZ);
@@ -601,6 +630,20 @@ public class LitematicaSchematic
              schematicPlacement.getRotation() == BlockRotation.COUNTERCLOCKWISE_90))
         {
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
+        }
+
+        int tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY();
+
+        if (tmp < 0)
+        {
+            startY += (0 - tmp);
+        }
+
+        tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY() + endY;
+
+        if (tmp > 255)
+        {
+            endY -= (tmp - 255);
         }
 
         for (int y = startY; y <= endY; ++y)

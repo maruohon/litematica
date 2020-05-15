@@ -293,6 +293,8 @@ public class ToolHud extends InfoHud
                     }
 
                     lines.add(StringUtils.translate("litematica.hud.misc.schematic_paste.replace_mode", str));
+                    String strVal = Configs.Generic.PASTE_IGNORE_INVENTORY.getBooleanValue() ? strYes : strNo;
+                    lines.add(String.format("Ignore inventory contents: %s", strVal));
                 }
             }
             else

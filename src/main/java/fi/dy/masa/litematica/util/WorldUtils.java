@@ -185,8 +185,9 @@ public class WorldUtils
 
             return litematicaSchematic;
         }
-        catch (Throwable t)
+        catch (Exception e)
         {
+            feedback.setString("Exception while trying to load the vanilla structure: " + e.getMessage());
         }
 
         return null;
@@ -398,6 +399,7 @@ public class WorldUtils
             if (stack.isEmpty() == false)
             {
                 PlayerInventory inv = mc.player.inventory;
+                stack = stack.copy();
 
                 if (mc.player.abilities.creativeMode)
                 {

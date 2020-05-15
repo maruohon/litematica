@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.render.schematic;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
+import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -10,7 +11,6 @@ import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
@@ -23,16 +23,15 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockRenderView;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.mixin.IMixinBlockModelRenderer;
 
 public class BlockModelRendererSchematic
 {
-    private final BlockModelRenderer vanillaRenderer;
     private final Random random = new Random();
+    private final BlockColors colorMap;
 
     public BlockModelRendererSchematic(BlockColors blockColorsIn)
     {
-        this.vanillaRenderer = MinecraftClient.getInstance().getBlockRenderManager().getModelRenderer();
+        this.colorMap = blockColorsIn;
     }
 
     public boolean renderModel(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
@@ -150,10 +149,10 @@ public class BlockModelRendererSchematic
         {
             BakedQuad bakedQuad = list.get(i);
 
-            ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeGetQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), box, flags);
+            this.getQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), box, flags);
             ambientOcclusionCalculator.apply(world, state, pos, bakedQuad.getFace(), box, flags);
 
-            ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeRenderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad,
+            this.renderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad,
                     ambientOcclusionCalculator.brightness[0],
                     ambientOcclusionCalculator.brightness[1],
                     ambientOcclusionCalculator.brightness[2],
@@ -176,12 +175,109 @@ public class BlockModelRendererSchematic
 
             if (useWorldLight)
             {
-                ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeGetQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), null, flags);
+                this.getQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), null, flags);
                 BlockPos blockPos = flags.get(0) ? pos.offset(bakedQuad.getFace()) : pos;
                 light = WorldRenderer.getLightmapCoordinates(world, state, blockPos);
             }
 
-            ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeRenderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad, 1.0F, 1.0F, 1.0F, 1.0F, light, light, light, light, overlay);
+            this.renderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad, 1.0F, 1.0F, 1.0F, 1.0F, light, light, light, light, overlay);
+        }
+    }
+
+    private void renderQuad(BlockRenderView world, BlockState state, BlockPos pos, VertexConsumer vertexConsumer, MatrixStack.Entry matrixEntry,
+            BakedQuad quad, float brightness0, float brightness1, float brightness2, float brightness3,
+            int light0, int light1, int light2, int light3, int overlay)
+    {
+        float r;
+        float g;
+        float b;
+
+        if (quad.hasColor())
+        {
+            int color = this.colorMap.getColor(state, world, pos, quad.getColorIndex());
+            r = (float) (color >> 16 & 0xFF) / 255.0F;
+            g = (float) (color >>  8 & 0xFF) / 255.0F;
+            b = (float) (color       & 0xFF) / 255.0F;
+        }
+        else
+        {
+            r = 1.0F;
+            g = 1.0F;
+            b = 1.0F;
+        }
+
+        vertexConsumer.quad(matrixEntry, quad, new float[]{ brightness0, brightness1, brightness2, brightness3 },
+                            r, g, b, new int[]{ light0, light1, light2, light3 }, overlay, true);
+    }
+
+    private void getQuadDimensions(BlockRenderView world, BlockState state, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] box, BitSet flags)
+    {
+        float minX = 32.0F;
+        float minY = 32.0F;
+        float minZ = 32.0F;
+        float maxX = -32.0F;
+        float maxY = -32.0F;
+        float maxZ = -32.0F;
+        final int vertexSize = vertexData.length / 4;
+
+        for (int index = 0; index < 4; ++index)
+        {
+            float x = Float.intBitsToFloat(vertexData[index * vertexSize    ]);
+            float y = Float.intBitsToFloat(vertexData[index * vertexSize + 1]);
+            float z = Float.intBitsToFloat(vertexData[index * vertexSize + 2]);
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            minZ = Math.min(minZ, z);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+            maxZ = Math.max(maxZ, z);
+        }
+
+        if (box != null)
+        {
+            box[Direction.WEST.getId()]  = minX;
+            box[Direction.EAST.getId()]  = maxX;
+            box[Direction.DOWN.getId()]  = minY;
+            box[Direction.UP.getId()]    = maxY;
+            box[Direction.NORTH.getId()] = minZ;
+            box[Direction.SOUTH.getId()] = maxZ;
+
+            box[Direction.WEST.getId()  + 6] = 1.0F - minX;
+            box[Direction.EAST.getId()  + 6] = 1.0F - maxX;
+            box[Direction.DOWN.getId()  + 6] = 1.0F - minY;
+            box[Direction.UP.getId()    + 6] = 1.0F - maxY;
+            box[Direction.NORTH.getId() + 6] = 1.0F - minZ;
+            box[Direction.SOUTH.getId() + 6] = 1.0F - maxZ;
+        }
+
+        float min = 1.0E-4F;
+        float max = 0.9999F;
+
+        switch (face)
+        {
+            case DOWN:
+                flags.set(1, minX >= min || minZ >= min || maxX <= max || maxZ <= max);
+                flags.set(0, minY == maxY && (minY < min || state.isFullCube(world, pos)));
+                break;
+            case UP:
+                flags.set(1, minX >= min || minZ >= min || maxX <= max || maxZ <= max);
+                flags.set(0, minY == maxY && (maxY > max || state.isFullCube(world, pos)));
+                break;
+            case NORTH:
+                flags.set(1, minX >= min || minY >= min || maxX <= max || maxY <= max);
+                flags.set(0, minZ == maxZ && (minZ < min || state.isFullCube(world, pos)));
+                break;
+            case SOUTH:
+                flags.set(1, minX >= min || minY >= min || maxX <= max || maxY <= max);
+                flags.set(0, minZ == maxZ && (maxZ > max || state.isFullCube(world, pos)));
+                break;
+            case WEST:
+                flags.set(1, minY >= min || minZ >= min || maxY <= max || maxZ <= max);
+                flags.set(0, minX == maxX && (minX < min || state.isFullCube(world, pos)));
+                break;
+            case EAST:
+                flags.set(1, minY >= min || minZ >= min || maxY <= max || maxZ <= max);
+                flags.set(0, minX == maxX && (maxX > max || state.isFullCube(world, pos)));
         }
     }
 
