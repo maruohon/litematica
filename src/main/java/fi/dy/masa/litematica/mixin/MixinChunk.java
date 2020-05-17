@@ -14,6 +14,6 @@ public abstract class MixinChunk
               at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;isRemote:Z"))
     private boolean redirectIsRemote(World world)
     {
-        return WorldUtils.shouldPreventBlockUpdates() ? true : world.isRemote;
+        return WorldUtils.shouldPreventBlockUpdates(world) ? true : world.isRemote;
     }
 }

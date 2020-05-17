@@ -136,7 +136,7 @@ public class SchematicPlacingUtils
 
         try
         {
-            WorldUtils.setShouldPreventBlockUpdates(true);
+            WorldUtils.setShouldPreventBlockUpdates(world, true);
 
             ISchematic schematic = schematicPlacement.getSchematic();
             ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
@@ -179,7 +179,7 @@ public class SchematicPlacingUtils
         }
         finally
         {
-            WorldUtils.setShouldPreventBlockUpdates(false);
+            WorldUtils.setShouldPreventBlockUpdates(world, false);
         }
 
         return success;
@@ -400,7 +400,7 @@ public class SchematicPlacingUtils
         {
             if (notifyNeighbors == false)
             {
-                WorldUtils.setShouldPreventBlockUpdates(true);
+                WorldUtils.setShouldPreventBlockUpdates(world, true);
             }
 
             for (String regionName : regionsTouchingChunk)
@@ -431,7 +431,7 @@ public class SchematicPlacingUtils
         }
         finally
         {
-            WorldUtils.setShouldPreventBlockUpdates(false);
+            WorldUtils.setShouldPreventBlockUpdates(world, false);
         }
 
         return allSuccess;

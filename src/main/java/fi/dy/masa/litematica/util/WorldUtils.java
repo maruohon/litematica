@@ -10,21 +10,20 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.litematica.interfaces.IWorldUpdateSuppressor;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 
 public class WorldUtils
 {
-    private static boolean preventBlockUpdates;
-
-    public static boolean shouldPreventBlockUpdates()
+    public static boolean shouldPreventBlockUpdates(World world)
     {
-        return preventBlockUpdates;
+        return ((IWorldUpdateSuppressor) world).getShouldPreventUpdates();
     }
 
-    public static void setShouldPreventBlockUpdates(boolean prevent)
+    public static void setShouldPreventBlockUpdates(World world, boolean preventUpdates)
     {
-        preventBlockUpdates = prevent;
+        ((IWorldUpdateSuppressor) world).setShouldPreventUpdates(preventUpdates);
     }
 
     public static void loadChunksClientWorld(WorldClient world, BlockPos origin, Vec3i areaSize)

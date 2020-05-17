@@ -16,7 +16,7 @@ public abstract class MixinBlock
             net.minecraft.item.ItemStack stack,
             CallbackInfo ci)
     {
-        if (WorldUtils.shouldPreventBlockUpdates())
+        if (WorldUtils.shouldPreventBlockUpdates(worldIn))
         {
             ci.cancel();
         }
