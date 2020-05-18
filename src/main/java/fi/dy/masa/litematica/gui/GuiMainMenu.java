@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -112,6 +113,12 @@ public class GuiMainMenu extends GuiBase
             this.parent = parent;
         }
 
+        private void changeToolMode(ToolMode mode) {
+            if (Configs.Generic.AUTO_SWAP_TOOL_MODE.getBooleanValue()) {
+                DataManager.setToolMode(mode);
+            }
+        }
+
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
@@ -121,18 +128,22 @@ public class GuiMainMenu extends GuiBase
             {
                 case AREA_EDITOR:
                     gui = DataManager.getSelectionManager().getEditGui();
+                    changeToolMode(ToolMode.AREA_SELECTION);
                     break;
                 case AREA_SELECTION_BROWSER:
                     gui = new GuiAreaSelectionManager();
+                    changeToolMode(ToolMode.AREA_SELECTION);
                     break;
                 case CONFIGURATION:
                     GuiBase.openGui(new GuiConfigs());
                     return;
                 case LOAD_SCHEMATICS:
                     gui = new GuiSchematicLoad();
+                    changeToolMode(ToolMode.SCHEMATIC_PLACEMENT);
                     break;
                 case LOADED_SCHEMATICS:
                     gui = new GuiSchematicLoadedList();
+                    changeToolMode(ToolMode.SCHEMATIC_PLACEMENT);
                     break;
                 case MAIN_MENU:
                     gui = new GuiMainMenu();
@@ -142,6 +153,7 @@ public class GuiMainMenu extends GuiBase
                     break;
                 case SCHEMATIC_PLACEMENTS:
                     gui = new GuiSchematicPlacementsList();
+                    changeToolMode(ToolMode.SCHEMATIC_PLACEMENT);
                     break;
                 case TASK_MANAGER:
                     gui = new GuiTaskManager();
