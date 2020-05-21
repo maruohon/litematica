@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.world;
 
 import javax.annotation.Nullable;
+import net.minecraft.class_5318;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.Difficulty;
@@ -19,8 +20,9 @@ public class SchematicWorldHandler
 
     public static WorldSchematic createSchematicWorld()
     {
-        ClientWorld.class_5271 levelInfo = new ClientWorld.class_5271(Difficulty.PEACEFUL, false, true);
-        return new WorldSchematic(null, levelInfo, DimensionType.THE_END, MinecraftClient.getInstance()::getProfiler);
+        ClientWorld.Properties levelInfo = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
+        DimensionType dimType = class_5318.method_29117().method_29116().get(DimensionType.THE_END_REGISTRY_KEY);
+        return new WorldSchematic(levelInfo, dimType, MinecraftClient.getInstance()::getProfiler);
     }
 
     public static void recreateSchematicWorld(boolean remove)
