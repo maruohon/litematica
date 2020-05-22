@@ -1,34 +1,39 @@
 package fi.dy.masa.litematica.world;
 
-import javax.annotation.Nullable;
-import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.collection.TypeFilterableList;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.light.LightingProvider;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
-public class ChunkProviderSchematic extends ClientChunkManager
+public class ChunkManagerSchematic extends ChunkManager
 {
     private final WorldSchematic world;
     private final Long2ObjectMap<ChunkSchematic> loadedChunks = new Long2ObjectOpenHashMap<>(8192);
     private final ChunkSchematic blankChunk;
+    private final LightingProvider lightingProvider;
 
-    public ChunkProviderSchematic(WorldSchematic world)
+    public ChunkManagerSchematic(WorldSchematic world)
     {
-        super(world, 1);
-
         this.world = world;
         this.blankChunk = new ChunkSchematic(world, new ChunkPos(0, 0));
+        this.lightingProvider = new LightingProvider(this, true, world.getDimension().hasSkyLight());
     }
 
-    public ChunkSchematic loadChunk(int chunkX, int chunkZ)
+    @Override
+    public WorldSchematic getWorld()
+    {
+        return this.world;
+    }
+
+    public void loadChunk(int chunkX, int chunkZ)
     {
         ChunkSchematic chunk = new ChunkSchematic(this.world, new ChunkPos(chunkX, chunkZ));
         this.loadedChunks.put(ChunkPos.toLong(chunkX, chunkZ), chunk);
-        return chunk;
     }
 
     @Override
@@ -37,7 +42,11 @@ public class ChunkProviderSchematic extends ClientChunkManager
         return this.loadedChunks.containsKey(ChunkPos.toLong(chunkX, chunkZ));
     }
 
-    @Override
+    public String getDebugString()
+    {
+        return "Schematic Chunk Cache: " + this.getLoadedChunkCount();
+    }
+
     public int getLoadedChunkCount()
     {
         return this.loadedChunks.size();
@@ -56,7 +65,6 @@ public class ChunkProviderSchematic extends ClientChunkManager
     }
 
     @Override
-    @Nullable
     public ChunkSchematic getChunk(int chunkX, int chunkZ)
     {
         ChunkSchematic chunk = this.loadedChunks.get(ChunkPos.toLong(chunkX, chunkZ));
@@ -79,5 +87,11 @@ public class ChunkProviderSchematic extends ClientChunkManager
                 }
             }
         }
+    }
+
+    @Override
+    public LightingProvider getLightingProvider()
+    {
+        return this.lightingProvider;
     }
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.annotation.Nullable;
 import com.mojang.datafixers.DataFixUtils;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PillarBlock;

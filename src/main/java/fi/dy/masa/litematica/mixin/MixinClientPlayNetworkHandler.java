@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
-import fi.dy.masa.litematica.world.ChunkProviderSchematic;
+import fi.dy.masa.litematica.world.ChunkManagerSchematic;
 
 @Mixin(net.minecraft.client.network.ClientPlayNetworkHandler.class)
 public abstract class MixinClientPlayNetworkHandler
@@ -26,7 +26,7 @@ public abstract class MixinClientPlayNetworkHandler
     private void onChunkUnload(net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket packet, CallbackInfo ci)
     {
         if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() == false &&
-            ((Object) this instanceof ChunkProviderSchematic) == false)
+            ((Object) this instanceof ChunkManagerSchematic) == false)
         {
             DataManager.getSchematicPlacementManager().onClientChunkUnload(packet.getX(), packet.getZ());
         }
