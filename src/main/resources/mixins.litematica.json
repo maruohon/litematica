@@ -10,6 +10,7 @@
         "MixinDebugHud",
         "MixinIntegratedServer",
         "MixinMinecraftClient",
+        "MixinModelOverride",
         "MixinRailBlocks",
         "MixinWorldChunk",
         "MixinWorldRenderer"
