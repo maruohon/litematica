@@ -33,6 +33,7 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.TickScheduler;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
@@ -107,7 +108,7 @@ public class WorldSchematic extends World
     @Override
     public Biome getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ)
     {
-        return null;
+        return Biomes.PLAINS;
     }
 
     @Override
@@ -167,6 +168,19 @@ public class WorldSchematic extends World
         }
     }
 
+    @Nullable
+    @Override
+    public Entity getEntityById(int id)
+    {
+        return this.regularEntities.get(id);
+    }
+
+    @Override
+    public List<? extends PlayerEntity> getPlayers()
+    {
+        return ImmutableList.of();
+    }
+
     public void unloadBlockEntities(Collection<BlockEntity> blockEntities)
     {
         Set<BlockEntity> remove = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -181,8 +195,8 @@ public class WorldSchematic extends World
         return this.mc.world != null ? this.mc.world.getTime() : 0;
     }
 
-    @Nullable
     @Override
+    @Nullable
     public MapState getMapState(String id)
     {
         return null;
@@ -198,6 +212,30 @@ public class WorldSchematic extends World
     public int getNextMapId()
     {
         return 0;
+    }
+
+    @Override
+    public Scoreboard getScoreboard()
+    {
+        return this.mc.world != null ? this.mc.world.getScoreboard() : null;
+    }
+
+    @Override
+    public RecipeManager getRecipeManager()
+    {
+        return this.mc.world != null ? this.mc.world.getRecipeManager() : null;
+    }
+
+    @Override
+    public RegistryTagManager getTagManager()
+    {
+        return this.mc.world != null ? this.mc.world.getTagManager() : null;
+    }
+
+    @Override
+    public class_5318 method_28380()
+    {
+        return this.mc.world != null ? this.mc.world.method_28380() : null;
     }
 
     @Override
@@ -274,30 +312,6 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public Scoreboard getScoreboard()
-    {
-        return null;
-    }
-
-    @Override
-    public RecipeManager getRecipeManager()
-    {
-        return null;
-    }
-
-    @Override
-    public RegistryTagManager getTagManager()
-    {
-        return null;
-    }
-
-    @Override
-    public class_5318 method_28380()
-    {
-        return null;
-    }
-
-    @Override
     public void syncGlobalEvent(int eventId, BlockPos pos, int data)
     {
         // NO-OP
@@ -332,13 +346,6 @@ public class WorldSchematic extends World
         // NO-OP
     }
 
-    @Nullable
-    @Override
-    public Entity getEntityById(int id)
-    {
-        return null;
-    }
-
     @Override
     public void playSound(double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch, boolean distanceDelay)
     {
@@ -361,11 +368,5 @@ public class WorldSchematic extends World
     public void playSoundFromEntity(@Nullable PlayerEntity player, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch)
     {
         // NO-OP
-    }
-
-    @Override
-    public List<? extends PlayerEntity> getPlayers()
-    {
-        return ImmutableList.of();
     }
 }
