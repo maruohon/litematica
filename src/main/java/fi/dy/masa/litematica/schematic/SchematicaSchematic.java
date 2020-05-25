@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.schematic;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
+import fi.dy.masa.litematica.util.NbtUtils;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
 
@@ -463,5 +466,13 @@ public class SchematicaSchematic extends SingleRegionSchematic
         {
             nbt.setByteArray("AddBlocks", addArr);
         }
+    }
+
+    @Override
+    public void writeToStream(NBTTagCompound tag, FileOutputStream outputStream) throws IOException
+    {
+        // MCEdit and World Edit require the root compound tag to be named "Schematic".
+        // The vanilla util methods don't support doing that, so we have to use a custom method for it.
+        NbtUtils.writeCompressed(tag, "Schematic", outputStream);
     }
 }

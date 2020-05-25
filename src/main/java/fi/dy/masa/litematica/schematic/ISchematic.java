@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.schematic;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -125,7 +126,7 @@ public interface ISchematic
             }
 
             FileOutputStream os = new FileOutputStream(file);
-            CompressedStreamTools.writeCompressed(this.toTag(), os);
+            this.writeToStream(this.toTag(), os);
             os.close();
 
             return true;
@@ -139,7 +140,13 @@ public interface ISchematic
         return false;
     }
 
+    default void writeToStream(NBTTagCompound tag, FileOutputStream outputStream) throws IOException
+    {
+        CompressedStreamTools.writeCompressed(tag, outputStream);
+    }
+
     /**
+     *
      * Tries to read the contents of this schematic from the file that was set on creation of this schematic.
      * @return
      */
