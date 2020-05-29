@@ -1,17 +1,16 @@
 package fi.dy.masa.litematica.world;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.class_5318;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.DummyClientTickScheduler;
 import net.minecraft.entity.Entity;
@@ -52,7 +51,7 @@ public class WorldSchematic extends World
 
     protected WorldSchematic(MutableWorldProperties mutableWorldProperties, DimensionType dimensionType, Supplier<Profiler> supplier)
     {
-        super(mutableWorldProperties, dimensionType, supplier, true, true, 0L);
+        super(mutableWorldProperties, null, null, dimensionType, supplier, true, true, 0L);
 
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
@@ -230,12 +229,6 @@ public class WorldSchematic extends World
     public RegistryTagManager getTagManager()
     {
         return this.mc.world != null ? this.mc.world.getTagManager() : null;
-    }
-
-    @Override
-    public class_5318 method_28380()
-    {
-        return this.mc.world != null ? this.mc.world.method_28380() : null;
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import javax.annotation.Nullable;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.block.Block;
@@ -161,7 +162,7 @@ public class WorldUtils
 
             StructurePlacementData placementSettings = new StructurePlacementData();
             placementSettings.setIgnoreEntities(ignoreEntities);
-            template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, 0x12);
+            template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, new Random(), 0x12);
 
             String subRegionName = FileUtils.getNameWithoutExtension(structureFileName) + " (Converted Structure)";
             AreaSelection area = new AreaSelection();
@@ -703,8 +704,6 @@ public class WorldUtils
      * in the schematic, or the player is holding the wrong item in hand, then true is returned
      * to indicate that the use action should be cancelled.
      * @param mc
-     * @param doEasyPlace
-     * @param restrictPlacement
      * @return
      */
     public static boolean handlePlacementRestriction(MinecraftClient mc)
@@ -725,8 +724,6 @@ public class WorldUtils
      * in the schematic, or the player is holding the wrong item in hand, then true is returned
      * to indicate that the use action should be cancelled.
      * @param mc
-     * @param doEasyPlace
-     * @param restrictPlacement
      * @return true if the use action should be cancelled
      */
     private static boolean placementRestrictionInEffect(MinecraftClient mc)
