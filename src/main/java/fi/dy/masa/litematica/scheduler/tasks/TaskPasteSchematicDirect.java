@@ -24,7 +24,7 @@ public class TaskPasteSchematicDirect extends TaskBase
     @Override
     public boolean execute()
     {
-        ServerWorld world = this.mc.getServer().getWorld(this.mc.world.method_27983());
+        ServerWorld world = this.mc.getServer().getWorld(this.mc.world.getRegistryKey());
         LitematicaSchematic schematic = this.placement.getSchematic();
 
         if (world != null && schematic.placeToWorld(world, this.placement, false))

@@ -256,7 +256,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                             int val = previewImageData[i++];
                             // Swap the color channels from ARGB to ABGR
                             val = (val & 0xFF00FF00) | (val & 0xFF0000) >> 16 | (val & 0xFF) << 16;
-                            image.setPixelRgba(x, y, val);
+                            image.setPixelColor(x, y, val);
                         }
                     }
 

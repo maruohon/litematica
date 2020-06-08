@@ -232,7 +232,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public void checkBlockRerender(BlockPos pos, BlockState stateOld, BlockState stateNew)
+    public void scheduleBlockRerenderIfNeeded(BlockPos pos, BlockState stateOld, BlockState stateNew)
     {
         this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
     }
