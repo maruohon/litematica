@@ -328,7 +328,7 @@ public class LitematicaRenderer
         }
     }
 
-    public void piecewiseRenderSolid(MatrixStack matrices, float partialTicks)
+    public void piecewiseRenderSolid(MatrixStack matrices)
     {
         if (this.renderPiecewiseBlocks)
         {
@@ -357,7 +357,7 @@ public class LitematicaRenderer
         }
     }
 
-    public void piecewiseRenderCutoutMipped(MatrixStack matrices, float partialTicks)
+    public void piecewiseRenderCutoutMipped(MatrixStack matrices)
     {
         if (this.renderPiecewiseBlocks)
         {
@@ -385,7 +385,7 @@ public class LitematicaRenderer
         }
     }
 
-    public void piecewiseRenderCutout(MatrixStack matrices, float partialTicks)
+    public void piecewiseRenderCutout(MatrixStack matrices)
     {
         if (this.renderPiecewiseBlocks)
         {
@@ -413,7 +413,7 @@ public class LitematicaRenderer
         }
     }
 
-    public void piecewiseRenderTranslucent(MatrixStack matrices, float partialTicks)
+    public void piecewiseRenderTranslucent(MatrixStack matrices)
     {
         if (this.renderPiecewisePrepared)
         {
