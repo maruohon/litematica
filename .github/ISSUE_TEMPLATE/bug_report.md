@@ -24,7 +24,7 @@ A clear and concise description of what the bug is.
 
 ---
 
-You can remove this all the following non-applicable sections of this template (and the first paragraph notice)!
+You can remove this and all the following non-applicable sections of this template (and the first paragraph notice)!
 
 ---
 
