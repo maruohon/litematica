@@ -181,7 +181,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
                 if (this.selectionManager.removeSelection(selectionId) &&
                     this.selectionManager.getSelectionMode() == SelectionMode.NORMAL &&
-                    current.equals(selectionId))
+                    selectionId.equals(current))
                 {
                     this.widget.parent.getSelectionManagerGui().initGui();
                 }
