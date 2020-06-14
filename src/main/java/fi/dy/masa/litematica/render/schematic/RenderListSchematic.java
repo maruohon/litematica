@@ -17,7 +17,7 @@ public class RenderListSchematic extends ChunkRenderContainerSchematic
                 RenderChunkSchematicList listedrenderchunk = (RenderChunkSchematicList) renderChunk;
                 GlStateManager.pushMatrix();
                 this.preRenderChunk(renderChunk);
-                GlStateManager.callList(listedrenderchunk.getDisplayList(layer, listedrenderchunk.getCompiledChunk()));
+                GlStateManager.callList(listedrenderchunk.getDisplayList(layer, listedrenderchunk.getChunkRenderData()));
                 GlStateManager.popMatrix();
             }
 
@@ -37,7 +37,7 @@ public class RenderListSchematic extends ChunkRenderContainerSchematic
 
                 GlStateManager.pushMatrix();
                 this.preRenderChunk(renderChunk);
-                GlStateManager.callList(listedRenderChunk.getOverlayDisplayList(type, (CompiledChunkSchematic) listedRenderChunk.getCompiledChunk()));
+                GlStateManager.callList(listedRenderChunk.getOverlayDisplayList(type, listedRenderChunk.getChunkRenderData()));
                 GlStateManager.popMatrix();
             }
 

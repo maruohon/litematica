@@ -213,7 +213,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                         return;
                     }
 
-                    generator.getRenderChunk().setCompiledChunk(compiledChunk);
+                    generator.getRenderChunk().setChunkRenderData(compiledChunk);
                 }
 
                 @Override

@@ -58,4 +58,30 @@ public class CompiledChunkSchematic extends CompiledChunk
     {
         this.overlayBufferStates[type.ordinal()] = state;
     }
+
+    public static final CompiledChunkSchematic EMPTY = new CompiledChunkSchematic() {
+        @Override
+        public void setLayerUsed(BlockRenderLayer layer)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setLayerStarted(BlockRenderLayer layer)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setOverlayTypeUsed(OverlayRenderType layer)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setOverlayTypeStarted(OverlayRenderType layer)
+        {
+            throw new UnsupportedOperationException();
+        }
+    };
 }

@@ -499,8 +499,8 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
                 for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
                 {
-                    if ((renderChunk.getCompiledChunk().isLayerStarted(blockLayerIn) ||
-                        (renderChunk.getCompiledChunk() != CompiledChunk.DUMMY && renderChunk.hasOverlay())) && i++ < 15)
+                    if ((renderChunk.getChunkRenderData().isLayerStarted(blockLayerIn) ||
+                        (renderChunk.getChunkRenderData() != CompiledChunk.DUMMY && renderChunk.hasOverlay())) && i++ < 15)
                     {
                         this.renderDispatcher.updateTransparencyLater(renderChunk);
                     }
@@ -519,9 +519,9 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
 
         for (int i = startIndex; i != stopIndex; i += increment)
         {
-            RenderChunk renderchunk = this.renderInfos.get(i);
+            RenderChunkSchematicVbo renderchunk = this.renderInfos.get(i);
 
-            if (renderchunk.getCompiledChunk().isLayerEmpty(blockLayerIn) == false)
+            if (renderchunk.getChunkRenderData().isLayerEmpty(blockLayerIn) == false)
             {
                 ++count;
                 this.renderContainer.addRenderChunk(renderchunk, blockLayerIn);
@@ -598,9 +598,9 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         {
             RenderChunkSchematicVbo renderChunk = this.renderInfos.get(i);
 
-            if (renderChunk.getCompiledChunk() != CompiledChunk.DUMMY && renderChunk.hasOverlay())
+            if (renderChunk.getChunkRenderData() != CompiledChunk.DUMMY && renderChunk.hasOverlay())
             {
-                CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) renderChunk.getCompiledChunk();
+                CompiledChunkSchematic compiledChunk = renderChunk.getChunkRenderData();
 
                 if (compiledChunk.isOverlayTypeEmpty(type) == false)
                 {
@@ -826,9 +826,9 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             this.world.profiler.endStartSection("block_entities");
             fi.dy.masa.malilib.render.RenderUtils.enableItemLighting();
 
-            for (RenderChunk renderChunk : this.renderInfos)
+            for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
             {
-                List<TileEntity> tiles = renderChunk.getCompiledChunk().getTileEntities();
+                List<TileEntity> tiles = renderChunk.getChunkRenderData().getTileEntities();
 
                 if (tiles.isEmpty() == false)
                 {
