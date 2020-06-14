@@ -14,7 +14,7 @@ public class ChunkRenderTaskSchematic implements Comparable<ChunkRenderTaskSchem
     private final ChunkRenderTaskSchematic.Type type;
     private final double distanceSq;
     private BufferBuilderCache bufferBuilderCache;
-    private CompiledChunk compiledChunk;
+    private CompiledChunkSchematic compiledChunk;
     private ChunkRenderTaskSchematic.Status status = ChunkRenderTaskSchematic.Status.PENDING;
     private boolean finished;
 
@@ -35,12 +35,12 @@ public class ChunkRenderTaskSchematic implements Comparable<ChunkRenderTaskSchem
         return this.renderChunk;
     }
 
-    public CompiledChunk getCompiledChunk()
+    public CompiledChunkSchematic getCompiledChunk()
     {
         return this.compiledChunk;
     }
 
-    public void setCompiledChunk(CompiledChunk compiledChunkIn)
+    public void setCompiledChunk(CompiledChunkSchematic compiledChunkIn)
     {
         this.compiledChunk = compiledChunkIn;
     }

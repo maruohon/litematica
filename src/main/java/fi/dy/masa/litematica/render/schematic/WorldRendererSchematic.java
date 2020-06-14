@@ -10,15 +10,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Lists;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
-import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
-import fi.dy.masa.litematica.world.ChunkSchematic;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockFluidRenderer;
@@ -31,7 +22,6 @@ import net.minecraft.client.renderer.ViewFrustum;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.client.renderer.chunk.IRenderChunkFactory;
-import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -57,6 +47,14 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.chunk.Chunk;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.mixin.IMixinBlockRendererDispatcher;
+import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class WorldRendererSchematic extends WorldRenderer
 {
@@ -149,11 +147,11 @@ public class WorldRendererSchematic extends WorldRenderer
     {
         int count = 0;
 
-        for (RenderChunk renderChunk : this.renderInfos)
+        for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
         {
-            CompiledChunk compiledchunk = renderChunk.compiledChunk;
+            CompiledChunkSchematic data = renderChunk.getChunkRenderData();
 
-            if (compiledchunk != CompiledChunk.DUMMY && compiledchunk.isEmpty() == false)
+            if (data != CompiledChunkSchematic.EMPTY && data.isEmpty() == false)
             {
                 ++count;
             }
@@ -473,8 +471,8 @@ public class WorldRendererSchematic extends WorldRenderer
 
                 for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
                 {
-                    if ((renderChunk.getCompiledChunk().isLayerStarted(blockLayerIn) ||
-                        (renderChunk.getCompiledChunk() != CompiledChunk.DUMMY && renderChunk.hasOverlay())) && i++ < 15)
+                    if ((renderChunk.getChunkRenderData().isLayerStarted(blockLayerIn) ||
+                        (renderChunk.getChunkRenderData() != CompiledChunk.DUMMY && renderChunk.hasOverlay())) && i++ < 15)
                     {
                         this.renderDispatcher.updateTransparencyLater(renderChunk);
                     }
@@ -493,9 +491,9 @@ public class WorldRendererSchematic extends WorldRenderer
 
         for (int i = startIndex; i != stopIndex; i += increment)
         {
-            RenderChunk renderchunk = this.renderInfos.get(i);
+            RenderChunkSchematicVbo renderchunk = this.renderInfos.get(i);
 
-            if (renderchunk.getCompiledChunk().isLayerEmpty(blockLayerIn) == false)
+            if (renderchunk.getChunkRenderData().isLayerEmpty(blockLayerIn) == false)
             {
                 ++count;
                 this.renderContainer.addRenderChunk(renderchunk, blockLayerIn);
@@ -572,9 +570,9 @@ public class WorldRendererSchematic extends WorldRenderer
         {
             RenderChunkSchematicVbo renderChunk = this.renderInfos.get(i);
 
-            if (renderChunk.getCompiledChunk() != CompiledChunk.DUMMY && renderChunk.hasOverlay())
+            if (renderChunk.getChunkRenderData() != CompiledChunk.DUMMY && renderChunk.hasOverlay())
             {
-                CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) renderChunk.getCompiledChunk();
+                CompiledChunkSchematic compiledChunk = renderChunk.getChunkRenderData();
 
                 if (compiledChunk.isOverlayTypeEmpty(type) == false)
                 {
@@ -719,7 +717,7 @@ public class WorldRendererSchematic extends WorldRenderer
             BlockPos.PooledMutableBlockPos posMutable = BlockPos.PooledMutableBlockPos.retain();
             LayerRange layerRange = DataManager.getRenderLayerRange();
 
-            for (RenderChunk renderChunk : this.renderInfos)
+            for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
             {
                 Chunk chunk = this.world.getChunk(renderChunk.getPosition());
                 ClassInheritanceMultiMap<Entity> classinheritancemultimap = chunk.getEntityLists()[renderChunk.getPosition().getY() / 16];
@@ -815,27 +813,18 @@ public class WorldRendererSchematic extends WorldRenderer
 
             for (RenderChunkSchematicVbo renderChunk : this.renderInfos)
             {
-                List<TileEntity> tiles = renderChunk.getCompiledChunk().getTileEntities();
+                List<TileEntity> tiles = renderChunk.getChunkRenderData().getTileEntities();
 
                 if (tiles.isEmpty() == false) 
                 {
-                    BlockPos pos = renderChunk.getPosition();
-                    ChunkSchematic chunk = this.world.getChunkProvider().getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-                    CompiledChunk compiledChunk = renderChunk.getCompiledChunk();
-
-                    if (chunk != null &&
-                        compiledChunk instanceof CompiledChunkSchematic &&
-                        ((CompiledChunkSchematic) compiledChunk).getTimeBuilt() >= chunk.getTimeCreated())
+                    for (TileEntity te : tiles)
                     {
-                        for (TileEntity te : tiles)
+                        try
                         {
-                            try
-                            {
-                                TileEntityRendererDispatcher.instance.render(te, partialTicks, -1);
-                            }
-                            catch (Exception e)
-                            {
-                            }
+                            TileEntityRendererDispatcher.instance.render(te, partialTicks, -1);
+                        }
+                        catch (Exception e)
+                        {
                         }
                     }
                 }

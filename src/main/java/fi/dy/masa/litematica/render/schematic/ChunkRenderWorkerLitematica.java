@@ -129,10 +129,10 @@ public class ChunkRenderWorkerLitematica implements Runnable
                 generator.getLock().unlock();
             }
 
-            final CompiledChunkSchematic compiledChunk = (CompiledChunkSchematic) generator.getCompiledChunk();
+            final CompiledChunkSchematic compiledChunk = generator.getCompiledChunk();
             ArrayList<ListenableFuture<Object>> futuresList = Lists.newArrayList();
             BufferBuilderCache buffers = generator.getBufferCache();
-            RenderChunkSchematicVbo renderChunk = (RenderChunkSchematicVbo) generator.getRenderChunk();
+            RenderChunkSchematicVbo renderChunk = generator.getRenderChunk();
 
             if (generatorType == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK)
             {
@@ -213,7 +213,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
                         return;
                     }
 
-                    generator.getRenderChunk().setCompiledChunk(compiledChunk);
+                    generator.getRenderChunk().setChunkRenderData(compiledChunk);
                 }
 
                 @Override

@@ -1,9 +1,9 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.chunk.CompiledChunk;
 import net.minecraft.util.BlockRenderLayer;
+import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 
 public class CompiledChunkSchematic extends CompiledChunk
 {
@@ -12,7 +12,6 @@ public class CompiledChunkSchematic extends CompiledChunk
     private final BufferBuilder.State[] blockBufferStates = new BufferBuilder.State[BlockRenderLayer.values().length];
     private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.values().length];
     private boolean overlayEmpty = true;
-    private long timeBuilt;
 
     @Override
     public void setLayerUsed(BlockRenderLayer layer)
@@ -66,13 +65,29 @@ public class CompiledChunkSchematic extends CompiledChunk
         this.overlayBufferStates[type.ordinal()] = state;
     }
 
-    public long getTimeBuilt()
-    {
-        return this.timeBuilt;
-    }
+    public static final CompiledChunkSchematic EMPTY = new CompiledChunkSchematic() {
+        @Override
+        public void setLayerUsed(BlockRenderLayer layer)
+        {
+            throw new UnsupportedOperationException();
+        }
 
-    public void setTimeBuilt(long time)
-    {
-        this.timeBuilt = time;
-    }
+        @Override
+        public void setLayerStarted(BlockRenderLayer layer)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setOverlayTypeUsed(OverlayRenderType layer)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setOverlayTypeStarted(OverlayRenderType layer)
+        {
+            throw new UnsupportedOperationException();
+        }
+    };
 }

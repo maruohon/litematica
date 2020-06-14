@@ -15,13 +15,10 @@ import net.minecraft.world.chunk.ChunkSection;
 
 public class ChunkSchematic extends Chunk
 {
-    private final long timeCreated;
-
     public ChunkSchematic(World worldIn, int x, int z)
     {
         super(worldIn, x, z, new Biome[256]);
 
-        this.timeCreated = worldIn.getGameTime();
         Arrays.fill(this.getBiomes(), Biomes.PLAINS);
     }
 
@@ -106,11 +103,6 @@ public class ChunkSchematic extends Chunk
                 return stateOld;
             }
         }
-    }
-
-    public long getTimeCreated()
-    {
-        return this.timeCreated;
     }
 
     @Override
