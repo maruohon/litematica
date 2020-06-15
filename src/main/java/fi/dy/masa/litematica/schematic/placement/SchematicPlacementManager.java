@@ -193,6 +193,21 @@ public class SchematicPlacementManager
         return this.schematicPlacements;
     }
 
+    public List<SchematicPlacement> getAllEnabledSchematicPlacements()
+    {
+        List<SchematicPlacement> placements = new ArrayList<>();
+
+        for (SchematicPlacement placement : this.schematicPlacements)
+        {
+            if (placement.matchesRequirement(RequiredEnabled.PLACEMENT_ENABLED))
+            {
+                placements.add(placement);
+            }
+        }
+
+        return placements;
+    }
+
     public List<IntBoundingBox> getTouchedBoxesInSubChunk(SubChunkPos subChunk)
     {
         List<IntBoundingBox> list = new ArrayList<>();

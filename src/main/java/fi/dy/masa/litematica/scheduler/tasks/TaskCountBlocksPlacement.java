@@ -1,29 +1,39 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.materials.IMaterialList;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
 
 public class TaskCountBlocksPlacement extends TaskCountBlocksBase
 {
-    protected final SchematicPlacement schematicPlacement;
     protected final WorldSchematic worldSchematic;
 
     public TaskCountBlocksPlacement(SchematicPlacement schematicPlacement, IMaterialList materialList)
     {
+        this(Collections.singletonList(schematicPlacement), materialList);
+    }
+
+    public TaskCountBlocksPlacement(List<SchematicPlacement> placements, IMaterialList materialList)
+    {
         super(materialList, "litematica.gui.label.task_name.material_list");
 
-        this.worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        this.schematicPlacement = schematicPlacement;
-        Collection<Box> boxes = schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values();
-        this.addBoxesPerChunks(boxes);
+        ArrayList<Box> boxes = new ArrayList<>();
 
+        for (SchematicPlacement placement : placements)
+        {
+            boxes.addAll(placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values());
+        }
+
+        this.worldSchematic = SchematicWorldHandler.getSchematicWorld();
+        this.addBoxesPerChunks(boxes);
         this.updateInfoHudLinesMissingChunks(this.requiredChunks);
     }
 
