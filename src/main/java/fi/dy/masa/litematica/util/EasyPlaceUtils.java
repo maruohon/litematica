@@ -249,7 +249,10 @@ public class EasyPlaceUtils
         }
 
         BlockPos targetBlockPos = targetPosition.getBlockPos();
-        boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue();
+
+        // seed items require adjacent click position, another lookup here but cleaner to have it here
+        ItemStack requiredStack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
+        boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue() || requiredStack.getItem() instanceof ItemSeeds;
 
         return requireAdjacent ? getAdjacentClickPosition(targetBlockPos, mc) : targetPosition;
     }
