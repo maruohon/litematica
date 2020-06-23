@@ -218,6 +218,10 @@ public class MaterialCache
         {
             return new ItemStack(Blocks.DIRT);
         }
+        else if (block == Blocks.GRASS_PATH)
+        {
+            return new ItemStack(Blocks.GRASS);
+        }
         else if (block == Blocks.BROWN_MUSHROOM_BLOCK)
         {
             return new ItemStack(Blocks.BROWN_MUSHROOM_BLOCK);
