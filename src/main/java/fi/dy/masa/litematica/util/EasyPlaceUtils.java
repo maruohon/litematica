@@ -6,19 +6,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRedstoneComparator;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.BlockTrapDoor;
+
+import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -251,9 +246,12 @@ public class EasyPlaceUtils
 
         BlockPos targetBlockPos = targetPosition.getBlockPos();
 
-        // seed items require adjacent click position, another lookup here but cleaner to have it here
-        ItemStack requiredStack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
-        boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue() || requiredStack.getItem() instanceof ItemSeeds;
+
+        // Crops / seed items require adjacent placement to reliably place onto farmland / non full blocks
+        boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue() ||
+                stateSchematic.getBlock() instanceof BlockCrops ||
+                stateSchematic.getBlock() instanceof BlockStem ||
+                stateSchematic.getBlock() instanceof BlockNetherWart;
 
         return requireAdjacent ? getAdjacentClickPosition(targetBlockPos, mc) : targetPosition;
     }
