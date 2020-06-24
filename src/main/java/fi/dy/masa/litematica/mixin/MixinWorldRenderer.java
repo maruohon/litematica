@@ -52,6 +52,7 @@ public abstract class MixinWorldRenderer
         else if (renderLayer == RenderLayer.getTranslucent())
         {
             LitematicaRenderer.getInstance().piecewiseRenderTranslucent(matrixStack);
+            LitematicaRenderer.getInstance().piecewiseRenderOverlay(matrixStack);
         }
     }
 
