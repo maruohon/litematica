@@ -498,6 +498,7 @@ public class LitematicaRenderer
     {
         this.renderPiecewise = false;
         this.renderPiecewisePrepared = false;
+        this.renderPiecewiseSchematic = false;
         this.renderPiecewiseBlocks = false;
     }
 }
