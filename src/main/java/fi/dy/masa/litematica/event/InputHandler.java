@@ -243,6 +243,10 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
             {
                 return SchematicUtils.breakSchematicBlocks(mc);
             }
+            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL_EXCEPT.getKeybind().isKeybindHeld())
+            {
+                return SchematicUtils.breakAllSchematicBlocksExceptTargeted(mc);
+            }
             else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
             {
                 return SchematicUtils.breakAllIdenticalSchematicBlocks(mc);

@@ -660,6 +660,11 @@ public class OverlayRenderer
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
         }
+        else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL_EXCEPT.getKeybind().isKeybindHeld())
+        {
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            color = Configs.Colors.REBUILD_BREAK_EXCEPT_OVERLAY_COLOR.getColor();
+        }
         else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
