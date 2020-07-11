@@ -191,7 +191,7 @@ public class SchematicConverter
         this.fixersPerBlock.put(TallPlantBlock.class,               SchematicConversionFixers.FIXER_DOUBLE_PLANT);
         this.fixersPerBlock.put(TripwireBlock.class,                SchematicConversionFixers.FIXER_TRIPWIRE);
         this.fixersPerBlock.put(VineBlock.class,                    SchematicConversionFixers.FIXER_VINE);
-        this.fixersPerBlock.put(WallBlock.class,                    SchematicConversionFixers.FIXER_WALL);
+        this.fixersPerBlock.put(WallBlock.class,                    WallStateFixer.INSTANCE);
 
         // Fixers to get values from old TileEntity data
         this.fixersPerBlock.put(BannerBlock.class,                  SchematicConversionFixers.FIXER_BANNER);

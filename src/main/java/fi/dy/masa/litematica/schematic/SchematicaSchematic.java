@@ -452,7 +452,15 @@ public class SchematicaSchematic
         {
             this.readEntitiesFromNBT(nbt);
             this.readTileEntitiesFromNBT(nbt);
-            this.postProcessBlocks();
+
+            try
+            {
+                this.postProcessBlocks();
+            }
+            catch (Exception e)
+            {
+                Litematica.logger.error("SchematicaSchematic: Exception while post-processing blocks for '{}'", this.fileName, e);
+            }
 
             return true;
         }

@@ -28,14 +28,12 @@ import net.minecraft.block.TallPlantBlock;
 import net.minecraft.block.TripwireBlock;
 import net.minecraft.block.VineBlock;
 import net.minecraft.block.WallBannerBlock;
-import net.minecraft.block.WallBlock;
 import net.minecraft.block.WallSkullBlock;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.Instrument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -49,7 +47,7 @@ import fi.dy.masa.malilib.util.Constants;
 
 public class SchematicConversionFixers
 {
-    private static final BooleanProperty[] FENCE_WALL_PROP_MAP = new BooleanProperty[] { null, null, HorizontalConnectingBlock.NORTH, HorizontalConnectingBlock.SOUTH, HorizontalConnectingBlock.WEST, HorizontalConnectingBlock.EAST };
+    private static final BooleanProperty[] HORIZONTAL_CONNECTING_BLOCK_PROPS = new BooleanProperty[] { null, null, HorizontalConnectingBlock.NORTH, HorizontalConnectingBlock.SOUTH, HorizontalConnectingBlock.WEST, HorizontalConnectingBlock.EAST };
 
     public static final IStateFixer FIXER_BANNER = (reader, state, pos) -> {
         CompoundTag tag = reader.getBlockEntityData(pos);
@@ -225,7 +223,7 @@ public class SchematicConversionFixers
             BlockState stateAdj = reader.getBlockState(posAdj);
             Direction sideOpposite = side.getOpposite();
             boolean flag = stateAdj.isSideSolidFullSquare(reader, posAdj, sideOpposite);
-            state = state.with(FENCE_WALL_PROP_MAP[side.getId()], fence.canConnect(stateAdj, flag, sideOpposite));
+            state = state.with(HORIZONTAL_CONNECTING_BLOCK_PROPS[side.getId()], fence.canConnect(stateAdj, flag, sideOpposite));
         }
 
         return state;
@@ -326,7 +324,7 @@ public class SchematicConversionFixers
             BlockState stateAdj = reader.getBlockState(posAdj);
             Direction sideOpposite = side.getOpposite();
             boolean flag = stateAdj.isSideSolidFullSquare(reader, posAdj, sideOpposite);
-            state = state.with(FENCE_WALL_PROP_MAP[side.getId()], pane.connectsTo(stateAdj, flag));
+            state = state.with(HORIZONTAL_CONNECTING_BLOCK_PROPS[side.getId()], pane.connectsTo(stateAdj, flag));
         }
 
         return state;
@@ -479,36 +477,6 @@ public class SchematicConversionFixers
         VineBlock vine = (VineBlock) state.getBlock();
         return state.with(VineBlock.UP, ((IMixinVineBlock) vine).invokeShouldConnectUp(reader, pos.up(), Direction.UP));
     };
-
-    public static final IStateFixer FIXER_WALL = (reader, state, pos) -> {
-        boolean[] sides = new boolean[6];
-
-        for (Direction side : fi.dy.masa.malilib.util.PositionUtils.HORIZONTAL_DIRECTIONS)
-        {
-            BlockPos posAdj = pos.offset(side);
-            BlockState stateAdj = reader.getBlockState(posAdj);
-
-            boolean val = wallAttachesTo(stateAdj, side.getOpposite(), reader, posAdj);
-            state = state.with(FENCE_WALL_PROP_MAP[side.getId()], val);
-            sides[side.getId()] = val;
-        }
-
-        boolean south = sides[Direction.SOUTH.getId()];
-        boolean west = sides[Direction.WEST.getId()];
-        boolean north = sides[Direction.NORTH.getId()];
-        boolean east = sides[Direction.EAST.getId()];
-        boolean up = ((! south || west || ! north || east) && (south || ! west || north || ! east)) || reader.getBlockState(pos.up()).isAir() == false;
-
-        return state.with(WallBlock.UP, up);
-    };
-
-    private static boolean wallAttachesTo(BlockState state, Direction side, BlockView world, BlockPos pos)
-    {
-        Block block = state.getBlock();
-        boolean flag1 = state.isSideSolidFullSquare(world, pos, side);
-        boolean flag2 = block.isIn(BlockTags.WALLS) || block instanceof FenceGateBlock && FenceGateBlock.canWallConnect(state, side);
-        return ! WallBlock.cannotConnect(block) && flag1 || flag2;
-    }
 
     private static boolean getIsRepeaterPoweredOnSide(BlockView reader, BlockPos pos, BlockState stateRepeater)
     {
