@@ -32,6 +32,7 @@ import net.minecraft.block.WallSkullBlock;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.Instrument;
+import net.minecraft.block.enums.WireConnection;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.DyeColor;
@@ -48,6 +49,11 @@ import fi.dy.masa.malilib.util.Constants;
 public class SchematicConversionFixers
 {
     private static final BooleanProperty[] HORIZONTAL_CONNECTING_BLOCK_PROPS = new BooleanProperty[] { null, null, HorizontalConnectingBlock.NORTH, HorizontalConnectingBlock.SOUTH, HorizontalConnectingBlock.WEST, HorizontalConnectingBlock.EAST };
+    private static final BlockState REDSTONE_WIRE_CROSS = Blocks.REDSTONE_WIRE.getDefaultState()
+                          .with(RedstoneWireBlock.WIRE_CONNECTION_NORTH, WireConnection.SIDE)
+                          .with(RedstoneWireBlock.WIRE_CONNECTION_EAST, WireConnection.SIDE)
+                          .with(RedstoneWireBlock.WIRE_CONNECTION_SOUTH, WireConnection.SIDE)
+                          .with(RedstoneWireBlock.WIRE_CONNECTION_WEST, WireConnection.SIDE);
 
     public static final IStateFixer FIXER_BANNER = (reader, state, pos) -> {
         CompoundTag tag = reader.getBlockEntityData(pos);
@@ -336,12 +342,7 @@ public class SchematicConversionFixers
 
     public static final IStateFixer FIXER_REDSTONE_WIRE = (reader, state, pos) -> {
         RedstoneWireBlock wire = (RedstoneWireBlock) state.getBlock();
-
-        return state
-            .with(RedstoneWireBlock.WIRE_CONNECTION_WEST, ((IMixinRedstoneWireBlock) wire).invokeGetSide(reader, pos, Direction.WEST))
-            .with(RedstoneWireBlock.WIRE_CONNECTION_EAST, ((IMixinRedstoneWireBlock) wire).invokeGetSide(reader, pos, Direction.EAST))
-            .with(RedstoneWireBlock.WIRE_CONNECTION_NORTH, ((IMixinRedstoneWireBlock) wire).invokeGetSide(reader, pos, Direction.NORTH))
-            .with(RedstoneWireBlock.WIRE_CONNECTION_SOUTH, ((IMixinRedstoneWireBlock) wire).invokeGetSide(reader, pos, Direction.SOUTH));
+        return ((IMixinRedstoneWireBlock) wire).litematicaGetFullState(reader, state, pos);
     };
 
     public static final IStateFixer FIXER_SKULL = (reader, state, pos) -> {
