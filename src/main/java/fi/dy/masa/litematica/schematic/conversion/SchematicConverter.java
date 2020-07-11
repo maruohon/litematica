@@ -1,7 +1,10 @@
 package fi.dy.masa.litematica.schematic.conversion;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Map;
 import javax.annotation.Nullable;
 import net.minecraft.block.BannerBlock;
 import net.minecraft.block.BedBlock;
@@ -32,7 +35,12 @@ import net.minecraft.block.VineBlock;
 import net.minecraft.block.WallBannerBlock;
 import net.minecraft.block.WallBlock;
 import net.minecraft.block.WallSkullBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers.IStateFixer;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -44,12 +52,20 @@ public class SchematicConverter
 
     private SchematicConverter()
     {
-        this.addPostUpdateBlocks();
     }
 
-    public static SchematicConverter create()
+    public static SchematicConverter createForSchematica()
     {
-        return new SchematicConverter();
+        SchematicConverter converter = new SchematicConverter();
+        converter.addPostUpdateBlocksSchematica();
+        return converter;
+    }
+
+    public static SchematicConverter createForLitematica()
+    {
+        SchematicConverter converter = new SchematicConverter();
+        converter.addPostUpdateBlocksLitematica();
+        return converter;
     }
 
     public boolean getConvertedStatesForBlock(int schematicBlockId, String blockName, BlockState[] paletteOut)
@@ -117,16 +133,24 @@ public class SchematicConverter
      */
     public boolean createPostProcessStateFilter(BlockState[] palette)
     {
+        return this.createPostProcessStateFilter(Arrays.asList(palette));
+    }
+
+    /**
+     * Creates the post process state filter array.
+     * @param palette
+     * @return true if there are at least some states that need post processing
+     */
+    public boolean createPostProcessStateFilter(Collection<BlockState> palette)
+    {
         boolean needsPostProcess = false;
         this.postProcessingStateFixers.clear();
 
         // The main reason to lazy-construct the state-to-fixer map is to check if a given
         // schematic even has any states that need fixing.
 
-        for (int i = 0; i < palette.length; ++i)
+        for (BlockState state : palette)
         {
-            BlockState state = palette[i];
-
             if (this.needsPostProcess(state))
             {
                 this.postProcessingStateFixers.put(state, this.getFixerFor(state));
@@ -170,7 +194,56 @@ public class SchematicConverter
         return tag;
     }
 
-    private void addPostUpdateBlocks()
+    public static void postProcessBlocks(LitematicaBlockStateContainer container, @Nullable Map<BlockPos, CompoundTag> tiles,
+                                         IdentityHashMap<BlockState, IStateFixer> postProcessingFilter)
+    {
+        final int sizeX = container.getSize().getX();
+        final int sizeY = container.getSize().getY();
+        final int sizeZ = container.getSize().getZ();
+        BlockReaderLitematicaContainer reader = new BlockReaderLitematicaContainer(container, tiles);
+        BlockPos.Mutable posMutable = new BlockPos.Mutable();
+
+        for (int y = 0; y < sizeY; ++y)
+        {
+            for (int z = 0; z < sizeZ; ++z)
+            {
+                for (int x = 0; x < sizeX; ++x)
+                {
+                    BlockState state = container.get(x, y, z);
+                    IStateFixer fixer = postProcessingFilter.get(state);
+
+                    if (fixer != null)
+                    {
+                        posMutable.set(x, y, z);
+                        BlockState stateFixed = fixer.fixState(reader, state, posMutable);
+
+                        if (stateFixed != state)
+                        {
+                            container.set(x, y, z, stateFixed);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void addPostUpdateBlocksLitematica()
+    {
+        // Fixers to fix the state according to the adjacent blocks
+        this.fixersPerBlock.put(RedstoneWireBlock.class,            SchematicConversionFixers.FIXER_REDSTONE_WIRE);
+        this.fixersPerBlock.put(WallBlock.class,                    WallStateFixer.INSTANCE);
+
+        // Fixers to get values from old TileEntity data
+        this.fixersPerBlock.put(BannerBlock.class,                  SchematicConversionFixers.FIXER_BANNER);
+        this.fixersPerBlock.put(WallBannerBlock.class,              SchematicConversionFixers.FIXER_BANNER_WALL);
+        this.fixersPerBlock.put(BedBlock.class,                     SchematicConversionFixers.FIXER_BED);
+        this.fixersPerBlock.put(FlowerPotBlock.class,               SchematicConversionFixers.FIXER_FLOWER_POT);
+        this.fixersPerBlock.put(NoteBlock.class,                    SchematicConversionFixers.FIXER_NOTE_BLOCK);
+        this.fixersPerBlock.put(SkullBlock.class,                   SchematicConversionFixers.FIXER_SKULL);
+        this.fixersPerBlock.put(WallSkullBlock.class,               SchematicConversionFixers.FIXER_SKULL_WALL);
+    }
+
+    private void addPostUpdateBlocksSchematica()
     {
         // Fixers to fix the state according to the adjacent blocks
         this.fixersPerBlock.put(ChorusPlantBlock.class,             SchematicConversionFixers.FIXER_CHRORUS_PLANT);
@@ -201,5 +274,55 @@ public class SchematicConverter
         this.fixersPerBlock.put(NoteBlock.class,                    SchematicConversionFixers.FIXER_NOTE_BLOCK);
         this.fixersPerBlock.put(SkullBlock.class,                   SchematicConversionFixers.FIXER_SKULL);
         this.fixersPerBlock.put(WallSkullBlock.class,               SchematicConversionFixers.FIXER_SKULL_WALL);
+    }
+
+    public static class BlockReaderLitematicaContainer implements IBlockReaderWithData
+    {
+        private final LitematicaBlockStateContainer container;
+        private final Map<BlockPos, CompoundTag> blockEntityData;
+        private final Vec3i size;
+        private final BlockState air;
+
+        public BlockReaderLitematicaContainer(LitematicaBlockStateContainer container, @Nullable Map<BlockPos, CompoundTag> blockEntityData)
+        {
+            this.container = container;
+            this.blockEntityData = blockEntityData != null ? blockEntityData : new HashMap<>();
+            this.size = container.getSize();
+            this.air = Blocks.AIR.getDefaultState();
+        }
+
+        @Override
+        public BlockState getBlockState(BlockPos pos)
+        {
+            if (pos.getX() >= 0 && pos.getX() < this.size.getX() &&
+                        pos.getY() >= 0 && pos.getY() < this.size.getY() &&
+                        pos.getZ() >= 0 && pos.getZ() < this.size.getZ())
+            {
+                return this.container.get(pos.getX(), pos.getY(), pos.getZ());
+            }
+
+            return this.air;
+        }
+
+        @Override
+        public FluidState getFluidState(BlockPos pos)
+        {
+            // FIXME change when fluids become completely separate
+            return this.getBlockState(pos).getFluidState();
+        }
+
+        @Override
+        @Nullable
+        public BlockEntity getBlockEntity(BlockPos pos)
+        {
+            return null;
+        }
+
+        @Override
+        @Nullable
+        public CompoundTag getBlockEntityData(BlockPos pos)
+        {
+            return this.blockEntityData.get(pos);
+        }
     }
 }

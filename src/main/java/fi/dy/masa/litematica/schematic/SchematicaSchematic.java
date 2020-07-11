@@ -15,7 +15,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.StructureBlockMode;
 import net.minecraft.entity.Entity;
-import net.minecraft.fluid.FluidState;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -32,7 +31,6 @@ import net.minecraft.world.chunk.WorldChunk;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
-import fi.dy.masa.litematica.schematic.conversion.IBlockReaderWithData;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers.IStateFixer;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConverter;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -58,7 +56,7 @@ public class SchematicaSchematic
 
     private SchematicaSchematic()
     {
-        this.converter = SchematicConverter.create();
+        this.converter = SchematicConverter.createForSchematica();
     }
 
     public Vec3i getSize()
@@ -679,34 +677,7 @@ public class SchematicaSchematic
     {
         if (this.needsConversionPostProcessing)
         {
-            final int sizeX = this.blocks.getSize().getX();
-            final int sizeY = this.blocks.getSize().getY();
-            final int sizeZ = this.blocks.getSize().getZ();
-            BlockReaderSchematicaSchematic reader = new BlockReaderSchematicaSchematic(this.blocks, this.tiles);
-            BlockPos.Mutable posMutable = new BlockPos.Mutable();
-
-            for (int y = 0; y < sizeY; ++y)
-            {
-                for (int z = 0; z < sizeZ; ++z)
-                {
-                    for (int x = 0; x < sizeX; ++x)
-                    {
-                        BlockState state = this.blocks.get(x, y, z);
-                        IStateFixer fixer = this.postProcessingFilter.get(state);
-
-                        if (fixer != null)
-                        {
-                            posMutable.set(x, y, z);
-                            BlockState stateFixed = fixer.fixState(reader, state, posMutable);
-
-                            if (stateFixed != state)
-                            {
-                                this.blocks.set(x, y, z, stateFixed);
-                            }
-                        }
-                    }
-                }
-            }
+            SchematicConverter.postProcessBlocks(this.blocks, this.tiles, this.postProcessingFilter);
         }
     }
 
@@ -763,56 +734,6 @@ public class SchematicaSchematic
         }
 
         return false;
-    }
-
-    public static class BlockReaderSchematicaSchematic implements IBlockReaderWithData
-    {
-        private final LitematicaBlockStateContainer container;
-        private final Map<BlockPos, CompoundTag> blockEntityData;
-        private final Vec3i size;
-        private final BlockState air;
-
-        public BlockReaderSchematicaSchematic(LitematicaBlockStateContainer container, Map<BlockPos, CompoundTag> blockEntityData)
-        {
-            this.container = container;
-            this.blockEntityData = blockEntityData;
-            this.size = container.getSize();
-            this.air = Blocks.AIR.getDefaultState();
-        }
-
-        @Override
-        public BlockState getBlockState(BlockPos pos)
-        {
-            if (pos.getX() >= 0 && pos.getX() < this.size.getX() &&
-                pos.getY() >= 0 && pos.getY() < this.size.getY() &&
-                pos.getZ() >= 0 && pos.getZ() < this.size.getZ())
-            {
-                return this.container.get(pos.getX(), pos.getY(), pos.getZ());
-            }
-
-            return this.air;
-        }
-
-        @Override
-        public FluidState getFluidState(BlockPos pos)
-        {
-            // FIXME change when fluids become completely separate
-            return this.getBlockState(pos).getFluidState();
-        }
-
-        @Override
-        @Nullable
-        public BlockEntity getBlockEntity(BlockPos pos)
-        {
-            return null;
-        }
-
-        @Override
-        @Nullable
-        public CompoundTag getBlockEntityData(BlockPos pos)
-        {
-            return this.blockEntityData.get(pos);
-        }
     }
 
     /*

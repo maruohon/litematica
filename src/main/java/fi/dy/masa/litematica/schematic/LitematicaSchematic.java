@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.LongArrayTag;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.world.ServerWorld;
@@ -41,7 +43,9 @@ import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
+import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionMaps;
+import fi.dy.masa.litematica.schematic.conversion.SchematicConverter;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
@@ -75,6 +79,7 @@ public class LitematicaSchematic
     private final Map<String, BlockPos> subRegionPositions = new HashMap<>();
     private final Map<String, BlockPos> subRegionSizes = new HashMap<>();
     private final SchematicMetadata metadata = new SchematicMetadata();
+    private final SchematicConverter converter;
     private int totalBlocks;
     @Nullable
     private final File schematicFile;
@@ -82,6 +87,7 @@ public class LitematicaSchematic
     private LitematicaSchematic(@Nullable File file)
     {
         this.schematicFile = file;
+        this.converter = SchematicConverter.createForLitematica();
     }
 
     @Nullable
@@ -205,7 +211,6 @@ public class LitematicaSchematic
      * This is intended to be used for the chunk-wise schematic creation.
      * @param area
      * @param author
-     * @param feedback
      * @return
      */
     public static LitematicaSchematic createEmptySchematic(AreaSelection area, String author)
@@ -1262,6 +1267,7 @@ public class LitematicaSchematic
                 CompoundTag regionTag = tag.getCompound(regionName);
                 BlockPos regionPos = NBTUtils.readBlockPos(regionTag.getCompound("Position"));
                 BlockPos regionSize = NBTUtils.readBlockPos(regionTag.getCompound("Size"));
+                Map<BlockPos, CompoundTag> tiles = null;
 
                 if (regionPos != null && regionSize != null)
                 {
@@ -1270,12 +1276,14 @@ public class LitematicaSchematic
 
                     if (version >= 2)
                     {
-                        this.tileEntities.put(regionName, this.readTileEntitiesFromNBT(regionTag.getList("TileEntities", Constants.NBT.TAG_COMPOUND)));
+                        tiles = this.readTileEntitiesFromNBT(regionTag.getList("TileEntities", Constants.NBT.TAG_COMPOUND));
+                        this.tileEntities.put(regionName, tiles);
                         this.entities.put(regionName, this.readEntitiesFromNBT(regionTag.getList("Entities", Constants.NBT.TAG_COMPOUND)));
                     }
                     else if (version == 1)
                     {
-                        this.tileEntities.put(regionName, this.readTileEntitiesFromNBT_v1(regionTag.getList("TileEntities", Constants.NBT.TAG_COMPOUND)));
+                        tiles = this.readTileEntitiesFromNBT_v1(regionTag.getList("TileEntities", Constants.NBT.TAG_COMPOUND));
+                        this.tileEntities.put(regionName, tiles);
                         this.entities.put(regionName, this.readEntitiesFromNBT_v1(regionTag.getList("Entities", Constants.NBT.TAG_COMPOUND)));
                     }
 
@@ -1305,12 +1313,49 @@ public class LitematicaSchematic
                         BlockPos size = posMax.subtract(posMin).add(1, 1, 1);
 
                         palette = this.convertBlockStatePalette_1_12_to_1_13_2(palette, version, minecraftDataVersion);
+
                         LitematicaBlockStateContainer container = LitematicaBlockStateContainer.createFrom(palette, blockStateArr, size);
+
+                        if (minecraftDataVersion < MINECRAFT_DATA_VERSION)
+                        {
+                            this.postProcessContainerIfNeeded(palette, container, tiles);
+                        }
+
                         this.blockContainers.put(regionName, container);
                     }
                 }
             }
         }
+    }
+
+    private void postProcessContainerIfNeeded(ListTag palette, LitematicaBlockStateContainer container, @Nullable Map<BlockPos, CompoundTag> tiles)
+    {
+        List<BlockState> states = getStatesFromPaletteTag(palette);
+
+        if (this.converter.createPostProcessStateFilter(states))
+        {
+            IdentityHashMap<BlockState, SchematicConversionFixers.IStateFixer> postProcessingFilter = this.converter.getPostProcessStateFilter();
+            SchematicConverter.postProcessBlocks(container, tiles, postProcessingFilter);
+        }
+    }
+
+    public static List<BlockState> getStatesFromPaletteTag(ListTag palette)
+    {
+        List<BlockState> states = new ArrayList<>();
+        final int size = palette.size();
+
+        for (int i = 0; i < size; ++i)
+        {
+            CompoundTag tag = palette.getCompound(i);
+            BlockState state = NbtHelper.toBlockState(tag);
+
+            if (i > 0 || state != LitematicaBlockStateContainer.AIR_BLOCK_STATE)
+            {
+                states.add(state);
+            }
+        }
+
+        return states;
     }
 
     private ListTag convertBlockStatePalette_1_12_to_1_13_2(ListTag oldPalette, int version, int minecraftDataVersion)
