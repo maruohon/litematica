@@ -78,6 +78,7 @@ public class Configs implements IConfigHandler
 
     public static class Visuals
     {
+    	public static final ConfigString        EQUIVALENT_BLOCK_TYPE_SUBSTITUTE    = new ConfigString("equivalentBlockTypeSubstitute", "", "Defined equivalent blocks can substitute each other.\nThis should be a valid json array containing regex expression(s).\ne.g. [\"minecraft:(stone|dirt)\", \"minecraft:(iron|gold|diamond)_block\"] \nso that no Wrong-Block overlay will be shown if you substitute dirt/stone, or iron/gold/diamond block for each other blocktypes");
         public static final ConfigBoolean       ENABLE_AREA_SELECTION_RENDERING     = new ConfigBoolean("enableAreaSelectionBoxesRendering", true, "Enable Area Selection boxes rendering", "Area Selection Boxes Rendering");
         public static final ConfigBoolean       ENABLE_PLACEMENT_BOXES_RENDERING    = new ConfigBoolean("enablePlacementBoxesRendering", true, "Enable Schematic Placement boxes rendering", "Schematic Placement Boxes Rendering");
         public static final ConfigBoolean       ENABLE_RENDERING                    = new ConfigBoolean("enableRendering", true, "Main rendering toggle option. Enables/disables ALL mod rendering.", "All Rendering");
@@ -110,6 +111,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       SCHEMATIC_VERIFIER_BLOCK_MODELS     = new ConfigBoolean("schematicVerifierUseBlockModels", false, "Forces using blocks models for everything in the Schematic Verifier\nresult list. Normally item models are used for anything\nthat has an item, and block models are only used for blocks\nthat don't have an item, plus for Flower Pots to see the contained item.");
 
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
+                EQUIVALENT_BLOCK_TYPE_SUBSTITUTE,
                 ENABLE_RENDERING,
                 ENABLE_SCHEMATIC_RENDERING,
 

@@ -31,6 +31,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.RenderUtils;
+import fi.dy.masa.litematica.util.BlockMatchingUtils;
 import fi.dy.masa.litematica.util.OverlayType;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
@@ -661,6 +662,9 @@ public class ChunkRendererSchematicVbo
                 // Wrong block
                 else if (stateSchematic.getBlock() != stateClient.getBlock())
                 {
+                    if (BlockMatchingUtils.isTwoBlockTypesMatching(stateSchematic, stateClient)){
+                        return OverlayType.NONE;
+                    }
                     return OverlayType.WRONG_BLOCK;
                 }
                 // Wrong state
