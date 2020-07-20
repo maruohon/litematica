@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class ChunkRendererListSchematicBase
@@ -47,7 +47,7 @@ public abstract class ChunkRendererListSchematicBase
         this.overlayChunkRenderers.add(renderChunk);
     }
 
-    public abstract void renderChunkLayer(BlockRenderLayer layer);
+    public abstract void renderChunkLayer(RenderLayer layer);
 
     public abstract void renderBlockOverlays(OverlayRenderType type);
 }

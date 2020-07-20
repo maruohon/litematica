@@ -10,10 +10,10 @@ import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.render.shader.ShaderProgram;
-import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.FrustumWithOrigin;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VisibleRegion;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 
@@ -151,12 +151,12 @@ public class LitematicaRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
-            worldRenderer.renderBlockLayer(BlockRenderLayer.SOLID, camera);
+            worldRenderer.renderBlockLayer(RenderLayer.SOLID, camera);
 
-            worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, camera);
+            worldRenderer.renderBlockLayer(RenderLayer.CUTOUT_MIPPED, camera);
 
             this.mc.getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX).pushFilter(false, false);
-            worldRenderer.renderBlockLayer(BlockRenderLayer.CUTOUT, camera);
+            worldRenderer.renderBlockLayer(RenderLayer.CUTOUT, camera);
             this.mc.getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX).popFilter();
 
             if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
@@ -200,7 +200,7 @@ public class LitematicaRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
-            worldRenderer.renderBlockLayer(BlockRenderLayer.TRANSLUCENT, camera);
+            worldRenderer.renderBlockLayer(RenderLayer.TRANSLUCENT, camera);
 
             GlStateManager.popMatrix();
 
@@ -319,7 +319,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.SOLID, this.getCamera());
+            this.getWorldRenderer().renderBlockLayer(RenderLayer.SOLID, this.getCamera());
 
             this.disableShader();
 
@@ -347,7 +347,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.CUTOUT_MIPPED, this.getCamera());
+            this.getWorldRenderer().renderBlockLayer(RenderLayer.CUTOUT_MIPPED, this.getCamera());
 
             this.disableShader();
 
@@ -375,7 +375,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.CUTOUT, this.getCamera());
+            this.getWorldRenderer().renderBlockLayer(RenderLayer.CUTOUT, this.getCamera());
 
             this.disableShader();
 
@@ -405,7 +405,7 @@ public class LitematicaRenderer
 
                 this.startShaderIfEnabled();
 
-                this.getWorldRenderer().renderBlockLayer(BlockRenderLayer.TRANSLUCENT, this.getCamera());
+                this.getWorldRenderer().renderBlockLayer(RenderLayer.TRANSLUCENT, this.getCamera());
 
                 this.disableShader();
 

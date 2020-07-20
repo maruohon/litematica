@@ -1,12 +1,12 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import fi.dy.masa.litematica.world.WorldSchematic;
-import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.GlAllocationUtils;
 
 public class ChunkRendererSchematicDisplaylist extends ChunkRendererSchematicVbo
 {
-    private static final int BLOCK_LAYERS = BlockRenderLayer.values().length;
+    private static final int BLOCK_LAYERS = RenderLayer.values().length;
     private static final int LIST_SIZE = BLOCK_LAYERS + OverlayRenderType.values().length;
 
     private final int baseDisplayList;
@@ -20,7 +20,7 @@ public class ChunkRendererSchematicDisplaylist extends ChunkRendererSchematicVbo
         this.baseOverlay = this.baseDisplayList + BLOCK_LAYERS;
     }
 
-    public int getDisplayList(BlockRenderLayer layer, ChunkRenderDataSchematic data)
+    public int getDisplayList(RenderLayer layer, ChunkRenderDataSchematic data)
     {
         return data.isBlockLayerEmpty(layer) == false ? this.baseDisplayList + layer.ordinal() : -1;
     }

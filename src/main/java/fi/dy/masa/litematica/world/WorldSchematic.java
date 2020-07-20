@@ -52,13 +52,7 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public ClientChunkManager method_2935()
-    {
-        return this.getChunkProvider();
-    }
-
-    @Override
-    public ChunkManager getChunkManager()
+    public ClientChunkManager getChunkManager()
     {
         return this.getChunkProvider();
     }
@@ -66,11 +60,11 @@ public class WorldSchematic extends ClientWorld
     @Override
     public WorldChunk getWorldChunk(BlockPos pos)
     {
-        return this.method_8497(pos.getX() >> 4, pos.getZ() >> 4);
+        return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
     }
 
     @Override
-    public WorldChunk method_8497(int chunkX, int chunkZ)
+    public WorldChunk getChunk(int chunkX, int chunkZ)
     {
         return this.chunkProviderSchematic.getChunk(chunkX, chunkZ);
     }
@@ -78,7 +72,7 @@ public class WorldSchematic extends ClientWorld
     @Override
     public Chunk getChunk(int chunkX, int chunkZ, ChunkStatus status, boolean required)
     {
-        return this.method_8497(chunkX, chunkZ);
+        return this.getChunk(chunkX, chunkZ);
     }
 
     @Override
@@ -133,7 +127,7 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void scheduleBlockRender(BlockPos pos, BlockState stateOld, BlockState stateNew)
+    public void checkBlockRerender(BlockPos pos, BlockState stateOld, BlockState stateNew)
     {
         this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
     }
@@ -201,7 +195,7 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void setBlockBreakingProgress(int int_1, BlockPos blockPos_1, int int_2)
+    public void setBlockBreakingInfo(int int_1, BlockPos blockPos_1, int int_2)
     {
         // NO-OP
     }

@@ -2,12 +2,12 @@ package fi.dy.masa.litematica.render.schematic;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
+import net.minecraft.client.render.RenderLayer;
 
 public class ChunkRendererListSchematicDisplaylist extends ChunkRendererListSchematicBase
 {
     @Override
-    public void renderChunkLayer(BlockRenderLayer layer)
+    public void renderChunkLayer(RenderLayer layer)
     {
         if (this.isCameraPositionSet)
         {

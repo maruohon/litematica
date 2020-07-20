@@ -313,7 +313,7 @@ public class WorldUtils
 
     public static boolean isClientChunkLoaded(ClientWorld world, int chunkX, int chunkZ)
     {
-        return ((ClientChunkManager) world.getChunkManager()).method_2857(chunkX, chunkZ, ChunkStatus.FULL, false) != null;
+        return ((ClientChunkManager) world.getChunkManager()).getChunk(chunkX, chunkZ, ChunkStatus.FULL, false) != null;
     }
 
     public static void loadChunksSchematicWorld(WorldSchematic world, BlockPos origin, Vec3i areaSize)
@@ -715,7 +715,7 @@ public class WorldUtils
      */
     private static boolean placementRestrictionInEffect(MinecraftClient mc)
     {
-        HitResult trace = mc.hitResult;
+        HitResult trace = mc.crosshairTarget;
 
         ItemStack stack = mc.player.getMainHandStack();
 

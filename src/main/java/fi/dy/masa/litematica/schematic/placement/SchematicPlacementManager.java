@@ -674,7 +674,7 @@ public class SchematicPlacementManager
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
                     MinecraftServer server = mc.getServer();
 
-                    server.method_18858(new ServerTask(server.getTicks(), () ->
+                    server.send(new ServerTask(server.getTicks(), () ->
                     {
                         if (schematic.placeToWorld(world, schematicPlacement, false))
                         {

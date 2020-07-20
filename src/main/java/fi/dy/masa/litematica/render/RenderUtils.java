@@ -114,7 +114,7 @@ public class RenderUtils
         GlStateManager.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
         // Min corner
@@ -170,13 +170,13 @@ public class RenderUtils
 
     private static void drawBoundingBoxEdges(net.minecraft.util.math.Box box, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
-        drawBoundingBoxEdges(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, colorX, colorY, colorZ);
+        drawBoundingBoxEdges(box.x1, box.y1, box.z1, box.x2, box.y2, box.z2, colorX, colorY, colorZ);
     }
 
     private static void drawBoundingBoxEdges(double minX, double minY, double minZ, double maxX, double maxY, double maxZ, Color4f colorX, Color4f colorY, Color4f colorZ)
     {
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBufferBuilder();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
         drawBoundingBoxLinesX(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorX);
@@ -237,7 +237,7 @@ public class RenderUtils
         GlStateManager.disableCull();
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
 
         renderAreaSidesBatched(pos1, pos2, color, 0.002, buffer, mc);
@@ -303,7 +303,7 @@ public class RenderUtils
         GlStateManager.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBufferBuilder();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
 
         // Edges along the X-axis

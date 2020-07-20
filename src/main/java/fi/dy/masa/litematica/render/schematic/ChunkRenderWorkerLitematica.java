@@ -11,9 +11,9 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.crash.CrashReport;
 
@@ -54,7 +54,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.create(throwable, "Batching chunks");
-                MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().populateCrashReport(crashreport));
+                MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
                 return;
             }
         }
@@ -137,7 +137,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             if (generatorType == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK)
             {
                 //if (GuiBase.isCtrlDown()) System.out.printf("pre uploadChunk()\n");
-                for (BlockRenderLayer layer : BlockRenderLayer.values())
+                for (RenderLayer layer : RenderLayer.values())
                 {
                     if (chunkRenderData.isBlockLayerEmpty(layer) == false)
                     {
@@ -159,8 +159,8 @@ public class ChunkRenderWorkerLitematica implements Runnable
             }
             else if (generatorType == ChunkRenderTaskSchematic.Type.RESORT_TRANSPARENCY)
             {
-                BufferBuilder buffer = buffers.getBlockBufferByLayer(BlockRenderLayer.TRANSLUCENT);
-                futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(BlockRenderLayer.TRANSLUCENT, buffer, renderChunk, chunkRenderData, generator.getDistanceSq()));
+                BufferBuilder buffer = buffers.getBlockBufferByLayer(RenderLayer.TRANSLUCENT);
+                futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(RenderLayer.TRANSLUCENT, buffer, renderChunk, chunkRenderData, generator.getDistanceSq()));
 
                 if (chunkRenderData.isOverlayTypeEmpty(OverlayRenderType.QUAD) == false)
                 {

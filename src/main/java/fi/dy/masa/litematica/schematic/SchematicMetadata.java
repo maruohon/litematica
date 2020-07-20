@@ -165,7 +165,7 @@ public class SchematicMetadata
             this.enclosingSize = size;
         }
 
-        if (nbt.containsKey("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
+        if (nbt.contains("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
         {
             this.thumbnailPixelData = nbt.getIntArray("PreviewImageData");
         }

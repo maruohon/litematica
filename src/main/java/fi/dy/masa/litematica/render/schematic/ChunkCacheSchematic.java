@@ -7,14 +7,14 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ExtendedBlockView;
+import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.WorldChunk;
 
-public class ChunkCacheSchematic implements ExtendedBlockView
+public class ChunkCacheSchematic implements BlockRenderView
 {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
 

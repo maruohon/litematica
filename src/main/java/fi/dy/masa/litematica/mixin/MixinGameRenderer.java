@@ -24,7 +24,7 @@ public class MixinGameRenderer
 
     @Inject(method = "renderCenter(FJ)V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(" +
-                     "Lnet/minecraft/block/BlockRenderLayer;Lnet/minecraft/client/render/Camera;)I", ordinal = 0, shift = Shift.AFTER))
+                     "Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/Camera;)I", ordinal = 0, shift = Shift.AFTER))
     private void renderSolid(float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewiseRenderSolid(this.renderCollidingSchematicBlocks, partialTicks);
@@ -32,7 +32,7 @@ public class MixinGameRenderer
 
     @Inject(method = "renderCenter(FJ)V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(" +
-                     "Lnet/minecraft/block/BlockRenderLayer;Lnet/minecraft/client/render/Camera;)I", ordinal = 1, shift = Shift.AFTER))
+                     "Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/Camera;)I", ordinal = 1, shift = Shift.AFTER))
     private void renderCutoutMipped(float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(this.renderCollidingSchematicBlocks, partialTicks);
@@ -40,7 +40,7 @@ public class MixinGameRenderer
 
     @Inject(method = "renderCenter(FJ)V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(" +
-                     "Lnet/minecraft/block/BlockRenderLayer;Lnet/minecraft/client/render/Camera;)I", ordinal = 2, shift = Shift.AFTER))
+                     "Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/Camera;)I", ordinal = 2, shift = Shift.AFTER))
     private void renderCutout(float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewiseRenderCutout(this.renderCollidingSchematicBlocks, partialTicks);
@@ -48,7 +48,7 @@ public class MixinGameRenderer
 
     @Inject(method = "renderCenter(FJ)V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/WorldRenderer;renderLayer(" +
-                     "Lnet/minecraft/block/BlockRenderLayer;Lnet/minecraft/client/render/Camera;)I", ordinal = 3, shift = Shift.AFTER))
+                     "Lnet/minecraft/client/render/RenderLayer;Lnet/minecraft/client/render/Camera;)I", ordinal = 3, shift = Shift.AFTER))
     private void renderTranslucent(float partialTicks, long finishTimeNano, CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewiseRenderTranslucent(this.renderCollidingSchematicBlocks, partialTicks);

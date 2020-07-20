@@ -19,12 +19,12 @@ import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.GlBuffer;
 import net.minecraft.client.gl.GlBufferRenderer;
+import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.math.MathHelper;
 
 public class ChunkRenderDispatcherLitematica
@@ -253,7 +253,7 @@ public class ChunkRenderDispatcherLitematica
         return flag;
     }
 
-    public ListenableFuture<Object> uploadChunkBlocks(final BlockRenderLayer layer, final BufferBuilder buffer,
+    public ListenableFuture<Object> uploadChunkBlocks(final RenderLayer layer, final BufferBuilder buffer,
             final ChunkRendererSchematicVbo renderChunk, final ChunkRenderDataSchematic chunkRenderData, final double distanceSq)
     {
         if (MinecraftClient.getInstance().isOnThread())
@@ -341,7 +341,7 @@ public class ChunkRenderDispatcherLitematica
         GlStateManager.endList();
     }
 
-    private void uploadVertexBuffer(BufferBuilder bufferBuilder, GlBuffer vertexBufferIn)
+    private void uploadVertexBuffer(BufferBuilder bufferBuilder, VertexBuffer vertexBufferIn)
     {
         this.vertexBufferUploader.setGlBuffer(vertexBufferIn);
         this.vertexBufferUploader.draw(bufferBuilder);

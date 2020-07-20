@@ -4,13 +4,13 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
-import net.minecraft.client.gl.GlBuffer;
+import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.render.RenderLayer;
 
 public class ChunkRendererListSchematicVbo extends ChunkRendererListSchematicBase
 {
     @Override
-    public void renderChunkLayer(BlockRenderLayer layer)
+    public void renderChunkLayer(RenderLayer layer)
     {
         if (this.isCameraPositionSet)
         {
@@ -19,7 +19,7 @@ public class ChunkRendererListSchematicVbo extends ChunkRendererListSchematicBas
                 this.renderBlocks(renderChunk.getBlocksGlBufferByLayer(layer), renderChunk);
             }
 
-            GlBuffer.unbind();
+            VertexBuffer.unbind();
             GlStateManager.clearCurrentColor();
 
             this.chunkRenderers.clear();
@@ -36,14 +36,14 @@ public class ChunkRendererListSchematicVbo extends ChunkRendererListSchematicBas
                 this.renderOverlay(renderChunk.getOverlayGlBuffer(type), renderChunk, type.getGlMode());
             }
 
-            GlBuffer.unbind();
+            VertexBuffer.unbind();
             GlStateManager.clearCurrentColor();
 
             this.overlayChunkRenderers.clear();
         }
     }
 
-    private void renderBlocks(GlBuffer vertexBuffer, ChunkRendererSchematicVbo renderChunk)
+    private void renderBlocks(VertexBuffer vertexBuffer, ChunkRendererSchematicVbo renderChunk)
     {
         GlStateManager.pushMatrix();
 
@@ -56,7 +56,7 @@ public class ChunkRendererListSchematicVbo extends ChunkRendererListSchematicBas
         GlStateManager.popMatrix();
     }
 
-    private void renderOverlay(GlBuffer vertexBuffer, ChunkRendererSchematicVbo renderChunk, int glMode)
+    private void renderOverlay(VertexBuffer vertexBuffer, ChunkRendererSchematicVbo renderChunk, int glMode)
     {
         GlStateManager.pushMatrix();
 

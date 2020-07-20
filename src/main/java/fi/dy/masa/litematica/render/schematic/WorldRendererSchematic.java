@@ -20,13 +20,13 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
-import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexFormatElement;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.VisibleRegion;
@@ -43,7 +43,7 @@ import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.ExtendedBlockView;
+import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.chunk.WorldChunk;
 
 public class WorldRendererSchematic
@@ -435,13 +435,13 @@ public class WorldRendererSchematic
         }
     }
 
-    public int renderBlockLayer(BlockRenderLayer blockLayerIn, Camera camera)
+    public int renderBlockLayer(RenderLayer blockLayerIn, Camera camera)
     {
         this.world.getProfiler().push("render_block_layer_" + blockLayerIn);
 
         RenderUtils.disableItemLighting();
 
-        if (blockLayerIn == BlockRenderLayer.TRANSLUCENT)
+        if (blockLayerIn == RenderLayer.TRANSLUCENT)
         {
             this.world.getProfiler().push("translucent_sort");
             Vec3d pos = camera.getPos();
@@ -470,7 +470,7 @@ public class WorldRendererSchematic
         }
 
         this.world.getProfiler().push("filter_empty");
-        boolean reverse = blockLayerIn == BlockRenderLayer.TRANSLUCENT;
+        boolean reverse = blockLayerIn == RenderLayer.TRANSLUCENT;
         int startIndex = reverse ? this.renderInfos.size() - 1 : 0;
         int stopIndex = reverse ? -1 : this.renderInfos.size();
         int increment = reverse ? -1 : 1;
@@ -497,7 +497,7 @@ public class WorldRendererSchematic
         return count;
     }
 
-    private void renderBlockLayer(BlockRenderLayer layer)
+    private void renderBlockLayer(RenderLayer layer)
     {
         this.mc.gameRenderer.enableLightmap();
 
@@ -615,7 +615,7 @@ public class WorldRendererSchematic
         this.mc.gameRenderer.disableLightmap();
     }
 
-    public boolean renderBlock(ExtendedBlockView world, BlockState state, BlockPos pos, BufferBuilder bufferBuilderIn)
+    public boolean renderBlock(BlockRenderView world, BlockState state, BlockPos pos, BufferBuilder bufferBuilderIn)
     {
         try
         {
@@ -647,7 +647,7 @@ public class WorldRendererSchematic
         }
     }
 
-    public boolean renderFluid(ExtendedBlockView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
+    public boolean renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
     {
         return this.blockRenderManager.tesselateFluid(pos, world, bufferBuilderIn, state);
     }
@@ -671,7 +671,7 @@ public class WorldRendererSchematic
             double cameraY = camera.getPos().y;
             double cameraZ = camera.getPos().z;
 
-            BlockEntityRenderDispatcher.INSTANCE.configure(this.world, this.mc.getTextureManager(), this.mc.textRenderer, camera, this.mc.hitResult);
+            BlockEntityRenderDispatcher.INSTANCE.configure(this.world, this.mc.getTextureManager(), this.mc.textRenderer, camera, this.mc.crosshairTarget);
             this.entityRenderDispatcher.configure(this.world, this.mc.textRenderer, camera, this.mc.targetedEntity, this.mc.options);
 
             this.countEntitiesTotal = 0;

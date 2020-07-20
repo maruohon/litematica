@@ -100,7 +100,7 @@ public class ItemUtils
     {
         CompoundTag nbt = te.toTag(new CompoundTag());
 
-        if (nbt.containsKey("Owner") && stack.getItem() instanceof BlockItem &&
+        if (nbt.contains("Owner") && stack.getItem() instanceof BlockItem &&
             ((BlockItem) stack.getItem()).getBlock() instanceof AbstractSkullBlock)
         {
             CompoundTag tagOwner = nbt.getCompound("Owner");

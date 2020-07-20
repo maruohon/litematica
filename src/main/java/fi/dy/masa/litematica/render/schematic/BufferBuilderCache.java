@@ -1,20 +1,20 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import net.minecraft.block.BlockRenderLayer;
 import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.RenderLayer;
 
 public class BufferBuilderCache
 {
-    private final BufferBuilder[] blockBufferBuilders = new BufferBuilder[BlockRenderLayer.values().length];
+    private final BufferBuilder[] blockBufferBuilders = new BufferBuilder[RenderLayer.values().length];
     private BufferBuilder[] overlayBufferBuilders;
 
     public BufferBuilderCache()
     {
-        this.blockBufferBuilders[BlockRenderLayer.SOLID.ordinal()] = new BufferBuilder(2097152);
-        this.blockBufferBuilders[BlockRenderLayer.CUTOUT.ordinal()] = new BufferBuilder(131072);
-        this.blockBufferBuilders[BlockRenderLayer.CUTOUT_MIPPED.ordinal()] = new BufferBuilder(131072);
-        this.blockBufferBuilders[BlockRenderLayer.TRANSLUCENT.ordinal()] = new BufferBuilder(262144);
+        this.blockBufferBuilders[RenderLayer.SOLID.ordinal()] = new BufferBuilder(2097152);
+        this.blockBufferBuilders[RenderLayer.CUTOUT.ordinal()] = new BufferBuilder(131072);
+        this.blockBufferBuilders[RenderLayer.CUTOUT_MIPPED.ordinal()] = new BufferBuilder(131072);
+        this.blockBufferBuilders[RenderLayer.TRANSLUCENT.ordinal()] = new BufferBuilder(262144);
 
         this.overlayBufferBuilders = new BufferBuilder[OverlayRenderType.values().length];
 
@@ -24,7 +24,7 @@ public class BufferBuilderCache
         }
     }
 
-    public BufferBuilder getBlockBufferByLayer(BlockRenderLayer layer)
+    public BufferBuilder getBlockBufferByLayer(RenderLayer layer)
     {
         return this.blockBufferBuilders[layer.ordinal()];
     }
