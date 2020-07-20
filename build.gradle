@@ -12,6 +12,7 @@ buildscript {
 }
 
 apply plugin: "fabric-loom"
+apply plugin: 'maven-publish'
 
 /*
 plugins {
@@ -95,4 +96,32 @@ processResources
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+}
+
+// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+// if it is present.
+// If you remove this task, sources will not be generated.
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+tasks.publish.dependsOn build
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId project.archivesBaseName
+
+            // add all the jars that should be included when publishing to maven
+            //artifact(jar)             { builtBy remapJar }
+            artifact(jar.archivePath)   { builtBy remapJar }
+            artifact(sourcesJar)        { builtBy remapSourcesJar }
+        }
+    }
+
+    repositories {
+        maven {
+            url "$projectDir/../../CommonMaven"
+        }
+    }
 }
