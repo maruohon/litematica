@@ -11,10 +11,10 @@ import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListSorter;
-import fi.dy.masa.malilib.gui.util.GuiIconBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
-import fi.dy.masa.malilib.util.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
+import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
+import fi.dy.masa.malilib.util.data.HorizontalAlignment;
 
 public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
 {
@@ -33,7 +33,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
         this.shouldSortList = true;
         this.sorter = new MaterialListSorter(parent.getMaterialList());
 
-        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.RIGHT)).setZLevel(1);
+        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.RIGHT)).setZLevel(1);
         this.setParentGui(parent);
     }
 

@@ -9,17 +9,17 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
+import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -28,7 +28,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
     private final SelectionManager selectionManager;
     private final WidgetAreaSelectionBrowser parent;
     private final FileType fileType;
-    private int buttonsStartX;
+    private final int buttonsStartX;
 
     public WidgetAreaSelectionEntry(int x, int y, int width, int height, boolean isOdd,
             DirectoryEntry entry, int listIndex, SelectionManager selectionManager,
@@ -158,7 +158,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
                 String name = selection != null ? selection.getName() : "<error>";
                 SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, false);
-                GuiBase.openPopupGui(new GuiTextInputFeedback(title, name, this.widget.parent.getSelectionManagerGui(), renamer));
+                GuiBase.openPopupGui(new GuiTextInput(title, name, this.widget.parent.getSelectionManagerGui(), renamer));
             }
             else if (this.type == ButtonType.COPY)
             {
@@ -168,7 +168,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
                 {
                     String title = StringUtils.translate("litematica.gui.title.copy_area_selection", selection.getName());
                     SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, true);
-                    GuiBase.openPopupGui(new GuiTextInputFeedback(title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
+                    GuiBase.openPopupGui(new GuiTextInput(title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
                 }
                 else
                 {
@@ -211,7 +211,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
 
             private final String labelKey;
 
-            private ButtonType(String labelKey)
+            ButtonType(String labelKey)
             {
                 this.labelKey = labelKey;
             }
@@ -223,7 +223,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         }
     }
 
-    private static class SelectionRenamer implements IStringConsumerFeedback
+    private static class SelectionRenamer implements IStringConsumer
     {
         private final WidgetAreaSelectionEntry widget;
         private final SelectionManager selectionManager;
@@ -237,7 +237,7 @@ public class WidgetAreaSelectionEntry extends WidgetDirectoryEntry
         }
 
         @Override
-        public boolean setString(String string)
+        public boolean consumeString(String string)
         {
             String selectionId = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
             return this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), selectionId, string, this.copy, this.widget.parent.getSelectionManagerGui());

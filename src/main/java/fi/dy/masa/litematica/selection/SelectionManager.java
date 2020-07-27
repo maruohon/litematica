@@ -27,10 +27,10 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.message.IMessageConsumer;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 
@@ -67,7 +67,7 @@ public class SelectionManager
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.error.schematic_projects.in_projects_mode_but_no_project_open");
+                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.error.schematic_projects.in_projects_mode_but_no_project_open");
             }
         }
         else
@@ -350,7 +350,7 @@ public class SelectionManager
                 if (printMessage)
                 {
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
+                    MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
                 }
 
                 return true;
@@ -508,7 +508,7 @@ public class SelectionManager
                         trace.getHitCorner(),
                         trace.getHitVec(),
                         entity.getPositionEyes(1f).distanceTo(trace.getHitVec()));
-                InfoUtils.printActionbarMessage("litematica.message.grabbed_element_for_moving");
+                MessageUtils.printActionbarMessage("litematica.message.grabbed_element_for_moving");
                 return true;
             }
         }
@@ -555,7 +555,7 @@ public class SelectionManager
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    InfoUtils.printActionbarMessage("litematica.message.set_selection_box_point", cornerIndex, posStr);
+                    MessageUtils.printActionbarMessage("litematica.message.set_selection_box_point", cornerIndex, posStr);
                 }
             }
         }
@@ -574,7 +574,7 @@ public class SelectionManager
 
             String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_area_origin", posStrOld, posStrNew);
+            MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_area_origin", posStrOld, posStrNew);
         }
     }
 
@@ -713,7 +713,7 @@ public class SelectionManager
             }
             else
             {
-                InfoUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
+                MessageUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
                 return null;
             }
         }

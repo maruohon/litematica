@@ -16,7 +16,7 @@ import fi.dy.masa.litematica.materials.MaterialListSorter;
 import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.malilib.data.DataDump;
+import fi.dy.masa.malilib.util.data.DataDump;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
@@ -25,10 +25,10 @@ import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetInfoIcon;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
-import fi.dy.masa.malilib.interfaces.ICompletionListener;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.WidgetInfoIcon;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
+import fi.dy.masa.malilib.listener.ICompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>

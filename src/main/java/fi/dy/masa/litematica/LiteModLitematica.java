@@ -5,7 +5,7 @@ import com.mumfrey.liteloader.Configurable;
 import com.mumfrey.liteloader.LiteMod;
 import com.mumfrey.liteloader.modconfig.ConfigPanel;
 import fi.dy.masa.litematica.config.gui.LitematicaConfigPanel;
-import fi.dy.masa.malilib.event.InitializationHandler;
+import fi.dy.masa.malilib.event.dispatch.InitializationDispatcher;
 
 public class LiteModLitematica implements LiteMod, Configurable
 {
@@ -30,7 +30,7 @@ public class LiteModLitematica implements LiteMod, Configurable
     @Override
     public void init(File configPath)
     {
-        InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
+        InitializationDispatcher.INSTANCE.registerInitializationHandler(new InitHandler());
     }
 
     @Override

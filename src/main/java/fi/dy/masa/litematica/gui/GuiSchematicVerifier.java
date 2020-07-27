@@ -22,9 +22,9 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.ICompletionListener;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetListSchematicVerificationResults>
@@ -275,8 +275,8 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             {
                 String name = Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getName();
                 String hotkeyName = Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getName();
-                String hotkeyVal = Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeybind().getKeysDisplayString();
-                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.warn.schematic_verifier.overlay_disabled", name, hotkeyName, hotkeyVal);
+                String hotkeyVal = Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeyBind().getKeysDisplayString();
+                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.warn.schematic_verifier.overlay_disabled", name, hotkeyName, hotkeyVal);
             }
         }
     }

@@ -18,14 +18,15 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.Color4f;
+import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.message.IMessageConsumer;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 
 public class SchematicPlacementUnloaded
 {
@@ -253,7 +254,7 @@ public class SchematicPlacementUnloaded
             }
             else
             {
-                InfoUtils.printErrorMessage("litematica.error.schematic_load.failed", this.schematicFile.getAbsolutePath());
+                MessageUtils.printErrorMessage("litematica.error.schematic_load.failed", this.schematicFile.getAbsolutePath());
             }
         }
 
@@ -268,7 +269,7 @@ public class SchematicPlacementUnloaded
 
             if (origin == null)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_placements.settings_load.missing_data");
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_placements.settings_load.missing_data");
                 String name = this.schematicFile != null ? this.schematicFile.getAbsolutePath() : "<null>";
                 Litematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", name);
                 return false;
@@ -481,7 +482,7 @@ public class SchematicPlacementUnloaded
 
             if (JsonUtils.hasString(obj, "verifier_type"))
             {
-                schematicPlacement.verifierType = BlockInfoListType.fromStringStatic(JsonUtils.getString(obj, "verifier_type"));
+                schematicPlacement.verifierType = ConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "verifier_type"), BlockInfoListType.VALUES);
             }
 
             if (JsonUtils.hasString(obj, "selected_region"))
@@ -622,7 +623,7 @@ public class SchematicPlacementUnloaded
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
         }
 
         return dir;

@@ -9,11 +9,11 @@ import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.util.GuiIconBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
+import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.HorizontalAlignment;
+import fi.dy.masa.malilib.util.data.HorizontalAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion, WidgetSchematicVersion>
@@ -32,7 +32,7 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
         this.setBorderColor(GuiBase.COLOR_HORIZONTAL_BAR);
         this.setBackgroundEnabled(true);
 
-        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT));
+        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override

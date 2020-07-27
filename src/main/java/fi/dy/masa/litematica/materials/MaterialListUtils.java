@@ -13,8 +13,8 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
-import fi.dy.masa.malilib.util.InventoryUtils;
-import fi.dy.masa.malilib.util.ItemType;
+import fi.dy.masa.malilib.util.inventory.InventoryUtils;
+import fi.dy.masa.malilib.util.data.ItemType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 

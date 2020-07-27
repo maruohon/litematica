@@ -10,7 +10,7 @@ import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 
 public abstract class TaskCountBlocksMaterialList extends TaskCountBlocksBase

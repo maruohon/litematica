@@ -18,8 +18,8 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.interfaces.ICompletionListener;
-import fi.dy.masa.malilib.interfaces.IConfirmationListener;
+import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.listener.IConfirmationListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>

@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -21,18 +21,18 @@ import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiConfirmAction;
-import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
+import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.FileUtils.FileDeleter;
 import fi.dy.masa.malilib.util.FileUtils.FileRenamer;
-import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
@@ -222,7 +222,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 if (type.getHasName())
                 {
                     String oldName = data.schematic.getMetadata().getName();
-                    GuiBase.openPopupGui(new GuiTextInputFeedback("litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
+                    GuiBase.openPopupGui(new GuiTextInput("litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
                 }
                 else
                 {
@@ -232,7 +232,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             else if (this.type == Type.RENAME_FILE)
             {
                 String oldName = FileUtils.getNameWithoutExtension(entry.getName());
-                GuiBase.openPopupGui(new GuiTextInputFeedback("litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
+                GuiBase.openPopupGui(new GuiTextInput("litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
             }
             else if (this.type == Type.DELETE_FILE)
             {
@@ -252,8 +252,8 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                     previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
                     GuiBase.openGui(null);
                     String hotkeyName = Hotkeys.SET_SCHEMATIC_PREVIEW.getName();
-                    String hotkeyValue = Hotkeys.SET_SCHEMATIC_PREVIEW.getKeybind().getKeysDisplayString();
-                    InfoUtils.showGuiAndInGameMessage(MessageType.INFO, 8000, "litematica.info.schematic_manager.preview.info", hotkeyName, hotkeyValue);
+                    String hotkeyValue = Hotkeys.SET_SCHEMATIC_PREVIEW.getKeyBind().getKeysDisplayString();
+                    MessageUtils.showGuiAndInGameMessage(MessageType.INFO, 8000, "litematica.info.schematic_manager.preview.info", hotkeyName, hotkeyValue);
                 }
                 else
                 {
@@ -297,7 +297,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
     }
 
-    private static class SchematicRenamer implements IStringConsumerFeedback
+    private static class SchematicRenamer implements IStringConsumer
     {
         private final File dir;
         private final String fileName;
@@ -313,7 +313,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
 
         @Override
-        public boolean setString(String string)
+        public boolean consumeString(String string)
         {
             if (this.schematic != null)
             {
@@ -398,7 +398,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
 
                     schematic.writeToFile(this.dir, this.fileName, true);
 
-                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
+                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
                 }
                 catch (Exception e)
                 {
@@ -407,7 +407,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
             }
         }
     }

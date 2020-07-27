@@ -13,9 +13,9 @@ import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.WorldUtils;
 
 public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunkBase
@@ -106,11 +106,11 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     {
         if (this.finished)
         {
-            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_placements_pasted");
+            MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_placements_pasted");
         }
         else
         {
-            InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
+            MessageUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
         }
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);

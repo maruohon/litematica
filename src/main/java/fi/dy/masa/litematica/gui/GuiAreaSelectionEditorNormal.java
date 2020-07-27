@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.config.option.ConfigHotkey;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
@@ -28,11 +28,11 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -176,7 +176,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             ConfigHotkey hotkey = Hotkeys.TOGGLE_AREA_SELECTION_RENDERING;
             String configName = Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getName();
             String hotkeyName = hotkey.getName();
-            String hotkeyVal = hotkey.getKeybind().getKeysDisplayString();
+            String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
             String str = StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled", configName, hotkeyName, hotkeyVal);
             List<String> lines = new ArrayList<>();
             int maxLineLength = this.width - x - 20;
@@ -592,7 +592,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
     }
 
-    protected static class SubRegionCreator implements IStringConsumerFeedback
+    protected static class SubRegionCreator implements IStringConsumer
     {
         private final GuiAreaSelectionEditorNormal gui;
 
@@ -602,7 +602,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
 
         @Override
-        public boolean setString(String string)
+        public boolean consumeString(String string)
         {
             return DataManager.getSelectionManager().createNewSubRegionIfDoesntExist(string, this.gui.mc, this.gui);
         }

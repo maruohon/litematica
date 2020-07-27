@@ -18,8 +18,8 @@ import fi.dy.masa.litematica.mixin.IMixinDataFixer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public abstract class SchematicBase implements ISchematic
 {
@@ -119,7 +119,7 @@ public abstract class SchematicBase implements ISchematic
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound entityData = tagList.getCompoundTagAt(i);
-            Vec3d posVec = NBTUtils.readVec3dFromListTag(entityData);
+            Vec3d posVec = NbtUtils.readVec3dFromListTag(entityData);
 
             if (posVec != null && entityData.isEmpty() == false)
             {
@@ -138,8 +138,8 @@ public abstract class SchematicBase implements ISchematic
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound tag = tagList.getCompoundTagAt(i);
-            BlockPos pos = NBTUtils.readBlockPos(tag);
-            NBTUtils.removeBlockPosFromTag(tag);
+            BlockPos pos = NbtUtils.readBlockPos(tag);
+            NbtUtils.removeBlockPosFromTag(tag);
 
             if (pos != null && tag.isEmpty() == false)
             {
@@ -190,7 +190,7 @@ public abstract class SchematicBase implements ISchematic
             for (Map.Entry<BlockPos, NBTTagCompound> entry : tileMap.entrySet())
             {
                 NBTTagCompound tag = entry.getValue();
-                NBTUtils.writeBlockPosToTag(entry.getKey(), tag);
+                NbtUtils.writeBlockPosToTag(entry.getKey(), tag);
                 tagList.appendTag(tag);
             }
         }

@@ -12,7 +12,7 @@ import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskTimer;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.interfaces.ICompletionListener;
+import fi.dy.masa.malilib.listener.ICompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;

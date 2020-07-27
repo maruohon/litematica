@@ -35,18 +35,18 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.input.KeyBindMulti;
 import fi.dy.masa.malilib.systems.BlockPlacementPositionHandler;
 import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.PlacementUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.SubChunkPos;
-import fi.dy.masa.malilib.util.data.HitPosition;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
+import fi.dy.masa.malilib.util.position.HitPosition;
 
 public class EasyPlaceUtils
 {
@@ -108,7 +108,7 @@ public class EasyPlaceUtils
     public static boolean shouldDoEasyPlaceActions()
     {
         return Configs.Generic.EASY_PLACE_MODE.getBooleanValue() && DataManager.getToolMode() != ToolMode.REBUILD &&
-               Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld();
+               Hotkeys.EASY_PLACE_ACTIVATION.getKeyBind().isKeyBindHeld();
     }
 
     public static void easyPlaceOnUseTick(Minecraft mc)
@@ -116,7 +116,7 @@ public class EasyPlaceUtils
         if (mc.player != null && isHandling == false &&
             shouldDoEasyPlaceActions() &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
-            KeybindMulti.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
+            KeyBindMulti.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
         {
             isHandling = true;
             handleEasyPlace(mc);
@@ -138,7 +138,7 @@ public class EasyPlaceUtils
         // Only print the warning message once per right click
         if (isFirstClickEasyPlace && result == EnumActionResult.FAIL)
         {
-            InfoUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
+            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
         }
 
         isFirstClickEasyPlace = false;
@@ -567,7 +567,7 @@ public class EasyPlaceUtils
 
         if (cancel && isFirstClickPlacementRestriction)
         {
-            InfoUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.placement_restriction_fail");
+            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.placement_restriction_fail");
         }
 
         isFirstClickPlacementRestriction = false;

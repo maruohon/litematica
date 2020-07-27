@@ -20,14 +20,14 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.hotkeys.IKeybindProvider;
-import fi.dy.masa.malilib.hotkeys.IMouseInputHandler;
-import fi.dy.masa.malilib.hotkeys.KeybindCategory;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.input.IHotkey;
+import fi.dy.masa.malilib.input.IKeyBindProvider;
+import fi.dy.masa.malilib.input.IMouseInputHandler;
+import fi.dy.masa.malilib.input.KeyBindCategory;
+import fi.dy.masa.malilib.message.MessageUtils;
 
-public class InputHandler implements IKeybindProvider, IMouseInputHandler
+public class InputHandler implements IKeyBindProvider, IMouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -47,20 +47,20 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
     }
 
     @Override
-    public List<KeybindCategory> getHotkeyCategoriesForCombinedView()
+    public List<KeyBindCategory> getHotkeyCategoriesForCombinedView()
     {
-        return ImmutableList.of(new KeybindCategory(Reference.MOD_NAME, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST));
+        return ImmutableList.of(new KeyBindCategory(Reference.MOD_NAME, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST));
     }
 
     @Override
-    public boolean onMouseInput(int eventButton, int dWheel, boolean eventButtonState)
+    public boolean onMouseInput(int eventButton, int wheelDelta, boolean eventButtonState)
     {
         Minecraft mc = Minecraft.getMinecraft();
 
         // Not in a GUI
-        if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null && dWheel != 0)
+        if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null && wheelDelta != 0)
         {
-            return this.handleMouseScroll(dWheel, mc);
+            return this.handleMouseScroll(wheelDelta, mc);
         }
 
         return false;
@@ -80,12 +80,12 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
         ToolMode mode = DataManager.getToolMode();
         EnumFacing direction = fi.dy.masa.malilib.util.PositionUtils.getClosestLookingDirection(player);
 
-        if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeybind().isKeybindHeld() && mode.getUsesAreaSelection())
+        if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())
         {
             return this.modifySelectionBox(amount, mode, direction, (boxIn, amountIn, side) -> PositionUtils.expandOrShrinkBox(boxIn, amountIn, side));
         }
 
-        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld() && mode.getUsesAreaSelection())
+        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())
         {
             SelectionManager sm = DataManager.getSelectionManager();
 
@@ -108,23 +108,23 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
             }
         }
 
-        if (Hotkeys.SELECTION_GROW_MODIFIER.getKeybind().isKeybindHeld())
+        if (Hotkeys.SELECTION_GROW_MODIFIER.getKeyBind().isKeyBindHeld())
         {
             return this.modifySelectionBox(amount, mode, direction, (boxIn, amountIn, side) -> PositionUtils.growOrShrinkBox(boxIn, amountIn));
         }
 
-        if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
+        if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeyBind().isKeyBindHeld())
         {
             return nudgeSelection(amount, mode, player);
         }
 
-        if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
+        if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeyBind().isKeyBindHeld())
         {
             DataManager.setToolMode(DataManager.getToolMode().cycle(player, amount < 0));
             return true;
         }
 
-        if (Hotkeys.SCHEMATIC_VERSION_CYCLE_MODIFIER.getKeybind().isKeybindHeld())
+        if (Hotkeys.SCHEMATIC_VERSION_CYCLE_MODIFIER.getKeyBind().isKeyBindHeld())
         {
             if (DataManager.getSchematicProjectsManager().hasProjectOpen())
             {
@@ -170,12 +170,12 @@ public class InputHandler implements IKeybindProvider, IMouseInputHandler
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.no_sub_region_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.no_sub_region_selected");
             }
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
         }
 
         return true;

@@ -10,7 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class SchematicType<S extends ISchematic>
 {
@@ -177,7 +177,7 @@ public class SchematicType<S extends ISchematic>
 
         if (possibleTypes.isEmpty() == false)
         {
-            NBTTagCompound tag = NBTUtils.readNbtFromFile(file);
+            NBTTagCompound tag = NbtUtils.readNbtFromFile(file);
 
             if (tag != null)
             {

@@ -20,9 +20,9 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.IMessageConsumer;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
@@ -333,7 +333,7 @@ public class AreaSelection
         {
             String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String newStr = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_selection", oldStr, newStr);
+            MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_selection", oldStr, newStr);
         }
     }
 

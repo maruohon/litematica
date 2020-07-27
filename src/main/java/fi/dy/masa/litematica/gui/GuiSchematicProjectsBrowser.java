@@ -15,12 +15,12 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicProjectBrowser>
@@ -152,11 +152,11 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
                             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
                             GuiBase.openGui(gui);
                             String name = project.getName();
-                            InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
+                            MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
                         }
                         else
                         {
-                            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
+                            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
                         }
                     }
                 }
@@ -219,7 +219,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
         }
     }
 
-    private static class ProjectCreator implements IStringConsumerFeedback
+    private static class ProjectCreator implements IStringConsumer
     {
         private final File dir;
         private final GuiSchematicProjectsBrowser gui;
@@ -231,7 +231,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
         }
 
         @Override
-        public boolean setString(String projectName)
+        public boolean consumeString(String projectName)
         {
             File file = new File(this.dir, projectName + ".json");
 
@@ -246,7 +246,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
                 return true;
             }
 
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.project_already_exists", projectName);
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.project_already_exists", projectName);
 
             return false;
         }

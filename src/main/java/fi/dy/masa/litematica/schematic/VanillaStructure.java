@@ -18,9 +18,9 @@ import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerSparse;
 import fi.dy.masa.litematica.schematic.container.VanillaStructurePalette;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 public class VanillaStructure extends SingleRegionSchematic
@@ -73,7 +73,7 @@ public class VanillaStructure extends SingleRegionSchematic
     @Nullable
     private static Vec3i readSizeFromTagImpl(NBTTagCompound tag)
     {
-        return NBTUtils.readBlockPosFromListTag(tag, "size");
+        return NbtUtils.readBlockPosFromListTag(tag, "size");
     }
 
     @Override
@@ -89,7 +89,7 @@ public class VanillaStructure extends SingleRegionSchematic
 
             if (this.readPaletteFromLitematicaFormatTag(paletteTag, palette) == false)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.vanilla.failed_to_read_palette");
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.vanilla.failed_to_read_palette");
                 return false;
             }
 
@@ -104,11 +104,11 @@ public class VanillaStructure extends SingleRegionSchematic
             for (int i = 0; i < count; ++i)
             {
                 NBTTagCompound blockTag = blockList.getCompoundTagAt(i);
-                BlockPos pos = NBTUtils.readBlockPosFromListTag(blockTag, "pos");
+                BlockPos pos = NbtUtils.readBlockPosFromListTag(blockTag, "pos");
 
                 if (pos == null)
                 {
-                    InfoUtils.printErrorMessage("litematica.message.error.schematic_read.vanilla.failed_to_read_block_pos");
+                    MessageUtils.printErrorMessage("litematica.message.error.schematic_read.vanilla.failed_to_read_block_pos");
                     return false;
                 }
 
@@ -150,7 +150,7 @@ public class VanillaStructure extends SingleRegionSchematic
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound entityData = tagList.getCompoundTagAt(i);
-            Vec3d pos = NBTUtils.readVec3dFromListTag(entityData, "pos");
+            Vec3d pos = NbtUtils.readVec3dFromListTag(entityData, "pos");
 
             if (pos != null && entityData.hasKey("nbt", Constants.NBT.TAG_COMPOUND))
             {
@@ -221,7 +221,7 @@ public class VanillaStructure extends SingleRegionSchematic
         NBTTagCompound blockTag = new NBTTagCompound();
         BlockPos pos = new BlockPos(x, y, z);
 
-        NBTUtils.writeBlockPosToListTag(pos, blockTag, "pos");
+        NbtUtils.writeBlockPosToListTag(pos, blockTag, "pos");
         blockTag.setInteger("state", id);
 
         NBTTagCompound beTag = this.blockEntities.get(pos);
@@ -241,8 +241,8 @@ public class VanillaStructure extends SingleRegionSchematic
         for (EntityInfo info : this.entities)
         {
             NBTTagCompound entityData = new NBTTagCompound();
-            NBTUtils.writeVec3dToListTag(info.pos, entityData, "pos");
-            NBTUtils.writeBlockPosToListTag(new BlockPos(info.pos), entityData, "blockPos");
+            NbtUtils.writeVec3dToListTag(info.pos, entityData, "pos");
+            NbtUtils.writeBlockPosToListTag(new BlockPos(info.pos), entityData, "blockPos");
             NBTTagCompound entityTag = info.nbt.copy();
 
             entityTag.removeTag("Pos");
@@ -263,7 +263,7 @@ public class VanillaStructure extends SingleRegionSchematic
         this.writeEntitiesToTag(tag);
         this.writeMetadataToTag(tag);
 
-        NBTUtils.writeBlockPosToListTag(this.getSize(), tag, "size");
+        NbtUtils.writeBlockPosToListTag(this.getSize(), tag, "size");
 
         tag.setInteger("DataVersion", LitematicaSchematic.MINECRAFT_DATA_VERSION);
 

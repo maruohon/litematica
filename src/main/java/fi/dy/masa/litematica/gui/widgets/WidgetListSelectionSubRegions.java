@@ -6,11 +6,11 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.malilib.gui.util.GuiIconBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
+import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
 import fi.dy.masa.malilib.util.AlphaNumComparator.AlphaNumStringComparator;
-import fi.dy.masa.malilib.util.HorizontalAlignment;
+import fi.dy.masa.malilib.util.data.HorizontalAlignment;
 
 public class WidgetListSelectionSubRegions extends WidgetListBase<String, WidgetSelectionSubRegion>
 {
@@ -27,7 +27,7 @@ public class WidgetListSelectionSubRegions extends WidgetListBase<String, Widget
         this.browserEntryHeight = 22;
         this.shouldSortList = true;
 
-        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT));
+        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.LEFT));
     }
 
     public GuiAreaSelectionEditorNormal getEditorGui()

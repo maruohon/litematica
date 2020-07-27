@@ -42,10 +42,10 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class SchematicPlacingUtils
 {
@@ -74,12 +74,12 @@ public class SchematicPlacingUtils
             else
             {
                 pastePlacementToWorld(placement, true, mc);
-                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, 8000, "litematica.message.grid_paste.warning.select_base_placement_for_grid_paste");
+                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, 8000, "litematica.message.grid_paste.warning.select_base_placement_for_grid_paste");
             }
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
         }
     }
 
@@ -91,7 +91,7 @@ public class SchematicPlacingUtils
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
         }
     }
 
@@ -116,17 +116,17 @@ public class SchematicPlacingUtils
 
                 if (printMessage)
                 {
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                    MessageUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
                 }
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
             }
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
         }
     }
 
@@ -162,7 +162,7 @@ public class SchematicPlacingUtils
                                 container, blockEntityMap, scheduledBlockTicks, range, notifyNeighbors) == false)
                         {
                             success = false;
-                            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed_region", regionName);
+                            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed_region", regionName);
                         }
                     }
                     else

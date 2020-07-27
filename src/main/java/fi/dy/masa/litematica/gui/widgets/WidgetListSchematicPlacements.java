@@ -6,11 +6,11 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.util.GuiIconBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetListBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetSearchBar;
+import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
+import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.HorizontalAlignment;
+import fi.dy.masa.malilib.util.data.HorizontalAlignment;
 
 public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacementUnloaded, WidgetSchematicPlacementEntry>
 {
@@ -23,7 +23,7 @@ public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlace
         this.gui = gui;
         this.browserEntryHeight = 22;
 
-        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 17, 14, 0, GuiIconBase.SEARCH, HorizontalAlignment.LEFT));
+        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 17, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override

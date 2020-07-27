@@ -11,9 +11,9 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.ToolUtils;
-import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
-import fi.dy.masa.malilib.hotkeys.IKeybind;
-import fi.dy.masa.malilib.hotkeys.KeyAction;
+import fi.dy.masa.malilib.input.IHotkeyCallback;
+import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.input.KeyAction;
 
 public class HotkeyCallbackToolActions implements IHotkeyCallback
 {
@@ -25,7 +25,7 @@ public class HotkeyCallbackToolActions implements IHotkeyCallback
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, IKeybind key)
+    public boolean onKeyAction(KeyAction action, IKeyBind key)
     {
         if (this.mc.player == null || this.mc.world == null)
         {
@@ -35,18 +35,18 @@ public class HotkeyCallbackToolActions implements IHotkeyCallback
         ToolMode mode = DataManager.getToolMode();
         boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
         boolean hasTool = EntityUtils.hasToolItem(this.mc.player);
-        boolean isToolPrimary = key == Hotkeys.TOOL_PLACE_CORNER_1.getKeybind();
-        boolean isToolSecondary = key == Hotkeys.TOOL_PLACE_CORNER_2.getKeybind();
-        boolean isToolSelect = key == Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind();
+        boolean isToolPrimary = key == Hotkeys.TOOL_PLACE_CORNER_1.getKeyBind();
+        boolean isToolSecondary = key == Hotkeys.TOOL_PLACE_CORNER_2.getKeyBind();
+        boolean isToolSelect = key == Hotkeys.TOOL_SELECT_ELEMENTS.getKeyBind();
 
         if (toolEnabled && isToolSelect)
         {
-            if (mode.getUsesBlockPrimary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeybind().isKeybindHeld())
+            if (mode.getUsesBlockPrimary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeyBind().isKeyBindHeld())
             {
                 ToolUtils.setToolModeBlockState(mode, true, this.mc);
                 return true;
             }
-            else if (mode.getUsesBlockSecondary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeybind().isKeybindHeld())
+            else if (mode.getUsesBlockSecondary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeyBind().isKeyBindHeld())
             {
                 ToolUtils.setToolModeBlockState(mode, false, this.mc);
                 return true;
@@ -63,7 +63,7 @@ public class HotkeyCallbackToolActions implements IHotkeyCallback
                 if (mode.getUsesAreaSelection() || projectMode)
                 {
                     SelectionManager sm = DataManager.getSelectionManager();
-                    boolean grabModifier = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
+                    boolean grabModifier = Hotkeys.SELECTION_GRAB_MODIFIER.getKeyBind().isKeyBindHeld();
                     boolean moveEverything = grabModifier;
 
                     if (grabModifier && mode == ToolMode.MOVE)
@@ -101,7 +101,7 @@ public class HotkeyCallbackToolActions implements IHotkeyCallback
                 {
                     SelectionManager sm = DataManager.getSelectionManager();
 
-                    if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
+                    if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeyBind().isKeyBindHeld())
                     {
                         if (sm.hasGrabbedElement())
                         {

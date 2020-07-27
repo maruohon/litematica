@@ -23,10 +23,10 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChunkBase
 {
@@ -267,12 +267,12 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         {
             if (this.printCompletionMessage)
             {
-                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted_using_setblock", this.sentCommandsTotal);
+                MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted_using_setblock", this.sentCommandsTotal);
             }
         }
         else
         {
-            InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
+            MessageUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
         }
 
         if (this.mc.player != null)

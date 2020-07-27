@@ -25,10 +25,11 @@ import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.render.InventoryOverlay.InventoryProperties;
-import fi.dy.masa.malilib.render.InventoryOverlay.InventoryRenderType;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.HorizontalAlignment;
+import fi.dy.masa.malilib.render.overlay.InventoryOverlay;
+import fi.dy.masa.malilib.render.overlay.InventoryOverlay.InventoryProperties;
+import fi.dy.masa.malilib.render.overlay.InventoryOverlay.InventoryRenderType;
+import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.data.HorizontalAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class RenderUtils
@@ -42,7 +43,7 @@ public class RenderUtils
     public static boolean isSchematicCurrentlyRendered()
     {
         return Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-               Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
+               Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeyBind().isKeyBindHeld();
     }
 
     /**
@@ -571,8 +572,8 @@ public class RenderUtils
 
         if (inv != null)
         {
-            final InventoryRenderType type = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryType(inv);
-            final InventoryProperties props = fi.dy.masa.malilib.render.InventoryOverlay.getInventoryPropsTemp(type, inv.getSizeInventory());
+            final InventoryRenderType type = InventoryOverlay.getInventoryType(inv);
+            final InventoryProperties props = InventoryOverlay.getInventoryPropsTemp(type, inv.getSizeInventory());
 
             return renderInventoryOverlay(align, side, offY, inv, type, props, mc);
         }
@@ -605,8 +606,8 @@ public class RenderUtils
 
         fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
 
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryBackground(type, xInv, yInv, z, props.slotsPerRow, props.totalSlots, mc);
-        fi.dy.masa.malilib.render.InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, zItems, props.slotsPerRow, 0, -1, mc);
+        InventoryOverlay.renderInventoryBackground(type, xInv, yInv, z, props.slotsPerRow, props.totalSlots, mc);
+        InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, zItems, props.slotsPerRow, 0, -1, mc);
 
         return props.height;
     }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.malilib.config.values.HudAlignment;
+import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 
 public class InfoHud

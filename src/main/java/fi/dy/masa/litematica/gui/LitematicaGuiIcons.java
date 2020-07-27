@@ -2,9 +2,9 @@ package fi.dy.masa.litematica.gui;
 
 import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.malilib.gui.util.GuiIconBase;
+import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
 
-public class LitematicaGuiIcons extends GuiIconBase
+public class LitematicaGuiIcons extends BaseGuiIcon
 {
     public static final ResourceLocation LITEMATICA_GUI_TEXTURES = new ResourceLocation(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 

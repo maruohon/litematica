@@ -36,9 +36,9 @@ import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 
@@ -443,7 +443,7 @@ public class DataManager implements IDirectoryCache
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
         }
 
         return dir;
@@ -561,7 +561,7 @@ public class DataManager implements IDirectoryCache
             }
 
             Configs.Generic.TOOL_ITEM.setValueFromString(cfgStr);
-            InfoUtils.printActionbarMessage("litematica.message.set_currently_held_item_as_tool");
+            MessageUtils.printActionbarMessage("litematica.message.set_currently_held_item_as_tool");
         }
     }
 }

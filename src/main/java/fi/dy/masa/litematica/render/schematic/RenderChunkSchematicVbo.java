@@ -38,10 +38,10 @@ import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.util.OverlayType;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.Color4f;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
+import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class RenderChunkSchematicVbo extends RenderChunk
 {

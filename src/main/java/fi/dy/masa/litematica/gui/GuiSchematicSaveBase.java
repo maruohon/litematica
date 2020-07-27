@@ -10,10 +10,10 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -165,10 +165,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public void setString(String string)
+    public boolean consumeString(String string)
     {
         this.setNextMessageType(MessageType.ERROR);
-        super.setString(string);
+
+        return super.consumeString(string);
     }
 
     @Override
@@ -209,7 +210,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         private final String labelKey;
 
-        private ButtonType(String labelKey)
+        ButtonType(String labelKey)
         {
             this.labelKey = labelKey;
         }

@@ -9,13 +9,13 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiTextInputFeedback;
+import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
-import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -156,7 +156,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
                 String title = "litematica.gui.title.rename_area_sub_region";
                 String name = this.widget.box != null ? this.widget.box.getName() : "<error>";
                 BoxRenamer renamer = new BoxRenamer(this.widget.selection, this.widget);
-                GuiBase.openPopupGui(new GuiTextInputFeedback(title, name, this.widget.parent.getEditorGui(), renamer));
+                GuiBase.openPopupGui(new GuiTextInput(title, name, this.widget.parent.getEditorGui(), renamer));
             }
             else if (this.type == ButtonType.REMOVE)
             {
@@ -191,7 +191,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         }
     }
 
-    private static class BoxRenamer implements IStringConsumerFeedback
+    private static class BoxRenamer implements IStringConsumer
     {
         private final WidgetSelectionSubRegion widget;
         private final AreaSelection selection;
@@ -203,7 +203,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         }
 
         @Override
-        public boolean setString(String string)
+        public boolean consumeString(String string)
         {
             String oldName = this.widget.entry;
             return this.selection.renameSubRegionBox(oldName, string, this.widget.parent.getEditorGui());

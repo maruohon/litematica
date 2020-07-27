@@ -5,7 +5,7 @@ import java.io.FileFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.google.common.io.Files;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.MessageUtils;
 
 public class FileMigrationUtils
 {
@@ -59,7 +59,7 @@ public class FileMigrationUtils
 
             if (newDataDir.exists() == false && newDataDir.mkdirs() == false)
             {
-                InfoUtils.printErrorMessage("Failed to create directory '" + newDataDir.getAbsolutePath() + "'");
+                MessageUtils.printErrorMessage("Failed to create directory '" + newDataDir.getAbsolutePath() + "'");
                 continue;
             }
 
@@ -72,7 +72,7 @@ public class FileMigrationUtils
             }
             catch (Exception e)
             {
-                InfoUtils.printErrorMessage("Failed to move data file '" + file.getAbsolutePath() + "' to '" + newFile.getAbsolutePath() + "'");
+                MessageUtils.printErrorMessage("Failed to move data file '" + file.getAbsolutePath() + "' to '" + newFile.getAbsolutePath() + "'");
             }
         }
     }
@@ -86,7 +86,7 @@ public class FileMigrationUtils
         {
             if (newDirPerWorldBase.exists() == false && newDirPerWorldBase.mkdirs() == false)
             {
-                InfoUtils.printErrorMessage("Failed to create directory '" + newDirPerWorldBase.getAbsolutePath() + "'");
+                MessageUtils.printErrorMessage("Failed to create directory '" + newDirPerWorldBase.getAbsolutePath() + "'");
             }
             else
             {
@@ -107,7 +107,7 @@ public class FileMigrationUtils
                             }
                             catch (Exception e)
                             {
-                                InfoUtils.printErrorMessage("Failed to move directory '" + oldDir.getAbsolutePath() + "' to '" + newDir.getAbsolutePath() + "'");
+                                MessageUtils.printErrorMessage("Failed to move directory '" + oldDir.getAbsolutePath() + "' to '" + newDir.getAbsolutePath() + "'");
                             }
                         }
 
@@ -139,7 +139,7 @@ public class FileMigrationUtils
             }
             catch (Exception e)
             {
-                InfoUtils.printErrorMessage("Failed to move directory '" + oldDirGlobal.getAbsolutePath() + "' to '" + newDirGlobal.getAbsolutePath() + "'");
+                MessageUtils.printErrorMessage("Failed to move directory '" + oldDirGlobal.getAbsolutePath() + "' to '" + newDirGlobal.getAbsolutePath() + "'");
             }
         }
     }

@@ -8,8 +8,8 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
@@ -135,7 +135,7 @@ public class SubRegionPlacement
         }
         else if (pos.equals(this.pos) == false && this.coordinateLockMask != 0)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 2000, "litematica.error.schematic_placements.coordinate_locked");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, 2000, "litematica.error.schematic_placements.coordinate_locked");
         }
     }
 

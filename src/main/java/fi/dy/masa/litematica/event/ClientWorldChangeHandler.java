@@ -5,12 +5,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.interfaces.IWorldLoadListener;
+import fi.dy.masa.malilib.event.IClientWorldChangeHandler;
 
-public class WorldLoadListener implements IWorldLoadListener
+public class ClientWorldChangeHandler implements IClientWorldChangeHandler
 {
     @Override
-    public void onWorldLoadPre(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
+    public void onPreClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
     {
         // Save the settings before the integrated server gets shut down
         if (worldBefore != null)
@@ -21,7 +21,7 @@ public class WorldLoadListener implements IWorldLoadListener
     }
 
     @Override
-    public void onWorldLoadPost(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
+    public void onPostClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)
     {
         SchematicWorldHandler.recreateSchematicWorld(worldAfter == null);
 

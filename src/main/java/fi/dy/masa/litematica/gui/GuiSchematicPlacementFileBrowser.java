@@ -4,8 +4,8 @@ import java.io.File;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacementBrowser;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicPlacementFileBrowser extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicPlacementBrowser>

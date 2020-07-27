@@ -12,16 +12,16 @@ import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.malilib.config.IConfigHandler;
-import fi.dy.masa.malilib.config.options.ConfigBoolean;
-import fi.dy.masa.malilib.config.options.ConfigColor;
-import fi.dy.masa.malilib.config.options.ConfigDirectory;
-import fi.dy.masa.malilib.config.options.ConfigDouble;
-import fi.dy.masa.malilib.config.options.ConfigInteger;
-import fi.dy.masa.malilib.config.options.ConfigOptionList;
-import fi.dy.masa.malilib.config.options.ConfigString;
-import fi.dy.masa.malilib.config.options.IConfigBase;
-import fi.dy.masa.malilib.config.values.HudAlignment;
-import fi.dy.masa.malilib.config.values.InfoType;
+import fi.dy.masa.malilib.config.option.ConfigBoolean;
+import fi.dy.masa.malilib.config.option.ConfigColor;
+import fi.dy.masa.malilib.config.option.ConfigDirectory;
+import fi.dy.masa.malilib.config.option.ConfigDouble;
+import fi.dy.masa.malilib.config.option.ConfigInteger;
+import fi.dy.masa.malilib.config.option.ConfigOptionList;
+import fi.dy.masa.malilib.config.option.ConfigString;
+import fi.dy.masa.malilib.config.option.IConfigBase;
+import fi.dy.masa.malilib.config.value.HudAlignment;
+import fi.dy.masa.malilib.config.value.InfoType;
 import fi.dy.masa.malilib.util.FileUtils;
 
 public class Configs implements IConfigHandler

@@ -8,7 +8,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal

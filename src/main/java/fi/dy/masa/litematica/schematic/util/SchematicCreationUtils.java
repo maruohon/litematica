@@ -34,12 +34,12 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class SchematicCreationUtils
 {
@@ -69,7 +69,6 @@ public class SchematicCreationUtils
      * This is intended to be used for the chunk-wise schematic creation.
      * @param area
      * @param author
-     * @param feedback
      * @return
      */
     public static LitematicaSchematic createEmptySchematic(AreaSelection area, String author)
@@ -78,7 +77,7 @@ public class SchematicCreationUtils
 
         if (boxes.isEmpty())
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, StringUtils.translate("litematica.error.schematic.create.no_selections"));
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, StringUtils.translate("litematica.error.schematic.create.no_selections"));
             return null;
         }
 
@@ -103,7 +102,7 @@ public class SchematicCreationUtils
 
         if (boxes.isEmpty())
         {
-            feedback.setString(StringUtils.translate("litematica.error.schematic.create.no_selections"));
+            feedback.consumeString(StringUtils.translate("litematica.error.schematic.create.no_selections"));
             return null;
         }
 
@@ -143,7 +142,7 @@ public class SchematicCreationUtils
 
             if (schematicEntityList == null)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_entity_list", box.getName());
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_entity_list", box.getName());
                 continue;
             }
 
@@ -159,7 +158,7 @@ public class SchematicCreationUtils
                 if (entity.writeToNBTOptional(tag))
                 {
                     Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
-                    NBTUtils.writeVec3dToListTag(posVec, tag);
+                    NbtUtils.writeVec3dToListTag(posVec, tag);
                     list.add(new EntityInfo(posVec, tag));
                 }
             }
@@ -180,7 +179,7 @@ public class SchematicCreationUtils
 
             if (box == null || schematicEntityList == null)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_entity_list", regionName);
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_entity_list", regionName);
                 continue;
             }
 
@@ -203,7 +202,7 @@ public class SchematicCreationUtils
                     if (entity.writeToNBTOptional(tag))
                     {
                         Vec3d posVec = new Vec3d(entity.posX - regionPosAbs.getX(), entity.posY - regionPosAbs.getY(), entity.posZ - regionPosAbs.getZ());
-                        NBTUtils.writeVec3dToListTag(posVec, tag);
+                        NbtUtils.writeVec3dToListTag(posVec, tag);
                         schematicEntityList.add(new EntityInfo(posVec, tag));
                         existingEntities.add(uuid);
                     }
@@ -227,7 +226,7 @@ public class SchematicCreationUtils
 
             if (container == null || blockEntityMap == null || tickMap == null)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
                 continue;
             }
 
@@ -268,7 +267,7 @@ public class SchematicCreationUtils
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
                                 NBTTagCompound tag = te.writeToNBT(new NBTTagCompound());
-                                NBTUtils.writeBlockPosToTag(pos, tag);
+                                NbtUtils.writeBlockPosToTag(pos, tag);
                                 blockEntityMap.put(pos, tag);
                             }
                         }
@@ -339,7 +338,7 @@ public class SchematicCreationUtils
 
             if (container == null || blockEntityMap == null || tickMap == null)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
                 Litematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }
@@ -383,7 +382,7 @@ public class SchematicCreationUtils
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
                                 NBTTagCompound tag = te.writeToNBT(new NBTTagCompound());
-                                NBTUtils.writeBlockPosToTag(pos, tag);
+                                NbtUtils.writeBlockPosToTag(pos, tag);
                                 blockEntityMap.put(pos, tag);
                             }
                         }

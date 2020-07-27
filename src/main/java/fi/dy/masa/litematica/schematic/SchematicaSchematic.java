@@ -18,8 +18,8 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.util.NbtUtils;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.message.MessageUtils;
 
 public class SchematicaSchematic extends SingleRegionSchematic
 {
@@ -132,7 +132,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
             if (id >= this.palette.length)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.invalid_id", id, key, this.palette.length - 1);
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.invalid_id", id, key, this.palette.length - 1);
                 continue;
             }
 
@@ -140,7 +140,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
             if (block == null)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.invalid_block", key);
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.invalid_block", key);
                 continue;
             }
 
@@ -165,13 +165,13 @@ public class SchematicaSchematic extends SingleRegionSchematic
             }
             catch (NumberFormatException e)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.id_not_number", idStr, key);
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.id_not_number", idStr, key);
                 continue;
             }
 
             if (id >= this.palette.length)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.mcedit2.palette.invalid_id", id, key, this.palette.length - 1);
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.mcedit2.palette.invalid_id", id, key, this.palette.length - 1);
                 continue;
             }
 
@@ -179,7 +179,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
             if (block == null)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.mcedit2.missing_block_data", key);
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.mcedit2.missing_block_data", key);
                 continue;
             }
 
@@ -205,7 +205,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
                 }
                 else
                 {
-                    InfoUtils.printErrorMessage("litematica.message.error.schematic_read.registry_palette.missing_block_data", id, key);
+                    MessageUtils.printErrorMessage("litematica.message.error.schematic_read.registry_palette.missing_block_data", id, key);
                 }
             }
         }
@@ -229,19 +229,19 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
         if (numBlocks != (sizeX * sizeY * sizeZ))
         {
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_block_array_size", numBlocks, sizeX, sizeY, sizeZ);
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_block_array_size", numBlocks, sizeX, sizeY, sizeZ);
             return false;
         }
 
         if (numBlocks != metaArr.length)
         {
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_metadata_array_size", numBlocks, metaArr.length);
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_metadata_array_size", numBlocks, metaArr.length);
             return false;
         }
 
         if (this.readPaletteFromTag(tag) == false)
         {
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.failed_to_read");
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.palette.failed_to_read");
             return false;
         }
 
@@ -253,7 +253,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
         else if (tag.hasKey("Add", Constants.NBT.TAG_BYTE_ARRAY))
         {
             // FIXME is this array 4 or 8 bits per block?
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.old_schematica_format_not_supported");
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.old_schematica_format_not_supported");
             return false;
         }
         // No palette, use the registry IDs directly
@@ -286,7 +286,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
         if (add.length != expectedAddLength)
         {
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_block_add_array_size", numBlocks, add.length, expectedAddLength);
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.schematica.schematic.invalid_block_add_array_size", numBlocks, add.length, expectedAddLength);
             return false;
         }
 
@@ -357,7 +357,7 @@ public class SchematicaSchematic extends SingleRegionSchematic
 
                 if (id >= this.palette.length)
                 {
-                    InfoUtils.printErrorMessage("litematica.message.error.schematic_write.schematica.palette.invalid_id", id, state, this.palette.length - 1);
+                    MessageUtils.printErrorMessage("litematica.message.error.schematic_write.schematica.palette.invalid_id", id, state, this.palette.length - 1);
                     continue;
                 }
 

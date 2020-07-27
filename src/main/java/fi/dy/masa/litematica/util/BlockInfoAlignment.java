@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.util;
 
-import fi.dy.masa.malilib.config.IConfigOptionListEntry;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum BlockInfoAlignment implements IConfigOptionListEntry<BlockInfoAlignment>
@@ -8,13 +10,15 @@ public enum BlockInfoAlignment implements IConfigOptionListEntry<BlockInfoAlignm
     CENTER      ("center",      "litematica.label.alignment.center"),
     TOP_CENTER  ("top_center",  "litematica.label.alignment.top_center");
 
-    private final String configString;
-    private final String unlocName;
+    public static final ImmutableList<BlockInfoAlignment> VALUES = ImmutableList.copyOf(values());
 
-    private BlockInfoAlignment(String configString, String unlocName)
+    private final String configString;
+    private final String translationKey;
+
+    BlockInfoAlignment(String configString, String translationKey)
     {
         this.configString = configString;
-        this.unlocName = unlocName;
+        this.translationKey = translationKey;
     }
 
     @Override
@@ -26,48 +30,18 @@ public enum BlockInfoAlignment implements IConfigOptionListEntry<BlockInfoAlignm
     @Override
     public String getDisplayName()
     {
-        return StringUtils.translate(this.unlocName);
+        return StringUtils.translate(this.translationKey);
     }
 
     @Override
     public BlockInfoAlignment cycle(boolean forward)
     {
-        int id = this.ordinal();
-
-        if (forward)
-        {
-            if (++id >= values().length)
-            {
-                id = 0;
-            }
-        }
-        else
-        {
-            if (--id < 0)
-            {
-                id = values().length - 1;
-            }
-        }
-
-        return values()[id % values().length];
+        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public BlockInfoAlignment fromString(String name)
     {
-        return fromStringStatic(name);
-    }
-
-    public static BlockInfoAlignment fromStringStatic(String name)
-    {
-        for (BlockInfoAlignment aligment : BlockInfoAlignment.values())
-        {
-            if (aligment.configString.equalsIgnoreCase(name))
-            {
-                return aligment;
-            }
-        }
-
-        return BlockInfoAlignment.CENTER;
+        return ConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

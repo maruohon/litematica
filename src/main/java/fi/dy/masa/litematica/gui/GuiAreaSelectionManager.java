@@ -15,14 +15,13 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
+import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetAreaSelectionBrowser> implements ISelectionListener<DirectoryEntry>
@@ -58,7 +57,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
 
         if (this.selectionManager.getSelectionMode() == SelectionMode.SIMPLE)
         {
-            InfoUtils.showGuiMessage(MessageType.WARNING, "litematica.message.warn.area_selection.browser_open_in_simple_mode");
+            MessageUtils.showGuiMessage(MessageType.WARNING, "litematica.message.warn.area_selection.browser_open_in_simple_mode");
         }
     }
 
@@ -221,7 +220,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
 
             private final String labelKey;
 
-            private ButtonType(String labelKey)
+            ButtonType(String labelKey)
             {
                 this.labelKey = labelKey;
             }
@@ -245,14 +244,15 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         }
 
         @Override
-        public void setString(String string)
+        public boolean consumeString(String string)
         {
             this.gui.selectionManager.createNewSelection(this.dir, string);
             this.gui.getListWidget().refreshEntries();
+            return true;
         }
     }
 
-    public static class SelectionCreatorPlacement implements IStringConsumerFeedback
+    public static class SelectionCreatorPlacement implements IStringConsumer
     {
         private final SchematicPlacement placement;
         private final File dir;
@@ -266,7 +266,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         }
 
         @Override
-        public boolean setString(String name)
+        public boolean consumeString(String name)
         {
             if (this.gui.getSelectionManager().createSelectionFromPlacement(this.dir, this.placement, name, this.gui))
             {

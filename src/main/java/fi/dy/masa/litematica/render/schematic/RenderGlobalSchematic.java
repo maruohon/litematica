@@ -53,8 +53,8 @@ import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.util.IGenericEventListener;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
+import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class RenderGlobalSchematic extends RenderGlobal implements IGenericEventListener
 {

@@ -36,7 +36,7 @@ import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.FileUtils;
 
 public class MaterialCache

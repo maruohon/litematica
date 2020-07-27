@@ -44,17 +44,17 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.config.options.ConfigHotkey;
-import fi.dy.masa.malilib.config.values.LayerMode;
-import fi.dy.masa.malilib.gui.interfaces.IMessageConsumer;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.config.option.ConfigHotkey;
+import fi.dy.masa.malilib.config.value.LayerMode;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.message.IMessageConsumer;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.SubChunkPos;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class SchematicPlacementManager
 {
@@ -189,10 +189,7 @@ public class SchematicPlacementManager
 
             LitematicaRenderer.getInstance().getWorldRenderer().markNeedsUpdate();
 
-            if (this.chunksToRebuild.isEmpty())
-            {
-                return true;
-            }
+            return this.chunksToRebuild.isEmpty();
         }
 
         return false;
@@ -322,7 +319,7 @@ public class SchematicPlacementManager
 
             if (printMessages && isLoadFromFile == false)
             {
-                InfoUtils.showGuiMessage(MessageType.SUCCESS, StringUtils.translate("litematica.message.schematic_placement_created", placement.getName()));
+                MessageUtils.showGuiMessage(MessageType.SUCCESS, StringUtils.translate("litematica.message.schematic_placement_created", placement.getName()));
 
                 if (Configs.InfoOverlays.WARN_DISABLED_RENDERING.getBooleanValue())
                 {
@@ -330,7 +327,7 @@ public class SchematicPlacementManager
 
                     if (mode != LayerMode.ALL)
                     {
-                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, "litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
+                        MessageUtils.showGuiAndInGameMessage(MessageType.WARNING, "litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
                     }
 
                     if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false)
@@ -338,10 +335,10 @@ public class SchematicPlacementManager
                         ConfigHotkey hotkey = Hotkeys.TOGGLE_ALL_RENDERING;
                         String configName = Configs.Visuals.ENABLE_RENDERING.getName();
                         String hotkeyName = hotkey.getName();
-                        String hotkeyVal = hotkey.getKeybind().getKeysDisplayString();
+                        String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
 
-                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
-                                "litematica.message.warn.main_rendering_disabled", configName, hotkeyName, hotkeyVal);
+                        MessageUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
+                                                             "litematica.message.warn.main_rendering_disabled", configName, hotkeyName, hotkeyVal);
                     }
 
                     if (Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false)
@@ -349,10 +346,10 @@ public class SchematicPlacementManager
                         ConfigHotkey hotkey = Hotkeys.TOGGLE_SCHEMATIC_RENDERING;
                         String configName = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getName();
                         String hotkeyName = hotkey.getName();
-                        String hotkeyVal = hotkey.getKeybind().getKeysDisplayString();
+                        String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
 
-                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
-                                "litematica.message.warn.schematic_rendering_disabled", configName, hotkeyName, hotkeyVal);
+                        MessageUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
+                                                             "litematica.message.warn.schematic_rendering_disabled", configName, hotkeyName, hotkeyVal);
                     }
 
                     if (Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false)
@@ -360,17 +357,17 @@ public class SchematicPlacementManager
                         ConfigHotkey hotkey = Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING;
                         String configName = Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getName();
                         String hotkeyName = hotkey.getName();
-                        String hotkeyVal = hotkey.getKeybind().getKeysDisplayString();
+                        String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
 
-                        InfoUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
-                                "litematica.message.warn.schematic_blocks_rendering_disabled", configName, hotkeyName, hotkeyVal);
+                        MessageUtils.showGuiAndInGameMessage(MessageType.WARNING, 8000,
+                                                             "litematica.message.warn.schematic_blocks_rendering_disabled", configName, hotkeyName, hotkeyVal);
                     }
                 }
             }
         }
         else if (printMessages)
         {
-            InfoUtils.showGuiAndInGameMessage(MessageType.ERROR, "litematica.error.duplicate_schematic_placement");
+            MessageUtils.showGuiAndInGameMessage(MessageType.ERROR, "litematica.error.duplicate_schematic_placement");
         }
     }
 
@@ -404,12 +401,6 @@ public class SchematicPlacementManager
         if (placement.isLoaded())
         {
             SchematicPlacement loadedPlacement = (SchematicPlacement) placement;
-
-            if (loadedPlacement.hasVerifier())
-            {
-                loadedPlacement.getSchematicVerifier().reset();
-            }
-
             boolean ret = this.schematicPlacements.remove(loadedPlacement);
 
             this.gridManager.onPlacementRemoved(loadedPlacement);
@@ -498,7 +489,7 @@ public class SchematicPlacementManager
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
         }
     }
 
@@ -649,12 +640,12 @@ public class SchematicPlacementManager
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_placement.load_failed", placement.getName(), placement.getSchematicFile());
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_placement.load_failed", placement.getName(), placement.getSchematicFile());
             }
         }
     }
 
-    public void toggleIgnoreEntities(SchematicPlacement placement, IMessageConsumer feedback)
+    public void toggleIgnoreEntities(SchematicPlacement placement)
     {
         this.onPrePlacementChange(placement);
         placement.toggleIgnoreEntities();
@@ -665,7 +656,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            feedback.setString("litematica.message.placement.cant_modify_is_locked");
+            feedback.consumeString("litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -680,7 +671,7 @@ public class SchematicPlacementManager
         }
         else if (origin.equals(oldOrigin) == false && placement.coordinateLockMask != 0)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 2000, "litematica.error.schematic_placements.coordinate_locked");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, 2000, "litematica.error.schematic_placements.coordinate_locked");
         }
     }
 
@@ -702,7 +693,7 @@ public class SchematicPlacementManager
 
     public void rotateBy(SchematicPlacement placement, Rotation rotation)
     {
-        this.setRotation(placement, placement.getRotation().add(rotation), InfoUtils.INGAME_MESSAGE_CONSUMER);
+        this.setRotation(placement, placement.getRotation().add(rotation), MessageUtils.INGAME_MESSAGE_CONSUMER);
     }
 
     public void setMirror(SchematicPlacement placement, Mirror mirror, IMessageConsumer feedback)
@@ -721,7 +712,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void toggleSubRegionEnabled(SchematicPlacement placement, String regionName, IMessageConsumer feedback)
+    public void toggleSubRegionEnabled(SchematicPlacement placement, String regionName)
     {
         SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
 
@@ -733,7 +724,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void toggleSubRegionIgnoreEntities(SchematicPlacement placement, String regionName, IMessageConsumer feedback)
+    public void toggleSubRegionIgnoreEntities(SchematicPlacement placement, String regionName)
     {
         SubRegionPlacement subPlacement = placement.getRelativeSubRegionPlacement(regionName);
 
@@ -792,7 +783,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            feedback.setString("litematica.message.placement.cant_modify_is_locked");
+            feedback.consumeString("litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -834,7 +825,7 @@ public class SchematicPlacementManager
     {
         if (placement.isLocked())
         {
-            feedback.setString("litematica.message.placement.cant_modify_is_locked");
+            feedback.consumeString("litematica.message.placement.cant_modify_is_locked");
             return;
         }
 
@@ -974,7 +965,7 @@ public class SchematicPlacementManager
             {
                 this.setSelectedSchematicPlacement(trace.getHitSchematicPlacement());
 
-                boolean selectSubRegion = Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld();
+                boolean selectSubRegion = Hotkeys.SELECTION_GRAB_MODIFIER.getKeyBind().isKeyBindHeld();
                 String subRegionName = selectSubRegion ? trace.getHitSchematicPlacementRegionName() : null;
                 this.getSelectedSchematicPlacement().setSelectedSubRegionName(subRegionName);
 
@@ -1012,11 +1003,11 @@ public class SchematicPlacementManager
                 pos = pos.offset(trace.sideHit);
             }
 
-            this.setPositionOfCurrentSelectionTo(pos, mc);
+            this.setPositionOfCurrentSelectionTo(pos);
         }
     }
 
-    public void setPositionOfCurrentSelectionTo(BlockPos pos, Minecraft mc)
+    public void setPositionOfCurrentSelectionTo(BlockPos pos)
     {
         SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
@@ -1024,7 +1015,7 @@ public class SchematicPlacementManager
         {
             if (schematicPlacement.isLocked())
             {
-                InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+                MessageUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
                 return;
             }
 
@@ -1032,22 +1023,22 @@ public class SchematicPlacementManager
 
             if (movingBox)
             {
-                this.moveSubRegionTo(schematicPlacement, schematicPlacement.getSelectedSubRegionName(), pos, InfoUtils.INFO_MESSAGE_CONSUMER);
+                this.moveSubRegionTo(schematicPlacement, schematicPlacement.getSelectedSubRegionName(), pos, MessageUtils.INFO_MESSAGE_CONSUMER);
 
                 String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.placement.moved_subregion_to", posStr);
+                MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.placement.moved_subregion_to", posStr);
             }
             // Moving the origin point
             else
             {
                 BlockPos old = schematicPlacement.getOrigin();
-                this.setOrigin(schematicPlacement, pos, InfoUtils.INFO_MESSAGE_CONSUMER);
+                this.setOrigin(schematicPlacement, pos, MessageUtils.INFO_MESSAGE_CONSUMER);
 
                 if (old.equals(schematicPlacement.getOrigin()) == false)
                 {
                     String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
                     String posStrNew = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
+                    MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.placement.moved_placement_origin", posStrOld, posStrNew);
                 }
             }
         }
@@ -1061,7 +1052,7 @@ public class SchematicPlacementManager
         {
             if (schematicPlacement.isLocked())
             {
-                InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
+                MessageUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.placement.cant_modify_is_locked");
                 return;
             }
 
@@ -1074,13 +1065,13 @@ public class SchematicPlacementManager
                 BlockPos old = PositionUtils.getTransformedBlockPos(placement.getPos(), schematicPlacement.getMirror(), schematicPlacement.getRotation());
                 old = old.add(schematicPlacement.getOrigin());
 
-                this.moveSubRegionTo(schematicPlacement, placement.getName(), old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
+                this.moveSubRegionTo(schematicPlacement, placement.getName(), old.offset(direction, amount), MessageUtils.INFO_MESSAGE_CONSUMER);
             }
             // Moving the origin point
             else
             {
                 BlockPos old = schematicPlacement.getOrigin();
-                this.setOrigin(schematicPlacement, old.offset(direction, amount), InfoUtils.INFO_MESSAGE_CONSUMER);
+                this.setOrigin(schematicPlacement, old.offset(direction, amount), MessageUtils.INFO_MESSAGE_CONSUMER);
             }
         }
     }
@@ -1111,7 +1102,7 @@ public class SchematicPlacementManager
         }
         else
         {
-            InfoUtils.printErrorMessage("litematica.error.schematic_placements.load_fail", file.getName());
+            MessageUtils.printErrorMessage("litematica.error.schematic_placements.load_fail", file.getName());
         }
     }
 
@@ -1121,7 +1112,7 @@ public class SchematicPlacementManager
         {
             if (isActiveList == false && this.checkIsAlreadyLoaded(placement))
             {
-                InfoUtils.printErrorMessage("litematica.error.schematic_placements.load_fail.already_loaded", placement.getName());
+                MessageUtils.printErrorMessage("litematica.error.schematic_placements.load_fail.already_loaded", placement.getName());
                 return;
             }
 
@@ -1147,7 +1138,7 @@ public class SchematicPlacementManager
 
             if (isActiveList == false)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_placement_loaded", placement.getName());
+                MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_placement_loaded", placement.getName());
             }
         }
     }
@@ -1189,10 +1180,8 @@ public class SchematicPlacementManager
             int selectedIndex = 0;
             boolean indexValid = false;
 
-            for (int i = 0; i < list.size(); ++i)
+            for (SchematicPlacementUnloaded placement : list)
             {
-                SchematicPlacementUnloaded placement = list.get(i);
-
                 if (placement.shouldBeSaved() == false)
                 {
                     continue;

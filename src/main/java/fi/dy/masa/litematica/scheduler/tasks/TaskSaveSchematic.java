@@ -15,9 +15,9 @@ import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
 
 public class TaskSaveSchematic extends TaskProcessChunkBase
 {
@@ -87,12 +87,12 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
                 {
                     if (this.printCompletionMessage)
                     {
-                        InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", this.fileName);
+                        MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", this.fileName);
                     }
                 }
                 else
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save_failed", this.fileName);
+                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save_failed", this.fileName);
                 }
             }
             // In-memory only
@@ -103,13 +103,13 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
 
                 if (this.printCompletionMessage)
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.in_memory_schematic_created", name);
+                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.in_memory_schematic_created", name);
                 }
             }
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.error.schematic_save_interrupted");
+            MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.error.schematic_save_interrupted");
         }
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);

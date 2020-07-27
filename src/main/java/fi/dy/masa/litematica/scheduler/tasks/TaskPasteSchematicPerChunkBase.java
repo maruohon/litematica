@@ -20,8 +20,8 @@ import fi.dy.masa.litematica.util.PositionUtils.ChunkPosComparator;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements IInfoHudRenderer

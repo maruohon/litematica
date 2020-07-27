@@ -10,13 +10,14 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.tool.ToolMode;
+import fi.dy.masa.malilib.event.IPostGameOverlayRenderer;
+import fi.dy.masa.malilib.event.IPostWorldRenderer;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.interfaces.IRenderer;
 
-public class RenderHandler implements IRenderer
+public class RenderHandler implements IPostGameOverlayRenderer, IPostWorldRenderer
 {
     @Override
-    public void onRenderWorldLast(float partialTicks)
+    public void onPostWorldRender(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -56,7 +57,7 @@ public class RenderHandler implements IRenderer
     }
 
     @Override
-    public void onRenderGameOverlayPost(float partialTicks)
+    public void onPostGameOverlayRender(float partialTicks)
     {
         Minecraft mc = Minecraft.getMinecraft();
 

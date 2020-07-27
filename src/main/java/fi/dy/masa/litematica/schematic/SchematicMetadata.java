@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.schematic;
 import javax.annotation.Nullable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class SchematicMetadata
 {
@@ -203,7 +203,7 @@ public class SchematicMetadata
             nbt.setLong("TimeModified", this.timeModified);
         }
 
-        nbt.setTag("EnclosingSize", NBTUtils.createBlockPosTag(this.enclosingSize));
+        nbt.setTag("EnclosingSize", NbtUtils.createBlockPosTag(this.enclosingSize));
 
         if (this.thumbnailPixelData != null)
         {
@@ -257,7 +257,7 @@ public class SchematicMetadata
 
         if (tag.hasKey("EnclosingSize", Constants.NBT.TAG_COMPOUND))
         {
-            Vec3i size = NBTUtils.readBlockPos(tag.getCompoundTag("EnclosingSize"));
+            Vec3i size = NbtUtils.readBlockPos(tag.getCompoundTag("EnclosingSize"));
 
             if (size != null)
             {

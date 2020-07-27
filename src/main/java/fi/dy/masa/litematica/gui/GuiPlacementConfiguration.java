@@ -28,11 +28,11 @@ import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -373,7 +373,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
                                 if (this.manager.loadPlacementSettings(this.placement, str, this.parent))
                                 {
-                                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
+                                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
                                 }
                             }
                         }
@@ -382,7 +382,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                         {
                             String str = JsonUtils.jsonToString(this.placement.baseSettingsToJson(true), true);
                             GuiScreen.setClipboardString(str);
-                            InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_copied_to_clipboard");
+                            MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_copied_to_clipboard");
                         }
                     }
                     else
@@ -396,9 +396,11 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                             {
                                 if (this.manager.loadPlacementSettings(this.placement, el.getAsJsonObject(), this.parent))
                                 {
-                                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
+                                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
                                 }
                             }
+
+                            return true;
                         }));
                     }
 
@@ -433,7 +435,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     break;
 
                 case TOGGLE_ENTITIES:
-                    this.manager.toggleIgnoreEntities(this.placement, this.parent);
+                    this.manager.toggleIgnoreEntities(this.placement);
                     break;
 
                 case TOGGLE_ENCLOSING_BOX:

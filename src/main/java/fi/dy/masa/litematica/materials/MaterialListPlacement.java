@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListPlacement extends MaterialListBase
@@ -53,7 +53,7 @@ public class MaterialListPlacement extends MaterialListBase
     {
         TaskCountBlocksPlacement task = new TaskCountBlocksPlacement(this.placement, this);
         TaskScheduler.getInstanceClient().scheduleTask(task, 20);
-        InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+        MessageUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
     }
 
     public static MaterialListPlacement createFromJson(JsonObject obj, SchematicPlacement schematicPlacement)

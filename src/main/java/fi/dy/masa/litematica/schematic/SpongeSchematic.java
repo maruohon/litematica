@@ -13,11 +13,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class SpongeSchematic extends SingleRegionSchematic
 {
@@ -100,13 +100,13 @@ public class SpongeSchematic extends SingleRegionSchematic
 
             if (state == null)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.error.schematic_read.sponge.palette.unknown_block", key);
+                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.error.schematic_read.sponge.palette.unknown_block", key);
                 state = LitematicaBlockStateContainerFull.AIR_BLOCK_STATE;
             }
 
             if (id < 0 || id >= size)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.sponge.palette.invalid_id", id);
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.sponge.palette.invalid_id", id);
                 return false;
             }
 
@@ -131,7 +131,7 @@ public class SpongeSchematic extends SingleRegionSchematic
 
             if (this.blockContainer == null)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.sponge.failed_to_read_blocks");
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.sponge.failed_to_read_blocks");
                 return false;
             }
 
@@ -154,7 +154,7 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound beTag = tagList.getCompoundTagAt(i);
-            BlockPos pos = NBTUtils.readBlockPosFromArrayTag(beTag, "Pos");
+            BlockPos pos = NbtUtils.readBlockPosFromArrayTag(beTag, "Pos");
 
             if (pos != null && beTag.isEmpty() == false)
             {
@@ -186,7 +186,7 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound entityData = tagList.getCompoundTagAt(i);
-            Vec3d pos = NBTUtils.readVec3dFromListTag(entityData);
+            Vec3d pos = NbtUtils.readVec3dFromListTag(entityData);
 
             if (pos != null && entityData.isEmpty() == false)
             {
@@ -245,7 +245,7 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (Map.Entry<BlockPos, NBTTagCompound> entry : this.blockEntities.entrySet())
         {
             NBTTagCompound beTag = entry.getValue().copy();
-            NBTUtils.writeBlockPosToArrayTag(entry.getKey(), beTag, "Pos");
+            NbtUtils.writeBlockPosToArrayTag(entry.getKey(), beTag, "Pos");
 
             // Add the Sponge tag and remove the vanilla/Litematica tag
             beTag.setString("Id", beTag.getString("id"));
@@ -269,7 +269,7 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (EntityInfo info : this.entities)
         {
             NBTTagCompound entityData = info.nbt.copy();
-            NBTUtils.writeVec3dToListTag(info.pos, entityData);
+            NbtUtils.writeVec3dToListTag(info.pos, entityData);
 
             // Add the Sponge tag and remove the vanilla/Litematica tag
             entityData.setString("Id", entityData.getString("id"));

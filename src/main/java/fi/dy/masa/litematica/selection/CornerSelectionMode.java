@@ -1,17 +1,21 @@
 package fi.dy.masa.litematica.selection;
 
-import fi.dy.masa.malilib.config.IConfigOptionListEntry;
+import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum CornerSelectionMode implements IConfigOptionListEntry<CornerSelectionMode>
 {
-    CORNERS     ("corners",     "litematica.hud.area_selection.mode.corners"),
-    EXPAND      ("expand",      "litematica.hud.area_selection.mode.expand");
+    EXPAND      ("expand",      "litematica.hud.area_selection.mode.expand"),
+    CORNERS     ("corners",     "litematica.hud.area_selection.mode.corners");
+
+    public static final ImmutableList<CornerSelectionMode> VALUES = ImmutableList.copyOf(values());
 
     private final String configString;
     private final String translationKey;
 
-    private CornerSelectionMode(String configString, String translationKey)
+    CornerSelectionMode(String configString, String translationKey)
     {
         this.configString = configString;
         this.translationKey = translationKey;
@@ -32,42 +36,12 @@ public enum CornerSelectionMode implements IConfigOptionListEntry<CornerSelectio
     @Override
     public CornerSelectionMode cycle(boolean forward)
     {
-        int id = this.ordinal();
-
-        if (forward)
-        {
-            if (++id >= values().length)
-            {
-                id = 0;
-            }
-        }
-        else
-        {
-            if (--id < 0)
-            {
-                id = values().length - 1;
-            }
-        }
-
-        return values()[id % values().length];
+        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public CornerSelectionMode fromString(String name)
     {
-        return fromStringStatic(name);
-    }
-
-    public static CornerSelectionMode fromStringStatic(String name)
-    {
-        for (CornerSelectionMode mode : CornerSelectionMode.values())
-        {
-            if (mode.configString.equalsIgnoreCase(name))
-            {
-                return mode;
-            }
-        }
-
-        return CornerSelectionMode.CORNERS;
+        return ConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

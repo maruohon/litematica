@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementFileBrowser;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase;
 
 public class WidgetSchematicPlacementBrowser extends WidgetFileBrowserBase
 {

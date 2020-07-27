@@ -7,9 +7,9 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.config.gui.ConfigGuiTabBase;
+import fi.dy.masa.malilib.gui.config.ConfigGuiTabBase;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiConfigsBase;
+import fi.dy.masa.malilib.gui.config.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
 
 public class GuiConfigs extends GuiConfigsBase

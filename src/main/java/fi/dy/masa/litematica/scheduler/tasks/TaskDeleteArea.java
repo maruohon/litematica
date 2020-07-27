@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import java.util.List;
 import net.minecraft.init.Blocks;
 import fi.dy.masa.litematica.selection.SelectionBox;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 
 public class TaskDeleteArea extends TaskFillArea
 {
@@ -20,12 +20,12 @@ public class TaskDeleteArea extends TaskFillArea
         {
             if (this.printCompletionMessage)
             {
-                InfoUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
+                MessageUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_cleared");
             }
         }
         else
         {
-            InfoUtils.showGuiMessage(MessageType.ERROR, "litematica.message.error.area_deletion_aborted");
+            MessageUtils.showGuiMessage(MessageType.ERROR, "litematica.message.error.area_deletion_aborted");
         }
     }
 }

@@ -17,9 +17,9 @@ import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
 
 public class TaskFillArea extends TaskProcessChunkBase
 {
@@ -60,14 +60,14 @@ public class TaskFillArea extends TaskProcessChunkBase
                 }
                 else
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica-message.error.invalid_block", replaceState.toString());
+                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica-message.error.invalid_block", replaceState.toString());
                     strName = null;
                 }
             }
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica-message.error.invalid_block", fillState.toString());
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica-message.error.invalid_block", fillState.toString());
         }
 
         this.blockString = strName;
@@ -210,12 +210,12 @@ public class TaskFillArea extends TaskProcessChunkBase
         {
             if (this.printCompletionMessage)
             {
-                InfoUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_filled");
+                MessageUtils.showGuiMessage(MessageType.SUCCESS, "litematica.message.area_filled");
             }
         }
         else
         {
-            InfoUtils.showGuiMessage(MessageType.ERROR, "litematica.message.area_fill_fail");
+            MessageUtils.showGuiMessage(MessageType.ERROR, "litematica.message.area_fill_fail");
         }
     }
 }

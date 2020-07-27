@@ -24,8 +24,8 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class SchematicUtils
 {
@@ -203,10 +203,10 @@ public class SchematicUtils
         return state;
     }
 
-    public static class SchematicVersionCreator implements IStringConsumerFeedback
+    public static class SchematicVersionCreator implements IStringConsumer
     {
         @Override
-        public boolean setString(String string)
+        public boolean consumeString(String string)
         {
             return DataManager.getSchematicProjectsManager().commitNewVersion(string);
         }

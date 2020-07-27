@@ -35,11 +35,11 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class PositionUtils
@@ -680,7 +680,7 @@ public class PositionUtils
 
         if (area == null || world == null)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
             return;
         }
 
@@ -688,7 +688,7 @@ public class PositionUtils
 
         if (box == null || (box.getPos1() == null && box.getPos2() == null))
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.grow.no_sub_region_selected");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.area_selection.grow.no_sub_region_selected");
             return;
         }
 

@@ -26,7 +26,7 @@ import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceCalcsData;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 
@@ -322,7 +322,7 @@ public class RayTraceUtils
     public static RayTraceResult traceToSchematicWorld(Entity entity, double range, boolean respectRenderRange)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
+        boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeyBind().isKeyBindHeld();
 
         if (world == null ||
             (respectRenderRange &&

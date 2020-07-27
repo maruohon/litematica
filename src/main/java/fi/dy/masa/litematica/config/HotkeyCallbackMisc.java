@@ -21,12 +21,11 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.config.values.LayerMode;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
-import fi.dy.masa.malilib.hotkeys.IKeybind;
-import fi.dy.masa.malilib.hotkeys.KeyAction;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.input.IHotkeyCallback;
+import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.input.KeyAction;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 
 public class HotkeyCallbackMisc implements IHotkeyCallback
 {
@@ -38,7 +37,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, IKeybind key)
+    public boolean onKeyAction(KeyAction action, IKeyBind key)
     {
         if (this.mc.player == null || this.mc.world == null)
         {
@@ -47,7 +46,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
 
         ToolMode mode = DataManager.getToolMode();
 
-        if (key == Hotkeys.ADD_SELECTION_BOX.getKeybind())
+        if (key == Hotkeys.ADD_SELECTION_BOX.getKeyBind())
         {
             if (mode.getUsesAreaSelection())
             {
@@ -55,7 +54,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.CLONE_SELECTION.getKeybind())
+        else if (key == Hotkeys.CLONE_SELECTION.getKeyBind())
         {
             if (DataManager.getSelectionManager().getCurrentSelection() != null)
             {
@@ -63,7 +62,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeybind())
+        else if (key == Hotkeys.DELETE_SELECTION_BOX.getKeyBind())
         {
             if (mode.getUsesAreaSelection())
             {
@@ -76,7 +75,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                     {
                         selection.setExplicitOrigin(null);
                         selection.setOriginSelected(false);
-                        InfoUtils.printActionbarMessage("litematica.message.removed_area_origin");
+                        MessageUtils.printActionbarMessage("litematica.message.removed_area_origin");
                         return true;
                     }
                     else
@@ -85,35 +84,35 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
 
                         if (name != null && selection.removeSelectedSubRegionBox())
                         {
-                            InfoUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
+                            MessageUtils.printActionbarMessage("litematica.message.removed_selection_box", name);
                             return true;
                         }
                     }
                 }
             }
         }
-        else if (key == Hotkeys.DUPLICATE_PLACEMENT.getKeybind())
+        else if (key == Hotkeys.DUPLICATE_PLACEMENT.getKeyBind())
         {
             if (DataManager.getSchematicPlacementManager().duplicateSelectedPlacement())
             {
                 BlockPos pos = new BlockPos(this.mc.player);
                 pos = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(pos);
-                DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
-                InfoUtils.printActionbarMessage("litematica.message.duplicated_selected_placement");
+                DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos);
+                MessageUtils.printActionbarMessage("litematica.message.duplicated_selected_placement");
             }
 
             return true;
         }
-        else if (key == Hotkeys.EXECUTE_OPERATION.getKeybind())
+        else if (key == Hotkeys.EXECUTE_OPERATION.getKeyBind())
         {
             boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
             if (Configs.Generic.EXECUTE_REQUIRE_TOOL.getBooleanValue()
                 && (EntityUtils.hasToolItem(this.mc.player) == false || toolEnabled == false))
             {
-                String keyRenderToggle = Hotkeys.TOGGLE_ALL_RENDERING.getKeybind().getKeysDisplayString();
-                String keyToolToggle = Hotkeys.TOOL_ENABLED_TOGGLE.getKeybind().getKeysDisplayString();
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, "litematica.error.execute_operation_no_tool", keyRenderToggle, keyToolToggle);
+                String keyRenderToggle = Hotkeys.TOGGLE_ALL_RENDERING.getKeyBind().getKeysDisplayString();
+                String keyToolToggle = Hotkeys.TOOL_ENABLED_TOGGLE.getKeyBind().getKeysDisplayString();
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, "litematica.error.execute_operation_no_tool", keyRenderToggle, keyToolToggle);
                 return true;
             }
 
@@ -149,32 +148,32 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())
+        else if (key == Hotkeys.LAYER_MODE_NEXT.getKeyBind())
         {
-            DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(true));
+            DataManager.getRenderLayerRange().setLayerMode(DataManager.getRenderLayerRange().getLayerMode().cycle(true));
             return true;
         }
-        else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeybind())
+        else if (key == Hotkeys.LAYER_MODE_PREVIOUS.getKeyBind())
         {
-            DataManager.getRenderLayerRange().setLayerMode((LayerMode) DataManager.getRenderLayerRange().getLayerMode().cycle(false));
+            DataManager.getRenderLayerRange().setLayerMode(DataManager.getRenderLayerRange().getLayerMode().cycle(false));
             return true;
         }
-        else if (key == Hotkeys.LAYER_NEXT.getKeybind())
+        else if (key == Hotkeys.LAYER_NEXT.getKeyBind())
         {
             DataManager.getRenderLayerRange().moveLayer(1);
             return true;
         }
-        else if (key == Hotkeys.LAYER_PREVIOUS.getKeybind())
+        else if (key == Hotkeys.LAYER_PREVIOUS.getKeyBind())
         {
             DataManager.getRenderLayerRange().moveLayer(-1);
             return true;
         }
-        else if (key == Hotkeys.LAYER_SET_HERE.getKeybind())
+        else if (key == Hotkeys.LAYER_SET_HERE.getKeyBind())
         {
             DataManager.getRenderLayerRange().setSingleBoundaryToPosition(this.mc.player);
             return true;
         }
-        else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeybind())
+        else if (key == Hotkeys.MOVE_ENTIRE_SELECTION.getKeyBind())
         {
             if (mode.getUsesAreaSelection())
             {
@@ -201,18 +200,18 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
             {
                 BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                 pos = PositionUtils.getPlacementPositionOffsetToInfrontOfPlayer(pos);
-                DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos, this.mc);
+                DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionTo(pos);
                 return true;
             }
         }
-        else if (key == Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeybind() ||
-                 key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind())
+        else if (key == Hotkeys.NUDGE_SELECTION_NEGATIVE.getKeyBind() ||
+                 key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeyBind())
         {
-            int amount = key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeybind() ? 1 : -1;
+            int amount = key == Hotkeys.NUDGE_SELECTION_POSITIVE.getKeyBind() ? 1 : -1;
             InputHandler.nudgeSelection(amount, mode, this.mc.player);
             return true;
         }
-        else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeybind())
+        else if (key == Hotkeys.PICK_BLOCK_FIRST.getKeyBind())
         {
             if (EntityUtils.shouldPickBlock(this.mc.player))
             {
@@ -221,7 +220,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
 
             return false;
         }
-        else if (key == Hotkeys.PICK_BLOCK_LAST.getKeybind())
+        else if (key == Hotkeys.PICK_BLOCK_LAST.getKeyBind())
         {
             // Don't use pick block last in the Rebuild mode, as that will interfere
             // with all the rebuild actions...
@@ -237,18 +236,18 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
 
             return false;
         }
-        else if (key == Hotkeys.REMOVE_SELECTED_PLACEMENT.getKeybind())
+        else if (key == Hotkeys.REMOVE_SELECTED_PLACEMENT.getKeyBind())
         {
             DataManager.getSchematicPlacementManager().removeSelectedSchematicPlacement();
             return true;
         }
-        else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeybind())
+        else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeyBind())
         {
             SchematicWorldRenderingNotifier.INSTANCE.updateAll();
-            InfoUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
+            MessageUtils.printActionbarMessage("litematica.message.schematic_rendering_refreshed");
             return true;
         }
-        else if (key == Hotkeys.ROTATE_PLACEMENT_CW.getKeybind())
+        else if (key == Hotkeys.ROTATE_PLACEMENT_CW.getKeyBind())
         {
             SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             SchematicPlacement placement = manager.getSelectedSchematicPlacement();
@@ -259,7 +258,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.ROTATE_PLACEMENT_CCW.getKeybind())
+        else if (key == Hotkeys.ROTATE_PLACEMENT_CCW.getKeyBind())
         {
             SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
             SchematicPlacement placement = manager.getSelectedSchematicPlacement();
@@ -270,20 +269,20 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeybind())
+        else if (key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeyBind())
         {
             return SchematicUtils.saveSchematic(true);
         }
-        else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeybind())
+        else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeyBind())
         {
             return SchematicUtils.saveSchematic(false);
         }
-        else if (key == Hotkeys.SCHEMATIC_REBUILD_ACCEPT_REPLACEMENT.getKeybind())
+        else if (key == Hotkeys.SCHEMATIC_REBUILD_ACCEPT_REPLACEMENT.getKeyBind())
         {
             SchematicEditUtils.rebuildAcceptReplacement(this.mc);
             return true;
         }
-        else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeybind())
+        else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_NEXT.getKeyBind())
         {
             if (DataManager.getSchematicProjectsManager().hasProjectOpen())
             {
@@ -291,7 +290,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeybind())
+        else if (key == Hotkeys.SCHEMATIC_VERSION_CYCLE_PREVIOUS.getKeyBind())
         {
             if (DataManager.getSchematicProjectsManager().hasProjectOpen())
             {
@@ -299,7 +298,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.SELECTION_GROW_HOTKEY.getKeybind())
+        else if (key == Hotkeys.SELECTION_GROW_HOTKEY.getKeyBind())
         {
             if (mode.getUsesAreaSelection())
             {
@@ -307,7 +306,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeybind())
+        else if (key == Hotkeys.SELECTION_MODE_CYCLE.getKeyBind())
         {
             if (mode == ToolMode.DELETE)
             {
@@ -325,7 +324,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.SELECTION_SHRINK.getKeybind())
+        else if (key == Hotkeys.SELECTION_SHRINK.getKeyBind())
         {
             if (mode.getUsesAreaSelection())
             {
@@ -333,7 +332,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.SET_AREA_ORIGIN.getKeybind())
+        else if (key == Hotkeys.SET_AREA_ORIGIN.getKeyBind())
         {
             if (mode.getUsesAreaSelection())
             {
@@ -345,17 +344,17 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                     BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
                     area.setExplicitOrigin(pos);
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    InfoUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
+                    MessageUtils.printActionbarMessage("litematica.message.set_area_origin", posStr);
                     return true;
                 }
             }
         }
-        else if (key == Hotkeys.SET_HELD_ITEM_AS_TOOL.getKeybind())
+        else if (key == Hotkeys.SET_HELD_ITEM_AS_TOOL.getKeyBind())
         {
             DataManager.setHeldItemAsTool();
             return true;
         }
-        else if (key == Hotkeys.SET_SCHEMATIC_PREVIEW.getKeybind())
+        else if (key == Hotkeys.SET_SCHEMATIC_PREVIEW.getKeyBind())
         {
             if (GuiSchematicManager.hasPendingPreviewTask())
             {
@@ -363,8 +362,8 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 return true;
             }
         }
-        else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ||
-                 key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeybind())
+        else if (key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeyBind() ||
+                 key == Hotkeys.SET_SELECTION_BOX_POSITION_2.getKeyBind())
         {
             if (mode.getUsesAreaSelection())
             {
@@ -374,7 +373,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                 if (area != null && area.getSelectedSubRegionBox() != null)
                 {
                     BlockPos pos = new BlockPos(this.mc.player.getPositionVector());
-                    Corner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeybind() ? Corner.CORNER_1 : Corner.CORNER_2;
+                    Corner corner = key == Hotkeys.SET_SELECTION_BOX_POSITION_1.getKeyBind() ? Corner.CORNER_1 : Corner.CORNER_2;
                     area.setSelectedSubRegionCornerPos(pos, corner);
 
                     if (Configs.Generic.CHANGE_SELECTED_CORNER.getBooleanValue())
@@ -383,27 +382,27 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
                     }
 
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    InfoUtils.printActionbarMessage("litematica.message.set_selection_box_point", corner.ordinal(), posStr);
+                    MessageUtils.printActionbarMessage("litematica.message.set_selection_box_point", corner.ordinal(), posStr);
                     return true;
                 }
             }
         }
-        else if (key == Hotkeys.TOOL_MODE_CYCLE_BACKWARD.getKeybind())
+        else if (key == Hotkeys.TOOL_MODE_CYCLE_BACKWARD.getKeyBind())
         {
             DataManager.setToolMode(DataManager.getToolMode().cycle(this.mc.player, false));
             return true;
         }
-        else if (key == Hotkeys.TOOL_MODE_CYCLE_FORWARD.getKeybind())
+        else if (key == Hotkeys.TOOL_MODE_CYCLE_FORWARD.getKeyBind())
         {
             DataManager.setToolMode(DataManager.getToolMode().cycle(this.mc.player, true));
             return true;
         }
-        else if (key == Hotkeys.UNLOAD_CURRENT_SCHEMATIC.getKeybind())
+        else if (key == Hotkeys.UNLOAD_CURRENT_SCHEMATIC.getKeyBind())
         {
             DataManager.getSchematicPlacementManager().unloadCurrentlySelectedSchematic();
             return true;
         }
-        else if (key == Hotkeys.UPDATE_BLOCKS.getKeybind())
+        else if (key == Hotkeys.UPDATE_BLOCKS.getKeyBind())
         {
             ToolUtils.updateSelectionVolumes(this.mc);
             return true;

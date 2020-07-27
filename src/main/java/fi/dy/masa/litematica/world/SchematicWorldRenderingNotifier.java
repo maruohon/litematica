@@ -8,12 +8,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.litematica.interfaces.IMixinChunkProviderClient;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
-import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
+import fi.dy.masa.malilib.listener.ILayerRangeChangeListener;
+import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
-public class SchematicWorldRenderingNotifier implements IRangeChangeListener
+public class SchematicWorldRenderingNotifier implements ILayerRangeChangeListener
 {
     public static final SchematicWorldRenderingNotifier INSTANCE = new SchematicWorldRenderingNotifier();
 

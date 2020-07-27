@@ -10,9 +10,9 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.Litematica;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public interface ISchematic
 {
@@ -115,13 +115,13 @@ public interface ISchematic
         {
             if (dir.exists() == false && dir.mkdirs() == false)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.directory_creation_failed", dir.getAbsolutePath());
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.directory_creation_failed", dir.getAbsolutePath());
                 return false;
             }
 
             if (override == false && file.exists())
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", file.getAbsolutePath());
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", file.getAbsolutePath());
                 return false;
             }
 
@@ -133,7 +133,7 @@ public interface ISchematic
         }
         catch (Exception e)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exception", file.getAbsolutePath());
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exception", file.getAbsolutePath());
             Litematica.logger.warn("Failed to write schematic to file '{}'", file.getAbsolutePath(), e);
         }
 
@@ -156,15 +156,15 @@ public interface ISchematic
 
         if (file == null)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.no_file");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.no_file");
             return false;
         }
 
-        NBTTagCompound tag = NBTUtils.readNbtFromFile(file);
+        NBTTagCompound tag = NbtUtils.readNbtFromFile(file);
 
         if (tag == null)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", file.getAbsolutePath());
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", file.getAbsolutePath());
             return false;
         }
 

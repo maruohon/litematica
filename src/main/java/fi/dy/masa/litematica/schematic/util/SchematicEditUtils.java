@@ -36,12 +36,12 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.SubChunkPos;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class SchematicEditUtils
 {
@@ -51,11 +51,11 @@ public class SchematicEditUtils
             DataManager.getToolMode() == ToolMode.REBUILD &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
-            if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
+            if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
             {
                 return breakSchematicBlocks(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
+            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeyBind().isKeyBindHeld())
             {
                 return breakAllIdenticalSchematicBlocks(mc);
             }
@@ -74,19 +74,19 @@ public class SchematicEditUtils
             DataManager.getToolMode() == ToolMode.REBUILD &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
-            if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
+            if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeyBind().isKeyBindHeld())
             {
                 return replaceSchematicBlocksInDirection(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
+            else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeyBind().isKeyBindHeld())
             {
                 return replaceAllIdenticalSchematicBlocks(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
+            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
             {
                 return placeSchematicBlocksInDirection(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
+            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeyBind().isKeyBindHeld())
             {
                 return fillAirWithBlocks(mc);
             }
@@ -176,7 +176,7 @@ public class SchematicEditUtils
             {
                 if (setAllIdenticalSchematicBlockStates(pos, stateOriginal, stateClient))
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_rebuild.accepted_replacement");
+                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_rebuild.accepted_replacement");
                     return true;
                 }
             }
@@ -559,7 +559,7 @@ public class SchematicEditUtils
             }
             else
             {
-                InfoUtils.showInGameMessage(MessageType.WARNING, 20000, "litematica.message.warn.schematic_rebuild.subregion_not_selected");
+                MessageUtils.showInGameMessage(MessageType.WARNING, 20000, "litematica.message.warn.schematic_rebuild.subregion_not_selected");
                 return false;
             }
         }

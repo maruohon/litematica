@@ -13,13 +13,13 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.Messages;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageHelpers;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
@@ -107,7 +107,7 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.placement_file", this.entry.getName()));
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.origin", o.getX(), o.getY(), o.getZ()));
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.rotation_mirror", rot, mir));
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enabled", Messages.getOnOffColored(placement.isEnabled(), true)));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enabled", MessageHelpers.getOnOffColored(placement.isEnabled(), true)));
         }
 
         int offset = 12;
@@ -149,7 +149,7 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
                 }
                 catch (Exception e)
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "malilib.error.file_delete_failed", file.getAbsolutePath());
+                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "malilib.error.file_delete_failed", file.getAbsolutePath());
                 }
             }
         }

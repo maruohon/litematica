@@ -8,12 +8,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.gen.structure.template.PlacementSettings;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListPlacement;
@@ -25,7 +23,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class SchematicPlacement extends SchematicPlacementUnloaded
@@ -57,6 +55,17 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
     public boolean isLoaded()
     {
         return true;
+    }
+
+    @Override
+    public void invalidate()
+    {
+        super.invalidate();
+
+        if (this.hasVerifier())
+        {
+            this.getSchematicVerifier().reset();
+        }
     }
 
     public boolean isRepeatedPlacement()
@@ -124,18 +133,6 @@ public class SchematicPlacement extends SchematicPlacementUnloaded
         }
 
         return this.materialList;
-    }
-
-    public PlacementSettings getPlacementSettings()
-    {
-        PlacementSettings placement = new PlacementSettings();
-
-        placement.setMirror(this.mirror);
-        placement.setRotation(this.rotation);
-        placement.setIgnoreEntities(this.ignoreEntities);
-        placement.setReplacedBlock(Blocks.STRUCTURE_VOID);
-
-        return placement;
     }
 
     @Nullable

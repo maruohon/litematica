@@ -18,9 +18,9 @@ import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
-import fi.dy.masa.malilib.gui.widgets.WidgetTextFieldInteger;
+import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -266,11 +266,11 @@ public class GuiSubRegionConfiguration extends GuiBase
                     break;
 
                 case TOGGLE_ENABLED:
-                    this.manager.toggleSubRegionEnabled(this.schematicPlacement, this.subRegionName, this.parent);
+                    this.manager.toggleSubRegionEnabled(this.schematicPlacement, this.subRegionName);
                     break;
 
                 case TOGGLE_ENTITIES:
-                    this.manager.toggleSubRegionIgnoreEntities(this.schematicPlacement, this.subRegionName, this.parent);
+                    this.manager.toggleSubRegionIgnoreEntities(this.schematicPlacement, this.subRegionName);
                     break;
 
                 case RESET_PLACEMENT:

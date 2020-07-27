@@ -22,10 +22,10 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
-import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase;
+import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>, IFileBrowserIconProvider
@@ -274,7 +274,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
 
         if (this.cachedData.containsKey(file) == false)
         {
-            NBTTagCompound tag = NBTUtils.readNbtFromFile(file);
+            NBTTagCompound tag = NbtUtils.readNbtFromFile(file);
             CachedSchematicData data = null;
 
             if (tag != null)

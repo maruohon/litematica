@@ -13,10 +13,10 @@ import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
-import fi.dy.masa.malilib.interfaces.ICompletionListener;
-import fi.dy.masa.malilib.interfaces.IStringConsumer;
+import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
+import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -99,14 +99,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         }
         else
         {
-            this.mc.addScheduledTask(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    GuiSchematicSave.this.refreshList();
-                }
-            });
+            this.mc.addScheduledTask(GuiSchematicSave.this::refreshList);
         }
     }
 
@@ -195,7 +188,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         }
 
         @Override
-        public void setString(String string)
+        public boolean consumeString(String string)
         {
             boolean takeEntities = true; // TODO
             String author = this.mc.player.getName();
@@ -206,7 +199,11 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                 schematic.getMetadata().setName(string);
                 TaskSaveSchematic task = new TaskSaveSchematic(schematic, this.area, takeEntities);
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
+
+                return true;
             }
+
+            return false;
         }
     }
 }

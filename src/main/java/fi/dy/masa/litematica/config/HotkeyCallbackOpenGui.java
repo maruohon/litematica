@@ -18,11 +18,11 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
-import fi.dy.masa.malilib.hotkeys.IKeybind;
-import fi.dy.masa.malilib.hotkeys.KeyAction;
-import fi.dy.masa.malilib.util.InfoUtils;
+import fi.dy.masa.malilib.input.IHotkeyCallback;
+import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.input.KeyAction;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 
 public class HotkeyCallbackOpenGui implements IHotkeyCallback
 {
@@ -34,23 +34,23 @@ public class HotkeyCallbackOpenGui implements IHotkeyCallback
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, IKeybind key)
+    public boolean onKeyAction(KeyAction action, IKeyBind key)
     {
         if (this.mc.player == null || this.mc.world == null)
         {
             return false;
         }
 
-        if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
+        if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeyBind())
         {
             GuiBase.openGui(new GuiMainMenu());
         }
-        else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeyBind())
         {
             GuiBase.openGui(new GuiConfigs());
         }
 
-        else if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeyBind())
         {
             SelectionManager manager = DataManager.getSelectionManager();
 
@@ -60,18 +60,18 @@ public class HotkeyCallbackOpenGui implements IHotkeyCallback
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeyBind())
         {
             GuiBase.openGui(new GuiSchematicLoad());
         }
-        else if (key == Hotkeys.OPEN_GUI_LOADED_SCHEMATICS.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_LOADED_SCHEMATICS.getKeyBind())
         {
             GuiBase.openGui(new GuiSchematicLoadedList());
         }
-        else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeyBind())
         {
             MaterialListBase materialList = DataManager.getMaterialList();
 
@@ -87,7 +87,7 @@ public class HotkeyCallbackOpenGui implements IHotkeyCallback
                 }
                 else
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
                 }
             }
 
@@ -96,7 +96,7 @@ public class HotkeyCallbackOpenGui implements IHotkeyCallback
                 GuiBase.openGui(new GuiMaterialList(materialList));
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_PLACEMENT_GRID_SETTINGS.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_PLACEMENT_GRID_SETTINGS.getKeyBind())
         {
             SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -108,11 +108,11 @@ public class HotkeyCallbackOpenGui implements IHotkeyCallback
                 }
                 else
                 {
-                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
+                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
                 }
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeyBind())
         {
             SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -131,18 +131,18 @@ public class HotkeyCallbackOpenGui implements IHotkeyCallback
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeyBind())
         {
             GuiBase.openGui(new GuiSchematicPlacementsList());
         }
-        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeyBind())
         {
             DataManager.getSchematicProjectsManager().openSchematicProjectsGui();
         }
-        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeyBind())
         {
             SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -152,10 +152,10 @@ public class HotkeyCallbackOpenGui implements IHotkeyCallback
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeybind())
+        else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeyBind())
         {
             if (DataManager.getSchematicProjectsManager().hasProjectOpen() == false)
             {
@@ -163,7 +163,7 @@ public class HotkeyCallbackOpenGui implements IHotkeyCallback
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
             }
         }
 

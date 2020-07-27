@@ -25,11 +25,11 @@ import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFu
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.mixin.IMixinNBTTagLongArray;
-import fi.dy.masa.malilib.util.Constants;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.util.data.Constants;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class LitematicaSchematic extends SchematicBase
 {
@@ -161,7 +161,7 @@ public class LitematicaSchematic extends SchematicBase
             }
             catch (Exception e)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "TODO - Failed to create the block state container for sub-region: " + regionName);
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "TODO - Failed to create the block state container for sub-region: " + regionName);
                 Litematica.logger.warn("Failed to create the block state container for sub-region '{}'", regionName, e.getMessage());
             }
 
@@ -249,12 +249,12 @@ public class LitematicaSchematic extends SchematicBase
             }
             else
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_schematic_version", version);
+                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_schematic_version", version);
             }
         }
         else
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_version_information");
+            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_version_information");
         }
 
         return false;
@@ -295,8 +295,8 @@ public class LitematicaSchematic extends SchematicBase
                 }
 
                 SubRegion region = this.subRegions.get(regionName);
-                tag.setTag("Position", NBTUtils.createBlockPosTag(region.pos));
-                tag.setTag("Size", NBTUtils.createBlockPosTag(region.size));
+                tag.setTag("Position", NbtUtils.createBlockPosTag(region.pos));
+                tag.setTag("Size", NbtUtils.createBlockPosTag(region.size));
 
                 wrapper.setTag(regionName, tag);
             }
@@ -343,8 +343,8 @@ public class LitematicaSchematic extends SchematicBase
             if (tag.getTag(regionName).getId() == Constants.NBT.TAG_COMPOUND)
             {
                 NBTTagCompound regionTag = tag.getCompoundTag(regionName);
-                BlockPos regionPos = NBTUtils.readBlockPos(regionTag.getCompoundTag("Position"));
-                BlockPos regionSize = NBTUtils.readBlockPos(regionTag.getCompoundTag("Size"));
+                BlockPos regionPos = NbtUtils.readBlockPos(regionTag.getCompoundTag("Position"));
+                BlockPos regionSize = NbtUtils.readBlockPos(regionTag.getCompoundTag("Size"));
 
                 if (regionPos != null && regionSize != null)
                 {
@@ -380,8 +380,8 @@ public class LitematicaSchematic extends SchematicBase
 
                         if (container == null)
                         {
-                            InfoUtils.printErrorMessage("litematica.error.schematic_read_from_file_failed.region_container",
-                                    regionName, this.getFile() != null ? this.getFile().getName() : "<null>");
+                            MessageUtils.printErrorMessage("litematica.error.schematic_read_from_file_failed.region_container",
+                                                           regionName, this.getFile() != null ? this.getFile().getName() : "<null>");
                             return false;
                         }
 
@@ -438,13 +438,13 @@ public class LitematicaSchematic extends SchematicBase
         for (int i = 0; i < size; ++i)
         {
             NBTTagCompound tag = tagList.getCompoundTagAt(i);
-            Vec3d posVec = NBTUtils.readVec3d(tag);
+            Vec3d posVec = NbtUtils.readVec3d(tag);
             NBTTagCompound entityData = tag.getCompoundTag("EntityData");
 
             if (posVec != null && entityData.isEmpty() == false)
             {
                 // Update the correct position to the Entity NBT, where it is stored in version 2
-                NBTUtils.writeVec3dToListTag(posVec, entityData);
+                NbtUtils.writeVec3dToListTag(posVec, entityData);
                 entityList.add(new EntityInfo(posVec, entityData));
             }
         }
@@ -463,7 +463,7 @@ public class LitematicaSchematic extends SchematicBase
             NBTTagCompound tileNbt = tag.getCompoundTag("TileNBT");
 
             // Note: This within-schematic relative position is not inside the tile tag!
-            BlockPos pos = NBTUtils.readBlockPos(tag);
+            BlockPos pos = NbtUtils.readBlockPos(tag);
 
             if (pos != null && tileNbt.isEmpty() == false)
             {

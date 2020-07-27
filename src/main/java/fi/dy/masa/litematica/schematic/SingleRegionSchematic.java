@@ -19,8 +19,8 @@ import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.InfoUtils;
-import fi.dy.masa.malilib.util.NBTUtils;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public abstract class SingleRegionSchematic extends SchematicBase implements ISchematicRegion
 {
@@ -91,7 +91,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         {
             if (isSizeValid(size) == false)
             {
-                InfoUtils.printErrorMessage("litematica.message.error.schematic_read.invalid_or_missing_size_value", size.getX(), size.getY(), size.getZ());
+                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.invalid_or_missing_size_value", size.getX(), size.getY(), size.getZ());
                 return;
             }
 
@@ -261,7 +261,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
                 region.getEntityList().forEach((info) -> {
                     Vec3d pos = info.pos.add(regionOffsetEntities.getX(), regionOffsetEntities.getY(), regionOffsetEntities.getZ());
                     NBTTagCompound nbt = info.nbt.copy();
-                    NBTUtils.writeVec3dToListTag(pos, nbt);
+                    NbtUtils.writeVec3dToListTag(pos, nbt);
                     this.entities.add(new EntityInfo(pos, nbt));
                 });
             }
@@ -291,7 +291,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
         if (isSizeValid(this.regionSize) == false)
         {
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.invalid_or_missing_size", this.getFile().getAbsolutePath());
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.invalid_or_missing_size", this.getFile().getAbsolutePath());
             return false;
         }
 
@@ -305,7 +305,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         }
         else
         {
-            InfoUtils.printErrorMessage("litematica.message.error.schematic_read.missing_or_invalid_data", this.getFile().getAbsolutePath());
+            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.missing_or_invalid_data", this.getFile().getAbsolutePath());
             return false;
         }
     }

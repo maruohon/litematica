@@ -20,7 +20,7 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
+import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -199,7 +199,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             else if (this.type == WidgetSchematicPlacementEntry.ButtonListener.ButtonType.TOGGLE_ENABLED)
             {
                 DataManager.getSchematicPlacementManager().toggleSubRegionEnabled(
-                        this.widget.schematicPlacement, this.widget.placement.getName(), this.widget.parent.getParentGui());
+                        this.widget.schematicPlacement, this.widget.placement.getName());
                 this.widget.parent.refreshEntries();
             }
         }

@@ -22,10 +22,10 @@ import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.ButtonOnOff;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.gui.util.Message.MessageType;
-import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.Messages;
+import fi.dy.masa.malilib.message.MessageHelpers;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<SchematicPlacementUnloaded>
@@ -223,7 +223,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             }
 
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
-            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_loaded", Messages.getYesNoColored(this.placement.isLoaded(), false)));
+            text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_loaded", MessageHelpers.getYesNoColored(this.placement.isLoaded(), false)));
 
             // Get a cached value, to not query and read the file every rendered frame...
             if (saved && this.gui.getCachedWasModifiedSinceSaved(this.placement))
@@ -232,7 +232,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
             }
             else
             {
-                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_saved_to_file_not_modified", Messages.getYesNoColored(saved, false)));
+                text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.is_saved_to_file_not_modified", MessageHelpers.getYesNoColored(saved, false)));
             }
 
             BlockPos o = this.placement.getOrigin();

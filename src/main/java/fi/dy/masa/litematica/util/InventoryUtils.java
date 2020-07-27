@@ -130,7 +130,7 @@ public class InventoryUtils
         EntityPlayer player = mc.player;
         InventoryPlayer inventory = player.inventory;
         boolean isCreativeMode = player.capabilities.isCreativeMode;
-        int slotWithItem = fi.dy.masa.malilib.util.InventoryUtils.findSlotWithItemToPickBlock(player.openContainer, stack, ignoreNbt);
+        int slotWithItem = fi.dy.masa.malilib.util.inventory.InventoryUtils.findSlotWithItemToPickBlock(player.openContainer, stack, ignoreNbt);
 
         // No item or no place to put it
         if (slotWithItem == -1 && isCreativeMode == false)
@@ -153,7 +153,7 @@ public class InventoryUtils
 
         if (slotWithItem != -1)
         {
-            fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotWithItem, hotbarSlot);
+            fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotWithItem, hotbarSlot);
             inventory.currentItem = hotbarSlot;
             return true;
         }
@@ -175,9 +175,9 @@ public class InventoryUtils
                     // The off-hand slot is empty, move the current stack to it
                     if (player.getHeldItemOffhand().isEmpty())
                     {
-                        fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
-                        fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, 45, 0);
-                        fi.dy.masa.malilib.util.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                        fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
+                        fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, 45, 0);
+                        fi.dy.masa.malilib.util.inventory.InventoryUtils.swapSlots(player.openContainer, slotNum, 0);
                     }
                 }
             }
@@ -292,7 +292,7 @@ public class InventoryUtils
 
         if (hand != null)
         {
-            fi.dy.masa.malilib.util.InventoryUtils.preRestockHand(player, hand, 6, true);
+            fi.dy.masa.malilib.util.inventory.InventoryUtils.preRestockHand(player, hand, 6, true);
         }
 
         return hand;
