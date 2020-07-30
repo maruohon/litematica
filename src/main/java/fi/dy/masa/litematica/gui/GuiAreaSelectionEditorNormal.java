@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.config.option.ConfigHotkey;
+import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.GuiTextInput;
@@ -173,7 +173,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     {
         if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
         {
-            ConfigHotkey hotkey = Hotkeys.TOGGLE_AREA_SELECTION_RENDERING;
+            HotkeyConfig hotkey = Hotkeys.TOGGLE_AREA_SELECTION_RENDERING;
             String configName = Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getName();
             String hotkeyName = hotkey.getName();
             String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();

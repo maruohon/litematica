@@ -4,12 +4,12 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.config.option.IConfigBoolean;
+import fi.dy.masa.malilib.config.IValueChangeCallback;
+import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.input.IHotkeyCallback;
 import fi.dy.masa.malilib.input.IKeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
 import fi.dy.masa.malilib.input.KeyCallbackToggleBooleanConfigWithMessage;
-import fi.dy.masa.malilib.config.IValueChangeCallback;
 
 public class HotkeyCallbacks
 {
@@ -136,7 +136,7 @@ public class HotkeyCallbacks
 
     private static class RenderToggle extends KeyCallbackToggleBooleanConfigWithMessage
     {
-        public RenderToggle(IConfigBoolean config)
+        public RenderToggle(BooleanConfig config)
         {
             super(config);
         }
