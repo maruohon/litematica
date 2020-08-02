@@ -57,6 +57,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       SIGN_TEXT_PASTE         = new ConfigBoolean(    "signTextPaste", true, "Automatically set the text in the sign GUIs from the schematic");
         public static final ConfigString        TOOL_ITEM               = new ConfigString(     "toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
         public static final ConfigBoolean       TOOL_ITEM_ENABLED       = new ConfigBoolean(    "toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.", "Tool Item Enabled");
+        public static final ConfigBoolean       MATERIAL_LIST_IGNORE_BLOCK_STATE = new ConfigBoolean(    "materialListIgnoreBlockState", false, "Ignore block state when generating material list.\nUseful for redstone components where block state may be different while building or constantly changing.\nBe aware that this might ignore more than you want, use with caution.", "Ignoring Block State in Material List");
 
         public static final ConfigOptionList<ReplaceBehavior>           PASTE_REPLACE_BEHAVIOR  = new ConfigOptionList<ReplaceBehavior>( "pasteReplaceBehavior", ReplaceBehavior.NONE, "The behavior of replacing existing blocks\nin the Paste schematic tool mode");
         public static final ConfigOptionList<CornerSelectionMode>       SELECTION_CORNERS_MODE  = new ConfigOptionList<CornerSelectionMode>( "selectionCornersMode", CornerSelectionMode.CORNERS, "The Area Selection corners mode to use (Corners, or Expand)");
@@ -85,6 +86,7 @@ public class Configs implements IConfigHandler
                 RENDER_THREAD_NO_TIMEOUT,
                 SIGN_TEXT_PASTE,
                 TOOL_ITEM_ENABLED,
+                MATERIAL_LIST_IGNORE_BLOCK_STATE,
 
                 PASTE_REPLACE_BEHAVIOR,
                 SELECTION_CORNERS_MODE,
@@ -187,7 +189,6 @@ public class Configs implements IConfigHandler
         public static final ConfigDouble        MATERIAL_LIST_HUD_SCALE             = new ConfigDouble(     "materialListHudScale", 1, 0.1, 4, "Scale factor for the Material List Info HUD");
         public static final ConfigBoolean       MATERIAL_LIST_HUD_STACKS            = new ConfigBoolean(    "materialListHudStacks", true, "Whether or not the number of stacks should be shown\non the Material List HUD, or only the total count");
         public static final ConfigBoolean       MATERIAL_LIST_SLOT_HIGHLIGHT        = new ConfigBoolean(    "materialListSlotHighlight", true, "Highlight inventory slots containing items that are\ncurrently missing or running low in the player's inventory\naccording to the currently active Material List");
-        public static final ConfigBoolean       MATERIAL_LIST_IGNORE_BLOCK_STATE = new ConfigBoolean(    "materialListIgnoreBlockState", false, "Ignore block state when generating material list.\nUseful for redstone components where block state may be different while building or constantly changing.\nBe aware that this might ignore more than you want, use with caution.", "Ignoring Block State in Material List");
         public static final ConfigBoolean       STATUS_INFO_HUD                     = new ConfigBoolean(    "statusInfoHud", false, "Enable a status info HUD renderer,\nwhich renders a few bits of status info, such as\nthe current layer mode and renderers enabled state");
         public static final ConfigBoolean       STATUS_INFO_HUD_AUTO                = new ConfigBoolean(    "statusInfoHudAuto", true, "Allow automatically momentarily enabling the status info HUD \"when needed\",\nfor example when creating a placement and having rendering disabled");
         public static final ConfigBoolean       TOOL_HUD_ALWAYS_VISIBLE             = new ConfigBoolean(    "toolHudAlwaysVisible", false, "Whether or not the tool HUD should always be rendered,\neven when not holding the tool item");
@@ -215,7 +216,6 @@ public class Configs implements IConfigHandler
                 TOOL_HUD_ALWAYS_VISIBLE,
                 VERIFIER_OVERLAY_ENABLED,
                 WARN_DISABLED_RENDERING,
-                MATERIAL_LIST_IGNORE_BLOCK_STATE,
 
                 BLOCK_INFO_LINES_ALIGNMENT,
                 BLOCK_INFO_OVERLAY_ALIGNMENT,

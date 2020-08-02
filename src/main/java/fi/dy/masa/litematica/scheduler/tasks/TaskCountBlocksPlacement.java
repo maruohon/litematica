@@ -22,7 +22,7 @@ public class TaskCountBlocksPlacement extends TaskCountBlocksMaterialList
     {
         super(materialList, "litematica.gui.label.task_name.material_list");
 
-        this.ignoreState = Configs.InfoOverlays.MATERIAL_LIST_IGNORE_BLOCK_STATE.getBooleanValue();
+        this.ignoreState = Configs.Generic.MATERIAL_LIST_IGNORE_BLOCK_STATE.getBooleanValue();
         this.worldSchematic = SchematicWorldHandler.getSchematicWorld();
         this.schematicPlacement = schematicPlacement;
         Collection<SelectionBox> boxes = schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).values();
@@ -52,7 +52,7 @@ public class TaskCountBlocksPlacement extends TaskCountBlocksMaterialList
             {
                 this.countsMissing.addTo(stateSchematic, 1);
             }
-            else if ((this.ignoreState && stateClient.getBlock() != stateSchematic.getBlock()) || (!this.ignoreState && stateClient != stateSchematic))
+            else if ((this.ignoreState && stateClient.getBlock() != stateSchematic.getBlock()) || (this.ignoreState == false && stateClient != stateSchematic))
             {
                 this.countsMissing.addTo(stateSchematic, 1);
                 this.countsMismatch.addTo(stateSchematic, 1);
