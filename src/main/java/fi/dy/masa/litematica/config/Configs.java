@@ -57,6 +57,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       SIGN_TEXT_PASTE         = new ConfigBoolean(    "signTextPaste", true, "Automatically set the text in the sign GUIs from the schematic");
         public static final ConfigString        TOOL_ITEM               = new ConfigString(     "toolItem", "minecraft:stick", "The item to use as the \"tool\" for selections etc.");
         public static final ConfigBoolean       TOOL_ITEM_ENABLED       = new ConfigBoolean(    "toolItemEnabled", true, "If true, then the \"tool\" item can be used to control selections etc.", "Tool Item Enabled");
+        public static final ConfigBoolean       MATERIAL_LIST_IGNORE_BLOCK_STATE = new ConfigBoolean(    "materialListIgnoreBlockState", false, "Ignore block state when generating material list.\nUseful for redstone components where block state may be different while building or constantly changing.\nBe aware that this might ignore more than you want, use with caution.", "Ignoring Block State in Material List");
 
         public static final ConfigOptionList<ReplaceBehavior>           PASTE_REPLACE_BEHAVIOR  = new ConfigOptionList<ReplaceBehavior>( "pasteReplaceBehavior", ReplaceBehavior.NONE, "The behavior of replacing existing blocks\nin the Paste schematic tool mode");
         public static final ConfigOptionList<CornerSelectionMode>       SELECTION_CORNERS_MODE  = new ConfigOptionList<CornerSelectionMode>( "selectionCornersMode", CornerSelectionMode.CORNERS, "The Area Selection corners mode to use (Corners, or Expand)");
@@ -85,6 +86,7 @@ public class Configs implements IConfigHandler
                 RENDER_THREAD_NO_TIMEOUT,
                 SIGN_TEXT_PASTE,
                 TOOL_ITEM_ENABLED,
+                MATERIAL_LIST_IGNORE_BLOCK_STATE,
 
                 PASTE_REPLACE_BEHAVIOR,
                 SELECTION_CORNERS_MODE,
