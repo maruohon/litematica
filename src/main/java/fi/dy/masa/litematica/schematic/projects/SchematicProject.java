@@ -26,7 +26,7 @@ import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 
@@ -515,7 +515,7 @@ public class SchematicProject
         return true;
     }
 
-    private class SaveCompletionListener implements ICompletionListener
+    private class SaveCompletionListener implements TaskCompletionListener
     {
         private final String name;
         private final String fileName;
@@ -560,9 +560,9 @@ public class SchematicProject
             SchematicProject.this.cacheCurrentAreaFromPlacement();
             SchematicProject.this.saveInProgress = false;
 
-            if (GuiUtils.getCurrentScreen() instanceof ICompletionListener)
+            if (GuiUtils.getCurrentScreen() instanceof TaskCompletionListener)
             {
-                ((ICompletionListener) GuiUtils.getCurrentScreen()).onTaskCompleted();
+                ((TaskCompletionListener) GuiUtils.getCurrentScreen()).onTaskCompleted();
             }
 
             MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.version_saved", this.version, this.name);

@@ -4,20 +4,20 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.config.IValueChangeCallback;
+import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
-import fi.dy.masa.malilib.input.IHotkeyCallback;
-import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.input.callback.HotkeyCallback;
+import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.input.KeyCallbackToggleBooleanConfigWithMessage;
+import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 
 public class HotkeyCallbacks
 {
     public static void init(Minecraft mc)
     {
-        IHotkeyCallback hotkeyCallbackMisc = new HotkeyCallbackMisc(mc);
-        IHotkeyCallback hotkeyCallbackOpenGui = new HotkeyCallbackOpenGui(mc);
-        IHotkeyCallback hotkeyCallbackToolActions = new HotkeyCallbackToolActions(mc);
+        HotkeyCallback hotkeyCallbackMisc = new HotkeyCallbackMisc(mc);
+        HotkeyCallback hotkeyCallbackOpenGui = new HotkeyCallbackOpenGui(mc);
+        HotkeyCallback hotkeyCallbackToolActions = new HotkeyCallbackToolActions(mc);
 
         Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((newValue, oldValue) -> { InventoryUtils.setPickBlockableSlots(newValue); });
         Configs.Generic.TOOL_ITEM.setValueChangeCallback((newValue, oldValue) -> { DataManager.setToolItem(newValue); });
@@ -85,25 +85,25 @@ public class HotkeyCallbacks
         Hotkeys.TOGGLE_OVERLAY_SIDE_RENDERING.getKeyBind().setCallback(new RenderToggle(Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES));
         Hotkeys.TOGGLE_TRANSLUCENT_RENDERING.getKeyBind().setCallback(new RenderToggle(Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT));
 
-        Hotkeys.EASY_PLACE_TOGGLE.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.EASY_PLACE_MODE));
-        Hotkeys.TOGGLE_AREA_SELECTION_RENDERING.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING));
-        Hotkeys.TOGGLE_INFO_OVERLAY_RENDERING.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED));
-        Hotkeys.PICK_BLOCK_TOGGLE.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PICK_BLOCK_ENABLED));
-        Hotkeys.PICK_BLOCK_TOGGLE_AUTO.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PICK_BLOCK_AUTO));
-        Hotkeys.TOGGLE_PLACEMENT_BOXES_RENDERING.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING));
-        Hotkeys.TOGGLE_PLACEMENT_RESTRICTION.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.PLACEMENT_RESTRICTION));
-        Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS));
-        Hotkeys.TOGGLE_SIGN_TEXT_PASTE.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.SIGN_TEXT_PASTE));
-        Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED));
-        Hotkeys.TOOL_ENABLED_TOGGLE.getKeyBind().setCallback(new KeyCallbackToggleBooleanConfigWithMessage(Configs.Generic.TOOL_ITEM_ENABLED));
+        Hotkeys.EASY_PLACE_TOGGLE.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Generic.EASY_PLACE_MODE));
+        Hotkeys.TOGGLE_AREA_SELECTION_RENDERING.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING));
+        Hotkeys.TOGGLE_INFO_OVERLAY_RENDERING.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED));
+        Hotkeys.PICK_BLOCK_TOGGLE.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Generic.PICK_BLOCK_ENABLED));
+        Hotkeys.PICK_BLOCK_TOGGLE_AUTO.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Generic.PICK_BLOCK_AUTO));
+        Hotkeys.TOGGLE_PLACEMENT_BOXES_RENDERING.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING));
+        Hotkeys.TOGGLE_PLACEMENT_RESTRICTION.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Generic.PLACEMENT_RESTRICTION));
+        Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS));
+        Hotkeys.TOGGLE_SIGN_TEXT_PASTE.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Generic.SIGN_TEXT_PASTE));
+        Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED));
+        Hotkeys.TOOL_ENABLED_TOGGLE.getKeyBind().setCallback(new ToggleBooleanWithMessageKeyCallback(Configs.Generic.TOOL_ITEM_ENABLED));
 
         assignRendererRefreshCallbacks();
     }
 
     private static void assignRendererRefreshCallbacks()
     {
-        IValueChangeCallback<Boolean> callbackBoolean = (newValue, oldValue) -> HotkeyCallbacks.refreshRenderer();
-        IValueChangeCallback<Double> callbackDouble = (newValue, oldValue) -> HotkeyCallbacks.refreshRenderer();
+        ValueChangeCallback<Boolean> callbackBoolean = (newValue, oldValue) -> HotkeyCallbacks.refreshRenderer();
+        ValueChangeCallback<Double> callbackDouble = (newValue, oldValue) -> HotkeyCallbacks.refreshRenderer();
 
         Configs.Visuals.ENABLE_RENDERING.setValueChangeCallback(callbackBoolean);
         Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.setValueChangeCallback(callbackBoolean);
@@ -134,7 +134,7 @@ public class HotkeyCallbacks
         SchematicWorldRenderingNotifier.INSTANCE.updateAll();
     }
 
-    private static class RenderToggle extends KeyCallbackToggleBooleanConfigWithMessage
+    private static class RenderToggle extends ToggleBooleanWithMessageKeyCallback
     {
         public RenderToggle(BooleanConfig config)
         {
@@ -142,7 +142,7 @@ public class HotkeyCallbacks
         }
 
         @Override
-        public boolean onKeyAction(KeyAction action, IKeyBind key)
+        public boolean onKeyAction(KeyAction action, KeyBind key)
         {
             super.onKeyAction(action, key);
 

@@ -11,7 +11,7 @@ import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
-import fi.dy.masa.malilib.config.IConfigHandler;
+import fi.dy.masa.malilib.config.ModConfig;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.config.option.ConfigOption;
@@ -24,7 +24,7 @@ import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.config.value.InfoType;
 import fi.dy.masa.malilib.util.FileUtils;
 
-public class Configs implements IConfigHandler
+public class Configs implements ModConfig
 {
     public static class Generic
     {
@@ -282,6 +282,12 @@ public class Configs implements IConfigHandler
                 PLACEMENT_LIST_ICON_BUTTONS,
                 SCHEMATIC_LIST_ICON_BUTTONS
         );
+    }
+
+    @Override
+    public String getModId()
+    {
+        return Reference.MOD_ID;
     }
 
     @Override

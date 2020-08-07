@@ -20,23 +20,23 @@ import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonOnOff;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.TextInputScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OnOffButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
+public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
                                           implements ISelectionListener<String>
 {
     protected final AreaSelection selection;
@@ -138,7 +138,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         x = 12;
         y = this.getListY() - 12;
         String str = String.valueOf(this.selection.getAllSubRegionNames().size());
-        x += this.addLabel(x, y + 3, 0xFFFFFFFF, GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.label.area_editor.sub_regions", str)).getWidth() + 16;
+        x += this.addLabel(x, y + 3, 0xFFFFFFFF, BaseScreen.TXT_BOLD + StringUtils.translate("litematica.gui.label.area_editor.sub_regions", str)).getWidth() + 16;
 
         this.addRenderingDisabledWarning(x, y);
 
@@ -147,7 +147,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER;
         String label = StringUtils.translate(type.getLabelKey());
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, 20, label, type.getIcon());
+        GenericButton button = new GenericButton(x, y, -1, 20, label, type.getIcon());
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
@@ -163,7 +163,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         label = StringUtils.translate(type.getLabelKey());
         int buttonWidth = this.getStringWidth(label) + 10;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+        button = new GenericButton(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         return y;
@@ -277,7 +277,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
 
     protected int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        OnOffButton button = new OnOffButton(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, null, null, this));
         return button.getWidth();
     }
@@ -330,7 +330,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
             hover = "litematica.gui.button.hover.area_editor.analyze_area";
         }
 
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+        GenericButton button = new GenericButton(x, y, width, 20, label);
         button.addHoverString(hover);
 
         this.addButton(button, new ButtonListener(type, corner, null, this));
@@ -341,7 +341,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected void createCoordinateButton(int x, int y, Corner corner, CoordinateType coordType, ButtonListener.Type type)
     {
         String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift");
-        ButtonGeneric button = new ButtonGeneric(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+        GenericButton button = new GenericButton(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
         ButtonListener listener = new ButtonListener(type, corner, coordType, this);
         this.addButton(button, listener);
     }
@@ -424,7 +424,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
     }
 
-    protected static class ButtonListener implements IButtonActionListener
+    protected static class ButtonListener implements ButtonActionListener
     {
         private final GuiAreaSelectionEditorNormal parent;
         private final Type type;
@@ -440,12 +440,12 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             int amount = mouseButton == 1 ? -1 : 1;
-            if (GuiBase.isCtrlDown()) { amount *= 100; }
-            if (GuiBase.isShiftDown()) { amount *= 10; }
-            if (GuiBase.isAltDown()) { amount *= 5; }
+            if (BaseScreen.isCtrlDown()) { amount *= 100; }
+            if (BaseScreen.isShiftDown()) { amount *= 10; }
+            if (BaseScreen.isAltDown()) { amount *= 5; }
 
             this.parent.setNextMessageType(MessageType.ERROR);
 
@@ -485,7 +485,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     break;
 
                 case CREATE_SCHEMATIC:
-                    SchematicUtils.saveSchematic(GuiBase.isShiftDown());
+                    SchematicUtils.saveSchematic(BaseScreen.isShiftDown());
                     break;
 
                 case ANALYZE_AREA:
@@ -493,16 +493,16 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
                     MaterialListAreaAnalyzer list = new MaterialListAreaAnalyzer(this.parent.selection);
                     DataManager.setMaterialList(list);
                     GuiMaterialList gui = new GuiMaterialList(list);
-                    GuiBase.openGui(gui);
+                    BaseScreen.openGui(gui);
                     list.reCreateMaterialList(); // This is after changing the GUI, so that the task message goes to the new GUI
                     return;
                 }
 
                 case CREATE_SUB_REGION:
                 {
-                    GuiTextInput gui = new GuiTextInput("litematica.gui.title.area_editor.sub_region_name", "", null, new SubRegionCreator(this.parent));
+                    TextInputScreen gui = new TextInputScreen("litematica.gui.title.area_editor.sub_region_name", "", null, new SubRegionCreator(this.parent));
                     gui.setParent(this.parent);
-                    GuiBase.openPopupGui(gui);
+                    BaseScreen.openPopupGui(gui);
                     break;
                 }
 
@@ -592,7 +592,7 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
         }
     }
 
-    protected static class SubRegionCreator implements IStringConsumer
+    protected static class SubRegionCreator implements StringConsumer
     {
         private final GuiAreaSelectionEditorNormal gui;
 
@@ -660,13 +660,13 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 146;
     }
@@ -694,6 +694,6 @@ public class GuiAreaSelectionEditorNormal extends GuiListBase<String, WidgetSele
     protected WidgetListSelectionSubRegions createListWidget(int listX, int listY)
     {
         return new WidgetListSelectionSubRegions(listX, listY,
-                this.getBrowserWidth(), this.getBrowserHeight(), this.selection, this);
+                                                 this.getListWidth(), this.getListHeight(), this.selection, this);
     }
 }

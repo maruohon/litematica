@@ -12,14 +12,14 @@ import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.schematic.verifier.VerifierResultSorter;
 import fi.dy.masa.litematica.util.ItemUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.util.data.ItemType;
 import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
-public class WidgetListSchematicVerificationResults extends WidgetListBase<BlockMismatchEntry, WidgetSchematicVerificationResult>
+public class WidgetListSchematicVerificationResults extends BaseListWidget<BlockMismatchEntry, WidgetSchematicVerificationResult>
 {
     private static int lastScrollbarPosition;
 
@@ -31,11 +31,11 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
     {
         super(x, y, width, height, parent);
 
-        this.browserEntryHeight = 22;
+        this.entryWidgetFixedHeight = 22;
         this.guiSchematicVerifier = parent;
         this.allowMultiSelection = true;
         this.sorter = new VerifierResultSorter(parent.getPlacement().getSchematicVerifier());
-        this.setParentGui(parent);
+        this.setParentScreen(parent);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
     @Override
     protected WidgetSchematicVerificationResult createHeaderWidget(int x, int y, int listIndexStart, int usableHeight, int usedHeight)
     {
-        int height = this.browserEntryHeight;
+        int height = this.entryWidgetFixedHeight;
 
         if ((usedHeight + height) > usableHeight)
         {
@@ -63,12 +63,12 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
         }
 
         MismatchType type = this.guiSchematicVerifier.getResultMode();
-        String strExpected = GuiBase.TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_EXPECTED) + GuiBase.TXT_RST;
+        String strExpected = BaseScreen.TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_EXPECTED) + BaseScreen.TXT_RST;
         BlockMismatchEntry entry;
 
         if (type != MismatchType.CORRECT_STATE)
         {
-            String strFound = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_FOUND) + GuiBase.TXT_RST;
+            String strFound = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD + StringUtils.translate(WidgetSchematicVerificationResult.HEADER_FOUND) + BaseScreen.TXT_RST;
             entry = new BlockMismatchEntry(strExpected, strFound);
         }
         else
@@ -111,7 +111,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
 
     private void addEntriesForType(MismatchType type)
     {
-        String title = type.getFormattingCode() + type.getDisplayname() + GuiBase.TXT_RST;
+        String title = type.getFormattingCode() + type.getDisplayname() + BaseScreen.TXT_RST;
         this.listContents.add(new BlockMismatchEntry(type, title));
         List<BlockMismatch> list;
 
@@ -164,7 +164,7 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
     @Override
     protected WidgetSchematicVerificationResult createListEntryWidget(int x, int y, int listIndex, boolean isOdd, BlockMismatchEntry entry)
     {
-        return new WidgetSchematicVerificationResult(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                isOdd, this, this.guiSchematicVerifier, entry, listIndex);
+        return new WidgetSchematicVerificationResult(x, y, this.entryWidgetWidth, this.getBrowserEntryHeightFor(entry),
+                                                     isOdd, this, this.guiSchematicVerifier, entry, listIndex);
     }
 }

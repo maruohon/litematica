@@ -8,18 +8,18 @@ import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSubRegion;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.TextInputScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
-import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
+public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
 {
     private final WidgetListSelectionSubRegions parent;
     private final AreaSelection selection;
@@ -49,13 +49,13 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
     private int createButton(int x, int y, ButtonListener.ButtonType type)
     {
-        return this.addButton(new ButtonGeneric(x, y, -1, true, type.getDisplayName()), new ButtonListener(type, this)).getX() - 1;
+        return this.addButton(new GenericButton(x, y, -1, true, type.getDisplayName()), new ButtonListener(type, this)).getX() - 1;
     }
 
     @Override
-    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
-        return mouseX < this.buttonsStartX && super.canSelectAt(mouseX, mouseY, mouseButton);
+        return mouseX < this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
         int offset = 12;
 
-        if (GuiBase.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
+        if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
             RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
@@ -137,7 +137,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final WidgetSelectionSubRegion widget;
         private final ButtonType type;
@@ -149,14 +149,14 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == ButtonType.RENAME)
             {
                 String title = "litematica.gui.title.rename_area_sub_region";
                 String name = this.widget.box != null ? this.widget.box.getName() : "<error>";
                 BoxRenamer renamer = new BoxRenamer(this.widget.selection, this.widget);
-                GuiBase.openPopupGui(new GuiTextInput(title, name, this.widget.parent.getEditorGui(), renamer));
+                BaseScreen.openPopupGui(new TextInputScreen(title, name, this.widget.parent.getEditorGui(), renamer));
             }
             else if (this.type == ButtonType.REMOVE)
             {
@@ -167,7 +167,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             {
                 GuiAreaSelectionEditorSubRegion gui = new GuiAreaSelectionEditorSubRegion(this.widget.selection, this.widget.box);
                 gui.setParent(GuiUtils.getCurrentScreen());
-                GuiBase.openGui(gui);
+                BaseScreen.openGui(gui);
             }
         }
 
@@ -175,7 +175,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         {
             RENAME          ("litematica.gui.button.rename"),
             CONFIGURE       ("litematica.gui.button.configure"),
-            REMOVE          (GuiBase.TXT_RED + "-");
+            REMOVE          (BaseScreen.TXT_RED + "-");
 
             private final String labelKey;
 
@@ -191,7 +191,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
         }
     }
 
-    private static class BoxRenamer implements IStringConsumer
+    private static class BoxRenamer implements StringConsumer
     {
         private final WidgetSelectionSubRegion widget;
         private final AreaSelection selection;

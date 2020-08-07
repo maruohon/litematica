@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.util;
 
 import com.google.common.collect.ImmutableList;
+import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
 import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.IConfigOptionListEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum BlockInfoListType implements IConfigOptionListEntry<BlockInfoListType>
+public enum BlockInfoListType implements ConfigOptionListEntry<BlockInfoListType>
 {
     ALL             ("all",             "litematica.gui.label.block_info_list_type.all"),
     RENDER_LAYERS   ("render_layers",   "litematica.gui.label.block_info_list_type.render_layers");
@@ -36,12 +36,12 @@ public enum BlockInfoListType implements IConfigOptionListEntry<BlockInfoListTyp
     @Override
     public BlockInfoListType cycle(boolean forward)
     {
-        return ConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
+        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public BlockInfoListType fromString(String name)
     {
-        return ConfigOptionListEntry.findValueByName(name, VALUES);
+        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
     }
 }

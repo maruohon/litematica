@@ -8,12 +8,12 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.IntBoxCoordType;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiDialogBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonOnOff;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseDialogScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OnOffButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
@@ -22,7 +22,7 @@ import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiPlacementGridSettings extends GuiDialogBase
+public class GuiPlacementGridSettings extends BaseDialogScreen
 {
     private final SchematicPlacementManager manager;
     private final SchematicPlacement placement;
@@ -58,14 +58,14 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         int width = 50;
 
         boolean on = this.placement.getGridSettings().isEnabled();
-        ButtonOnOff buttonOnOff = new ButtonOnOff(x, y, -1, false, "litematica.gui.button.schematic_placement.grid_settings", on);
+        OnOffButton buttonOnOff = new OnOffButton(x, y, -1, false, "litematica.gui.button.schematic_placement.grid_settings", on);
         this.addButton(buttonOnOff, (btn, mb) -> {
             this.placement.getGridSettings().toggleEnabled();
             this.updatePlacementManager();
             this.initGui();
         });
 
-        ButtonGeneric button = new ButtonGeneric(x + buttonOnOff.getWidth() + 4, y, -1, 20, "litematica.gui.button.schematic_placement.reset_grid_size");
+        GenericButton button = new GenericButton(x + buttonOnOff.getWidth() + 4, y, -1, 20, "litematica.gui.button.schematic_placement.reset_grid_size");
         this.addButton(button, (btn, mb) -> {
             this.placement.getGridSettings().resetSize();
             this.updatePlacementManager();
@@ -153,7 +153,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
 
         x += width + 4;
         String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-        ButtonGeneric button = new ButtonGeneric(x, y + 1, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+        GenericButton button = new GenericButton(x, y + 1, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
 
         this.addButton(button, new ButtonListenerRepeat(type, this.placement, this));
 
@@ -178,7 +178,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
 
         x += width + 4;
         String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-        ButtonGeneric button = new ButtonGeneric(x, y + 1, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+        GenericButton button = new GenericButton(x, y + 1, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
 
         this.addButton(button, new ButtonListenerSize(type, this.placement, this));
     }
@@ -210,7 +210,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         }
     }
 
-    private static class ButtonListenerRepeat implements IButtonActionListener
+    private static class ButtonListenerRepeat implements ButtonActionListener
     {
         private final GuiPlacementGridSettings parent;
         private final SchematicPlacement placement;
@@ -224,11 +224,11 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             int amount = mouseButton == 1 ? -1 : 1;
-            if (GuiBase.isShiftDown()) { amount *= 8; }
-            if (GuiBase.isAltDown()) { amount *= 4; }
+            if (BaseScreen.isShiftDown()) { amount *= 8; }
+            if (BaseScreen.isAltDown()) { amount *= 4; }
 
             IntBoundingBox old = this.placement.getGridSettings().getRepeatCounts();
             int newValue = Math.max(0, PositionUtils.getIntBoxValue(old, this.type) + amount);
@@ -265,7 +265,7 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         }
     }
 
-    private static class ButtonListenerSize implements IButtonActionListener
+    private static class ButtonListenerSize implements ButtonActionListener
     {
         private final GuiPlacementGridSettings parent;
         private final SchematicPlacement placement;
@@ -279,11 +279,11 @@ public class GuiPlacementGridSettings extends GuiDialogBase
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             int amount = mouseButton == 1 ? -1 : 1;
-            if (GuiBase.isShiftDown()) { amount *= 8; }
-            if (GuiBase.isAltDown()) { amount *= 4; }
+            if (BaseScreen.isShiftDown()) { amount *= 8; }
+            if (BaseScreen.isAltDown()) { amount *= 4; }
 
             this.placement.getGridSettings().modifySize(this.type, amount);
             this.parent.updatePlacementManager();

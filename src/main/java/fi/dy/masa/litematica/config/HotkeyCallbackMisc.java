@@ -21,13 +21,13 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.input.IHotkeyCallback;
-import fi.dy.masa.malilib.input.IKeyBind;
+import fi.dy.masa.malilib.input.callback.HotkeyCallback;
+import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 
-public class HotkeyCallbackMisc implements IHotkeyCallback
+public class HotkeyCallbackMisc implements HotkeyCallback
 {
     private final Minecraft mc;
 
@@ -37,7 +37,7 @@ public class HotkeyCallbackMisc implements IHotkeyCallback
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, IKeyBind key)
+    public boolean onKeyAction(KeyAction action, KeyBind key)
     {
         if (this.mc.player == null || this.mc.world == null)
         {

@@ -34,7 +34,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -96,7 +96,7 @@ public class SchematicCreationUtils
     }
 
     @Nullable
-    public static LitematicaSchematic createFromWorld(World world, AreaSelection area, boolean ignoreEntities, String author, IStringConsumer feedback)
+    public static LitematicaSchematic createFromWorld(World world, AreaSelection area, boolean ignoreEntities, String author, StringConsumer feedback)
     {
         List<SelectionBox> boxes = PositionUtils.getValidBoxes(area);
 

@@ -36,9 +36,9 @@ import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
@@ -311,7 +311,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     }
 
     public void startVerification(WorldClient worldClient, WorldSchematic worldSchematic,
-            SchematicPlacement schematicPlacement, ICompletionListener completionListener)
+            SchematicPlacement schematicPlacement, TaskCompletionListener completionListener)
     {
         this.reset();
 
@@ -635,7 +635,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         }
     }
 
-    public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(GuiBase gui)
+    public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(BaseScreen gui)
     {
         List<Pair<IBlockState, IBlockState>> list = Lists.newArrayList(this.ignoredMismatches);
 
@@ -908,7 +908,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
         if (positionList.isEmpty() == false)
         {
-            String rst = GuiBase.TXT_RST;
+            String rst = BaseScreen.TXT_RST;
 
             if (mismatchType != null)
             {
@@ -917,7 +917,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             else
             {
                 String title = StringUtils.translate("litematica.gui.title.schematic_verifier_errors");
-                hudLines.add(String.format("%s%s%s", GuiBase.TXT_BOLD, title, rst));
+                hudLines.add(String.format("%s%s%s", BaseScreen.TXT_BOLD, title, rst));
             }
 
             final int count = Math.min(positionList.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
@@ -1054,12 +1054,12 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
     public enum MismatchType
     {
-        ALL             (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.all", GuiBase.TXT_WHITE),
-        MISSING         (0x00FFFF, "litematica.gui.label.schematic_verifier_display_type.missing", GuiBase.TXT_AQUA),
-        EXTRA           (0xFF00CF, "litematica.gui.label.schematic_verifier_display_type.extra", GuiBase.TXT_LIGHT_PURPLE),
-        WRONG_BLOCK     (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.wrong_blocks", GuiBase.TXT_RED),
-        WRONG_STATE     (0xFFAF00, "litematica.gui.label.schematic_verifier_display_type.wrong_state", GuiBase.TXT_GOLD),
-        CORRECT_STATE   (0x11FF11, "litematica.gui.label.schematic_verifier_display_type.correct_state", GuiBase.TXT_GREEN);
+        ALL             (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.all", BaseScreen.TXT_WHITE),
+        MISSING         (0x00FFFF, "litematica.gui.label.schematic_verifier_display_type.missing", BaseScreen.TXT_AQUA),
+        EXTRA           (0xFF00CF, "litematica.gui.label.schematic_verifier_display_type.extra", BaseScreen.TXT_LIGHT_PURPLE),
+        WRONG_BLOCK     (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.wrong_blocks", BaseScreen.TXT_RED),
+        WRONG_STATE     (0xFFAF00, "litematica.gui.label.schematic_verifier_display_type.wrong_state", BaseScreen.TXT_GOLD),
+        CORRECT_STATE   (0x11FF11, "litematica.gui.label.schematic_verifier_display_type.correct_state", BaseScreen.TXT_GREEN);
 
         private final String unlocName;
         private final String colorCode;
@@ -1089,7 +1089,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
         public String getFormattingCode()
         {
-            return this.colorCode + GuiBase.TXT_BOLD;
+            return this.colorCode + BaseScreen.TXT_BOLD;
         }
     }
 

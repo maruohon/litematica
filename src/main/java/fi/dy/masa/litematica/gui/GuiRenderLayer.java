@@ -1,18 +1,18 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiRenderLayerEditBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiRenderLayer extends GuiRenderLayerEditBase
+public class GuiRenderLayer extends BaseRenderLayerEditScreen
 {
     public GuiRenderLayer()
     {
@@ -24,14 +24,14 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
     @Override
     public void initGui()
     {
-        DataManager.setConfigGuiTab(GuiConfigs.RENDER_LAYERS);
+        DataManager.setConfigGuiTab(ConfigScreen.RENDER_LAYERS);
 
         super.initGui();
 
         int x = 10;
         int y = 26;
 
-        for (IConfigGuiTab tab : GuiConfigs.TABS)
+        for (ConfigTab tab : ConfigScreen.TABS)
         {
             x += this.createTabButton(x, y, -1, tab);
         }
@@ -54,7 +54,7 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
         return LitematicaGuiIcons.BUTTON_PLUS_MINUS_16;
     }
 
-    private int createTabButton(int x, int y, int width, IConfigGuiTab tab)
+    private int createTabButton(int x, int y, int width, ConfigTab tab)
     {
         ButtonListenerTab listener = new ButtonListenerTab(tab);
         boolean enabled = DataManager.getConfigGuiTab() != tab;
@@ -65,7 +65,7 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
             width = this.getStringWidth(label) + 10;
         }
 
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+        GenericButton button = new GenericButton(x, y, width, 20, label);
         button.setEnabled(enabled);
         this.addButton(button, listener);
 
@@ -92,20 +92,20 @@ public class GuiRenderLayer extends GuiRenderLayerEditBase
         return y;
     }
 
-    private static class ButtonListenerTab implements IButtonActionListener
+    private static class ButtonListenerTab implements ButtonActionListener
     {
-        private final IConfigGuiTab tab;
+        private final ConfigTab tab;
 
-        public ButtonListenerTab(IConfigGuiTab tab)
+        public ButtonListenerTab(ConfigTab tab)
         {
             this.tab = tab;
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             DataManager.setConfigGuiTab(this.tab);
-            GuiBase.openGui(new GuiConfigs());
+            BaseScreen.openGui(new ConfigScreen());
         }
     }
 }

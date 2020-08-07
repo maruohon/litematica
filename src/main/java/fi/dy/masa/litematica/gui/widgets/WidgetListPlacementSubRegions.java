@@ -7,12 +7,12 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
-import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
 import fi.dy.masa.malilib.util.AlphaNumComparator;
-import fi.dy.masa.malilib.util.data.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.util.HorizontalAlignment;
 
-public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlacement, WidgetPlacementSubRegion>
+public class WidgetListPlacementSubRegions extends BaseListWidget<SubRegionPlacement, WidgetPlacementSubRegion>
 {
     private final GuiPlacementConfiguration parent;
 
@@ -21,14 +21,14 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
         super(x, y, width, height, parent);
 
         this.parent = parent;
-        this.browserEntryHeight = 22;
+        this.entryWidgetFixedHeight = 22;
         this.shouldSortList = true;
 
         this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override
-    public GuiPlacementConfiguration getParentGui()
+    public GuiPlacementConfiguration getParentScreen()
     {
         return this.parent;
     }
@@ -54,8 +54,8 @@ public class WidgetListPlacementSubRegions extends WidgetListBase<SubRegionPlace
     @Override
     protected WidgetPlacementSubRegion createListEntryWidget(int x, int y, int listIndex, boolean isOdd, SubRegionPlacement entry)
     {
-        return new WidgetPlacementSubRegion(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                isOdd, this.parent.getSchematicPlacement(), entry, listIndex, this);
+        return new WidgetPlacementSubRegion(x, y, this.entryWidgetWidth, this.getBrowserEntryHeightFor(entry),
+                                            isOdd, this.parent.getSchematicPlacement(), entry, listIndex, this);
     }
 
     protected static class PlacementComparator extends AlphaNumComparator implements Comparator<SubRegionPlacement>

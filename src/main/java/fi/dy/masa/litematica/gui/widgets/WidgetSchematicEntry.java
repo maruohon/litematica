@@ -16,19 +16,19 @@ import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
+public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 {
     private final WidgetListLoadedSchematics parent;
     private final ISchematic schematic;
@@ -79,7 +79,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
     private int addButton(int x, int y, ButtonListener.Type type)
     {
         ButtonListener listener = new ButtonListener(type, this);
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
+        GenericButton button = new GenericButton(x, y, -1, true, type.getDisplayName());
         button.addHoverString(type.getHoverKey());
 
         this.addButton(button, listener);
@@ -90,16 +90,16 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
     private int createButtonIconOnly(int xRight, int y, ButtonListener.Type type)
     {
         IGuiIcon icon = type.getIcon();
-        ButtonGeneric button;
+        GenericButton button;
         int size = 20;
 
         if (icon != null)
         {
-            button = new ButtonGeneric(xRight - size, y, size, size, "", icon, type.getHoverKey());
+            button = new GenericButton(xRight - size, y, size, size, "", icon, type.getHoverKey());
         }
         else
         {
-            button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
+            button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
             button.addHoverString(type.getHoverKey());
         }
 
@@ -177,12 +177,12 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
         int height = this.getHeight();
 
         if (this.schematic.getMetadata().wasModifiedSinceSaved() &&
-            GuiBase.isMouseOver(mouseX, mouseY, this.buttonsStartX - 13, y + 6, 11, 11))
+            BaseScreen.isMouseOver(mouseX, mouseY, this.buttonsStartX - 13, y + 6, 11, 11))
         {
-            String str = WidgetFileBrowserBase.DATE_FORMAT.format(new Date(this.schematic.getMetadata().getTimeModified()));
+            String str = BaseFileBrowserWidget.DATE_FORMAT.format(new Date(this.schematic.getMetadata().getTimeModified()));
             RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str)));
         }
-        else if (GuiBase.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 12, height))
+        else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 12, height))
         {
             List<String> lines = new ArrayList<>();
             File schematicFile = this.schematic.getFile();
@@ -200,7 +200,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
         RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
         private final WidgetSchematicEntry widget;
@@ -212,14 +212,14 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == Type.CREATE_PLACEMENT)
             {
                 BlockPos pos = new BlockPos(this.widget.mc.player.getPositionVector());
                 ISchematic entry = this.widget.schematic;
                 String name = entry.getMetadata().getName();
-                boolean enabled = GuiBase.isShiftDown() == false;
+                boolean enabled = BaseScreen.isShiftDown() == false;
 
                 SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
                 SchematicPlacement placement = SchematicPlacement.createFor(entry, pos, name, enabled);
@@ -239,7 +239,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<ISchematic>
                 GuiSchematicSaveConvert gui = new GuiSchematicSaveConvert(schematic, name);
                 gui.setUpdatePlacementsOption(true);
                 gui.setParent(GuiUtils.getCurrentScreen());
-                GuiBase.openGui(gui);
+                BaseScreen.openGui(gui);
             }
             else if (this.type == Type.RELOAD)
             {

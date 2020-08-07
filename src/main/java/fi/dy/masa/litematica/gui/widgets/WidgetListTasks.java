@@ -6,16 +6,16 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 
-public class WidgetListTasks extends WidgetListBase<ITask, WidgetTaskEntry>
+public class WidgetListTasks extends BaseListWidget<ITask, WidgetTaskEntry>
 {
     public WidgetListTasks(int x, int y, int width, int height,
             @Nullable ISelectionListener<ITask> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 
-        this.browserEntryHeight = 22;
+        this.entryWidgetFixedHeight = 22;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class WidgetListTasks extends WidgetListBase<ITask, WidgetTaskEntry>
     @Override
     protected WidgetTaskEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, ITask entry)
     {
-        return new WidgetTaskEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                isOdd, entry, listIndex, this);
+        return new WidgetTaskEntry(x, y, this.entryWidgetWidth, this.getBrowserEntryHeightFor(entry),
+                                   isOdd, entry, listIndex, this);
     }
 }

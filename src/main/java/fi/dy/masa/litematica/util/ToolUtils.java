@@ -34,7 +34,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
@@ -138,7 +138,7 @@ public class ToolUtils
     }
 
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities,
-            @Nullable ICompletionListener listener, Minecraft mc)
+                                              @Nullable TaskCompletionListener listener, Minecraft mc)
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {

@@ -6,28 +6,29 @@ import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>
+public class WidgetSchematicProjectBrowser extends BaseFileBrowserWidget implements ISelectionListener<DirectoryEntry>
 {
-    @Nullable private SchematicProject selectedProject;
-    private final ISelectionListener<DirectoryEntry> selectionListener;
+    private final ISelectionListener<DirectoryEntry> parentSelectionListener;
     protected final int infoWidth;
+    @Nullable private SchematicProject selectedProject;
 
     public WidgetSchematicProjectBrowser(int x, int y, int width, int height, ISelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, DataManager.getSchematicsBaseDirectory(), DataManager.getSchematicsBaseDirectory(),
                 DataManager.getDirectoryCache(), "version_control", null);
 
-        this.selectionListener = selectionListener;
-        this.browserEntryHeight = 14;
+        this.parentSelectionListener = selectionListener;
+        this.entryWidgetFixedHeight = 14;
         this.infoWidth = 170;
-        this.setSelectionListener(this);
+
+        this.getEntrySelectionHandler().setSelectionListener(this);
     }
 
     @Override
@@ -37,9 +38,9 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
     }
 
     @Override
-    protected int getBrowserWidthForTotalWidth(int width)
+    protected int getListMaxWidthForTotalWidth(int width)
     {
-        return super.getBrowserWidthForTotalWidth(width) - this.infoWidth;
+        return super.getListMaxWidthForTotalWidth(width) - this.infoWidth;
     }
 
     @Override
@@ -57,7 +58,7 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
             }
         }
 
-        this.selectionListener.onSelectionChange(entry);
+        this.parentSelectionListener.onSelectionChange(entry);
     }
 
     @Override
@@ -66,15 +67,15 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
         int x = this.getX() + this.getWidth() - this.infoWidth;
         int y = this.getY() + 4;
         int infoHeight = 100;
-        RenderUtils.drawOutlinedBox(x + 1, y - 4, this.infoWidth, infoHeight, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, this.getZLevel());
+        RenderUtils.drawOutlinedBox(x + 1, y - 4, this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, this.getZLevel());
 
         SchematicProject project = this.selectedProject;
 
         if (project != null)
         {
             String str;
-            String w = GuiBase.TXT_WHITE;
-            String r = GuiBase.TXT_RST;
+            String w = BaseScreen.TXT_WHITE;
+            String r = BaseScreen.TXT_RST;
             int color = 0xFFB0B0B0;
 
             x += 5;

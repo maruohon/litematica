@@ -10,11 +10,11 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonOnOff;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OnOffButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
@@ -24,11 +24,11 @@ import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiSubRegionConfiguration extends GuiBase
+public class GuiSubRegionConfiguration extends BaseScreen
 {
     private final SchematicPlacement schematicPlacement;
     private final SubRegionPlacement placement;
-    private ButtonGeneric buttonResetPlacement;
+    private GenericButton buttonResetPlacement;
 
     public GuiSubRegionConfiguration(SchematicPlacement schematicPlacement, SubRegionPlacement placement)
     {
@@ -92,7 +92,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         label = StringUtils.translate("litematica.gui.button.placement_sub.placement_configuration");
         int buttonWidth = this.getStringWidth(label) + 10;
         x = 10;
-        ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+        GenericButton button = new GenericButton(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListener(ButtonListener.Type.PLACEMENT_CONFIGURATION, this.schematicPlacement, this.placement, this));
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
@@ -100,7 +100,7 @@ public class GuiSubRegionConfiguration extends GuiBase
         int menuButtonWidth = this.getStringWidth(label) + 20;
         x = GuiUtils.getScaledWindowWidth() >= 270 ? this.width - menuButtonWidth - 10 : x + buttonWidth + 4;
 
-        button = new ButtonGeneric(x, y, menuButtonWidth, 20, label);
+        button = new GenericButton(x, y, menuButtonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         this.updateElements();
@@ -132,7 +132,7 @@ public class GuiSubRegionConfiguration extends GuiBase
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        OnOffButton button = new OnOffButton(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this.schematicPlacement, this.placement, this));
         return button.getWidth();
     }
@@ -149,7 +149,7 @@ public class GuiSubRegionConfiguration extends GuiBase
             case NUDGE_COORD_Z:
             {
                 String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-                ButtonGeneric button = new ButtonGeneric(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+                GenericButton button = new GenericButton(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return;
             }
@@ -171,7 +171,7 @@ public class GuiSubRegionConfiguration extends GuiBase
                 break;
         }
 
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+        GenericButton button = new GenericButton(x, y, width, 20, label);
         this.addButton(button, listener);
 
         if (type == ButtonListener.Type.RESET_PLACEMENT)
@@ -194,16 +194,16 @@ public class GuiSubRegionConfiguration extends GuiBase
         this.buttonResetPlacement.setEnabled(enabled);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
-        private final GuiBase parent;
+        private final BaseScreen parent;
         private final SchematicPlacementManager manager;
         private final SchematicPlacement schematicPlacement;
         private final SubRegionPlacement placement;
         private final Type type;
         private final String subRegionName;
 
-        public ButtonListener(Type type, SchematicPlacement schematicPlacement, SubRegionPlacement placement, GuiBase parent)
+        public ButtonListener(Type type, SchematicPlacement schematicPlacement, SubRegionPlacement placement, BaseScreen parent)
         {
             this.type = type;
             this.manager = DataManager.getSchematicPlacementManager();
@@ -214,11 +214,11 @@ public class GuiSubRegionConfiguration extends GuiBase
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             int amount = mouseButton == 1 ? -1 : 1;
-            if (GuiBase.isShiftDown()) { amount *= 8; }
-            if (GuiBase.isAltDown()) { amount *= 4; }
+            if (BaseScreen.isShiftDown()) { amount *= 8; }
+            if (BaseScreen.isAltDown()) { amount *= 4; }
 
             // The sub-region placements are relative (but the setter below uses the
             // absolute position and subtracts the placement origin internally)
@@ -230,7 +230,7 @@ public class GuiSubRegionConfiguration extends GuiBase
             switch (this.type)
             {
                 case PLACEMENT_CONFIGURATION:
-                    GuiBase.openGui(new GuiPlacementConfiguration(this.schematicPlacement));
+                    BaseScreen.openGui(new GuiPlacementConfiguration(this.schematicPlacement));
                     break;
 
                 case ROTATE:

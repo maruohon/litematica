@@ -4,9 +4,8 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.render.DebugScreenMessages;
-import fi.dy.masa.malilib.event.IClientTickHandler;
 
-public class ClientTickHandler implements IClientTickHandler
+public class ClientTickHandler implements fi.dy.masa.malilib.event.ClientTickHandler
 {
     @Override
     public void onClientTick(Minecraft mc)

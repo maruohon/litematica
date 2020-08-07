@@ -5,9 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.event.IClientWorldChangeHandler;
 
-public class ClientWorldChangeHandler implements IClientWorldChangeHandler
+public class ClientWorldChangeHandler implements fi.dy.masa.malilib.event.ClientWorldChangeHandler
 {
     @Override
     public void onPreClientWorldChange(@Nullable WorldClient worldBefore, @Nullable WorldClient worldAfter, Minecraft mc)

@@ -3,12 +3,12 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacementBrowser;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiSchematicPlacementFileBrowser extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicPlacementBrowser>
+public class GuiSchematicPlacementFileBrowser extends BaseListScreen<DirectoryEntry, DirectoryEntryWidget, WidgetSchematicPlacementBrowser>
 {
     public GuiSchematicPlacementFileBrowser()
     {
@@ -18,13 +18,13 @@ public class GuiSchematicPlacementFileBrowser extends GuiListBase<DirectoryEntry
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 68;
     }

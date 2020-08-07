@@ -10,14 +10,14 @@ import fi.dy.masa.litematica.gui.widgets.WidgetSchematicPlacementEntry;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.button.GenericButton;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicPlacementsList
-        extends GuiListBase<SchematicPlacementUnloaded, WidgetSchematicPlacementEntry, WidgetListSchematicPlacements>
+        extends BaseListScreen<SchematicPlacementUnloaded, WidgetSchematicPlacementEntry, WidgetListSchematicPlacements>
         implements ISelectionListener<SchematicPlacementUnloaded>
 {
     private final SchematicPlacementManager manager;
@@ -32,13 +32,13 @@ public class GuiSchematicPlacementsList
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 64;
     }
@@ -51,24 +51,24 @@ public class GuiSchematicPlacementsList
 
         int x = 12;
         int y = this.height - 26;
-        ButtonGeneric button;
+        GenericButton button;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS;
-        button = new ButtonGeneric(x, y, -1, 20, type.getLabelKey(), type.getIcon());
+        button = new GenericButton(x, y, -1, 20, type.getLabelKey(), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         x += button.getWidth() + 2;
 
-        button = new ButtonGeneric(x, y, -1, 20, "litematica.gui.label.schematic_placement.open_placement_browser");
-        this.addButton(button, (btn, mbtn) -> { GuiBase.openGui((new GuiSchematicPlacementFileBrowser()).setParent(this)); });
+        button = new GenericButton(x, y, -1, 20, "litematica.gui.label.schematic_placement.open_placement_browser");
+        this.addButton(button, (btn, mbtn) -> { BaseScreen.openGui((new GuiSchematicPlacementFileBrowser()).setParent(this)); });
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        button = new ButtonGeneric(this.width - 10, y, -1, true, type.getLabelKey());
+        button = new GenericButton(this.width - 10, y, -1, true, type.getLabelKey());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         x = this.width - 22;
         y = 10;
         String val = Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue() ? "litematica.gui.label.misc.icons" : "litematica.gui.label.misc.text";
-        button = new ButtonGeneric(x, y, -1, true, StringUtils.translate("litematica.gui.button.buttons_val", StringUtils.translate(val)));
+        button = new GenericButton(x, y, -1, true, StringUtils.translate("litematica.gui.button.buttons_val", StringUtils.translate(val)));
         button.addHoverString("litematica.gui.button.hover.use_text_or_icon_buttons");
         this.addButton(button, (btn, mbtn) -> { Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue(); this.initGui(); });
     }
@@ -91,7 +91,7 @@ public class GuiSchematicPlacementsList
     @Override
     protected WidgetListSchematicPlacements createListWidget(int listX, int listY)
     {
-        return new WidgetListSchematicPlacements(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+        return new WidgetListSchematicPlacements(listX, listY, this.getListWidth(), this.getListHeight(), this);
     }
 
     public boolean getCachedWasModifiedSinceSaved(SchematicPlacementUnloaded placement)

@@ -10,8 +10,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.JsonUtils;
 
 public abstract class MaterialListBase implements IMaterialList
@@ -21,7 +21,7 @@ public abstract class MaterialListBase implements IMaterialList
     protected final List<MaterialListEntry> materialListPreFiltered = new ArrayList<>();
     protected final List<MaterialListEntry> materialListFiltered = new ArrayList<>();
     protected ImmutableList<MaterialListEntry> materialListAll = ImmutableList.of();
-    @Nullable protected ICompletionListener completionListener;
+    @Nullable protected TaskCompletionListener completionListener;
     protected SortCriteria sortCriteria = SortCriteria.COUNT_TOTAL;
     protected BlockInfoListType materialListType = BlockInfoListType.ALL;
     protected boolean reverse;
@@ -81,7 +81,7 @@ public abstract class MaterialListBase implements IMaterialList
         return this.materialListFiltered;
     }
 
-    public void setCompletionListener(ICompletionListener listener)
+    public void setCompletionListener(TaskCompletionListener listener)
     {
         this.completionListener = listener;
     }
@@ -266,7 +266,7 @@ public abstract class MaterialListBase implements IMaterialList
     {
         if (JsonUtils.hasString(obj, "type"))
         {
-            this.setMaterialListType(ConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "type"), BlockInfoListType.VALUES));
+            this.setMaterialListType(BaseConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "type"), BlockInfoListType.VALUES));
         }
 
         if (JsonUtils.hasString(obj, "sort_criteria"))

@@ -12,11 +12,11 @@ import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListSorter;
 import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
-import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
-import fi.dy.masa.malilib.util.data.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.util.HorizontalAlignment;
 
-public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, WidgetMaterialListEntry>
+public class WidgetListMaterialList extends BaseListWidget<MaterialListEntry, WidgetMaterialListEntry>
 {
     private static int lastScrollbarPosition;
 
@@ -29,12 +29,12 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
         super(x, y, width, height, null);
 
         this.gui = parent;
-        this.browserEntryHeight = 22;
+        this.entryWidgetFixedHeight = 22;
         this.shouldSortList = true;
         this.sorter = new MaterialListSorter(parent.getMaterialList());
 
         this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 8, width - 16, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.RIGHT)).setZLevel(1);
-        this.setParentGui(parent);
+        this.setParentScreen(parent);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     @Override
     protected WidgetMaterialListEntry createHeaderWidget(int x, int y, int listIndexStart, int usableHeight, int usedHeight)
     {
-        int height = this.browserEntryHeight;
+        int height = this.entryWidgetFixedHeight;
 
         if ((usedHeight + height) > usableHeight)
         {
@@ -109,7 +109,7 @@ public class WidgetListMaterialList extends WidgetListBase<MaterialListEntry, Wi
     @Override
     protected WidgetMaterialListEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, @Nullable MaterialListEntry entry)
     {
-        return new WidgetMaterialListEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                isOdd, this.gui.getMaterialList(), entry, listIndex, this);
+        return new WidgetMaterialListEntry(x, y, this.entryWidgetWidth, this.getBrowserEntryHeightFor(entry),
+                                           isOdd, this.gui.getMaterialList(), entry, listIndex, this);
     }
 }

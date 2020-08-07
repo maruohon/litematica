@@ -12,16 +12,16 @@ import fi.dy.masa.litematica.materials.MaterialListSchematic;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiStringListSelection;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.StringListSelectionScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IStringListConsumer;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
@@ -48,7 +48,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
     @Override
     public int getMaxInfoHeight()
     {
-        return this.getBrowserHeight() + 10;
+        return this.getListHeight() + 10;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         int y = this.height - 40;
         int buttonWidth;
         String label;
-        ButtonGeneric button;
+        GenericButton button;
 
         label = StringUtils.translate("litematica.gui.label.schematic_load.checkbox.create_placement");
         String hover = StringUtils.translate("litematica.gui.label.schematic_load.hoverinfo.create_placement");
@@ -76,14 +76,14 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.LOADED_SCHEMATICS;
         label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 30;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label, type.getIcon());
+        button = new GenericButton(x, y, buttonWidth, 20, label, type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+        button = new GenericButton(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
     }
 
@@ -97,7 +97,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
             width = this.getStringWidth(label) + 10;
         }
 
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+        GenericButton button = new GenericButton(x, y, width, 20, label);
 
         if (type == ButtonListener.Type.MATERIAL_LIST)
         {
@@ -109,7 +109,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         return width;
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
         private final GuiSchematicLoad gui;
@@ -121,7 +121,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             DirectoryEntry entry = this.gui.getListWidget().getLastSelectedEntry();
 
@@ -152,7 +152,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                 {
                     BlockPos pos = new BlockPos(this.gui.mc.player.getPositionVector());
                     String name = schematic.getMetadata().getName();
-                    boolean enabled = GuiBase.isShiftDown() == false;
+                    boolean enabled = BaseScreen.isShiftDown() == false;
 
                     SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
                     SchematicPlacement placement = SchematicPlacement.createFor(schematic, pos, name, enabled);
@@ -162,19 +162,19 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
             }
             else if (this.type == Type.MATERIAL_LIST)
             {
-                if (GuiBase.isShiftDown())
+                if (BaseScreen.isShiftDown())
                 {
                     MaterialListCreator creator = new MaterialListCreator(schematic);
-                    GuiStringListSelection gui = new GuiStringListSelection(schematic.getRegionNames(), creator);
+                    StringListSelectionScreen gui = new StringListSelectionScreen(schematic.getRegionNames(), creator);
                     gui.setTitle(StringUtils.translate("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
                     gui.setParent(GuiUtils.getCurrentScreen());
-                    GuiBase.openGui(gui);
+                    BaseScreen.openGui(gui);
                 }
                 else
                 {
                     MaterialListSchematic materialList = new MaterialListSchematic(schematic, true);
                     DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-                    GuiBase.openGui(new GuiMaterialList(materialList));
+                    BaseScreen.openGui(new GuiMaterialList(materialList));
                 }
             }
         }
@@ -212,7 +212,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         {
             MaterialListSchematic materialList = new MaterialListSchematic(this.schematic, strings, true);
             DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-            GuiBase.openGui(new GuiMaterialList(materialList));
+            BaseScreen.openGui(new GuiMaterialList(materialList));
 
             return true;
         }

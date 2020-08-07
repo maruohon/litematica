@@ -18,17 +18,17 @@ import fi.dy.masa.litematica.gui.GuiSchematicBrowserBase;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.SchematicType;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
-public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISelectionListener<DirectoryEntry>, IFileBrowserIconProvider
+public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements ISelectionListener<DirectoryEntry>, IFileBrowserIconProvider
 {
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
 
@@ -42,20 +42,20 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
     public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, parent.getDefaultDirectory(), DataManager.getSchematicsBaseDirectory(),
-                DataManager.getDirectoryCache(), parent.getBrowserContext(), null);
+                DataManager.getDirectoryCache(), parent.getBrowserContext());
 
         this.parentSelectionListener = selectionListener;
         this.infoWidth = 170;
         this.infoHeight = 290;
         this.parent = parent;
 
-        this.setSelectionListener(this);
+        this.getEntrySelectionHandler().setSelectionListener(this);
     }
 
     @Override
-    protected int getBrowserWidthForTotalWidth(int width)
+    protected int getListMaxWidthForTotalWidth(int width)
     {
-        return super.getBrowserWidthForTotalWidth(width) - this.infoWidth;
+        return super.getListMaxWidthForTotalWidth(width) - this.infoWidth;
     }
 
     @Override
@@ -139,7 +139,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
         int z = this.getZLevel();
         int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x + 1, y, this.infoWidth, height, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, z);
+        RenderUtils.drawOutlinedBox(x + 1, y, this.infoWidth, height, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
 
         if (entry == null)
         {
@@ -237,7 +237,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase implements ISe
                     iconSize = height - y + this.getY() - 6;
                 }
 
-                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, GuiBase.COLOR_HORIZONTAL_BAR, z);
+                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
 
                 this.bindTexture(data.iconName);
                 Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);

@@ -46,8 +46,8 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.config.value.LayerMode;
-import fi.dy.masa.malilib.util.consumer.IStringConsumer;
-import fi.dy.masa.malilib.message.IMessageConsumer;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
+import fi.dy.masa.malilib.message.MessageConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -652,7 +652,7 @@ public class SchematicPlacementManager
         this.onPlacementModified(placement);
     }
 
-    public void setOrigin(SchematicPlacement placement, BlockPos origin, IStringConsumer feedback)
+    public void setOrigin(SchematicPlacement placement, BlockPos origin, StringConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -675,7 +675,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void setRotation(SchematicPlacement placement, Rotation rotation, IMessageConsumer feedback)
+    public void setRotation(SchematicPlacement placement, Rotation rotation, MessageConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -696,7 +696,7 @@ public class SchematicPlacementManager
         this.setRotation(placement, placement.getRotation().add(rotation), MessageUtils.INGAME_MESSAGE_CONSUMER);
     }
 
-    public void setMirror(SchematicPlacement placement, Mirror mirror, IMessageConsumer feedback)
+    public void setMirror(SchematicPlacement placement, Mirror mirror, MessageConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -743,7 +743,7 @@ public class SchematicPlacementManager
         this.onPlacementRegionModified(placement);
     }
 
-    public void setSubRegionRotation(SchematicPlacement placement, String regionName, Rotation rotation, IMessageConsumer feedback)
+    public void setSubRegionRotation(SchematicPlacement placement, String regionName, Rotation rotation, MessageConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -761,7 +761,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void setSubRegionMirror(SchematicPlacement placement, String regionName, Mirror mirror, IMessageConsumer feedback)
+    public void setSubRegionMirror(SchematicPlacement placement, String regionName, Mirror mirror, MessageConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -779,7 +779,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void moveSubRegionTo(SchematicPlacement placement, String regionName, BlockPos newPos, IStringConsumer feedback)
+    public void moveSubRegionTo(SchematicPlacement placement, String regionName, BlockPos newPos, StringConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -797,7 +797,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void resetSubRegionToSchematicValues(SchematicPlacement placement, String regionName, IMessageConsumer feedback)
+    public void resetSubRegionToSchematicValues(SchematicPlacement placement, String regionName, MessageConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -816,12 +816,12 @@ public class SchematicPlacementManager
         }
     }
 
-    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, IStringConsumer feedback)
+    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, StringConsumer feedback)
     {
         this.resetAllSubRegionsToSchematicValues(placement, feedback, true);
     }
 
-    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, IStringConsumer feedback, boolean updatePlacementManager)
+    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, StringConsumer feedback, boolean updatePlacementManager)
     {
         if (placement.isLocked())
         {
@@ -842,7 +842,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public boolean loadPlacementSettings(SchematicPlacement placement, String str, IMessageConsumer feedback)
+    public boolean loadPlacementSettings(SchematicPlacement placement, String str, MessageConsumer feedback)
     {
         JsonElement el = JsonUtils.parseJsonFromString(str);
 
@@ -856,7 +856,7 @@ public class SchematicPlacementManager
         return false;
     }
 
-    public boolean loadPlacementSettings(SchematicPlacement placement, JsonObject obj, IMessageConsumer feedback)
+    public boolean loadPlacementSettings(SchematicPlacement placement, JsonObject obj, MessageConsumer feedback)
     {
         if (placement.isLocked())
         {

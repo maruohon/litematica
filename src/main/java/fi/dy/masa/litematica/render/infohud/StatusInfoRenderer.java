@@ -5,7 +5,7 @@ import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.malilib.config.value.LayerMode;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -53,9 +53,9 @@ public class StatusInfoRenderer implements IInfoHudRenderer
     {
         List<String> lines = new ArrayList<>();
 
-        String g = GuiBase.TXT_GREEN;
-        String red = GuiBase.TXT_RED;
-        String rst = GuiBase.TXT_RST;
+        String g = BaseScreen.TXT_GREEN;
+        String red = BaseScreen.TXT_RED;
+        String rst = BaseScreen.TXT_RST;
 
         if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue())
         {

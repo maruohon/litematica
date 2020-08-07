@@ -9,20 +9,20 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.message.MessageHelpers;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
+public class WidgetSchematicPlacementFileEntry extends DirectoryEntryWidget
 {
     private final WidgetSchematicPlacementBrowser browser;
     private final FileType fileType;
@@ -53,7 +53,7 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
 
     private int createButton(int xRight, int y, ButtonListener.ButtonType type)
     {
-        ButtonGeneric button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
+        GenericButton button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
         button.addHoverString(type.getHoverKey());
 
         this.addButton(button, new ButtonListener(type, this));
@@ -73,9 +73,9 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
     }
 
     @Override
-    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
-        return mouseX < this.buttonsStartX && super.canSelectAt(mouseX, mouseY, mouseButton);
+        return mouseX < this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -112,13 +112,13 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
 
         int offset = 12;
 
-        if (GuiBase.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
+        if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
             RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final WidgetSchematicPlacementFileEntry widget;
         private final ButtonType type;
@@ -130,7 +130,7 @@ public class WidgetSchematicPlacementFileEntry extends WidgetDirectoryEntry
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             File file = this.widget.getDirectoryEntry().getFullPath();
 

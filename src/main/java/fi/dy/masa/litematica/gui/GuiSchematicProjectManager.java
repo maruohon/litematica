@@ -10,20 +10,20 @@ import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.litematica.schematic.util.SchematicUtils;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiConfirmAction;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.ConfirmActionScreen;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.listener.ICompletionListener;
-import fi.dy.masa.malilib.listener.IConfirmationListener;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
+import fi.dy.masa.malilib.listener.ConfirmationListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>
-                                        implements ISelectionListener<SchematicVersion>, ICompletionListener
+public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>
+                                        implements ISelectionListener<SchematicVersion>, TaskCompletionListener
 {
     private final SchematicProject project;
 
@@ -36,13 +36,13 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 74;
     }
@@ -74,7 +74,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
 
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, rightAlign, type.getTranslationKey());
+        GenericButton button = new GenericButton(x, y, -1, rightAlign, type.getTranslationKey());
         button.addHoverString(type.getHoverText());
 
         this.addButton(button, new ButtonListener(type, this));
@@ -117,10 +117,10 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
     @Override
     protected WidgetListSchematicVersions createListWidget(int listX, int listY)
     {
-        return new WidgetListSchematicVersions(listX, listY, this.getBrowserWidth() - 186, this.getBrowserHeight(), this.project, this);
+        return new WidgetListSchematicVersions(listX, listY, this.getListWidth() - 186, this.getListHeight(), this.project, this);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
         private final GuiSchematicProjectManager gui;
@@ -132,12 +132,12 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == Type.OPEN_PROJECT_BROWSER)
             {
                 GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
-                GuiBase.openGui(gui);
+                BaseScreen.openGui(gui);
             }
             else if (this.type == Type.SAVE_VERSION)
             {
@@ -157,16 +157,16 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
                 PlaceToWorldExecutor executor = new PlaceToWorldExecutor();
                 String title = "litematica.gui.title.schematic_projects.confirm_place_to_world";
                 String msg = "litematica.gui.message.schematic_projects.confirm_place_to_world";
-                GuiConfirmAction gui = new GuiConfirmAction(320, title, executor, this.gui, msg);
-                GuiBase.openGui(gui);
+                ConfirmActionScreen gui = new ConfirmActionScreen(320, title, executor, this.gui, msg);
+                BaseScreen.openGui(gui);
             }
             else if (this.type == Type.DELETE_AREA)
             {
                 DeleteAreaExecutor executor = new DeleteAreaExecutor();
                 String title = "litematica.gui.title.schematic_projects.confirm_delete_area";
                 String msg = "litematica.gui.message.schematic_projects.confirm_delete_area";
-                GuiConfirmAction gui = new GuiConfirmAction(320, title, executor, this.gui, msg);
-                GuiBase.openGui(gui);
+                ConfirmActionScreen gui = new ConfirmActionScreen(320, title, executor, this.gui, msg);
+                BaseScreen.openGui(gui);
             }
             else if (this.type == Type.MOVE_ORIGIN)
             {
@@ -182,7 +182,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
             {
                 DataManager.getSchematicProjectsManager().closeCurrentProject();
                 GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
-                GuiBase.openGui(gui);
+                BaseScreen.openGui(gui);
             }
         }
 
@@ -223,7 +223,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         }
     }
 
-    public static class PlaceToWorldExecutor implements IConfirmationListener
+    public static class PlaceToWorldExecutor implements ConfirmationListener
     {
         @Override
         public boolean onActionConfirmed()
@@ -239,7 +239,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         }
     }
 
-    public static class DeleteAreaExecutor implements IConfirmationListener
+    public static class DeleteAreaExecutor implements ConfirmationListener
     {
         @Override
         public boolean onActionConfirmed()

@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.PositionUtils.ChunkPosComparator;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -135,9 +135,9 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
     {
         List<String> hudLines = new ArrayList<>();
 
-        String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
+        String pre = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD;
         String title = StringUtils.translate("litematica.gui.label.schematic_paste.missing_chunks", this.chunks.size());
-        hudLines.add(String.format("%s%s%s", pre, title, GuiBase.TXT_RST));
+        hudLines.add(String.format("%s%s%s", pre, title, BaseScreen.TXT_RST));
 
         int maxLines = Math.min(this.chunks.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
 

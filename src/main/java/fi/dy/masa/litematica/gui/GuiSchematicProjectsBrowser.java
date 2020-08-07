@@ -7,23 +7,23 @@ import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicProjectBrowser;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.util.FileType;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.TextInputScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicProjectBrowser>
+public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, DirectoryEntryWidget, WidgetSchematicProjectBrowser>
                                         implements ISelectionListener<DirectoryEntry>
 {
     public GuiSchematicProjectsBrowser()
@@ -34,13 +34,13 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 58;
     }
@@ -82,12 +82,12 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         String label = StringUtils.translate(type.getLabelKey());
         int buttonWidth = this.getStringWidth(label) + 20;
-        this.addButton(new ButtonGeneric(this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
+        this.addButton(new GenericButton(this.width - buttonWidth - 10, y, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
     }
 
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, rightAlign, type.getTranslationKey());
+        GenericButton button = new GenericButton(x, y, -1, rightAlign, type.getTranslationKey());
         button.addHoverString(type.getHoverText());
 
         this.addButton(button, new ButtonListener(type, this));
@@ -123,7 +123,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
         return new WidgetSchematicProjectBrowser(listX, listY, 100, 100, this.getSelectionListener());
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
         private final GuiSchematicProjectsBrowser gui;
@@ -135,7 +135,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == Type.LOAD_PROJECT)
             {
@@ -150,7 +150,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
                         if (project != null)
                         {
                             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
-                            GuiBase.openGui(gui);
+                            BaseScreen.openGui(gui);
                             String name = project.getName();
                             MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
                         }
@@ -164,8 +164,8 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
             else if (this.type == Type.CREATE_PROJECT)
             {
                 ProjectCreator creator = new ProjectCreator(this.gui.getListWidget().getCurrentDirectory(), this.gui);
-                GuiTextInput gui = new GuiTextInput("litematica.gui.title.create_schematic_project", "", GuiUtils.getCurrentScreen(), creator);
-                GuiBase.openPopupGui(gui);
+                TextInputScreen gui = new TextInputScreen("litematica.gui.title.create_schematic_project", "", GuiUtils.getCurrentScreen(), creator);
+                BaseScreen.openPopupGui(gui);
             }
             else if (this.type == Type.CLOSE_PROJECT)
             {
@@ -179,7 +179,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
                 if (project != null)
                 {
                     GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
-                    GuiBase.openGui(gui);
+                    BaseScreen.openGui(gui);
                 }
             }
         }
@@ -219,7 +219,7 @@ public class GuiSchematicProjectsBrowser extends GuiListBase<DirectoryEntry, Wid
         }
     }
 
-    private static class ProjectCreator implements IStringConsumer
+    private static class ProjectCreator implements StringConsumer
     {
         private final File dir;
         private final GuiSchematicProjectsBrowser gui;

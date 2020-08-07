@@ -27,7 +27,7 @@ import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.systems.BlockPlacementPositionHandler;
 
 public class InventoryUtils
@@ -261,7 +261,7 @@ public class InventoryUtils
                     // The creative mode pick block with NBT only works correctly
                     // if the server world doesn't have a TileEntity in that position.
                     // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (GuiBase.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
+                    if (BaseScreen.isCtrlDown() && te != null && mc.world.isAirBlock(pos))
                     {
                         stack = stack.copy();
                         ItemUtils.storeTEInStack(stack, te);

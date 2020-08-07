@@ -26,7 +26,7 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -87,8 +87,8 @@ public class ToolHud extends InfoHud
     protected void updateHudText()
     {
         String str;
-        String green = GuiBase.TXT_GREEN;
-        String rst = GuiBase.TXT_RST;
+        String green = BaseScreen.TXT_GREEN;
+        String rst = BaseScreen.TXT_RST;
         boolean hasTool = this.hasEnabledTool();
 
         List<String> lines = this.lineList;
@@ -141,11 +141,11 @@ public class ToolHud extends InfoHud
         }
 
         ToolMode mode = DataManager.getToolMode();
-        String orange = GuiBase.TXT_GOLD;
-        String red = GuiBase.TXT_RED;
-        String white = GuiBase.TXT_WHITE;
+        String orange = BaseScreen.TXT_GOLD;
+        String red = BaseScreen.TXT_RED;
+        String white = BaseScreen.TXT_WHITE;
         String strYes = green + StringUtils.translate("litematica.label.yes") + rst;
-        String strNo = GuiBase.TXT_RED + StringUtils.translate("litematica.label.no") + rst;
+        String strNo = BaseScreen.TXT_RED + StringUtils.translate("litematica.label.no") + rst;
 
         if (hasTool && mode == ToolMode.DELETE)
         {
@@ -330,15 +330,15 @@ public class ToolHud extends InfoHud
         ResourceLocation id = Block.REGISTRY.getNameForObject(state.getBlock());
         String regName = id != null ? id.toString() : "<null>";
 
-        String green = GuiBase.TXT_GREEN;
-        String rst = GuiBase.TXT_RST;
+        String green = BaseScreen.TXT_GREEN;
+        String rst = BaseScreen.TXT_RST;
 
         String strBlock = String.format("%s%s (%s)%s", green, regName, state.getBlock().getLocalizedName(), rst);
         EnumFacing facing = BlockUtils.getFirstPropertyFacingValue(state);
 
         if (facing != null)
         {
-            String gold = GuiBase.TXT_GOLD;
+            String gold = BaseScreen.TXT_GOLD;
             String strFacing = gold + facing.getName().toLowerCase() + rst;
             strBlock += " - " + StringUtils.translate("litematica.tool_hud.facing", strFacing);
         }

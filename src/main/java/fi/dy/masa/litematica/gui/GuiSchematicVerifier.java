@@ -16,19 +16,19 @@ import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetListSchematicVerificationResults>
-                                    implements ISelectionListener<BlockMismatchEntry>, ICompletionListener
+public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetListSchematicVerificationResults>
+                                    implements ISelectionListener<BlockMismatchEntry>, TaskCompletionListener
 {
     private static SchematicVerifier verifierLast;
     // static to remember the mode over GUI close/open cycles
@@ -55,13 +55,13 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 94;
     }
@@ -75,7 +75,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         int y = 20;
         int buttonWidth;
         String label;
-        ButtonGeneric button;
+        GenericButton button;
 
         x += this.createButton(x, y, -1, ButtonListener.Type.START) + 4;
         x += this.createButton(x, y, -1, ButtonListener.Type.STOP) + 4;
@@ -118,7 +118,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+        button = new GenericButton(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
     }
 
@@ -212,7 +212,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
             width = this.getStringWidth(label) + 10;
         }
 
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+        GenericButton button = new GenericButton(x, y, width, 20, label);
         button.setEnabled(enabled);
         this.addButton(button, listener);
 
@@ -290,7 +290,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
     @Override
     protected WidgetListSchematicVerificationResults createListWidget(int listX, int listY)
     {
-        return new WidgetListSchematicVerificationResults(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+        return new WidgetListSchematicVerificationResults(listX, listY, this.getListWidth(), this.getListHeight(), this);
     }
 
     public static class BlockMismatchEntry
@@ -391,7 +391,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final GuiSchematicVerifier parent;
         private final Type type;
@@ -403,7 +403,7 @@ public class GuiSchematicVerifier   extends GuiListBase<BlockMismatchEntry, Widg
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             switch (this.type)
             {

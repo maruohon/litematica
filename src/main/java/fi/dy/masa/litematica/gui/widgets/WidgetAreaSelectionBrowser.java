@@ -4,10 +4,10 @@ import java.io.FileFilter;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
+public class WidgetAreaSelectionBrowser extends BaseFileBrowserWidget
 {
     public static final FileFilter JSON_FILTER = (file) -> file.getName().endsWith(".json");
 
@@ -19,7 +19,7 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
         super(x, y, width, height, parent.getDefaultDirectory(), DataManager.getAreaSelectionsBaseDirectory(),
                 DataManager.getDirectoryCache(), parent.getBrowserContext(), selectionListener);
 
-        this.browserEntryHeight = 22;
+        this.entryWidgetFixedHeight = 22;
         this.guiAreaSelectionManager = parent;
         this.allowKeyboardNavigation = false;
     }
@@ -44,7 +44,7 @@ public class WidgetAreaSelectionBrowser extends WidgetFileBrowserBase
     @Override
     protected WidgetAreaSelectionEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, DirectoryEntry entry)
     {
-        return new WidgetAreaSelectionEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry), isOdd,
-                entry, listIndex, this.guiAreaSelectionManager.getSelectionManager(), this, this.iconProvider);
+        return new WidgetAreaSelectionEntry(x, y, this.entryWidgetWidth, this.getBrowserEntryHeightFor(entry), isOdd,
+                                            entry, listIndex, this.guiAreaSelectionManager.getSelectionManager(), this, this.iconProvider);
     }
 }

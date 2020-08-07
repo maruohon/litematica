@@ -24,17 +24,17 @@ import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.SortCriteria;
 import fi.dy.masa.litematica.util.ItemUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntrySortable;
+import fi.dy.masa.malilib.gui.widget.list.entry.SortableListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<BlockMismatchEntry>
+public class WidgetSchematicVerificationResult extends SortableListEntryWidget<BlockMismatchEntry>
 {
     public static final String HEADER_EXPECTED = "litematica.gui.label.schematic_verifier.expected";
     public static final String HEADER_FOUND = "litematica.gui.label.schematic_verifier.found";
@@ -55,7 +55,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     @Nullable private final BlockMismatchInfo mismatchInfo;
     private final int count;
     private final boolean isOdd;
-    @Nullable private final ButtonGeneric buttonIgnore;
+    @Nullable private final GenericButton buttonIgnore;
 
     public WidgetSchematicVerificationResult(int x, int y, int width, int height, boolean isOdd,
             WidgetListSchematicVerificationResults listWidget, GuiSchematicVerifier guiSchematicVerifier,
@@ -76,7 +76,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         {
             this.header1 = entry.header1;
             this.header2 = entry.header2;
-            this.header3 = GuiBase.TXT_BOLD + StringUtils.translate(HEADER_COUNT) + GuiBase.TXT_RST;
+            this.header3 = BaseScreen.TXT_BOLD + StringUtils.translate(HEADER_COUNT) + BaseScreen.TXT_RST;
             this.mismatchInfo = null;
             this.count = 0;
             this.buttonIgnore = null;
@@ -113,8 +113,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
     public static void setMaxNameLengths(List<BlockMismatch> mismatches)
     {
-        maxNameLengthExpected = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADER_EXPECTED) + GuiBase.TXT_RST);
-        maxNameLengthFound    = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADER_FOUND) + GuiBase.TXT_RST);
+        maxNameLengthExpected = StringUtils.getStringWidth(BaseScreen.TXT_BOLD + StringUtils.translate(HEADER_EXPECTED) + BaseScreen.TXT_RST);
+        maxNameLengthFound    = StringUtils.getStringWidth(BaseScreen.TXT_BOLD + StringUtils.translate(HEADER_FOUND) + BaseScreen.TXT_RST);
         maxCountLength = 7 * StringUtils.getStringWidth("8");
 
         for (BlockMismatch entry : mismatches)
@@ -128,12 +128,12 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             maxNameLengthFound = Math.max(maxNameLengthFound, StringUtils.getStringWidth(name));
         }
 
-        maxCountLength = Math.max(maxCountLength, StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADER_COUNT) + GuiBase.TXT_RST));
+        maxCountLength = Math.max(maxCountLength, StringUtils.getStringWidth(BaseScreen.TXT_BOLD + StringUtils.translate(HEADER_COUNT) + BaseScreen.TXT_RST));
     }
 
-    private ButtonGeneric createButton(int x, int y, ButtonListener.ButtonType type)
+    private GenericButton createButton(int x, int y, ButtonListener.ButtonType type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
+        GenericButton button = new GenericButton(x, y, -1, true, type.getDisplayName());
         return this.addButton(button, new ButtonListener(type, this.mismatchEntry, this.guiSchematicVerifier));
     }
 
@@ -203,9 +203,9 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     }
 
     @Override
-    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
-        return (this.buttonIgnore == null || mouseX < this.buttonIgnore.getX()) && super.canSelectAt(mouseX, mouseY, mouseButton);
+        return (this.buttonIgnore == null || mouseX < this.buttonIgnore.getX()) && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
     protected boolean shouldRenderAsSelected()
@@ -448,14 +448,14 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 int x1 = x + 10;
                 int x2 = x + this.columnWidthExpected + 30;
 
-                RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR, zLevel);
+                RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, zLevel);
                 RenderUtils.drawRect(x1, y + 16, 16, 16, 0x50C0C0C0, zLevel); // light background for the item
                 RenderUtils.drawRect(x2, y + 16, 16, 16, 0x50C0C0C0, zLevel); // light background for the item
 
                 FontRenderer textRenderer = mc.fontRenderer;
-                String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
-                String strExpected = pre + StringUtils.translate("litematica.gui.label.schematic_verifier.expected") + GuiBase.TXT_RST;
-                String strFound =    pre + StringUtils.translate("litematica.gui.label.schematic_verifier.found") + GuiBase.TXT_RST;
+                String pre = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD;
+                String strExpected = pre + StringUtils.translate("litematica.gui.label.schematic_verifier.expected") + BaseScreen.TXT_RST;
+                String strFound =    pre + StringUtils.translate("litematica.gui.label.schematic_verifier.found") + BaseScreen.TXT_RST;
 
                 GlStateManager.translate(0f, 0f, zLevel + 0.1f);
 
@@ -525,7 +525,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final ButtonType type;
         private final GuiSchematicVerifier guiSchematicVerifier;
@@ -539,7 +539,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == ButtonType.IGNORE_MISMATCH)
             {

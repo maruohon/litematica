@@ -7,11 +7,11 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
+import fi.dy.masa.malilib.gui.button.GenericButton;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -46,7 +46,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public int getBrowserHeight()
+    public int getListHeight()
     {
         return this.height - 80;
     }
@@ -148,15 +148,15 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         String label = StringUtils.translate(type.getLabelKey());
         int width = this.getStringWidth(label) + 10;
 
-        ButtonGeneric button;
+        GenericButton button;
 
         if (type == ButtonType.SAVE)
         {
-            button = new ButtonGeneric(x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
+            button = new GenericButton(x, y, width, 20, label, "litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite");
         }
         else
         {
-            button = new ButtonGeneric(x, y, width, 20, label);
+            button = new GenericButton(x, y, width, 20, label);
         }
 
         this.addButton(button, (btn, mbtn) -> this.saveSchematic());

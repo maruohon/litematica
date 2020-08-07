@@ -16,7 +16,7 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
@@ -121,7 +121,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             long multiplier = this.materialList.getMultiplier();
             long count = multiplier == 1L ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
             count *= multiplier;
-            String strCount = GuiBase.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + GuiBase.TXT_RST;
+            String strCount = BaseScreen.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + BaseScreen.TXT_RST;
             maxCountLength = Math.max(maxCountLength, font.getStringWidth(strCount));
         }
 
@@ -159,7 +159,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                          maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor, 0);
         }
 
-        String title = GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + GuiBase.TXT_RST;
+        String title = BaseScreen.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + BaseScreen.TXT_RST;
 
         if (useShadow)
         {

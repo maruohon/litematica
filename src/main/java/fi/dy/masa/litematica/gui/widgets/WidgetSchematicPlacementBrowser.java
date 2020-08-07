@@ -12,9 +12,9 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementFileBrowser;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 
-public class WidgetSchematicPlacementBrowser extends WidgetFileBrowserBase
+public class WidgetSchematicPlacementBrowser extends BaseFileBrowserWidget
 {
     protected final Map<File, SchematicPlacementUnloaded> cache = new HashMap<>();
 
@@ -23,9 +23,9 @@ public class WidgetSchematicPlacementBrowser extends WidgetFileBrowserBase
         super(x, y, width, height, parent.getDefaultDirectory(), SchematicPlacementUnloaded.getSaveDirectory(),
                 DataManager.getDirectoryCache(), parent.getBrowserContext(), null);
 
-        this.browserEntryHeight = 22;
+        this.entryWidgetFixedHeight = 22;
         this.allowKeyboardNavigation = false;
-        this.setParentGui(parent);
+        this.setParentScreen(parent);
     }
 
     @Nullable
@@ -59,7 +59,7 @@ public class WidgetSchematicPlacementBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected List<String> getEntryStringsForFilter(DirectoryEntry entry)
+    protected List<String> getFilterTargetStringsForEntry(DirectoryEntry entry)
     {
         String fileName = entry.getName().toLowerCase(Locale.ROOT);
         SchematicPlacementUnloaded placement = this.getOrLoadPlacement(entry.getFullPath());
@@ -83,7 +83,7 @@ public class WidgetSchematicPlacementBrowser extends WidgetFileBrowserBase
     @Override
     protected WidgetSchematicPlacementFileEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, DirectoryEntry entry)
     {
-        return new WidgetSchematicPlacementFileEntry(x, y, this.browserEntryWidth,
+        return new WidgetSchematicPlacementFileEntry(x, y, this.entryWidgetWidth,
                 this.getBrowserEntryHeightFor(entry), isOdd, entry, listIndex, this);
     }
 }

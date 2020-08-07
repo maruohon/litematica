@@ -7,14 +7,14 @@ import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiMainMenu extends GuiBase
+public class GuiMainMenu extends BaseScreen
 {
     public GuiMainMenu()
     {
@@ -45,14 +45,14 @@ public class GuiMainMenu extends GuiBase
 
         SelectionMode mode = DataManager.getSelectionManager().getSelectionMode();
         String label = StringUtils.translate("litematica.gui.button.area_selection_mode", mode.getDisplayName());
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+        GenericButton button = new GenericButton(x, y, width, 20, label);
         this.addButton(button, new ButtonListenerCycleAreaMode(this));
 
         label = StringUtils.translate("litematica.gui.button.tool_mode", DataManager.getToolMode().getName());
         int width2 = this.getStringWidth(label) + 10;
 
         y = this.height - 26;
-        button = new ButtonGeneric(x, y, width2, 20, label);
+        button = new GenericButton(x, y, width2, 20, label);
         this.addButton(button, new ButtonListenerCycleToolMode(this));
 
         x += width + 20;
@@ -71,7 +71,7 @@ public class GuiMainMenu extends GuiBase
 
     private void createChangeMenuButton(int x, int y, int width, ButtonListenerChangeMenu.ButtonType type)
     {
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, type.getDisplayName(), type.getIcon());
+        GenericButton button = new GenericButton(x, y, width, 20, type.getDisplayName(), type.getIcon());
 
         if (type == ButtonListenerChangeMenu.ButtonType.AREA_SELECTION_BROWSER &&
             DataManager.getSchematicProjectsManager().hasProjectOpen())
@@ -101,7 +101,7 @@ public class GuiMainMenu extends GuiBase
         return width;
     }
 
-    public static class ButtonListenerChangeMenu implements IButtonActionListener
+    public static class ButtonListenerChangeMenu implements ButtonActionListener
     {
         private final ButtonType type;
         @Nullable
@@ -114,9 +114,9 @@ public class GuiMainMenu extends GuiBase
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
-            GuiBase gui = null;
+            BaseScreen gui = null;
 
             switch (this.type)
             {
@@ -127,7 +127,7 @@ public class GuiMainMenu extends GuiBase
                     gui = new GuiAreaSelectionManager();
                     break;
                 case CONFIGURATION:
-                    GuiBase.openGui(new GuiConfigs());
+                    BaseScreen.openGui(new ConfigScreen());
                     return;
                 case LOAD_SCHEMATICS:
                     gui = new GuiSchematicLoad();
@@ -155,7 +155,7 @@ public class GuiMainMenu extends GuiBase
             if (gui != null)
             {
                 gui.setParent(this.parent);
-                GuiBase.openGui(gui);
+                BaseScreen.openGui(gui);
             }
         }
 
@@ -208,7 +208,7 @@ public class GuiMainMenu extends GuiBase
         }
     }
 
-    private static class ButtonListenerCycleToolMode implements IButtonActionListener
+    private static class ButtonListenerCycleToolMode implements ButtonActionListener
     {
         private final GuiMainMenu gui;
 
@@ -218,7 +218,7 @@ public class GuiMainMenu extends GuiBase
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             ToolMode mode = DataManager.getToolMode().cycle(Minecraft.getMinecraft().player, mouseButton == 0);
             DataManager.setToolMode(mode);
@@ -226,7 +226,7 @@ public class GuiMainMenu extends GuiBase
         }
     }
 
-    private static class ButtonListenerCycleAreaMode implements IButtonActionListener
+    private static class ButtonListenerCycleAreaMode implements ButtonActionListener
     {
         private final GuiMainMenu gui;
 
@@ -236,7 +236,7 @@ public class GuiMainMenu extends GuiBase
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             DataManager.getSelectionManager().switchSelectionMode();
             this.gui.initGui();

@@ -21,13 +21,13 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.input.IHotkey;
-import fi.dy.masa.malilib.input.IKeyBindProvider;
-import fi.dy.masa.malilib.input.IMouseInputHandler;
+import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.input.KeyBindProvider;
+import fi.dy.masa.malilib.input.MouseInputHandler;
 import fi.dy.masa.malilib.input.KeyBindCategory;
 import fi.dy.masa.malilib.message.MessageUtils;
 
-public class InputHandler implements IKeyBindProvider, IMouseInputHandler
+public class InputHandler implements KeyBindProvider, MouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -41,7 +41,7 @@ public class InputHandler implements IKeyBindProvider, IMouseInputHandler
     }
 
     @Override
-    public List<? extends IHotkey> getAllHotkeys()
+    public List<? extends Hotkey> getAllHotkeys()
     {
         return Hotkeys.HOTKEY_LIST;
     }

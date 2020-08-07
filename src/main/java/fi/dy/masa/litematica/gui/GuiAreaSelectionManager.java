@@ -8,23 +8,23 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.FileType;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.TextInputScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntryType;
-import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetAreaSelectionBrowser> implements ISelectionListener<DirectoryEntry>
+public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, DirectoryEntryWidget, WidgetAreaSelectionBrowser> implements ISelectionListener<DirectoryEntry>
 {
     private SelectionManager selectionManager;
 
@@ -37,13 +37,13 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 68;
     }
@@ -70,7 +70,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         int y = 24;
 
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.AREA_EDITOR;
-        ButtonGeneric button = new ButtonGeneric(10, y, -1, 20, StringUtils.translate(type.getLabelKey()), type.getIcon());
+        GenericButton button = new GenericButton(10, y, -1, 20, StringUtils.translate(type.getLabelKey()), type.getIcon());
         this.addButton(button, new ButtonListenerChangeMenu(type, this));
 
         // These are placed from right to left
@@ -99,7 +99,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         int len = this.getStringWidth(label) + 10;
         x -= (len + 2);
 
-        ButtonGeneric button = new ButtonGeneric(x, y, len, 20, label);
+        GenericButton button = new GenericButton(x, y, len, 20, label);
 
         if (type == ButtonListener.ButtonType.UNSELECT)
         {
@@ -166,11 +166,11 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     {
         // The width and height will be set to the actual values in initGui()
         WidgetAreaSelectionBrowser widget = new WidgetAreaSelectionBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
-        widget.setParentGui(this);
+        widget.setParentScreen(this);
         return widget;
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final GuiAreaSelectionManager gui;
         private final ButtonType type;
@@ -182,13 +182,13 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == ButtonType.NEW_SELECTION)
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_area_selection";
-                GuiBase.openPopupGui(new GuiTextInput(title, "", this.gui, new SelectionCreator(dir, this.gui)));
+                BaseScreen.openPopupGui(new TextInputScreen(title, "", this.gui, new SelectionCreator(dir, this.gui)));
             }
             else if (this.type == ButtonType.FROM_PLACEMENT)
             {
@@ -198,7 +198,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
                 {
                     File dir = this.gui.getListWidget().getCurrentDirectory();
                     String title = "litematica.gui.title.create_area_selection_from_placement";
-                    GuiBase.openPopupGui(new GuiTextInput(title, placement.getName(), this.gui, new SelectionCreatorPlacement(placement, dir, this.gui)));
+                    BaseScreen.openPopupGui(new TextInputScreen(title, placement.getName(), this.gui, new SelectionCreatorPlacement(placement, dir, this.gui)));
                 }
                 else
                 {
@@ -232,7 +232,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         }
     }
 
-    public static class SelectionCreator implements IStringConsumer
+    public static class SelectionCreator implements StringConsumer
     {
         private final File dir;
         private final GuiAreaSelectionManager gui;
@@ -252,7 +252,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
         }
     }
 
-    public static class SelectionCreatorPlacement implements IStringConsumer
+    public static class SelectionCreatorPlacement implements StringConsumer
     {
         private final SchematicPlacement placement;
         private final File dir;

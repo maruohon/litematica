@@ -26,8 +26,8 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.message.IMessageConsumer;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.message.MessageConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.message.MessageUtils;
@@ -215,7 +215,7 @@ public class SelectionManager
         return false;
     }
 
-    public boolean renameSelection(String selectionId, String newName, IMessageConsumer feedback)
+    public boolean renameSelection(String selectionId, String newName, MessageConsumer feedback)
     {
         File dir = new File(selectionId);
         dir = dir.getParentFile();
@@ -223,12 +223,12 @@ public class SelectionManager
         return this.renameSelection(dir, selectionId, newName, feedback);
     }
 
-    public boolean renameSelection(File dir, String selectionId, String newName, IMessageConsumer feedback)
+    public boolean renameSelection(File dir, String selectionId, String newName, MessageConsumer feedback)
     {
         return this.renameSelection(dir, selectionId, newName, false, feedback);
     }
 
-    public boolean renameSelection(File dir, String selectionId, String newName, boolean copy, IMessageConsumer feedback)
+    public boolean renameSelection(File dir, String selectionId, String newName, boolean copy, MessageConsumer feedback)
     {
         File file = new File(selectionId);
 
@@ -360,7 +360,7 @@ public class SelectionManager
         return false;
     }
 
-    public boolean createNewSubRegionIfDoesntExist(String name, Minecraft mc, IMessageConsumer feedback)
+    public boolean createNewSubRegionIfDoesntExist(String name, Minecraft mc, MessageConsumer feedback)
     {
         AreaSelection selection = this.getCurrentSelection();
 
@@ -386,7 +386,7 @@ public class SelectionManager
         return false;
     }
 
-    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, String name, IMessageConsumer feedback)
+    public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, String name, MessageConsumer feedback)
     {
         String safeName = FileUtils.generateSafeFileName(name);
 
@@ -701,7 +701,7 @@ public class SelectionManager
     }
 
     @Nullable
-    public GuiBase getEditGui()
+    public BaseScreen getEditGui()
     {
         AreaSelection selection = this.getCurrentSelection();
 
@@ -725,12 +725,12 @@ public class SelectionManager
 
     public void openEditGui(@Nullable GuiScreen parent)
     {
-        GuiBase gui = this.getEditGui();
+        BaseScreen gui = this.getEditGui();
 
         if (gui != null)
         {
             gui.setParent(parent);
-            GuiBase.openGui(gui);
+            BaseScreen.openGui(gui);
         }
     }
 

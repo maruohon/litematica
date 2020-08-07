@@ -6,18 +6,18 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
-import fi.dy.masa.malilib.gui.widget.WidgetListBase;
+import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.data.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.util.HorizontalAlignment;
 
-public class WidgetListLoadedSchematics extends WidgetListBase<ISchematic, WidgetSchematicEntry>
+public class WidgetListLoadedSchematics extends BaseListWidget<ISchematic, WidgetSchematicEntry>
 {
     public WidgetListLoadedSchematics(int x, int y, int width, int height)
     {
         super(x, y, width, height, null);
 
-        this.browserEntryHeight = 22;
+        this.entryWidgetFixedHeight = 22;
         this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.LEFT));
     }
 
@@ -46,7 +46,7 @@ public class WidgetListLoadedSchematics extends WidgetListBase<ISchematic, Widge
     @Override
     protected WidgetSchematicEntry createListEntryWidget(int x, int y, int listIndex, boolean isOdd, ISchematic entry)
     {
-        return new WidgetSchematicEntry(x, y, this.browserEntryWidth, this.getBrowserEntryHeightFor(entry),
-                isOdd, entry, listIndex, this);
+        return new WidgetSchematicEntry(x, y, this.entryWidgetWidth, this.getBrowserEntryHeightFor(entry),
+                                        isOdd, entry, listIndex, this);
     }
 }

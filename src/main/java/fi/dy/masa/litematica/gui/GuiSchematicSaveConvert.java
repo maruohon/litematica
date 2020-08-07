@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicType;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.interfaces.IIconProvider;
 import fi.dy.masa.malilib.gui.widget.WidgetDropDownList;
@@ -51,7 +51,7 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
     }
 
     @Override
-    public int getBrowserHeight()
+    public int getListHeight()
     {
         return this.height - 100;
     }
@@ -102,7 +102,7 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
 
         if (outputType != null)
         {
-            boolean override = GuiBase.isShiftDown();
+            boolean override = BaseScreen.isShiftDown();
             fileName = StringUtils.stripExtensionIfMatches(fileName, this.schematic.getType().getFileNameExtension());
             fileName += outputType.getFileNameExtension();
 

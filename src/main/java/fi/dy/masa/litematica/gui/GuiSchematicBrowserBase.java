@@ -3,12 +3,12 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser;
-import fi.dy.masa.malilib.gui.GuiListBase;
+import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetDirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
+import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 
-public abstract class GuiSchematicBrowserBase extends GuiListBase<DirectoryEntry, WidgetDirectoryEntry, WidgetSchematicBrowser>
+public abstract class GuiSchematicBrowserBase extends BaseListScreen<DirectoryEntry, DirectoryEntryWidget, WidgetSchematicBrowser>
 {
     public GuiSchematicBrowserBase(int browserX, int browserY)
     {
@@ -20,7 +20,7 @@ public abstract class GuiSchematicBrowserBase extends GuiListBase<DirectoryEntry
     {
         // The width and height will be set to the actual values in initGui()
         WidgetSchematicBrowser widget = new WidgetSchematicBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
-        widget.setParentGui(this.getParent());
+        widget.setParentScreen(this.getParent());
         return widget;
     }
 
@@ -41,19 +41,19 @@ public abstract class GuiSchematicBrowserBase extends GuiListBase<DirectoryEntry
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 70;
     }
 
     public int getMaxInfoHeight()
     {
-        return this.getBrowserHeight();
+        return this.getListHeight();
     }
 }

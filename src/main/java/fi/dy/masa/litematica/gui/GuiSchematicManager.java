@@ -19,15 +19,15 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiConfirmAction;
-import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.ConfirmActionScreen;
+import fi.dy.masa.malilib.gui.TextInputScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetFileBrowserBase.DirectoryEntry;
-import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -62,7 +62,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         if (this.width < 520)
         {
@@ -116,7 +116,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         String label = StringUtils.translate(type.getLabelKey());
         int buttonWidth = this.getStringWidth(label) + 20;
-        this.addButton(new ButtonGeneric(this.width - buttonWidth - 10, this.height - 26, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
+        this.addButton(new GenericButton(this.width - buttonWidth - 10, this.height - 26, buttonWidth, 20, label), new ButtonListenerChangeMenu(type, null));
     }
 
     @Override
@@ -134,7 +134,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             this.nextY += 22;
         }
 
-        ButtonGeneric button = new ButtonGeneric(this.nextX, this.nextY, -1, 20, type.getLabel());
+        GenericButton button = new GenericButton(this.nextX, this.nextY, -1, 20, type.getLabel());
         button.addHoverString(type.getHoverText());
         this.nextX += button.getWidth() + 2;
 
@@ -166,7 +166,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         return previewGenerator != null;
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
         private final GuiSchematicManager gui;
@@ -178,7 +178,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == Type.SET_PREVIEW && mouseButton == 1)
             {
@@ -222,7 +222,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                 if (type.getHasName())
                 {
                     String oldName = data.schematic.getMetadata().getName();
-                    GuiBase.openPopupGui(new GuiTextInput("litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
+                    BaseScreen.openPopupGui(new TextInputScreen("litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
                 }
                 else
                 {
@@ -232,25 +232,25 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             else if (this.type == Type.RENAME_FILE)
             {
                 String oldName = FileUtils.getNameWithoutExtension(entry.getName());
-                GuiBase.openPopupGui(new GuiTextInput("litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
+                BaseScreen.openPopupGui(new TextInputScreen("litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
             }
             else if (this.type == Type.DELETE_FILE)
             {
                 FileDeleter deleter = new FileDeleter(entry.getFullPath());
-                GuiBase.openPopupGui(new GuiConfirmAction(400, "litematica.gui.title.confirm_file_deletion", deleter, this.gui, "litematica.gui.message.confirm_file_deletion", entry.getName()));
+                BaseScreen.openPopupGui(new ConfirmActionScreen(400, "litematica.gui.title.confirm_file_deletion", deleter, this.gui, "litematica.gui.message.confirm_file_deletion", entry.getName()));
             }
             else if (this.type == Type.CONVERT_FORMAT)
             {
                 GuiSchematicSaveConvert gui = new GuiSchematicSaveConvert(data.schematic, entry.getName());
                 gui.setParent(this.gui);
-                GuiBase.openGui(gui);
+                BaseScreen.openGui(gui);
             }
             else if (this.type == Type.SET_PREVIEW)
             {
                 if (type == SchematicType.LITEMATICA)
                 {
                     previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
-                    GuiBase.openGui(null);
+                    BaseScreen.openGui(null);
                     String hotkeyName = Hotkeys.SET_SCHEMATIC_PREVIEW.getName();
                     String hotkeyValue = Hotkeys.SET_SCHEMATIC_PREVIEW.getKeyBind().getKeysDisplayString();
                     MessageUtils.showGuiAndInGameMessage(MessageType.INFO, 8000, "litematica.info.schematic_manager.preview.info", hotkeyName, hotkeyValue);
@@ -297,7 +297,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
         }
     }
 
-    private static class SchematicRenamer implements IStringConsumer
+    private static class SchematicRenamer implements StringConsumer
     {
         private final File dir;
         private final String fileName;

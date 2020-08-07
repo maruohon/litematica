@@ -8,15 +8,15 @@ import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListBase.SortCriteria;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntrySortable;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SortableListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialListEntry>
+public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialListEntry>
 {
     private static final String[] HEADERS = new String[] {
             "litematica.gui.label.material_list.title.item",
@@ -59,10 +59,10 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         }
         else
         {
-            this.header1 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]) + GuiBase.TXT_RST;
-            this.header2 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]) + GuiBase.TXT_RST;
-            this.header3 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[2]) + GuiBase.TXT_RST;
-            this.header4 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[3]) + GuiBase.TXT_RST;
+            this.header1 = BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[0]) + BaseScreen.TXT_RST;
+            this.header2 = BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[1]) + BaseScreen.TXT_RST;
+            this.header3 = BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[2]) + BaseScreen.TXT_RST;
+            this.header4 = BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[3]) + BaseScreen.TXT_RST;
         }
 
         int posX = x + width;
@@ -77,15 +77,15 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     {
         String label = type.getDisplayName();
         ButtonListener listener = new ButtonListener(type, this.materialList, this.entry, this.listWidget);
-        return this.addButton(new ButtonGeneric(xRight, y, -1, true, label), listener).getX();
+        return this.addButton(new GenericButton(xRight, y, -1, true, label), listener).getX();
     }
 
     public static void setMaxNameLength(List<MaterialListEntry> materials, long multiplier)
     {
-        maxNameLength   = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]) + GuiBase.TXT_RST);
-        maxCountLength1 = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]) + GuiBase.TXT_RST);
-        maxCountLength2 = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[2]) + GuiBase.TXT_RST);
-        maxCountLength3 = StringUtils.getStringWidth(GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[3]) + GuiBase.TXT_RST);
+        maxNameLength   = StringUtils.getStringWidth(BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[0]) + BaseScreen.TXT_RST);
+        maxCountLength1 = StringUtils.getStringWidth(BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[1]) + BaseScreen.TXT_RST);
+        maxCountLength2 = StringUtils.getStringWidth(BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[2]) + BaseScreen.TXT_RST);
+        maxCountLength3 = StringUtils.getStringWidth(BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[3]) + BaseScreen.TXT_RST);
 
         for (MaterialListEntry entry : materials)
         {
@@ -100,7 +100,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     }
 
     @Override
-    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
         return false;
     }
@@ -224,9 +224,9 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             long countTotal = this.entry.getCountTotal() * multiplier;
             long countMissing = this.materialList.getMultipliedMissingCount(this.entry);
             long countAvailable = this.entry.getCountAvailable();
-            String green = GuiBase.TXT_GREEN;
-            String gold = GuiBase.TXT_GOLD;
-            String red = GuiBase.TXT_RED;
+            String green = BaseScreen.TXT_GREEN;
+            String gold = BaseScreen.TXT_GOLD;
+            String red = BaseScreen.TXT_RED;
             String pre;
             this.drawString(x1 + 20, y, color, this.entry.getStack().getDisplayName());
 
@@ -267,9 +267,9 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             GlStateManager.pushMatrix();
             //GlStateManager.translate(0, 0, 200);
 
-            String header1 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]);
-            String header2 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]);
-            String header3 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[2]);
+            String header1 = BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[0]);
+            String header2 = BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[1]);
+            String header3 = BaseScreen.TXT_BOLD + StringUtils.translate(HEADERS[2]);
 
             ItemStack stack = this.entry.getStack();
             String stackName = stack.getDisplayName();
@@ -296,7 +296,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int y1 = y + 6;
             int z = this.getZLevel() + 1;
 
-            RenderUtils.drawOutlinedBox(x, y, totalWidth, 60, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR, z);
+            RenderUtils.drawOutlinedBox(x, y, totalWidth, 60, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
             RenderUtils.drawRect(x2, y1, 16, 16, 0x20FFFFFF, z); // light background for the item
             y += 10;
 
@@ -361,7 +361,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         return strCount;
     }
 
-    static class ButtonListener implements IButtonActionListener
+    static class ButtonListener implements ButtonActionListener
     {
         private final ButtonType type;
         private final MaterialListBase materialList;
@@ -377,7 +377,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == ButtonType.IGNORE)
             {

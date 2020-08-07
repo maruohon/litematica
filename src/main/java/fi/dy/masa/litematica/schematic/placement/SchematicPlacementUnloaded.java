@@ -18,8 +18,8 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
-import fi.dy.masa.malilib.message.IMessageConsumer;
+import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
+import fi.dy.masa.malilib.message.MessageConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -482,7 +482,7 @@ public class SchematicPlacementUnloaded
 
             if (JsonUtils.hasString(obj, "verifier_type"))
             {
-                schematicPlacement.verifierType = ConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "verifier_type"), BlockInfoListType.VALUES);
+                schematicPlacement.verifierType = BaseConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "verifier_type"), BlockInfoListType.VALUES);
             }
 
             if (JsonUtils.hasString(obj, "selected_region"))
@@ -523,7 +523,7 @@ public class SchematicPlacementUnloaded
         return null;
     }
 
-    public boolean saveToFileIfChanged(IMessageConsumer feedback)
+    public boolean saveToFileIfChanged(MessageConsumer feedback)
     {
         if (this.shouldBeSaved == false)
         {
@@ -599,7 +599,7 @@ public class SchematicPlacementUnloaded
         return false;
     }
 
-    protected boolean saveToFile(File file, JsonObject obj, IMessageConsumer feedback)
+    protected boolean saveToFile(File file, JsonObject obj, MessageConsumer feedback)
     {
         boolean success = JsonUtils.writeJsonToFile(obj, file);
 

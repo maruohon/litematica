@@ -3,14 +3,14 @@ package fi.dy.masa.litematica.gui.widgets;
 import net.minecraft.client.renderer.GlStateManager;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
+public class WidgetTaskEntry extends BaseListEntryWidget<ITask>
 {
     private final WidgetListTasks parent;
     private final boolean isOdd;
@@ -25,7 +25,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
 
         int posX = x + width;
         ButtonListener listener = new ButtonListener(ButtonListener.Type.REMOVE, this);
-        this.addButton(new ButtonGeneric(posX, y + 1, -1, true, StringUtils.translate("litematica.gui.button.remove")), listener);
+        this.addButton(new GenericButton(posX, y + 1, -1, true, StringUtils.translate("litematica.gui.button.remove")), listener);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         GlStateManager.disableLighting();
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
         private final WidgetTaskEntry widget;
@@ -75,7 +75,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == Type.REMOVE)
             {

@@ -17,13 +17,13 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonOnOff;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.TextInputScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OnOffButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
@@ -37,11 +37,11 @@ import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
+public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
                                         implements ISelectionListener<SubRegionPlacement>
 {
     private final SchematicPlacement placement;
-    private ButtonGeneric buttonResetPlacement;
+    private GenericButton buttonResetPlacement;
     private WidgetTextFieldBase textFieldRename;
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
@@ -52,13 +52,13 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 150;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 84;
     }
@@ -145,7 +145,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             type = ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PLACEMENTS;
             label = StringUtils.translate(type.getLabelKey());
             int buttonWidth = this.getStringWidth(label) + 10;
-            ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+            GenericButton button = new GenericButton(x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         }
         else
@@ -161,7 +161,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             label = StringUtils.translate(type.getLabelKey());
             int buttonWidth = this.getStringWidth(label) + 10;
             x = this.width - buttonWidth - 9;
-            ButtonGeneric button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+            GenericButton button = new GenericButton(x, y, buttonWidth, 20, label);
             this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
         }
 
@@ -189,7 +189,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        OnOffButton button = new OnOffButton(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         button.addHoverString(type.getHoverText());
         this.addButton(button, new ButtonListener(type, this.placement, this));
 
@@ -210,7 +210,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 String str = (enabled ? TXT_GREEN : TXT_RED) + StringUtils.translate("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
                 String hover = StringUtils.translate("litematica.gui.button.schematic_placement.hover.enclosing_box", str);
 
-                this.addButton(new ButtonGeneric(x, y, icon, hover), listener);
+                this.addButton(new GenericButton(x, y, icon, hover), listener);
 
                 return icon.getWidth();
             }
@@ -234,14 +234,14 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             case NUDGE_COORD_Z:
             {
                 String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-                ButtonGeneric button = new ButtonGeneric(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+                GenericButton button = new GenericButton(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return width;
             }
 
             case COPY_PASTE_SETTINGS:
             {
-                ButtonGeneric button = new ButtonGeneric(x, y, 20, 20, "", LitematicaGuiIcons.DUPLICATE, type.getHoverText());
+                GenericButton button = new GenericButton(x, y, 20, 20, "", LitematicaGuiIcons.DUPLICATE, type.getHoverText());
                 return this.addButton(button, listener).getWidth();
             }
 
@@ -260,7 +260,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
             x -= width;
         }
 
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+        GenericButton button = new GenericButton(x, y, width, 20, label);
 
         this.addButton(button, listener);
 
@@ -310,10 +310,10 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
     @Override
     protected WidgetListPlacementSubRegions createListWidget(int listX, int listY)
     {
-        return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+        return new WidgetListPlacementSubRegions(listX, listY, this.getListWidth(), this.getListHeight(), this);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final GuiPlacementConfiguration parent;
         private final SchematicPlacementManager manager;
@@ -329,12 +329,12 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             Minecraft mc = Minecraft.getMinecraft();
             int amount = mouseButton == 1 ? -1 : 1;
-            if (GuiBase.isShiftDown()) { amount *= 8; }
-            if (GuiBase.isAltDown()) { amount *= 4; }
+            if (BaseScreen.isShiftDown()) { amount *= 8; }
+            if (BaseScreen.isAltDown()) { amount *= 4; }
             BlockPos oldOrigin = this.placement.getOrigin();
             this.parent.setNextMessageType(MessageType.ERROR);
 
@@ -389,7 +389,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     {
                         JsonObject origJson = this.placement.baseSettingsToJson(true);
 
-                        openPopupGui(new GuiTextInput("litematica.gui.title.schematic_placement.copy_or_load_settings", origJson.toString(), this.parent, (str) -> {
+                        openPopupGui(new TextInputScreen("litematica.gui.title.schematic_placement.copy_or_load_settings", origJson.toString(), this.parent, (str) -> {
                             JsonElement el = JsonUtils.parseJsonFromString(str);
 
                             if (el != null && el.isJsonObject() && el.getAsJsonObject().equals(origJson) == false)
@@ -458,7 +458,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 {
                     GuiSchematicVerifier gui = new GuiSchematicVerifier(this.placement);
                     gui.setParent(this.parent);
-                    GuiBase.openGui(gui);
+                    BaseScreen.openGui(gui);
                     break;
                 }
 
@@ -468,13 +468,13 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     GuiMaterialList gui = new GuiMaterialList(materialList);
                     DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
                     gui.setParent(this.parent);
-                    GuiBase.openGui(gui);
+                    BaseScreen.openGui(gui);
                     break;
                 }
 
                 case GRID_SETTINGS:
                 {
-                    if (GuiBase.isShiftDown())
+                    if (BaseScreen.isShiftDown())
                     {
                         this.placement.getGridSettings().toggleEnabled();
                         this.manager.updateGridPlacementsFor(this.placement);
@@ -482,7 +482,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                     else
                     {
                         GuiPlacementGridSettings gui = new GuiPlacementGridSettings(this.placement, this.parent);
-                        GuiBase.openPopupGui(gui);
+                        BaseScreen.openPopupGui(gui);
                     }
                     break;
                 }

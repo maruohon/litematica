@@ -21,10 +21,10 @@ import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiTextInput;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.util.consumer.IStringConsumer;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class SchematicUtils
@@ -40,20 +40,20 @@ public class SchematicUtils
             {
                 String title = "litematica.gui.title.schematic_projects.save_new_version";
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-                GuiTextInput gui = new GuiTextInput(title, project.getCurrentVersionName(), GuiUtils.getCurrentScreen(), new SchematicVersionCreator());
-                GuiBase.openPopupGui(gui);
+                TextInputScreen gui = new TextInputScreen(title, project.getCurrentVersionName(), GuiUtils.getCurrentScreen(), new SchematicVersionCreator());
+                BaseScreen.openPopupGui(gui);
             }
             else if (inMemoryOnly)
             {
                 String title = "litematica.gui.title.create_in_memory_schematic";
-                GuiTextInput gui = new GuiTextInput(title, area.getName(), GuiUtils.getCurrentScreen(), new InMemorySchematicCreator(area));
-                GuiBase.openPopupGui(gui);
+                TextInputScreen gui = new TextInputScreen(title, area.getName(), GuiUtils.getCurrentScreen(), new InMemorySchematicCreator(area));
+                BaseScreen.openPopupGui(gui);
             }
             else
             {
                 GuiSchematicSave gui = new GuiSchematicSave();
                 gui.setParent(GuiUtils.getCurrentScreen());
-                GuiBase.openGui(gui);
+                BaseScreen.openGui(gui);
             }
 
             return true;
@@ -203,7 +203,7 @@ public class SchematicUtils
         return state;
     }
 
-    public static class SchematicVersionCreator implements IStringConsumer
+    public static class SchematicVersionCreator implements StringConsumer
     {
         @Override
         public boolean consumeString(String string)

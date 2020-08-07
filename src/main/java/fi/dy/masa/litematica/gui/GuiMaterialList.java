@@ -17,22 +17,22 @@ import fi.dy.masa.litematica.materials.MaterialListUtils;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.util.data.DataDump;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.GuiListBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonOnOff;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OnOffButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.gui.widget.WidgetInfoIcon;
 import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
-import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
-                             implements ICompletionListener
+public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMaterialListEntry, WidgetListMaterialList>
+                             implements TaskCompletionListener
 {
     private final MaterialListBase materialList;
 
@@ -56,13 +56,13 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     }
 
     @Override
-    protected int getBrowserWidth()
+    protected int getListWidth()
     {
         return this.width - 20;
     }
 
     @Override
-    protected int getBrowserHeight()
+    protected int getListHeight()
     {
         return this.height - 80;
     }
@@ -78,7 +78,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         int y = 24;
         int buttonWidth;
         String label;
-        ButtonGeneric button;
+        GenericButton button;
 
         String str = StringUtils.translate("litematica.gui.label.material_list.multiplier");
         int w = this.getStringWidth(str);
@@ -118,7 +118,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         label = StringUtils.translate(type.getLabelKey());
         buttonWidth = this.getStringWidth(label) + 20;
         x = this.width - buttonWidth - 10;
-        button = new ButtonGeneric(x, y, buttonWidth, 20, label);
+        button = new GenericButton(x, y, buttonWidth, 20, label);
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
 
         // Progress: Done xx % / Missing xx % / Wrong xx %
@@ -165,7 +165,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
             label = type.getDisplayName();
         }
 
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, label);
+        GenericButton button = new GenericButton(x, y, width, 20, label);
 
         if (type == ButtonListener.Type.CLEAR_CACHE)
         {
@@ -190,8 +190,8 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         width += this.getStringWidth(ButtonListener.Type.CLEAR_IGNORED.getDisplayName());
         width += this.getStringWidth(ButtonListener.Type.CLEAR_CACHE.getDisplayName());
         width += this.getStringWidth(ButtonListener.Type.WRITE_TO_FILE.getDisplayName());
-        width += (new ButtonOnOff(0, 0, -1, false, ButtonListener.Type.HIDE_AVAILABLE.getTranslationKey(), false)).getWidth();
-        width += (new ButtonOnOff(0, 0, -1, false, ButtonListener.Type.TOGGLE_INFO_HUD.getTranslationKey(), false)).getWidth();
+        width += (new OnOffButton(0, 0, -1, false, ButtonListener.Type.HIDE_AVAILABLE.getTranslationKey(), false)).getWidth();
+        width += (new OnOffButton(0, 0, -1, false, ButtonListener.Type.TOGGLE_INFO_HUD.getTranslationKey(), false)).getWidth();
         width += this.getStringWidth(StringUtils.translate("litematica.gui.label.material_list.multiplier"));
         width += 130;
 
@@ -200,7 +200,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
-        ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
+        OnOffButton button = new OnOffButton(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this));
         return button.getWidth();
     }
@@ -224,10 +224,10 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
     @Override
     protected WidgetListMaterialList createListWidget(int listX, int listY)
     {
-        return new WidgetListMaterialList(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
+        return new WidgetListMaterialList(listX, listY, this.getListWidth(), this.getListHeight(), this);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final GuiMaterialList parent;
         private final Type type;
@@ -239,7 +239,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             MaterialListBase materialList = this.parent.materialList;
 
@@ -287,7 +287,7 @@ public class GuiMaterialList extends GuiListBase<MaterialListEntry, WidgetMateri
 
                 case WRITE_TO_FILE:
                     File dir = DataManager.getDataBaseDirectory("material_lists");
-                    boolean csv = GuiBase.isShiftDown();
+                    boolean csv = BaseScreen.isShiftDown();
                     String ext = csv ? ".csv" : ".txt";
                     File file = DataDump.dumpDataToFile(dir, "material_list", ext, this.getMaterialListDump(materialList, csv).getLines());
 

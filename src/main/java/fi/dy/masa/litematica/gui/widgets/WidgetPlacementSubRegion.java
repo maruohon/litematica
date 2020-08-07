@@ -14,17 +14,17 @@ import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonOnOff;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OnOffButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlacement>
+public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlacement>
 {
     private final SchematicPlacement schematicPlacement;
     private final WidgetListPlacementSubRegions parent;
@@ -59,23 +59,23 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         String label = StringUtils.translate(type.getTranslationKey());
         int len = this.getStringWidth(label) + 10;
         xRight -= len;
-        this.addButton(new ButtonGeneric(xRight, y, len, 20, label), new ButtonListener(type, this));
+        this.addButton(new GenericButton(xRight, y, len, 20, label), new ButtonListener(type, this));
 
         return xRight - 2;
     }
 
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, WidgetSchematicPlacementEntry.ButtonListener.ButtonType type)
     {
-        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
+        OnOffButton button = new OnOffButton(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         this.addButton(button, new ButtonListener(type, this));
 
         return xRight - button.getWidth() - 2;
     }
 
     @Override
-    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
-        return mouseX < this.buttonsStartX && super.canSelectAt(mouseX, mouseY, mouseButton);
+        return mouseX < this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         }
 
         String name = this.placement.getName();
-        String pre = this.placement.isEnabled() ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+        String pre = this.placement.isEnabled() ? BaseScreen.TXT_GREEN : BaseScreen.TXT_RED;
         this.drawString(x + 20, y + 7, 0xFFFFFFFF, pre + name);
 
         IGuiIcon icon;
@@ -148,12 +148,12 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         int height = this.getHeight();
 
         if (this.placement.isRegionPlacementModifiedFromDefault() &&
-            GuiBase.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
+            BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_sub_region_modified");
             RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
-        else if (GuiBase.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 14, height))
+        else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 14, height))
         {
             List<String> text = new ArrayList<>();
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_name", schematic.getMetadata().getName()));
@@ -176,7 +176,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         }
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    private static class ButtonListener implements ButtonActionListener
     {
         private final WidgetSchematicPlacementEntry.ButtonListener.ButtonType type;
         private final WidgetPlacementSubRegion widget;
@@ -188,13 +188,13 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == WidgetSchematicPlacementEntry.ButtonListener.ButtonType.CONFIGURE)
             {
                 GuiSubRegionConfiguration gui = new GuiSubRegionConfiguration(this.widget.schematicPlacement, this.widget.placement);
-                gui.setParent(this.widget.parent.getParentGui());
-                GuiBase.openGui(gui);
+                gui.setParent(this.widget.parent.getParentScreen());
+                BaseScreen.openGui(gui);
             }
             else if (this.type == WidgetSchematicPlacementEntry.ButtonListener.ButtonType.TOGGLE_ENABLED)
             {

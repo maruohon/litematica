@@ -20,7 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.gui.GuiConfigs;
+import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -33,7 +33,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.gui.interfaces.IConfigGuiTab;
+import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.message.MessageUtils;
@@ -53,7 +53,7 @@ public class DataManager implements IDirectoryCache
 
     private static ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private static ItemStack toolItem = new ItemStack(Items.STICK);
-    private static IConfigGuiTab configGuiTab = GuiConfigs.VISUALS;
+    private static ConfigTab configGuiTab = ConfigScreen.VISUALS;
     private static boolean canSave;
     private static long clientTickStart;
 
@@ -94,12 +94,12 @@ public class DataManager implements IDirectoryCache
         return toolItem;
     }
 
-    public static IConfigGuiTab getConfigGuiTab()
+    public static ConfigTab getConfigGuiTab()
     {
         return configGuiTab;
     }
 
-    public static void setConfigGuiTab(IConfigGuiTab tab)
+    public static void setConfigGuiTab(ConfigTab tab)
     {
         configGuiTab = tab;
     }
@@ -223,7 +223,7 @@ public class DataManager implements IDirectoryCache
 
             if (JsonUtils.hasString(root, "config_gui_tab"))
             {
-                configGuiTab = IConfigGuiTab.getTabByNameOrDefault(root.get("config_gui_tab").getAsString(), GuiConfigs.TABS, GuiConfigs.VISUALS);
+                configGuiTab = ConfigTab.getTabByNameOrDefault(root.get("config_gui_tab").getAsString(), ConfigScreen.TABS, ConfigScreen.VISUALS);
             }
 
             if (JsonUtils.hasString(root, "operation_mode"))

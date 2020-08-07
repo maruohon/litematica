@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.util.ItemUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -28,8 +28,8 @@ public class BlockInfo
 
     public BlockInfo(IBlockState state, String titleKey)
     {
-        String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
-        this.title = pre + StringUtils.translate(titleKey) + GuiBase.TXT_RST;
+        String pre = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD;
+        this.title = pre + StringUtils.translate(titleKey) + BaseScreen.TXT_RST;
         this.state = state;
         this.stack = ItemUtils.getItemForState(this.state);
 
@@ -64,7 +64,7 @@ public class BlockInfo
         {
             GlStateManager.pushMatrix();
 
-            RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR, zLevel);
+            RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, zLevel);
 
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;

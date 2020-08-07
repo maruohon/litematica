@@ -2,11 +2,11 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicVersion extends WidgetListEntryBase<SchematicVersion>
+public class WidgetSchematicVersion extends BaseListEntryWidget<SchematicVersion>
 {
     private final SchematicProject project;
     private final boolean isOdd;

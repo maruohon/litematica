@@ -20,7 +20,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.message.IMessageConsumer;
+import fi.dy.masa.malilib.message.MessageConsumer;
 import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -275,7 +275,7 @@ public class AreaSelection
         return this.renameSubRegionBox(oldName, newName, null);
     }
 
-    public boolean renameSubRegionBox(String oldName, String newName, @Nullable IMessageConsumer feedback)
+    public boolean renameSubRegionBox(String oldName, String newName, @Nullable MessageConsumer feedback)
     {
         SelectionBox box = this.subRegionBoxes.get(oldName);
 

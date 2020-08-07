@@ -11,8 +11,8 @@ import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskTimer;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.listener.ICompletionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -29,7 +29,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     protected List<String> infoHudLines = new ArrayList<>();
     protected boolean finished;
     protected boolean printCompletionMessage = true;
-    @Nullable private ICompletionListener completionListener;
+    @Nullable private TaskCompletionListener completionListener;
 
     protected TaskBase()
     {
@@ -59,7 +59,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
         this.printCompletionMessage = false;
     }
 
-    public void setCompletionListener(@Nullable ICompletionListener listener)
+    public void setCompletionListener(@Nullable TaskCompletionListener listener)
     {
         this.completionListener = listener;
     }
@@ -142,9 +142,9 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
             PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
             Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
 
-            String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
+            String pre = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD;
             String title = StringUtils.translate("litematica.gui.label.missing_chunks", this.name, requiredChunks.size());
-            hudLines.add(String.format("%s%s%s", pre, title, GuiBase.TXT_RST));
+            hudLines.add(String.format("%s%s%s", pre, title, BaseScreen.TXT_RST));
 
             int maxLines = Math.min(list.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
 

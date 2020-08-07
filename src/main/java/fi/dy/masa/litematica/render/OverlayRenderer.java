@@ -44,11 +44,11 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.data.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.util.HorizontalAlignment;
 import fi.dy.masa.malilib.util.WorldUtils;
 
 public class OverlayRenderer
@@ -616,7 +616,7 @@ public class OverlayRenderer
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
         stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
         IBlockState air = Blocks.AIR.getDefaultState();
-        String ul = GuiBase.TXT_UNDERLINE;
+        String ul = BaseScreen.TXT_UNDERLINE;
 
         if (stateSchematic != stateClient && stateSchematic != air && stateClient != air)
         {

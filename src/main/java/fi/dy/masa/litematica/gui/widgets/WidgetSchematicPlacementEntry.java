@@ -16,19 +16,19 @@ import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.GuiBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.ButtonOnOff;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.button.BaseButton;
+import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.button.OnOffButton;
+import fi.dy.masa.malilib.gui.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.gui.widget.WidgetListEntryBase;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.message.MessageHelpers;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<SchematicPlacementUnloaded>
+public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<SchematicPlacementUnloaded>
 {
     private final SchematicPlacementManager manager;
     private final GuiSchematicPlacementsList gui;
@@ -82,7 +82,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
 
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
-        ButtonGeneric button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
+        GenericButton button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
         button.addHoverString(type.getHoverKey());
 
         return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
@@ -91,16 +91,16 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
     private int createButtonIconOnly(int xRight, int y, ButtonListener.ButtonType type)
     {
         IGuiIcon icon = type.getIcon();
-        ButtonGeneric button;
+        GenericButton button;
         int size = 20;
 
         if (icon != null)
         {
-            button = new ButtonGeneric(xRight - size, y, size, size, "", icon, type.getHoverKey());
+            button = new GenericButton(xRight - size, y, size, size, "", icon, type.getHoverKey());
         }
         else
         {
-            button = new ButtonGeneric(xRight, y, -1, true, type.getDisplayName());
+            button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
             button.addHoverString(type.getHoverKey());
         }
 
@@ -110,16 +110,16 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
     private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
         String key = this.useIconButtons() ? "%s" : type.getTranslationKey();
-        ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, key, isCurrentlyOn);
+        OnOffButton button = new OnOffButton(xRight, y, -1, true, key, isCurrentlyOn);
         button.addHoverString(type.getHoverKey());
 
         return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
     }
 
     @Override
-    public boolean canSelectAt(int mouseX, int mouseY, int mouseButton)
+    public boolean canHoverAt(int mouseX, int mouseY, int mouseButton)
     {
-        return mouseX < this.buttonsStartX && super.canSelectAt(mouseX, mouseY, mouseButton);
+        return mouseX < this.buttonsStartX && super.canHoverAt(mouseX, mouseY, mouseButton);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         }
 
         String name = this.placement.getName();
-        String pre = this.placement.isEnabled() ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
+        String pre = this.placement.isEnabled() ? BaseScreen.TXT_GREEN : BaseScreen.TXT_RED;
         this.drawString(x + 20, y + 7, 0xFFFFFFFF, pre + name);
 
         IGuiIcon icon;
@@ -198,18 +198,18 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         int height = this.getHeight();
 
         if (this.placement.isLocked() &&
-            GuiBase.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 38, y + 6, 11, 11))
+            BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 38, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_locked");
             RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
         else if (this.placement.isRegionPlacementModified() &&
-                 GuiBase.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
+                 BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_modified");
             RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
-        else if (GuiBase.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 18, height))
+        else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 18, height))
         {
             File schematicFile = this.placement.getSchematicFile();
             SchematicMetadata metadata = this.loadedPlacement != null ? this.loadedPlacement.getSchematic().getMetadata() : null;
@@ -252,7 +252,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
     }
 
-    static class ButtonListener implements IButtonActionListener
+    static class ButtonListener implements ButtonActionListener
     {
         private final ButtonType type;
         private final WidgetSchematicPlacementEntry widget;
@@ -264,11 +264,11 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
         }
 
         @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton)
+        public void actionPerformedWithButton(BaseButton button, int mouseButton)
         {
             if (this.type == ButtonType.REMOVE)
             {
-                if (this.widget.placement.isLocked() && GuiBase.isShiftDown() == false)
+                if (this.widget.placement.isLocked() && BaseScreen.isShiftDown() == false)
                 {
                     this.widget.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_placements.remove_fail_locked");
                 }
@@ -301,7 +301,7 @@ public class WidgetSchematicPlacementEntry extends WidgetListEntryBase<Schematic
                 {
                     GuiPlacementConfiguration gui = new GuiPlacementConfiguration((SchematicPlacement) this.widget.placement);
                     gui.setParent(this.widget.gui);
-                    GuiBase.openGui(gui);
+                    BaseScreen.openGui(gui);
                 }
             }
         }

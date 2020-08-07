@@ -36,7 +36,7 @@ import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.input.KeyBindMulti;
+import fi.dy.masa.malilib.input.KeyBindImpl;
 import fi.dy.masa.malilib.systems.BlockPlacementPositionHandler;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.message.MessageUtils;
@@ -116,7 +116,7 @@ public class EasyPlaceUtils
         if (mc.player != null && isHandling == false &&
             shouldDoEasyPlaceActions() &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
-            KeyBindMulti.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
+            KeyBindImpl.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
         {
             isHandling = true;
             handleEasyPlace(mc);

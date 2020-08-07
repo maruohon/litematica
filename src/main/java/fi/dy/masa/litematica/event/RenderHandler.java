@@ -10,11 +10,11 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.tool.ToolMode;
-import fi.dy.masa.malilib.event.IPostGameOverlayRenderer;
-import fi.dy.masa.malilib.event.IPostWorldRenderer;
+import fi.dy.masa.malilib.event.PostGameOverlayRenderer;
+import fi.dy.masa.malilib.event.PostWorldRenderer;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 
-public class RenderHandler implements IPostGameOverlayRenderer, IPostWorldRenderer
+public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 {
     @Override
     public void onPostWorldRender(float partialTicks)
