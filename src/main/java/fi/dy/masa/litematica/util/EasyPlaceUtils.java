@@ -6,12 +6,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRedstoneComparator;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.BlockTrapDoor;
+
+import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
@@ -249,7 +245,13 @@ public class EasyPlaceUtils
         }
 
         BlockPos targetBlockPos = targetPosition.getBlockPos();
-        boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue();
+
+
+        // Crops / seed items require adjacent placement to reliably place onto farmland / non full blocks
+        boolean requireAdjacent = Configs.Generic.EASY_PLACE_CLICK_ADJACENT.getBooleanValue() ||
+                stateSchematic.getBlock() instanceof BlockCrops ||
+                stateSchematic.getBlock() instanceof BlockStem ||
+                stateSchematic.getBlock() instanceof BlockNetherWart;
 
         return requireAdjacent ? getAdjacentClickPosition(targetBlockPos, mc) : targetPosition;
     }
