@@ -255,7 +255,7 @@ public class EntityUtils
         BlockPos regionPosAbs = regionPosRelTransformed.add(origin);
         net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
 
-        return world.getEntities((Entity) null, bb, null);
+        return world.getOtherEntities(null, bb, null);
     }
 
     public static boolean shouldPickBlock(PlayerEntity player)

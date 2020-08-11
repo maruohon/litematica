@@ -34,9 +34,5 @@
 
     "depends": {
         "malilib": ">=0.10.0-dev.21"
-    },
-
-    "custom": {
-        "modmenu:clientsideOnly": true
     }
 }

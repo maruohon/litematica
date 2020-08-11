@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.world;
 
+import javax.annotation.Nullable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.LightType;
@@ -32,14 +33,9 @@ public class FakeLightingProvider extends LightingProvider
 
     public static class FakeLightingView implements ChunkLightingView
     {
+        @Nullable
         @Override
-        public void updateSectionStatus(ChunkSectionPos var1, boolean var2)
-        {
-            // NO-OP
-        }
-
-        @Override
-        public ChunkNibbleArray getLightArray(ChunkSectionPos var1)
+        public ChunkNibbleArray getLightSection(ChunkSectionPos pos)
         {
             return null;
         }
@@ -48,6 +44,12 @@ public class FakeLightingProvider extends LightingProvider
         public int getLightLevel(BlockPos pos)
         {
             return 15;
+        }
+
+        @Override
+        public void setSectionStatus(ChunkSectionPos pos, boolean notReady)
+        {
+            // NO-OP
         }
     }
 }
