@@ -23,7 +23,7 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     @Override
     public int idFor(BlockState state)
     {
-        int i = this.statePaletteMap.getId(state);
+        int i = this.statePaletteMap.getRawId(state);
 
         if (i == -1)
         {

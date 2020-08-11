@@ -91,7 +91,7 @@ public class WorldRendererSchematic
     public WorldRendererSchematic(MinecraftClient mc)
     {
         this.mc = mc;
-        this.entityRenderDispatcher = mc.getEntityRenderManager();
+        this.entityRenderDispatcher = mc.getEntityRenderDispatcher();
         this.bufferBuilders = mc.getBufferBuilders();
 
         this.renderChunkFactory = new RenderChunkFactoryVbo();

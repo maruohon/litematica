@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import javax.annotation.Nullable;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.block.Block;
@@ -161,7 +160,7 @@ public class WorldUtils
 
             StructurePlacementData placementSettings = new StructurePlacementData();
             placementSettings.setIgnoreEntities(ignoreEntities);
-            template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, new Random(), 0x12);
+            //template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, new Random(), 0x12); // TODO will be fixed in the schematic rewrite merge from 1.12.2 later on...
 
             String subRegionName = FileUtils.getNameWithoutExtension(structureFileName) + " (Converted Structure)";
             AreaSelection area = new AreaSelection();

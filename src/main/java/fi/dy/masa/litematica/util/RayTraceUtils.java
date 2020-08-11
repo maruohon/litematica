@@ -506,7 +506,7 @@ public class RayTraceUtils
         HitResult result = rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, false, false, 1000);
 
         net.minecraft.util.math.Box bb = entity.getBoundingBox().expand(rangedLookRot.x, rangedLookRot.y, rangedLookRot.z).expand(1d, 1d, 1d);
-        List<Entity> list = world.getEntities(entity, bb);
+        List<Entity> list = world.getOtherEntities(entity, bb);
 
         double closest = result != null && result.getType() == HitResult.Type.BLOCK ? eyesPos.distanceTo(result.getPos()) : Double.MAX_VALUE;
         Entity targetEntity = null;
