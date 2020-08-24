@@ -42,6 +42,7 @@ import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionMaps;
@@ -57,6 +58,7 @@ import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.Constants;
+import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -1328,6 +1330,238 @@ public class LitematicaSchematic
         }
     }
 
+    public static boolean isSizeValid(@Nullable Vec3i size)
+    {
+        return size != null && size.getX() > 0 && size.getY() > 0 && size.getZ() > 0;
+    }
+
+    @Nullable
+    private static Vec3i readSizeFromTagImpl(CompoundTag tag)
+    {
+        if (tag.contains("size", Constants.NBT.TAG_LIST))
+        {
+            ListTag tagList = tag.getList("size", Constants.NBT.TAG_INT);
+
+            if (tagList.size() == 3)
+            {
+                return new Vec3i(tagList.getInt(0), tagList.getInt(1), tagList.getInt(2));
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static BlockPos readBlockPosFromListTag(CompoundTag tag, String tagName)
+    {
+        if (tag.contains(tagName, Constants.NBT.TAG_LIST))
+        {
+            ListTag tagList = tag.getList(tagName, Constants.NBT.TAG_INT);
+
+            if (tagList.size() == 3)
+            {
+                return new BlockPos(tagList.getInt(0), tagList.getInt(1), tagList.getInt(2));
+            }
+        }
+
+        return null;
+    }
+
+    protected boolean readPaletteFromLitematicaFormatTag(ListTag tagList, ILitematicaBlockStatePalette palette)
+    {
+        final int size = tagList.size();
+        List<BlockState> list = new ArrayList<>(size);
+
+        for (int id = 0; id < size; ++id)
+        {
+            CompoundTag tag = tagList.getCompound(id);
+            BlockState state = NbtHelper.toBlockState(tag);
+            list.add(state);
+        }
+
+        return palette.setMapping(list);
+    }
+
+    public boolean readBlocksFromVanillaStructure(String name, CompoundTag tag)
+    {
+        Vec3i size = readSizeFromTagImpl(tag);
+
+        if (tag.contains("palette", Constants.NBT.TAG_LIST) &&
+            tag.contains("blocks", Constants.NBT.TAG_LIST) &&
+            isSizeValid(size))
+        {
+            ListTag paletteTag = tag.getList("palette", Constants.NBT.TAG_COMPOUND);
+
+            Map<BlockPos, CompoundTag> tileMap = new HashMap<>();
+            this.tileEntities.put(name, tileMap);
+
+            BlockState air = Blocks.AIR.getDefaultState();
+            int paletteSize = paletteTag.size();
+            List<BlockState> list = new ArrayList<>(paletteSize);
+
+            for (int id = 0; id < paletteSize; ++id)
+            {
+                CompoundTag t = paletteTag.getCompound(id);
+                BlockState state = NbtHelper.toBlockState(t);
+                list.add(state);
+            }
+
+            BlockState zeroState = list.get(0);
+            int airId = -1;
+
+            // If air is not ID 0, then we need to re-map the palette such that air is ID 0,
+            // due to how it's currently handled in the Litematica container.
+            for (int i = 0; i < paletteSize; ++i)
+            {
+                if (list.get(i) == air)
+                {
+                    airId = i;
+                    break;
+                }
+            }
+
+            if (airId != 0)
+            {
+                // No air in the palette, insert it
+                if (airId == -1)
+                {
+                    list.add(0, air);
+                    ++paletteSize;
+                }
+                // Air as some other ID, swap the entries
+                else
+                {
+                    list.set(0, air);
+                    list.set(airId, zeroState);
+                }
+            }
+
+            int bits = Math.max(2, Integer.SIZE - Integer.numberOfLeadingZeros(paletteSize - 1));
+            LitematicaBlockStateContainer container = new LitematicaBlockStateContainer(size.getX(), size.getY(), size.getZ(), bits, null);
+            ILitematicaBlockStatePalette palette = container.getPalette();
+            palette.setMapping(list);
+            this.blockContainers.put(name, container);
+
+            if (tag.contains("author", Constants.NBT.TAG_STRING))
+            {
+                this.getMetadata().setAuthor(tag.getString("author"));
+            }
+
+            this.subRegionPositions.put(name, BlockPos.ORIGIN);
+            this.subRegionSizes.put(name, new BlockPos(size));
+            this.metadata.setName(name);
+            this.metadata.setRegionCount(1);
+            this.metadata.setTotalVolume(size.getX() * size.getY() * size.getZ());
+            this.metadata.setEnclosingSize(size);
+            this.metadata.setTimeCreated(System.currentTimeMillis());
+            this.metadata.setTimeModified(this.metadata.getTimeCreated());
+
+            ListTag blockList = tag.getList("blocks", Constants.NBT.TAG_COMPOUND);
+            final int count = blockList.size();
+            int totalBlocks = 0;
+
+            for (int i = 0; i < count; ++i)
+            {
+                CompoundTag blockTag = blockList.getCompound(i);
+                BlockPos pos = readBlockPosFromListTag(blockTag, "pos");
+
+                if (pos == null)
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Failed to read block position for vanilla structure");
+                    return false;
+                }
+
+                int id = blockTag.getInt("state");
+                BlockState state;
+
+                // Air was inserted as ID 0, so the other IDs need to shift
+                if (airId == -1)
+                {
+                    state = palette.getBlockState(id + 1);
+                }
+                else if (airId != 0)
+                {
+                    // re-mapping air and ID 0 state
+                    if (id == 0)
+                    {
+                        state = zeroState;
+                    }
+                    else if (id == airId)
+                    {
+                        state = air;
+                    }
+                    else
+                    {
+                        state = palette.getBlockState(id);
+                    }
+                }
+                else
+                {
+                    state = palette.getBlockState(id);
+                }
+
+                if (state == null)
+                {
+                    state = air;
+                }
+                else if (state != air)
+                {
+                    ++totalBlocks;
+                }
+
+                container.set(pos.getX(), pos.getY(), pos.getZ(), state);
+
+                if (blockTag.contains("nbt", Constants.NBT.TAG_COMPOUND))
+                {
+                    tileMap.put(pos, blockTag.getCompound("nbt"));
+                }
+            }
+
+            this.metadata.setTotalBlocks(totalBlocks);
+            this.entities.put(name, this.readEntitiesFromVanillaStructure(tag));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected List<EntityInfo> readEntitiesFromVanillaStructure(CompoundTag tag)
+    {
+        List<EntityInfo> entities = new ArrayList<>();
+        ListTag tagList = tag.getList("entities", Constants.NBT.TAG_COMPOUND);
+        final int size = tagList.size();
+
+        for (int i = 0; i < size; ++i)
+        {
+            CompoundTag entityData = tagList.getCompound(i);
+            Vec3d pos = readVec3dFromListTag(entityData, "pos");
+
+            if (pos != null && entityData.contains("nbt", Constants.NBT.TAG_COMPOUND))
+            {
+                entities.add(new EntityInfo(pos, entityData.getCompound("nbt")));
+            }
+        }
+
+        return entities;
+    }
+
+    @Nullable
+    public static Vec3d readVec3dFromListTag(@Nullable CompoundTag tag, String tagName)
+    {
+        if (tag != null && tag.contains(tagName, Constants.NBT.TAG_LIST))
+        {
+            ListTag tagList = tag.getList(tagName, Constants.NBT.TAG_DOUBLE);
+
+            if (tagList.getElementType() == Constants.NBT.TAG_DOUBLE && tagList.size() == 3)
+            {
+                return new Vec3d(tagList.getDouble(0), tagList.getDouble(1), tagList.getDouble(2));
+            }
+        }
+
+        return null;
+    }
+
     private void postProcessContainerIfNeeded(ListTag palette, LitematicaBlockStateContainer container, @Nullable Map<BlockPos, CompoundTag> tiles)
     {
         List<BlockState> states = getStatesFromPaletteTag(palette);
@@ -1553,7 +1787,8 @@ public class LitematicaSchematic
         catch (Exception e)
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exception", fileSchematic.getAbsolutePath());
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, e.getMessage());
+            Litematica.logger.error(StringUtils.translate("litematica.error.schematic_write_to_file_failed.exception", fileSchematic.getAbsolutePath()), e);
+            Litematica.logger.error(e.getMessage());
         }
 
         return false;
@@ -1562,7 +1797,12 @@ public class LitematicaSchematic
     @Nullable
     public static LitematicaSchematic createFromFile(File dir, String fileName)
     {
-        if (fileName.endsWith(FILE_EXTENSION) == false)
+        return createFromFile(dir, fileName, false);
+    }
+
+    public static LitematicaSchematic createFromFile(File dir, String fileName, boolean vanillaStructure)
+    {
+        if (fileName.endsWith(FILE_EXTENSION) == false && vanillaStructure == false)
         {
             fileName = fileName + FILE_EXTENSION;
         }
@@ -1585,7 +1825,16 @@ public class LitematicaSchematic
             {
                 LitematicaSchematic schematic = new LitematicaSchematic(fileSchematic);
 
-                if (schematic.readFromNBT(nbt))
+                if (vanillaStructure)
+                {
+                    String name = FileUtils.getNameWithoutExtension(fileName) + " (Converted Structure)";
+
+                    if (schematic.readBlocksFromVanillaStructure(name, nbt))
+                    {
+                        return schematic;
+                    }
+                }
+                else if (schematic.readFromNBT(nbt))
                 {
                     return schematic;
                 }

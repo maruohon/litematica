@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +43,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -146,48 +146,21 @@ public class WorldUtils
     public static LitematicaSchematic convertStructureToLitematicaSchematic(File structureDir, String structureFileName,
             boolean ignoreEntities, IStringConsumer feedback)
     {
-        DataFixer fixer = MinecraftClient.getInstance().getDataFixer();
-        File file = new File(structureDir, structureFileName);
-
         try
         {
-            InputStream is = new FileInputStream(file);
-            Structure template = readTemplateFromStream(is, fixer);
-            is.close();
+            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(structureDir, structureFileName, true);
 
-            WorldSchematic world = SchematicWorldHandler.createSchematicWorld();
-
-            loadChunksSchematicWorld(world, BlockPos.ORIGIN, template.getSize());
-
-            StructurePlacementData placementSettings = new StructurePlacementData();
-            placementSettings.setIgnoreEntities(ignoreEntities);
-            //template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, new Random(), 0x12); // TODO will be fixed in the schematic rewrite merge from 1.12.2 later on...
-
-            String subRegionName = FileUtils.getNameWithoutExtension(structureFileName) + " (Converted Structure)";
-            AreaSelection area = new AreaSelection();
-            area.setName(subRegionName);
-            subRegionName = area.createNewSubRegionBox(BlockPos.ORIGIN, subRegionName);
-            area.setSelectedSubRegionBox(subRegionName);
-            Box box = area.getSelectedSubRegionBox();
-            area.setSubRegionCornerPos(box, Corner.CORNER_1, BlockPos.ORIGIN);
-            area.setSubRegionCornerPos(box, Corner.CORNER_2, template.getSize().add(-1, -1, -1));
-
-            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, ignoreEntities, template.getAuthor(), feedback);
-
-            if (litematicaSchematic != null)
+            if (litematicaSchematic == null)
             {
-                //litematicaSchematic.takeEntityDataFromVanillaStructure(template, subRegionName); // TODO
-            }
-            else
-            {
-                feedback.setString("litematica.error.schematic_conversion.structure_to_litematica_failed");
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Failed to read the vanilla structure template from '" + structureFileName + '"');
             }
 
             return litematicaSchematic;
         }
         catch (Exception e)
         {
-            feedback.setString("Exception while trying to load the vanilla structure: " + e.getMessage());
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Exception while trying to load the vanilla structure: " + e.getMessage());
+            Litematica.logger.error("Exception while trying to load the vanilla structure: " + e.getMessage());
         }
 
         return null;

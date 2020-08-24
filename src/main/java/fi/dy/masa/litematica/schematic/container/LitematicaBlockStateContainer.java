@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.schematic.container;
 
+import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.ListTag;
@@ -22,7 +23,7 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
         this(sizeX, sizeY, sizeZ, 2, null);
     }
 
-    private LitematicaBlockStateContainer(int sizeX, int sizeY, int sizeZ, int bits, long[] backingLongArray)
+    public LitematicaBlockStateContainer(int sizeX, int sizeY, int sizeZ, int bits, @Nullable long[] backingLongArray)
     {
         this.sizeX = sizeX;
         this.sizeY = sizeY;
@@ -35,6 +36,11 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
     public Vec3i getSize()
     {
         return new Vec3i(this.sizeX, this.sizeY, this.sizeZ);
+    }
+
+    public LitematicaBitArray getArray()
+    {
+        return this.storage;
     }
 
     public BlockState get(int x, int y, int z)
@@ -60,7 +66,7 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
         return (y * this.sizeLayer) + z * this.sizeX + x;
     }
 
-    protected void setBits(int bitsIn, long[] backingLongArray)
+    protected void setBits(int bitsIn, @Nullable long[] backingLongArray)
     {
         if (bitsIn != this.bits)
         {

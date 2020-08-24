@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.schematic.container;
 
+import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundTag;
@@ -108,5 +109,25 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
         }
 
         return tagList;
+    }
+
+    @Override
+    public boolean setMapping(List<BlockState> list)
+    {
+        final int size = list.size();
+
+        if (size <= this.states.length)
+        {
+            for (int id = 0; id < size; ++id)
+            {
+                this.states[id] = list.get(id);
+            }
+
+            this.currentSize = size;
+
+            return true;
+        }
+
+        return false;
     }
 }
