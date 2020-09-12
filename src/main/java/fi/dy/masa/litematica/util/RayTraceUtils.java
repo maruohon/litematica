@@ -20,7 +20,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -175,7 +175,7 @@ public class RayTraceUtils
         if (pos != null)
         {
             net.minecraft.util.math.Box bb = PositionUtils.createAABBForPosition(pos);
-            Optional<Vec3d> optional = bb.rayTrace(start, end);
+            Optional<Vec3d> optional = bb.raycast(start, end);
 
             if (optional.isPresent())
             {
@@ -199,7 +199,7 @@ public class RayTraceUtils
         if (box.getPos1() != null && box.getPos2() != null)
         {
             net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-            Optional<Vec3d> optional = bb.rayTrace(start, end);
+            Optional<Vec3d> optional = bb.raycast(start, end);
 
             if (optional.isPresent())
             {
@@ -231,7 +231,7 @@ public class RayTraceUtils
             if (box.getPos1() != null && box.getPos2() != null)
             {
                 net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-                Optional<Vec3d> optional = bb.rayTrace(start, end);
+                Optional<Vec3d> optional = bb.raycast(start, end);
 
                 if (optional.isPresent())
                 {
@@ -255,7 +255,7 @@ public class RayTraceUtils
         if (pos != null)
         {
             net.minecraft.util.math.Box bb = PositionUtils.createAABBForPosition(pos);
-            Optional<Vec3d> optional = bb.rayTrace(start, end);
+            Optional<Vec3d> optional = bb.raycast(start, end);
 
             if (optional.isPresent())
             {
@@ -305,7 +305,7 @@ public class RayTraceUtils
         {
             if (pos != null)
             {
-                BlockHitResult hit = net.minecraft.util.math.Box.rayTrace(ImmutableList.of(FULL_BLOCK_BOUNDS), eyesPos, lookEndPos, pos);
+                BlockHitResult hit = net.minecraft.util.math.Box.raycast(ImmutableList.of(FULL_BLOCK_BOUNDS), eyesPos, lookEndPos, pos);
 
                 if (hit != null)
                 {
@@ -345,7 +345,7 @@ public class RayTraceUtils
         Vec3d eyesPos = entity.getCameraPosVec(1f);
         Vec3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
-        RayTraceContext.FluidHandling fluidMode = RayTraceContext.FluidHandling.ANY;
+        RaycastContext.FluidHandling fluidMode = RaycastContext.FluidHandling.ANY;
 
         return rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, true, respectRenderRange, 200);
     }
@@ -448,7 +448,7 @@ public class RayTraceUtils
         Direction side = vanillaBlockHit.getSide();
         BlockPos closestVanillaPos = vanillaBlockHit.getBlockPos();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        List<BlockHitResult> list = rayTraceBlocksToList(worldSchematic, eyesPos, lookEndPos, RayTraceContext.FluidHandling.NONE, false, false, true, 200);
+        List<BlockHitResult> list = rayTraceBlocksToList(worldSchematic, eyesPos, lookEndPos, RaycastContext.FluidHandling.NONE, false, false, true, 200);
         BlockHitResult furthestTrace = null;
         double furthestDist = -1D;
 
@@ -501,7 +501,7 @@ public class RayTraceUtils
         Vec3d eyesPos = entity.getCameraPosVec(1f);
         Vec3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
-        RayTraceContext.FluidHandling fluidMode = useLiquids ? RayTraceContext.FluidHandling.ANY : RayTraceContext.FluidHandling.NONE;
+        RaycastContext.FluidHandling fluidMode = useLiquids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE;
 
         HitResult result = rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, false, false, 1000);
 
@@ -515,7 +515,7 @@ public class RayTraceUtils
         for (int i = 0; i < list.size(); i++)
         {
             Entity entityTmp = list.get(i);
-            Optional<Vec3d> optionalTmp = entityTmp.getBoundingBox().rayTrace(eyesPos, lookEndPos);
+            Optional<Vec3d> optionalTmp = entityTmp.getBoundingBox().raycast(eyesPos, lookEndPos);
 
             if (optionalTmp.isPresent())
             {
@@ -548,7 +548,7 @@ public class RayTraceUtils
      */
     @Nullable
     public static BlockHitResult rayTraceBlocks(World world, Vec3d start, Vec3d end,
-            RayTraceContext.FluidHandling fluidMode, boolean ignoreBlockWithoutBoundingBox,
+            RaycastContext.FluidHandling fluidMode, boolean ignoreBlockWithoutBoundingBox,
             boolean returnLastUncollidableBlock, boolean respectLayerRange, int maxSteps)
     {
         if (Double.isNaN(start.x) || Double.isNaN(start.y) || Double.isNaN(start.z) ||
@@ -608,12 +608,12 @@ public class RayTraceUtils
 
                 if (blockCollidable)
                 {
-                    trace = blockShape.rayTrace(data.start, data.end, data.blockPos);
+                    trace = blockShape.raycast(data.start, data.end, data.blockPos);
                 }
 
                 if (trace == null && fluidCollidable)
                 {
-                    trace = fluidState.getShape(world, data.blockPos).rayTrace(data.start, data.end, data.blockPos);
+                    trace = fluidState.getShape(world, data.blockPos).raycast(data.start, data.end, data.blockPos);
                 }
 
                 if (trace != null)
@@ -651,12 +651,12 @@ public class RayTraceUtils
 
                 if (blockCollidable)
                 {
-                    traceTmp = blockShape.rayTrace(data.start, data.end, data.blockPos);
+                    traceTmp = blockShape.raycast(data.start, data.end, data.blockPos);
                 }
 
                 if (traceTmp == null && fluidCollidable)
                 {
-                    traceTmp = fluidState.getShape(world, data.blockPos).rayTrace(data.start, data.end, data.blockPos);
+                    traceTmp = fluidState.getShape(world, data.blockPos).raycast(data.start, data.end, data.blockPos);
                 }
 
                 if (traceTmp != null)
@@ -671,7 +671,7 @@ public class RayTraceUtils
     }
 
     public static List<BlockHitResult> rayTraceBlocksToList(World world, Vec3d start, Vec3d end,
-            RayTraceContext.FluidHandling fluidMode, boolean ignoreBlockWithoutBoundingBox,
+            RaycastContext.FluidHandling fluidMode, boolean ignoreBlockWithoutBoundingBox,
             boolean returnLastUncollidableBlock, boolean respectLayerRange, int maxSteps)
     {
         if (Double.isNaN(start.x) || Double.isNaN(start.y) || Double.isNaN(start.z) ||
@@ -852,7 +852,7 @@ public class RayTraceUtils
     public static class RayTraceCalcsData
     {
         public final LayerRange range;
-        public final RayTraceContext.FluidHandling fluidMode;
+        public final RaycastContext.FluidHandling fluidMode;
         public final Vec3d start;
         public final Vec3d end;
         public final int xEnd;
@@ -868,7 +868,7 @@ public class RayTraceUtils
         public Direction facing;
         public BlockHitResult trace;
 
-        public RayTraceCalcsData(Vec3d start, Vec3d end, LayerRange range, RayTraceContext.FluidHandling fluidMode)
+        public RayTraceCalcsData(Vec3d start, Vec3d end, LayerRange range, RaycastContext.FluidHandling fluidMode)
         {
             this.start = start;
             this.end = end;

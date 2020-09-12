@@ -33,7 +33,7 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.TickScheduler;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.biome.BuiltinBiomes;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
@@ -108,7 +108,7 @@ public class WorldSchematic extends World
     @Override
     public Biome getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ)
     {
-        return Biomes.PLAINS;
+        return BuiltinBiomes.PLAINS;
     }
 
     @Override
