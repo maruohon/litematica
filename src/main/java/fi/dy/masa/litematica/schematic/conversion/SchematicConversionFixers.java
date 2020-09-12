@@ -49,6 +49,7 @@ import fi.dy.masa.malilib.util.Constants;
 public class SchematicConversionFixers
 {
     private static final BooleanProperty[] HORIZONTAL_CONNECTING_BLOCK_PROPS = new BooleanProperty[] { null, null, HorizontalConnectingBlock.NORTH, HorizontalConnectingBlock.SOUTH, HorizontalConnectingBlock.WEST, HorizontalConnectingBlock.EAST };
+    private static final BlockState REDSTONE_WIRE_DOT = Blocks.REDSTONE_WIRE.getDefaultState();
     private static final BlockState REDSTONE_WIRE_CROSS = Blocks.REDSTONE_WIRE.getDefaultState()
                           .with(RedstoneWireBlock.WIRE_CONNECTION_NORTH, WireConnection.SIDE)
                           .with(RedstoneWireBlock.WIRE_CONNECTION_EAST, WireConnection.SIDE)
@@ -342,7 +343,15 @@ public class SchematicConversionFixers
 
     public static final IStateFixer FIXER_REDSTONE_WIRE = (reader, state, pos) -> {
         RedstoneWireBlock wire = (RedstoneWireBlock) state.getBlock();
-        return ((IMixinRedstoneWireBlock) wire).litematicaGetFullState(reader, state, pos);
+        state = ((IMixinRedstoneWireBlock) wire).litematicaGetFullState(reader, state, pos);
+
+        // Turn all old dots into crosses, while keeping the power level
+        if (state.with(RedstoneWireBlock.POWER, 0) == REDSTONE_WIRE_DOT)
+        {
+            state = REDSTONE_WIRE_CROSS.with(RedstoneWireBlock.POWER, state.get(RedstoneWireBlock.POWER));
+        }
+
+        return state;
     };
 
     public static final IStateFixer FIXER_SKULL = (reader, state, pos) -> {
