@@ -3,6 +3,7 @@
 bin/
 build/
 eclipse/
+logs/
 .classpath
 .project
 build.number
