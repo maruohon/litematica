@@ -4,6 +4,7 @@
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7",
     "client": [
+        "IMixinChunkDeltaUpdateS2CPacket",
         "IMixinFenceGateBlock",
         "IMixinRedstoneWireBlock",
         "IMixinStairsBlock",
