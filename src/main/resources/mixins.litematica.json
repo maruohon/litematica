@@ -4,7 +4,8 @@
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7",
     "client": [
-    	"IMixinBlockModelRenderer",
+        "IMixinBlockModelRenderer",
+        "IMixinChunkDeltaUpdateS2CPacket",
         "MixinClientPlayNetworkHandler",
         "MixinClientWorld",
         "MixinDebugHud",
