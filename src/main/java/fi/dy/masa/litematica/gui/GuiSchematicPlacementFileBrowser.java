@@ -12,21 +12,9 @@ public class GuiSchematicPlacementFileBrowser extends BaseListScreen<DirectoryEn
 {
     public GuiSchematicPlacementFileBrowser()
     {
-        super(10, 50);
+        super(10, 50, 20, 68);
 
         this.title = StringUtils.translate("litematica.gui.title.schematic_placement_browser");
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 68;
     }
 
     /**

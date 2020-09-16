@@ -5,28 +5,16 @@ import fi.dy.masa.litematica.gui.widgets.WidgetListTasks;
 import fi.dy.masa.litematica.gui.widgets.WidgetTaskEntry;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiTaskManager extends BaseListScreen<ITask, WidgetTaskEntry, WidgetListTasks>
 {
     public GuiTaskManager()
     {
-        super(12, 30);
+        super(12, 30, 20, 68);
 
         this.title = StringUtils.translate("litematica.gui.title.task_manager");
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 68;
     }
 
     @Override

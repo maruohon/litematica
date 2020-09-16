@@ -6,9 +6,9 @@ import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
-import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
+import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.callback.HotkeyCallback;
 import fi.dy.masa.malilib.input.callback.ToggleBooleanWithMessageKeyCallback;
 
 public class HotkeyCallbacks
@@ -19,8 +19,10 @@ public class HotkeyCallbacks
         HotkeyCallback hotkeyCallbackOpenGui = new HotkeyCallbackOpenGui(mc);
         HotkeyCallback hotkeyCallbackToolActions = new HotkeyCallbackToolActions(mc);
 
-        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((newValue, oldValue) -> { InventoryUtils.setPickBlockableSlots(newValue); });
-        Configs.Generic.TOOL_ITEM.setValueChangeCallback((newValue, oldValue) -> { DataManager.setToolItem(newValue); });
+        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback((newValue, oldValue) -> InventoryUtils.setPickBlockableSlots(newValue));
+        Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueLoadCallback(InventoryUtils::setPickBlockableSlots);
+        Configs.Generic.TOOL_ITEM.setValueChangeCallback((newValue, oldValue) -> DataManager.setToolItem(newValue));
+        Configs.Generic.TOOL_ITEM.setValueLoadCallback(DataManager::setToolItem);
 
         Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeyBind().setCallback(hotkeyCallbackOpenGui);
         Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeyBind().setCallback(hotkeyCallbackOpenGui);

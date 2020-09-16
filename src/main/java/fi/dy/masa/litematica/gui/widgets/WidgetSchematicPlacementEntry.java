@@ -11,21 +11,21 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
-import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
+import fi.dy.masa.litematica.gui.LitematicaIcons;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.OnOffButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.icon.Icon;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.message.MessageHelpers;
+import fi.dy.masa.malilib.render.message.MessageHelpers;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<SchematicPlacementUnloaded>
@@ -90,7 +90,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
 
     private int createButtonIconOnly(int xRight, int y, ButtonListener.ButtonType type)
     {
-        IGuiIcon icon = type.getIcon();
+        Icon icon = type.getIcon();
         GenericButton button;
         int size = 20;
 
@@ -137,28 +137,28 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
         // Draw a lighter background for the hovered and the selected entry
         if (placementSelected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0101010, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0303030, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
         }
 
         if (placementSelected)
         {
-            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
+            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
         }
 
         String name = this.placement.getName();
         String pre = this.placement.isEnabled() ? BaseScreen.TXT_GREEN : BaseScreen.TXT_RED;
         this.drawString(x + 20, y + 7, 0xFFFFFFFF, pre + name);
 
-        IGuiIcon icon;
+        Icon icon;
 
         if (this.loadedPlacement != null)
         {
@@ -168,7 +168,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
             }
             else
             {
-                icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
+                icon = LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
             }
 
             icon.renderAt(x + 2, y + 5, z + 0.1f, false, false);
@@ -176,13 +176,13 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
 
         if (this.placement.isRegionPlacementModified())
         {
-            icon = LitematicaGuiIcons.NOTICE_EXCLAMATION_11;
+            icon = LitematicaIcons.NOTICE_EXCLAMATION_11;
             icon.renderAt(this.buttonsStartX - 13, y + 6, z + 0.1f, false, false);
         }
 
         if (this.placement.isLocked())
         {
-            icon = LitematicaGuiIcons.LOCK_LOCKED;
+            icon = LitematicaIcons.LOCK_LOCKED;
             icon.renderAt(this.buttonsStartX - 26, y + 6, z + 0.1f, false, false);
         }
 
@@ -201,13 +201,13 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
             BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 38, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_locked");
-            RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(str));
+            RenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
         else if (this.placement.isRegionPlacementModified() &&
                  BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_modified");
-            RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(str));
+            RenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
         else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 18, height))
         {
@@ -246,7 +246,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
                 text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enclosing_size", size.getX(), size.getY(), size.getZ()));
             }
 
-            RenderUtils.drawHoverText(mouseX, mouseY, z, text);
+            RenderUtils.renderHoverText(mouseX, mouseY, z, text);
         }
 
         super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
@@ -308,17 +308,17 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
 
         public enum ButtonType
         {
-            CONFIGURE       (LitematicaGuiIcons.CONFIGURATION,  "litematica.gui.button.schematic_placements.configure", "litematica.gui.hover.schematic_placement.button.configure"),
-            DUPLICATE       (LitematicaGuiIcons.DUPLICATE,      "litematica.gui.button.schematic_placements.duplicate", "litematica.gui.hover.schematic_placement.button.duplicate"),
-            REMOVE          (LitematicaGuiIcons.TRASH_CAN,      "litematica.gui.button.schematic_placements.remove", "litematica.gui.hover.schematic_placement.button.remove"),
-            SAVE            (LitematicaGuiIcons.SAVE_DISK,      "litematica.gui.button.schematic_placements.save", "litematica.gui.hover.schematic_placement.button.save"),
+            CONFIGURE       (LitematicaIcons.CONFIGURATION, "litematica.gui.button.schematic_placements.configure", "litematica.gui.hover.schematic_placement.button.configure"),
+            DUPLICATE       (LitematicaIcons.DUPLICATE, "litematica.gui.button.schematic_placements.duplicate", "litematica.gui.hover.schematic_placement.button.duplicate"),
+            REMOVE          (LitematicaIcons.TRASH_CAN, "litematica.gui.button.schematic_placements.remove", "litematica.gui.hover.schematic_placement.button.remove"),
+            SAVE            (LitematicaIcons.SAVE_DISK, "litematica.gui.button.schematic_placements.save", "litematica.gui.hover.schematic_placement.button.save"),
             TOGGLE_ENABLED  (null,                              "litematica.gui.button.schematic_placements.placement_enabled", "litematica.gui.hover.schematic_placement.button.toggle_enabled");
 
-            @Nullable private final IGuiIcon icon;
+            @Nullable private final Icon icon;
             private final String translationKey;
             private final String hoverKey;
 
-            private ButtonType(@Nullable IGuiIcon icon, String translationKey, String hoverKey)
+            private ButtonType(@Nullable Icon icon, String translationKey, String hoverKey)
             {
                 this.icon = icon;
                 this.translationKey = translationKey;
@@ -326,7 +326,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
             }
 
             @Nullable
-            public IGuiIcon getIcon()
+            public Icon getIcon()
             {
                 return this.icon;
             }

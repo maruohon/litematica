@@ -20,30 +20,30 @@ import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseListScreen;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.OnOffButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
+import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
+import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 
 public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
-                                          implements ISelectionListener<String>
+                                          implements SelectionListener<String>
 {
     protected final AreaSelection selection;
-    protected WidgetTextFieldBase textFieldSelectionName;
-    protected WidgetCheckBox checkBoxOrigin;
-    protected WidgetCheckBox checkBoxCorner1;
-    protected WidgetCheckBox checkBoxCorner2;
+    protected BaseTextFieldWidget textFieldSelectionName;
+    protected CheckBoxWidget checkBoxOrigin;
+    protected CheckBoxWidget checkBoxCorner1;
+    protected CheckBoxWidget checkBoxCorner2;
     protected int xNext;
     protected int yNext;
     protected int xOrigin;
@@ -51,7 +51,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
 
     public GuiAreaSelectionEditorNormal(AreaSelection selection)
     {
-        super(8, 116);
+        super(8, 116, 20, 146);
 
         this.selection = selection;
         this.selectionId = DataManager.getSelectionManager().getCurrentSelectionId();
@@ -106,7 +106,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         y += 10;
 
         int width = 202;
-        this.textFieldSelectionName = new WidgetTextFieldBase(x, y + 1, width, 18, this.selection.getName());
+        this.textFieldSelectionName = new BaseTextFieldWidget(x, y + 1, width, 18, this.selection.getName());
         this.textFieldSelectionName.setFocused(true);
         this.addWidget(this.textFieldSelectionName);
         x += width + 4;
@@ -198,23 +198,23 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
     protected int createCoordinateInputs(int x, int y, int width, Corner corner)
     {
         String label = "";
-        WidgetCheckBox widget = null;
+        CheckBoxWidget widget = null;
 
         switch (corner)
         {
             case CORNER_1:
                 label = StringUtils.translate("litematica.gui.label.area_editor.corner_1");
-                widget = new WidgetCheckBox(x, y + 3, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label);
+                widget = new CheckBoxWidget(x, y + 3, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label);
                 this.checkBoxCorner1 = widget;
                 break;
             case CORNER_2:
                 label = StringUtils.translate("litematica.gui.label.area_editor.corner_2");
-                widget = new WidgetCheckBox(x, y + 3, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label);
+                widget = new CheckBoxWidget(x, y + 3, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label);
                 this.checkBoxCorner2 = widget;
                 break;
             case NONE:
                 label = StringUtils.translate("litematica.gui.label.area_editor.origin");
-                widget = new WidgetCheckBox(x, y + 3, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label);
+                widget = new CheckBoxWidget(x, y + 3, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label);
                 this.checkBoxOrigin = widget;
                 break;
         }
@@ -268,7 +268,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
                 break;
         }
 
-        WidgetTextFieldInteger textField = new WidgetTextFieldInteger(x + offset, y, width, 16, value);
+        IntegerTextFieldWidget textField = new IntegerTextFieldWidget(x + offset, y, width, 16, value);
         textField.setUpdateListenerAlways(true);
         this.addTextField(textField, (newText) -> this.updatePosition(textField.getText(), corner, coordType));
 
@@ -341,7 +341,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
     protected void createCoordinateButton(int x, int y, Corner corner, CoordinateType coordType, ButtonListener.Type type)
     {
         String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift");
-        GenericButton button = new GenericButton(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+        GenericButton button = new GenericButton(x, y, LitematicaIcons.BUTTON_PLUS_MINUS_16, hover);
         ButtonListener listener = new ButtonListener(type, corner, coordType, this);
         this.addButton(button, listener);
     }
@@ -608,7 +608,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         }
     }
 
-    protected static class CheckBoxListener implements ISelectionListener<WidgetCheckBox>
+    protected static class CheckBoxListener implements SelectionListener<CheckBoxWidget>
     {
         private final GuiAreaSelectionEditorNormal gui;
         private final Corner corner;
@@ -620,7 +620,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         }
 
         @Override
-        public void onSelectionChange(WidgetCheckBox entry)
+        public void onSelectionChange(CheckBoxWidget entry)
         {
             if (entry.isChecked())
             {
@@ -660,19 +660,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
     }
 
     @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 146;
-    }
-
-    @Override
-    protected ISelectionListener<String> getSelectionListener()
+    protected SelectionListener<String> getSelectionListener()
     {
         return this;
     }

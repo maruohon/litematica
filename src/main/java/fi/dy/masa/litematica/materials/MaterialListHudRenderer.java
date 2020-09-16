@@ -155,8 +155,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         if (useBackground)
         {
-            RenderUtils.drawRect(posX - bgMargin, posY - bgMargin,
-                         maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor, 0);
+            RenderUtils.renderRectangle(posX - bgMargin, posY - bgMargin,
+                                        maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor, 0);
         }
 
         String title = BaseScreen.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + BaseScreen.TXT_RST;
@@ -279,7 +279,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                     {
                         Slot slot = pair.getLeft();
                         Color4f color = pair.getRight();
-                        RenderUtils.drawOutlinedBox(guiX + slot.xPos, guiY + slot.yPos, 16, 16, color.intValue, color.intValue | 0xFF000000, 1f);
+                        RenderUtils.renderOutlinedBox(guiX + slot.xPos, guiY + slot.yPos, 16, 16, color.intValue, color.intValue | 0xFF000000, 1f);
                     }
 
                     GlStateManager.enableTexture2D();

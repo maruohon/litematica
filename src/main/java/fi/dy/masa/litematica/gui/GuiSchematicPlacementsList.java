@@ -12,35 +12,23 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicPlacementsList
         extends BaseListScreen<SchematicPlacementUnloaded, WidgetSchematicPlacementEntry, WidgetListSchematicPlacements>
-        implements ISelectionListener<SchematicPlacementUnloaded>
+        implements SelectionListener<SchematicPlacementUnloaded>
 {
     private final SchematicPlacementManager manager;
     private final HashMap<SchematicPlacementUnloaded, Boolean> modifiedCache = new HashMap<>();
 
     public GuiSchematicPlacementsList()
     {
-        super(12, 30);
+        super(12, 30, 20, 64);
 
         this.title = StringUtils.translate("litematica.gui.title.manage_schematic_placements");
         this.manager = DataManager.getSchematicPlacementManager();
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 64;
     }
 
     @Override
@@ -83,7 +71,7 @@ public class GuiSchematicPlacementsList
     }
 
     @Override
-    protected ISelectionListener<SchematicPlacementUnloaded> getSelectionListener()
+    protected SelectionListener<SchematicPlacementUnloaded> getSelectionListener()
     {
         return this;
     }

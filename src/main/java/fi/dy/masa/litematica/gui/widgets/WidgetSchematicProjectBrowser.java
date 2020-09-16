@@ -7,19 +7,19 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicProjectBrowser extends BaseFileBrowserWidget implements ISelectionListener<DirectoryEntry>
+public class WidgetSchematicProjectBrowser extends BaseFileBrowserWidget implements SelectionListener<DirectoryEntry>
 {
-    private final ISelectionListener<DirectoryEntry> parentSelectionListener;
+    private final SelectionListener<DirectoryEntry> parentSelectionListener;
     protected final int infoWidth;
     @Nullable private SchematicProject selectedProject;
 
-    public WidgetSchematicProjectBrowser(int x, int y, int width, int height, ISelectionListener<DirectoryEntry> selectionListener)
+    public WidgetSchematicProjectBrowser(int x, int y, int width, int height, SelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, DataManager.getSchematicsBaseDirectory(), DataManager.getSchematicsBaseDirectory(),
                 DataManager.getDirectoryCache(), "version_control", null);
@@ -67,7 +67,7 @@ public class WidgetSchematicProjectBrowser extends BaseFileBrowserWidget impleme
         int x = this.getX() + this.getWidth() - this.infoWidth;
         int y = this.getY() + 4;
         int infoHeight = 100;
-        RenderUtils.drawOutlinedBox(x + 1, y - 4, this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, this.getZLevel());
+        RenderUtils.renderOutlinedBox(x + 1, y - 4, this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, this.getZLevel());
 
         SchematicProject project = this.selectedProject;
 

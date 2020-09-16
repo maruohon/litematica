@@ -12,15 +12,15 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.GuiSchematicSaveConvert;
-import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
+import fi.dy.masa.litematica.gui.LitematicaIcons;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
@@ -89,7 +89,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 
     private int createButtonIconOnly(int xRight, int y, ButtonListener.Type type)
     {
-        IGuiIcon icon = type.getIcon();
+        Icon icon = type.getIcon();
         GenericButton button;
         int size = 20;
 
@@ -122,16 +122,16 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
         // Draw a lighter background for the hovered entry
         if (this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x70FFFFFF, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(x, y, width, height, 0x20FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x20FFFFFF, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(x, y, width, height, 0x50FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x50FFFFFF, z);
         }
 
         boolean modified = this.schematic.getMetadata().wasModifiedSinceSaved();
@@ -141,7 +141,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 
         GlStateManager.disableBlend();
 
-        IGuiIcon icon;
+        Icon icon;
 
         if (this.schematic.getFile() != null)
         {
@@ -149,17 +149,17 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
         }
         else
         {
-            icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
+            icon = LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
         }
 
         icon.renderAt(this.typeIconX, this.typeIconY, z + 0.1f, false, false);
 
         if (modified)
         {
-            LitematicaGuiIcons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, y + 6, z + 0.1f, false, false);
+            LitematicaIcons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, y + 6, z + 0.1f, false, false);
         }
 
-        this.drawSubWidgets(mouseX, mouseY, isActiveGui, hoveredWidgetId);
+        this.renderSubWidgets(mouseX, mouseY, isActiveGui, hoveredWidgetId);
 
         RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();
@@ -180,7 +180,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
             BaseScreen.isMouseOver(mouseX, mouseY, this.buttonsStartX - 13, y + 6, 11, 11))
         {
             String str = BaseFileBrowserWidget.DATE_FORMAT.format(new Date(this.schematic.getMetadata().getTimeModified()));
-            RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str)));
+            RenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str)));
         }
         else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 12, height))
         {
@@ -192,7 +192,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
             lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
             lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_type", this.schematic.getType().getDisplayName()));
 
-            RenderUtils.drawHoverText(mouseX, mouseY, z, lines);
+            RenderUtils.renderHoverText(mouseX, mouseY, z, lines);
         }
 
         super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
@@ -256,23 +256,23 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 
         public enum Type
         {
-            CREATE_PLACEMENT    (LitematicaGuiIcons.PLACEMENT,  "litematica.gui.button.create_placement",   "litematica.gui.button.hover.schematic_list.create_new_placement_shift_to_disable"),
-            RELOAD              (LitematicaGuiIcons.RELOAD,     "litematica.gui.button.reload",             "litematica.gui.button.hover.schematic_list.reload_schematic"),
-            SAVE_TO_FILE        (LitematicaGuiIcons.SAVE_DISK,  "litematica.gui.button.save_to_file",       "litematica.gui.button.hover.schematic_list.save_to_file"),
-            UNLOAD              (LitematicaGuiIcons.TRASH_CAN,  "litematica.gui.button.unload",             "litematica.gui.button.hover.schematic_list.unload");
+            CREATE_PLACEMENT    (LitematicaIcons.PLACEMENT, "litematica.gui.button.create_placement", "litematica.gui.button.hover.schematic_list.create_new_placement_shift_to_disable"),
+            RELOAD              (LitematicaIcons.RELOAD, "litematica.gui.button.reload", "litematica.gui.button.hover.schematic_list.reload_schematic"),
+            SAVE_TO_FILE        (LitematicaIcons.SAVE_DISK, "litematica.gui.button.save_to_file", "litematica.gui.button.hover.schematic_list.save_to_file"),
+            UNLOAD              (LitematicaIcons.TRASH_CAN, "litematica.gui.button.unload", "litematica.gui.button.hover.schematic_list.unload");
 
-            private final IGuiIcon icon;
+            private final Icon icon;
             private final String translationKey;
             @Nullable private final String hoverKey;
 
-            private Type(IGuiIcon icon, String translationKey, @Nullable String hoverKey)
+            private Type(Icon icon, String translationKey, @Nullable String hoverKey)
             {
                 this.icon = icon;
                 this.translationKey = translationKey;
                 this.hoverKey = hoverKey;
             }
 
-            public IGuiIcon getIcon()
+            public Icon getIcon()
             {
                 return this.icon;
             }

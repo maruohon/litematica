@@ -1,7 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -14,14 +15,13 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.StringListSelectionScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IStringListConsumer;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
@@ -64,7 +64,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         label = StringUtils.translate("litematica.gui.label.schematic_load.checkbox.create_placement");
         String hover = StringUtils.translate("litematica.gui.label.schematic_load.hoverinfo.create_placement");
-        WidgetCheckBox checkbox = new WidgetCheckBox(x, y, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label, hover);
+        CheckBoxWidget checkbox = new CheckBoxWidget(x, y, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label, hover);
         checkbox.setListener((widget) -> { Configs.Internal.CREATE_PLACEMENT_ON_LOAD.setBooleanValue(widget.isChecked()); });
         checkbox.setChecked(Configs.Internal.CREATE_PLACEMENT_ON_LOAD.getBooleanValue(), false);
         this.addWidget(checkbox);
@@ -198,7 +198,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         }
     }
 
-    private static class MaterialListCreator implements IStringListConsumer
+    private static class MaterialListCreator implements Consumer<List<String>>
     {
         private final ISchematic schematic;
 
@@ -208,13 +208,11 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         }
 
         @Override
-        public boolean consume(Collection<String> strings)
+        public void accept(List<String> strings)
         {
             MaterialListSchematic materialList = new MaterialListSchematic(this.schematic, strings, true);
             DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
             BaseScreen.openGui(new GuiMaterialList(materialList));
-
-            return true;
         }
     }
 }

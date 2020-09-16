@@ -10,9 +10,9 @@ import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
@@ -73,21 +73,21 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0101010, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0303030, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
         }
 
         if (selected)
         {
-            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z + 1);
+            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z + 1);
         }
 
         this.drawString(x + 2, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, this.entry);
@@ -131,7 +131,7 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            RenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
 
         RenderUtils.color(1f, 1f, 1f, 1f);

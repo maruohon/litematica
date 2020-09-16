@@ -34,15 +34,15 @@ import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
-import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
+import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 
-public class DataManager implements IDirectoryCache
+public class DataManager implements DirectoryCache
 {
     private static final DataManager INSTANCE = new DataManager();
 
@@ -74,7 +74,7 @@ public class DataManager implements IDirectoryCache
         return INSTANCE;
     }
 
-    public static IDirectoryCache getDirectoryCache()
+    public static DirectoryCache getDirectoryCache()
     {
         return INSTANCE;
     }

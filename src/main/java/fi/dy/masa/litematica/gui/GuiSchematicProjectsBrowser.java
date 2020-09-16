@@ -10,39 +10,27 @@ import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, DirectoryEntryWidget, WidgetSchematicProjectBrowser>
-                                        implements ISelectionListener<DirectoryEntry>
+                                        implements SelectionListener<DirectoryEntry>
 {
     public GuiSchematicProjectsBrowser()
     {
-        super(10, 30);
+        super(10, 30, 20, 58);
 
         this.title = StringUtils.translate("litematica.gui.title.schematic_projects_browser");
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 58;
     }
 
     @Override
@@ -105,7 +93,7 @@ public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, 
 
     @Override
     @Nullable
-    protected ISelectionListener<DirectoryEntry> getSelectionListener()
+    protected SelectionListener<DirectoryEntry> getSelectionListener()
     {
         return this;
     }

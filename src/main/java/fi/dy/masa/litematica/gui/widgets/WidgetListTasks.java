@@ -5,13 +5,13 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 
 public class WidgetListTasks extends BaseListWidget<ITask, WidgetTaskEntry>
 {
     public WidgetListTasks(int x, int y, int width, int height,
-            @Nullable ISelectionListener<ITask> selectionListener)
+            @Nullable SelectionListener<ITask> selectionListener)
     {
         super(x, y, width, height, selectionListener);
 

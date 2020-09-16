@@ -20,12 +20,12 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.input.Hotkey;
+import fi.dy.masa.malilib.input.KeyBindCategory;
 import fi.dy.masa.malilib.input.KeyBindProvider;
 import fi.dy.masa.malilib.input.MouseInputHandler;
-import fi.dy.masa.malilib.input.KeyBindCategory;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 
 public class InputHandler implements KeyBindProvider, MouseInputHandler
 {
@@ -49,7 +49,7 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
     @Override
     public List<KeyBindCategory> getHotkeyCategoriesForCombinedView()
     {
-        return ImmutableList.of(new KeyBindCategory(Reference.MOD_NAME, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST));
+        return ImmutableList.of(new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
 
         if (Hotkeys.SELECTION_EXPAND_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())
         {
-            return this.modifySelectionBox(amount, mode, direction, (boxIn, amountIn, side) -> PositionUtils.expandOrShrinkBox(boxIn, amountIn, side));
+            return this.modifySelectionBox(amount, mode, direction, PositionUtils::expandOrShrinkBox);
         }
 
         if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeyBind().isKeyBindHeld() && mode.getUsesAreaSelection())

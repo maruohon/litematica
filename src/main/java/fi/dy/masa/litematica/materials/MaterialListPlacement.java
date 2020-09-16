@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListPlacement extends MaterialListBase

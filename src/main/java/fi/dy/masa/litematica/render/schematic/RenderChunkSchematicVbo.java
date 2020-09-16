@@ -392,7 +392,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     {
                         if (type.getRenderPriority() > typeAdj.getRenderPriority())
                         {
-                            fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceSideBatchedQuads(pos, side, overlayColor, 0, bufferOverlayQuads);
+                            fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceSideBatchedQuads(pos, side, overlayColor, 0, bufferOverlayQuads);
                         }
                     }
                 }
@@ -409,7 +409,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 }
                 else
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllSidesBatchedQuads(pos, overlayColor, 0, bufferOverlayQuads);
+                    fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllSidesBatchedQuads(pos, overlayColor, 0, bufferOverlayQuads);
                 }
             }
         }
@@ -484,7 +484,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 }
                 else
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.drawBlockSpaceAllOutlinesBatchedLines(pos, overlayColor, 0, bufferOverlayOutlines);
+                    fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(pos, overlayColor, 0, bufferOverlayOutlines);
                 }
             }
         }

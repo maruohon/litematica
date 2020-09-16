@@ -19,15 +19,15 @@ import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.util.data.DataDump;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.OnOffButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.gui.widget.WidgetInfoIcon;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.InfoIconWidget;
+import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -38,7 +38,7 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
 
     public GuiMaterialList(MaterialListBase materialList)
     {
-        super(10, 44);
+        super(10, 44, 20, 80);
 
         this.materialList = materialList;
         this.materialList.setCompletionListener(this);
@@ -53,18 +53,6 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
         {
             DataManager.setMaterialList(materialList);
         }
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 80;
     }
 
     @Override
@@ -84,12 +72,12 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
         int w = this.getStringWidth(str);
         this.addLabel(this.width - w - 56, y + 6, 0xFFFFFFFF, str);
 
-        WidgetTextFieldBase textField = new WidgetTextFieldBase(this.width - 52, y + 2, 40, 16, String.valueOf(this.materialList.getMultiplier()));
-        textField.setTextValidator(WidgetTextFieldBase.VALIDATOR_INTEGER_POSITIVE);
+        BaseTextFieldWidget textField = new BaseTextFieldWidget(this.width - 52, y + 2, 40, 16, String.valueOf(this.materialList.getMultiplier()));
+        textField.setTextValidator(BaseTextFieldWidget.VALIDATOR_INTEGER_POSITIVE);
         textField.setUpdateListenerAlways(true);
         this.addTextField(textField, new MultiplierListener(this.materialList, this));
 
-        this.addWidget(new WidgetInfoIcon(this.width - 23, 10, LitematicaGuiIcons.INFO_11, "litematica.info.material_list"));
+        this.addWidget(new InfoIconWidget(this.width - 23, 10, LitematicaIcons.INFO_11, "litematica.info.material_list"));
 
         int gap = 1;
         x += this.createButton(x, y, -1, ButtonListener.Type.REFRESH_LIST) + gap;
@@ -361,7 +349,7 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
         }
     }
 
-    private static class MultiplierListener implements ITextFieldListener
+    private static class MultiplierListener implements TextChangeListener
     {
         private final MaterialListBase materialList;
         private final GuiMaterialList gui;

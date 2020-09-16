@@ -8,10 +8,10 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiMainMenu extends BaseScreen
@@ -162,30 +162,30 @@ public class GuiMainMenu extends BaseScreen
         public enum ButtonType
         {
             // List loaded Schematics in SchematicHolder
-            LOADED_SCHEMATICS           ("litematica.gui.button.change_menu.show_loaded_schematics", LitematicaGuiIcons.LOADED_SCHEMATICS),
+            LOADED_SCHEMATICS           ("litematica.gui.button.change_menu.show_loaded_schematics", LitematicaIcons.LOADED_SCHEMATICS),
             // List Schematics placements
-            SCHEMATIC_PLACEMENTS        ("litematica.gui.button.change_menu.show_schematic_placements", LitematicaGuiIcons.SCHEMATIC_PLACEMENTS),
+            SCHEMATIC_PLACEMENTS        ("litematica.gui.button.change_menu.show_schematic_placements", LitematicaIcons.SCHEMATIC_PLACEMENTS),
             // Open the Area Selection browser
-            AREA_SELECTION_BROWSER      ("litematica.gui.button.change_menu.show_area_selections", LitematicaGuiIcons.AREA_SELECTION),
+            AREA_SELECTION_BROWSER      ("litematica.gui.button.change_menu.show_area_selections", LitematicaIcons.AREA_SELECTION),
             // Open the Area Editor GUI
-            AREA_EDITOR                 ("litematica.gui.button.change_menu.area_editor", LitematicaGuiIcons.AREA_EDITOR),
+            AREA_EDITOR                 ("litematica.gui.button.change_menu.area_editor", LitematicaIcons.AREA_EDITOR),
             // Load Schematics from file to memory
-            LOAD_SCHEMATICS             ("litematica.gui.button.change_menu.load_schematics_to_memory", LitematicaGuiIcons.SCHEMATIC_BROWSER),
+            LOAD_SCHEMATICS             ("litematica.gui.button.change_menu.load_schematics_to_memory", LitematicaIcons.SCHEMATIC_BROWSER),
             // Edit Schematics (description or icon), or convert between formats
-            SCHEMATIC_MANAGER           ("litematica.gui.button.change_menu.schematic_manager", LitematicaGuiIcons.SCHEMATIC_MANAGER),
+            SCHEMATIC_MANAGER           ("litematica.gui.button.change_menu.schematic_manager", LitematicaIcons.SCHEMATIC_MANAGER),
             // Open the Task Manager
-            TASK_MANAGER                ("litematica.gui.button.change_menu.task_manager", LitematicaGuiIcons.TASK_MANAGER),
+            TASK_MANAGER                ("litematica.gui.button.change_menu.task_manager", LitematicaIcons.TASK_MANAGER),
             // Open the Schematic Projects browser
-            SCHEMATIC_PROJECTS_MANAGER  ("litematica.gui.button.change_menu.schematic_projects_manager", LitematicaGuiIcons.SCHEMATIC_PROJECTS),
+            SCHEMATIC_PROJECTS_MANAGER  ("litematica.gui.button.change_menu.schematic_projects_manager", LitematicaIcons.SCHEMATIC_PROJECTS),
             // In-game Configuration GUI
-            CONFIGURATION               ("litematica.gui.button.change_menu.configuration_menu", LitematicaGuiIcons.CONFIGURATION),
+            CONFIGURATION               ("litematica.gui.button.change_menu.configuration_menu", LitematicaIcons.CONFIGURATION),
             // Switch to the Litematica main menu
             MAIN_MENU                   ("litematica.gui.button.change_menu.to_main_menu", null);
 
             private final String labelKey;
-            private final IGuiIcon icon;
+            private final Icon icon;
 
-            private ButtonType(String labelKey, IGuiIcon icon)
+            private ButtonType(String labelKey, Icon icon)
             {
                 this.labelKey = labelKey;
                 this.icon = icon;
@@ -201,7 +201,7 @@ public class GuiMainMenu extends BaseScreen
                 return StringUtils.translate(this.getLabelKey());
             }
 
-            public IGuiIcon getIcon()
+            public Icon getIcon()
             {
                 return this.icon;
             }

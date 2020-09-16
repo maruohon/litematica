@@ -35,21 +35,21 @@ public class WidgetSchematicVersion extends BaseListEntryWidget<SchematicVersion
         // Draw a lighter background for the hovered and the selected entry
         if (selected || versionSelected || (isActiveGui && this.getId() == hoveredWidgetId))
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0101010, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0303030, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
         }
 
         if (versionSelected)
         {
-            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
+            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
         }
 
         String str = StringUtils.translate("litematica.gui.label.schematic_projects.version_entry", this.entry.getVersion(), this.entry.getName());

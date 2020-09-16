@@ -6,11 +6,11 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
-import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
+import fi.dy.masa.malilib.gui.icon.BaseIcon;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
-import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
+import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
 import fi.dy.masa.malilib.util.AlphaNumComparator;
-import fi.dy.masa.malilib.gui.util.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
 
 public class WidgetListPlacementSubRegions extends BaseListWidget<SubRegionPlacement, WidgetPlacementSubRegion>
 {
@@ -24,7 +24,7 @@ public class WidgetListPlacementSubRegions extends BaseListWidget<SubRegionPlace
         this.entryWidgetFixedHeight = 22;
         this.shouldSortList = true;
 
-        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.LEFT));
+        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 14, 14, 0, BaseIcon.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override

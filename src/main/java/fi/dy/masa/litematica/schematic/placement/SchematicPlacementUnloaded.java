@@ -19,9 +19,9 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
-import fi.dy.masa.malilib.message.MessageConsumer;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageConsumer;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;

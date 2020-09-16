@@ -13,38 +13,26 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.ConfirmActionScreen;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.listener.ConfirmationListener;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion, WidgetSchematicVersion, WidgetListSchematicVersions>
-                                        implements ISelectionListener<SchematicVersion>, TaskCompletionListener
+                                        implements SelectionListener<SchematicVersion>, TaskCompletionListener
 {
     private final SchematicProject project;
 
     public GuiSchematicProjectManager(SchematicProject project)
     {
-        super(10, 24);
+        super(10, 24, 20, 74);
 
         this.project = project;
         this.title = StringUtils.translate("litematica.gui.title.schematic_project_manager");
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 74;
     }
 
     @Override
@@ -91,7 +79,7 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
     }
 
     @Override
-    protected ISelectionListener<SchematicVersion> getSelectionListener()
+    protected SelectionListener<SchematicVersion> getSelectionListener()
     {
         return this;
     }
@@ -231,12 +219,6 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
             DataManager.getSchematicProjectsManager().pasteCurrentVersionToWorld();
             return true;
         }
-
-        @Override
-        public boolean onActionCancelled()
-        {
-            return false;
-        }
     }
 
     public static class DeleteAreaExecutor implements ConfirmationListener
@@ -246,12 +228,6 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
         {
             DataManager.getSchematicProjectsManager().deleteLastSeenArea(Minecraft.getMinecraft());
             return true;
-        }
-
-        @Override
-        public boolean onActionCancelled()
-        {
-            return false;
         }
     }
 }

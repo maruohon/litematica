@@ -17,18 +17,18 @@ import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetListSchematicVerificationResults>
-                                    implements ISelectionListener<BlockMismatchEntry>, TaskCompletionListener
+                                    implements SelectionListener<BlockMismatchEntry>, TaskCompletionListener
 {
     private static SchematicVerifier verifierLast;
     // static to remember the mode over GUI close/open cycles
@@ -39,7 +39,7 @@ public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, W
 
     public GuiSchematicVerifier(SchematicPlacement placement)
     {
-        super(10, 60);
+        super(10, 60, 20, 94);
 
         this.title = StringUtils.translate("litematica.gui.title.schematic_verifier", placement.getName());
         this.placement = placement;
@@ -52,18 +52,6 @@ public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, W
             WidgetSchematicVerificationResult.setMaxNameLengths(verifier.getMismatchOverviewCombined());
             verifierLast = verifier;
         }
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 94;
     }
 
     @Override
@@ -282,7 +270,7 @@ public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, W
     }
 
     @Override
-    protected ISelectionListener<BlockMismatchEntry> getSelectionListener()
+    protected SelectionListener<BlockMismatchEntry> getSelectionListener()
     {
         return this;
     }

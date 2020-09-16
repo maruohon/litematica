@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.materials;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksArea;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListAreaAnalyzer extends MaterialListBase

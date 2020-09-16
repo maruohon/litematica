@@ -1,13 +1,15 @@
 package fi.dy.masa.litematica.config;
 
 import net.minecraft.client.Minecraft;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.ConfigScreen;
+import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.GuiPlacementGridSettings;
+import fi.dy.masa.litematica.gui.GuiRenderLayer;
 import fi.dy.masa.litematica.gui.GuiSchematicLoad;
 import fi.dy.masa.litematica.gui.GuiSchematicLoadedList;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
@@ -18,11 +20,12 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.input.KeyBind;
+import fi.dy.masa.malilib.input.callback.HotkeyCallback;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 
 public class HotkeyCallbackOpenGui implements HotkeyCallback
 {
@@ -47,7 +50,9 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeyBind())
         {
-            BaseScreen.openGui(new ConfigScreen());
+            BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.RENDER_LAYERS ? new GuiRenderLayer() : ConfigScreen.create();
+            BaseScreen.openGui(screen);
+            return true;
         }
 
         else if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeyBind())

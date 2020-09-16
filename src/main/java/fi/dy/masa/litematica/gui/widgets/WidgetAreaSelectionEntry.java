@@ -10,16 +10,16 @@ import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -32,7 +32,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
 
     public WidgetAreaSelectionEntry(int x, int y, int width, int height, boolean isOdd,
             DirectoryEntry entry, int listIndex, SelectionManager selectionManager,
-            WidgetAreaSelectionBrowser parent, IFileBrowserIconProvider iconProvider)
+            WidgetAreaSelectionBrowser parent, FileBrowserIconProvider iconProvider)
     {
         super(x, y, width, height, isOdd, entry, listIndex, parent, iconProvider);
 
@@ -130,7 +130,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            RenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
     }
 

@@ -13,17 +13,17 @@ import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase implements TaskCompletionListener
 {
     private final SelectionManager selectionManager;
-    protected WidgetCheckBox checkboxIgnoreEntities;
+    protected CheckBoxWidget checkboxIgnoreEntities;
 
     public static String generateFilename(String nameIn)
     {
@@ -72,7 +72,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements TaskComple
         int y = 32;
 
         String str = StringUtils.translate("litematica.gui.label.schematic_save.checkbox.ignore_entities");
-        this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, str);
+        this.checkboxIgnoreEntities = new CheckBoxWidget(x, y + 24, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, str);
         this.addWidget(this.checkboxIgnoreEntities);
 
         this.createButton(x, y, ButtonType.SAVE);

@@ -64,7 +64,7 @@ public class BlockInfo
         {
             GlStateManager.pushMatrix();
 
-            RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, zLevel);
+            RenderUtils.renderOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, zLevel);
 
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;
@@ -77,7 +77,7 @@ public class BlockInfo
             GlStateManager.disableLighting();
             RenderUtils.enableGuiItemLighting();
 
-            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF, zLevel); // light background for the item
+            RenderUtils.renderRectangle(x1, y, 16, 16, 0x20FFFFFF, zLevel); // light background for the item
 
             float origZ = mc.getRenderItem().zLevel;
             mc.getRenderItem().zLevel = zLevel + 1;

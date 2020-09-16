@@ -29,7 +29,7 @@ import fi.dy.masa.malilib.render.overlay.InventoryOverlay;
 import fi.dy.masa.malilib.render.overlay.InventoryOverlay.InventoryProperties;
 import fi.dy.masa.malilib.render.overlay.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.gui.util.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class RenderUtils
@@ -91,7 +91,7 @@ public class RenderUtils
         double maxY = pos.getY() - dy + expand + 1;
         double maxZ = pos.getZ() - dz + expand + 1;
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
+        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllEdgesBatchedLines(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 
     public static void drawConnectingLineBatchedLines(BlockPos pos1, BlockPos pos2, boolean center, Color4f color, BufferBuilder buffer,
@@ -288,7 +288,7 @@ public class RenderUtils
         double maxY = Math.max(pos1.getY(), pos2.getY()) + 1 - dy + expand;
         double maxZ = Math.max(pos1.getZ(), pos2.getZ()) + 1 - dz + expand;
 
-        fi.dy.masa.malilib.render.RenderUtils.drawBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
+        fi.dy.masa.malilib.render.RenderUtils.renderBoxAllSidesBatchedQuads(minX, minY, minZ, maxX, maxY, maxZ, color, buffer);
     }
 
     public static void renderAreaOutlineNoCorners(BlockPos pos1, BlockPos pos2,

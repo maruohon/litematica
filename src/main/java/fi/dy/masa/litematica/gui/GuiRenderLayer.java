@@ -3,12 +3,12 @@ package fi.dy.masa.litematica.gui;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
+import fi.dy.masa.malilib.gui.icon.Icon;
+import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -49,9 +49,9 @@ public class GuiRenderLayer extends BaseRenderLayerEditScreen
     }
 
     @Override
-    protected IGuiIcon getValueAdjustButtonIcon()
+    protected Icon getValueAdjustButtonIcon()
     {
-        return LitematicaGuiIcons.BUTTON_PLUS_MINUS_16;
+        return LitematicaIcons.BUTTON_PLUS_MINUS_16;
     }
 
     private int createTabButton(int x, int y, int width, ConfigTab tab)
@@ -78,13 +78,13 @@ public class GuiRenderLayer extends BaseRenderLayerEditScreen
         String label = StringUtils.translate("litematica.gui.label.render_layers.hotkey");
         String hover = StringUtils.translate("litematica.gui.label.render_layers.hover.hotkey");
 
-        WidgetCheckBox cb = new WidgetCheckBox(x, y + 4, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label, hover);
+        CheckBoxWidget cb = new CheckBoxWidget(x, y + 4, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label, hover);
         cb.setChecked(layerRange.getMoveLayerRangeMax(), false);
         cb.setListener(new RangeHotkeyListener(layerRange, true));
         this.addWidget(cb);
 
         y += 23;
-        cb = new WidgetCheckBox(x, y + 4, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, label, hover);
+        cb = new CheckBoxWidget(x, y + 4, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label, hover);
         cb.setChecked(layerRange.getMoveLayerRangeMin(), false);
         cb.setListener(new RangeHotkeyListener(layerRange, false));
         this.addWidget(cb);

@@ -10,16 +10,16 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.message.MessageUtils;
-import fi.dy.masa.malilib.message.MessageHelpers;
+import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageHelpers;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicPlacementFileEntry extends DirectoryEntryWidget
@@ -114,7 +114,7 @@ public class WidgetSchematicPlacementFileEntry extends DirectoryEntryWidget
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            RenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
     }
 

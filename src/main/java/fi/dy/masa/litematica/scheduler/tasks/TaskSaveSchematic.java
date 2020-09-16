@@ -15,8 +15,8 @@ import fi.dy.masa.litematica.schematic.util.SchematicCreationUtils;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 
 public class TaskSaveSchematic extends TaskProcessChunkBase

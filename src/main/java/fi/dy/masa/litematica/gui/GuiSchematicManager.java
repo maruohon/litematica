@@ -22,20 +22,20 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.ConfirmActionScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.FileUtils.FileDeleter;
 import fi.dy.masa.malilib.util.FileUtils.FileRenamer;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
+public class GuiSchematicManager extends GuiSchematicBrowserBase implements SelectionListener<DirectoryEntry>
 {
     private static PreviewGenerator previewGenerator;
 
@@ -144,7 +144,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
     }
 
     @Override
-    protected ISelectionListener<DirectoryEntry> getSelectionListener()
+    protected SelectionListener<DirectoryEntry> getSelectionListener()
     {
         return this;
     }

@@ -11,16 +11,16 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.OnOffButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
+import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -118,13 +118,13 @@ public class GuiSubRegionConfiguration extends BaseScreen
         pos = pos.add(this.schematicPlacement.getOrigin());
 
         int value = PositionUtils.getCoordinate(pos, type);
-        WidgetTextFieldInteger textField = new WidgetTextFieldInteger(x + offset, y + 1, width, 16, value);
+        IntegerTextFieldWidget textField = new IntegerTextFieldWidget(x + offset, y + 1, width, 16, value);
         textField.setUpdateListenerAlways(true);
         this.addTextField(textField, new TextFieldListener(type, this.schematicPlacement, this.placement, this));
 
         String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x = x + offset + width + 20;
-        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, "", hover);
+        CheckBoxWidget cb = new CheckBoxWidget(x, y + 3, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, "", hover);
         cb.setChecked(this.placement.isCoordinateLocked(type), false);
         cb.setListener(new CoordinateLockListener(type, this.placement));
         this.addWidget(cb);
@@ -149,7 +149,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
             case NUDGE_COORD_Z:
             {
                 String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-                GenericButton button = new GenericButton(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+                GenericButton button = new GenericButton(x, y, LitematicaIcons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return;
             }
@@ -324,7 +324,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
         }
     }
 
-    private static class TextFieldListener implements ITextFieldListener
+    private static class TextFieldListener implements TextChangeListener
     {
         private final GuiSubRegionConfiguration parent;
         private final SchematicPlacementManager manager;
@@ -369,7 +369,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
         }
     }
 
-    private static class CoordinateLockListener implements ISelectionListener<WidgetCheckBox>
+    private static class CoordinateLockListener implements SelectionListener<CheckBoxWidget>
     {
         private final SubRegionPlacement placement;
         private final CoordinateType type;
@@ -381,7 +381,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
         }
 
         @Override
-        public void onSelectionChange(WidgetCheckBox entry)
+        public void onSelectionChange(CheckBoxWidget entry)
         {
             this.placement.setCoordinateLocked(this.type, entry.isChecked());
         }

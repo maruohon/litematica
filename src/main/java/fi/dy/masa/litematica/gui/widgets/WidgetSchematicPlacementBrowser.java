@@ -59,7 +59,7 @@ public class WidgetSchematicPlacementBrowser extends BaseFileBrowserWidget
     }
 
     @Override
-    protected List<String> getFilterTargetStringsForEntry(DirectoryEntry entry)
+    protected List<String> getSearchStringsForEntry(DirectoryEntry entry)
     {
         String fileName = entry.getName().toLowerCase(Locale.ROOT);
         SchematicPlacementUnloaded placement = this.getOrLoadPlacement(entry.getFullPath());

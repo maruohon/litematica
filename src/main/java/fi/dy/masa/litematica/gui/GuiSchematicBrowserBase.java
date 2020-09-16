@@ -4,7 +4,7 @@ import java.io.File;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 
@@ -12,7 +12,7 @@ public abstract class GuiSchematicBrowserBase extends BaseListScreen<DirectoryEn
 {
     public GuiSchematicBrowserBase(int browserX, int browserY)
     {
-        super(browserX, browserY);
+        super(browserX, browserY, 20, 70);
     }
 
     @Override
@@ -35,21 +35,9 @@ public abstract class GuiSchematicBrowserBase extends BaseListScreen<DirectoryEn
 
     @Override
     @Nullable
-    protected ISelectionListener<DirectoryEntry> getSelectionListener()
+    protected SelectionListener<DirectoryEntry> getSelectionListener()
     {
         return null;
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 70;
     }
 
     public int getMaxInfoHeight()

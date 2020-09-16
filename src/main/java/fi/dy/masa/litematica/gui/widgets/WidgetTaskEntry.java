@@ -3,9 +3,9 @@ package fi.dy.masa.litematica.gui.widgets;
 import net.minecraft.client.renderer.GlStateManager;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -42,22 +42,22 @@ public class WidgetTaskEntry extends BaseListEntryWidget<ITask>
         // Draw a lighter background for the hovered entry
         if (this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.drawRect(x, y, width, height, 0x70FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x70FFFFFF, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(x, y, width, height, 0x20FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x20FFFFFF, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(x, y, width, height, 0x50FFFFFF, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0x50FFFFFF, z);
         }
 
         String name = this.getEntry().getDisplayName();
         this.drawString(x + 4, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, name);
 
-        this.drawSubWidgets(mouseX, mouseY, isActiveGui, hoveredWidgetId);
+        this.renderSubWidgets(mouseX, mouseY, isActiveGui, hoveredWidgetId);
 
         RenderUtils.disableItemLighting();
         GlStateManager.disableLighting();

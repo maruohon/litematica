@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimple
@@ -35,7 +35,7 @@ public class GuiAreaSelectionEditorSubRegion extends GuiAreaSelectionEditorSimpl
         y += 13;
 
         int width = 202;
-        this.textFieldBoxName = new WidgetTextFieldBase(x, y + 2, width, 16, this.getBox().getName());
+        this.textFieldBoxName = new BaseTextFieldWidget(x, y + 2, width, 16, this.getBox().getName());
         this.addWidget(this.textFieldBoxName);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.SET_BOX_NAME);
         y += 20;

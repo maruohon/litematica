@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.FileFilter;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -14,7 +14,7 @@ public class WidgetAreaSelectionBrowser extends BaseFileBrowserWidget
     private final GuiAreaSelectionManager guiAreaSelectionManager;
 
     public WidgetAreaSelectionBrowser(int x, int y, int width, int height,
-            GuiAreaSelectionManager parent, ISelectionListener<DirectoryEntry> selectionListener)
+            GuiAreaSelectionManager parent, SelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, parent.getDefaultDirectory(), DataManager.getAreaSelectionsBaseDirectory(),
                 DataManager.getDirectoryCache(), parent.getBrowserContext(), selectionListener);

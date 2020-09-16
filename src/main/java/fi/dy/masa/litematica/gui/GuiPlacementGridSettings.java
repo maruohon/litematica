@@ -10,13 +10,13 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.IntBoxCoordType;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseDialogScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.OnOffButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.listener.TextChangeListener;
+import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
+import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
@@ -95,7 +95,7 @@ public class GuiPlacementGridSettings extends BaseDialogScreen
     @Override
     protected void drawScreenBackground(int mouseX, int mouseY)
     {
-        RenderUtils.drawOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0x90000000, COLOR_HORIZONTAL_BAR, (int) this.zLevel);
+        RenderUtils.renderOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0x90000000, COLOR_HORIZONTAL_BAR, (int) this.zLevel);
     }
 
     private void updatePlacementManager()
@@ -146,14 +146,14 @@ public class GuiPlacementGridSettings extends BaseDialogScreen
         String text = String.valueOf(PositionUtils.getIntBoxValue(repeat, type));
 
         x += labelWidth;
-        WidgetTextFieldBase textField = new WidgetTextFieldBase(x, y + 2, width, 14, text);
-        textField.setTextValidator(new WidgetTextFieldInteger.IntValidator(0, Integer.MAX_VALUE));
+        BaseTextFieldWidget textField = new BaseTextFieldWidget(x, y + 2, width, 14, text);
+        textField.setTextValidator(new IntegerTextFieldWidget.IntValidator(0, Integer.MAX_VALUE));
         textField.setUpdateListenerAlways(true);
         this.addTextField(textField, new TextFieldListenerRepeat(type, this.placement, this));
 
         x += width + 4;
         String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-        GenericButton button = new GenericButton(x, y + 1, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+        GenericButton button = new GenericButton(x, y + 1, LitematicaIcons.BUTTON_PLUS_MINUS_16, hover);
 
         this.addButton(button, new ButtonListenerRepeat(type, this.placement, this));
 
@@ -171,19 +171,19 @@ public class GuiPlacementGridSettings extends BaseDialogScreen
 
         x += offset;
         int defaultSize = PositionUtils.getCoordinate(this.placement.getGridSettings().getDefaultSize(), type);
-        WidgetTextFieldBase textField = new WidgetTextFieldBase(x, y + 2, width, 14, text);
-        textField.setTextValidator(new WidgetTextFieldInteger.IntValidator(defaultSize, Integer.MAX_VALUE));
+        BaseTextFieldWidget textField = new BaseTextFieldWidget(x, y + 2, width, 14, text);
+        textField.setTextValidator(new IntegerTextFieldWidget.IntValidator(defaultSize, Integer.MAX_VALUE));
         textField.setUpdateListenerAlways(true);
         this.addTextField(textField, new TextFieldListenerSize(type, this.placement, this));
 
         x += width + 4;
         String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-        GenericButton button = new GenericButton(x, y + 1, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+        GenericButton button = new GenericButton(x, y + 1, LitematicaIcons.BUTTON_PLUS_MINUS_16, hover);
 
         this.addButton(button, new ButtonListenerSize(type, this.placement, this));
     }
 
-    private static class TextFieldListenerRepeat implements ITextFieldListener
+    private static class TextFieldListenerRepeat implements TextChangeListener
     {
         private final GuiPlacementGridSettings parent;
         private final SchematicPlacement placement;
@@ -239,7 +239,7 @@ public class GuiPlacementGridSettings extends BaseDialogScreen
         }
     }
 
-    private static class TextFieldListenerSize implements ITextFieldListener
+    private static class TextFieldListenerSize implements TextChangeListener
     {
         private final GuiPlacementGridSettings parent;
         private final SchematicPlacement placement;

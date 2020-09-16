@@ -7,8 +7,8 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.nbt.NBTTagCompound;
-import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
+import fi.dy.masa.litematica.gui.LitematicaIcons;
+import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
@@ -20,7 +20,7 @@ public class SchematicType<S extends ISchematic>
             .setDataValidator(LitematicaSchematic::isValidSchematic)
             .setExtension(LitematicaSchematic.FILE_NAME_EXTENSION)
             .setExtensionValidator(LitematicaSchematic.FILE_NAME_EXTENSION::equals)
-            .setIcon(LitematicaGuiIcons.FILE_ICON_LITEMATIC)
+            .setIcon(LitematicaIcons.FILE_ICON_LITEMATIC)
             .setHasName(true)
             .build();
 
@@ -30,7 +30,7 @@ public class SchematicType<S extends ISchematic>
             .setDataValidator(SchematicaSchematic::isValidSchematic)
             .setExtension(SchematicaSchematic.FILE_NAME_EXTENSION)
             .setExtensionValidator(SchematicaSchematic.FILE_NAME_EXTENSION::equals)
-            .setIcon(LitematicaGuiIcons.FILE_ICON_SCHEMATIC)
+            .setIcon(LitematicaIcons.FILE_ICON_SCHEMATIC)
             .setHasName(true)
             .build();
 
@@ -40,7 +40,7 @@ public class SchematicType<S extends ISchematic>
             .setDataValidator(SpongeSchematic::isValidSchematic)
             .setExtension(SpongeSchematic.FILE_NAME_EXTENSION)
             .setExtensionValidator((ext) -> { return SpongeSchematic.FILE_NAME_EXTENSION.equals(ext) || SchematicaSchematic.FILE_NAME_EXTENSION.equals(ext); })
-            .setIcon(LitematicaGuiIcons.FILE_ICON_SPONGE)
+            .setIcon(LitematicaIcons.FILE_ICON_SPONGE)
             .setHasName(true)
             .build();
 
@@ -50,14 +50,14 @@ public class SchematicType<S extends ISchematic>
             .setDataValidator(VanillaStructure::isValidSchematic)
             .setExtension(VanillaStructure.FILE_NAME_EXTENSION)
             .setExtensionValidator(VanillaStructure.FILE_NAME_EXTENSION::equals)
-            .setIcon(LitematicaGuiIcons.FILE_ICON_VANILLA)
+            .setIcon(LitematicaIcons.FILE_ICON_VANILLA)
             .setHasName(true)
             .build();
 
     public static final ImmutableList<SchematicType<?>> KNOWN_TYPES = ImmutableList.of(LITEMATICA, SCHEMATICA, SPONGE, VANILLA);
 
     private final String extension;
-    private final IGuiIcon icon;
+    private final Icon icon;
     private final Function<File, S> factory;
     private final Function<String, Boolean> extensionValidator;
     private final Function<NBTTagCompound, Boolean> dataValidator;
@@ -65,7 +65,7 @@ public class SchematicType<S extends ISchematic>
     private final boolean hasName;
 
     private SchematicType(String displayName, Function<File, S> factory, Function<NBTTagCompound, Boolean> dataValidator,
-            String extension, Function<String, Boolean> extensionValidator, IGuiIcon icon, boolean hasName)
+                          String extension, Function<String, Boolean> extensionValidator, Icon icon, boolean hasName)
     {
         this.displayName = displayName;
         this.extension = extension;
@@ -86,7 +86,7 @@ public class SchematicType<S extends ISchematic>
         return this.displayName;
     }
 
-    public IGuiIcon getIcon()
+    public Icon getIcon()
     {
         return this.icon;
     }
@@ -208,7 +208,7 @@ public class SchematicType<S extends ISchematic>
     public static class Builder<S extends ISchematic>
     {
         private String extension = null;
-        private IGuiIcon icon = null;
+        private Icon icon = null;
         private Function<File, S> factory = null;
         private Function<String, Boolean> extensionValidator = null;
         private Function<NBTTagCompound, Boolean> dataValidator = null;
@@ -251,7 +251,7 @@ public class SchematicType<S extends ISchematic>
             return this;
         }
 
-        public Builder<S> setIcon(IGuiIcon icon)
+        public Builder<S> setIcon(Icon icon)
         {
             this.icon = icon;
             return this;

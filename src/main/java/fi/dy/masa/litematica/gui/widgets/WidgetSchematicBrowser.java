@@ -19,27 +19,27 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
+import fi.dy.masa.malilib.gui.icon.Icon;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
-public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements ISelectionListener<DirectoryEntry>, IFileBrowserIconProvider
+public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements SelectionListener<DirectoryEntry>, FileBrowserIconProvider
 {
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
 
     protected final Map<File, CachedSchematicData> cachedData = new HashMap<>();
-    protected final Map<File, IGuiIcon> possibleTypeIcons = new HashMap<>();
+    protected final Map<File, Icon> possibleTypeIcons = new HashMap<>();
     protected final GuiSchematicBrowserBase parent;
-    @Nullable protected final ISelectionListener<DirectoryEntry> parentSelectionListener;
+    @Nullable protected final SelectionListener<DirectoryEntry> parentSelectionListener;
     protected final int infoWidth;
     protected final int infoHeight;
 
-    public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable ISelectionListener<DirectoryEntry> selectionListener)
+    public WidgetSchematicBrowser(int x, int y, int width, int height, GuiSchematicBrowserBase parent, @Nullable SelectionListener<DirectoryEntry> selectionListener)
     {
         super(x, y, width, height, parent.getDefaultDirectory(), DataManager.getSchematicsBaseDirectory(),
                 DataManager.getDirectoryCache(), parent.getBrowserContext());
@@ -80,7 +80,7 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements ISe
 
     @Override
     @Nullable
-    public IGuiIcon getIconForFile(File file)
+    public Icon getIconForFile(File file)
     {
         CachedSchematicData data = this.getCachedSchematicData(file);
 
@@ -89,7 +89,7 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements ISe
             return data.schematic.getType().getIcon();
         }
 
-        IGuiIcon icon = this.possibleTypeIcons.get(file);
+        Icon icon = this.possibleTypeIcons.get(file);
 
         if (icon == null && this.possibleTypeIcons.containsKey(file) == false)
         {
@@ -107,7 +107,7 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements ISe
     }
 
     @Override
-    public IFileBrowserIconProvider getIconProvider()
+    public FileBrowserIconProvider getIconProvider()
     {
         return this;
     }
@@ -139,7 +139,7 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements ISe
         int z = this.getZLevel();
         int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.drawOutlinedBox(x + 1, y, this.infoWidth, height, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
+        RenderUtils.renderOutlinedBox(x + 1, y, this.infoWidth, height, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
 
         if (entry == null)
         {
@@ -237,7 +237,7 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements ISe
                     iconSize = height - y + this.getY() - 6;
                 }
 
-                RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
+                RenderUtils.renderOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
 
                 this.bindTexture(data.iconName);
                 Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);

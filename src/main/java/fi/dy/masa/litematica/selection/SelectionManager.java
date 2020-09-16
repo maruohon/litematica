@@ -27,10 +27,10 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.message.MessageConsumer;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageConsumer;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 

@@ -8,18 +8,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
-import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
+import fi.dy.masa.litematica.gui.LitematicaIcons;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.OnOffButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -93,28 +93,28 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
         // Draw a lighter background for the hovered and the selected entry
         if (placementSelected || (isActiveGui && this.getId() == hoveredWidgetId))
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0101010, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0303030, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
         }
 
         if (placementSelected)
         {
-            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z + 1);
+            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z + 1);
         }
 
         String name = this.placement.getName();
         String pre = this.placement.isEnabled() ? BaseScreen.TXT_GREEN : BaseScreen.TXT_RED;
         this.drawString(x + 20, y + 7, 0xFFFFFFFF, pre + name);
 
-        IGuiIcon icon;
+        Icon icon;
 
         if (this.schematicPlacement.getSchematic().getFile() != null)
         {
@@ -122,14 +122,14 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
         }
         else
         {
-            icon = LitematicaGuiIcons.SCHEMATIC_TYPE_MEMORY;
+            icon = LitematicaIcons.SCHEMATIC_TYPE_MEMORY;
         }
 
         icon.renderAt(x + 2, y + 5, z, false, false);
 
         if (this.placement.isRegionPlacementModifiedFromDefault())
         {
-            icon = LitematicaGuiIcons.NOTICE_EXCLAMATION_11;
+            icon = LitematicaIcons.NOTICE_EXCLAMATION_11;
             icon.renderAt(this.buttonsStartX - icon.getWidth() - 2, y + 6, z, false, false);
         }
 
@@ -151,7 +151,7 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
             BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_sub_region_modified");
-            RenderUtils.drawHoverText(mouseX, mouseY, z, ImmutableList.of(str));
+            RenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
         else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 14, height))
         {
@@ -172,7 +172,7 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
                 text.add(StringUtils.translate("litematica.gui.label.placement_sub.hover.region_size", size.getX(), size.getY(), size.getZ()));
             }
 
-            RenderUtils.drawHoverText(mouseX, mouseY, z, text);
+            RenderUtils.renderHoverText(mouseX, mouseY, z, text);
         }
     }
 

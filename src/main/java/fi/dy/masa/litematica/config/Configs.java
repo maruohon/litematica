@@ -1,16 +1,14 @@
 package fi.dy.masa.litematica.config;
 
 import java.io.File;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
-import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
+import fi.dy.masa.malilib.config.BaseConfigOptionCategory;
+import fi.dy.masa.malilib.config.ConfigOptionCategory;
 import fi.dy.masa.malilib.config.ModConfig;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
@@ -33,7 +31,7 @@ public class Configs implements ModConfig
         public static final BooleanConfig CHANGE_SELECTED_CORNER        = new BooleanConfig("changeSelectedCornerOnMove", true, "If true, then the selected corner of an area selection\nis always set to the last moved corner,\nwhen using the set corner hotkeys");
         public static final BooleanConfig CLONE_AT_ORIGINAL_POS         = new BooleanConfig("cloneAtOriginalPosition", false, "If enabled, then using the Clone Area hotkey will create\nthe placement at the original area selection position,\ninstead of at the player's current position");
         public static final BooleanConfig CUSTOM_SCHEMATIC_DIR_ENABLED  = new BooleanConfig("customSchematicDirectoryEnabled", false, "If enabled, then the directory set in 'customSchematicDirectory'\nwill be used as the root/base schematic directory,\ninstead of the normal '.minecraft/schematics/' directory");
-        public static final DirectoryConfig CUSTOM_SCHEMATIC_DIRECTORY  = new DirectoryConfig("customSchematicDirectory", FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics")), "The root/base schematic directory to use, if 'customSchematicDirectoryEnabled' is enabled");
+        public static final DirectoryConfig CUSTOM_SCHEMATIC_DIRECTORY  = new DirectoryConfig("customSchematicDirectory", FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics"))); //, "The root/base schematic directory to use, if 'customSchematicDirectoryEnabled' is enabled");
         public static final BooleanConfig DEBUG_MESSAGES                = new BooleanConfig("debugMessages", false, "Enables some debug messages in the game console");
         public static final BooleanConfig EASY_PLACE_CLICK_ADJACENT     = new BooleanConfig("easyPlaceClickAdjacent", false, "If enabled, then the Easy Place mode will try to\nclick on existing adjacent blocks. This may help on Spigot\nor similar servers, which don't allow clicking on air blocks.");
         public static final BooleanConfig EASY_PLACE_MODE               = new BooleanConfig("easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place that block in that position");
@@ -273,9 +271,9 @@ public class Configs implements ModConfig
     // Configs that are not shown in the config GUI
     public static class Internal
     {
-        public static final BooleanConfig CREATE_PLACEMENT_ON_LOAD      = new BooleanConfig("createPlacementOnLoad", true, "A Schematic Placement is created automatically when loading a schematic");
-        public static final BooleanConfig PLACEMENT_LIST_ICON_BUTTONS   = new BooleanConfig("placementListIconButtons", false, "Show smaller, icon-only buttons in the Schematic Placements list");
-        public static final BooleanConfig SCHEMATIC_LIST_ICON_BUTTONS   = new BooleanConfig("schematicListIconButtons", false, "Show smaller, icon-only buttons in the Loaded Schematics list");
+        public static final BooleanConfig CREATE_PLACEMENT_ON_LOAD      = new BooleanConfig("createPlacementOnLoad", true);
+        public static final BooleanConfig PLACEMENT_LIST_ICON_BUTTONS   = new BooleanConfig("placementListIconButtons", false);
+        public static final BooleanConfig SCHEMATIC_LIST_ICON_BUTTONS   = new BooleanConfig("schematicListIconButtons", false);
 
         public static final ImmutableList<ConfigOption<?>> OPTIONS = ImmutableList.of(
                 CREATE_PLACEMENT_ON_LOAD,
@@ -283,6 +281,15 @@ public class Configs implements ModConfig
                 SCHEMATIC_LIST_ICON_BUTTONS
         );
     }
+
+    private static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
+            BaseConfigOptionCategory.normal("Generic",      Generic.OPTIONS),
+            BaseConfigOptionCategory.normal("InfoOverlays", InfoOverlays.OPTIONS),
+            BaseConfigOptionCategory.normal("Internal",     Internal.OPTIONS),
+            BaseConfigOptionCategory.normal("Visuals",      Visuals.OPTIONS),
+            BaseConfigOptionCategory.normal("Colors",       Colors.OPTIONS),
+            BaseConfigOptionCategory.normal("Hotkeys",      Hotkeys.HOTKEY_LIST)
+    );
 
     @Override
     public String getModId()
@@ -303,30 +310,8 @@ public class Configs implements ModConfig
     }
 
     @Override
-    public Map<String, List<? extends ConfigOption<?>>> getConfigsPerCategories()
+    public List<ConfigOptionCategory> getConfigOptionCategories()
     {
-        Map<String, List<? extends ConfigOption<?>>> map = new LinkedHashMap<>();
-
-        map.put("Generic", Generic.OPTIONS);
-        map.put("InfoOverlays", InfoOverlays.OPTIONS);
-        map.put("Internal", Internal.OPTIONS);
-        map.put("Visuals", Visuals.OPTIONS);
-        map.put("Colors", Colors.OPTIONS);
-        map.put("Hotkeys", Hotkeys.HOTKEY_LIST);
-
-        return map;
-    }
-
-    @Override
-    public boolean shouldShowCategoryOnConfigGuis(String category)
-    {
-        return category.equals("Internal") == false;
-    }
-
-    @Override
-    public void onPostLoad()
-    {
-        DataManager.setToolItem(Generic.TOOL_ITEM.getStringValue());
-        InventoryUtils.setPickBlockableSlots(Generic.PICK_BLOCKABLE_SLOTS.getStringValue());
+        return CATEGORIES;
     }
 }

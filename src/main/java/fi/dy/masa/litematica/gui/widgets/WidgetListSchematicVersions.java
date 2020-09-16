@@ -9,12 +9,12 @@ import fi.dy.masa.litematica.render.infohud.ToolHud;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.util.BaseGuiIcon;
-import fi.dy.masa.malilib.gui.widget.WidgetSearchBar;
+import fi.dy.masa.malilib.gui.icon.BaseIcon;
+import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.gui.util.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
 
 public class WidgetListSchematicVersions extends BaseListWidget<SchematicVersion, WidgetSchematicVersion>
 {
@@ -32,7 +32,7 @@ public class WidgetListSchematicVersions extends BaseListWidget<SchematicVersion
         this.setBorderColor(BaseScreen.COLOR_HORIZONTAL_BAR);
         this.setBackgroundEnabled(true);
 
-        this.addSearchBarWidget(new WidgetSearchBar(x + 2, y + 4, width - 14, 14, 0, BaseGuiIcon.SEARCH, HorizontalAlignment.LEFT));
+        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 14, 14, 0, BaseIcon.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class WidgetListSchematicVersions extends BaseListWidget<SchematicVersion
         String r = BaseScreen.TXT_RST;
         int color = 0xFFB0B0B0;
 
-        RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, this.getZLevel());
+        RenderUtils.renderOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, this.getZLevel());
 
         str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
         this.drawString(x, y, color, str);

@@ -6,28 +6,16 @@ import fi.dy.masa.litematica.gui.widgets.WidgetListLoadedSchematics;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicEntry;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.gui.BaseListScreen;
-import fi.dy.masa.malilib.gui.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicLoadedList extends BaseListScreen<ISchematic, WidgetSchematicEntry, WidgetListLoadedSchematics>
 {
     public GuiSchematicLoadedList()
     {
-        super(12, 30);
+        super(12, 30, 20, 68);
 
         this.title = StringUtils.translate("litematica.gui.title.manage_loaded_schematics");
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 20;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 68;
     }
 
     @Override

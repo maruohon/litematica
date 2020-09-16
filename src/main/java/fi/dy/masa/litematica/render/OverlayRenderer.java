@@ -48,7 +48,7 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.gui.util.HorizontalAlignment;
+import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
 import fi.dy.masa.malilib.util.WorldUtils;
 
 public class OverlayRenderer
@@ -758,7 +758,7 @@ public class OverlayRenderer
         int y = height >= width ? (height - width) / 2 : 0;
         int longerSide = Math.min(width, height);
 
-        fi.dy.masa.malilib.render.RenderUtils.drawOutline(x, y, longerSide, longerSide, 2, 0xFFFFFFFF, 0);
+        fi.dy.masa.malilib.render.RenderUtils.renderOutline(x, y, longerSide, longerSide, 2, 0xFFFFFFFF, 0);
     }
 
     private enum BoxType

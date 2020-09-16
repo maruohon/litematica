@@ -18,16 +18,16 @@ import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
-import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
+import fi.dy.masa.litematica.gui.LitematicaIcons;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.MismatchType;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.SortCriteria;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.entry.SortableListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
@@ -251,11 +251,11 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
         int width = this.getWidth();
         int height = this.getHeight();
 
-        RenderUtils.drawRect(x, y, width, height, color, z);
+        RenderUtils.renderRectangle(x, y, width, height, color, z);
 
         if (selected)
         {
-            RenderUtils.drawOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
+            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
         }
 
         int x1 = this.getColumnPosX(0);
@@ -270,7 +270,7 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
             this.drawString(x2, y, color, this.header2);
             this.drawString(x3, y, color, this.header3);
 
-            this.renderColumnHeader(mouseX, mouseY, LitematicaGuiIcons.ARROW_DOWN, LitematicaGuiIcons.ARROW_UP);
+            this.renderColumnHeader(mouseX, mouseY, LitematicaIcons.ARROW_DOWN, LitematicaIcons.ARROW_UP);
         }
         else if (this.header1 != null)
         {
@@ -290,7 +290,7 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
             this.drawString(x3, y, color, String.valueOf(this.count));
 
             y = this.getY() + 3;
-            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF, z); // light background for the item
+            RenderUtils.renderRectangle(x1, y, 16, 16, 0x20FFFFFF, z); // light background for the item
 
             boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
             boolean hasModelExpected = this.mismatchInfo.stateExpected.getRenderType() == EnumBlockRenderType.MODEL;
@@ -320,7 +320,7 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
 
             if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
             {
-                RenderUtils.drawRect(x2, y, 16, 16, 0x20FFFFFF, z); // light background for the item
+                RenderUtils.renderRectangle(x2, y, 16, 16, 0x20FFFFFF, z); // light background for the item
 
                 if (useBlockModelFound)
                 {
@@ -448,9 +448,9 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
                 int x1 = x + 10;
                 int x2 = x + this.columnWidthExpected + 30;
 
-                RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, zLevel);
-                RenderUtils.drawRect(x1, y + 16, 16, 16, 0x50C0C0C0, zLevel); // light background for the item
-                RenderUtils.drawRect(x2, y + 16, 16, 16, 0x50C0C0C0, zLevel); // light background for the item
+                RenderUtils.renderOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, zLevel);
+                RenderUtils.renderRectangle(x1, y + 16, 16, 16, 0x50C0C0C0, zLevel); // light background for the item
+                RenderUtils.renderRectangle(x2, y + 16, 16, 16, 0x50C0C0C0, zLevel); // light background for the item
 
                 FontRenderer textRenderer = mc.fontRenderer;
                 String pre = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD;

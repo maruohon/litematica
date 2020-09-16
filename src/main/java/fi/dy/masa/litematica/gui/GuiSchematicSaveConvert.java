@@ -7,20 +7,20 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.SchematicType;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.gui.interfaces.IIconProvider;
-import fi.dy.masa.malilib.gui.widget.WidgetDropDownList;
-import fi.dy.masa.malilib.gui.widget.WidgetRadioButton;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.gui.icon.Icon;
+import fi.dy.masa.malilib.gui.icon.IconProvider;
+import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
+import fi.dy.masa.malilib.gui.widget.RadioButtonWidget;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
 {
     private final ISchematic schematic;
-    private final WidgetDropDownList<SchematicType<?>> widgetOutputType;
-    private WidgetRadioButton<UpdatePlacementsOption> widgetUpdatePlacements;
+    private final DropDownListWidget<SchematicType<?>> widgetOutputType;
+    private RadioButtonWidget<UpdatePlacementsOption> widgetUpdatePlacements;
 
     public GuiSchematicSaveConvert(ISchematic schematic, String inputName)
     {
@@ -33,7 +33,7 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
         this.title = StringUtils.translate("litematica.gui.title.save_schematic_convert", inputName);
         this.useTitleHierarchy = false;
 
-        this.widgetOutputType = new WidgetDropDownList<>(9, 56, -1, 20, 200, 10, SchematicType.KNOWN_TYPES, SchematicType::getDisplayName);
+        this.widgetOutputType = new DropDownListWidget<>(9, 56, -1, 20, 200, 10, SchematicType.KNOWN_TYPES, SchematicType::getDisplayName);
         this.widgetOutputType.setIconProvider(new SchematicIconProvider());
         this.widgetOutputType.setSelectedEntry(SchematicType.LITEMATICA);
     }
@@ -66,9 +66,9 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
 
         if (this.updatePlacementsOption)
         {
-            this.widgetUpdatePlacements = new WidgetRadioButton<>(x, y - 2,
-                UpdatePlacementsOption.asList(), UpdatePlacementsOption::getDisplayString,
-                "litematica.gui.hover.schematic_save.update_dependent_placements");
+            this.widgetUpdatePlacements = new RadioButtonWidget<>(x, y - 2,
+                                                                  UpdatePlacementsOption.asList(), UpdatePlacementsOption::getDisplayString,
+                                                                  "litematica.gui.hover.schematic_save.update_dependent_placements");
             this.widgetUpdatePlacements.setSelection(UpdatePlacementsOption.NONE, false);
             this.addWidget(this.widgetUpdatePlacements);
         }
@@ -159,16 +159,16 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
         }
     }
 
-    public static class SchematicIconProvider implements IIconProvider<SchematicType<?>>
+    public static class SchematicIconProvider implements IconProvider<SchematicType<?>>
     {
         @Override
         public int getExpectedWidth()
         {
-            return LitematicaGuiIcons.FILE_ICON_LITEMATIC.getWidth();
+            return LitematicaIcons.FILE_ICON_LITEMATIC.getWidth();
         }
 
         @Override
-        public IGuiIcon getIconFor(SchematicType<?> entry)
+        public Icon getIconFor(SchematicType<?> entry)
         {
             return entry.getIcon();
         }

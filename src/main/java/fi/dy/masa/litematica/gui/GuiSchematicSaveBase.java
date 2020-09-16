@@ -7,20 +7,20 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
+import fi.dy.masa.malilib.render.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
+public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements SelectionListener<DirectoryEntry>
 {
     @Nullable protected final ISchematic schematic;
-    protected WidgetTextFieldBase textField;
+    protected BaseTextFieldWidget textField;
     protected String lastText = "";
     protected String defaultText = "";
     protected boolean updatePlacementsOption;
@@ -36,7 +36,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
 
         this.schematic = schematic;
 
-        this.textField = new WidgetTextFieldBase(10, 32, 160, 20);
+        this.textField = new BaseTextFieldWidget(10, 32, 160, 20);
         this.textField.setFocused(true);
     }
 
@@ -182,7 +182,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    protected ISelectionListener<DirectoryEntry> getSelectionListener()
+    protected SelectionListener<DirectoryEntry> getSelectionListener()
     {
         return this;
     }

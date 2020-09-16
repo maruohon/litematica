@@ -8,12 +8,12 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
+import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
 {
-    protected WidgetTextFieldBase textFieldBoxName;
+    protected BaseTextFieldWidget textFieldBoxName;
 
     public GuiAreaSelectionEditorSimple(AreaSelection selection)
     {
@@ -41,7 +41,7 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
         this.createButtonOnOff(this.xOrigin, 24, -1, currentlyOn, ButtonListener.Type.TOGGLE_ORIGIN_ENABLED);
 
         int width = 202;
-        this.textFieldBoxName = new WidgetTextFieldBase(x, y + 1, width, 18, this.getBox().getName());
+        this.textFieldBoxName = new BaseTextFieldWidget(x, y + 1, width, 18, this.getBox().getName());
         this.addWidget(this.textFieldBoxName);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.SET_BOX_NAME);
         y += 20;

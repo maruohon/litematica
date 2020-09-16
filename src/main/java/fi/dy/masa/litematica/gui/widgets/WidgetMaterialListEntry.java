@@ -4,14 +4,14 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
-import fi.dy.masa.litematica.gui.LitematicaGuiIcons;
+import fi.dy.masa.litematica.gui.LitematicaIcons;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListBase.SortCriteria;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.SortableListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -187,16 +187,16 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
         // Draw a lighter background for the hovered and the selected entry
         if (this.header1 == null && (selected || (isActiveGui && this.getId() == hoveredWidgetId)))
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0707070, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
         }
         else if (this.isOdd)
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0101010, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.drawRect(x, y, width, height, 0xA0303030, z);
+            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
         }
 
         int x1 = this.getColumnPosX(0);
@@ -215,7 +215,7 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
                 this.drawString(x3, y, color, this.header3);
                 this.drawString(x4, y, color, this.header4);
 
-                this.renderColumnHeader(mouseX, mouseY, LitematicaGuiIcons.ARROW_DOWN, LitematicaGuiIcons.ARROW_UP);
+                this.renderColumnHeader(mouseX, mouseY, LitematicaIcons.ARROW_DOWN, LitematicaIcons.ARROW_UP);
             }
         }
         else if (this.entry != null)
@@ -239,7 +239,7 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
             this.drawString(x4, y, color, pre + String.valueOf(countAvailable));
 
             y = this.getY() + 3;
-            RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF, z); // light background for the item
+            RenderUtils.renderRectangle(x1, y, 16, 16, 0x20FFFFFF, z); // light background for the item
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -296,8 +296,8 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
             int y1 = y + 6;
             int z = this.getZLevel() + 1;
 
-            RenderUtils.drawOutlinedBox(x, y, totalWidth, 60, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
-            RenderUtils.drawRect(x2, y1, 16, 16, 0x20FFFFFF, z); // light background for the item
+            RenderUtils.renderOutlinedBox(x, y, totalWidth, 60, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
+            RenderUtils.renderRectangle(x2, y1, 16, 16, 0x20FFFFFF, z); // light background for the item
             y += 10;
 
             GlStateManager.translate(0f, 0f, z + 0.1f);

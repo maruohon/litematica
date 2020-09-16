@@ -20,47 +20,35 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.button.BaseButton;
-import fi.dy.masa.malilib.gui.button.GenericButton;
-import fi.dy.masa.malilib.gui.button.OnOffButton;
-import fi.dy.masa.malilib.gui.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
-import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;
-import fi.dy.masa.malilib.gui.interfaces.ITextFieldListener;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.icon.Icon;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.WidgetCheckBox;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldBase;
-import fi.dy.masa.malilib.gui.widget.WidgetTextFieldInteger;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
+import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
+import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
+import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.render.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
-                                        implements ISelectionListener<SubRegionPlacement>
+                                        implements SelectionListener<SubRegionPlacement>
 {
     private final SchematicPlacement placement;
     private GenericButton buttonResetPlacement;
-    private WidgetTextFieldBase textFieldRename;
+    private BaseTextFieldWidget textFieldRename;
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
     {
-        super(10, 62);
+        super(10, 62, 150, 84);
         this.placement = placement;
         this.title = StringUtils.translate("litematica.gui.title.configure_schematic_placement");
-    }
-
-    @Override
-    protected int getListWidth()
-    {
-        return this.width - 150;
-    }
-
-    @Override
-    protected int getListHeight()
-    {
-        return this.height - 84;
     }
 
     @Override
@@ -73,7 +61,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         int x = 12;
         int y = 22;
 
-        this.textFieldRename = new WidgetTextFieldBase(x, y + 1, width, 18, this.placement.getName());
+        this.textFieldRename = new BaseTextFieldWidget(x, y + 1, width, 18, this.placement.getName());
         this.addWidget(this.textFieldRename);
         this.createButton(x + width + 4, y, -1, ButtonListener.Type.RENAME_PLACEMENT);
 
@@ -175,13 +163,13 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         BlockPos pos = this.placement.getOrigin();
         int value = PositionUtils.getCoordinate(pos, type);
 
-        WidgetTextFieldInteger textField = new WidgetTextFieldInteger(x, y + 1, width, 16, value);
+        IntegerTextFieldWidget textField = new IntegerTextFieldWidget(x, y + 1, width, 16, value);
         textField.setUpdateListenerAlways(true);
         this.addTextField(textField, new TextFieldListener(type, this.placement, this));
 
         String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x += width + 20;
-        WidgetCheckBox cb = new WidgetCheckBox(x, y + 3, LitematicaGuiIcons.CHECKBOX_UNSELECTED, LitematicaGuiIcons.CHECKBOX_SELECTED, "", hover);
+        CheckBoxWidget cb = new CheckBoxWidget(x, y + 3, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, "", hover);
         cb.setChecked(this.placement.isCoordinateLocked(type), false);
         cb.setListener(new CoordinateLockListener(type, this.placement));
         this.addWidget(cb);
@@ -205,7 +193,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         {
             case TOGGLE_ENCLOSING_BOX:
             {
-                IGuiIcon icon = this.placement.shouldRenderEnclosingBox() ? LitematicaGuiIcons.ENCLOSING_BOX_ENABLED : LitematicaGuiIcons.ENCLOSING_BOX_DISABLED;
+                Icon icon = this.placement.shouldRenderEnclosingBox() ? LitematicaIcons.ENCLOSING_BOX_ENABLED : LitematicaIcons.ENCLOSING_BOX_DISABLED;
                 boolean enabled = this.placement.shouldRenderEnclosingBox();
                 String str = (enabled ? TXT_GREEN : TXT_RED) + StringUtils.translate("litematica.message.value." + (enabled ? "on" : "off")) + TXT_RST;
                 String hover = StringUtils.translate("litematica.gui.button.schematic_placement.hover.enclosing_box", str);
@@ -234,14 +222,14 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
             case NUDGE_COORD_Z:
             {
                 String hover = StringUtils.translate("litematica.gui.button.hover.plus_minus_tip");
-                GenericButton button = new GenericButton(x, y, LitematicaGuiIcons.BUTTON_PLUS_MINUS_16, hover);
+                GenericButton button = new GenericButton(x, y, LitematicaIcons.BUTTON_PLUS_MINUS_16, hover);
                 this.addButton(button, listener);
                 return width;
             }
 
             case COPY_PASTE_SETTINGS:
             {
-                GenericButton button = new GenericButton(x, y, 20, 20, "", LitematicaGuiIcons.DUPLICATE, type.getHoverText());
+                GenericButton button = new GenericButton(x, y, 20, 20, "", LitematicaIcons.DUPLICATE, type.getHoverText());
                 return this.addButton(button, listener).getWidth();
             }
 
@@ -296,7 +284,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
     }
 
     @Override
-    protected ISelectionListener<SubRegionPlacement> getSelectionListener()
+    protected SelectionListener<SubRegionPlacement> getSelectionListener()
     {
         return this;
     }
@@ -544,7 +532,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         }
     }
 
-    private static class TextFieldListener implements ITextFieldListener
+    private static class TextFieldListener implements TextChangeListener
     {
         private final GuiPlacementConfiguration parent;
         private final SchematicPlacementManager manager;
@@ -581,7 +569,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         }
     }
 
-    private static class CoordinateLockListener implements ISelectionListener<WidgetCheckBox>
+    private static class CoordinateLockListener implements SelectionListener<CheckBoxWidget>
     {
         private final SchematicPlacement placement;
         private final CoordinateType type;
@@ -593,7 +581,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         }
 
         @Override
-        public void onSelectionChange(WidgetCheckBox entry)
+        public void onSelectionChange(CheckBoxWidget entry)
         {
             this.placement.setCoordinateLocked(this.type, entry.isChecked());
         }
