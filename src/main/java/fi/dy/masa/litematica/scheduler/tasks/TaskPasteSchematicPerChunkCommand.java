@@ -229,7 +229,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                 String nbtString = nbt.toString();
                 */
 
-                String strCommand = String.format(Locale.ROOT, "/summon %s %f %f %f", entityName, entity.posX, entity.posY, entity.posZ);
+                String strCommand = String.format(Locale.ROOT, "/minecraft:summon %s %f %f %f", entityName, entity.posX, entity.posY, entity.posZ);
                 /*
                 String strCommand = String.format("/summon %s %f %f %f %s", entityName, entity.posX, entity.posY, entity.posZ, nbtString);
                 System.out.printf("entity: %s\n", entity);
