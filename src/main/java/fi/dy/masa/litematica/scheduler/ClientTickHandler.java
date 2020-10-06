@@ -10,13 +10,10 @@ public class ClientTickHandler implements fi.dy.masa.malilib.event.ClientTickHan
     @Override
     public void onClientTick(Minecraft mc)
     {
-        if (mc.world != null && mc.player != null)
-        {
-            InputHandler.onTick(mc);
-            DebugScreenMessages.update(mc);
-            DataManager.getRenderLayerRange().followPlayerIfEnabled(mc.player);
-            DataManager.getSchematicPlacementManager().processQueuedChunks();
-            TaskScheduler.getInstanceClient().runTasks();
-        }
+        InputHandler.onTick(mc);
+        DebugScreenMessages.update(mc);
+        DataManager.getRenderLayerRange().followPlayerIfEnabled(mc.player);
+        DataManager.getSchematicPlacementManager().processQueuedChunks();
+        TaskScheduler.getInstanceClient().runTasks();
     }
 }

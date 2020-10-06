@@ -17,11 +17,9 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 {
     @Override
-    public void onPostWorldRender(float partialTicks)
+    public void onPostWorldRender(Minecraft mc, float partialTicks)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue())
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.isHeld();
 
@@ -57,11 +55,9 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
     }
 
     @Override
-    public void onPostGameOverlayRender(float partialTicks)
+    public void onPostGameOverlayRender(Minecraft mc, float partialTicks)
     {
-        Minecraft mc = Minecraft.getMinecraft();
-
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue())
         {
             // The Info HUD renderers can decide if they want to be rendered in GUIs
             InfoHud.getInstance().renderHud();
