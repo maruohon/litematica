@@ -32,9 +32,9 @@ import net.minecraft.util.math.BlockPos;
 public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
                                         implements ISelectionListener<SubRegionPlacement>
 {
-    private final SchematicPlacement placement;
-    private ButtonGeneric buttonResetPlacement;
-    private GuiTextFieldGeneric textFieldRename;
+    public final SchematicPlacement placement;
+    public ButtonGeneric buttonResetPlacement;
+    public GuiTextFieldGeneric textFieldRename;
 
     public GuiPlacementConfiguration(SchematicPlacement placement)
     {
@@ -159,7 +159,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.updateElements();
     }
 
-    private void createCoordinateInput(int x, int y, int width, CoordinateType type)
+    protected void createCoordinateInput(int x, int y, int width, CoordinateType type)
     {
         String label = type.name() + ":";
         this.addLabel(x, y, width, 20, 0xFFFFFFFF, label);
@@ -188,7 +188,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         this.addWidget(cb);
     }
 
-    private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
+    public int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
         ButtonOnOff button = new ButtonOnOff(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
         String hoverString = type.getHoverText();
@@ -203,7 +203,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         return button.getWidth();
     }
 
-    private int createButton(int x, int y, int width, ButtonListener.Type type)
+    public int createButton(int x, int y, int width, ButtonListener.Type type)
     {
         ButtonListener listener = new ButtonListener(type, this.placement, this);
         String label = "";
@@ -285,7 +285,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         return width;
     }
 
-    private void updateElements()
+    protected void updateElements()
     {
         String label = StringUtils.translate("litematica.gui.button.schematic_placement.reset_sub_region_placements");;
         boolean enabled = true;
@@ -326,11 +326,11 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         return new WidgetListPlacementSubRegions(listX, listY, this.getBrowserWidth(), this.getBrowserHeight(), this);
     }
 
-    private static class ButtonListener implements IButtonActionListener
+    public static class ButtonListener implements IButtonActionListener
     {
-        private final GuiPlacementConfiguration parent;
-        private final SchematicPlacement placement;
-        private final Type type;
+        public final GuiPlacementConfiguration parent;
+        public final SchematicPlacement placement;
+        public final Type type;
 
         public ButtonListener(Type type, SchematicPlacement placement, GuiPlacementConfiguration parent)
         {
@@ -496,11 +496,11 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         }
     }
 
-    private static class TextFieldListener implements ITextFieldListener<GuiTextFieldInteger>
+    public static class TextFieldListener implements ITextFieldListener<GuiTextFieldInteger>
     {
-        private final GuiPlacementConfiguration parent;
-        private final SchematicPlacement placement;
-        private final CoordinateType type;
+        public final GuiPlacementConfiguration parent;
+        public final SchematicPlacement placement;
+        public final CoordinateType type;
 
         public TextFieldListener(CoordinateType type, SchematicPlacement placement, GuiPlacementConfiguration parent)
         {
@@ -535,12 +535,12 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         }
     }
 
-    private static class CoordinateLockListener implements ISelectionListener<WidgetCheckBox>
+    public static class CoordinateLockListener implements ISelectionListener<WidgetCheckBox>
     {
-        private final SchematicPlacement placement;
-        private final CoordinateType type;
+        public final SchematicPlacement placement;
+        public final CoordinateType type;
 
-        private CoordinateLockListener(CoordinateType type, SchematicPlacement placement)
+        public CoordinateLockListener(CoordinateType type, SchematicPlacement placement)
         {
             this.type = type;
             this.placement = placement;

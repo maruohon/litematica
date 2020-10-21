@@ -24,11 +24,11 @@ import net.minecraft.util.math.Vec3i;
 
 public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlacement>
 {
-    private final SchematicPlacementManager manager;
-    private final WidgetListSchematicPlacements parent;
-    private final SchematicPlacement placement;
-    private final boolean isOdd;
-    private int buttonsStartX;
+    public final SchematicPlacementManager manager;
+    public final WidgetListSchematicPlacements parent;
+    public final SchematicPlacement placement;
+    public final boolean isOdd;
+    public int buttonsStartX;
 
     public WidgetSchematicPlacement(int x, int y, int width, int height, boolean isOdd,
             SchematicPlacement placement, int listIndex, WidgetListSchematicPlacements parent)
@@ -52,12 +52,12 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         this.buttonsStartX = posX;
     }
 
-    private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
+    public int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
         return this.addButton(new ButtonGeneric(xRight, y, -1, true, type.getDisplayName()), new ButtonListener(type, this)).getX() - 1;
     }
 
-    private int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
+    public int createButtonOnOff(int xRight, int y, boolean isCurrentlyOn, ButtonListener.ButtonType type)
     {
         ButtonOnOff button = new ButtonOnOff(xRight, y, -1, true, type.getTranslationKey(), isCurrentlyOn);
         return this.addButton(button, new ButtonListener(type, this)).getX() - 2;
@@ -166,10 +166,10 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
         }
     }
 
-    static class ButtonListener implements IButtonActionListener
+    public static class ButtonListener implements IButtonActionListener
     {
-        private final ButtonType type;
-        private final WidgetSchematicPlacement widget;
+        public final ButtonType type;
+        public final WidgetSchematicPlacement widget;
 
         public ButtonListener(ButtonType type, WidgetSchematicPlacement widget)
         {
@@ -213,7 +213,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
             private final String translationKey;
 
-            private ButtonType(String translationKey)
+            ButtonType(String translationKey)
             {
                 this.translationKey = translationKey;
             }

@@ -14,7 +14,7 @@ import fi.dy.masa.malilib.util.FileUtils;
 
 public class WidgetListSchematicPlacements extends WidgetListBase<SchematicPlacement, WidgetSchematicPlacement>
 {
-    private final GuiSchematicPlacementsList parent;
+    public final GuiSchematicPlacementsList parent;
 
     public WidgetListSchematicPlacements(int x, int y, int width, int height, GuiSchematicPlacementsList parent)
     {

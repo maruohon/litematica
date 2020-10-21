@@ -14,7 +14,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicPlacementsList extends GuiListBase<SchematicPlacement, WidgetSchematicPlacement, WidgetListSchematicPlacements> implements ISelectionListener<SchematicPlacement>
 {
-    private final SchematicPlacementManager manager;
+    public final SchematicPlacementManager manager;
 
     public GuiSchematicPlacementsList()
     {
