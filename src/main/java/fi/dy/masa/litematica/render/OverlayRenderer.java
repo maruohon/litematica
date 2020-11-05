@@ -14,6 +14,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -380,7 +381,7 @@ public class OverlayRenderer
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+        buffer.begin(VertexFormat.class_5596.field_27377, VertexFormats.POSITION_COLOR); // LINES
         MismatchRenderPos lookedEntry = null;
         MismatchRenderPos prevEntry = null;
         boolean connections = Configs.Visuals.RENDER_ERROR_MARKER_CONNECTIONS.getBooleanValue();
@@ -414,7 +415,7 @@ public class OverlayRenderer
             }
 
             tessellator.draw();
-            buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+            buffer.begin(VertexFormat.class_5596.field_27377, VertexFormats.POSITION_COLOR); // LINES
 
             RenderSystem.lineWidth(6f);
             RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, this.mc);
@@ -427,7 +428,7 @@ public class OverlayRenderer
             RenderSystem.enableBlend();
             RenderSystem.disableCull();
 
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+            buffer.begin(VertexFormat.class_5596.field_27382, VertexFormats.POSITION_COLOR); // QUADS
             float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_ALPHA.getDoubleValue();
 
             for (MismatchRenderPos entry : posList)

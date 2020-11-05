@@ -2,6 +2,8 @@ package fi.dy.masa.litematica.util;
 
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
@@ -14,14 +16,12 @@ import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
 
 public class ToolUtils
 {
     public static void fillSelectionVolumes(MinecraftClient mc, BlockState state, @Nullable BlockState stateToReplace)
     {
-        if (mc.player != null && mc.player.abilities.creativeMode)
+        if (mc.player != null && mc.player.isCreative())
         {
             final AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
 
@@ -81,7 +81,7 @@ public class ToolUtils
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities,
             @Nullable ICompletionListener listener, MinecraftClient mc)
     {
-        if (mc.player != null && mc.player.abilities.creativeMode)
+        if (mc.player != null && mc.player.isCreative())
         {
             if (area == null)
             {

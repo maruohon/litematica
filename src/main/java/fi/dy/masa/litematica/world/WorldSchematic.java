@@ -158,7 +158,7 @@ public class WorldSchematic extends World
 
         if (entity != null)
         {
-            entity.remove();
+            entity.discard();
             entity.detach();
 
             if (entity.updateNeeded)

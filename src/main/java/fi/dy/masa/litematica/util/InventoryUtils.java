@@ -37,12 +37,12 @@ public class InventoryUtils
     public static void setPickedItemToHand(ItemStack stack, MinecraftClient mc)
     {
         PlayerEntity player = mc.player;
-        PlayerInventory inventory = player.inventory;
+        PlayerInventory inventory = player.method_31548();
         int slotNum = inventory.getSlotWithStack(stack);
 
         if (PlayerInventory.isValidHotbarIndex(slotNum))
         {
-            player.inventory.selectedSlot = slotNum;
+            inventory.selectedSlot = slotNum;
         }
         else
         {
@@ -58,9 +58,9 @@ public class InventoryUtils
 
             if (slotNum == -1)
             {
-                if (PICK_BLOCKABLE_SLOTS.contains(player.inventory.selectedSlot + 1))
+                if (PICK_BLOCKABLE_SLOTS.contains(inventory.selectedSlot + 1))
                 {
-                    slotNum = player.inventory.selectedSlot;
+                    slotNum = inventory.selectedSlot;
                 }
                 else
                 {
@@ -82,7 +82,7 @@ public class InventoryUtils
             {
                 inventory.selectedSlot = slotNum;
 
-                if (player.abilities.creativeMode)
+                if (player.isCreative())
                 {
                     inventory.main.set(slotNum, stack.copy());
                 }

@@ -427,7 +427,7 @@ public class LitematicaSchematic
 
                             try
                             {
-                                te.fromTag(state, teNBT);
+                                te.fromTag(teNBT);
 
                                 if (ignoreInventories && te instanceof Inventory)
                                 {
@@ -708,7 +708,7 @@ public class LitematicaSchematic
 
                             try
                             {
-                                te.fromTag(state, teNBT);
+                                te.fromTag(teNBT);
 
                                 if (mirrorMain != BlockMirror.NONE) { te.applyMirror(mirrorMain); }
                                 if (mirrorSub != BlockMirror.NONE)  { te.applyMirror(mirrorSub); }

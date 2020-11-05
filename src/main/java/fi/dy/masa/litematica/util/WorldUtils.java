@@ -371,10 +371,10 @@ public class WorldUtils
 
             if (stack.isEmpty() == false)
             {
-                PlayerInventory inv = mc.player.inventory;
+                PlayerInventory inv = mc.player.method_31548();
                 stack = stack.copy();
 
-                if (mc.player.abilities.creativeMode)
+                if (mc.player.isCreative())
                 {
                     BlockEntity te = world.getBlockEntity(pos);
 

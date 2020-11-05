@@ -100,7 +100,7 @@ public class TaskFillArea extends TaskProcessChunkBase
             {
                 if ((entity instanceof PlayerEntity) == false)
                 {
-                    entity.remove();
+                    entity.discard();
                 }
             }
         }
