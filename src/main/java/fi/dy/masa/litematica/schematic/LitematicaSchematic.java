@@ -392,7 +392,7 @@ public class LitematicaSchematic
                     if (mirrorSub != BlockMirror.NONE)  { state = state.mirror(mirrorSub); }
                     if (rotationCombined != BlockRotation.NONE) { state = state.rotate(rotationCombined); }
 
-                    if (stateOld == state && state.getBlock().hasBlockEntity() == false)
+                    if (stateOld == state && state.hasBlockEntity() == false)
                     {
                         continue;
                     }
@@ -433,10 +433,6 @@ public class LitematicaSchematic
                                 {
                                     ((Inventory) te).clear();
                                 }
-
-                                if (mirrorMain != BlockMirror.NONE) { te.applyMirror(mirrorMain); }
-                                if (mirrorSub != BlockMirror.NONE)  { te.applyMirror(mirrorSub); }
-                                if (rotationCombined != BlockRotation.NONE) { te.applyRotation(rotationCombined); }
                             }
                             catch (Exception e)
                             {
@@ -709,10 +705,6 @@ public class LitematicaSchematic
                             try
                             {
                                 te.fromTag(teNBT);
-
-                                if (mirrorMain != BlockMirror.NONE) { te.applyMirror(mirrorMain); }
-                                if (mirrorSub != BlockMirror.NONE)  { te.applyMirror(mirrorSub); }
-                                if (rotationCombined != BlockRotation.NONE) { te.applyRotation(rotationCombined); }
                             }
                             catch (Exception e)
                             {
@@ -907,7 +899,7 @@ public class LitematicaSchematic
                             this.totalBlocks++;
                         }
 
-                        if (state.getBlock().hasBlockEntity())
+                        if (state.hasBlockEntity())
                         {
                             BlockEntity te = world.getBlockEntity(posMutable);
 
@@ -1033,7 +1025,7 @@ public class LitematicaSchematic
                             this.totalBlocks++;
                         }
 
-                        if (state.getBlock().hasBlockEntity())
+                        if (state.hasBlockEntity())
                         {
                             BlockEntity te = world.getBlockEntity(posMutable);
 

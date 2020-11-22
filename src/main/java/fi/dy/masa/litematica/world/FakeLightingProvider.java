@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.ChunkNibbleArray;
+import net.minecraft.world.chunk.ChunkProvider;
 import net.minecraft.world.chunk.light.ChunkLightingView;
 import net.minecraft.world.chunk.light.LightingProvider;
 
@@ -12,9 +13,9 @@ public class FakeLightingProvider extends LightingProvider
 {
     private final FakeLightingView lightingView;
 
-    public FakeLightingProvider()
+    public FakeLightingProvider(ChunkProvider chunkProvider)
     {
-        super(null, false, false);
+        super(chunkProvider, false, false);
 
         this.lightingView = new FakeLightingView();
     }

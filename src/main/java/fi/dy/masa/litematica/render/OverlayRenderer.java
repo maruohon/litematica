@@ -381,7 +381,7 @@ public class OverlayRenderer
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.class_5596.field_27377, VertexFormats.POSITION_COLOR); // LINES
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
         MismatchRenderPos lookedEntry = null;
         MismatchRenderPos prevEntry = null;
         boolean connections = Configs.Visuals.RENDER_ERROR_MARKER_CONNECTIONS.getBooleanValue();
@@ -415,7 +415,7 @@ public class OverlayRenderer
             }
 
             tessellator.draw();
-            buffer.begin(VertexFormat.class_5596.field_27377, VertexFormats.POSITION_COLOR); // LINES
+            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
 
             RenderSystem.lineWidth(6f);
             RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, this.mc);
@@ -428,7 +428,7 @@ public class OverlayRenderer
             RenderSystem.enableBlend();
             RenderSystem.disableCull();
 
-            buffer.begin(VertexFormat.class_5596.field_27382, VertexFormats.POSITION_COLOR); // QUADS
+            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_ALPHA.getDoubleValue();
 
             for (MismatchRenderPos entry : posList)

@@ -9,4 +9,18 @@ public interface IBlockReaderWithData extends BlockView
 {
     @Nullable
     CompoundTag getBlockEntityData(BlockPos pos);
+
+    @Override
+    default int getSectionCount()
+    {
+        // TODO 1.17
+        return 16;
+    }
+
+    @Override
+    default int getBottomSectionLimit()
+    {
+        // TODO 1.17
+        return 0;
+    }
 }

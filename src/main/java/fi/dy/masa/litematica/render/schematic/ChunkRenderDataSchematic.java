@@ -45,8 +45,8 @@ public class ChunkRenderDataSchematic
 
     private final boolean[] overlayLayersUsed = new boolean[OverlayRenderType.values().length];
     private final boolean[] overlayLayersStarted = new boolean[OverlayRenderType.values().length];
-    private final Map<RenderLayer, BufferBuilder.State> blockBufferStates = new HashMap<>();
-    private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.values().length];
+    private final Map<RenderLayer, BufferBuilder.class_5594> blockBufferStates = new HashMap<>();
+    private final BufferBuilder.class_5594[] overlayBufferStates = new BufferBuilder.class_5594[OverlayRenderType.values().length];
     private boolean overlayEmpty = true;
     private boolean empty = true;
     private long timeBuilt;
@@ -103,22 +103,22 @@ public class ChunkRenderDataSchematic
         return this.overlayLayersStarted[type.ordinal()];
     }
 
-    public BufferBuilder.State getBlockBufferState(RenderLayer layer)
+    public BufferBuilder.class_5594 getBlockBufferState(RenderLayer layer)
     {
         return this.blockBufferStates.get(layer);
     }
 
-    public void setBlockBufferState(RenderLayer layer, BufferBuilder.State state)
+    public void setBlockBufferState(RenderLayer layer, BufferBuilder.class_5594 state)
     {
         this.blockBufferStates.put(layer, state);
     }
 
-    public BufferBuilder.State getOverlayBufferState(OverlayRenderType type)
+    public BufferBuilder.class_5594 getOverlayBufferState(OverlayRenderType type)
     {
         return this.overlayBufferStates[type.ordinal()];
     }
 
-    public void setOverlayBufferState(OverlayRenderType type, BufferBuilder.State state)
+    public void setOverlayBufferState(OverlayRenderType type, BufferBuilder.class_5594 state)
     {
         this.overlayBufferStates[type.ordinal()] = state;
     }

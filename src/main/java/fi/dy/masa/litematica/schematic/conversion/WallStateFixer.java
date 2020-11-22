@@ -85,7 +85,7 @@ public class WallStateFixer implements SchematicConversionFixers.IStateFixer
         Block block = state.getBlock();
 
         return state.isIn(BlockTags.WALLS) ||
-               Block.cannotConnect(block) == false && faceFullSquare ||
+               Block.cannotConnect(state) == false && faceFullSquare ||
                block instanceof PaneBlock ||
                block instanceof FenceGateBlock && FenceGateBlock.canWallConnect(state, side);
     }
@@ -126,7 +126,7 @@ public class WallStateFixer implements SchematicConversionFixers.IStateFixer
                 }
                 else
                 {
-                    return stateUp.getBlock().isIn(BlockTags.WALL_POST_OVERRIDE) || this.shapesDoNotIntersect(shapeAbove, SHAPE_PILLAR);
+                    return stateUp.isIn(BlockTags.WALL_POST_OVERRIDE) || this.shapesDoNotIntersect(shapeAbove, SHAPE_PILLAR);
                 }
             }
         }

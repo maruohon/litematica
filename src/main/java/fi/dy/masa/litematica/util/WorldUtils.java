@@ -371,7 +371,7 @@ public class WorldUtils
 
             if (stack.isEmpty() == false)
             {
-                PlayerInventory inv = mc.player.method_31548();
+                PlayerInventory inv = mc.player.getInventory();
                 stack = stack.copy();
 
                 if (mc.player.isCreative())

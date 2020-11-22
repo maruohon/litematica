@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -23,7 +22,6 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
@@ -81,7 +79,7 @@ public class ChunkRendererSchematicVbo
     public ChunkRendererSchematicVbo(WorldSchematic world, WorldRendererSchematic worldRenderer)
     {
         this.world = world;
-        this.worldRenderer = (WorldRendererSchematic) worldRenderer;
+        this.worldRenderer = worldRenderer;
         this.chunkRenderData = ChunkRenderDataSchematic.EMPTY;
         this.chunkRenderLock = new ReentrantLock();
         this.chunkRenderDataLock = new ReentrantLock();
@@ -89,16 +87,15 @@ public class ChunkRendererSchematicVbo
         this.vertexBufferOverlay = new VertexBuffer[OverlayRenderType.values().length];
         this.position = new BlockPos.Mutable();
         this.chunkRelativePos = new BlockPos.Mutable();
-        VertexFormat formatBlocks = RenderLayer.getSolid().getVertexFormat();
 
         for (RenderLayer layer : RenderLayer.getBlockLayers())
         {
-            this.vertexBufferBlocks.put(layer, new VertexBuffer(formatBlocks));
+            this.vertexBufferBlocks.put(layer, new VertexBuffer());
         }
 
         for (int i = 0; i < OverlayRenderType.values().length; ++i)
         {
-            this.vertexBufferOverlay[i] = new VertexBuffer(VertexFormats.POSITION_COLOR);
+            this.vertexBufferOverlay[i] = new VertexBuffer();
         }
     }
 
@@ -202,7 +199,7 @@ public class ChunkRendererSchematicVbo
         RenderLayer layerTranslucent = RenderLayer.getTranslucent();
         ChunkRenderDataSchematic data = task.getChunkRenderData();
         BufferBuilderCache buffers = task.getBufferCache();
-        BufferBuilder.State bufferState = data.getBlockBufferState(layerTranslucent);
+        BufferBuilder.class_5594 bufferState = data.getBlockBufferState(layerTranslucent);
         Vec3d cameraPos = task.getCameraPosSupplier().get();
         float x = (float) cameraPos.x - this.position.getX();
         float y = (float) cameraPos.y - this.position.getY();
@@ -230,7 +227,7 @@ public class ChunkRendererSchematicVbo
             {
                 BufferBuilder buffer = buffers.getOverlayBuffer(type);
 
-                this.preRenderOverlay(buffer, type.getGlMode());
+                this.preRenderOverlay(buffer, type.getDrawMode());
                 buffer.restoreState(bufferState);
                 this.postRenderOverlay(type, x, y, z, buffer, data);
             }
@@ -357,7 +354,6 @@ public class ChunkRendererSchematicVbo
     {
         BlockState stateSchematic = this.schematicWorldView.getBlockState(pos);
         BlockState stateClient    = this.clientWorldView.getBlockState(pos);
-        Block blockSchematic = stateSchematic.getBlock();
         boolean clientHasAir = stateClient.isAir();
         boolean schematicHasAir = stateSchematic.isAir();
         boolean missing = false;
@@ -372,7 +368,7 @@ public class ChunkRendererSchematicVbo
         // Schematic has a block, client has air
         if (clientHasAir || (stateSchematic != stateClient && Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue()))
         {
-            if (blockSchematic.hasBlockEntity())
+            if (stateSchematic.hasBlockEntity())
             {
                 this.addBlockEntity(pos, data, tileEntities);
             }
@@ -731,7 +727,7 @@ public class ChunkRendererSchematicVbo
 
         if (te != null)
         {
-            BlockEntityRenderer<BlockEntity> tesr = BlockEntityRenderDispatcher.INSTANCE.get(te);
+            BlockEntityRenderer<BlockEntity> tesr = MinecraftClient.getInstance().method_31975().get(te);
 
             if (tesr != null)
             {
@@ -747,14 +743,14 @@ public class ChunkRendererSchematicVbo
 
     private void preRenderBlocks(BufferBuilder buffer)
     {
-        buffer.begin(GL11.GL_QUADS, RenderLayer.getSolid().getVertexFormat());
+        buffer.begin(VertexFormat.DrawMode.QUADS, RenderLayer.getSolid().getVertexFormat());
     }
 
     private void postRenderBlocks(RenderLayer layer, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
     {
         if (layer == RenderLayer.getTranslucent() && chunkRenderData.isBlockLayerEmpty(layer) == false)
         {
-            buffer.sortQuads(x, y, z);
+            buffer.method_31948(x, y, z); // sortQuads
             chunkRenderData.setBlockBufferState(layer, buffer.popState());
         }
 
@@ -766,19 +762,19 @@ public class ChunkRendererSchematicVbo
         this.existingOverlays.add(type);
         this.hasOverlay = true;
 
-        buffer.begin(type.getGlMode(), VertexFormats.POSITION_COLOR);
+        buffer.begin(type.getDrawMode(), VertexFormats.POSITION_COLOR);
     }
 
-    private void preRenderOverlay(BufferBuilder buffer, int glMode)
+    private void preRenderOverlay(BufferBuilder buffer, VertexFormat.DrawMode drawMode)
     {
-        buffer.begin(glMode, VertexFormats.POSITION_COLOR);
+        buffer.begin(drawMode, VertexFormats.POSITION_COLOR);
     }
 
     private void postRenderOverlay(OverlayRenderType type, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
     {
         if (type == OverlayRenderType.QUAD && chunkRenderData.isOverlayTypeEmpty(type) == false)
         {
-            buffer.sortQuads(x, y, z);
+            buffer.method_31948(x, y, z); // sortQuads
             chunkRenderData.setOverlayBufferState(type, buffer.popState());
         }
 
@@ -909,19 +905,19 @@ public class ChunkRendererSchematicVbo
 
     public enum OverlayRenderType
     {
-        OUTLINE     (GL11.GL_LINES),
-        QUAD        (GL11.GL_QUADS);
+        OUTLINE     (VertexFormat.DrawMode.LINES),
+        QUAD        (VertexFormat.DrawMode.QUADS);
 
-        private final int glMode;
+        private final VertexFormat.DrawMode drawMode;
 
-        private OverlayRenderType(int glMode)
+        OverlayRenderType(VertexFormat.DrawMode drawMode)
         {
-            this.glMode = glMode;
+            this.drawMode = drawMode;
         }
 
-        public int getGlMode()
+        public VertexFormat.DrawMode getDrawMode()
         {
-            return this.glMode;
+            return this.drawMode;
         }
     }
 }

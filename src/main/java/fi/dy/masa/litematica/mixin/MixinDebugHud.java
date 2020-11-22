@@ -31,7 +31,7 @@ public abstract class MixinDebugHud extends DrawableHelper
 
             list.add(String.format("%s[Litematica]%s %s C#: %d", pre, rst, renderer.getDebugInfoRenders(), world.getChunkProvider().getLoadedChunks().size()));
 
-            String str = String.format("E: %d TE: %d", world.getRegularEntityCount(), world.blockEntities.size());
+            String str = String.format("E: %d TE: TODO 1.17", world.getRegularEntityCount()); //, world.blockEntities.size()); // TODO 1.17
             list.add(String.format("%s[Litematica]%s %s %s", pre, rst, renderer.getDebugInfoEntities(), str));
         }
     }

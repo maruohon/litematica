@@ -144,8 +144,6 @@ public class SchematicaSchematic
                                 try
                                 {
                                     te.fromTag(teNBT);
-                                    te.applyMirror(mirror);
-                                    te.applyRotation(rotation);
                                 }
                                 catch (Exception e)
                                 {
@@ -207,8 +205,6 @@ public class SchematicaSchematic
         {
             final BlockPos posMin = PositionUtils.getMinCorner(posStart, posEnd);
             final BlockPos posMax = PositionUtils.getMaxCorner(posStart, posEnd);
-            final BlockRotation rotation = placement.getRotation();
-            final BlockMirror mirror = placement.getMirror();
             final int cxStart = posMin.getX() >> 4;
             final int czStart = posMin.getZ() >> 4;
             final int cxEnd = posMax.getX() >> 4;
@@ -281,8 +277,6 @@ public class SchematicaSchematic
                                         try
                                         {
                                             te.fromTag(teNBT);
-                                            te.applyMirror(mirror);
-                                            te.applyRotation(rotation);
                                         }
                                         catch (Exception e)
                                         {

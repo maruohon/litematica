@@ -9,18 +9,21 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkProvider;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.chunk.light.LightingProvider;
 import net.minecraft.world.level.ColorResolver;
 import fi.dy.masa.litematica.world.FakeLightingProvider;
 
-public class ChunkCacheSchematic implements BlockRenderView
+public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
 {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
 
+    protected final World world;
     protected final ClientWorld worldClient;
     protected final FakeLightingProvider lightingProvider;
     protected int chunkStartX;
@@ -30,7 +33,8 @@ public class ChunkCacheSchematic implements BlockRenderView
 
     public ChunkCacheSchematic(World worldIn, ClientWorld clientWorld, BlockPos pos, int expand)
     {
-        this.lightingProvider = new FakeLightingProvider();
+        this.world = worldIn;
+        this.lightingProvider = new FakeLightingProvider(this);
 
         this.worldClient = clientWorld;
         this.chunkStartX = (pos.getX() - expand) >> 4;
@@ -61,6 +65,19 @@ public class ChunkCacheSchematic implements BlockRenderView
                 }
             }
         }
+    }
+
+    @Override
+    public BlockView getWorld()
+    {
+        return this.world;
+    }
+
+    @Override
+    @org.jetbrains.annotations.Nullable
+    public BlockView getChunk(int chunkX, int chunkZ)
+    {
+        return null; // TODO 1.17 this shouldn't be needed since the lighting provider does nothing
     }
 
     public boolean isEmpty()
@@ -136,5 +153,19 @@ public class ChunkCacheSchematic implements BlockRenderView
     public float getBrightness(Direction direction, boolean bl)
     {
         return this.worldClient.getBrightness(direction, bl); // AO brightness on face
+    }
+
+    @Override
+    public int getSectionCount()
+    {
+        // TODO 1.17
+        return 16;
+    }
+
+    @Override
+    public int getBottomSectionLimit()
+    {
+        // TODO 1.17
+        return 0;
     }
 }

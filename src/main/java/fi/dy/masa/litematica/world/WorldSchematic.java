@@ -1,16 +1,16 @@
 package fi.dy.masa.litematica.world;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.class_5575;
+import net.minecraft.class_5577;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.DummyClientTickScheduler;
 import net.minecraft.entity.Entity;
@@ -24,6 +24,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.TagManager;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
@@ -40,15 +41,14 @@ import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class WorldSchematic extends World
 {
     private final MinecraftClient mc;
     private final WorldRendererSchematic worldRenderer;
     private final ChunkManagerSchematic chunkManagerSchematic;
-    private final Int2ObjectOpenHashMap<Entity> regularEntities = new Int2ObjectOpenHashMap<>();
     private int nextEntityId;
+    private int entityCount;
 
     protected WorldSchematic(MutableWorldProperties mutableWorldProperties, DimensionType dimensionType, Supplier<Profiler> supplier)
     {
@@ -84,7 +84,7 @@ public class WorldSchematic extends World
 
     public int getRegularEntityCount()
     {
-        return this.regularEntities.size();
+        return this.entityCount;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public WorldChunk getChunk(int chunkX, int chunkZ)
+    public ChunkSchematic getChunk(int chunkX, int chunkZ)
     {
         return this.chunkManagerSchematic.getChunk(chunkX, chunkZ);
     }
@@ -131,62 +131,39 @@ public class WorldSchematic extends World
 
     private boolean spawnEntityBase(Entity entity)
     {
-        int cx = MathHelper.floor(entity.getX() / 16.0D);
-        int cz = MathHelper.floor(entity.getZ() / 16.0D);
+        int chunkX = MathHelper.floor(entity.getX() / 16.0D);
+        int chunkZ = MathHelper.floor(entity.getZ() / 16.0D);
 
-        if (this.chunkManagerSchematic.isChunkLoaded(cx, cz) == false)
+        if (this.chunkManagerSchematic.isChunkLoaded(chunkX, chunkZ) == false)
         {
             return false;
         }
         else
         {
             entity.setEntityId(this.nextEntityId++);
-
-            int id = entity.getEntityId();
-            this.removeEntity(id);
-
-            this.regularEntities.put(id, entity);
-            this.chunkManagerSchematic.getChunk(MathHelper.floor(entity.getX() / 16.0D), MathHelper.floor(entity.getZ() / 16.0D)).addEntity(entity);
+            this.chunkManagerSchematic.getChunk(chunkX, chunkZ).addEntity(entity);
+            ++this.entityCount;
 
             return true;
         }
     }
 
-    public void removeEntity(int id)
+    public void unloadedEntities(int count)
     {
-        Entity entity = this.regularEntities.remove(id);
-
-        if (entity != null)
-        {
-            entity.discard();
-            entity.detach();
-
-            if (entity.updateNeeded)
-            {
-                this.getChunk(entity.chunkX, entity.chunkZ).remove(entity);
-            }
-        }
+        this.entityCount -= count;
     }
 
     @Nullable
     @Override
     public Entity getEntityById(int id)
     {
-        return this.regularEntities.get(id);
+        return null; // this shouldn't be used for anything in the mod, so just returning null here in 1.17+
     }
 
     @Override
     public List<? extends PlayerEntity> getPlayers()
     {
         return ImmutableList.of();
-    }
-
-    public void unloadBlockEntities(Collection<BlockEntity> blockEntities)
-    {
-        Set<BlockEntity> remove = Collections.newSetFromMap(new IdentityHashMap<>());
-        remove.addAll(blockEntities);
-        this.tickingBlockEntities.removeAll(remove);
-        this.blockEntities.removeAll(remove);
     }
 
     @Override
@@ -230,6 +207,67 @@ public class WorldSchematic extends World
     public TagManager getTagManager()
     {
         return this.mc.world != null ? this.mc.world.getTagManager() : null;
+    }
+
+    @Override
+    protected class_5577<Entity> method_31592()
+    {
+        // TODO 1.17
+        return null;
+    }
+
+    @Override
+    public List<Entity> getOtherEntities(@Nullable final Entity except, final Box box, Predicate<? super Entity> predicate)
+    {
+        final int minY = MathHelper.floor(box.minY / 16.0);
+        final int maxY = MathHelper.floor(box.maxY / 16.0);
+        final List<Entity> entities = new ArrayList<>();
+        List<ChunkSchematic> chunks = this.getChunksWithinBox(box);
+
+        for (ChunkSchematic chunk : chunks)
+        {
+            for (int cy = minY; cy <= maxY; ++cy)
+            {
+                chunk.getEntityListForSectionIfExists(cy).forEach((e) -> {
+                    if (e != except && box.intersects(e.getBoundingBox()) && predicate.test(e)) {
+                        entities.add(e);
+                    }
+                });
+            }
+        }
+
+        return entities;
+    }
+
+    @Override
+    public <T extends Entity> List<T> getEntitiesByType(class_5575<Entity, T> arg, Box box, Predicate<? super T> predicate)
+    {
+        return Collections.emptyList(); // TODO 1.17
+    }
+
+    public List<ChunkSchematic> getChunksWithinBox(Box box)
+    {
+        final int minX = MathHelper.floor(box.minX / 16.0);
+        final int minZ = MathHelper.floor(box.minZ / 16.0);
+        final int maxX = MathHelper.floor(box.maxX / 16.0);
+        final int maxZ = MathHelper.floor(box.maxZ / 16.0);
+
+        List<ChunkSchematic> chunks = new ArrayList<>();
+
+        for (int cx = minX; cx <= maxX; ++cx)
+        {
+            for (int cz = minZ; cz <= maxZ; ++cz)
+            {
+                ChunkSchematic chunk = this.chunkManagerSchematic.getChunkIfExists(cx, cz);
+
+                if (chunk != null)
+                {
+                    chunks.add(chunk);
+                }
+            }
+        }
+
+        return chunks;
     }
 
     @Override

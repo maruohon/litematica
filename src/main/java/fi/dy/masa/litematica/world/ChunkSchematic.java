@@ -1,14 +1,19 @@
 package fi.dy.masa.litematica.world;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -16,11 +21,14 @@ import net.minecraft.world.biome.BuiltinBiomes;
 import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class ChunkSchematic extends WorldChunk
 {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
 
+    private final Int2ObjectOpenHashMap<List<Entity>> entityLists = new Int2ObjectOpenHashMap<>();
+    private int entityCount;
     private final long timeCreated;
     private boolean isEmpty = true;
 
@@ -102,29 +110,14 @@ public class ChunkSchematic extends WorldChunk
             }
             else
             {
-                if (blockOld.hasBlockEntity())
-                {
-                    BlockEntity te = this.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
-
-                    if (te != null)
-                    {
-                        te.resetBlock();
-                    }
-                }
-
-                if (blockNew.hasBlockEntity() && blockNew instanceof BlockEntityProvider)
+                if (state.hasBlockEntity() && blockNew instanceof BlockEntityProvider)
                 {
                     BlockEntity te = this.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
 
                     if (te == null)
                     {
-                        te = ((BlockEntityProvider) blockNew).createBlockEntity(this.getWorld());
-                        this.getWorld().setBlockEntity(pos, te);
-                    }
-
-                    if (te != null)
-                    {
-                        te.resetBlock();
+                        te = ((BlockEntityProvider) blockNew).createBlockEntity(pos, state);
+                        this.getWorld().getWorldChunk(pos).setBlockEntity(te);
                     }
                 }
 
@@ -133,6 +126,25 @@ public class ChunkSchematic extends WorldChunk
                 return stateOld;
             }
         }
+    }
+
+    @Override
+    public void addEntity(Entity entity)
+    {
+        int chunkY = MathHelper.floor(entity.getY());
+        List<Entity> list = this.entityLists.computeIfAbsent(chunkY, (y) -> new ArrayList<>());
+        list.add(entity);
+        ++this.entityCount;
+    }
+
+    public List<Entity> getEntityListForSectionIfExists(int sectionY)
+    {
+        return this.entityLists.getOrDefault(sectionY, Collections.emptyList());
+    }
+
+    public int getEntityCount()
+    {
+        return this.entityCount;
     }
 
     public long getTimeCreated()

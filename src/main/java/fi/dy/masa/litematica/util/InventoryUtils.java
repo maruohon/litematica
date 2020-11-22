@@ -37,7 +37,7 @@ public class InventoryUtils
     public static void setPickedItemToHand(ItemStack stack, MinecraftClient mc)
     {
         PlayerEntity player = mc.player;
-        PlayerInventory inventory = player.method_31548();
+        PlayerInventory inventory = player.getInventory();
         int slotNum = inventory.getSlotWithStack(stack);
 
         if (PlayerInventory.isValidHotbarIndex(slotNum))

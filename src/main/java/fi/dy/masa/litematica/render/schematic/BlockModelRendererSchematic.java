@@ -23,6 +23,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockRenderView;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.malilib.util.PositionUtils;
 
 public class BlockModelRendererSchematic
 {
@@ -58,8 +59,8 @@ public class BlockModelRendererSchematic
         {
             CrashReport crashreport = CrashReport.create(throwable, "Tesselating block model");
             CrashReportSection crashreportcategory = crashreport.addElement("Block model being tesselated");
-            CrashReportSection.addBlockInfo(crashreportcategory, posIn, stateIn);
-            crashreportcategory.add("Using AO", Boolean.valueOf(ao));
+            CrashReportSection.addBlockInfo(crashreportcategory, worldIn, posIn, stateIn);
+            crashreportcategory.add("Using AO", ao);
             throw new CrashException(crashreport);
         }
     }
@@ -68,11 +69,11 @@ public class BlockModelRendererSchematic
             VertexConsumer vertexConsumer, Random random, long seedIn, int overlay)
     {
         boolean renderedSomething = false;
-        float[] quadBounds = new float[Direction.values().length * 2];
+        float[] quadBounds = new float[PositionUtils.ALL_DIRECTIONS.length * 2];
         BitSet bitset = new BitSet(3);
         AmbientOcclusionCalculator aoFace = new AmbientOcclusionCalculator();
 
-        for (Direction side : Direction.values())
+        for (Direction side : PositionUtils.ALL_DIRECTIONS)
         {
             random.setSeed(seedIn);
             List<BakedQuad> quads = modelIn.getQuads(stateIn, side, random);
@@ -88,7 +89,7 @@ public class BlockModelRendererSchematic
         }
 
         random.setSeed(seedIn);
-        List<BakedQuad> quads = modelIn.getQuads(stateIn, (Direction) null, random);
+        List<BakedQuad> quads = modelIn.getQuads(stateIn, null, random);
 
         if (quads.isEmpty() == false)
         {
@@ -105,7 +106,7 @@ public class BlockModelRendererSchematic
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
 
-        for (Direction side : Direction.values())
+        for (Direction side : PositionUtils.ALL_DIRECTIONS)
         {
             random.setSeed(seedIn);
             List<BakedQuad> quads = modelIn.getQuads(stateIn, side, random);
@@ -137,7 +138,7 @@ public class BlockModelRendererSchematic
     {
         return DataManager.getRenderLayerRange().isPositionAtRenderEdgeOnSide(posIn, side) ||
                (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.getBooleanValue()) ||
-               Block.shouldDrawSide(stateIn, worldIn, posIn, side);
+               Block.shouldDrawSide(stateIn, worldIn, posIn, side ,posIn.offset(side));
     }
 
     private void renderQuadsSmooth(BlockRenderView world, BlockState state, BlockPos pos, MatrixStack matrices,

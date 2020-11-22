@@ -74,7 +74,7 @@ public class MaterialListUtils
             convertStatesToStacks(countsMissing, itemTypesMissing, cache);
             convertStatesToStacks(countsMismatch, itemTypesMismatch, cache);
 
-            Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.method_31548());
+            Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.getInventory());
 
             for (ItemType type : itemTypesTotal.keySet())
             {
@@ -120,7 +120,7 @@ public class MaterialListUtils
 
     public static void updateAvailableCounts(List<MaterialListEntry> list, PlayerEntity player)
     {
-        Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.method_31548());
+        Object2IntOpenHashMap<ItemType> playerInvItems = InventoryUtils.getInventoryItemCounts(player.getInventory());
 
         for (MaterialListEntry entry : list)
         {

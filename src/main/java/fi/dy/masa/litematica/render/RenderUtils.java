@@ -49,7 +49,7 @@ public class RenderUtils
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.class_5596.field_27377, VertexFormats.POSITION_COLOR); // LINES
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
 
         drawBlockBoundingBoxOutlinesBatchedLines(pos, color, expand, buffer, mc);
 
@@ -122,7 +122,7 @@ public class RenderUtils
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.class_5596.field_27377, VertexFormats.POSITION_COLOR); // LINES
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
 
         // Min corner
         buffer.vertex(minX, minY, minZ).color(color1.r, color1.g, color1.b, color1.a).next();
@@ -190,7 +190,7 @@ public class RenderUtils
     {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(VertexFormat.class_5596.field_27377, VertexFormats.POSITION_COLOR); // LINES
+        bufferbuilder.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
 
         drawBoundingBoxLinesX(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorX);
         drawBoundingBoxLinesY(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorY);
@@ -251,7 +251,7 @@ public class RenderUtils
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.class_5596.field_27382, VertexFormats.POSITION_COLOR); // QUADS
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
         renderAreaSidesBatched(pos1, pos2, color, 0.002, buffer, mc);
 
@@ -317,7 +317,7 @@ public class RenderUtils
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.class_5596.field_27377, VertexFormats.POSITION_COLOR); // LINES
+        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
 
         // Edges along the X-axis
         start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMin) ? xMin + 1 : xMin;
