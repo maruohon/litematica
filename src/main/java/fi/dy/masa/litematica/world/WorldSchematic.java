@@ -180,7 +180,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public void putMapState(MapState mapState)
+    public void putMapState(String name, MapState mapState)
     {
         // NO-OP
     }
