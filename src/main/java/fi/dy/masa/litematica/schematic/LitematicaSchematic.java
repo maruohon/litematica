@@ -19,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
@@ -800,7 +801,7 @@ public class LitematicaSchematic
             net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
             BlockPos regionPosAbs = box.getPos1();
             List<EntityInfo> list = new ArrayList<>();
-            List<Entity> entities = world.getOtherEntities(null, bb, null);
+            List<Entity> entities = world.getOtherEntities(null, bb, (e) -> (e instanceof PlayerEntity) == false);
 
             for (Entity entity : entities)
             {
@@ -834,7 +835,7 @@ public class LitematicaSchematic
             }
 
             net.minecraft.util.math.Box bb = PositionUtils.createAABBFrom(entry.getValue());
-            List<Entity> entities = world.getOtherEntities(null, bb, null);
+            List<Entity> entities = world.getOtherEntities(null, bb, (e) -> (e instanceof PlayerEntity) == false);
             BlockPos regionPosAbs = box.getPos1();
 
             for (Entity entity : entities)

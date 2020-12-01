@@ -15,6 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.StructureBlockMode;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -395,7 +396,7 @@ public class SchematicaSchematic
     private void readEntitiesFromWorld(World world, BlockPos posStart, BlockPos size)
     {
         this.entities.clear();
-        List<Entity> entities = world.getOtherEntities(null, new net.minecraft.util.math.Box(posStart, posStart.add(size)));
+        List<Entity> entities = world.getOtherEntities(null, new net.minecraft.util.math.Box(posStart, posStart.add(size)), (e) -> (e instanceof PlayerEntity) == false);
 
         for (Entity entity : entities)
         {
