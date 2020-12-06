@@ -1615,7 +1615,7 @@ public class LitematicaSchematic
             CompoundTag entityData = tagList.getCompound(i);
             Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
 
-            if (posVec != null && entityData.isEmpty() == false)
+            if (posVec != null && entityData.method_33133() == false) // isEmpty
             {
                 entityList.add(new EntityInfo(posVec, entityData));
             }
@@ -1634,7 +1634,7 @@ public class LitematicaSchematic
             CompoundTag tag = tagList.getCompound(i);
             BlockPos pos = NBTUtils.readBlockPos(tag);
 
-            if (pos != null && tag.isEmpty() == false)
+            if (pos != null && tag.method_33133() == false) // isEmpty
             {
                 tileMap.put(pos, tag);
             }
@@ -1711,7 +1711,7 @@ public class LitematicaSchematic
             Vec3d posVec = NBTUtils.readVec3d(tag);
             CompoundTag entityData = tag.getCompound("EntityData");
 
-            if (posVec != null && entityData.isEmpty() == false)
+            if (posVec != null && entityData.method_33133() == false) // isEmpty
             {
                 // Update the correct position to the TileEntity NBT, where it is stored in version 2
                 NBTUtils.writeEntityPositionToTag(posVec, entityData);
@@ -1735,7 +1735,7 @@ public class LitematicaSchematic
             // Note: This within-schematic relative position is not inside the tile tag!
             BlockPos pos = NBTUtils.readBlockPos(tag);
 
-            if (pos != null && tileNbt.isEmpty() == false)
+            if (pos != null && tileNbt.method_33133() == false) // isEmpty
             {
                 // Update the correct position to the entity NBT, where it is stored in version 2
                 NBTUtils.writeBlockPosToTag(pos, tileNbt);

@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.class_5575;
 import net.minecraft.class_5577;
+import net.minecraft.class_5712;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.DummyClientTickScheduler;
 import net.minecraft.entity.Entity;
@@ -352,6 +353,12 @@ public class WorldSchematic extends World
     @Override
     public void syncWorldEvent(@Nullable PlayerEntity entity, int id, BlockPos pos, int data)
     {
+    }
+
+    @Override
+    public void method_32888(@org.jetbrains.annotations.Nullable Entity entity, class_5712 arg, BlockPos blockPos)
+    {
+        // NO-OP
     }
 
     @Override

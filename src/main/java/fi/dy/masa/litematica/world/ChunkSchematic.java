@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.world;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import net.minecraft.block.Block;
@@ -10,15 +9,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BuiltinBiomes;
 import net.minecraft.world.biome.source.BiomeArray;
+import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -34,7 +32,8 @@ public class ChunkSchematic extends WorldChunk
 
     public ChunkSchematic(World worldIn, ChunkPos pos)
     {
-        super(worldIn, pos, new BiomeArray(worldIn.getRegistryManager().get(Registry.BIOME_KEY), Util.make(new Biome[BiomeArray.DEFAULT_LENGTH], (biomes) -> Arrays.fill(biomes, BuiltinBiomes.PLAINS))));
+        super(worldIn, pos, new BiomeArray(worldIn.getRegistryManager().get(Registry.BIOME_KEY),
+                                           worldIn, pos, new FixedBiomeSource(BuiltinBiomes.THE_VOID)));
 
         this.timeCreated = worldIn.getTime();
     }
