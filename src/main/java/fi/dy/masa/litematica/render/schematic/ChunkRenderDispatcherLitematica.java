@@ -18,7 +18,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
@@ -39,13 +38,17 @@ public class ChunkRenderDispatcherLitematica
 
     public ChunkRenderDispatcherLitematica()
     {
-        int threadLimitMemory = Math.max(1, (int)((double)Runtime.getRuntime().maxMemory() * 0.3D) / 10485760);
-        int threadLimitCPU = Math.max(1, MathHelper.clamp(Runtime.getRuntime().availableProcessors(), 1, threadLimitMemory / 5));
-        this.countRenderBuilders = MathHelper.clamp(threadLimitCPU * 10, 1, threadLimitMemory);
+        //int threadLimitMemory = Math.max(1, (int)((double)Runtime.getRuntime().maxMemory() * 0.3D) / 10485760);
+        //int threadLimitCPU = Math.max(1, MathHelper.clamp(Runtime.getRuntime().availableProcessors(), 1, threadLimitMemory / 5));
+        //this.countRenderBuilders = MathHelper.clamp(threadLimitCPU * 10, 1, threadLimitMemory);
+        this.countRenderBuilders = 2;
         this.cameraPos = Vec3d.ZERO;
 
+        /*
         if (threadLimitCPU > 1)
         {
+            Litematica.logger.info("Creating {} render threads", threadLimitCPU);
+
             for (int i = 0; i < threadLimitCPU; ++i)
             {
                 ChunkRenderWorkerLitematica worker = new ChunkRenderWorkerLitematica(this);
@@ -55,6 +58,9 @@ public class ChunkRenderDispatcherLitematica
                 this.listWorkerThreads.add(thread);
             }
         }
+        */
+
+        Litematica.logger.info("Using {} total BufferBuilder caches", this.countRenderBuilders + 1);
 
         this.queueFreeRenderBuilders = Queues.newArrayBlockingQueue(this.countRenderBuilders);
 
