@@ -36,7 +36,6 @@ public class LitematicaRenderer
     private boolean renderPiecewise;
     private boolean renderPiecewiseSchematic;
     private boolean renderPiecewiseBlocks;
-    private boolean renderPiecewisePrepared;
     private boolean translucentSchematic;
 
     static
@@ -302,10 +301,11 @@ public class LitematicaRenderer
         this.renderPiecewise = Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() &&
                                Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
                                this.mc.getCameraEntity() != null;
-        this.renderPiecewisePrepared = false;
+        this.renderPiecewiseSchematic = false;
         this.renderPiecewiseBlocks = false;
+        WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
-        if (this.renderPiecewise && frustum != null)
+        if (this.renderPiecewise && frustum != null && worldRenderer.hasWorld())
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
             this.renderPiecewiseSchematic = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
@@ -315,7 +315,6 @@ public class LitematicaRenderer
             this.mc.getProfiler().push("litematica_culling");
 
             this.calculateFinishTime();
-            WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
             this.mc.getProfiler().swap("litematica_terrain_setup");
             worldRenderer.setupTerrain(this.getCamera(), frustum, this.frameCount++, this.mc.player.isSpectator());
@@ -326,7 +325,6 @@ public class LitematicaRenderer
             this.mc.getProfiler().pop();
 
             this.frustum = frustum;
-            this.renderPiecewisePrepared = true;
         }
     }
 
@@ -497,7 +495,6 @@ public class LitematicaRenderer
     private void cleanup()
     {
         this.renderPiecewise = false;
-        this.renderPiecewisePrepared = false;
         this.renderPiecewiseSchematic = false;
         this.renderPiecewiseBlocks = false;
     }

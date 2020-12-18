@@ -105,6 +105,11 @@ public class WorldRendererSchematic
         this.displayListEntitiesDirty = true;
     }
 
+    public boolean hasWorld()
+    {
+        return this.world != null;
+    }
+
     public String getDebugInfoRenders()
     {
         int rcTotal = this.chunkRendererDispatcher != null ? this.chunkRendererDispatcher.renderers.length : 0;
@@ -172,7 +177,7 @@ public class WorldRendererSchematic
 
     public void loadRenderers()
     {
-        if (this.world != null)
+        if (this.hasWorld())
         {
             if (this.renderDispatcher == null)
             {
