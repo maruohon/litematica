@@ -343,7 +343,7 @@ public class SchematicConversionFixers
 
     public static final IStateFixer FIXER_REDSTONE_WIRE = (reader, state, pos) -> {
         RedstoneWireBlock wire = (RedstoneWireBlock) state.getBlock();
-        state = ((IMixinRedstoneWireBlock) wire).litematicaGetFullState(reader, state, pos);
+        state = ((IMixinRedstoneWireBlock) wire).litematicaGetPlacementState(reader, state, pos);
 
         // Turn all old dots into crosses, while keeping the power level
         if (state.with(RedstoneWireBlock.POWER, 0) == REDSTONE_WIRE_DOT)

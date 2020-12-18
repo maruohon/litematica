@@ -80,7 +80,7 @@ public class SchematicaSchematic
             CompoundTag entityData = this.entities.get(i);
             Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
 
-            if (posVec != null && entityData.method_33133() == false) // isEmpty
+            if (posVec != null && entityData.isEmpty() == false)
             {
                 entityList.add(new EntityInfo(posVec, entityData));
             }

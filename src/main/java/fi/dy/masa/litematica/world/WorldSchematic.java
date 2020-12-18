@@ -11,7 +11,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.class_5575;
 import net.minecraft.class_5577;
-import net.minecraft.class_5712;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.DummyClientTickScheduler;
 import net.minecraft.entity.Entity;
@@ -40,6 +39,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.event.GameEvent;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 
@@ -356,7 +356,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public void method_32888(@org.jetbrains.annotations.Nullable Entity entity, class_5712 arg, BlockPos blockPos)
+    public void emitGameEvent(@org.jetbrains.annotations.Nullable Entity entity, GameEvent event, BlockPos pos)
     {
         // NO-OP
     }
