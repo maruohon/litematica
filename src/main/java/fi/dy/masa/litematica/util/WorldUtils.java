@@ -120,8 +120,9 @@ public class WorldUtils
         Box box = area.getSelectedSubRegionBox();
         area.setSubRegionCornerPos(box, Corner.CORNER_1, BlockPos.ORIGIN);
         area.setSubRegionCornerPos(box, Corner.CORNER_2, (new BlockPos(schematic.getSize())).add(-1, -1, -1));
+        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(false, false);
 
-        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);
+        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, info, "?", feedback);
 
         if (litematicaSchematic != null && ignoreEntities == false)
         {

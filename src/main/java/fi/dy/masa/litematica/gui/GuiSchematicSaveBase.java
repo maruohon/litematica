@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.util.math.MatrixStack;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -13,12 +14,12 @@ import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase.DirectoryEntryType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.KeyCodes;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.util.math.MatrixStack;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
     protected GuiTextFieldGeneric textField;
     protected WidgetCheckBox checkboxIgnoreEntities;
+    protected WidgetCheckBox checkboxVisibleOnly;
     protected String lastText = "";
     protected String defaultText = "";
     @Nullable protected final LitematicaSchematic schematic;
@@ -85,6 +86,9 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         String str = StringUtils.translate("litematica.gui.label.schematic_save.checkbox.ignore_entities");
         this.checkboxIgnoreEntities = new WidgetCheckBox(x, y + 24, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, str);
         this.addWidget(this.checkboxIgnoreEntities);
+
+        this.checkboxVisibleOnly = new WidgetCheckBox(12, y + 24, Icons.CHECKBOX_UNSELECTED, Icons.CHECKBOX_SELECTED, "Visible blocks only [experimental quick hax]");
+        this.addWidget(this.checkboxVisibleOnly);
 
         x = this.createButton(x, y, ButtonType.SAVE);
     }

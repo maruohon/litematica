@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -16,8 +18,6 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
 public class TaskSaveSchematic extends TaskProcessChunkBase
 {
@@ -27,15 +27,15 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
     private final Set<UUID> existingEntities = new HashSet<>();
     @Nullable private final File dir;
     @Nullable private final String fileName;
-    private final boolean takeEntities;
+    private final LitematicaSchematic.SchematicSaveInfo info;
     private final boolean overrideFile;
 
-    public TaskSaveSchematic(LitematicaSchematic schematic, AreaSelection area, boolean takeEntities)
+    public TaskSaveSchematic(LitematicaSchematic schematic, AreaSelection area, LitematicaSchematic.SchematicSaveInfo info)
     {
-        this(null, null, schematic, area, takeEntities, false);
+        this(null, null, schematic, area, info, false);
     }
 
-    public TaskSaveSchematic(@Nullable File dir, @Nullable String fileName, LitematicaSchematic schematic, AreaSelection area, boolean takeEntities, boolean overrideFile)
+    public TaskSaveSchematic(@Nullable File dir, @Nullable String fileName, LitematicaSchematic schematic, AreaSelection area, LitematicaSchematic.SchematicSaveInfo info, boolean overrideFile)
     {
         super("litematica.gui.label.task_name.save_schematic");
 
@@ -44,7 +44,7 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
         this.schematic = schematic;
         this.origin = area.getEffectiveOrigin();
         this.subRegions = area.getAllSubRegions();
-        this.takeEntities = takeEntities;
+        this.info = info;
         this.overrideFile = overrideFile;
 
         this.addBoxesPerChunks(area.getAllSubRegionBoxes());
@@ -61,9 +61,9 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
     protected boolean processChunk(ChunkPos pos)
     {
         ImmutableMap<String, IntBoundingBox> volumes = PositionUtils.getBoxesWithinChunk(pos.x, pos.z, this.subRegions);
-        this.schematic.takeBlocksFromWorldWithinChunk(this.world, pos.x, pos.z, volumes, this.subRegions);
+        this.schematic.takeBlocksFromWorldWithinChunk(this.world, volumes, this.subRegions, this.info);
 
-        if (this.takeEntities)
+        if (this.info.ignoreEntities == false)
         {
             this.schematic.takeEntitiesFromWorldWithinChunk(this.world, pos.x, pos.z, volumes, this.subRegions, this.existingEntities, this.origin);
         }
