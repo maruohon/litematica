@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -105,6 +106,11 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     public boolean onMouseScroll(int mouseX, int mouseY, double dWheel)
     {
         MinecraftClient mc = MinecraftClient.getInstance();
+
+        if (Configs.Generic.DEBUG_LOGGING.getBooleanValue())
+        {
+            Litematica.logger.info("Mouse scroll: x: {}, y; {}, wheel: {}", mouseX, mouseY, dWheel);
+        }
 
         // Not in a GUI
         if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null)
