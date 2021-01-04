@@ -394,7 +394,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
             if (mismatch != null)
             {
-                this.recheckQueue.add(pos);
+                this.recheckQueue.add(pos.toImmutable());
             }
         }
     }
