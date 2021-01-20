@@ -21,7 +21,6 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
@@ -89,11 +88,10 @@ public class ChunkRendererSchematicVbo
         this.vertexBufferOverlay = new VertexBuffer[OverlayRenderType.values().length];
         this.position = new BlockPos.Mutable();
         this.chunkRelativePos = new BlockPos.Mutable();
-        VertexFormat formatBlocks = RenderLayer.getSolid().getVertexFormat();
 
         for (RenderLayer layer : RenderLayer.getBlockLayers())
         {
-            this.vertexBufferBlocks.put(layer, new VertexBuffer(formatBlocks));
+            this.vertexBufferBlocks.put(layer, new VertexBuffer(layer.getVertexFormat()));
         }
 
         for (int i = 0; i < OverlayRenderType.values().length; ++i)
@@ -214,7 +212,7 @@ public class ChunkRendererSchematicVbo
             {
                 BufferBuilder buffer = buffers.getBlockBufferByLayer(layerTranslucent);
 
-                this.preRenderBlocks(buffer);
+                this.preRenderBlocks(buffer, layerTranslucent);
                 buffer.restoreState(bufferState);
                 this.postRenderBlocks(layerTranslucent, x, y, z, buffer, data);
             }
@@ -389,7 +387,7 @@ public class ChunkRendererSchematicVbo
                 if (data.isBlockLayerStarted(layer) == false)
                 {
                     data.setBlockLayerStarted(layer);
-                    this.preRenderBlocks(bufferSchematic);
+                    this.preRenderBlocks(bufferSchematic, layer);
                 }
 
                 if (this.worldRenderer.renderFluid(this.schematicWorldView, fluidState, pos, bufferSchematic))
@@ -406,7 +404,7 @@ public class ChunkRendererSchematicVbo
                 if (data.isBlockLayerStarted(layer) == false)
                 {
                     data.setBlockLayerStarted(layer);
-                    this.preRenderBlocks(bufferSchematic);
+                    this.preRenderBlocks(bufferSchematic, layer);
                 }
 
                 if (this.worldRenderer.renderBlock(this.schematicWorldView, stateSchematic, pos, matrices, bufferSchematic))
@@ -745,9 +743,9 @@ public class ChunkRendererSchematicVbo
         }
     }
 
-    private void preRenderBlocks(BufferBuilder buffer)
+    private void preRenderBlocks(BufferBuilder buffer, RenderLayer layer)
     {
-        buffer.begin(GL11.GL_QUADS, RenderLayer.getSolid().getVertexFormat());
+        buffer.begin(GL11.GL_QUADS, layer.getVertexFormat());
     }
 
     private void postRenderBlocks(RenderLayer layer, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
