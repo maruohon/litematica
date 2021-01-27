@@ -11,7 +11,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.class_5575;
 import net.minecraft.class_5577;
+import net.minecraft.class_5582;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.world.DummyClientTickScheduler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -211,8 +213,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    protected class_5577<Entity> method_31592()
-    {
+    protected class_5577<Entity> getEntityIdMap() {
         // TODO 1.17
         return null;
     }

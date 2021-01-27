@@ -727,7 +727,7 @@ public class ChunkRendererSchematicVbo
 
         if (te != null)
         {
-            BlockEntityRenderer<BlockEntity> tesr = MinecraftClient.getInstance().method_31975().get(te);
+            BlockEntityRenderer<BlockEntity> tesr = MinecraftClient.getInstance().getBlockEntityRenderDispatcher().get(te);
 
             if (tesr != null)
             {

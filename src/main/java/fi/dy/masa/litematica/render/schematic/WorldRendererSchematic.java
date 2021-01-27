@@ -616,7 +616,7 @@ public class WorldRendererSchematic
             double cameraY = camera.getPos().y;
             double cameraZ = camera.getPos().z;
 
-            MinecraftClient.getInstance().method_31975().configure(this.world, camera, this.mc.crosshairTarget);
+            MinecraftClient.getInstance().getBlockEntityRenderDispatcher().configure(this.world, camera, this.mc.crosshairTarget);
             this.entityRenderDispatcher.configure(this.world, camera, this.mc.targetedEntity);
 
             this.countEntitiesTotal = 0;
@@ -663,7 +663,7 @@ public class WorldRendererSchematic
             }
 
             this.world.getProfiler().swap("block_entities");
-            BlockEntityRenderDispatcher renderer = MinecraftClient.getInstance().method_31975();
+            BlockEntityRenderDispatcher renderer = MinecraftClient.getInstance().getBlockEntityRenderDispatcher();
 
             for (ChunkRendererSchematicVbo chunkRenderer : this.renderInfos)
             {
