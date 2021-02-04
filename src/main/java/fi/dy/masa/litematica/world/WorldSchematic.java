@@ -211,7 +211,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    protected class_5577<Entity> method_31592()
+    protected class_5577<Entity> getEntityIdMap()
     {
         // TODO 1.17
         return null;

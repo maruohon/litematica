@@ -234,9 +234,9 @@ public class WorldRendererSchematic
         double entityX = entity.getX();
         double entityY = entity.getY();
         double entityZ = entity.getZ();
-        int chunkX = ChunkSectionPos.method_32204(entityX);
-        int chunkY = ChunkSectionPos.method_32204(entityY);
-        int chunkZ = ChunkSectionPos.method_32204(entityZ);
+        int chunkX = ChunkSectionPos.getSectionCoord(entityX);
+        int chunkY = ChunkSectionPos.getSectionCoord(entityY);
+        int chunkZ = ChunkSectionPos.getSectionCoord(entityZ);
 
         double diffX = entityX - this.lastCameraChunkUpdateX;
         double diffY = entityY - this.lastCameraChunkUpdateY;
@@ -616,7 +616,7 @@ public class WorldRendererSchematic
             double cameraY = camera.getPos().y;
             double cameraZ = camera.getPos().z;
 
-            MinecraftClient.getInstance().method_31975().configure(this.world, camera, this.mc.crosshairTarget);
+            MinecraftClient.getInstance().getBlockEntityRenderDispatcher().configure(this.world, camera, this.mc.crosshairTarget);
             this.entityRenderDispatcher.configure(this.world, camera, this.mc.targetedEntity);
 
             this.countEntitiesTotal = 0;
@@ -663,7 +663,7 @@ public class WorldRendererSchematic
             }
 
             this.world.getProfiler().swap("block_entities");
-            BlockEntityRenderDispatcher renderer = MinecraftClient.getInstance().method_31975();
+            BlockEntityRenderDispatcher renderer = MinecraftClient.getInstance().getBlockEntityRenderDispatcher();
 
             for (ChunkRendererSchematicVbo chunkRenderer : this.renderInfos)
             {

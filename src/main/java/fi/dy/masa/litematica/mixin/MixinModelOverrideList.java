@@ -6,15 +6,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProvider;
-import net.minecraft.client.render.model.json.ModelOverride;
+import net.minecraft.client.render.model.json.ModelOverrideList;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
-@Mixin(ModelOverride.class)
-public abstract class MixinModelOverride
+@Mixin(ModelOverrideList.class)
+public abstract class MixinModelOverrideList
 {
-    @Redirect(method = "matches", at = @At(value = "INVOKE",
+    @Redirect(method = "apply", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/client/item/ModelPredicateProvider;call(" +
                        "Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/world/ClientWorld;" +
                        "Lnet/minecraft/entity/LivingEntity;I)F"))

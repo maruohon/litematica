@@ -22,7 +22,7 @@ public class SchematicWorldHandler
     public static WorldSchematic createSchematicWorld()
     {
         ClientWorld.Properties levelInfo = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
-        Optional<? extends Registry<DimensionType>> optional = MinecraftClient.getInstance().world.getRegistryManager().method_33310(Registry.DIMENSION_TYPE_KEY);
+        Optional<? extends Registry<DimensionType>> optional = MinecraftClient.getInstance().world.getRegistryManager().getOptional(Registry.DIMENSION_TYPE_KEY);
         DimensionType dimType = optional.map(dimensionTypes -> dimensionTypes.get(DimensionType.THE_END_REGISTRY_KEY)).orElse(null);
         return new WorldSchematic(levelInfo, dimType, MinecraftClient.getInstance()::getProfiler);
     }
