@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
 
 public class InventoryUtils
 {
@@ -112,5 +113,23 @@ public class InventoryUtils
         }
 
         return -1;
+    }
+
+    public static boolean doesShulkerBoxContainItem(ItemStack stack, ItemStack referenceItem)
+    {
+        DefaultedList<ItemStack> items = fi.dy.masa.malilib.util.InventoryUtils.getStoredItems(stack);
+
+        if (items.size() > 0)
+        {
+            for (ItemStack item : items)
+            {
+                if (fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(item, referenceItem))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

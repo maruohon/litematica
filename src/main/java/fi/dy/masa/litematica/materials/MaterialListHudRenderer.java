@@ -3,20 +3,35 @@ package fi.dy.masa.litematica.materials;
 import java.util.Collections;
 import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.mixin.IMixinHandledScreen;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
+import fi.dy.masa.litematica.util.InventoryUtils;
+import fi.dy.masa.litematica.util.RayTraceUtils;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class MaterialListHudRenderer implements IInfoHudRenderer
 {
+    protected static BlockState lastLookedAtBlock = Blocks.AIR.getDefaultState();
+    protected static ItemStack lastLookedAtBlocksItem = ItemStack.EMPTY;
+
     protected final MaterialListBase materialList;
     protected final MaterialListSorter sorter;
     protected boolean shouldRender;
@@ -239,5 +254,62 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         {
             return String.format("%d", count);
         }
+    }
+
+    public static void renderLookedAtBlockInInventory(HandledScreen<?> gui, MinecraftClient mc)
+    {
+        if (Configs.Generic.HIGHLIGHT_BLOCK_IN_INV.getBooleanValue())
+        {
+            RayTraceUtils.RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+
+            if (traceWrapper != null && traceWrapper.getHitType() == RayTraceUtils.RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
+            {
+                BlockPos pos = traceWrapper.getBlockHitResult().getBlockPos();
+                BlockState state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+
+                if (state != lastLookedAtBlock)
+                {
+                    lastLookedAtBlock = state;
+                    lastLookedAtBlocksItem = MaterialCache.getInstance().getRequiredBuildItemForState(state);
+                }
+
+                Color4f color = Configs.Colors.HIGHTLIGHT_BLOCK_IN_INV_COLOR.getColor();
+                highlightSlotsWithItem(lastLookedAtBlocksItem, gui, color, mc);
+            }
+        }
+    }
+
+    public static void highlightSlotsWithItem(ItemStack referenceItem, HandledScreen<?> gui, Color4f color, MinecraftClient mc)
+    {
+        List<Slot> slots = gui.getScreenHandler().slots;
+
+        RenderSystem.disableTexture();
+        RenderUtils.setupBlend();
+        int guiX = ((IMixinHandledScreen) gui).litematica_getX();
+        int guiY = ((IMixinHandledScreen) gui).litematica_getY();
+
+        for (int slotNum = 0; slotNum < slots.size(); ++slotNum)
+        {
+            Slot slot = slots.get(slotNum);
+
+            if (slot.hasStack() && (slot.inventory instanceof PlayerInventory) &&
+                (fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(slot.getStack(), referenceItem) ||
+                 InventoryUtils.doesShulkerBoxContainItem(slot.getStack(), referenceItem)))
+            {
+                renderOutlinedBox(guiX + slot.x, guiY + slot.y, 16, 16, color.intValue, color.intValue | 0xFF000000, 1f);
+            }
+        }
+
+        RenderUtils.color(1f, 1f, 1f, 1f);
+        RenderSystem.enableTexture();
+    }
+
+    public static void renderOutlinedBox(int x, int y, int width, int height, int colorBg, int colorBorder, float zLevel)
+    {
+        // Draw the background
+        RenderUtils.drawRect(x + 1, y + 1, width - 2, height - 2, colorBg, zLevel);
+
+        // Draw the border
+        RenderUtils.drawOutline(x, y, width, height, 1, colorBorder, zLevel);
     }
 }
