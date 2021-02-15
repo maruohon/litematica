@@ -9,7 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
@@ -288,11 +287,9 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         int guiX = ((IMixinHandledScreen) gui).litematica_getX();
         int guiY = ((IMixinHandledScreen) gui).litematica_getY();
 
-        for (int slotNum = 0; slotNum < slots.size(); ++slotNum)
+        for (Slot slot : slots)
         {
-            Slot slot = slots.get(slotNum);
-
-            if (slot.hasStack() && (slot.inventory instanceof PlayerInventory) &&
+            if (slot.hasStack() &&
                 (fi.dy.masa.malilib.util.InventoryUtils.areStacksEqual(slot.getStack(), referenceItem) ||
                  InventoryUtils.doesShulkerBoxContainItem(slot.getStack(), referenceItem)))
             {
