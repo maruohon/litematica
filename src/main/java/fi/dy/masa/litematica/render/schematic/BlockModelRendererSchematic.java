@@ -14,9 +14,6 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -57,11 +54,14 @@ public class BlockModelRendererSchematic
         }
         catch (Throwable throwable)
         {
+            /*
             CrashReport crashreport = CrashReport.create(throwable, "Tesselating block model");
             CrashReportSection crashreportcategory = crashreport.addElement("Block model being tesselated");
             CrashReportSection.addBlockInfo(crashreportcategory, worldIn, posIn, stateIn);
             crashreportcategory.add("Using AO", ao);
             throw new CrashException(crashreport);
+            */
+            return false;
         }
     }
 

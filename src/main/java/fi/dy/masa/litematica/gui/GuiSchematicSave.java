@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import javax.annotation.Nullable;
+import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
@@ -17,7 +18,6 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
@@ -165,9 +165,11 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                         }
 
                         String author = this.gui.mc.player.getName().getString();
-                        boolean takeEntities = this.gui.checkboxIgnoreEntities.isChecked() == false;
+                        boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
+                        boolean visibleOnly = this.gui.checkboxVisibleOnly.isChecked();
+                        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(visibleOnly, ignoreEntities);
                         LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
-                        TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
+                        TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, info, overwrite);
                         task.setCompletionListener(this.gui);
                         TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
                         this.gui.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
@@ -195,14 +197,14 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         @Override
         public void setString(String string)
         {
-            boolean takeEntities = true; // TODO
+            LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(false, false); // TODO
             String author = this.mc.player.getName().getString();
             LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(this.area, author);
 
             if (schematic != null)
             {
                 schematic.getMetadata().setName(string);
-                TaskSaveSchematic task = new TaskSaveSchematic(schematic, this.area, takeEntities);
+                TaskSaveSchematic task = new TaskSaveSchematic(schematic, this.area, info);
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
             }
         }

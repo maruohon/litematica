@@ -807,7 +807,8 @@ public class SchematicUtils
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
             LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, "");
-            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
+            LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(false, false);
+            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, info);
             taskSave.disableCompletionMessage();
             areaMovedTime = System.currentTimeMillis();
 
@@ -865,7 +866,8 @@ public class SchematicUtils
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
             LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, mc.player.getName().getString());
-            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, true);
+            LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(false, false);
+            TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, info);
             taskSave.disableCompletionMessage();
 
             taskSave.setCompletionListener(() ->

@@ -211,7 +211,7 @@ public class ChunkRendererSchematicVbo
             {
                 BufferBuilder buffer = buffers.getBlockBufferByLayer(layerTranslucent);
 
-                this.preRenderBlocks(buffer);
+                this.preRenderBlocks(buffer, layerTranslucent);
                 buffer.restoreState(bufferState);
                 this.postRenderBlocks(layerTranslucent, x, y, z, buffer, data);
             }
@@ -385,7 +385,7 @@ public class ChunkRendererSchematicVbo
                 if (data.isBlockLayerStarted(layer) == false)
                 {
                     data.setBlockLayerStarted(layer);
-                    this.preRenderBlocks(bufferSchematic);
+                    this.preRenderBlocks(bufferSchematic, layer);
                 }
 
                 if (this.worldRenderer.renderFluid(this.schematicWorldView, fluidState, pos, bufferSchematic))
@@ -402,7 +402,7 @@ public class ChunkRendererSchematicVbo
                 if (data.isBlockLayerStarted(layer) == false)
                 {
                     data.setBlockLayerStarted(layer);
-                    this.preRenderBlocks(bufferSchematic);
+                    this.preRenderBlocks(bufferSchematic, layer);
                 }
 
                 if (this.worldRenderer.renderBlock(this.schematicWorldView, stateSchematic, pos, matrices, bufferSchematic))
@@ -741,9 +741,9 @@ public class ChunkRendererSchematicVbo
         }
     }
 
-    private void preRenderBlocks(BufferBuilder buffer)
+    private void preRenderBlocks(BufferBuilder buffer, RenderLayer layer)
     {
-        buffer.begin(VertexFormat.DrawMode.QUADS, RenderLayer.getSolid().getVertexFormat());
+        buffer.begin(VertexFormat.DrawMode.QUADS, layer.getVertexFormat());
     }
 
     private void postRenderBlocks(RenderLayer layer, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)

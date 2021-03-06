@@ -120,8 +120,9 @@ public class WorldUtils
         Box box = area.getSelectedSubRegionBox();
         area.setSubRegionCornerPos(box, Corner.CORNER_1, BlockPos.ORIGIN);
         area.setSubRegionCornerPos(box, Corner.CORNER_2, (new BlockPos(schematic.getSize())).add(-1, -1, -1));
+        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(false, false);
 
-        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, false, "?", feedback);
+        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, info, "?", feedback);
 
         if (litematicaSchematic != null && ignoreEntities == false)
         {
@@ -395,11 +396,20 @@ public class WorldUtils
                 {
                     int slot = inv.getSlotWithStack(stack);
                     boolean shouldPick = inv.selectedSlot != slot;
-                    boolean canPick = slot != -1;
 
-                    if (shouldPick && canPick)
+                    if (shouldPick && slot != -1)
                     {
                         InventoryUtils.setPickedItemToHand(stack, mc);
+                    }
+                    else if (slot == -1 && Configs.Generic.PICK_BLOCK_SHULKERS.getBooleanValue())
+                    {
+                        slot = InventoryUtils.findSlotWithBoxWithItem(mc.player.playerScreenHandler, stack, false);
+
+                        if (slot != -1)
+                        {
+                            ItemStack boxStack = mc.player.playerScreenHandler.slots.get(slot).getStack();
+                            InventoryUtils.setPickedItemToHand(boxStack, mc);
+                        }
                     }
 
                     //return shouldPick == false || canPick;

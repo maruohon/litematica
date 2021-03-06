@@ -324,8 +324,9 @@ public class SchematicProject
             schematic.getMetadata().setName(name);
             BlockPos areaOffset = selection.getEffectiveOrigin().subtract(this.origin);
             SaveCompletionListener listener = new SaveCompletionListener(name, fileName, areaOffset);
+            LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(false, false);
 
-            TaskSaveSchematic task = new TaskSaveSchematic(this.directory, fileName, schematic, selection.copy(), true, false);
+            TaskSaveSchematic task = new TaskSaveSchematic(this.directory, fileName, schematic, selection.copy(), info, false);
             task.setCompletionListener(listener);
             TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 2);
             this.saveInProgress = true;

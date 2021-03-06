@@ -22,7 +22,6 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
@@ -55,7 +54,6 @@ public class WorldRendererSchematic
     private final BlockModelRendererSchematic blockModelRenderer;
     private final Set<BlockEntity> blockEntities = new HashSet<>();
     private final List<ChunkRendererSchematicVbo> renderInfos = new ArrayList<>(1024);
-    private final VertexFormat vertexFormat = VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL;
     private final BufferBuilderStorage bufferBuilders;
     private Set<ChunkRendererSchematicVbo> chunksToUpdate = new LinkedHashSet<>();
     private WorldSchematic world;
@@ -102,6 +100,11 @@ public class WorldRendererSchematic
     public void markNeedsUpdate()
     {
         this.displayListEntitiesDirty = true;
+    }
+
+    public boolean hasWorld()
+    {
+        return this.world != null;
     }
 
     public String getDebugInfoRenders()
@@ -171,7 +174,7 @@ public class WorldRendererSchematic
 
     public void loadRenderers()
     {
-        if (this.world != null)
+        if (this.hasWorld())
         {
             if (this.renderDispatcher == null)
             {
@@ -477,7 +480,7 @@ public class WorldRendererSchematic
                 matrices.translate((double) chunkOrigin.getX() - x, (double) chunkOrigin.getY() - y, (double) chunkOrigin.getZ() - z);
 
                 buffer.bind();
-                this.vertexFormat.startDrawing(0L);
+                renderLayer.getVertexFormat().startDrawing(0L);
                 buffer.draw(matrices.peek().getModel());
 
                 matrices.pop();
@@ -487,7 +490,7 @@ public class WorldRendererSchematic
 
         VertexBuffer.unbind();
         RenderSystem.clearCurrentColor();
-        this.vertexFormat.endDrawing();
+        renderLayer.getVertexFormat().endDrawing();
         renderLayer.endDrawing();
 
         this.world.getProfiler().pop();
