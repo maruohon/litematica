@@ -10,17 +10,16 @@ public interface IBlockReaderWithData extends BlockView
     @Nullable
     CompoundTag getBlockEntityData(BlockPos pos);
 
+    // TODO 1.17: These shouldn't matter here... right?
     @Override
-    default int getSectionCount()
+    default int getHeight()
     {
-        // TODO 1.17
-        return 16;
+        return 384;
     }
 
     @Override
-    default int getBottomSectionLimit()
+    default int getBottomY()
     {
-        // TODO 1.17
-        return 0;
+        return -64;
     }
 }

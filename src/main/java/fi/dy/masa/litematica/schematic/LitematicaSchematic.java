@@ -428,7 +428,7 @@ public class LitematicaSchematic
 
                             try
                             {
-                                te.fromTag(teNBT);
+                                te.readNbt(teNBT);
 
                                 if (ignoreInventories && te instanceof Inventory)
                                 {
@@ -705,7 +705,7 @@ public class LitematicaSchematic
 
                             try
                             {
-                                te.fromTag(teNBT);
+                                te.readNbt(teNBT);
                             }
                             catch (Exception e)
                             {
@@ -908,7 +908,7 @@ public class LitematicaSchematic
                             {
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
-                                CompoundTag tag = te.toTag(new CompoundTag());
+                                CompoundTag tag = te.writeNbt(new CompoundTag());
                                 NBTUtils.writeBlockPosToTag(pos, tag);
                                 tileEntityMap.put(pos, tag);
                             }
@@ -1034,7 +1034,7 @@ public class LitematicaSchematic
                             {
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
-                                CompoundTag tag = te.toTag(new CompoundTag());
+                                CompoundTag tag = te.writeNbt(new CompoundTag());
                                 NBTUtils.writeBlockPosToTag(pos, tag);
                                 tileEntityMap.put(pos, tag);
                             }

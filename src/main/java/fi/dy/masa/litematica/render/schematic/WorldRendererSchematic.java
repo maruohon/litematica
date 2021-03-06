@@ -35,6 +35,7 @@ import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.Mutable;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -307,6 +308,7 @@ public class WorldRendererSchematic
             //if (GuiBase.isCtrlDown()) System.out.printf("sorted positions: %d\n", positions.size());
 
             this.world.getProfiler().swap("iteration");
+            BlockPos.Mutable subChunkCornerPos = new Mutable();
 
             //while (queuePositions.isEmpty() == false)
             for (int i = 0; i < positions.size(); ++i)
@@ -320,21 +322,18 @@ public class WorldRendererSchematic
                     Math.abs(subChunk.getZ() - centerChunkZ) <= renderDistance &&
                     this.world.getChunkProvider().isChunkLoaded(subChunk.getX(), subChunk.getZ()))
                 {
-                    BlockPos subChunkCornerPos = new BlockPos(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
+                    subChunkCornerPos.set(subChunk.getX() << 4, subChunk.getY() << 4, subChunk.getZ() << 4);
                     ChunkRendererSchematicVbo chunkRenderer = this.chunkRendererDispatcher.getChunkRenderer(subChunkCornerPos);
 
-                    if (chunkRenderer != null)
+                    if (chunkRenderer != null && frustum.isVisible(chunkRenderer.getBoundingBox()))
                     {
-                        if (frustum.isVisible(chunkRenderer.getBoundingBox()))
+                        //if (GuiBase.isCtrlDown()) System.out.printf("add @ %s\n", subChunk);
+                        if (chunkRenderer.needsUpdate() && subChunkCornerPos.equals(viewPosSubChunk))
                         {
-                            //if (GuiBase.isCtrlDown()) System.out.printf("add @ %s\n", subChunk);
-                            if (chunkRenderer.needsUpdate() && subChunkCornerPos.equals(viewPosSubChunk))
-                            {
-                                chunkRenderer.setNeedsUpdate(true);
-                            }
-
-                            this.renderInfos.add(chunkRenderer);
+                            chunkRenderer.setNeedsUpdate(true);
                         }
+
+                        this.renderInfos.add(chunkRenderer);
                     }
                 }
             }

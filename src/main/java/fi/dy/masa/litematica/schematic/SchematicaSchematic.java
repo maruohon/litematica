@@ -144,7 +144,7 @@ public class SchematicaSchematic
 
                                 try
                                 {
-                                    te.fromTag(teNBT);
+                                    te.readNbt(teNBT);
                                 }
                                 catch (Exception e)
                                 {
@@ -277,7 +277,7 @@ public class SchematicaSchematic
 
                                         try
                                         {
-                                            te.fromTag(teNBT);
+                                            te.readNbt(teNBT);
                                         }
                                         catch (Exception e)
                                         {
@@ -374,7 +374,7 @@ public class SchematicaSchematic
                     {
                         try
                         {
-                            CompoundTag nbt = te.toTag(new CompoundTag());
+                            CompoundTag nbt = te.writeNbt(new CompoundTag());
 
                             nbt.putInt("x", relX);
                             nbt.putInt("y", relY);

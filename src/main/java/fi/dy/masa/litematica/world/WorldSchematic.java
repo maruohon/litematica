@@ -211,10 +211,9 @@ public class WorldSchematic extends World
     }
 
     @Override
-    protected class_5577<Entity> getEntityIdMap()
+    protected EntityLookup<Entity> getEntityLookup()
     {
-        // TODO 1.17
-        return null;
+        return null; // TODO 1.17
     }
 
     @Override
@@ -241,7 +240,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public <T extends Entity> List<T> getEntitiesByType(class_5575<Entity, T> arg, Box box, Predicate<? super T> predicate)
+    public <T extends Entity> List<T> getEntitiesByType(TypeFilter<Entity, T> arg, Box box, Predicate<? super T> predicate)
     {
         return Collections.emptyList(); // TODO 1.17
     }
@@ -312,6 +311,18 @@ public class WorldSchematic extends World
                 }
             }
         }
+    }
+
+    @Override
+    public int getBottomY()
+    {
+        return this.mc.world != null ? this.mc.world.getBottomY() : -64;
+    }
+
+    @Override
+    public int getHeight()
+    {
+        return this.mc.world != null ? this.mc.world.getHeight() : 384;
     }
 
     @Override

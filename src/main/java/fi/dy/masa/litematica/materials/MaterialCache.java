@@ -257,7 +257,7 @@ public class MaterialCache
             CompoundTag stateTag = NbtHelper.fromBlockState(entry.getKey());
 
             tag.put("Block", stateTag);
-            tag.put("Item", entry.getValue().toTag(new CompoundTag()));
+            tag.put("Item", entry.getValue().writeNbt(new CompoundTag()));
 
             list.add(tag);
         }
@@ -292,7 +292,7 @@ public class MaterialCache
 
                     if (state != null)
                     {
-                        ItemStack stack = ItemStack.fromTag(tag.getCompound("Item"));
+                        ItemStack stack = ItemStack.fromNbt(tag.getCompound("Item"));
                         this.buildItemsForStates.put(state, stack);
                     }
                 }

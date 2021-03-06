@@ -146,7 +146,7 @@ public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
     @Override
     public int getColor(BlockPos pos, ColorResolver colorResolver)
     {
-        return colorResolver.getColor(this.worldClient.getBiome(pos), (double)pos.getX(), (double)pos.getZ());
+        return colorResolver.getColor(this.worldClient.getBiome(pos), pos.getX(), pos.getZ());
     }
 
     @Override
@@ -156,16 +156,14 @@ public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
     }
 
     @Override
-    public int getSectionCount()
+    public int getHeight()
     {
-        // TODO 1.17
-        return 16;
+        return this.world.getHeight();
     }
 
     @Override
-    public int getBottomSectionLimit()
+    public int getBottomY()
     {
-        // TODO 1.17
-        return 0;
+        return this.world.getBottomY();
     }
 }

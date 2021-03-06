@@ -157,7 +157,7 @@ public class EntityUtils
     {
         try
         {
-            Optional<Entity> optional = EntityType.getEntityFromTag(nbt, world);
+            Optional<Entity> optional = EntityType.getEntityFromNbt(nbt, world);
 
             if (optional.isPresent())
             {

@@ -261,7 +261,7 @@ public class WorldUtils
                 return false;
             }
 
-            CompoundTag tag = template.toTag(new CompoundTag());
+            CompoundTag tag = template.writeNbt(new CompoundTag());
             os = new FileOutputStream(file);
             NbtIo.writeCompressed(tag, os);
             os.close();
@@ -281,7 +281,7 @@ public class WorldUtils
         CompoundTag nbt = NbtIo.readCompressed(stream);
         Structure template = new Structure();
         //template.read(fixer.process(FixTypes.STRUCTURE, nbt));
-        template.fromTag(nbt);
+        template.readNbt(nbt);
 
         return template;
     }

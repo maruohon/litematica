@@ -98,7 +98,7 @@ public class ItemUtils
 
     public static ItemStack storeTEInStack(ItemStack stack, BlockEntity te)
     {
-        CompoundTag nbt = te.toTag(new CompoundTag());
+        CompoundTag nbt = te.writeNbt(new CompoundTag());
 
         if (nbt.contains("Owner") && stack.getItem() instanceof BlockItem &&
             ((BlockItem) stack.getItem()).getBlock() instanceof AbstractSkullBlock)

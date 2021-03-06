@@ -295,8 +295,8 @@ public class SchematicConverter
         public BlockState getBlockState(BlockPos pos)
         {
             if (pos.getX() >= 0 && pos.getX() < this.size.getX() &&
-                        pos.getY() >= 0 && pos.getY() < this.size.getY() &&
-                        pos.getZ() >= 0 && pos.getZ() < this.size.getZ())
+                pos.getY() >= 0 && pos.getY() < this.size.getY() &&
+                pos.getZ() >= 0 && pos.getZ() < this.size.getZ())
             {
                 return this.container.get(pos.getX(), pos.getY(), pos.getZ());
             }
