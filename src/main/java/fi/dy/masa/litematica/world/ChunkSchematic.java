@@ -11,6 +11,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -44,7 +45,8 @@ public class ChunkSchematic extends WorldChunk
         int x = pos.getX() & 0xF;
         int y = pos.getY();
         int z = pos.getZ() & 0xF;
-        int cy = y >> 4;
+        int cy = this.getSectionIndex(y);
+        y &= 0xF;
 
         ChunkSection[] sections = this.getSectionArray();
 
@@ -54,7 +56,7 @@ public class ChunkSchematic extends WorldChunk
 
             if (ChunkSection.isEmpty(chunkSection) == false)
             {
-                return chunkSection.getBlockState(x, y & 0xF, z);
+                return chunkSection.getBlockState(x, y, z);
             }
          }
 
@@ -75,10 +77,11 @@ public class ChunkSchematic extends WorldChunk
             int x = pos.getX() & 15;
             int y = pos.getY();
             int z = pos.getZ() & 15;
+            int cy = this.getSectionIndex(y);
 
             Block blockNew = state.getBlock();
             Block blockOld = stateOld.getBlock();
-            ChunkSection section = this.getSectionArray()[y >> 4];
+            ChunkSection section = this.getSectionArray()[cy];
 
             if (section == EMPTY_SECTION)
             {
@@ -87,23 +90,25 @@ public class ChunkSchematic extends WorldChunk
                     return null;
                 }
 
-                section = new ChunkSection(y & 0xF0);
-                this.getSectionArray()[y >> 4] = section;
+                section = new ChunkSection(ChunkSectionPos.getSectionCoord(y));
+                this.getSectionArray()[cy] = section;
             }
+
+            y &= 0xF;
 
             if (state.isAir() == false)
             {
                 this.isEmpty = false;
             }
 
-            section.setBlockState(x, y & 0xF, z, state);
+            section.setBlockState(x, y, z, state);
 
             if (blockOld != blockNew)
             {
                 this.getWorld().removeBlockEntity(pos);
             }
 
-            if (section.getBlockState(x, y & 0xF, z).getBlock() != blockNew)
+            if (section.getBlockState(x, y, z).getBlock() != blockNew)
             {
                 return null;
             }

@@ -436,7 +436,11 @@ public class SchematicPlacementManager
 
     private void updateTouchedBoxesInChunk(ChunkPos pos)
     {
-        for (int y = 0; y < 16; ++y)
+        WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
+        int minChunkY = world != null ? world.getBottomSectionCoord() : -4;
+        int maxChunkY = world != null ? world.getTopSectionCoord() : 19;
+
+        for (int y = minChunkY; y < maxChunkY; ++y)
         {
             SubChunkPos subChunk = new SubChunkPos(pos.x, y, pos.z);
             this.touchedVolumesInSubChunk.removeAll(subChunk);

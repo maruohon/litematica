@@ -88,20 +88,17 @@ public class ChunkCacheSchematic implements BlockRenderView, ChunkProvider
     @Override
     public BlockState getBlockState(BlockPos pos)
     {
-        if (pos.getY() >= 0 && pos.getY() < 256)
+        int cx = (pos.getX() >> 4) - this.chunkStartX;
+        int cz = (pos.getZ() >> 4) - this.chunkStartZ;
+
+        if (cx >= 0 && cx < this.chunkArray.length &&
+            cz >= 0 && cz < this.chunkArray[cx].length)
         {
-            int cx = (pos.getX() >> 4) - this.chunkStartX;
-            int cz = (pos.getZ() >> 4) - this.chunkStartZ;
+            Chunk chunk = this.chunkArray[cx][cz];
 
-            if (cx >= 0 && cx < this.chunkArray.length &&
-                cz >= 0 && cz < this.chunkArray[cx].length)
+            if (chunk != null)
             {
-                Chunk chunk = this.chunkArray[cx][cz];
-
-                if (chunk != null)
-                {
-                    return chunk.getBlockState(pos);
-                }
+                return chunk.getBlockState(pos);
             }
         }
 

@@ -1,9 +1,9 @@
 package fi.dy.masa.litematica.render.schematic;
 
 import javax.annotation.Nullable;
-import fi.dy.masa.litematica.world.WorldSchematic;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import fi.dy.masa.litematica.world.WorldSchematic;
 
 public class ChunkRenderDispatcherSchematic
 {
@@ -62,7 +62,7 @@ public class ChunkRenderDispatcherSchematic
     {
         int diameter = viewDistance * 2 + 1;
         this.sizeX = diameter;
-        this.sizeY = 16;
+        this.sizeY = this.world.countVerticalSections();
         this.sizeZ = diameter;
     }
 
@@ -82,7 +82,7 @@ public class ChunkRenderDispatcherSchematic
 
                 for (int y = 0; y < this.sizeY; ++y)
                 {
-                    int blockY = y * 16;
+                    int blockY = this.world.getBottomY() + y * 16;
                     this.renderers[this.getChunkIndex(x, y, z)].setPosition(blockX, blockY, blockZ);
                 }
             }
@@ -105,7 +105,7 @@ public class ChunkRenderDispatcherSchematic
     public void scheduleChunkRender(int chunkX, int chunkY, int chunkZ, boolean immediate)
     {
         chunkX = Math.floorMod(chunkX, this.sizeX);
-        chunkY = Math.floorMod(chunkY, this.sizeY);
+        chunkY = Math.floorMod(chunkY - this.world.getBottomSectionCoord(), this.sizeY);
         chunkZ = Math.floorMod(chunkZ, this.sizeZ);
 
         this.renderers[this.getChunkIndex(chunkX, chunkY, chunkZ)].setNeedsUpdate(immediate);
@@ -115,7 +115,7 @@ public class ChunkRenderDispatcherSchematic
     protected ChunkRendererSchematicVbo getChunkRenderer(BlockPos pos)
     {
         int cx = MathHelper.floorDiv(pos.getX(), 16);
-        int cy = MathHelper.floorDiv(pos.getY(), 16);
+        int cy = MathHelper.floorDiv(pos.getY() - this.world.getBottomY(), 16);
         int cz = MathHelper.floorDiv(pos.getZ(), 16);
 
         if (cy >= 0 && cy < this.sizeY)
@@ -125,9 +125,7 @@ public class ChunkRenderDispatcherSchematic
 
             return this.renderers[this.getChunkIndex(cx, cy, cz)];
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 }

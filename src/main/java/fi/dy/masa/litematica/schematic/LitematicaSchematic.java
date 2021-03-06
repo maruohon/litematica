@@ -342,20 +342,22 @@ public class LitematicaSchematic
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
         }
 
+        int bottomY = world.getBottomY();
+        int topY = world.getTopY();
         int tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY();
         int startY = 0;
         int endY = sizeY;
 
-        if (tmp < 0)
+        if (tmp < bottomY)
         {
-            startY += (0 - tmp);
+            startY += (bottomY - tmp);
         }
 
         tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY() + (endY - 1);
 
-        if (tmp > 255)
+        if (tmp > topY)
         {
-            endY -= (tmp - 255);
+            endY -= (tmp - topY);
         }
 
         for (int y = startY; y < endY; ++y)
@@ -636,18 +638,20 @@ public class LitematicaSchematic
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
         }
 
+        int bottomY = world.getBottomY();
+        int topY = world.getTopY();
         int tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY();
 
-        if (tmp < 0)
+        if (tmp < bottomY)
         {
-            startY += (0 - tmp);
+            startY += (bottomY - tmp);
         }
 
         tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY() + endY;
 
-        if (tmp > 255)
+        if (tmp > topY)
         {
-            endY -= (tmp - 255);
+            endY -= (tmp - topY);
         }
 
         for (int y = startY; y <= endY; ++y)

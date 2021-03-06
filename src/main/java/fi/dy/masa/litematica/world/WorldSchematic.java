@@ -9,8 +9,6 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.class_5575;
-import net.minecraft.class_5577;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.DummyClientTickScheduler;
 import net.minecraft.entity.Entity;
@@ -23,6 +21,7 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.TagManager;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -39,6 +38,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.world.event.GameEvent;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
@@ -115,7 +115,7 @@ public class WorldSchematic extends World
     @Override
     public boolean setBlockState(BlockPos pos, BlockState newState, int flags)
     {
-        if (pos.getY() < 0 || pos.getY() >= 256)
+        if (pos.getY() < this.getBottomY() || pos.getY() > this.getTopY())
         {
             return false;
         }
@@ -278,15 +278,18 @@ public class WorldSchematic extends World
 
     public void scheduleBlockRenders(int chunkX, int chunkY, int chunkZ)
     {
-        if (chunkY >= 0 && chunkY < 16)
-        {
-            this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
-        }
+        this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
     }
 
     public void scheduleChunkRenders(int chunkX, int chunkZ)
     {
-        for (int chunkY = 0; chunkY < 16; ++chunkY)
+        MinecraftClient mc = MinecraftClient.getInstance();
+        int renderDistanceChunks = mc.options.viewDistance / 16 + 2;
+        int cameraChunkY = (mc.gameRenderer.getCamera().getBlockPos().getY()) / 16;
+        int startChunkY = Math.max(this.getBottomSectionCoord(), cameraChunkY - renderDistanceChunks);
+        int endChunkY = Math.min(this.getTopSectionCoord(), cameraChunkY + renderDistanceChunks);
+
+        for (int chunkY = startChunkY; chunkY < endChunkY; ++chunkY)
         {
             this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
         }
@@ -295,10 +298,10 @@ public class WorldSchematic extends World
     public void scheduleChunkRenders(int minBlockX, int minBlockY, int minBlockZ, int maxBlockX, int maxBlockY, int maxBlockZ)
     {
         final int minChunkX = Math.min(minBlockX, maxBlockX) >> 4;
-        final int minChunkY = MathHelper.clamp(Math.min(minBlockY, maxBlockY) >> 4, 0, 15);
+        final int minChunkY = Math.min(minBlockY, maxBlockY) >> 4;
         final int minChunkZ = Math.min(minBlockZ, maxBlockZ) >> 4;
         final int maxChunkX = Math.max(minBlockX, maxBlockX) >> 4;
-        final int maxChunkY = MathHelper.clamp(Math.max(minBlockY, maxBlockY) >> 4, 0, 15);
+        final int maxChunkY = Math.max(minBlockY, maxBlockY) >> 4;
         final int maxChunkZ = Math.max(minBlockZ, maxBlockZ) >> 4;
 
         for (int cz = minChunkZ; cz <= maxChunkZ; ++cz)
