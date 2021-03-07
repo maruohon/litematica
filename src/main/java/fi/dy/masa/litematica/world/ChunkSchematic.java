@@ -27,8 +27,10 @@ public class ChunkSchematic extends WorldChunk
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
 
     private final Int2ObjectOpenHashMap<List<Entity>> entityLists = new Int2ObjectOpenHashMap<>();
-    private int entityCount;
     private final long timeCreated;
+    private final int bottomY;
+    private final int topY;
+    private int entityCount;
     private boolean isEmpty = true;
 
     public ChunkSchematic(World worldIn, ChunkPos pos)
@@ -37,6 +39,8 @@ public class ChunkSchematic extends WorldChunk
                                            worldIn, pos, new FixedBiomeSource(BuiltinBiomes.THE_VOID)));
 
         this.timeCreated = worldIn.getTime();
+        this.bottomY = worldIn.getBottomY();
+        this.topY = worldIn.getTopY();
     }
 
     @Override
@@ -67,15 +71,15 @@ public class ChunkSchematic extends WorldChunk
     public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving)
     {
         BlockState stateOld = this.getBlockState(pos);
+        int y = pos.getY();
 
-        if (stateOld == state)
+        if (stateOld == state || y >= this.topY || y < bottomY)
         {
             return null;
         }
         else
         {
             int x = pos.getX() & 15;
-            int y = pos.getY();
             int z = pos.getZ() & 15;
             int cy = this.getSectionIndex(y);
 

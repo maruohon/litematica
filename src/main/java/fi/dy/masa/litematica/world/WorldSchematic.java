@@ -115,7 +115,7 @@ public class WorldSchematic extends World
     @Override
     public boolean setBlockState(BlockPos pos, BlockState newState, int flags)
     {
-        if (pos.getY() < this.getBottomY() || pos.getY() > this.getTopY())
+        if (pos.getY() < this.getBottomY() || pos.getY() >= this.getTopY())
         {
             return false;
         }
