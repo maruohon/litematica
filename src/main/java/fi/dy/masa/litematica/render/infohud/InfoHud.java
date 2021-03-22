@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 
 public class InfoHud
 {
@@ -75,8 +76,8 @@ public class InfoHud
 
             if (this.lineList.isEmpty() == false)
             {
-                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(xOffset, yOffset, 0, scale,
-                        0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                int ySize = TextRenderUtils.renderText(xOffset, yOffset, 0, scale,
+                                                       0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
                 yOffset += (int) Math.ceil(ySize * scale);
             }
 
@@ -170,7 +171,7 @@ public class InfoHud
 
     protected HudAlignment getHudAlignment()
     {
-        return Configs.InfoOverlays.INFO_HUD_ALIGNMENT.getOptionListValue();
+        return Configs.InfoOverlays.INFO_HUD_ALIGNMENT.getValue();
     }
 
     protected void updateHudText()

@@ -13,7 +13,7 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -58,9 +58,9 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         this.textField.setWidth(this.width - 196);
         this.addWidget(this.textField);
@@ -188,20 +188,20 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public boolean onKeyTyped(char typedChar, int keyCode)
+    public boolean onKeyTyped(char typedChar, int keyCode, int scanCode, int modifiers)
     {
         if (this.textField.isFocused() && keyCode == Keyboard.KEY_RETURN)
         {
             this.saveSchematic();
             return true;
         }
-        else if (this.textField.onKeyTyped(typedChar, keyCode))
+        else if (this.textField.onKeyTyped(typedChar, keyCode, , ))
         {
             this.getListWidget().clearSelection();
             return true;
         }
 
-        return super.onKeyTyped(typedChar, keyCode);
+        return super.onKeyTyped(typedChar, keyCode, scanCode, modifiers);
     }
 
     public enum ButtonType

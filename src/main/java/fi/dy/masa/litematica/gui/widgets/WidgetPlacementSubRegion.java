@@ -22,6 +22,8 @@ import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlacement>
@@ -93,21 +95,21 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
         // Draw a lighter background for the hovered and the selected entry
         if (placementSelected || (isActiveGui && this.getId() == hoveredWidgetId))
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0303030);
         }
 
         if (placementSelected)
         {
-            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z + 1);
+            ShapeRenderUtils.renderOutline(x, y, z + 1, width, height, 1, 0xFFE0E0E0);
         }
 
         String name = this.placement.getName();
@@ -151,7 +153,7 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
             BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_sub_region_modified");
-            RenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
+            TextRenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
         else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 14, height))
         {
@@ -172,7 +174,7 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
                 text.add(StringUtils.translate("litematica.gui.label.placement_sub.hover.region_size", size.getX(), size.getY(), size.getZ()));
             }
 
-            RenderUtils.renderHoverText(mouseX, mouseY, z, text);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, z, text);
         }
     }
 
@@ -194,7 +196,7 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
             {
                 GuiSubRegionConfiguration gui = new GuiSubRegionConfiguration(this.widget.schematicPlacement, this.widget.placement);
                 gui.setParent(this.widget.parent.getParentScreen());
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
             else if (this.type == WidgetSchematicPlacementEntry.ButtonListener.ButtonType.TOGGLE_ENABLED)
             {

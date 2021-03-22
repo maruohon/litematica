@@ -31,8 +31,8 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -52,9 +52,9 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         int scaledWidth = GuiUtils.getScaledWindowWidth();
         int width = Math.min(300, scaledWidth - 200);
@@ -178,7 +178,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
     private int createButtonOnOff(int x, int y, int width, boolean isCurrentlyOn, ButtonListener.Type type)
     {
         OnOffButton button = new OnOffButton(x, y, width, false, type.getTranslationKey(), isCurrentlyOn);
-        button.addHoverString(type.getHoverText());
+        button.translateAndAddHoverString(type.getHoverText());
         this.addButton(button, new ButtonListener(type, this.placement, this));
 
         return button.getWidth();
@@ -377,7 +377,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                     {
                         JsonObject origJson = this.placement.baseSettingsToJson(true);
 
-                        openPopupGui(new TextInputScreen("litematica.gui.title.schematic_placement.copy_or_load_settings", origJson.toString(), this.parent, (str) -> {
+                        openPopupScreen(new TextInputScreen("litematica.gui.title.schematic_placement.copy_or_load_settings", origJson.toString(), this.parent, (str) -> {
                             JsonElement el = JsonUtils.parseJsonFromString(str);
 
                             if (el != null && el.isJsonObject() && el.getAsJsonObject().equals(origJson) == false)
@@ -446,7 +446,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                 {
                     GuiSchematicVerifier gui = new GuiSchematicVerifier(this.placement);
                     gui.setParent(this.parent);
-                    BaseScreen.openGui(gui);
+                    BaseScreen.openScreen(gui);
                     break;
                 }
 
@@ -456,7 +456,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                     GuiMaterialList gui = new GuiMaterialList(materialList);
                     DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
                     gui.setParent(this.parent);
-                    BaseScreen.openGui(gui);
+                    BaseScreen.openScreen(gui);
                     break;
                 }
 
@@ -470,7 +470,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                     else
                     {
                         GuiPlacementGridSettings gui = new GuiPlacementGridSettings(this.placement, this.parent);
-                        BaseScreen.openPopupGui(gui);
+                        BaseScreen.openPopupScreen(gui);
                     }
                     break;
                 }

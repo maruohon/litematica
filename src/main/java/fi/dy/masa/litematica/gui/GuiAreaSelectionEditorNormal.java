@@ -31,7 +31,7 @@ import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
@@ -73,9 +73,9 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         if (this.selection != null)
         {
@@ -152,7 +152,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             button.setEnabled(false);
-            button.addHoverString("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+            button.translateAndAddHoverString("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
         }
 
         x += this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent())).getWidth() + 4;
@@ -300,7 +300,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         }
         else if (type == ButtonListener.Type.CHANGE_CORNER_MODE)
         {
-            CornerSelectionMode mode = Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue();
+            CornerSelectionMode mode = Configs.Generic.SELECTION_CORNERS_MODE.getValue();
             label = type.getDisplayName(mode.getDisplayName());
 
             if (mode == CornerSelectionMode.EXPAND)
@@ -331,7 +331,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         }
 
         GenericButton button = new GenericButton(x, y, width, 20, label);
-        button.addHoverString(hover);
+        button.translateAndAddHoverString(hover);
 
         this.addButton(button, new ButtonListener(type, corner, null, this));
 
@@ -493,7 +493,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
                     MaterialListAreaAnalyzer list = new MaterialListAreaAnalyzer(this.parent.selection);
                     DataManager.setMaterialList(list);
                     GuiMaterialList gui = new GuiMaterialList(list);
-                    BaseScreen.openGui(gui);
+                    BaseScreen.openScreen(gui);
                     list.reCreateMaterialList(); // This is after changing the GUI, so that the task message goes to the new GUI
                     return;
                 }
@@ -502,7 +502,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
                 {
                     TextInputScreen gui = new TextInputScreen("litematica.gui.title.area_editor.sub_region_name", "", null, new SubRegionCreator(this.parent));
                     gui.setParent(this.parent);
-                    BaseScreen.openPopupGui(gui);
+                    BaseScreen.openPopupScreen(gui);
                     break;
                 }
 

@@ -19,8 +19,8 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -37,9 +37,9 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         this.reCreateGuiElements();
 
@@ -91,11 +91,11 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
 
         if (type == ButtonListener.ButtonType.UNSELECT)
         {
-            button.addHoverString("litematica.gui.button.hover.area_selections.unselect");
+            button.translateAndAddHoverString("litematica.gui.button.hover.area_selections.unselect");
         }
         else if (type == ButtonListener.ButtonType.FROM_PLACEMENT)
         {
-            button.addHoverString("litematica.gui.button.hover.area_selections.from_placement");
+            button.translateAndAddHoverString("litematica.gui.button.hover.area_selections.from_placement");
         }
 
         this.addButton(button, new ButtonListener(type, this));
@@ -176,7 +176,7 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
             {
                 File dir = this.gui.getListWidget().getCurrentDirectory();
                 String title = "litematica.gui.title.create_area_selection";
-                BaseScreen.openPopupGui(new TextInputScreen(title, "", this.gui, new SelectionCreator(dir, this.gui)));
+                BaseScreen.openPopupScreen(new TextInputScreen(title, "", this.gui, new SelectionCreator(dir, this.gui)));
             }
             else if (this.type == ButtonType.FROM_PLACEMENT)
             {
@@ -186,7 +186,7 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
                 {
                     File dir = this.gui.getListWidget().getCurrentDirectory();
                     String title = "litematica.gui.title.create_area_selection_from_placement";
-                    BaseScreen.openPopupGui(new TextInputScreen(title, placement.getName(), this.gui, new SelectionCreatorPlacement(placement, dir, this.gui)));
+                    BaseScreen.openPopupScreen(new TextInputScreen(title, placement.getName(), this.gui, new SelectionCreatorPlacement(placement, dir, this.gui)));
                 }
                 else
                 {

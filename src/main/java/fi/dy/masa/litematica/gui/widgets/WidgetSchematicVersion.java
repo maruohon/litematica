@@ -4,6 +4,7 @@ import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicVersion extends BaseListEntryWidget<SchematicVersion>
@@ -35,21 +36,21 @@ public class WidgetSchematicVersion extends BaseListEntryWidget<SchematicVersion
         // Draw a lighter background for the hovered and the selected entry
         if (selected || versionSelected || (isActiveGui && this.getId() == hoveredWidgetId))
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0303030);
         }
 
         if (versionSelected)
         {
-            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
+            ShapeRenderUtils.renderOutline(x, y, z, width, height, 1, 0xFFE0E0E0);
         }
 
         String str = StringUtils.translate("litematica.gui.label.schematic_projects.version_entry", this.entry.getVersion(), this.entry.getName());

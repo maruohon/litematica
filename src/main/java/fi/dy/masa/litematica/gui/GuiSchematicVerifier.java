@@ -22,9 +22,9 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, WidgetSchematicVerificationResult, WidgetListSchematicVerificationResults>
@@ -55,9 +55,9 @@ public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, W
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         int x = 12;
         int y = 20;

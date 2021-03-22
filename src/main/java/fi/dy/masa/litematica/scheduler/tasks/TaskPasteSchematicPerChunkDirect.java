@@ -13,8 +13,8 @@ import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.WorldUtils;
 
@@ -27,7 +27,7 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     {
         super(placements, range, changedBlocksOnly);
 
-        this.replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
+        this.replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getValue();
     }
 
     @Override

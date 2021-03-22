@@ -28,7 +28,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.systems.BlockPlacementPositionHandler;
+import fi.dy.masa.malilib.interoperation.BlockPlacementPositionHandler;
 
 public class InventoryUtils
 {

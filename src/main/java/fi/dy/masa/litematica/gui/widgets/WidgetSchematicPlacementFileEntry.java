@@ -13,13 +13,13 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.render.message.MessageUtils;
-import fi.dy.masa.malilib.render.message.MessageHelpers;
+import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageHelpers;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicPlacementFileEntry extends DirectoryEntryWidget
@@ -54,7 +54,7 @@ public class WidgetSchematicPlacementFileEntry extends DirectoryEntryWidget
     private int createButton(int xRight, int y, ButtonListener.ButtonType type)
     {
         GenericButton button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
-        button.addHoverString(type.getHoverKey());
+        button.translateAndAddHoverString(type.getHoverKey());
 
         this.addButton(button, new ButtonListener(type, this));
 
@@ -114,7 +114,7 @@ public class WidgetSchematicPlacementFileEntry extends DirectoryEntryWidget
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            RenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
     }
 

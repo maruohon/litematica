@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.icon.BaseIcon;
+import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -23,7 +23,7 @@ public class WidgetListSchematicPlacements extends BaseListWidget<SchematicPlace
         this.gui = gui;
         this.entryWidgetFixedHeight = 22;
 
-        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 17, 14, 0, BaseIcon.SEARCH, HorizontalAlignment.LEFT));
+        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 17, 14, 0, DefaultIcons.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override

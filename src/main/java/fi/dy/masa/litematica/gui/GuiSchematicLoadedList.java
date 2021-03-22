@@ -19,9 +19,9 @@ public class GuiSchematicLoadedList extends BaseListScreen<ISchematic, WidgetSch
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         int x = 12;
         int y = this.height - 26;
@@ -45,7 +45,7 @@ public class GuiSchematicLoadedList extends BaseListScreen<ISchematic, WidgetSch
         y = 10;
         String val = Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.getBooleanValue() ? "litematica.gui.label.misc.icons" : "litematica.gui.label.misc.text";
         button = new GenericButton(x, y, -1, true, StringUtils.translate("litematica.gui.button.buttons_val", StringUtils.translate(val)));
-        button.addHoverString("litematica.gui.button.hover.use_text_or_icon_buttons");
+        button.translateAndAddHoverString("litematica.gui.button.hover.use_text_or_icon_buttons");
         this.addButton(button, (btn, mbtn) -> { Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.toggleBooleanValue(); this.initGui(); });
     }
 

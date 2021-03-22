@@ -1,98 +1,79 @@
 package fi.dy.masa.litematica.gui.widgets;
 
-import net.minecraft.client.renderer.GlStateManager;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 
-public class WidgetTaskEntry extends BaseListEntryWidget<ITask>
+public class WidgetTaskEntry extends BaseDataListEntryWidget<ITask>
 {
-    private final WidgetListTasks parent;
-    private final boolean isOdd;
+    protected final GenericButton removeButton;
 
-    public WidgetTaskEntry(int x, int y, int width, int height, boolean isOdd,
-            ITask task, int listIndex, WidgetListTasks parent)
+    public WidgetTaskEntry(int x, int y, int width, int height, int listIndex, int originalListIndex,
+                           ITask task, DataListWidget<ITask> listWidget)
     {
-        super(x, y, width, height, task, listIndex);
+        super(x, y, width, height, listIndex, originalListIndex, task, listWidget);
 
-        this.parent = parent;
-        this.isOdd = isOdd;
+        this.removeButton = new GenericButton(x + width - 2, y + 1, -1, true, "litematica.gui.button.remove");
+        this.removeButton.setActionListener((w, btn) -> {
+            if (TaskScheduler.getInstanceClient().removeTask(this.getData()) == false)
+            {
+                TaskScheduler.getInstanceServer().removeTask(this.getData());
+            }
 
-        int posX = x + width;
-        ButtonListener listener = new ButtonListener(ButtonListener.Type.REMOVE, this);
-        this.addButton(new GenericButton(posX, y + 1, -1, true, StringUtils.translate("litematica.gui.button.remove")), listener);
+            this.listWidget.refreshEntries();
+        });
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
+    public void updateSubWidgetsToGeometryChanges()
+    {
+        super.updateSubWidgetsToGeometryChanges();
+
+        int x = this.getX() + this.getWidth() - 2;
+        this.removeButton.setRightX(x);
+    }
+
+    @Override
+    public void reAddSubWidgets()
+    {
+        super.reAddSubWidgets();
+
+        this.addWidget(this.removeButton);
+    }
+
+    @Override
+    public void renderAt(int x, int y, float z, int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
-        int x = this.getX();
-        int y = this.getY();
-        int z = this.getZLevel();
         int width = this.getWidth();
         int height = this.getHeight();
 
         // Draw a lighter background for the hovered entry
         if (this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x70FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x70FFFFFF);
         }
         else if (this.isOdd)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x20FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x20FFFFFF);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x50FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x50FFFFFF);
         }
 
-        String name = this.getEntry().getDisplayName();
-        this.drawString(x + 4, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, name);
+        String name = this.getData().getDisplayName();
+        this.drawString(x + 4, y + this.getCenteredTextOffsetY(), z, 0xFFFFFFFF, name);
 
-        this.renderSubWidgets(mouseX, mouseY, isActiveGui, hoveredWidgetId);
+        this.renderSubWidgets(x, y, z, mouseX, mouseY, isActiveGui, hoveredWidgetId);
 
-        RenderUtils.disableItemLighting();
-        GlStateManager.disableLighting();
-    }
-
-    private static class ButtonListener implements ButtonActionListener
-    {
-        private final Type type;
-        private final WidgetTaskEntry widget;
-
-        public ButtonListener(Type type, WidgetTaskEntry widget)
-        {
-            this.type = type;
-            this.widget = widget;
-        }
-
-        @Override
-        public void actionPerformedWithButton(BaseButton button, int mouseButton)
-        {
-            if (this.type == Type.REMOVE)
-            {
-                ITask task = this.widget.getEntry();
-
-                if (TaskScheduler.getInstanceClient().removeTask(task) == false)
-                {
-                    TaskScheduler.getInstanceServer().removeTask(task);
-                }
-
-                this.widget.parent.refreshEntries();
-            }
-        }
-
-        public enum Type
-        {
-            REMOVE;
-        }
+        //RenderUtils.disableItemLighting();
+        //GlStateManager.disableLighting();
     }
 }

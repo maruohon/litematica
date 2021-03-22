@@ -1,16 +1,14 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
-import fi.dy.masa.malilib.gui.widget.button.BaseButton;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
-import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class GuiRenderLayer extends BaseRenderLayerEditScreen
 {
@@ -22,11 +20,11 @@ public class GuiRenderLayer extends BaseRenderLayerEditScreen
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
         DataManager.setConfigGuiTab(ConfigScreen.RENDER_LAYERS);
 
-        super.initGui();
+        super.initScreen();
 
         int x = 10;
         int y = 26;
@@ -36,10 +34,7 @@ public class GuiRenderLayer extends BaseRenderLayerEditScreen
             x += this.createTabButton(x, y, -1, tab);
         }
 
-        x = 10;
-        y = 60;
-
-        this.createLayerEditControls(x, y, this.getLayerRange());
+        this.createLayerEditControls(10, 60, this.getLayerRange());
     }
 
     @Override
@@ -56,20 +51,11 @@ public class GuiRenderLayer extends BaseRenderLayerEditScreen
 
     private int createTabButton(int x, int y, int width, ConfigTab tab)
     {
-        ButtonListenerTab listener = new ButtonListenerTab(tab);
-        boolean enabled = DataManager.getConfigGuiTab() != tab;
-        String label = tab.getDisplayName();
+        GenericButton button = new GenericButton(x, y, width, 20, tab.getDisplayName());
+        button.setEnabled(DataManager.getConfigGuiTab() != tab);
+        this.addButton(button, (w, btn) -> BaseScreen.openScreen(ConfigScreen.createOnTab(tab)));
 
-        if (width < 0)
-        {
-            width = this.getStringWidth(label) + 10;
-        }
-
-        GenericButton button = new GenericButton(x, y, width, 20, label);
-        button.setEnabled(enabled);
-        this.addButton(button, listener);
-
-        return width + 2;
+        return button.getWidth() + 2;
     }
 
     @Override
@@ -90,22 +76,5 @@ public class GuiRenderLayer extends BaseRenderLayerEditScreen
         this.addWidget(cb);
 
         return y;
-    }
-
-    private static class ButtonListenerTab implements ButtonActionListener
-    {
-        private final ConfigTab tab;
-
-        public ButtonListenerTab(ConfigTab tab)
-        {
-            this.tab = tab;
-        }
-
-        @Override
-        public void actionPerformedWithButton(BaseButton button, int mouseButton)
-        {
-            DataManager.setConfigGuiTab(this.tab);
-            BaseScreen.openGui(new ConfigScreen());
-        }
     }
 }

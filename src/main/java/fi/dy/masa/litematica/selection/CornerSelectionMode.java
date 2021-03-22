@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.selection;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
+import fi.dy.masa.malilib.config.value.OptionListConfigValue;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum CornerSelectionMode implements ConfigOptionListEntry<CornerSelectionMode>
+public enum CornerSelectionMode implements OptionListConfigValue<CornerSelectionMode>
 {
     EXPAND      ("expand",      "litematica.hud.area_selection.mode.expand"),
     CORNERS     ("corners",     "litematica.hud.area_selection.mode.corners");
@@ -22,7 +22,7 @@ public enum CornerSelectionMode implements ConfigOptionListEntry<CornerSelection
     }
 
     @Override
-    public String getStringValue()
+    public String getName()
     {
         return this.configString;
     }
@@ -36,12 +36,12 @@ public enum CornerSelectionMode implements ConfigOptionListEntry<CornerSelection
     @Override
     public CornerSelectionMode cycle(boolean forward)
     {
-        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
+        return BaseOptionListConfigValue.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public CornerSelectionMode fromString(String name)
     {
-        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
+        return BaseOptionListConfigValue.findValueByName(name, VALUES);
     }
 }

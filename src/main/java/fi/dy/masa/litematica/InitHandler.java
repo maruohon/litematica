@@ -11,11 +11,12 @@ import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.ClientTickHandler;
+import fi.dy.masa.malilib.config.BaseModConfig;
 import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InitializationHandler;
 import fi.dy.masa.malilib.event.dispatch.ClientWorldChangeEventDispatcher;
-import fi.dy.masa.malilib.event.dispatch.InputDispatcher;
-import fi.dy.masa.malilib.event.dispatch.KeyBindManager;
+import fi.dy.masa.malilib.input.InputDispatcher;
+import fi.dy.masa.malilib.input.HotkeyManager;
 import fi.dy.masa.malilib.event.dispatch.RenderEventDispatcher;
 import fi.dy.masa.malilib.event.dispatch.TickEventDispatcher;
 import fi.dy.masa.malilib.gui.config.ConfigTabRegistry;
@@ -25,10 +26,10 @@ public class InitHandler implements InitializationHandler
     @Override
     public void registerModHandlers()
     {
-        ConfigManager.INSTANCE.registerConfigHandler(new Configs());
-        ConfigTabRegistry.INSTANCE.registerConfigTabProvider(Reference.MOD_ID, ConfigScreen::getConfigTabs);
+        ConfigManager.INSTANCE.registerConfigHandler(BaseModConfig.createDefaultModConfig(Reference.MOD_INFO, 1, Configs.CATEGORIES));
+        ConfigTabRegistry.INSTANCE.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
-        KeyBindManager.INSTANCE.registerKeyBindProvider(InputHandler.getInstance());
+        HotkeyManager.INSTANCE.registerHotkeyProvider(InputHandler.getInstance());
         InputDispatcher.INSTANCE.registerMouseInputHandler(InputHandler.getInstance());
 
         RenderHandler renderer = new RenderHandler();

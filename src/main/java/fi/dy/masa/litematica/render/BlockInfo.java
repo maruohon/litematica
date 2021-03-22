@@ -11,6 +11,8 @@ import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -64,7 +66,7 @@ public class BlockInfo
         {
             GlStateManager.pushMatrix();
 
-            RenderUtils.renderOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, zLevel);
+            ShapeRenderUtils.renderOutlinedRectangle(x, y, zLevel, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR);
 
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;
@@ -77,7 +79,7 @@ public class BlockInfo
             GlStateManager.disableLighting();
             RenderUtils.enableGuiItemLighting();
 
-            RenderUtils.renderRectangle(x1, y, 16, 16, 0x20FFFFFF, zLevel); // light background for the item
+            ShapeRenderUtils.renderRectangle(x1, y, zLevel, 16, 16, 0x20FFFFFF); // light background for the item
 
             float origZ = mc.getRenderItem().zLevel;
             mc.getRenderItem().zLevel = zLevel + 1;
@@ -94,7 +96,7 @@ public class BlockInfo
             textRenderer.drawString(this.blockRegistryname, x1, y, 0xFF4060FF);
             y += textRenderer.FONT_HEIGHT + 4;
 
-            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props);
+            TextRenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props);
 
             GlStateManager.popMatrix();
         }

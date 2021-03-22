@@ -35,11 +35,11 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.input.KeyBindImpl;
-import fi.dy.masa.malilib.systems.BlockPlacementPositionHandler;
+import fi.dy.masa.malilib.interoperation.BlockPlacementPositionHandler;
 import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.PlacementUtils;
@@ -138,7 +138,7 @@ public class EasyPlaceUtils
         // Only print the warning message once per right click
         if (isFirstClickEasyPlace && result == EnumActionResult.FAIL)
         {
-            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
+            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
         }
 
         isFirstClickEasyPlace = false;
@@ -567,7 +567,7 @@ public class EasyPlaceUtils
 
         if (cancel && isFirstClickPlacementRestriction)
         {
-            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getOptionListValue(), MessageType.WARNING, 1000, "litematica.message.placement_restriction_fail");
+            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue(), MessageType.WARNING, 1000, "litematica.message.placement_restriction_fail");
         }
 
         isFirstClickPlacementRestriction = false;

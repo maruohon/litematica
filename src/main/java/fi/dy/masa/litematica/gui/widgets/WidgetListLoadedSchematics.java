@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.schematic.ISchematic;
-import fi.dy.masa.malilib.gui.icon.BaseIcon;
+import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -18,7 +18,7 @@ public class WidgetListLoadedSchematics extends BaseListWidget<ISchematic, Widge
         super(x, y, width, height, null);
 
         this.entryWidgetFixedHeight = 22;
-        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 14, 14, 0, BaseIcon.SEARCH, HorizontalAlignment.LEFT));
+        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 14, 14, 0, DefaultIcons.SEARCH, HorizontalAlignment.LEFT));
     }
 
     @Override

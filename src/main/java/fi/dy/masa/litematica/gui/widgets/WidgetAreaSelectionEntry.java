@@ -18,9 +18,9 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
@@ -130,7 +130,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            RenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
     }
 
@@ -158,7 +158,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
                 AreaSelection selection = this.selectionManager.getOrLoadSelection(selectionId);
                 String name = selection != null ? selection.getName() : "<error>";
                 SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, false);
-                BaseScreen.openPopupGui(new TextInputScreen(title, name, this.widget.parent.getSelectionManagerGui(), renamer));
+                BaseScreen.openPopupScreen(new TextInputScreen(title, name, this.widget.parent.getSelectionManagerGui(), renamer));
             }
             else if (this.type == ButtonType.COPY)
             {
@@ -168,7 +168,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
                 {
                     String title = StringUtils.translate("litematica.gui.title.copy_area_selection", selection.getName());
                     SelectionRenamer renamer = new SelectionRenamer(this.selectionManager, this.widget, true);
-                    BaseScreen.openPopupGui(new TextInputScreen(title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
+                    BaseScreen.openPopupScreen(new TextInputScreen(title, selection.getName(), this.widget.parent.getSelectionManagerGui(), renamer));
                 }
                 else
                 {
@@ -197,7 +197,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
                     GuiAreaSelectionEditorNormal gui = new GuiAreaSelectionEditorNormal(selection);
                     gui.setParent(GuiUtils.getCurrentScreen());
                     gui.setSelectionId(selectionId);
-                    BaseScreen.openGui(gui);
+                    BaseScreen.openScreen(gui);
                 }
             }
         }

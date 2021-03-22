@@ -42,7 +42,7 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
         this.changedBlockOnly = changedBlocksOnly;
         this.comparator = new ChunkPosComparator();
         this.comparator.setClosestFirst(true);
-        this.replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
+        this.replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getValue();
         this.name = StringUtils.translate("litematica.gui.label.task_name.paste");
     }
 

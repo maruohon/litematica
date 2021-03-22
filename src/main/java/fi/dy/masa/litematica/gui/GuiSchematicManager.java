@@ -28,8 +28,8 @@ import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.FileUtils.FileDeleter;
 import fi.dy.masa.malilib.util.FileUtils.FileRenamer;
@@ -73,9 +73,9 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         this.createButtons();
     }
@@ -135,7 +135,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
         }
 
         GenericButton button = new GenericButton(this.nextX, this.nextY, -1, 20, type.getLabel());
-        button.addHoverString(type.getHoverText());
+        button.translateAndAddHoverString(type.getHoverText());
         this.nextX += button.getWidth() + 2;
 
         this.addButton(button, new ButtonListener(type, this));
@@ -222,7 +222,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
                 if (type.getHasName())
                 {
                     String oldName = data.schematic.getMetadata().getName();
-                    BaseScreen.openPopupGui(new TextInputScreen("litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
+                    BaseScreen.openPopupScreen(new TextInputScreen("litematica.gui.title.rename_schematic", oldName, this.gui, new SchematicRenamer(entry.getDirectory(), entry.getName(), data.schematic, this.gui)));
                 }
                 else
                 {
@@ -232,25 +232,25 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
             else if (this.type == Type.RENAME_FILE)
             {
                 String oldName = FileUtils.getNameWithoutExtension(entry.getName());
-                BaseScreen.openPopupGui(new TextInputScreen("litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
+                BaseScreen.openPopupScreen(new TextInputScreen("litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
             }
             else if (this.type == Type.DELETE_FILE)
             {
                 FileDeleter deleter = new FileDeleter(entry.getFullPath());
-                BaseScreen.openPopupGui(new ConfirmActionScreen(400, "litematica.gui.title.confirm_file_deletion", deleter, this.gui, "litematica.gui.message.confirm_file_deletion", entry.getName()));
+                BaseScreen.openPopupScreen(new ConfirmActionScreen(400, "litematica.gui.title.confirm_file_deletion", deleter, this.gui, "litematica.gui.message.confirm_file_deletion", entry.getName()));
             }
             else if (this.type == Type.CONVERT_FORMAT)
             {
                 GuiSchematicSaveConvert gui = new GuiSchematicSaveConvert(data.schematic, entry.getName());
                 gui.setParent(this.gui);
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
             else if (this.type == Type.SET_PREVIEW)
             {
                 if (type == SchematicType.LITEMATICA)
                 {
                     previewGenerator = new PreviewGenerator(entry.getDirectory(), entry.getName());
-                    BaseScreen.openGui(null);
+                    BaseScreen.openScreen(null);
                     String hotkeyName = Hotkeys.SET_SCHEMATIC_PREVIEW.getName();
                     String hotkeyValue = Hotkeys.SET_SCHEMATIC_PREVIEW.getKeyBind().getKeysDisplayString();
                     MessageUtils.showGuiAndInGameMessage(MessageType.INFO, 8000, "litematica.info.schematic_manager.preview.info", hotkeyName, hotkeyValue);

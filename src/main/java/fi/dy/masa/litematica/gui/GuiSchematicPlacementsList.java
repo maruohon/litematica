@@ -32,9 +32,10 @@ public class GuiSchematicPlacementsList
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
+
         this.modifiedCache.clear();
 
         int x = 12;
@@ -47,7 +48,7 @@ public class GuiSchematicPlacementsList
         x += button.getWidth() + 2;
 
         button = new GenericButton(x, y, -1, 20, "litematica.gui.label.schematic_placement.open_placement_browser");
-        this.addButton(button, (btn, mbtn) -> { BaseScreen.openGui((new GuiSchematicPlacementFileBrowser()).setParent(this)); });
+        this.addButton(button, (btn, mbtn) -> { BaseScreen.openScreen((new GuiSchematicPlacementFileBrowser()).setParent(this)); });
 
         type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
         button = new GenericButton(this.width - 10, y, -1, true, type.getLabelKey());
@@ -57,7 +58,7 @@ public class GuiSchematicPlacementsList
         y = 10;
         String val = Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue() ? "litematica.gui.label.misc.icons" : "litematica.gui.label.misc.text";
         button = new GenericButton(x, y, -1, true, StringUtils.translate("litematica.gui.button.buttons_val", StringUtils.translate(val)));
-        button.addHoverString("litematica.gui.button.hover.use_text_or_icon_buttons");
+        button.translateAndAddHoverString("litematica.gui.button.hover.use_text_or_icon_buttons");
         this.addButton(button, (btn, mbtn) -> { Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.toggleBooleanValue(); this.initGui(); });
     }
 

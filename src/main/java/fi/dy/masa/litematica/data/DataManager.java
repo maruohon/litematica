@@ -33,10 +33,11 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
+import fi.dy.masa.malilib.gui.ScreenTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -53,7 +54,7 @@ public class DataManager implements DirectoryCache
 
     private static ToolMode operationMode = ToolMode.SCHEMATIC_PLACEMENT;
     private static ItemStack toolItem = new ItemStack(Items.STICK);
-    private static ConfigTab configGuiTab = ConfigScreen.VISUALS;
+    private static ScreenTab configGuiTab = ConfigScreen.VISUALS;
     private static boolean canSave;
     private static long clientTickStart;
 
@@ -94,7 +95,7 @@ public class DataManager implements DirectoryCache
         return toolItem;
     }
 
-    public static ConfigTab getConfigGuiTab()
+    public static ScreenTab getConfigGuiTab()
     {
         return configGuiTab;
     }
@@ -223,7 +224,7 @@ public class DataManager implements DirectoryCache
 
             if (JsonUtils.hasString(root, "config_gui_tab"))
             {
-                configGuiTab = ConfigTab.getTabByNameOrDefault(root.get("config_gui_tab").getAsString(), ConfigScreen.TABS, ConfigScreen.VISUALS);
+                configGuiTab = ScreenTab.getTabByNameOrDefault(root.get("config_gui_tab").getAsString(), ConfigScreen.ALL_TABS, ConfigScreen.VISUALS);
             }
 
             if (JsonUtils.hasString(root, "operation_mode"))
@@ -391,7 +392,7 @@ public class DataManager implements DirectoryCache
 
         if (custom)
         {
-            dir = Configs.Generic.CUSTOM_SCHEMATIC_DIRECTORY.getFile();
+            dir = Configs.Generic.CUSTOM_SCHEMATIC_DIRECTORY.getValue();
         }
 
         if (custom == false || dir == null)

@@ -25,6 +25,8 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -80,7 +82,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
     {
         ButtonListener listener = new ButtonListener(type, this);
         GenericButton button = new GenericButton(x, y, -1, true, type.getDisplayName());
-        button.addHoverString(type.getHoverKey());
+        button.translateAndAddHoverString(type.getHoverKey());
 
         this.addButton(button, listener);
 
@@ -100,7 +102,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
         else
         {
             button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
-            button.addHoverString(type.getHoverKey());
+            button.translateAndAddHoverString(type.getHoverKey());
         }
 
         this.addButton(button, new ButtonListener(type, this));
@@ -122,16 +124,16 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
         // Draw a lighter background for the hovered entry
         if (this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x70FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x70FFFFFF);
         }
         else if (this.isOdd)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x20FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x20FFFFFF);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0x50FFFFFF, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0x50FFFFFF);
         }
 
         boolean modified = this.schematic.getMetadata().wasModifiedSinceSaved();
@@ -180,7 +182,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
             BaseScreen.isMouseOver(mouseX, mouseY, this.buttonsStartX - 13, y + 6, 11, 11))
         {
             String str = BaseFileBrowserWidget.DATE_FORMAT.format(new Date(this.schematic.getMetadata().getTimeModified()));
-            RenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str)));
+            TextRenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str)));
         }
         else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 12, height))
         {
@@ -192,7 +194,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
             lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_file", fileName));
             lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.schematic_type", this.schematic.getType().getDisplayName()));
 
-            RenderUtils.renderHoverText(mouseX, mouseY, z, lines);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, z, lines);
         }
 
         super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
@@ -239,7 +241,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
                 GuiSchematicSaveConvert gui = new GuiSchematicSaveConvert(schematic, name);
                 gui.setUpdatePlacementsOption(true);
                 gui.setParent(GuiUtils.getCurrentScreen());
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
             else if (this.type == Type.RELOAD)
             {

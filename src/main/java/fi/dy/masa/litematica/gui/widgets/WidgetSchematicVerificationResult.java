@@ -31,6 +31,8 @@ import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.entry.SortableListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -167,9 +169,9 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
     }
 
     @Override
-    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
+    protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        if (super.onMouseClickedImpl(mouseX, mouseY, mouseButton))
+        if (super.onMouseClicked(mouseX, mouseY, mouseButton))
         {
             return true;
         }
@@ -251,11 +253,11 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
         int width = this.getWidth();
         int height = this.getHeight();
 
-        RenderUtils.renderRectangle(x, y, width, height, color, z);
+        ShapeRenderUtils.renderRectangle(x, y, z, width, height, color);
 
         if (selected)
         {
-            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
+            ShapeRenderUtils.renderOutline(x, y, z, width, height, 1, 0xFFE0E0E0);
         }
 
         int x1 = this.getColumnPosX(0);
@@ -290,7 +292,7 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
             this.drawString(x3, y, color, String.valueOf(this.count));
 
             y = this.getY() + 3;
-            RenderUtils.renderRectangle(x1, y, 16, 16, 0x20FFFFFF, z); // light background for the item
+            ShapeRenderUtils.renderRectangle(x1, y, z, 16, 16, 0x20FFFFFF); // light background for the item
 
             boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
             boolean hasModelExpected = this.mismatchInfo.stateExpected.getRenderType() == EnumBlockRenderType.MODEL;
@@ -320,7 +322,7 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
 
             if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
             {
-                RenderUtils.renderRectangle(x2, y, 16, 16, 0x20FFFFFF, z); // light background for the item
+                ShapeRenderUtils.renderRectangle(x2, y, z, 16, 16, 0x20FFFFFF); // light background for the item
 
                 if (useBlockModelFound)
                 {
@@ -448,9 +450,9 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
                 int x1 = x + 10;
                 int x2 = x + this.columnWidthExpected + 30;
 
-                RenderUtils.renderOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, zLevel);
-                RenderUtils.renderRectangle(x1, y + 16, 16, 16, 0x50C0C0C0, zLevel); // light background for the item
-                RenderUtils.renderRectangle(x2, y + 16, 16, 16, 0x50C0C0C0, zLevel); // light background for the item
+                ShapeRenderUtils.renderOutlinedRectangle(x, y, zLevel, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR);
+                ShapeRenderUtils.renderRectangle(x1, y + 16, zLevel, 16, 16, 0x50C0C0C0); // light background for the item
+                ShapeRenderUtils.renderRectangle(x2, y + 16, zLevel, 16, 16, 0x50C0C0C0); // light background for the item
 
                 FontRenderer textRenderer = mc.fontRenderer;
                 String pre = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD;
@@ -517,8 +519,8 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
 
                 List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected, " = ");
                 List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound, " = ");
-                RenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected);
-                RenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound);
+                TextRenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected);
+                TextRenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound);
 
                 GlStateManager.popMatrix();
             }

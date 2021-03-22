@@ -22,10 +22,12 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.icon.Icon;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.render.message.MessageHelpers;
+import fi.dy.masa.malilib.message.MessageHelpers;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<SchematicPlacementUnloaded>
@@ -83,7 +85,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
     private int createButtonGeneric(int xRight, int y, ButtonListener.ButtonType type)
     {
         GenericButton button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
-        button.addHoverString(type.getHoverKey());
+        button.translateAndAddHoverString(type.getHoverKey());
 
         return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
     }
@@ -101,7 +103,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
         else
         {
             button = new GenericButton(xRight, y, -1, true, type.getDisplayName());
-            button.addHoverString(type.getHoverKey());
+            button.translateAndAddHoverString(type.getHoverKey());
         }
 
         return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
@@ -111,7 +113,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
     {
         String key = this.useIconButtons() ? "%s" : type.getTranslationKey();
         OnOffButton button = new OnOffButton(xRight, y, -1, true, key, isCurrentlyOn);
-        button.addHoverString(type.getHoverKey());
+        button.translateAndAddHoverString(type.getHoverKey());
 
         return this.addButton(button, new ButtonListener(type, this)).getX() - 1;
     }
@@ -137,21 +139,21 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
         // Draw a lighter background for the hovered and the selected entry
         if (placementSelected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0303030);
         }
 
         if (placementSelected)
         {
-            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z);
+            ShapeRenderUtils.renderOutline(x, y, z, width, height, 1, 0xFFE0E0E0);
         }
 
         String name = this.placement.getName();
@@ -201,13 +203,13 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
             BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 38, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_locked");
-            RenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
+            TextRenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
         else if (this.placement.isRegionPlacementModified() &&
                  BaseScreen.isMouseOver(mouseX, mouseY, x + this.buttonsStartX - 25, y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_modified");
-            RenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
+            TextRenderUtils.renderHoverText(mouseX, mouseY, z, ImmutableList.of(str));
         }
         else if (BaseScreen.isMouseOver(mouseX, mouseY, x, y, this.buttonsStartX - 18, height))
         {
@@ -246,7 +248,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
                 text.add(StringUtils.translate("litematica.gui.label.schematic_placement.hover.enclosing_size", size.getX(), size.getY(), size.getZ()));
             }
 
-            RenderUtils.renderHoverText(mouseX, mouseY, z, text);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, z, text);
         }
 
         super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
@@ -301,7 +303,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
                 {
                     GuiPlacementConfiguration gui = new GuiPlacementConfiguration((SchematicPlacement) this.widget.placement);
                     gui.setParent(this.widget.gui);
-                    BaseScreen.openGui(gui);
+                    BaseScreen.openScreen(gui);
                 }
             }
         }

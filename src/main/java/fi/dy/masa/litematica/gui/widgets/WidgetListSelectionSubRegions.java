@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.malilib.gui.icon.BaseIcon;
+import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
 import fi.dy.masa.malilib.util.AlphaNumComparator.AlphaNumStringComparator;
@@ -27,7 +27,7 @@ public class WidgetListSelectionSubRegions extends BaseListWidget<String, Widget
         this.entryWidgetFixedHeight = 22;
         this.shouldSortList = true;
 
-        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 14, 14, 0, BaseIcon.SEARCH, HorizontalAlignment.LEFT));
+        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 14, 14, 0, DefaultIcons.SEARCH, HorizontalAlignment.LEFT));
     }
 
     public GuiAreaSelectionEditorNormal getEditorGui()

@@ -76,12 +76,12 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
                             ToolUtils.moveCurrentlySelectedWorldRegionTo(pos, mc);
                         }
                     }
-                    else if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
+                    else if (Configs.Generic.SELECTION_CORNERS_MODE.getValue() == CornerSelectionMode.CORNERS)
                     {
                         Corner corner = isToolPrimary ? Corner.CORNER_1 : Corner.CORNER_2;
                         sm.setPositionOfCurrentSelectionToRayTrace(this.mc, corner, moveEverything, maxDistance);
                     }
-                    else if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.EXPAND)
+                    else if (Configs.Generic.SELECTION_CORNERS_MODE.getValue() == CornerSelectionMode.EXPAND)
                     {
                         sm.handleCuboidModeMouseClick(this.mc, maxDistance, isToolSecondary, moveEverything);
                     }

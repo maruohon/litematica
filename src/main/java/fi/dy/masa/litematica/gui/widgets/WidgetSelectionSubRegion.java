@@ -15,6 +15,8 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -73,21 +75,21 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
         // Draw a lighter background for the hovered and the selected entry
         if (selected || this.isMouseOver(mouseX, mouseY))
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0303030);
         }
 
         if (selected)
         {
-            RenderUtils.renderOutline(x, y, width, height, 1, 0xFFE0E0E0, z + 1);
+            ShapeRenderUtils.renderOutline(x, y, z + 1, width, height, 1, 0xFFE0E0E0);
         }
 
         this.drawString(x + 2, y + this.getCenteredTextOffsetY(), 0xFFFFFFFF, this.entry);
@@ -131,7 +133,7 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            RenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
         }
 
         RenderUtils.color(1f, 1f, 1f, 1f);
@@ -156,7 +158,7 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
                 String title = "litematica.gui.title.rename_area_sub_region";
                 String name = this.widget.box != null ? this.widget.box.getName() : "<error>";
                 BoxRenamer renamer = new BoxRenamer(this.widget.selection, this.widget);
-                BaseScreen.openPopupGui(new TextInputScreen(title, name, this.widget.parent.getEditorGui(), renamer));
+                BaseScreen.openPopupScreen(new TextInputScreen(title, name, this.widget.parent.getEditorGui(), renamer));
             }
             else if (this.type == ButtonType.REMOVE)
             {
@@ -167,7 +169,7 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
             {
                 GuiAreaSelectionEditorSubRegion gui = new GuiAreaSelectionEditorSubRegion(this.widget.selection, this.widget.box);
                 gui.setParent(GuiUtils.getCurrentScreen());
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
         }
 

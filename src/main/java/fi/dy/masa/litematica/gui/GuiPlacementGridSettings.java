@@ -22,7 +22,7 @@ import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiPlacementGridSettings extends BaseDialogScreen
+public class GuiPlacementGridSettings extends BaseScreen
 {
     private final SchematicPlacementManager manager;
     private final SchematicPlacement placement;
@@ -42,19 +42,19 @@ public class GuiPlacementGridSettings extends BaseDialogScreen
         this.useTitleHierarchy = false;
         this.zLevel = 1f;
 
-        this.setWidthAndHeight(360, 200);
+        this.setScreenWidthAndHeight(360, 200);
         this.centerOnScreen();
 
-        this.setWorldAndResolution(this.mc, this.dialogWidth, this.dialogHeight);
+        this.setWorldAndResolution(this.mc, this.screenWidth, this.screenHeight);
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
         this.clearElements();
 
-        int x = this.dialogLeft + 10;
-        int y = this.dialogTop + 20;
+        int x = this.x + 10;
+        int y = this.y + 20;
         int width = 50;
 
         boolean on = this.placement.getGridSettings().isEnabled();
@@ -62,14 +62,14 @@ public class GuiPlacementGridSettings extends BaseDialogScreen
         this.addButton(buttonOnOff, (btn, mb) -> {
             this.placement.getGridSettings().toggleEnabled();
             this.updatePlacementManager();
-            this.initGui();
+            this.initScreen();
         });
 
         GenericButton button = new GenericButton(x + buttonOnOff.getWidth() + 4, y, -1, 20, "litematica.gui.button.schematic_placement.reset_grid_size");
         this.addButton(button, (btn, mb) -> {
             this.placement.getGridSettings().resetSize();
             this.updatePlacementManager();
-            this.initGui();
+            this.initScreen();
         });
 
         y += 30;
@@ -90,12 +90,6 @@ public class GuiPlacementGridSettings extends BaseDialogScreen
         this.addRepeatInputElements(x, y     , width, IntBoxCoordType.MAX_X);
         this.addRepeatInputElements(x, y + 16, width, IntBoxCoordType.MAX_Y);
         this.addRepeatInputElements(x, y + 32, width, IntBoxCoordType.MAX_Z);
-    }
-
-    @Override
-    protected void drawScreenBackground(int mouseX, int mouseY)
-    {
-        RenderUtils.renderOutlinedBox(this.dialogLeft, this.dialogTop, this.dialogWidth, this.dialogHeight, 0x90000000, COLOR_HORIZONTAL_BAR, (int) this.zLevel);
     }
 
     private void updatePlacementManager()

@@ -24,8 +24,8 @@ import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.input.KeyAction;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 
 public class HotkeyCallbackOpenGui implements HotkeyCallback
 {
@@ -46,12 +46,12 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
         if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeyBind())
         {
-            BaseScreen.openGui(new GuiMainMenu());
+            BaseScreen.openScreen(new GuiMainMenu());
         }
         else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeyBind())
         {
             BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.RENDER_LAYERS ? new GuiRenderLayer() : ConfigScreen.create();
-            BaseScreen.openGui(screen);
+            BaseScreen.openScreen(screen);
             return true;
         }
 
@@ -70,11 +70,11 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeyBind())
         {
-            BaseScreen.openGui(new GuiSchematicLoad());
+            BaseScreen.openScreen(new GuiSchematicLoad());
         }
         else if (key == Hotkeys.OPEN_GUI_LOADED_SCHEMATICS.getKeyBind())
         {
-            BaseScreen.openGui(new GuiSchematicLoadedList());
+            BaseScreen.openScreen(new GuiSchematicLoadedList());
         }
         else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeyBind())
         {
@@ -98,7 +98,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
             if (materialList != null)
             {
-                BaseScreen.openGui(new GuiMaterialList(materialList));
+                BaseScreen.openScreen(new GuiMaterialList(materialList));
             }
         }
         else if (key == Hotkeys.OPEN_GUI_PLACEMENT_GRID_SETTINGS.getKeyBind())
@@ -109,7 +109,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             {
                 if (placement.isRepeatedPlacement() == false)
                 {
-                    BaseScreen.openGui(new GuiPlacementGridSettings(placement, null));
+                    BaseScreen.openScreen(new GuiPlacementGridSettings(placement, null));
                 }
                 else
                 {
@@ -127,11 +127,11 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
                 if (placement != null)
                 {
-                    BaseScreen.openGui(new GuiSubRegionConfiguration(schematicPlacement, placement));
+                    BaseScreen.openScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
                 }
                 else
                 {
-                    BaseScreen.openGui(new GuiPlacementConfiguration(schematicPlacement));
+                    BaseScreen.openScreen(new GuiPlacementConfiguration(schematicPlacement));
                 }
             }
             else
@@ -141,7 +141,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeyBind())
         {
-            BaseScreen.openGui(new GuiSchematicPlacementsList());
+            BaseScreen.openScreen(new GuiSchematicPlacementsList());
         }
         else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeyBind())
         {
@@ -153,7 +153,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
             if (schematicPlacement != null)
             {
-                BaseScreen.openGui(new GuiSchematicVerifier(schematicPlacement));
+                BaseScreen.openScreen(new GuiSchematicVerifier(schematicPlacement));
             }
             else
             {
@@ -164,7 +164,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         {
             if (DataManager.getSchematicProjectsManager().hasProjectOpen() == false)
             {
-                BaseScreen.openGui(new GuiAreaSelectionManager());
+                BaseScreen.openScreen(new GuiAreaSelectionManager());
             }
             else
             {

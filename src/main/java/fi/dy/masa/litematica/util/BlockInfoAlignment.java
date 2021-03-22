@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.util;
 
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
-import fi.dy.masa.malilib.config.value.ConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
+import fi.dy.masa.malilib.config.value.OptionListConfigValue;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public enum BlockInfoAlignment implements ConfigOptionListEntry<BlockInfoAlignment>
+public enum BlockInfoAlignment implements OptionListConfigValue<BlockInfoAlignment>
 {
     CENTER      ("center",      "litematica.label.alignment.center"),
     TOP_CENTER  ("top_center",  "litematica.label.alignment.top_center");
@@ -22,7 +22,7 @@ public enum BlockInfoAlignment implements ConfigOptionListEntry<BlockInfoAlignme
     }
 
     @Override
-    public String getStringValue()
+    public String getName()
     {
         return this.configString;
     }
@@ -36,12 +36,12 @@ public enum BlockInfoAlignment implements ConfigOptionListEntry<BlockInfoAlignme
     @Override
     public BlockInfoAlignment cycle(boolean forward)
     {
-        return BaseConfigOptionListEntry.cycleValue(VALUES, this.ordinal(), forward);
+        return BaseOptionListConfigValue.cycleValue(VALUES, this.ordinal(), forward);
     }
 
     @Override
     public BlockInfoAlignment fromString(String name)
     {
-        return BaseConfigOptionListEntry.findValueByName(name, VALUES);
+        return BaseOptionListConfigValue.findValueByName(name, VALUES);
     }
 }

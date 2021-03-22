@@ -25,6 +25,7 @@ import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
@@ -139,7 +140,7 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements Sel
         int z = this.getZLevel();
         int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
-        RenderUtils.renderOutlinedBox(x + 1, y, this.infoWidth, height, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
+        ShapeRenderUtils.renderOutlinedRectangle(x + 1, y, z, this.infoWidth, height, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR);
 
         if (entry == null)
         {
@@ -237,7 +238,7 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements Sel
                     iconSize = height - y + this.getY() - 6;
                 }
 
-                RenderUtils.renderOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
+                ShapeRenderUtils.renderOutlinedRectangle(x + 4, y, z, iconSize, iconSize, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR);
 
                 this.bindTexture(data.iconName);
                 Gui.drawModalRectWithCustomSizedTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);

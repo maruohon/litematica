@@ -25,7 +25,7 @@ import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.gui.widget.InfoIconWidget;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
@@ -56,9 +56,9 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         boolean isNarrow = this.width < this.getElementTotalWidth();
 
@@ -157,11 +157,11 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
 
         if (type == ButtonListener.Type.CLEAR_CACHE)
         {
-            button.addHoverString("litematica.gui.button.hover.material_list.clear_cache");
+            button.translateAndAddHoverString("litematica.gui.button.hover.material_list.clear_cache");
         }
         else if (type == ButtonListener.Type.WRITE_TO_FILE)
         {
-            button.addHoverString("litematica.gui.button.hover.material_list.write_hold_shift_for_csv");
+            button.translateAndAddHoverString("litematica.gui.button.hover.material_list.write_hold_shift_for_csv");
         }
 
         this.addButton(button, listener);

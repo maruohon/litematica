@@ -21,7 +21,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
@@ -52,9 +52,9 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         int x = 12;
         int y = this.height - 40;
@@ -65,7 +65,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         label = StringUtils.translate("litematica.gui.label.schematic_load.checkbox.create_placement");
         String hover = StringUtils.translate("litematica.gui.label.schematic_load.hoverinfo.create_placement");
         CheckBoxWidget checkbox = new CheckBoxWidget(x, y, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label, hover);
-        checkbox.setListener((widget) -> { Configs.Internal.CREATE_PLACEMENT_ON_LOAD.setBooleanValue(widget.isChecked()); });
+        checkbox.setListener((widget) -> { Configs.Internal.CREATE_PLACEMENT_ON_LOAD.setValue(widget.isChecked()); });
         checkbox.setChecked(Configs.Internal.CREATE_PLACEMENT_ON_LOAD.getBooleanValue(), false);
         this.addWidget(checkbox);
 
@@ -101,7 +101,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
         if (type == ButtonListener.Type.MATERIAL_LIST)
         {
-            button.addHoverString("litematica.gui.button.hover.material_list_shift_to_select_sub_regions");
+            button.translateAndAddHoverString("litematica.gui.button.hover.material_list_shift_to_select_sub_regions");
         }
 
         this.addButton(button, listener);
@@ -168,13 +168,13 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                     StringListSelectionScreen gui = new StringListSelectionScreen(schematic.getRegionNames(), creator);
                     gui.setTitle(StringUtils.translate("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
                     gui.setParent(GuiUtils.getCurrentScreen());
-                    BaseScreen.openGui(gui);
+                    BaseScreen.openScreen(gui);
                 }
                 else
                 {
                     MaterialListSchematic materialList = new MaterialListSchematic(schematic, true);
                     DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-                    BaseScreen.openGui(new GuiMaterialList(materialList));
+                    BaseScreen.openScreen(new GuiMaterialList(materialList));
                 }
             }
         }
@@ -212,7 +212,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         {
             MaterialListSchematic materialList = new MaterialListSchematic(this.schematic, strings, true);
             DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it
-            BaseScreen.openGui(new GuiMaterialList(materialList));
+            BaseScreen.openScreen(new GuiMaterialList(materialList));
         }
     }
 }

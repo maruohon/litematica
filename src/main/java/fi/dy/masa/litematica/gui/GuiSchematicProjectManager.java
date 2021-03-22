@@ -36,9 +36,9 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         this.createElements();
     }
@@ -63,7 +63,7 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
     {
         GenericButton button = new GenericButton(x, y, -1, rightAlign, type.getTranslationKey());
-        button.addHoverString(type.getHoverText());
+        button.translateAndAddHoverString(type.getHoverText());
 
         this.addButton(button, new ButtonListener(type, this));
 
@@ -125,7 +125,7 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
             if (this.type == Type.OPEN_PROJECT_BROWSER)
             {
                 GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
             else if (this.type == Type.SAVE_VERSION)
             {
@@ -146,7 +146,7 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
                 String title = "litematica.gui.title.schematic_projects.confirm_place_to_world";
                 String msg = "litematica.gui.message.schematic_projects.confirm_place_to_world";
                 ConfirmActionScreen gui = new ConfirmActionScreen(320, title, executor, this.gui, msg);
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
             else if (this.type == Type.DELETE_AREA)
             {
@@ -154,7 +154,7 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
                 String title = "litematica.gui.title.schematic_projects.confirm_delete_area";
                 String msg = "litematica.gui.message.schematic_projects.confirm_delete_area";
                 ConfirmActionScreen gui = new ConfirmActionScreen(320, title, executor, this.gui, msg);
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
             else if (this.type == Type.MOVE_ORIGIN)
             {
@@ -170,7 +170,7 @@ public class GuiSchematicProjectManager extends BaseListScreen<SchematicVersion,
             {
                 DataManager.getSchematicProjectsManager().closeCurrentProject();
                 GuiSchematicProjectsBrowser gui = new GuiSchematicProjectsBrowser();
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
         }
 

@@ -10,8 +10,8 @@ public class TaskScheduler
     private static final TaskScheduler INSTANCE_CLIENT = new TaskScheduler();
     private static final TaskScheduler INSTANCE_SERVER = new TaskScheduler();
 
-    private List<ITask> tasks = new ArrayList<>();
-    private List<ITask> tasksToAdd = new ArrayList<>();
+    private final List<ITask> tasks = new ArrayList<>();
+    private final List<ITask> tasksToAdd = new ArrayList<>();
 
     private TaskScheduler()
     {
@@ -83,9 +83,8 @@ public class TaskScheduler
 
     private void addNewTasks()
     {
-        for (int i = 0; i < this.tasksToAdd.size(); ++i)
+        for (ITask task : this.tasksToAdd)
         {
-            ITask task = this.tasksToAdd.get(i);
             task.init();
             this.tasks.add(task);
         }
@@ -199,9 +198,8 @@ public class TaskScheduler
     {
         synchronized (this)
         {
-            for (int i = 0; i < this.tasks.size(); ++i)
+            for (ITask task : this.tasks)
             {
-                ITask task = this.tasks.get(i);
                 task.stop();
             }
 

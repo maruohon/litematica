@@ -38,6 +38,7 @@ import fi.dy.masa.litematica.mixin.IMixinCompiledChunk;
 import fi.dy.masa.litematica.render.RenderUtils;
 import fi.dy.masa.litematica.util.OverlayType;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
@@ -392,7 +393,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                     {
                         if (type.getRenderPriority() > typeAdj.getRenderPriority())
                         {
-                            fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceSideBatchedQuads(pos, side, overlayColor, 0, bufferOverlayQuads);
+                            ShapeRenderUtils.renderBlockPosSideQuad(pos, side, 0, overlayColor, bufferOverlayQuads);
                         }
                     }
                 }
@@ -409,7 +410,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 }
                 else
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllSidesBatchedQuads(pos, overlayColor, 0, bufferOverlayQuads);
+                    ShapeRenderUtils.renderBlockPosSideQuads(pos, 0, overlayColor, bufferOverlayQuads);
                 }
             }
         }
@@ -484,7 +485,7 @@ public class RenderChunkSchematicVbo extends RenderChunk
                 }
                 else
                 {
-                    fi.dy.masa.malilib.render.RenderUtils.renderBlockSpaceAllOutlinesBatchedLines(pos, overlayColor, 0, bufferOverlayOutlines);
+                    ShapeRenderUtils.renderBlockPosEdgeLines(pos, 0, overlayColor, bufferOverlayOutlines);
                 }
             }
         }

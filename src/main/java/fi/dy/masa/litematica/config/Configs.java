@@ -3,16 +3,14 @@ package fi.dy.masa.litematica.config;
 import java.io.File;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
-import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.selection.CornerSelectionMode;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
-import fi.dy.masa.malilib.config.BaseConfigOptionCategory;
-import fi.dy.masa.malilib.config.ConfigOptionCategory;
-import fi.dy.masa.malilib.config.ModConfig;
+import fi.dy.masa.malilib.config.option.ConfigOption;
+import fi.dy.masa.malilib.config.category.BaseConfigOptionCategory;
+import fi.dy.masa.malilib.config.category.ConfigOptionCategory;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
 import fi.dy.masa.malilib.config.option.ColorConfig;
-import fi.dy.masa.malilib.config.option.ConfigOption;
 import fi.dy.masa.malilib.config.option.DirectoryConfig;
 import fi.dy.masa.malilib.config.option.DoubleConfig;
 import fi.dy.masa.malilib.config.option.IntegerConfig;
@@ -22,7 +20,7 @@ import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.config.value.InfoType;
 import fi.dy.masa.malilib.util.FileUtils;
 
-public class Configs implements ModConfig
+public class Configs
 {
     public static class Generic
     {
@@ -282,7 +280,7 @@ public class Configs implements ModConfig
         );
     }
 
-    private static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
+    public static final List<ConfigOptionCategory> CATEGORIES = ImmutableList.of(
             BaseConfigOptionCategory.normal("Generic",      Generic.OPTIONS),
             BaseConfigOptionCategory.normal("InfoOverlays", InfoOverlays.OPTIONS),
             BaseConfigOptionCategory.normal("Internal",     Internal.OPTIONS),
@@ -290,28 +288,4 @@ public class Configs implements ModConfig
             BaseConfigOptionCategory.normal("Colors",       Colors.OPTIONS),
             BaseConfigOptionCategory.normal("Hotkeys",      Hotkeys.HOTKEY_LIST)
     );
-
-    @Override
-    public String getModId()
-    {
-        return Reference.MOD_ID;
-    }
-
-    @Override
-    public String getModName()
-    {
-        return Reference.MOD_NAME;
-    }
-
-    @Override
-    public String getConfigFileName()
-    {
-        return Reference.MOD_ID + ".json";
-    }
-
-    @Override
-    public List<ConfigOptionCategory> getConfigOptionCategories()
-    {
-        return CATEGORIES;
-    }
 }

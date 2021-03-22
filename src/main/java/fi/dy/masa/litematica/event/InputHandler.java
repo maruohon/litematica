@@ -21,13 +21,13 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.input.Hotkey;
-import fi.dy.masa.malilib.input.KeyBindCategory;
-import fi.dy.masa.malilib.input.KeyBindProvider;
+import fi.dy.masa.malilib.input.HotkeyCategory;
+import fi.dy.masa.malilib.input.HotkeyProvider;
 import fi.dy.masa.malilib.input.MouseInputHandler;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 
-public class InputHandler implements KeyBindProvider, MouseInputHandler
+public class InputHandler implements HotkeyProvider, MouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -47,9 +47,9 @@ public class InputHandler implements KeyBindProvider, MouseInputHandler
     }
 
     @Override
-    public List<KeyBindCategory> getHotkeyCategoriesForCombinedView()
+    public List<HotkeyCategory> getHotkeysByCategories()
     {
-        return ImmutableList.of(new KeyBindCategory(Reference.MOD_ID, Reference.MOD_NAME, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST));
+        return ImmutableList.of(new HotkeyCategory(Reference.MOD_INFO, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST));
     }
 
     @Override

@@ -32,6 +32,7 @@ public class WidgetAreaSelectionBrowser extends BaseFileBrowserWidget
     @Override
     protected FileFilter getFileFilter()
     {
+
         return JSON_FILTER;
     }
 

@@ -20,7 +20,7 @@ import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
-import fi.dy.masa.malilib.render.message.MessageType;
+import fi.dy.masa.malilib.message.MessageType;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -38,9 +38,9 @@ public class GuiSubRegionConfiguration extends BaseScreen
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         int width = 120;
         int x = this.width - width - 10;
@@ -230,7 +230,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
             switch (this.type)
             {
                 case PLACEMENT_CONFIGURATION:
-                    BaseScreen.openGui(new GuiPlacementConfiguration(this.schematicPlacement));
+                    BaseScreen.openScreen(new GuiPlacementConfiguration(this.schematicPlacement));
                     break;
 
                 case ROTATE:

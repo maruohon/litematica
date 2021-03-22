@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.gui.GuiMaterialList;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
 import fi.dy.masa.litematica.materials.MaterialListSorter;
-import fi.dy.masa.malilib.gui.icon.BaseIcon;
+import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
 import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
@@ -33,7 +33,7 @@ public class WidgetListMaterialList extends BaseListWidget<MaterialListEntry, Wi
         this.shouldSortList = true;
         this.sorter = new MaterialListSorter(parent.getMaterialList());
 
-        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 8, width - 16, 14, 0, BaseIcon.SEARCH, HorizontalAlignment.RIGHT)).setZLevel(1);
+        this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 8, width - 16, 14, 0, DefaultIcons.SEARCH, HorizontalAlignment.RIGHT)).setZLevel(1);
         this.setParentScreen(parent);
     }
 

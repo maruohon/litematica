@@ -41,19 +41,19 @@ public class SchematicUtils
                 String title = "litematica.gui.title.schematic_projects.save_new_version";
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
                 TextInputScreen gui = new TextInputScreen(title, project.getCurrentVersionName(), GuiUtils.getCurrentScreen(), new SchematicVersionCreator());
-                BaseScreen.openPopupGui(gui);
+                BaseScreen.openPopupScreen(gui);
             }
             else if (inMemoryOnly)
             {
                 String title = "litematica.gui.title.create_in_memory_schematic";
                 TextInputScreen gui = new TextInputScreen(title, area.getName(), GuiUtils.getCurrentScreen(), new InMemorySchematicCreator(area));
-                BaseScreen.openPopupGui(gui);
+                BaseScreen.openPopupScreen(gui);
             }
             else
             {
                 GuiSchematicSave gui = new GuiSchematicSave();
                 gui.setParent(GuiUtils.getCurrentScreen());
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
 
             return true;

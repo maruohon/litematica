@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.MathHelper;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.JsonUtils;
 
@@ -253,7 +253,7 @@ public abstract class MaterialListBase implements IMaterialList
     {
         JsonObject obj = new JsonObject();
 
-        obj.add("type", new JsonPrimitive(this.getMaterialListType().getStringValue()));
+        obj.add("type", new JsonPrimitive(this.getMaterialListType().getName()));
         obj.add("sort_criteria", new JsonPrimitive(this.sortCriteria.name()));
         obj.add("sort_reverse", new JsonPrimitive(this.reverse));
         obj.add("hide_available", new JsonPrimitive(this.hideAvailable));
@@ -266,7 +266,7 @@ public abstract class MaterialListBase implements IMaterialList
     {
         if (JsonUtils.hasString(obj, "type"))
         {
-            this.setMaterialListType(BaseConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "type"), BlockInfoListType.VALUES));
+            this.setMaterialListType(BaseOptionListConfigValue.findValueByName(JsonUtils.getString(obj, "type"), BlockInfoListType.VALUES));
         }
 
         if (JsonUtils.hasString(obj, "sort_criteria"))

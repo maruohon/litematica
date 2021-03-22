@@ -113,13 +113,6 @@ litematica.gui.button.change_menu.show_schematic_placements=Schematic Placements
 litematica.gui.button.change_menu.task_manager=Task Manager
 litematica.gui.button.change_menu.to_main_menu=Litematica menu
 
-litematica.gui.button.config_gui.colors=Colors
-litematica.gui.button.config_gui.generic=Generic
-litematica.gui.button.config_gui.hotkeys=Hotkeys
-litematica.gui.button.config_gui.info_overlays=Info Overlays
-litematica.gui.button.config_gui.render_layers=Render Layers
-litematica.gui.button.config_gui.visuals=Visuals
-
 litematica.gui.button.hover.area_editor.analyze_area=§7Creates a Material List from the current selection
 litematica.gui.button.hover.area_editor.corner_mode.corners=§fCorners Mode:\n§7Left click to set the first/origin corner,\n§7right click to set the second corner.\n§7Middle click to select a corner, and then you can Alt + scroll\n§7to nudge it around in the looking direction.
 litematica.gui.button.hover.area_editor.corner_mode.expand=§fExpand Mode:\n§7Right click to reset/collapse the selection box to the clicked position.\n§7Left click to expand the selection around all the clicked positions.\n§7Middle click to select a corner, and then you can Alt + scroll\n§7to nudge it around in the looking direction.
@@ -490,6 +483,13 @@ litematica.info.material_list=- The Material List hotkey will open the last view
 
 litematica.label.alignment.center=Center
 litematica.label.alignment.top_center=Top Center
+
+litematica.label.config_tab.colors=Colors
+litematica.label.config_tab.generic=Generic
+litematica.label.config_tab.hotkeys=Hotkeys
+litematica.label.config_tab.info_overlays=Info Overlays
+litematica.label.config_tab.render_layers=Render Layers
+litematica.label.config_tab.visuals=Visuals
 
 litematica.label.none_lower=none
 litematica.label.no=no

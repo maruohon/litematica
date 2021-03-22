@@ -19,6 +19,7 @@ import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.inventory.InventoryScreenUtils;
 import fi.dy.masa.malilib.util.data.ItemType;
@@ -155,8 +156,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         if (useBackground)
         {
-            RenderUtils.renderRectangle(posX - bgMargin, posY - bgMargin,
-                                        maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor, 0);
+            ShapeRenderUtils.renderRectangle(posX - bgMargin, posY - bgMargin,
+                                             0, maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor);
         }
 
         String title = BaseScreen.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + BaseScreen.TXT_RST;
@@ -279,7 +280,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                     {
                         Slot slot = pair.getLeft();
                         Color4f color = pair.getRight();
-                        RenderUtils.renderOutlinedBox(guiX + slot.xPos, guiY + slot.yPos, 16, 16, color.intValue, color.intValue | 0xFF000000, 1f);
+                        ShapeRenderUtils.renderOutlinedRectangle(guiX + slot.xPos, guiY + slot.yPos, 1f, 16, 16, color.intValue, color.intValue | 0xFF000000);
                     }
 
                     GlStateManager.enableTexture2D();

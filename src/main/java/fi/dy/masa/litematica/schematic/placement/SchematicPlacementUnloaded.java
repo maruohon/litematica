@@ -18,10 +18,10 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
-import fi.dy.masa.malilib.config.value.BaseConfigOptionListEntry;
-import fi.dy.masa.malilib.render.message.MessageConsumer;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
+import fi.dy.masa.malilib.message.MessageConsumer;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -418,7 +418,7 @@ public class SchematicPlacementUnloaded
             obj.add("locked", new JsonPrimitive(this.isLocked()));
             obj.add("locked_coords", new JsonPrimitive(this.coordinateLockMask));
             obj.add("bb_color", new JsonPrimitive(this.boundingBoxColor.intValue));
-            obj.add("verifier_type", new JsonPrimitive(this.verifierType.getStringValue()));
+            obj.add("verifier_type", new JsonPrimitive(this.verifierType.getName()));
 
             if (this.selectedSubRegionName != null)
             {
@@ -482,7 +482,7 @@ public class SchematicPlacementUnloaded
 
             if (JsonUtils.hasString(obj, "verifier_type"))
             {
-                schematicPlacement.verifierType = BaseConfigOptionListEntry.findValueByName(JsonUtils.getString(obj, "verifier_type"), BlockInfoListType.VALUES);
+                schematicPlacement.verifierType = BaseOptionListConfigValue.findValueByName(JsonUtils.getString(obj, "verifier_type"), BlockInfoListType.VALUES);
             }
 
             if (JsonUtils.hasString(obj, "selected_region"))

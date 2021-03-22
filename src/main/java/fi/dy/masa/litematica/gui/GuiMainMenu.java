@@ -23,9 +23,9 @@ public class GuiMainMenu extends BaseScreen
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         int x = 12;
         int y = 30;
@@ -77,7 +77,7 @@ public class GuiMainMenu extends BaseScreen
             DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
             button.setEnabled(false);
-            button.addHoverString("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+            button.translateAndAddHoverString("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
         }
 
         this.addButton(button, new ButtonListenerChangeMenu(type, this));
@@ -127,7 +127,7 @@ public class GuiMainMenu extends BaseScreen
                     gui = new GuiAreaSelectionManager();
                     break;
                 case CONFIGURATION:
-                    BaseScreen.openGui(new ConfigScreen());
+                    BaseScreen.openScreen(ConfigScreen.create());
                     return;
                 case LOAD_SCHEMATICS:
                     gui = new GuiSchematicLoad();
@@ -155,7 +155,7 @@ public class GuiMainMenu extends BaseScreen
             if (gui != null)
             {
                 gui.setParent(this.parent);
-                BaseScreen.openGui(gui);
+                BaseScreen.openScreen(gui);
             }
         }
 

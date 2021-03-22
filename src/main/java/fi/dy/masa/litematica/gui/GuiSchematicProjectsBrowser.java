@@ -19,8 +19,8 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.render.message.MessageType;
-import fi.dy.masa.malilib.render.message.MessageUtils;
+import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, DirectoryEntryWidget, WidgetSchematicProjectBrowser>
@@ -34,9 +34,9 @@ public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, 
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         this.createElements();
     }
@@ -76,7 +76,7 @@ public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, 
     private int createButton(int x, int y, boolean rightAlign, ButtonListener.Type type)
     {
         GenericButton button = new GenericButton(x, y, -1, rightAlign, type.getTranslationKey());
-        button.addHoverString(type.getHoverText());
+        button.translateAndAddHoverString(type.getHoverText());
 
         this.addButton(button, new ButtonListener(type, this));
 
@@ -138,7 +138,7 @@ public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, 
                         if (project != null)
                         {
                             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
-                            BaseScreen.openGui(gui);
+                            BaseScreen.openScreen(gui);
                             String name = project.getName();
                             MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
                         }
@@ -153,7 +153,7 @@ public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, 
             {
                 ProjectCreator creator = new ProjectCreator(this.gui.getListWidget().getCurrentDirectory(), this.gui);
                 TextInputScreen gui = new TextInputScreen("litematica.gui.title.create_schematic_project", "", GuiUtils.getCurrentScreen(), creator);
-                BaseScreen.openPopupGui(gui);
+                BaseScreen.openPopupScreen(gui);
             }
             else if (this.type == Type.CLOSE_PROJECT)
             {
@@ -167,7 +167,7 @@ public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, 
                 if (project != null)
                 {
                     GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
-                    BaseScreen.openGui(gui);
+                    BaseScreen.openScreen(gui);
                 }
             }
         }

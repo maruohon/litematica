@@ -1,14 +1,18 @@
 package fi.dy.masa.litematica.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.widgets.WidgetListTasks;
 import fi.dy.masa.litematica.gui.widgets.WidgetTaskEntry;
 import fi.dy.masa.litematica.scheduler.ITask;
+import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.BaseListScreen;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
+import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class GuiTaskManager extends BaseListScreen<ITask, WidgetTaskEntry, WidgetListTasks>
+public class GuiTaskManager extends BaseListScreen<DataListWidget<ITask>>
 {
     public GuiTaskManager()
     {
@@ -18,9 +22,9 @@ public class GuiTaskManager extends BaseListScreen<ITask, WidgetTaskEntry, Widge
     }
 
     @Override
-    public void initGui()
+    protected void initScreen()
     {
-        super.initGui();
+        super.initScreen();
 
         int y = this.height - 26;
 
@@ -29,9 +33,22 @@ public class GuiTaskManager extends BaseListScreen<ITask, WidgetTaskEntry, Widge
         this.addButton(button, new ButtonListenerChangeMenu(type, this.getParent()));
     }
 
-    @Override
-    protected WidgetListTasks createListWidget(int listX, int listY)
+    public static Supplier<List<ITask>> getAllTasksSupplier()
     {
-        return new WidgetListTasks(listX, listY, this.getListWidth(), this.getListHeight(), null);
+        return () -> {
+            ArrayList<ITask> list = new ArrayList<>();
+            list.addAll(TaskScheduler.getInstanceClient().getAllTasks());
+            list.addAll(TaskScheduler.getInstanceServer().getAllTasks());
+            return list;
+        };
+    }
+
+    @Override
+    protected DataListWidget<ITask> createListWidget(int listX, int listY, int listWidth, int listHeight)
+    {
+        DataListWidget<ITask> listWidget = new DataListWidget<>(listX, listY, listWidth, listHeight, getAllTasksSupplier());
+        listWidget.setEntryWidgetFactory(WidgetTaskEntry::new);
+        listWidget.setFetchFromSupplierOnRefresh(true);
+        return listWidget;
     }
 }

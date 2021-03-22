@@ -14,6 +14,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.SortableListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialListEntry>
@@ -137,9 +138,9 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
     }
 
     @Override
-    protected boolean onMouseClickedImpl(int mouseX, int mouseY, int mouseButton)
+    protected boolean onMouseClicked(int mouseX, int mouseY, int mouseButton)
     {
-        if (super.onMouseClickedImpl(mouseX, mouseY, mouseButton))
+        if (super.onMouseClicked(mouseX, mouseY, mouseButton))
         {
             return true;
         }
@@ -187,16 +188,16 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
         // Draw a lighter background for the hovered and the selected entry
         if (this.header1 == null && (selected || (isActiveGui && this.getId() == hoveredWidgetId)))
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0707070, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0707070);
         }
         else if (this.isOdd)
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0101010, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0101010);
         }
         // Draw a slightly lighter background for even entries
         else
         {
-            RenderUtils.renderRectangle(x, y, width, height, 0xA0303030, z);
+            ShapeRenderUtils.renderRectangle(x, y, z, width, height, 0xA0303030);
         }
 
         int x1 = this.getColumnPosX(0);
@@ -239,7 +240,7 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
             this.drawString(x4, y, color, pre + String.valueOf(countAvailable));
 
             y = this.getY() + 3;
-            RenderUtils.renderRectangle(x1, y, 16, 16, 0x20FFFFFF, z); // light background for the item
+            ShapeRenderUtils.renderRectangle(x1, y, z, 16, 16, 0x20FFFFFF); // light background for the item
 
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -296,8 +297,8 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
             int y1 = y + 6;
             int z = this.getZLevel() + 1;
 
-            RenderUtils.renderOutlinedBox(x, y, totalWidth, 60, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR, z);
-            RenderUtils.renderRectangle(x2, y1, 16, 16, 0x20FFFFFF, z); // light background for the item
+            ShapeRenderUtils.renderOutlinedRectangle(x, y, z, totalWidth, 60, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR);
+            ShapeRenderUtils.renderRectangle(x2, y1, z, 16, 16, 0x20FFFFFF); // light background for the item
             y += 10;
 
             GlStateManager.translate(0f, 0f, z + 0.1f);

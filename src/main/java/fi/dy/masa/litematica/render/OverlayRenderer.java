@@ -46,6 +46,8 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.config.value.HudAlignment;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
@@ -482,11 +484,11 @@ public class OverlayRenderer
         double fontScale = Configs.InfoOverlays.BLOCK_INFO_LINES_FONT_SCALE.getDoubleValue();
         int textColor = 0xFFFFFFFF;
         int bgColor = 0xA0505050;
-        HudAlignment alignment = Configs.InfoOverlays.BLOCK_INFO_LINES_ALIGNMENT.getOptionListValue();
+        HudAlignment alignment = Configs.InfoOverlays.BLOCK_INFO_LINES_ALIGNMENT.getValue();
         boolean useBackground = true;
         boolean useShadow = false;
 
-        fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, 0, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
+        TextRenderUtils.renderText(x, y, 0, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
     }
 
     private boolean renderVerifierOverlay(Minecraft mc)
@@ -515,7 +517,7 @@ public class OverlayRenderer
 
                         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
                         World worldClient = WorldUtils.getBestWorld(mc);
-                        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+                        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
                         RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
                         return true;
                     }
@@ -540,7 +542,7 @@ public class OverlayRenderer
         stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
 
         int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
-        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
 
         ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
         ItemUtils.setItemForBlock(mc.world, pos, stateClient);
@@ -587,7 +589,7 @@ public class OverlayRenderer
 
     protected void getOverlayPosition(int width, int height, int offY, Minecraft mc)
     {
-        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+        BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
 
         switch (align)
         {
@@ -758,7 +760,7 @@ public class OverlayRenderer
         int y = height >= width ? (height - width) / 2 : 0;
         int longerSide = Math.min(width, height);
 
-        fi.dy.masa.malilib.render.RenderUtils.renderOutline(x, y, longerSide, longerSide, 2, 0xFFFFFFFF, 0);
+        ShapeRenderUtils.renderOutline(x, y, 0, longerSide, longerSide, 2, 0xFFFFFFFF);
     }
 
     private enum BoxType

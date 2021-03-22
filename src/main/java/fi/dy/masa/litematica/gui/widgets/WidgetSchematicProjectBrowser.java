@@ -10,7 +10,7 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicProjectBrowser extends BaseFileBrowserWidget implements SelectionListener<DirectoryEntry>
@@ -67,7 +67,7 @@ public class WidgetSchematicProjectBrowser extends BaseFileBrowserWidget impleme
         int x = this.getX() + this.getWidth() - this.infoWidth;
         int y = this.getY() + 4;
         int infoHeight = 100;
-        RenderUtils.renderOutlinedBox(x + 1, y - 4, this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR, this.getZLevel());
+        ShapeRenderUtils.renderOutlinedRectangle(x + 1, y - 4, this.getZLevel(), this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR);
 
         SchematicProject project = this.selectedProject;
 

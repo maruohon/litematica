@@ -62,7 +62,7 @@ public class ToolHud extends InfoHud
     @Override
     protected HudAlignment getHudAlignment()
     {
-        return Configs.InfoOverlays.TOOL_HUD_ALIGNMENT.getOptionListValue();
+        return Configs.InfoOverlays.TOOL_HUD_ALIGNMENT.getValue();
     }
 
     @Override
@@ -127,7 +127,7 @@ public class ToolHud extends InfoHud
                 }
             }
 
-            str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
+            str = green + Configs.Generic.SELECTION_CORNERS_MODE.getValue().getDisplayName() + rst;
             lines.add(StringUtils.translate("litematica.hud.area_selection.selection_corners_mode", str));
 
             // The Projects Mode indicator gets rendered via the status info HUD, if it's enabled.
@@ -233,7 +233,7 @@ public class ToolHud extends InfoHud
                 this.getBlockStateProperties(mode.getSecondaryBlock(), lines);
             }
 
-            str = green + Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue().getDisplayName() + rst;
+            str = green + Configs.Generic.SELECTION_CORNERS_MODE.getValue().getDisplayName() + rst;
             lines.add(StringUtils.translate("litematica.hud.area_selection.selection_corners_mode", str));
         }
         else if ((hasTool || mode == ToolMode.REBUILD) && mode.getUsesSchematic())
@@ -287,7 +287,7 @@ public class ToolHud extends InfoHud
 
                 if (mode == ToolMode.PASTE_SCHEMATIC)
                 {
-                    ReplaceBehavior replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
+                    ReplaceBehavior replace = Configs.Generic.PASTE_REPLACE_BEHAVIOR.getValue();
                     str = replace.getDisplayName();
 
                     if (replace == ReplaceBehavior.NONE)
