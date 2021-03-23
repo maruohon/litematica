@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.util.NbtUtils;
 import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageUtils;
 
 public class SchematicaSchematic extends SingleRegionSchematic
 {

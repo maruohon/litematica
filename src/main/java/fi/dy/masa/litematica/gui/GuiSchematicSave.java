@@ -16,7 +16,7 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageType;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 

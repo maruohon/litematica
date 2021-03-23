@@ -25,9 +25,9 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageType;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 
 public class SchematicProject

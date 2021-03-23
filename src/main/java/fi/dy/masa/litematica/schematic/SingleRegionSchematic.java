@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public abstract class SingleRegionSchematic extends SchematicBase implements ISchematicRegion

@@ -21,7 +21,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import fi.dy.masa.malilib.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageType;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase

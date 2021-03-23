@@ -24,8 +24,8 @@ import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.input.HotkeyCategory;
 import fi.dy.masa.malilib.input.HotkeyProvider;
 import fi.dy.masa.malilib.input.MouseInputHandler;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageUtils;
 
 public class InputHandler implements HotkeyProvider, MouseInputHandler
 {

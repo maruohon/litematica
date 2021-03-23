@@ -24,8 +24,8 @@ import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageUtils;
 
 public class HotkeyCallbackMisc implements HotkeyCallback
 {

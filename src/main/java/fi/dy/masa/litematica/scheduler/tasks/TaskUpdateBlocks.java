@@ -7,8 +7,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.SelectionBox;
-import fi.dy.masa.malilib.message.MessageType;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 
 public class TaskUpdateBlocks extends TaskProcessChunkBase

@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerSp
 import fi.dy.masa.litematica.schematic.container.VanillaStructurePalette;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
