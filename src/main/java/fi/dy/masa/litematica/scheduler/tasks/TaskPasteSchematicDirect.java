@@ -4,7 +4,7 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.server.ServerWorld;
 
 public class TaskPasteSchematicDirect extends TaskBase
 {

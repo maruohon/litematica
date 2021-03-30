@@ -13,7 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.Direction;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;

@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.vector.Vector3i;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
 
@@ -11,7 +11,7 @@ public class SchematicMetadata
     private String name = "?";
     private String author = "Unknown";
     private String description = "";
-    private Vec3i enclosingSize = Vec3i.ZERO;
+    private Vector3i enclosingSize = Vector3i.ZERO;
     private long timeCreated;
     private long timeModified;
     private int regionCount;
@@ -55,7 +55,7 @@ public class SchematicMetadata
         return this.totalBlocks;
     }
 
-    public Vec3i getEnclosingSize()
+    public Vector3i getEnclosingSize()
     {
         return this.enclosingSize;
     }
@@ -110,7 +110,7 @@ public class SchematicMetadata
         this.totalBlocks = totalBlocks;
     }
 
-    public void setEnclosingSize(Vec3i enclosingSize)
+    public void setEnclosingSize(Vector3i enclosingSize)
     {
         this.enclosingSize = enclosingSize;
     }
@@ -125,9 +125,9 @@ public class SchematicMetadata
         this.timeModified = timeModified;
     }
 
-    public CompoundTag writeToNBT()
+    public CompoundNBT writeToNBT()
     {
-        CompoundTag nbt = new CompoundTag();
+        CompoundNBT nbt = new CompoundNBT();
 
         nbt.putString("Name", this.name);
         nbt.putString("Author", this.author);
@@ -147,7 +147,7 @@ public class SchematicMetadata
         return nbt;
     }
 
-    public void readFromNBT(CompoundTag nbt)
+    public void readFromNBT(CompoundNBT nbt)
     {
         this.name = nbt.getString("Name");
         this.author = nbt.getString("Author");
@@ -158,7 +158,7 @@ public class SchematicMetadata
         this.timeCreated = nbt.getLong("TimeCreated");
         this.timeModified = nbt.getLong("TimeModified");
 
-        Vec3i size = NBTUtils.readBlockPos(nbt.getCompound("EnclosingSize"));
+        Vector3i size = NBTUtils.readBlockPos(nbt.getCompound("EnclosingSize"));
 
         if (size != null)
         {

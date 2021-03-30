@@ -2,27 +2,27 @@ package fi.dy.masa.litematica.world;
 
 import java.util.Arrays;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.biome.source.BiomeArray;
+import net.minecraft.world.biome.BiomeContainer;
 import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.Chunk;
 
-public class ChunkSchematic extends WorldChunk
+public class ChunkSchematic extends Chunk
 {
     private final long timeCreated;
     private boolean isEmpty = true;
 
     public ChunkSchematic(World worldIn, ChunkPos pos)
     {
-        super(worldIn, pos, new BiomeArray(Util.make(new Biome[BiomeArray.DEFAULT_LENGTH], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
+        super(worldIn, pos, new BiomeContainer(Util.make(new Biome[BiomeContainer.DEFAULT_LENGTH], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
 
         this.timeCreated = worldIn.getTime();
     }
@@ -77,7 +77,7 @@ public class ChunkSchematic extends WorldChunk
             {
                 if (blockOld.hasBlockEntity())
                 {
-                    BlockEntity te = this.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
+                    TileEntity te = this.getBlockEntity(pos, Chunk.CreateEntityType.CHECK);
 
                     if (te != null)
                     {
@@ -85,13 +85,13 @@ public class ChunkSchematic extends WorldChunk
                     }
                 }
 
-                if (blockNew.hasBlockEntity() && blockNew instanceof BlockEntityProvider)
+                if (blockNew.hasBlockEntity() && blockNew instanceof ITileEntityProvider)
                 {
-                    BlockEntity te = this.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
+                    TileEntity te = this.getBlockEntity(pos, Chunk.CreateEntityType.CHECK);
 
                     if (te == null)
                     {
-                        te = ((BlockEntityProvider) blockNew).createBlockEntity(this.getWorld());
+                        te = ((ITileEntityProvider) blockNew).createBlockEntity(this.getWorld());
                         this.getWorld().setBlockEntity(pos, te);
                     }
 

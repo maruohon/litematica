@@ -9,18 +9,18 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.EntityRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -37,7 +37,7 @@ import fi.dy.masa.malilib.util.LayerRange;
 
 public class RayTraceUtils
 {
-    private static final net.minecraft.util.math.Box FULL_BLOCK_BOUNDS = new net.minecraft.util.math.Box(0, 0, 0, 1, 1, 1);
+    private static final net.minecraft.util.math.AxisAlignedBB FULL_BLOCK_BOUNDS = new net.minecraft.util.math.AxisAlignedBB(0, 0, 0, 1, 1, 1);
 
     private static RayTraceWrapper closestBox;
     private static RayTraceWrapper closestCorner;
@@ -50,14 +50,14 @@ public class RayTraceUtils
     @Nullable
     public static BlockPos getTargetedPosition(World world, Entity player, double maxDistance, boolean sneakToOffset)
     {
-        HitResult trace = getRayTraceFromEntity(world, player, false, maxDistance);
+        RayTraceResult trace = getRayTraceFromEntity(world, player, false, maxDistance);
 
-        if (trace.getType() != HitResult.Type.BLOCK)
+        if (trace.getType() != RayTraceResult.Type.BLOCK)
         {
             return null;
         }
 
-        BlockHitResult traceBlock = (BlockHitResult) trace;
+        BlockRayTraceResult traceBlock = (BlockRayTraceResult) trace;
         BlockPos pos = traceBlock.getBlockPos();
 
         // Sneaking puts the position adjacent the targeted block face, not sneaking puts it inside the targeted block
@@ -72,12 +72,12 @@ public class RayTraceUtils
     @Nonnull
     public static RayTraceWrapper getWrappedRayTraceFromEntity(World world, Entity entity, double range)
     {
-        Vec3d eyesPos = entity.getCameraPosVec(1f);
-        Vec3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
-        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
+        Vector3d eyesPos = entity.getCameraPosVec(1f);
+        Vector3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
+        Vector3d lookEndPos = eyesPos.add(rangedLookRot);
 
-        HitResult result = getRayTraceFromEntity(world, entity, false, range);
-        double closestVanilla = result.getType() != HitResult.Type.MISS ? result.getPos().distanceTo(eyesPos) : -1D;
+        RayTraceResult result = getRayTraceFromEntity(world, entity, false, range);
+        double closestVanilla = result.getType() != RayTraceResult.Type.MISS ? result.getPos().distanceTo(eyesPos) : -1D;
 
         AreaSelection area = DataManager.getSelectionManager().getCurrentSelection();
         RayTraceWrapper wrapper = null;
@@ -168,14 +168,14 @@ public class RayTraceUtils
         closestOriginDistance = -1D;
     }
 
-    private static boolean traceToSelectionBoxCorner(Box box, Corner corner, Vec3d start, Vec3d end)
+    private static boolean traceToSelectionBoxCorner(Box box, Corner corner, Vector3d start, Vector3d end)
     {
         BlockPos pos = (corner == Corner.CORNER_1) ? box.getPos1() : (corner == Corner.CORNER_2) ? box.getPos2() : null;
 
         if (pos != null)
         {
-            net.minecraft.util.math.Box bb = PositionUtils.createAABBForPosition(pos);
-            Optional<Vec3d> optional = bb.rayTrace(start, end);
+            net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
+            Optional<Vector3d> optional = bb.rayTrace(start, end);
 
             if (optional.isPresent())
             {
@@ -194,12 +194,12 @@ public class RayTraceUtils
         return false;
     }
 
-    private static boolean traceToSelectionBoxBody(Box box, Vec3d start, Vec3d end)
+    private static boolean traceToSelectionBoxBody(Box box, Vector3d start, Vector3d end)
     {
         if (box.getPos1() != null && box.getPos2() != null)
         {
-            net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-            Optional<Vec3d> optional = bb.rayTrace(start, end);
+            net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+            Optional<Vector3d> optional = bb.rayTrace(start, end);
 
             if (optional.isPresent())
             {
@@ -218,7 +218,7 @@ public class RayTraceUtils
         return false;
     }
 
-    private static boolean traceToPlacementBox(SchematicPlacement placement, Vec3d start, Vec3d end)
+    private static boolean traceToPlacementBox(SchematicPlacement placement, Vector3d start, Vector3d end)
     {
         ImmutableMap<String, Box> boxes = placement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED);
         boolean hitSomething = false;
@@ -230,8 +230,8 @@ public class RayTraceUtils
 
             if (box.getPos1() != null && box.getPos2() != null)
             {
-                net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-                Optional<Vec3d> optional = bb.rayTrace(start, end);
+                net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
+                Optional<Vector3d> optional = bb.rayTrace(start, end);
 
                 if (optional.isPresent())
                 {
@@ -250,12 +250,12 @@ public class RayTraceUtils
         return hitSomething;
     }
 
-    private static boolean traceToOrigin(BlockPos pos, Vec3d start, Vec3d end, HitType type, @Nullable SchematicPlacement placement)
+    private static boolean traceToOrigin(BlockPos pos, Vector3d start, Vector3d end, HitType type, @Nullable SchematicPlacement placement)
     {
         if (pos != null)
         {
-            net.minecraft.util.math.Box bb = PositionUtils.createAABBForPosition(pos);
-            Optional<Vec3d> optional = bb.rayTrace(start, end);
+            net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
+            Optional<Vector3d> optional = bb.rayTrace(start, end);
 
             if (optional.isPresent())
             {
@@ -287,25 +287,25 @@ public class RayTraceUtils
      * @return
      */
     @Nullable
-    public static BlockHitResult traceToPositions(List<BlockPos> posList, Entity entity, double range)
+    public static BlockRayTraceResult traceToPositions(List<BlockPos> posList, Entity entity, double range)
     {
         if (posList.isEmpty())
         {
             return null;
         }
 
-        Vec3d eyesPos = entity.getCameraPosVec(1f);
-        Vec3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
-        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
+        Vector3d eyesPos = entity.getCameraPosVec(1f);
+        Vector3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
+        Vector3d lookEndPos = eyesPos.add(rangedLookRot);
 
         double closest = -1D;
-        BlockHitResult trace = null;
+        BlockRayTraceResult trace = null;
 
         for (BlockPos pos : posList)
         {
             if (pos != null)
             {
-                BlockHitResult hit = net.minecraft.util.math.Box.rayTrace(ImmutableList.of(FULL_BLOCK_BOUNDS), eyesPos, lookEndPos, pos);
+                BlockRayTraceResult hit = net.minecraft.util.math.AxisAlignedBB.rayTrace(ImmutableList.of(FULL_BLOCK_BOUNDS), eyesPos, lookEndPos, pos);
 
                 if (hit != null)
                 {
@@ -313,7 +313,7 @@ public class RayTraceUtils
 
                     if (closest < 0 || dist < closest)
                     {
-                        trace = new BlockHitResult(hit.getPos(), hit.getSide(), pos, false);
+                        trace = new BlockRayTraceResult(hit.getPos(), hit.getSide(), pos, false);
                         closest = dist;
                     }
                 }
@@ -324,7 +324,7 @@ public class RayTraceUtils
     }
 
     @Nullable
-    public static BlockHitResult traceToSchematicWorld(Entity entity, double range, boolean respectRenderRange)
+    public static BlockRayTraceResult traceToSchematicWorld(Entity entity, double range, boolean respectRenderRange)
     {
         boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
 
@@ -342,10 +342,10 @@ public class RayTraceUtils
             return null;
         }
 
-        Vec3d eyesPos = entity.getCameraPosVec(1f);
-        Vec3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
-        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
-        RayTraceContext.FluidHandling fluidMode = RayTraceContext.FluidHandling.ANY;
+        Vector3d eyesPos = entity.getCameraPosVec(1f);
+        Vector3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
+        Vector3d lookEndPos = eyesPos.add(rangedLookRot);
+        RayTraceContext.FluidMode fluidMode = RayTraceContext.FluidMode.ANY;
 
         return rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, true, respectRenderRange, 200);
     }
@@ -353,14 +353,14 @@ public class RayTraceUtils
     @Nullable
     public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range, boolean respectRenderRange)
     {
-        HitResult traceClient = getRayTraceFromEntity(worldClient, entity, true, range);
-        HitResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange);
+        RayTraceResult traceClient = getRayTraceFromEntity(worldClient, entity, true, range);
+        RayTraceResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange);
         double distClosest = -1D;
         HitType type = HitType.MISS;
-        Vec3d eyesPos = entity.getCameraPosVec(1f);
-        HitResult trace = null;
+        Vector3d eyesPos = entity.getCameraPosVec(1f);
+        RayTraceResult trace = null;
 
-        if (traceSchematic != null && traceSchematic.getType() == HitResult.Type.BLOCK)
+        if (traceSchematic != null && traceSchematic.getType() == RayTraceResult.Type.BLOCK)
         {
             double dist = eyesPos.squaredDistanceTo(traceSchematic.getPos());
 
@@ -372,7 +372,7 @@ public class RayTraceUtils
             }
         }
 
-        if (traceClient != null && traceClient.getType() == HitResult.Type.BLOCK)
+        if (traceClient != null && traceClient.getType() == RayTraceResult.Type.BLOCK)
         {
             double dist = eyesPos.squaredDistanceTo(traceClient.getPos());
 
@@ -390,7 +390,7 @@ public class RayTraceUtils
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-            BlockHitResult traceMismatch = traceToPositions(posList, entity, range);
+            BlockRayTraceResult traceMismatch = traceToPositions(posList, entity, range);
 
             // Mismatch overlay has priority over other hits
             if (traceMismatch != null)
@@ -402,7 +402,7 @@ public class RayTraceUtils
 
         if (type != HitType.MISS)
         {
-            return new RayTraceWrapper(type, (BlockHitResult) trace);
+            return new RayTraceWrapper(type, (BlockRayTraceResult) trace);
         }
 
         return null;
@@ -431,30 +431,30 @@ public class RayTraceUtils
     @Nullable
     public static BlockPos getFurthestSchematicWorldTrace(World worldClient, Entity entity, double maxRange)
     {
-        Vec3d eyesPos = entity.getCameraPosVec(1f);
-        Vec3d rangedLookRot = entity.getRotationVec(1f).multiply(maxRange);
-        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
+        Vector3d eyesPos = entity.getCameraPosVec(1f);
+        Vector3d rangedLookRot = entity.getRotationVec(1f).multiply(maxRange);
+        Vector3d lookEndPos = eyesPos.add(rangedLookRot);
 
-        HitResult traceVanilla = getRayTraceFromEntity(worldClient, entity, false, maxRange);
+        RayTraceResult traceVanilla = getRayTraceFromEntity(worldClient, entity, false, maxRange);
 
-        if (traceVanilla.getType() != HitResult.Type.BLOCK)
+        if (traceVanilla.getType() != RayTraceResult.Type.BLOCK)
         {
             return null;
         }
 
         final double closestVanilla = traceVanilla.getPos().squaredDistanceTo(eyesPos);
 
-        BlockHitResult vanillaBlockHit = (BlockHitResult) traceVanilla;
+        BlockRayTraceResult vanillaBlockHit = (BlockRayTraceResult) traceVanilla;
         Direction side = vanillaBlockHit.getSide();
         BlockPos closestVanillaPos = vanillaBlockHit.getBlockPos();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        List<BlockHitResult> list = rayTraceBlocksToList(worldSchematic, eyesPos, lookEndPos, RayTraceContext.FluidHandling.NONE, false, false, true, 200);
-        BlockHitResult furthestTrace = null;
+        List<BlockRayTraceResult> list = rayTraceBlocksToList(worldSchematic, eyesPos, lookEndPos, RayTraceContext.FluidMode.NONE, false, false, true, 200);
+        BlockRayTraceResult furthestTrace = null;
         double furthestDist = -1D;
 
         if (list.isEmpty() == false)
         {
-            for (BlockHitResult trace : list)
+            for (BlockRayTraceResult trace : list)
             {
                 double dist = trace.getPos().squaredDistanceTo(eyesPos);
 
@@ -496,26 +496,26 @@ public class RayTraceUtils
     }
 
     @Nonnull
-    public static HitResult getRayTraceFromEntity(World world, Entity entity, boolean useLiquids, double range)
+    public static RayTraceResult getRayTraceFromEntity(World world, Entity entity, boolean useLiquids, double range)
     {
-        Vec3d eyesPos = entity.getCameraPosVec(1f);
-        Vec3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
-        Vec3d lookEndPos = eyesPos.add(rangedLookRot);
-        RayTraceContext.FluidHandling fluidMode = useLiquids ? RayTraceContext.FluidHandling.ANY : RayTraceContext.FluidHandling.NONE;
+        Vector3d eyesPos = entity.getCameraPosVec(1f);
+        Vector3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
+        Vector3d lookEndPos = eyesPos.add(rangedLookRot);
+        RayTraceContext.FluidMode fluidMode = useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE;
 
-        HitResult result = rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, false, false, 1000);
+        RayTraceResult result = rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, false, false, 1000);
 
-        net.minecraft.util.math.Box bb = entity.getBoundingBox().expand(rangedLookRot.x, rangedLookRot.y, rangedLookRot.z).expand(1d, 1d, 1d);
+        net.minecraft.util.math.AxisAlignedBB bb = entity.getBoundingBox().expand(rangedLookRot.x, rangedLookRot.y, rangedLookRot.z).expand(1d, 1d, 1d);
         List<Entity> list = world.getEntities(entity, bb);
 
-        double closest = result != null && result.getType() == HitResult.Type.BLOCK ? eyesPos.distanceTo(result.getPos()) : Double.MAX_VALUE;
+        double closest = result != null && result.getType() == RayTraceResult.Type.BLOCK ? eyesPos.distanceTo(result.getPos()) : Double.MAX_VALUE;
         Entity targetEntity = null;
-        Optional<Vec3d> optional = Optional.empty();
+        Optional<Vector3d> optional = Optional.empty();
 
         for (int i = 0; i < list.size(); i++)
         {
             Entity entityTmp = list.get(i);
-            Optional<Vec3d> optionalTmp = entityTmp.getBoundingBox().rayTrace(eyesPos, lookEndPos);
+            Optional<Vector3d> optionalTmp = entityTmp.getBoundingBox().rayTrace(eyesPos, lookEndPos);
 
             if (optionalTmp.isPresent())
             {
@@ -532,12 +532,12 @@ public class RayTraceUtils
 
         if (targetEntity != null)
         {
-            result = new EntityHitResult(targetEntity, optional.get());
+            result = new EntityRayTraceResult(targetEntity, optional.get());
         }
 
         if (result == null || eyesPos.distanceTo(result.getPos()) > range)
         {
-            result = BlockHitResult.createMissed(Vec3d.ZERO, Direction.UP, BlockPos.ORIGIN);
+            result = BlockRayTraceResult.createMissed(Vector3d.ZERO, Direction.UP, BlockPos.ORIGIN);
         }
 
         return result;
@@ -547,8 +547,8 @@ public class RayTraceUtils
      * Mostly copy pasted from World#rayTraceBlocks() except for the added maxSteps argument and the layer range check
      */
     @Nullable
-    public static BlockHitResult rayTraceBlocks(World world, Vec3d start, Vec3d end,
-            RayTraceContext.FluidHandling fluidMode, boolean ignoreBlockWithoutBoundingBox,
+    public static BlockRayTraceResult rayTraceBlocks(World world, Vector3d start, Vector3d end,
+            RayTraceContext.FluidMode fluidMode, boolean ignoreBlockWithoutBoundingBox,
             boolean returnLastUncollidableBlock, boolean respectLayerRange, int maxSteps)
     {
         if (Double.isNaN(start.x) || Double.isNaN(start.y) || Double.isNaN(start.z) ||
@@ -563,7 +563,7 @@ public class RayTraceUtils
         BlockState blockState = world.getBlockState(data.blockPos);
         FluidState fluidState = world.getFluidState(data.blockPos);
 
-        BlockHitResult trace = traceFirstStep(data, world, blockState, fluidState, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock, respectLayerRange);
+        BlockRayTraceResult trace = traceFirstStep(data, world, blockState, fluidState, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock, respectLayerRange);
 
         if (trace != null)
         {
@@ -590,7 +590,7 @@ public class RayTraceUtils
     }
 
     @Nullable
-    private static BlockHitResult traceFirstStep(RayTraceCalcsData data,
+    private static BlockRayTraceResult traceFirstStep(RayTraceCalcsData data,
             World world, BlockState blockState, FluidState fluidState,
             boolean ignoreBlockWithoutBoundingBox,
             boolean returnLastUncollidableBlock, boolean respectLayerRange)
@@ -604,7 +604,7 @@ public class RayTraceUtils
 
             if (blockCollidable || fluidCollidable)
             {
-                BlockHitResult trace = null;
+                BlockRayTraceResult trace = null;
 
                 if (blockCollidable)
                 {
@@ -642,12 +642,12 @@ public class RayTraceUtils
 
             if (blockCollidable == false && fluidCollidable == false)
             {
-                Vec3d pos = new Vec3d(data.currentX, data.currentY, data.currentZ);
-                data.trace = BlockHitResult.createMissed(pos, data.facing, data.blockPos);
+                Vector3d pos = new Vector3d(data.currentX, data.currentY, data.currentZ);
+                data.trace = BlockRayTraceResult.createMissed(pos, data.facing, data.blockPos);
             }
             else
             {
-                BlockHitResult traceTmp = null;
+                BlockRayTraceResult traceTmp = null;
 
                 if (blockCollidable)
                 {
@@ -670,8 +670,8 @@ public class RayTraceUtils
         return false;
     }
 
-    public static List<BlockHitResult> rayTraceBlocksToList(World world, Vec3d start, Vec3d end,
-            RayTraceContext.FluidHandling fluidMode, boolean ignoreBlockWithoutBoundingBox,
+    public static List<BlockRayTraceResult> rayTraceBlocksToList(World world, Vector3d start, Vector3d end,
+            RayTraceContext.FluidMode fluidMode, boolean ignoreBlockWithoutBoundingBox,
             boolean returnLastUncollidableBlock, boolean respectLayerRange, int maxSteps)
     {
         if (Double.isNaN(start.x) || Double.isNaN(start.y) || Double.isNaN(start.z) ||
@@ -686,8 +686,8 @@ public class RayTraceUtils
         BlockState blockState = world.getBlockState(data.blockPos);
         FluidState fluidState = world.getFluidState(data.blockPos);
 
-        BlockHitResult trace = traceFirstStep(data, world, blockState, fluidState, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock, respectLayerRange);
-        List<BlockHitResult> hits = new ArrayList<>();
+        BlockRayTraceResult trace = traceFirstStep(data, world, blockState, fluidState, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock, respectLayerRange);
+        List<BlockRayTraceResult> hits = new ArrayList<>();
 
         if (trace != null)
         {
@@ -852,9 +852,9 @@ public class RayTraceUtils
     public static class RayTraceCalcsData
     {
         public final LayerRange range;
-        public final RayTraceContext.FluidHandling fluidMode;
-        public final Vec3d start;
-        public final Vec3d end;
+        public final RayTraceContext.FluidMode fluidMode;
+        public final Vector3d start;
+        public final Vector3d end;
         public final int xEnd;
         public final int yEnd;
         public final int zEnd;
@@ -866,9 +866,9 @@ public class RayTraceUtils
         public double currentZ;
         public BlockPos blockPos;
         public Direction facing;
-        public BlockHitResult trace;
+        public BlockRayTraceResult trace;
 
-        public RayTraceCalcsData(Vec3d start, Vec3d end, LayerRange range, RayTraceContext.FluidHandling fluidMode)
+        public RayTraceCalcsData(Vector3d start, Vector3d end, LayerRange range, RayTraceContext.FluidMode fluidMode)
         {
             this.start = start;
             this.end = end;
@@ -892,9 +892,9 @@ public class RayTraceUtils
     {
         private final HitType type;
         private Corner corner = Corner.NONE;
-        private Vec3d hitVec = Vec3d.ZERO;
-        @Nullable private BlockHitResult traceBlock = null;
-        @Nullable private EntityHitResult traceEntity = null;
+        private Vector3d hitVec = Vector3d.ZERO;
+        @Nullable private BlockRayTraceResult traceBlock = null;
+        @Nullable private EntityRayTraceResult traceEntity = null;
         @Nullable private Box box = null;
         @Nullable private SchematicPlacement schematicPlacement = null;
         @Nullable private String placementRegionName = null;
@@ -909,21 +909,21 @@ public class RayTraceUtils
             this.type = type;
         }
 
-        public RayTraceWrapper(HitType type, BlockHitResult trace)
+        public RayTraceWrapper(HitType type, BlockRayTraceResult trace)
         {
             this.type = type;
             this.hitVec = trace.getPos();
             this.traceBlock = trace;
         }
 
-        public RayTraceWrapper(HitType type, EntityHitResult trace)
+        public RayTraceWrapper(HitType type, EntityRayTraceResult trace)
         {
             this.type = type;
             this.hitVec = trace.getPos();
             this.traceEntity = trace;
         }
 
-        public RayTraceWrapper(Box box, Corner corner, Vec3d hitVec)
+        public RayTraceWrapper(Box box, Corner corner, Vector3d hitVec)
         {
             this.type = corner == Corner.NONE ? HitType.SELECTION_BOX_BODY : HitType.SELECTION_BOX_CORNER;
             this.corner = corner;
@@ -931,7 +931,7 @@ public class RayTraceUtils
             this.box = box;
         }
 
-        public RayTraceWrapper(SchematicPlacement placement, Vec3d hitVec, @Nullable String regionName)
+        public RayTraceWrapper(SchematicPlacement placement, Vector3d hitVec, @Nullable String regionName)
         {
             this.type = regionName != null ? HitType.PLACEMENT_SUBREGION : HitType.PLACEMENT_ORIGIN;
             this.hitVec = hitVec;
@@ -945,13 +945,13 @@ public class RayTraceUtils
         }
 
         @Nullable
-        public BlockHitResult getBlockHitResult()
+        public BlockRayTraceResult getBlockHitResult()
         {
             return this.traceBlock;
         }
 
         @Nullable
-        public EntityHitResult getEntityHitResult()
+        public EntityRayTraceResult getEntityHitResult()
         {
             return this.traceEntity;
         }
@@ -974,7 +974,7 @@ public class RayTraceUtils
             return this.placementRegionName;
         }
 
-        public Vec3d getHitVec()
+        public Vector3d getHitVec()
         {
             return this.hitVec;
         }

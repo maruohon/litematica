@@ -2,14 +2,14 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.util.collection.Int2ObjectBiMap;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.IntIdentityHashBiMap;
 
 public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockStatePalette
 {
-    private final Int2ObjectBiMap<BlockState> statePaletteMap;
+    private final IntIdentityHashBiMap<BlockState> statePaletteMap;
     private final ILitematicaBlockStatePaletteResizer paletteResizer;
     private final int bits;
 
@@ -17,7 +17,7 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     {
         this.bits = bitsIn;
         this.paletteResizer = paletteResizer;
-        this.statePaletteMap = new Int2ObjectBiMap<>(1 << bitsIn);
+        this.statePaletteMap = new IntIdentityHashBiMap<>(1 << bitsIn);
     }
 
     @Override
@@ -67,14 +67,14 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     }
 
     @Override
-    public void readFromNBT(ListTag tagList)
+    public void readFromNBT(ListNBT tagList)
     {
         final int size = tagList.size();
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag tag = tagList.getCompound(i);
-            BlockState state = NbtHelper.toBlockState(tag);
+            CompoundNBT tag = tagList.getCompound(i);
+            BlockState state = NBTUtil.toBlockState(tag);
 
             if (i > 0 || state != LitematicaBlockStateContainer.AIR_BLOCK_STATE)
             {
@@ -84,13 +84,13 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     }
 
     @Override
-    public ListTag writeToNBT()
+    public ListNBT writeToNBT()
     {
-        ListTag tagList = new ListTag();
+        ListNBT tagList = new ListNBT();
 
         for (int id = 0; id < this.statePaletteMap.size(); ++id)
         {
-            CompoundTag tag = NbtHelper.fromBlockState(this.statePaletteMap.get(id));
+            CompoundNBT tag = NBTUtil.fromBlockState(this.statePaletteMap.get(id));
             tagList.add(tag);
         }
 

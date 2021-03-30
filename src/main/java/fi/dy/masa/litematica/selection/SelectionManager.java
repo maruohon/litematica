@@ -8,12 +8,12 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
@@ -36,7 +36,7 @@ import fi.dy.masa.malilib.util.JsonUtils;
 
 public class SelectionManager
 {
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
     private final Map<String, AreaSelection> selections = new HashMap<>();
     private final Map<String, AreaSelection> readOnlySelections = new HashMap<>();
     @Nullable
@@ -333,7 +333,7 @@ public class SelectionManager
         return this.currentSelectionId;
     }
 
-    public boolean createNewSubRegion(MinecraftClient mc, boolean printMessage)
+    public boolean createNewSubRegion(Minecraft mc, boolean printMessage)
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection selection = sm.getCurrentSelection();
@@ -357,7 +357,7 @@ public class SelectionManager
         return false;
     }
 
-    public boolean createNewSubRegionIfDoesntExist(String name, MinecraftClient mc, IMessageConsumer feedback)
+    public boolean createNewSubRegionIfDoesntExist(String name, Minecraft mc, IMessageConsumer feedback)
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection selection = sm.getCurrentSelection();
@@ -487,7 +487,7 @@ public class SelectionManager
         return this.grabbedElement != null;
     }
 
-    public boolean grabElement(MinecraftClient mc, int maxDistance)
+    public boolean grabElement(Minecraft mc, int maxDistance)
     {
         World world = mc.world;
         Entity entity = mc.player;
@@ -514,7 +514,7 @@ public class SelectionManager
         return false;
     }
 
-    public void setPositionOfCurrentSelectionToRayTrace(MinecraftClient mc, Corner corner, boolean moveEntireSelection, double maxDistance)
+    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, Corner corner, boolean moveEntireSelection, double maxDistance)
     {
         AreaSelection area = this.getCurrentSelection();
 
@@ -575,7 +575,7 @@ public class SelectionManager
         }
     }
 
-    public void handleCuboidModeMouseClick(MinecraftClient mc, double maxDistance, boolean isRightClick, boolean moveEntireSelection)
+    public void handleCuboidModeMouseClick(Minecraft mc, double maxDistance, boolean isRightClick, boolean moveEntireSelection)
     {
         AreaSelection selection = this.getCurrentSelection();
 
@@ -603,7 +603,7 @@ public class SelectionManager
         }
     }
 
-    private void resetSelectionToClickedPosition(MinecraftClient mc, double maxDistance)
+    private void resetSelectionToClickedPosition(Minecraft mc, double maxDistance)
     {
         AreaSelection area = this.getCurrentSelection();
 
@@ -619,7 +619,7 @@ public class SelectionManager
         }
     }
 
-    private void growSelectionToContainClickedPosition(MinecraftClient mc, double maxDistance)
+    private void growSelectionToContainClickedPosition(Minecraft mc, double maxDistance)
     {
         AreaSelection sel = this.getCurrentSelection();
 
@@ -788,11 +788,11 @@ public class SelectionManager
         private final AreaSelection area;
         public final Box grabbedBox;
         public final Box originalBox;
-        public final Vec3d grabPosition;
+        public final Vector3d grabPosition;
         public final Corner grabbedCorner;
         public double grabDistance;
 
-        private GrabbedElement(AreaSelection area, Box box, Corner corner, Vec3d grabPosition, double grabDistance)
+        private GrabbedElement(AreaSelection area, Box box, Corner corner, Vector3d grabPosition, double grabDistance)
         {
             this.area = area;
             this.grabbedBox = box;
@@ -809,8 +809,8 @@ public class SelectionManager
 
         public void moveElement(Entity entity)
         {
-            Vec3d newLookPos = entity.getCameraPosVec(1f).add(entity.getRotationVec(1f).multiply(this.grabDistance));
-            Vec3d change = newLookPos.subtract(this.grabPosition);
+            Vector3d newLookPos = entity.getCameraPosVec(1f).add(entity.getRotationVec(1f).multiply(this.grabDistance));
+            Vector3d change = newLookPos.subtract(this.grabPosition);
 
             if ((this.grabbedCorner == Corner.NONE || this.grabbedCorner == Corner.CORNER_1) && this.grabbedBox.getPos1() != null)
             {

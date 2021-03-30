@@ -14,17 +14,17 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerTask;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.concurrent.TickDelayedTask;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.Direction;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -95,7 +95,7 @@ public class SchematicPlacementManager
         //System.out.printf("processQueuedChunks, size: %d\n", this.chunksToRebuild.size());
         if (this.chunksToRebuild.isEmpty() == false)
         {
-            ClientWorld worldClient = MinecraftClient.getInstance().world;
+            ClientWorld worldClient = Minecraft.getInstance().world;
 
             if (worldClient == null)
             {
@@ -547,32 +547,32 @@ public class SchematicPlacementManager
         return false;
     }
 
-    public void setPositionOfCurrentSelectionToRayTrace(MinecraftClient mc, double maxDistance)
+    public void setPositionOfCurrentSelectionToRayTrace(Minecraft mc, double maxDistance)
     {
         SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
         if (schematicPlacement != null)
         {
-            HitResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
+            RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
 
-            if (trace.getType() != HitResult.Type.BLOCK)
+            if (trace.getType() != RayTraceResult.Type.BLOCK)
             {
                 return;
             }
 
-            BlockPos pos = ((BlockHitResult) trace).getBlockPos();
+            BlockPos pos = ((BlockRayTraceResult) trace).getBlockPos();
 
             // Sneaking puts the position inside the targeted block, not sneaking puts it against the targeted face
             if (mc.player.isSneaking() == false)
             {
-                pos = pos.offset(((BlockHitResult) trace).getSide());
+                pos = pos.offset(((BlockRayTraceResult) trace).getSide());
             }
 
             this.setPositionOfCurrentSelectionTo(pos, mc);
         }
     }
 
-    public void setPositionOfCurrentSelectionTo(BlockPos pos, MinecraftClient mc)
+    public void setPositionOfCurrentSelectionTo(BlockPos pos, Minecraft mc)
     {
         SchematicPlacement schematicPlacement = this.getSelectedSchematicPlacement();
 
@@ -641,22 +641,22 @@ public class SchematicPlacementManager
         }
     }
 
-    public void pasteCurrentPlacementToWorld(MinecraftClient mc)
+    public void pasteCurrentPlacementToWorld(Minecraft mc)
     {
         this.pastePlacementToWorld(this.getSelectedSchematicPlacement(), mc);
     }
 
-    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, MinecraftClient mc)
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, Minecraft mc)
     {
         this.pastePlacementToWorld(schematicPlacement, true, mc);
     }
 
-    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, MinecraftClient mc)
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, Minecraft mc)
     {
         this.pastePlacementToWorld(schematicPlacement, changedBlocksOnly, true, mc);
     }
 
-    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, boolean printMessage, MinecraftClient mc)
+    public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, boolean printMessage, Minecraft mc)
     {
         if (mc.player != null && mc.player.abilities.creativeMode)
         {
@@ -674,7 +674,7 @@ public class SchematicPlacementManager
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
                     MinecraftServer server = mc.getServer();
 
-                    server.send(new ServerTask(server.getTicks(), () ->
+                    server.send(new TickDelayedTask(server.getTicks(), () ->
                     {
                         if (schematic.placeToWorld(world, schematicPlacement, false))
                         {

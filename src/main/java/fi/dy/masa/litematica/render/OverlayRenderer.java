@@ -10,16 +10,16 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -80,7 +80,7 @@ public class OverlayRenderer
             0x232C16     // Dark Olive Green
         };
 
-    private final MinecraftClient mc;
+    private final Minecraft mc;
     private final Map<SchematicPlacement, ImmutableMap<String, Box>> placements = new HashMap<>();
     private Color4f colorPos1 = new Color4f(1f, 0.0625f, 0.0625f);
     private Color4f colorPos2 = new Color4f(0.0625f, 0.0625f, 1f);
@@ -100,7 +100,7 @@ public class OverlayRenderer
 
     private OverlayRenderer()
     {
-        this.mc = MinecraftClient.getInstance();
+        this.mc = Minecraft.getInstance();
     }
 
     public static OverlayRenderer getInstance()
@@ -361,8 +361,8 @@ public class OverlayRenderer
             if (list.isEmpty() == false)
             {
                 List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-                HitResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 128);
-                BlockPos posLook = trace != null && trace.getType() == HitResult.Type.BLOCK ? ((BlockHitResult) trace).getBlockPos() : null;
+                RayTraceResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 128);
+                BlockPos posLook = trace != null && trace.getType() == RayTraceResult.Type.BLOCK ? ((BlockRayTraceResult) trace).getBlockPos() : null;
                 this.renderSchematicMismatches(list, posLook, matrices, partialTicks);
             }
         }
@@ -380,7 +380,7 @@ public class OverlayRenderer
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
         MismatchRenderPos lookedEntry = null;
         MismatchRenderPos prevEntry = null;
         boolean connections = Configs.Visuals.RENDER_ERROR_MARKER_CONNECTIONS.getBooleanValue();
@@ -414,7 +414,7 @@ public class OverlayRenderer
             }
 
             tessellator.draw();
-            buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+            buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
             RenderSystem.lineWidth(6f);
             RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, this.mc);
@@ -427,7 +427,7 @@ public class OverlayRenderer
             RenderSystem.enableBlend();
             RenderSystem.disableCull();
 
-            buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
             float alpha = (float) Configs.InfoOverlays.VERIFIER_ERROR_HILIGHT_ALPHA.getDoubleValue();
 
             for (MismatchRenderPos entry : posList)
@@ -450,7 +450,7 @@ public class OverlayRenderer
         RenderSystem.enableDepthTest();
     }
 
-    public void renderHoverInfo(MinecraftClient mc)
+    public void renderHoverInfo(Minecraft mc)
     {
         if (mc.world != null && mc.player != null)
         {
@@ -490,7 +490,7 @@ public class OverlayRenderer
         }
     }
 
-    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, MinecraftClient mc)
+    private void renderBlockInfoLines(RayTraceWrapper traceWrapper, Minecraft mc)
     {
         long currentTime = System.currentTimeMillis();
 
@@ -513,7 +513,7 @@ public class OverlayRenderer
         fi.dy.masa.malilib.render.RenderUtils.renderText(x, y, fontScale, textColor, bgColor, alignment, useBackground, useShadow, this.blockInfoLines);
     }
 
-    private boolean renderVerifierOverlay(MinecraftClient mc)
+    private boolean renderVerifierOverlay(Minecraft mc)
     {
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -521,11 +521,11 @@ public class OverlayRenderer
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-            HitResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 128);
+            RayTraceResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 128);
 
-            if (trace != null && trace.getType() == HitResult.Type.BLOCK)
+            if (trace != null && trace.getType() == RayTraceResult.Type.BLOCK)
             {
-                BlockMismatch mismatch = verifier.getMismatchForPosition(((BlockHitResult) trace).getBlockPos());
+                BlockMismatch mismatch = verifier.getMismatchForPosition(((BlockRayTraceResult) trace).getBlockPos());
 
                 if (mismatch != null)
                 {
@@ -539,7 +539,7 @@ public class OverlayRenderer
         return false;
     }
 
-    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, MinecraftClient mc)
+    private void renderBlockInfoOverlay(RayTraceWrapper traceWrapper, Minecraft mc)
     {
         BlockState air = Blocks.AIR.getDefaultState();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
@@ -574,7 +574,7 @@ public class OverlayRenderer
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            BlockEntity te = worldClient.getBlockEntity(pos);
+            TileEntity te = worldClient.getBlockEntity(pos);
 
             if (te instanceof Inventory)
             {
@@ -595,7 +595,7 @@ public class OverlayRenderer
         }
     }
 
-    protected void getOverlayPosition(int width, int height, int offY, int invHeight, MinecraftClient mc)
+    protected void getOverlayPosition(int width, int height, int offY, int invHeight, Minecraft mc)
     {
         BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
 
@@ -612,7 +612,7 @@ public class OverlayRenderer
         }
     }
 
-    private void updateBlockInfoLines(RayTraceWrapper traceWrapper, MinecraftClient mc)
+    private void updateBlockInfoLines(RayTraceWrapper traceWrapper, Minecraft mc)
     {
         this.blockInfoLines.clear();
 
@@ -681,7 +681,7 @@ public class OverlayRenderer
         if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
             Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-            BlockHitResult trace = traceWrapper.getBlockHitResult();
+            BlockRayTraceResult trace = traceWrapper.getBlockHitResult();
             BlockPos pos = trace.getBlockPos();
 
             RenderSystem.depthMask(false);
@@ -712,7 +712,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderPreviewFrame(MinecraftClient mc)
+    public void renderPreviewFrame(Minecraft mc)
     {
         int width = GuiUtils.getScaledWindowWidth();
         int height = GuiUtils.getScaledWindowHeight();

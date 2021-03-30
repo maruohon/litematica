@@ -25,7 +25,7 @@ import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 
 public class SchematicProject
@@ -232,7 +232,7 @@ public class SchematicProject
     {
         if (this.currentPlacement != null)
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
+            Minecraft mc = Minecraft.getInstance();
 
             if (mc.player == null || mc.player.abilities.creativeMode == false)
             {
@@ -249,7 +249,7 @@ public class SchematicProject
         }
     }
 
-    public void deleteLastSeenArea(MinecraftClient mc)
+    public void deleteLastSeenArea(Minecraft mc)
     {
         ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, mc);
     }
@@ -315,7 +315,7 @@ public class SchematicProject
     {
         if (this.checkCanSaveOrPrintError())
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
+            Minecraft mc = Minecraft.getInstance();
             String author = mc.player.getName().getString();
             String fileName = this.getNextFileName();
 
@@ -504,7 +504,7 @@ public class SchematicProject
             return false;
         }
 
-        if (MinecraftClient.getInstance().player == null)
+        if (Minecraft.getInstance().player == null)
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.null_player");
             return false;
@@ -531,7 +531,7 @@ public class SchematicProject
         @Override
         public void onTaskCompleted()
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
+            Minecraft mc = Minecraft.getInstance();
 
             if (mc.isOnThread())
             {

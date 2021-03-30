@@ -5,18 +5,18 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.hud.DebugHud;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.overlay.DebugOverlayGui;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
 
-@Mixin(DebugHud.class)
-public abstract class MixinDebugHud extends DrawableHelper
+@Mixin(DebugOverlayGui.class)
+public abstract class MixinDebugHud extends AbstractGui
 {
-    @Inject(method = "getLeftText", at = @At("RETURN"))
+    @Inject(method = "getDebugInfoLeft", at = @At("RETURN"))
     private void addDebugLines(CallbackInfoReturnable<List<String>> cir)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();

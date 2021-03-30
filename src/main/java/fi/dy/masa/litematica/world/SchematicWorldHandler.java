@@ -1,11 +1,11 @@
 package fi.dy.masa.litematica.world;
 
 import javax.annotation.Nullable;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.LevelGeneratorType;
-import net.minecraft.world.level.LevelInfo;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.GameType;
+import net.minecraft.world.DimensionType;
+import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
+import net.minecraft.world.WorldSettings;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 
 public class SchematicWorldHandler
@@ -20,8 +20,8 @@ public class SchematicWorldHandler
 
     public static WorldSchematic createSchematicWorld()
     {
-        LevelInfo info = new LevelInfo(0, GameMode.CREATIVE, false, false, LevelGeneratorType.FLAT.getDefaultOptions());
-        return new WorldSchematic(null, info, DimensionType.THE_END, MinecraftClient.getInstance()::getProfiler);
+        WorldSettings info = new WorldSettings(0, GameType.CREATIVE, false, false, BiomeGeneratorTypeScreens.FLAT.getDefaultOptions());
+        return new WorldSchematic(null, info, DimensionType.THE_END, Minecraft.getInstance()::getProfiler);
     }
 
     public static void recreateSchematicWorld(boolean remove)

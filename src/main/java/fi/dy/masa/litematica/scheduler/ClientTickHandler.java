@@ -4,12 +4,12 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class ClientTickHandler implements IClientTickHandler
 {
     @Override
-    public void onClientTick(MinecraftClient mc)
+    public void onClientTick(Minecraft mc)
     {
         if (mc.world != null && mc.player != null)
         {

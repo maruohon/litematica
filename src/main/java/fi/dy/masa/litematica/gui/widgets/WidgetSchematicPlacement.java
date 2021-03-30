@@ -19,7 +19,7 @@ import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 
 public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlacement>
 {
@@ -157,7 +157,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.origin", strOrigin));
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.sub_region_count", String.valueOf(this.placement.getSubRegionCount())));
 
-            Vec3i size = this.placement.getSchematic().getTotalSize();
+            Vector3i size = this.placement.getSchematic().getTotalSize();
             String strSize = String.format("%d x %d x %d", size.getX(), size.getY(), size.getZ());
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.enclosing_size", strSize));
 

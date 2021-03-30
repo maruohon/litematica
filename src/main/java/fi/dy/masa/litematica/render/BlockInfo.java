@@ -3,10 +3,10 @@ package fi.dy.masa.litematica.render;
 import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -33,7 +33,7 @@ public class BlockInfo
         this.state = state;
         this.stack = ItemUtils.getItemForState(this.state);
 
-        Identifier rl = Registry.BLOCK.getId(this.state.getBlock());
+        ResourceLocation rl = Registry.BLOCK.getId(this.state.getBlock());
         this.blockRegistryname = rl != null ? rl.toString() : "<null>";
 
         this.stackName = this.stack.getName().getString();
@@ -58,7 +58,7 @@ public class BlockInfo
         return this.totalHeight;
     }
 
-    public void render(int x, int y, MinecraftClient mc)
+    public void render(int x, int y, Minecraft mc)
     {
         if (this.state != null)
         {
@@ -66,7 +66,7 @@ public class BlockInfo
 
             RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
-            TextRenderer textRenderer = mc.textRenderer;
+            FontRenderer textRenderer = mc.textRenderer;
             int x1 = x + 10;
             y += 4;
 

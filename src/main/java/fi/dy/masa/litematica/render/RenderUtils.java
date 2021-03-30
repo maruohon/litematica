@@ -5,18 +5,18 @@ import java.util.Random;
 import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.BakedQuad;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
 import fi.dy.masa.litematica.util.PositionUtils;
@@ -43,13 +43,13 @@ public class RenderUtils
         return length;
     }
 
-    public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth, Color4f color, MinecraftClient mc)
+    public static void renderBlockOutline(BlockPos pos, float expand, float lineWidth, Color4f color, Minecraft mc)
     {
         RenderSystem.lineWidth(lineWidth);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
         drawBlockBoundingBoxOutlinesBatchedLines(pos, color, expand, buffer, mc);
 
@@ -57,9 +57,9 @@ public class RenderUtils
     }
 
     public static void drawBlockBoundingBoxOutlinesBatchedLines(BlockPos pos, Color4f color,
-            double expand, BufferBuilder buffer, MinecraftClient mc)
+            double expand, BufferBuilder buffer, Minecraft mc)
     {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        Vector3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
@@ -75,9 +75,9 @@ public class RenderUtils
     }
 
     public static void drawConnectingLineBatchedLines(BlockPos pos1, BlockPos pos2, boolean center,
-            Color4f color, BufferBuilder buffer, MinecraftClient mc)
+            Color4f color, BufferBuilder buffer, Minecraft mc)
     {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        Vector3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
@@ -104,9 +104,9 @@ public class RenderUtils
     }
 
     public static void renderBlockOutlineOverlapping(BlockPos pos, float expand, float lineWidth,
-            Color4f color1, Color4f color2, Color4f color3, MatrixStack matrices, MinecraftClient mc)
+            Color4f color1, Color4f color2, Color4f color3, MatrixStack matrices, Minecraft mc)
     {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        Vector3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
@@ -122,7 +122,7 @@ public class RenderUtils
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
         // Min corner
         buffer.vertex(minX, minY, minZ).color(color1.r, color1.g, color1.b, color1.a).next();
@@ -167,11 +167,11 @@ public class RenderUtils
     }
 
     public static void renderAreaOutline(BlockPos pos1, BlockPos pos2, float lineWidth,
-            Color4f colorX, Color4f colorY, Color4f colorZ, MinecraftClient mc)
+            Color4f colorX, Color4f colorY, Color4f colorZ, Minecraft mc)
     {
         RenderSystem.lineWidth(lineWidth);
 
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        Vector3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
@@ -190,7 +190,7 @@ public class RenderUtils
     {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+        bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
         drawBoundingBoxLinesX(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorX);
         drawBoundingBoxLinesY(bufferbuilder, minX, minY, minZ, maxX, maxY, maxZ, colorY);
@@ -244,14 +244,14 @@ public class RenderUtils
         buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
     }
 
-    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, MatrixStack matrices, MinecraftClient mc)
+    public static void renderAreaSides(BlockPos pos1, BlockPos pos2, Color4f color, MatrixStack matrices, Minecraft mc)
     {
         RenderSystem.enableBlend();
         RenderSystem.disableCull();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, VertexFormats.POSITION_COLOR);
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
         renderAreaSidesBatched(pos1, pos2, color, 0.002, buffer, mc);
 
@@ -265,9 +265,9 @@ public class RenderUtils
      * Assumes a BufferBuilder in GL_QUADS mode has been initialized
      */
     public static void renderAreaSidesBatched(BlockPos pos1, BlockPos pos2, Color4f color,
-            double expand, BufferBuilder buffer, MinecraftClient mc)
+            double expand, BufferBuilder buffer, Minecraft mc)
     {
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        Vector3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
@@ -282,7 +282,7 @@ public class RenderUtils
     }
 
     public static void renderAreaOutlineNoCorners(BlockPos pos1, BlockPos pos2,
-            float lineWidth, Color4f colorX, Color4f colorY, Color4f colorZ, MinecraftClient mc)
+            float lineWidth, Color4f colorX, Color4f colorY, Color4f colorZ, Minecraft mc)
     {
         final int xMin = Math.min(pos1.getX(), pos2.getX());
         final int yMin = Math.min(pos1.getY(), pos2.getY());
@@ -292,7 +292,7 @@ public class RenderUtils
         final int zMax = Math.max(pos1.getZ(), pos2.getZ());
 
         final double expand = 0.001;
-        Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+        Vector3d cameraPos = mc.gameRenderer.getCamera().getPos();
         final double dx = cameraPos.x;
         final double dy = cameraPos.y;
         final double dz = cameraPos.z;
@@ -317,7 +317,7 @@ public class RenderUtils
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_LINES, VertexFormats.POSITION_COLOR);
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
         // Edges along the X-axis
         start = (pos1.getX() == xMin && pos1.getY() == yMin && pos1.getZ() == zMin) || (pos2.getX() == xMin && pos2.getY() == yMin && pos2.getZ() == zMin) ? xMin + 1 : xMin;
@@ -436,7 +436,7 @@ public class RenderUtils
     /**
      * Assumes a BufferBuilder in the GL_LINES mode has been initialized
      */
-    public static void drawBlockModelOutlinesBatched(BakedModel model, BlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
+    public static void drawBlockModelOutlinesBatched(IBakedModel model, BlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
         for (final Direction side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
         {
@@ -485,7 +485,7 @@ public class RenderUtils
         buffer.vertex(fx[0], fy[0], fz[0]).color(color.r, color.g, color.b, color.a).next();
     }
 
-    public static void drawBlockModelQuadOverlayBatched(BakedModel model, BlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
+    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, BlockState state, BlockPos pos, Color4f color, double expand, BufferBuilder buffer)
     {
         for (final Direction side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
         {
@@ -495,7 +495,7 @@ public class RenderUtils
         renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, RAND));
     }
 
-    public static void drawBlockModelQuadOverlayBatched(BakedModel model, BlockState state, BlockPos pos, Direction side, Color4f color, double expand, BufferBuilder buffer)
+    public static void drawBlockModelQuadOverlayBatched(IBakedModel model, BlockState state, BlockPos pos, Direction side, Color4f color, double expand, BufferBuilder buffer)
     {
         renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, RAND));
     }
@@ -587,7 +587,7 @@ public class RenderUtils
 
     public static void drawBlockBoxEdgeBatchedLines(BlockPos pos, Direction.Axis axis, int cornerIndex, Color4f color, BufferBuilder buffer)
     {
-        Vec3i offset = PositionUtils.getEdgeNeighborOffsets(axis, cornerIndex)[cornerIndex];
+        Vector3i offset = PositionUtils.getEdgeNeighborOffsets(axis, cornerIndex)[cornerIndex];
 
         double minX = pos.getX() + offset.getX();
         double minY = pos.getY() + offset.getY();
@@ -601,7 +601,7 @@ public class RenderUtils
         buffer.vertex(maxX, maxY, maxZ).color(color.r, color.g, color.b, color.a).next();
     }
 
-    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, MinecraftClient mc)
+    public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, Minecraft mc)
     {
         int heightSch = renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc);
         int heightCli = renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc);
@@ -610,7 +610,7 @@ public class RenderUtils
     }
 
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
-            World world, BlockPos pos, MinecraftClient mc)
+            World world, BlockPos pos, Minecraft mc)
     {
         Inventory inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
 
@@ -626,7 +626,7 @@ public class RenderUtils
     }
 
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
-            Inventory inv, InventoryRenderType type, InventoryProperties props, MinecraftClient mc)
+            Inventory inv, InventoryRenderType type, InventoryProperties props, Minecraft mc)
     {
         int xInv = 0;
         int yInv = 0;
@@ -686,7 +686,7 @@ public class RenderUtils
                 bufferbuilder.putColorRGB_F4(brightness, brightness, brightness);
             }
 
-            Vec3i direction = quad.getFace().getDirectionVec();
+            Vector3i direction = quad.getFace().getDirectionVec();
             bufferbuilder.putNormal(direction.getX(), direction.getY(), direction.getZ());
 
             tessellator.draw();

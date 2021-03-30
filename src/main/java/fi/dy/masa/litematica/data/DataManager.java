@@ -12,7 +12,7 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
@@ -451,7 +451,7 @@ public class DataManager implements IDirectoryCache
 
             if (matcher.matches())
             {
-                Item item = Registry.ITEM.get(new Identifier(matcher.group("name")));
+                Item item = Registry.ITEM.get(new ResourceLocation(matcher.group("name")));
 
                 if (item != null && item != Items.AIR)
                 {

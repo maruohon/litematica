@@ -15,7 +15,7 @@ import fi.dy.masa.malilib.event.TickHandler;
 import fi.dy.masa.malilib.event.WorldLoadHandler;
 import fi.dy.masa.malilib.interfaces.IInitializationHandler;
 import fi.dy.masa.malilib.interfaces.IRenderer;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class InitHandler implements IInitializationHandler
 {
@@ -38,7 +38,7 @@ public class InitHandler implements IInitializationHandler
         WorldLoadHandler.getInstance().registerWorldLoadPreHandler(listener);
         WorldLoadHandler.getInstance().registerWorldLoadPostHandler(listener);
 
-        KeyCallbacks.init(MinecraftClient.getInstance());
+        KeyCallbacks.init(Minecraft.getInstance());
         StatusInfoRenderer.init();
 
         DataManager.getAreaSelectionsBaseDirectory();

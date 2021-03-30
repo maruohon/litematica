@@ -13,21 +13,21 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DoorBlock;
 import net.minecraft.block.FlowerPotBlock;
-import net.minecraft.block.FluidBlock;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.SnowBlock;
-import net.minecraft.block.TallPlantBlock;
-import net.minecraft.block.enums.BedPart;
-import net.minecraft.block.enums.DoubleBlockHalf;
-import net.minecraft.block.enums.SlabType;
+import net.minecraft.block.DoublePlantBlock;
+import net.minecraft.state.properties.BedPart;
+import net.minecraft.state.properties.DoubleBlockHalf;
+import net.minecraft.state.properties.SlabType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
@@ -52,7 +52,7 @@ public class MaterialCache
         this.tempWorld = SchematicWorldHandler.createSchematicWorld();
         this.checkPos = new BlockPos(8, 0, 8);
 
-        WorldUtils.loadChunksSchematicWorld(this.tempWorld, this.checkPos, new Vec3i(1, 1, 1));
+        WorldUtils.loadChunksSchematicWorld(this.tempWorld, this.checkPos, new Vector3i(1, 1, 1));
     }
 
     public static MaterialCache getInstance()
@@ -168,7 +168,7 @@ public class MaterialCache
         }
         else if (block == Blocks.LAVA)
         {
-            if (state.get(FluidBlock.LEVEL) == 0)
+            if (state.get(FlowingFluidBlock.LEVEL) == 0)
             {
                 return new ItemStack(Items.LAVA_BUCKET);
             }
@@ -179,7 +179,7 @@ public class MaterialCache
         }
         else if (block == Blocks.WATER)
         {
-            if (state.get(FluidBlock.LEVEL) == 0)
+            if (state.get(FlowingFluidBlock.LEVEL) == 0)
             {
                 return new ItemStack(Items.WATER_BUCKET);
             }
@@ -196,7 +196,7 @@ public class MaterialCache
         {
             return ItemStack.EMPTY;
         }
-        else if (block instanceof TallPlantBlock && state.get(TallPlantBlock.HALF) == DoubleBlockHalf.UPPER)
+        else if (block instanceof DoublePlantBlock && state.get(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER)
         {
             return ItemStack.EMPTY;
         }
@@ -216,18 +216,18 @@ public class MaterialCache
         }
     }
 
-    protected CompoundTag writeToNBT()
+    protected CompoundNBT writeToNBT()
     {
-        CompoundTag nbt = new CompoundTag();
-        ListTag list = new ListTag();
+        CompoundNBT nbt = new CompoundNBT();
+        ListNBT list = new ListNBT();
 
         for (Map.Entry<BlockState, ItemStack> entry : this.itemsForStates.entrySet())
         {
-            CompoundTag tag = new CompoundTag();
-            CompoundTag stateTag = NbtHelper.fromBlockState(entry.getKey());
+            CompoundNBT tag = new CompoundNBT();
+            CompoundNBT stateTag = NBTUtil.fromBlockState(entry.getKey());
 
             tag.put("Block", stateTag);
-            tag.put("Item", entry.getValue().toTag(new CompoundTag()));
+            tag.put("Item", entry.getValue().toTag(new CompoundNBT()));
 
             list.add(tag);
         }
@@ -237,23 +237,23 @@ public class MaterialCache
         return nbt;
     }
 
-    protected boolean readFromNBT(CompoundTag nbt)
+    protected boolean readFromNBT(CompoundNBT nbt)
     {
         this.itemsForStates.clear();
 
         if (nbt.contains("MaterialCache", Constants.NBT.TAG_LIST))
         {
-            ListTag list = nbt.getList("MaterialCache", Constants.NBT.TAG_COMPOUND);
+            ListNBT list = nbt.getList("MaterialCache", Constants.NBT.TAG_COMPOUND);
             final int count = list.size();
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag tag = list.getCompound(i);
+                CompoundNBT tag = list.getCompound(i);
 
                 if (tag.contains("Block", Constants.NBT.TAG_COMPOUND) &&
                     tag.contains("Item", Constants.NBT.TAG_COMPOUND))
                 {
-                    BlockState state = NbtHelper.toBlockState(tag.getCompound("Block"));
+                    BlockState state = NBTUtil.toBlockState(tag.getCompound("Block"));
 
                     if (state != null)
                     {
@@ -298,7 +298,7 @@ public class MaterialCache
             }
 
             FileOutputStream os = new FileOutputStream(file);
-            NbtIo.writeCompressed(this.writeToNBT(), os);
+            CompressedStreamTools.writeCompressed(this.writeToNBT(), os);
             os.close();
             this.dirty = false;
 
@@ -324,7 +324,7 @@ public class MaterialCache
         try
         {
             FileInputStream is = new FileInputStream(file);
-            CompoundTag nbt = NbtIo.readCompressed(is);
+            CompoundNBT nbt = CompressedStreamTools.readCompressed(is);
             is.close();
 
             if (nbt != null)

@@ -10,12 +10,12 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.Direction;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -148,12 +148,12 @@ public class EntityUtils
     public static String getEntityId(Entity entity)
     {
         EntityType<?> entitytype = entity.getType();
-        Identifier resourcelocation = EntityType.getId(entitytype);
+        ResourceLocation resourcelocation = EntityType.getId(entitytype);
         return entitytype.isSaveable() && resourcelocation != null ? resourcelocation.toString() : null;
     }
 
     @Nullable
-    private static Entity createEntityFromNBTSingle(CompoundTag nbt, World world)
+    private static Entity createEntityFromNBTSingle(CompoundNBT nbt, World world)
     {
         try
         {
@@ -180,7 +180,7 @@ public class EntityUtils
      * @return
      */
     @Nullable
-    public static Entity createEntityAndPassengersFromNBT(CompoundTag nbt, World world)
+    public static Entity createEntityAndPassengersFromNBT(CompoundNBT nbt, World world)
     {
         Entity entity = createEntityFromNBTSingle(nbt, world);
 
@@ -192,7 +192,7 @@ public class EntityUtils
         {
             if (nbt.contains("Passengers", Constants.NBT.TAG_LIST))
             {
-                ListTag taglist = nbt.getList("Passengers", Constants.NBT.TAG_COMPOUND);
+                ListNBT taglist = nbt.getList("Passengers", Constants.NBT.TAG_COMPOUND);
 
                 for (int i = 0; i < taglist.size(); ++i)
                 {
@@ -253,7 +253,7 @@ public class EntityUtils
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         BlockPos posEndAbs = PositionUtils.getTransformedPlacementPosition(regionSize.add(-1, -1, -1), schematicPlacement, placement).add(regionPosRelTransformed).add(origin);
         BlockPos regionPosAbs = regionPosRelTransformed.add(origin);
-        net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
+        net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
 
         return world.getEntities((Entity) null, bb, null);
     }

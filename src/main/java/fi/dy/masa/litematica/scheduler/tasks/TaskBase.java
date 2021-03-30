@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +25,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
 {
     private TaskTimer timer = new TaskTimer(1);
 
-    protected final MinecraftClient mc;
+    protected final Minecraft mc;
     protected String name = "";
     protected List<String> infoHudLines = new ArrayList<>();
     protected boolean finished;
@@ -34,7 +34,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
 
     protected TaskBase()
     {
-        this.mc = MinecraftClient.getInstance();
+        this.mc = Minecraft.getInstance();
     }
 
     @Override

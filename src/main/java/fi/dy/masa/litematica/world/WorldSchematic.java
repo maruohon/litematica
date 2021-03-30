@@ -7,41 +7,41 @@ import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.world.ClientChunkManager;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.network.play.ClientPlayNetHandler;
+import net.minecraft.client.multiplayer.ClientChunkProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.profiler.Profiler;
+import net.minecraft.profiler.IProfiler;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.level.LevelInfo;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.WorldSettings;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 
 public class WorldSchematic extends ClientWorld
 {
-    private final MinecraftClient mc;
+    private final Minecraft mc;
     private final WorldRendererSchematic worldRenderer;
     private ChunkProviderSchematic chunkProviderSchematic;
     private int nextEntityId;
 
-    public WorldSchematic(ClientPlayNetworkHandler netHandler, LevelInfo settings,
-            DimensionType dimType, Supplier<Profiler> profilerIn)
+    public WorldSchematic(ClientPlayNetHandler netHandler, WorldSettings settings,
+            DimensionType dimType, Supplier<IProfiler> profilerIn)
     {
         super(netHandler, settings, dimType, 1, profilerIn, null);
 
-        this.mc = MinecraftClient.getInstance();
+        this.mc = Minecraft.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
         this.chunkProviderSchematic = new ChunkProviderSchematic(this);
     }
@@ -52,19 +52,19 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public ClientChunkManager getChunkManager()
+    public ClientChunkProvider getChunkManager()
     {
         return this.getChunkProvider();
     }
 
     @Override
-    public WorldChunk getWorldChunk(BlockPos pos)
+    public Chunk getWorldChunk(BlockPos pos)
     {
         return this.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
     }
 
     @Override
-    public WorldChunk getChunk(int chunkX, int chunkZ)
+    public Chunk getChunk(int chunkX, int chunkZ)
     {
         return this.chunkProviderSchematic.getChunk(chunkX, chunkZ);
     }
@@ -112,9 +112,9 @@ public class WorldSchematic extends ClientWorld
         }
     }
 
-    public void unloadBlockEntities(Collection<BlockEntity> blockEntities)
+    public void unloadBlockEntities(Collection<TileEntity> blockEntities)
     {
-        Set<BlockEntity> remove = Collections.newSetFromMap(new IdentityHashMap<>());
+        Set<TileEntity> remove = Collections.newSetFromMap(new IdentityHashMap<>());
         remove.addAll(blockEntities);
         this.tickingBlockEntities.removeAll(remove);
         this.blockEntities.removeAll(remove);
@@ -200,25 +200,25 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void addParticle(ParticleEffect particleParameters_1, double double_1, double double_2, double double_3, double double_4, double     double_5, double double_6)
+    public void addParticle(IParticleData particleParameters_1, double double_1, double double_2, double double_3, double double_4, double     double_5, double double_6)
     {
         // NO-OP
     }
 
     @Override
-    public void addParticle(ParticleEffect particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3, double   double_4, double double_5, double double_6)
+    public void addParticle(IParticleData particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3, double   double_4, double double_5, double double_6)
     {
         // NO-OP
     }
 
     @Override
-    public void addImportantParticle(ParticleEffect particleParameters_1, double double_1, double double_2, double double_3, double double_4,   double double_5, double double_6)
+    public void addImportantParticle(IParticleData particleParameters_1, double double_1, double double_2, double double_3, double double_4,   double double_5, double double_6)
     {
         // NO-OP
     }
 
     @Override
-    public void addImportantParticle(ParticleEffect particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3,     double double_4, double double_5, double double_6)
+    public void addImportantParticle(IParticleData particleParameters_1, boolean boolean_1, double double_1, double double_2, double double_3,     double double_4, double double_5, double double_6)
     {
         // NO-OP
     }

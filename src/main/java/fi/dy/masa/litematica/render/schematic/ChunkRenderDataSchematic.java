@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.RenderType;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 
@@ -15,13 +15,13 @@ public class ChunkRenderDataSchematic
 {
     public static final ChunkRenderDataSchematic EMPTY = new ChunkRenderDataSchematic() {
         @Override
-        public void setBlockLayerUsed(RenderLayer layer)
+        public void setBlockLayerUsed(RenderType layer)
         {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public void setBlockLayerStarted(RenderLayer layer)
+        public void setBlockLayerStarted(RenderType layer)
         {
             throw new UnsupportedOperationException();
         }
@@ -39,13 +39,13 @@ public class ChunkRenderDataSchematic
         }
     };
 
-    private final Set<RenderLayer> blockLayersUsed = new ObjectArraySet<>();
-    private final Set<RenderLayer> blockLayersStarted = new ObjectArraySet<>();
-    private final List<BlockEntity> blockEntities = new ArrayList<>();
+    private final Set<RenderType> blockLayersUsed = new ObjectArraySet<>();
+    private final Set<RenderType> blockLayersStarted = new ObjectArraySet<>();
+    private final List<TileEntity> blockEntities = new ArrayList<>();
 
     private final boolean[] overlayLayersUsed = new boolean[OverlayRenderType.values().length];
     private final boolean[] overlayLayersStarted = new boolean[OverlayRenderType.values().length];
-    private final Map<RenderLayer, BufferBuilder.State> blockBufferStates = new HashMap<>();
+    private final Map<RenderType, BufferBuilder.State> blockBufferStates = new HashMap<>();
     private final BufferBuilder.State[] overlayBufferStates = new BufferBuilder.State[OverlayRenderType.values().length];
     private boolean overlayEmpty = true;
     private boolean empty = true;
@@ -56,23 +56,23 @@ public class ChunkRenderDataSchematic
         return this.empty;
     }
 
-    public boolean isBlockLayerEmpty(RenderLayer layer)
+    public boolean isBlockLayerEmpty(RenderType layer)
     {
         return ! this.blockLayersUsed.contains(layer);
     }
 
-    public void setBlockLayerUsed(RenderLayer layer)
+    public void setBlockLayerUsed(RenderType layer)
     {
         this.blockLayersUsed.add(layer);
         this.empty = false;
     }
 
-    public boolean isBlockLayerStarted(RenderLayer layer)
+    public boolean isBlockLayerStarted(RenderType layer)
     {
         return this.blockLayersStarted.contains(layer);
     }
 
-    public void setBlockLayerStarted(RenderLayer layer)
+    public void setBlockLayerStarted(RenderType layer)
     {
         this.blockLayersStarted.add(layer);
     }
@@ -103,12 +103,12 @@ public class ChunkRenderDataSchematic
         return this.overlayLayersStarted[type.ordinal()];
     }
 
-    public BufferBuilder.State getBlockBufferState(RenderLayer layer)
+    public BufferBuilder.State getBlockBufferState(RenderType layer)
     {
         return this.blockBufferStates.get(layer);
     }
 
-    public void setBlockBufferState(RenderLayer layer, BufferBuilder.State state)
+    public void setBlockBufferState(RenderType layer, BufferBuilder.State state)
     {
         this.blockBufferStates.put(layer, state);
     }
@@ -123,12 +123,12 @@ public class ChunkRenderDataSchematic
         this.overlayBufferStates[type.ordinal()] = state;
     }
 
-    public List<BlockEntity> getBlockEntities()
+    public List<TileEntity> getBlockEntities()
     {
         return this.blockEntities;
     }
 
-    public void addBlockEntity(BlockEntity be)
+    public void addBlockEntity(TileEntity be)
     {
         this.blockEntities.add(be);
     }

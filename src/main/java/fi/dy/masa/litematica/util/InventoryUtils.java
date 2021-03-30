@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -34,7 +34,7 @@ public class InventoryUtils
         }
     }
 
-    public static void setPickedItemToHand(ItemStack stack, MinecraftClient mc)
+    public static void setPickedItemToHand(ItemStack stack, Minecraft mc)
     {
         PlayerEntity player = mc.player;
         PlayerInventory inventory = player.inventory;

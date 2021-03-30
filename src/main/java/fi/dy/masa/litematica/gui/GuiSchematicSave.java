@@ -17,7 +17,7 @@ import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
@@ -184,12 +184,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
     public static class InMemorySchematicCreator implements IStringConsumer
     {
         private final AreaSelection area;
-        private final MinecraftClient mc;
+        private final Minecraft mc;
 
         public InMemorySchematicCreator(AreaSelection area)
         {
             this.area = area;
-            this.mc = MinecraftClient.getInstance();
+            this.mc = Minecraft.getInstance();
         }
 
         @Override

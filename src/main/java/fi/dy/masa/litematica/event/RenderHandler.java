@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.event;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicManager;
@@ -17,7 +17,7 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderWorldLast(float partialTicks, MatrixStack matrices)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {
@@ -38,7 +38,7 @@ public class RenderHandler implements IRenderer
     @Override
     public void onRenderGameOverlayPost(float partialTicks)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && mc.player != null)
         {

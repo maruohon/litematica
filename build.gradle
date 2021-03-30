@@ -3,7 +3,7 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven {
             name = 'sponge'
-            url = 'http://repo.spongepowered.org/maven'
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
         }
         jcenter()
         mavenCentral()

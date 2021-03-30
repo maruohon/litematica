@@ -13,34 +13,34 @@ import org.lwjgl.opengl.GL11;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferBuilderStorage;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.vertex.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.RenderTypeBuffers;
+import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.culling.ClippingHelper;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.model.IBakedModel;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.util.collection.TypeFilterableList;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.crash.ReportedException;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.world.ChunkSchematic;
@@ -50,14 +50,14 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 
 public class WorldRendererSchematic
 {
-    private final MinecraftClient mc;
-    private final EntityRenderDispatcher entityRenderDispatcher;
-    private final BlockRenderManager blockRenderManager;
+    private final Minecraft mc;
+    private final EntityRendererManager entityRenderDispatcher;
+    private final BlockRendererDispatcher blockRenderManager;
     private final BlockModelRendererSchematic blockModelRenderer;
-    private final Set<BlockEntity> blockEntities = new HashSet<>();
+    private final Set<TileEntity> blockEntities = new HashSet<>();
     private final List<ChunkRendererSchematicVbo> renderInfos = new ArrayList<>(1024);
-    private final VertexFormat vertexFormat = VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL;
-    private final BufferBuilderStorage bufferBuilders;
+    private final VertexFormat vertexFormat = DefaultVertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL;
+    private final RenderTypeBuffers bufferBuilders;
     private Set<ChunkRendererSchematicVbo> chunksToUpdate = new LinkedHashSet<>();
     private WorldSchematic world;
     private ChunkRenderDispatcherSchematic chunkRendererDispatcher;
@@ -88,7 +88,7 @@ public class WorldRendererSchematic
     private double lastTranslucentSortZ;
     private boolean displayListEntitiesDirty = true;
 
-    public WorldRendererSchematic(MinecraftClient mc)
+    public WorldRendererSchematic(Minecraft mc)
     {
         this.mc = mc;
         this.entityRenderDispatcher = mc.getEntityRenderManager();
@@ -96,7 +96,7 @@ public class WorldRendererSchematic
 
         this.renderChunkFactory = new RenderChunkFactoryVbo();
 
-        this.blockRenderManager = MinecraftClient.getInstance().getBlockRenderManager();
+        this.blockRenderManager = Minecraft.getInstance().getBlockRenderManager();
         this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColorMap());
     }
 
@@ -213,7 +213,7 @@ public class WorldRendererSchematic
         this.renderDispatcher.stopChunkUpdates();
     }
 
-    public void setupTerrain(Camera camera, Frustum frustum, int frameCount, boolean playerSpectator)
+    public void setupTerrain(ActiveRenderInfo camera, ClippingHelper frustum, int frameCount, boolean playerSpectator)
     {
         this.world.getProfiler().push("setup_terrain");
 
@@ -257,7 +257,7 @@ public class WorldRendererSchematic
 
         this.world.getProfiler().swap("renderlist_camera");
 
-        Vec3d cameraPos = camera.getPos();
+        Vector3d cameraPos = camera.getPos();
         double cameraX = cameraPos.x;
         double cameraY = cameraPos.y;
         double cameraZ = cameraPos.z;
@@ -415,15 +415,15 @@ public class WorldRendererSchematic
         }
     }
 
-    public int renderBlockLayer(RenderLayer renderLayer, MatrixStack matrices, Camera camera)
+    public int renderBlockLayer(RenderType renderLayer, MatrixStack matrices, ActiveRenderInfo camera)
     {
         this.world.getProfiler().push("render_block_layer_" + renderLayer.toString());
 
-        boolean isTranslucent = renderLayer == RenderLayer.getTranslucent();
+        boolean isTranslucent = renderLayer == RenderType.getTranslucent();
 
         renderLayer.startDrawing();
         //RenderUtils.disableDiffuseLighting();
-        Vec3d cameraPos = camera.getPos();
+        Vector3d cameraPos = camera.getPos();
         double x = cameraPos.x;
         double y = cameraPos.y;
         double z = cameraPos.z;
@@ -496,21 +496,21 @@ public class WorldRendererSchematic
         return count;
     }
 
-    public void renderBlockOverlays(MatrixStack matrices, Camera camera)
+    public void renderBlockOverlays(MatrixStack matrices, ActiveRenderInfo camera)
     {
         this.renderBlockOverlay(OverlayRenderType.OUTLINE, matrices, camera);
         this.renderBlockOverlay(OverlayRenderType.QUAD, matrices, camera);
     }
 
-    private void renderBlockOverlay(OverlayRenderType type, MatrixStack matrices, Camera camera)
+    private void renderBlockOverlay(OverlayRenderType type, MatrixStack matrices, ActiveRenderInfo camera)
     {
-        //RenderLayer renderLayer = RenderLayer.getTranslucent();
+        //RenderType renderLayer = RenderType.getTranslucent();
         //renderLayer.startDrawing();
         //RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        Vec3d cameraPos = camera.getPos();
+        Vector3d cameraPos = camera.getPos();
         double x = cameraPos.x;
         double y = cameraPos.y;
         double z = cameraPos.z;
@@ -535,7 +535,7 @@ public class WorldRendererSchematic
                     matrices.translate((double) chunkOrigin.getX() - x, (double) chunkOrigin.getY() - y, (double) chunkOrigin.getZ() - z);
 
                     buffer.bind();
-                    VertexFormats.POSITION_COLOR.startDrawing(0L);
+                    DefaultVertexFormats.POSITION_COLOR.startDrawing(0L);
                     buffer.draw(matrices.peek().getModel(), type.getGlMode());
 
                     matrices.pop();
@@ -545,7 +545,7 @@ public class WorldRendererSchematic
 
         VertexBuffer.unbind();
         RenderSystem.clearCurrentColor();
-        VertexFormats.POSITION_COLOR.endDrawing();
+        DefaultVertexFormats.POSITION_COLOR.endDrawing();
 
         RenderSystem.disableBlend();
         //RenderSystem.enableTexture();
@@ -554,7 +554,7 @@ public class WorldRendererSchematic
         this.world.getProfiler().pop();
     }
 
-    public boolean renderBlock(BlockRenderView world, BlockState state, BlockPos pos, MatrixStack matrices, BufferBuilder bufferBuilderIn)
+    public boolean renderBlock(IBlockDisplayReader world, BlockState state, BlockPos pos, MatrixStack matrices, BufferBuilder bufferBuilderIn)
     {
         try
         {
@@ -580,23 +580,23 @@ public class WorldRendererSchematic
         catch (Throwable throwable)
         {
             CrashReport crashreport = CrashReport.create(throwable, "Tesselating block in world");
-            CrashReportSection crashreportcategory = crashreport.addElement("Block being tesselated");
-            CrashReportSection.addBlockInfo(crashreportcategory, pos, state);
-            throw new CrashException(crashreport);
+            CrashReportCategory crashreportcategory = crashreport.addElement("Block being tesselated");
+            CrashReportCategory.addBlockInfo(crashreportcategory, pos, state);
+            throw new ReportedException(crashreport);
         }
     }
 
-    public boolean renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
+    public boolean renderFluid(IBlockDisplayReader world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
     {
         return this.blockRenderManager.renderFluid(pos, world, bufferBuilderIn, state);
     }
 
-    public BakedModel getModelForState(BlockState state)
+    public IBakedModel getModelForState(BlockState state)
     {
         return this.blockRenderManager.getModel(state);
     }
 
-    public void renderEntities(Camera camera, Frustum frustum, MatrixStack matrices, float partialTicks)
+    public void renderEntities(ActiveRenderInfo camera, ClippingHelper frustum, MatrixStack matrices, float partialTicks)
     {
         if (this.renderEntitiesStartupCounter > 0)
         {
@@ -610,7 +610,7 @@ public class WorldRendererSchematic
             double cameraY = camera.getPos().y;
             double cameraZ = camera.getPos().z;
 
-            BlockEntityRenderDispatcher.INSTANCE.configure(this.world, this.mc.getTextureManager(), this.mc.textRenderer, camera, this.mc.crosshairTarget);
+            TileEntityRendererDispatcher.INSTANCE.configure(this.world, this.mc.getTextureManager(), this.mc.textRenderer, camera, this.mc.crosshairTarget);
             this.entityRenderDispatcher.configure(this.world, camera, this.mc.targetedEntity);
 
             this.countEntitiesTotal = 0;
@@ -622,15 +622,15 @@ public class WorldRendererSchematic
             this.world.getProfiler().swap("regular_entities");
             //List<Entity> entitiesMultipass = Lists.<Entity>newArrayList();
 
-            VertexConsumerProvider.Immediate entityVertexConsumers = this.bufferBuilders.getEntityVertexConsumers();
-            DiffuseLighting.enableForLevel(matrices.peek().getModel());
+            IRenderTypeBuffer.Impl entityVertexConsumers = this.bufferBuilders.getEntityVertexConsumers();
+            RenderHelper.enableForLevel(matrices.peek().getModel());
             LayerRange layerRange = DataManager.getRenderLayerRange();
 
             for (ChunkRendererSchematicVbo chunkRenderer : this.renderInfos)
             {
                 BlockPos pos = chunkRenderer.getOrigin();
-                WorldChunk chunk = (WorldChunk) this.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-                TypeFilterableList<Entity> list = chunk.getEntitySectionArray()[pos.getY() >> 4];
+                Chunk chunk = (Chunk) this.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+                ClassInheritanceMultiMap<Entity> list = chunk.getEntitySectionArray()[pos.getY() >> 4];
 
                 if (list.isEmpty() == false)
                 {
@@ -661,7 +661,7 @@ public class WorldRendererSchematic
             for (ChunkRendererSchematicVbo chunkRenderer : this.renderInfos)
             {
                 ChunkRenderDataSchematic data = chunkRenderer.getChunkRenderData();
-                List<BlockEntity> tiles = data.getBlockEntities();
+                List<TileEntity> tiles = data.getBlockEntities();
 
                 if (tiles.isEmpty() == false) 
                 {
@@ -671,7 +671,7 @@ public class WorldRendererSchematic
                     if (chunk != null && data instanceof ChunkRenderDataSchematic &&
                         data.getTimeBuilt() >= chunk.getTimeCreated())
                     {
-                        for (BlockEntity te : tiles)
+                        for (TileEntity te : tiles)
                         {
                             try
                             {
@@ -679,7 +679,7 @@ public class WorldRendererSchematic
                                 matrices.push();
                                 matrices.translate(pos.getX() - cameraX, pos.getY() - cameraY, pos.getZ() - cameraZ);
 
-                                BlockEntityRenderDispatcher.INSTANCE.render(te, partialTicks, matrices, entityVertexConsumers);
+                                TileEntityRendererDispatcher.INSTANCE.render(te, partialTicks, matrices, entityVertexConsumers);
 
                                 matrices.pop();
                             }
@@ -693,7 +693,7 @@ public class WorldRendererSchematic
 
             synchronized (this.blockEntities)
             {
-                for (BlockEntity te : this.blockEntities)
+                for (TileEntity te : this.blockEntities)
                 {
                     try
                     {
@@ -701,7 +701,7 @@ public class WorldRendererSchematic
                         matrices.push();
                         matrices.translate(pos.getX() - cameraX, pos.getY() - cameraY, pos.getZ() - cameraZ);
 
-                        BlockEntityRenderDispatcher.INSTANCE.render(te, partialTicks, matrices, entityVertexConsumers);
+                        TileEntityRendererDispatcher.INSTANCE.render(te, partialTicks, matrices, entityVertexConsumers);
 
                         matrices.pop();
                     }
@@ -716,7 +716,7 @@ public class WorldRendererSchematic
     }
 
     /*
-    private boolean isOutlineActive(Entity entityIn, Entity viewer, Camera camera)
+    private boolean isOutlineActive(Entity entityIn, Entity viewer, ActiveRenderInfo camera)
     {
         boolean sleeping = viewer instanceof LivingEntity && ((LivingEntity) viewer).isSleeping();
 
@@ -739,7 +739,7 @@ public class WorldRendererSchematic
     }
     */
 
-    public void updateBlockEntities(Collection<BlockEntity> toRemove, Collection<BlockEntity> toAdd)
+    public void updateBlockEntities(Collection<TileEntity> toRemove, Collection<TileEntity> toAdd)
     {
         synchronized (this.blockEntities)
         {

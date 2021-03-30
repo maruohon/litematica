@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.schematic.container;
 
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.ListNBT;
 
 public interface ILitematicaBlockStatePalette
 {
@@ -20,7 +20,7 @@ public interface ILitematicaBlockStatePalette
 
     int getPaletteSize();
 
-    void readFromNBT(ListTag tagList);
+    void readFromNBT(ListNBT tagList);
 
-    ListTag writeToNBT();
+    ListNBT writeToNBT();
 }

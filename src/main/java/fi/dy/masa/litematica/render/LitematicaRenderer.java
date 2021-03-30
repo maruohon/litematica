@@ -5,14 +5,14 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.Frustum;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.culling.ClippingHelper;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3d;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
@@ -25,9 +25,9 @@ public class LitematicaRenderer
 
     private static final ShaderProgram SHADER_ALPHA = new ShaderProgram("litematica", null, "shaders/alpha.frag");
 
-    private MinecraftClient mc;
+    private Minecraft mc;
     private WorldRendererSchematic worldRenderer;
-    private Frustum frustum;
+    private ClippingHelper frustum;
     private int frameCount;
     private long finishTimeNano;
 
@@ -59,7 +59,7 @@ public class LitematicaRenderer
     {
         if (this.worldRenderer == null)
         {
-            this.mc = MinecraftClient.getInstance();
+            this.mc = Minecraft.getInstance();
             this.worldRenderer = new WorldRendererSchematic(this.mc);
         }
 
@@ -121,17 +121,17 @@ public class LitematicaRenderer
 
         RenderSystem.shadeModel(GL11.GL_SMOOTH);
 
-        Camera camera = this.getCamera();
-        Vec3d cameraPos = camera.getPos();
+        ActiveRenderInfo camera = this.getCamera();
+        Vector3d cameraPos = camera.getPos();
         double x = cameraPos.x;
         double y = cameraPos.y;
         double z = cameraPos.z;
 
-        Frustum frustum = new Frustum(matrices.peek().getModel(), matrix);
+        ClippingHelper frustum = new ClippingHelper(matrices.peek().getModel(), matrix);
         frustum.setPosition(x, y, z);
 
         this.mc.getProfiler().swap("prepare_terrain");
-        this.mc.getTextureManager().bindTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
+        this.mc.getTextureManager().bindTexture(AtlasTexture.BLOCK_ATLAS_TEX);
         fi.dy.masa.malilib.render.RenderUtils.disableDiffuseLighting();
         WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
@@ -159,9 +159,9 @@ public class LitematicaRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
-            worldRenderer.renderBlockLayer(RenderLayer.getSolid(), matrices, camera);
-            worldRenderer.renderBlockLayer(RenderLayer.getCutoutMipped(), matrices, camera);
-            worldRenderer.renderBlockLayer(RenderLayer.getCutout(), matrices, camera);
+            worldRenderer.renderBlockLayer(RenderType.getSolid(), matrices, camera);
+            worldRenderer.renderBlockLayer(RenderType.getCutoutMipped(), matrices, camera);
+            worldRenderer.renderBlockLayer(RenderType.getCutout(), matrices, camera);
 
             if (Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue())
             {
@@ -194,7 +194,7 @@ public class LitematicaRenderer
 
             RenderSystem.enableCull();
             RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F);
-            this.mc.getTextureManager().bindTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
+            this.mc.getTextureManager().bindTexture(AtlasTexture.BLOCK_ATLAS_TEX);
             RenderSystem.shadeModel(GL11.GL_SMOOTH);
 
             this.mc.getProfiler().swap("translucent");
@@ -204,7 +204,7 @@ public class LitematicaRenderer
 
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
 
-            worldRenderer.renderBlockLayer(RenderLayer.getTranslucent(), matrices, camera);
+            worldRenderer.renderBlockLayer(RenderType.getTranslucent(), matrices, camera);
 
             RenderSystem.popMatrix();
 
@@ -282,7 +282,7 @@ public class LitematicaRenderer
         }
     }
 
-    public void piecewisePrepareAndUpdate(Frustum frustum)
+    public void piecewisePrepareAndUpdate(ClippingHelper frustum)
     {
         this.renderPiecewise = Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() &&
                                Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
@@ -329,7 +329,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(RenderLayer.getSolid(), matrices, this.getCamera());
+            this.getWorldRenderer().renderBlockLayer(RenderType.getSolid(), matrices, this.getCamera());
 
             this.disableShader();
 
@@ -357,7 +357,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(RenderLayer.getCutoutMipped(), matrices, this.getCamera());
+            this.getWorldRenderer().renderBlockLayer(RenderType.getCutoutMipped(), matrices, this.getCamera());
 
             this.disableShader();
 
@@ -385,7 +385,7 @@ public class LitematicaRenderer
 
             this.startShaderIfEnabled();
 
-            this.getWorldRenderer().renderBlockLayer(RenderLayer.getCutout(), matrices, this.getCamera());
+            this.getWorldRenderer().renderBlockLayer(RenderType.getCutout(), matrices, this.getCamera());
 
             this.disableShader();
 
@@ -415,7 +415,7 @@ public class LitematicaRenderer
 
                 this.startShaderIfEnabled();
 
-                this.getWorldRenderer().renderBlockLayer(RenderLayer.getTranslucent(), matrices, this.getCamera());
+                this.getWorldRenderer().renderBlockLayer(RenderType.getTranslucent(), matrices, this.getCamera());
 
                 this.disableShader();
 
@@ -461,7 +461,7 @@ public class LitematicaRenderer
         }
     }
 
-    private Camera getCamera()
+    private ActiveRenderInfo getCamera()
     {
         return this.mc.gameRenderer.getCamera();
     }

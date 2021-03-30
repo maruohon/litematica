@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.event;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -48,7 +48,7 @@ import fi.dy.masa.malilib.util.LayerMode;
 
 public class KeyCallbacks
 {
-    public static void init(MinecraftClient mc)
+    public static void init(Minecraft mc)
     {
         IHotkeyCallback callbackHotkeys = new KeyCallbackHotkeys(mc);
         IHotkeyCallback callbackMessage = new KeyCallbackToggleMessage(mc);
@@ -150,9 +150,9 @@ public class KeyCallbacks
 
     private static class KeyCallbackHotkeys implements IHotkeyCallback
     {
-        private final MinecraftClient mc;
+        private final Minecraft mc;
 
-        public KeyCallbackHotkeys(MinecraftClient mc)
+        public KeyCallbackHotkeys(Minecraft mc)
         {
             this.mc = mc;
         }
@@ -525,9 +525,9 @@ public class KeyCallbacks
 
     private static class KeyCallbackToggleMessage implements IHotkeyCallback
     {
-        private final MinecraftClient mc;
+        private final Minecraft mc;
 
-        public KeyCallbackToggleMessage(MinecraftClient mc)
+        public KeyCallbackToggleMessage(Minecraft mc)
         {
             this.mc = mc;
         }

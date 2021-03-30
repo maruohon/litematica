@@ -3,14 +3,14 @@ package fi.dy.masa.litematica.world;
 import javax.annotation.Nullable;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.client.world.ClientChunkManager;
+import net.minecraft.client.multiplayer.ClientChunkProvider;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.collection.TypeFilterableList;
+import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.Chunk;
 
-public class ChunkProviderSchematic extends ClientChunkManager
+public class ChunkProviderSchematic extends ClientChunkProvider
 {
     private final WorldSchematic world;
     private final Long2ObjectMap<ChunkSchematic> loadedChunks = new Long2ObjectOpenHashMap<>(8192);
@@ -42,7 +42,7 @@ public class ChunkProviderSchematic extends ClientChunkManager
     }
 
     @Override
-    public WorldChunk getChunk(int chunkX, int chunkZ, ChunkStatus status, boolean fallbackToEmpty)
+    public Chunk getChunk(int chunkX, int chunkZ, ChunkStatus status, boolean fallbackToEmpty)
     {
         ChunkSchematic chunk = this.getChunk(chunkX, chunkZ);
         return chunk == null && fallbackToEmpty ? this.blankChunk : chunk;
@@ -63,7 +63,7 @@ public class ChunkProviderSchematic extends ClientChunkManager
         {
             this.world.unloadBlockEntities(chunk.getBlockEntities().values());
 
-            for (TypeFilterableList<Entity> list : chunk.getEntitySectionArray())
+            for (ClassInheritanceMultiMap<Entity> list : chunk.getEntitySectionArray())
             {
                 for (Entity entity : list.getAllOfType(Entity.class))
                 {

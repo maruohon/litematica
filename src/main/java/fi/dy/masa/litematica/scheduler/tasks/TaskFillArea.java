@@ -4,8 +4,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.command.arguments.BlockArgumentParser;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.command.arguments.BlockStateParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
@@ -39,11 +39,11 @@ public class TaskFillArea extends TaskProcessChunkBase
         this.replaceState = replaceState;
         this.removeEntities = removeEntities;
 
-        String blockString = BlockArgumentParser.stringifyBlockState(fillState);
+        String blockString = BlockStateParser.stringifyBlockState(fillState);
 
         if (replaceState != null)
         {
-            blockString += " replace " + BlockArgumentParser.stringifyBlockState(replaceState);
+            blockString += " replace " + BlockStateParser.stringifyBlockState(replaceState);
         }
 
         this.blockString = blockString;
@@ -93,7 +93,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (removeEntities)
         {
-            net.minecraft.util.math.Box aabb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+            net.minecraft.util.math.AxisAlignedBB aabb = new net.minecraft.util.math.AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
             List<Entity> entities = this.world.getEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER);
 
             for (Entity entity : entities)
@@ -119,7 +119,7 @@ public class TaskFillArea extends TaskProcessChunkBase
 
                     if ((this.replaceState == null && oldState != this.fillState) || oldState == this.replaceState)
                     {
-                        BlockEntity te = this.world.getBlockEntity(posMutable);
+                        TileEntity te = this.world.getBlockEntity(posMutable);
 
                         if (te instanceof Inventory)
                         {
@@ -138,7 +138,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         if (removeEntities)
         {
-            net.minecraft.util.math.Box aabb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+            net.minecraft.util.math.AxisAlignedBB aabb = new net.minecraft.util.math.AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
 
             if (this.world.getEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER).size() > 0)
             {

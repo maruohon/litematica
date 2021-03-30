@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.materials;
 import java.util.Collections;
 import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
@@ -59,7 +59,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     @Override
     public int render(int xOffset, int yOffset, HudAlignment alignment)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         long currentTime = System.currentTimeMillis();
         List<MaterialListEntry> list;
 
@@ -80,7 +80,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             return 0;
         }
 
-        TextRenderer font = mc.textRenderer;
+        FontRenderer font = mc.textRenderer;
         final double scale = Configs.InfoOverlays.MATERIAL_LIST_HUD_SCALE.getDoubleValue();
         final int maxLines = Configs.InfoOverlays.MATERIAL_LIST_HUD_MAX_LINES.getIntegerValue();
         int bgMargin = 2;

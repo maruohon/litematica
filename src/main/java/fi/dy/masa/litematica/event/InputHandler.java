@@ -1,9 +1,9 @@
 package fi.dy.masa.litematica.event;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.Direction;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -61,7 +61,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         if (eventKeyState)
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
+            Minecraft mc = Minecraft.getInstance();
 
             if (mc.options.keyUse.matchesKey(keyCode, scanCode))
             {
@@ -83,7 +83,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     @Override
     public boolean onMouseClick(int mouseX, int mouseY, int eventButton, boolean eventButtonState)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         // Tool enabled, and not in a GUI
         if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null && eventButtonState)
@@ -104,7 +104,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     @Override
     public boolean onMouseScroll(int mouseX, int mouseY, double dWheel)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         // Not in a GUI
         if (GuiUtils.getCurrentScreen() == null && mc.world != null && mc.player != null)
@@ -115,7 +115,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
-    private boolean handleMouseScroll(double dWheel, MinecraftClient mc)
+    private boolean handleMouseScroll(double dWheel, Minecraft mc)
     {
         PlayerEntity player = mc.player;
         boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
@@ -235,7 +235,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return true;
     }
 
-    private boolean handleAttackKey(MinecraftClient mc)
+    private boolean handleAttackKey(Minecraft mc)
     {
         if (mc.player != null && DataManager.getToolMode() == ToolMode.REBUILD && KeybindMulti.getTriggeredCount() == 0)
         {
@@ -256,7 +256,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
-    private boolean handleUseKey(MinecraftClient mc)
+    private boolean handleUseKey(Minecraft mc)
     {
         if (mc.player != null)
         {
@@ -305,7 +305,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
-    public static void onTick(MinecraftClient mc)
+    public static void onTick(Minecraft mc)
     {
         SelectionManager sm = DataManager.getSelectionManager();
 

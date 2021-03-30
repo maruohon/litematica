@@ -24,9 +24,9 @@ import fi.dy.masa.malilib.gui.widgets.WidgetCheckBox;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, WidgetPlacementSubRegion, WidgetListPlacementSubRegions>
@@ -342,7 +342,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
         @Override
         public void actionPerformedWithButton(ButtonBase button, int mouseButton)
         {
-            MinecraftClient mc = MinecraftClient.getInstance();
+            Minecraft mc = Minecraft.getInstance();
             int amount = mouseButton == 1 ? -1 : 1;
             if (GuiBase.isShiftDown()) { amount *= 8; }
             if (GuiBase.isAltDown()) { amount *= 4; }
@@ -358,7 +358,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 case ROTATE:
                 {
                     boolean reverse = mouseButton == 1;
-                    BlockRotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
+                    Rotation rotation = PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
                     this.placement.setRotation(rotation, this.parent);
                     break;
                 }
@@ -366,7 +366,7 @@ public class GuiPlacementConfiguration  extends GuiListBase<SubRegionPlacement, 
                 case MIRROR:
                 {
                     boolean reverse = mouseButton == 1;
-                    BlockMirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
+                    Mirror mirror = PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
                     this.placement.setMirror(mirror, this.parent);
                     break;
                 }

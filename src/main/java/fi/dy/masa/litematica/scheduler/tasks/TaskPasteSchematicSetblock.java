@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.command.arguments.BlockArgumentParser;
+import net.minecraft.command.arguments.BlockStateParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -256,7 +256,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
     private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, ClientPlayerEntity player)
     {
-        net.minecraft.util.math.Box bb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
+        net.minecraft.util.math.AxisAlignedBB bb = new net.minecraft.util.math.AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
         List<Entity> entities = worldSchematic.getEntities((Entity) null, bb, null);
 
         for (Entity entity : entities)
@@ -287,7 +287,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private void sendSetBlockCommand(int x, int y, int z, BlockState state, ClientPlayerEntity player)
     {
         String cmdName = Configs.Generic.PASTE_COMMAND_SETBLOCK.getStringValue();
-        String blockString = BlockArgumentParser.stringifyBlockState(state);
+        String blockString = BlockStateParser.stringifyBlockState(state);
         String strCommand = String.format("/%s %d %d %d %s", cmdName, x, y, z, blockString);
 
         player.sendChatMessage(strCommand);

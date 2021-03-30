@@ -15,11 +15,11 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
 import fi.dy.masa.malilib.util.InfoUtils;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class ToolUtils
 {
-    public static void fillSelectionVolumes(MinecraftClient mc, BlockState state, @Nullable BlockState stateToReplace)
+    public static void fillSelectionVolumes(Minecraft mc, BlockState state, @Nullable BlockState stateToReplace)
     {
         if (mc.player != null && mc.player.abilities.creativeMode)
         {
@@ -52,7 +52,7 @@ public class ToolUtils
         }
     }
 
-    public static void deleteSelectionVolumes(boolean removeEntities, MinecraftClient mc)
+    public static void deleteSelectionVolumes(boolean removeEntities, Minecraft mc)
     {
         AreaSelection area = null;
 
@@ -73,13 +73,13 @@ public class ToolUtils
         deleteSelectionVolumes(area, removeEntities, mc);
     }
 
-    public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities, MinecraftClient mc)
+    public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities, Minecraft mc)
     {
         deleteSelectionVolumes(area, removeEntities, null, mc);
     }
 
     public static void deleteSelectionVolumes(@Nullable final AreaSelection area, boolean removeEntities,
-            @Nullable ICompletionListener listener, MinecraftClient mc)
+            @Nullable ICompletionListener listener, Minecraft mc)
     {
         if (mc.player != null && mc.player.abilities.creativeMode)
         {

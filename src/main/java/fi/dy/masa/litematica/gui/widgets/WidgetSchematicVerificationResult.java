@@ -7,12 +7,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
@@ -43,7 +43,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     private static int maxNameLengthFound;
     private static int maxCountLength;
 
-    private final BlockRenderManager blockModelShapes;
+    private final BlockRendererDispatcher blockModelShapes;
     private final GuiSchematicVerifier guiSchematicVerifier;
     private final WidgetListSchematicVerificationResults listWidget;
     private final SchematicVerifier verifier;
@@ -296,7 +296,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             RenderSystem.pushMatrix();
             RenderUtils.enableDiffuseLightingGui3D();
 
-            BakedModel model;
+            IBakedModel model;
 
             if (useBlockModelExpected)
             {
@@ -386,8 +386,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
             Block blockExpected = this.stateExpected.getBlock();
             Block blockFound = this.stateFound.getBlock();
-            Identifier rl1 = Registry.BLOCK.getId(blockExpected);
-            Identifier rl2 = Registry.BLOCK.getId(blockFound);
+            ResourceLocation rl1 = Registry.BLOCK.getId(blockExpected);
+            ResourceLocation rl2 = Registry.BLOCK.getId(blockFound);
 
             this.blockRegistrynameExpected = rl1 != null ? rl1.toString() : "<null>";
             this.blockRegistrynameFound = rl2 != null ? rl2.toString() : "<null>";
@@ -428,7 +428,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             return this.totalHeight;
         }
 
-        public void render(int x, int y, MinecraftClient mc)
+        public void render(int x, int y, Minecraft mc)
         {
             if (this.stateExpected != null && this.stateFound != null)
             {
@@ -440,7 +440,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 int x2 = x + this.columnWidthExpected + 30;
                 y += 4;
 
-                TextRenderer textRenderer = mc.textRenderer;
+                FontRenderer textRenderer = mc.textRenderer;
                 String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
                 String strExpected = pre + StringUtils.translate("litematica.gui.label.schematic_verifier.expected") + GuiBase.TXT_RST;
                 String strFound =    pre + StringUtils.translate("litematica.gui.label.schematic_verifier.found") + GuiBase.TXT_RST;
@@ -459,13 +459,13 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 boolean isAirItemFound    = this.stackExpected.isEmpty();
                 boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.stateExpected.getBlock() == Blocks.FLOWER_POT);
                 boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.stateFound.getBlock() == Blocks.FLOWER_POT);
-                BlockRenderManager blockModelShapes = mc.getBlockRenderManager();
+                BlockRendererDispatcher blockModelShapes = mc.getBlockRenderManager();
 
                 //mc.getRenderItem().zLevel += 100;
                 RenderUtils.drawRect(x1, y, 16, 16, 0x50C0C0C0); // light background for the item
                 RenderUtils.drawRect(x2, y, 16, 16, 0x50C0C0C0); // light background for the item
 
-                BakedModel model;
+                IBakedModel model;
 
                 if (useBlockModelExpected)
                 {

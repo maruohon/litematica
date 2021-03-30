@@ -5,15 +5,15 @@ import net.minecraft.block.AbstractSkullBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SlabBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.SlabType;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.state.properties.SlabType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -96,15 +96,15 @@ public class ItemUtils
         }
     }
 
-    public static ItemStack storeTEInStack(ItemStack stack, BlockEntity te)
+    public static ItemStack storeTEInStack(ItemStack stack, TileEntity te)
     {
-        CompoundTag nbt = te.toTag(new CompoundTag());
+        CompoundNBT nbt = te.toTag(new CompoundNBT());
 
         if (nbt.contains("Owner") && stack.getItem() instanceof BlockItem &&
             ((BlockItem) stack.getItem()).getBlock() instanceof AbstractSkullBlock)
         {
-            CompoundTag tagOwner = nbt.getCompound("Owner");
-            CompoundTag tagSkull = new CompoundTag();
+            CompoundNBT tagOwner = nbt.getCompound("Owner");
+            CompoundNBT tagSkull = new CompoundNBT();
 
             tagSkull.put("SkullOwner", tagOwner);
             stack.setTag(tagSkull);
@@ -113,10 +113,10 @@ public class ItemUtils
         }
         else
         {
-            CompoundTag tagLore = new CompoundTag();
-            ListTag tagList = new ListTag();
+            CompoundNBT tagLore = new CompoundNBT();
+            ListNBT tagList = new ListNBT();
 
-            tagList.add(StringTag.of("(+NBT)"));
+            tagList.add(StringNBT.of("(+NBT)"));
             tagLore.put("Lore", tagList);
             stack.putSubTag("display", tagLore);
             stack.putSubTag("BlockEntityTag", nbt);
@@ -129,7 +129,7 @@ public class ItemUtils
     {
         if (stack.isEmpty() == false)
         {
-            Identifier rl = Registry.ITEM.getId(stack.getItem());
+            ResourceLocation rl = Registry.ITEM.getId(stack.getItem());
 
             return String.format("[%s - display: %s - NBT: %s] (%s)",
                     rl != null ? rl.toString() : "null", stack.getName().getString(),

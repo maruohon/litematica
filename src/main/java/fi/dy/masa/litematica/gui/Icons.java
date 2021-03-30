@@ -7,7 +7,7 @@ import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 
 public enum Icons implements IGuiIcon, IFileBrowserIconProvider
 {
@@ -37,7 +37,7 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
     ARROW_UP                (209,   0, 15, 15),
     ARROW_DOWN              (209,  15, 15, 15);
 
-    public static final Identifier TEXTURE = new Identifier(Reference.MOD_ID, "textures/gui/gui_widgets.png");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(Reference.MOD_ID, "textures/gui/gui_widgets.png");
 
     private final int u;
     private final int v;
@@ -83,7 +83,7 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
     }
 
     @Override
-    public Identifier getTexture()
+    public ResourceLocation getTexture()
     {
         return TEXTURE;
     }

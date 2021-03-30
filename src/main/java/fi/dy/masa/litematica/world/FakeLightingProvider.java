@@ -1,13 +1,13 @@
 package fi.dy.masa.litematica.world;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.SectionPos;
 import net.minecraft.world.LightType;
-import net.minecraft.world.chunk.ChunkNibbleArray;
-import net.minecraft.world.chunk.light.ChunkLightingView;
-import net.minecraft.world.chunk.light.LightingProvider;
+import net.minecraft.world.chunk.NibbleArray;
+import net.minecraft.world.lighting.IWorldLightListener;
+import net.minecraft.world.lighting.WorldLightManager;
 
-public class FakeLightingProvider extends LightingProvider
+public class FakeLightingProvider extends WorldLightManager
 {
     private final FakeLightingView lightingView;
 
@@ -19,7 +19,7 @@ public class FakeLightingProvider extends LightingProvider
     }
 
     @Override
-    public ChunkLightingView get(LightType type)
+    public IWorldLightListener get(LightType type)
     {
         return this.lightingView;
     }
@@ -30,16 +30,16 @@ public class FakeLightingProvider extends LightingProvider
         return 15;
     }
 
-    public static class FakeLightingView implements ChunkLightingView
+    public static class FakeLightingView implements IWorldLightListener
     {
         @Override
-        public void updateSectionStatus(ChunkSectionPos var1, boolean var2)
+        public void updateSectionStatus(SectionPos var1, boolean var2)
         {
             // NO-OP
         }
 
         @Override
-        public ChunkNibbleArray getLightArray(ChunkSectionPos var1)
+        public NibbleArray getLightArray(SectionPos var1)
         {
             return null;
         }

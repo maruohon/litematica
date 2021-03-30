@@ -9,11 +9,11 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.crash.CrashReport;
+import net.minecraft.crash.CrashReport;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 
@@ -54,7 +54,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.create(throwable, "Batching chunks");
-                MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
+                Minecraft.getInstance().setCrashReport(Minecraft.getInstance().addDetailsToCrashReport(crashreport));
                 return;
             }
         }
@@ -83,7 +83,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             task.getLock().unlock();
         }
 
-        Entity entity = MinecraftClient.getInstance().getCameraEntity();
+        Entity entity = Minecraft.getInstance().getCameraEntity();
 
         if (entity == null)
         {
@@ -134,7 +134,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             if (taskType == ChunkRenderTaskSchematic.Type.REBUILD_CHUNK)
             {
                 //if (GuiBase.isCtrlDown()) System.out.printf("pre uploadChunk()\n");
-                for (RenderLayer layer : RenderLayer.getBlockLayers())
+                for (RenderType layer : RenderType.getBlockLayers())
                 {
                     if (chunkRenderData.isBlockLayerEmpty(layer) == false)
                     {
@@ -157,13 +157,13 @@ public class ChunkRenderWorkerLitematica implements Runnable
             }
             else if (taskType == ChunkRenderTaskSchematic.Type.RESORT_TRANSPARENCY)
             {
-                RenderLayer layer = RenderLayer.getTranslucent();
+                RenderType layer = RenderType.getTranslucent();
 
                 if (chunkRenderData.isBlockLayerEmpty(layer) == false)
                 {
                     //System.out.printf("RESORT_TRANSPARENCY pre uploadChunkBlocks(%s)\n", layer.toString());
                     BufferBuilder buffer = buffers.getBlockBufferByLayer(layer);
-                    futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(RenderLayer.getTranslucent(), buffer, renderChunk, chunkRenderData, task.getDistanceSq()));
+                    futuresList.add(this.chunkRenderDispatcher.uploadChunkBlocks(RenderType.getTranslucent(), buffer, renderChunk, chunkRenderData, task.getDistanceSq()));
                 }
 
                 if (chunkRenderData.isOverlayTypeEmpty(OverlayRenderType.QUAD) == false)
@@ -227,7 +227,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
                     if ((throwable instanceof CancellationException) == false && (throwable instanceof InterruptedException) == false)
                     {
-                        MinecraftClient.getInstance().setCrashReport(CrashReport.create(throwable, "Rendering Litematica chunk"));
+                        Minecraft.getInstance().setCrashReport(CrashReport.create(throwable, "Rendering Litematica chunk"));
                     }
                 }
             });

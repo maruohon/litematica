@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVersions;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVersion;
@@ -248,7 +248,7 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
         @Override
         public boolean onActionConfirmed()
         {
-            DataManager.getSchematicProjectsManager().deleteLastSeenArea(MinecraftClient.getInstance());
+            DataManager.getSchematicProjectsManager().deleteLastSeenArea(Minecraft.getInstance());
             return true;
         }
 

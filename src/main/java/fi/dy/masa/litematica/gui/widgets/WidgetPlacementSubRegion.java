@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -159,7 +159,7 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
             String strOrigin = String.format("x: %d, y: %d, z: %d", o.getX(), o.getY(), o.getZ());
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.origin", strOrigin));
 
-            Vec3i size = schematic.getAreaSize(this.placement.getName());
+            Vector3i size = schematic.getAreaSize(this.placement.getName());
 
             if (size != null)
             {

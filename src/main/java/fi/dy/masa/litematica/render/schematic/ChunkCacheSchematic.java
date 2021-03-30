@@ -3,20 +3,20 @@ package fi.dy.masa.litematica.render.schematic;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.util.Direction;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.WorldChunk;
-import net.minecraft.world.chunk.light.LightingProvider;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.lighting.WorldLightManager;
 import net.minecraft.world.level.ColorResolver;
 import fi.dy.masa.litematica.world.FakeLightingProvider;
 
-public class ChunkCacheSchematic implements BlockRenderView
+public class ChunkCacheSchematic implements IBlockDisplayReader
 {
     private static final BlockState AIR = Blocks.AIR.getDefaultState();
 
@@ -25,7 +25,7 @@ public class ChunkCacheSchematic implements BlockRenderView
     protected final FakeLightingProvider lightingProvider;
     protected int chunkStartX;
     protected int chunkStartZ;
-    protected WorldChunk[][] chunkArray;
+    protected Chunk[][] chunkArray;
     protected boolean empty;
 
     public ChunkCacheSchematic(ClientWorld worldIn, ClientWorld clientWorld, BlockPos pos, int expand)
@@ -38,14 +38,14 @@ public class ChunkCacheSchematic implements BlockRenderView
         this.chunkStartZ = (pos.getZ() - expand) >> 4;
         int chunkEndX = (pos.getX() + expand + 15) >> 4;
         int chunkEndZ = (pos.getZ() + expand + 15) >> 4;
-        this.chunkArray = new WorldChunk[chunkEndX - this.chunkStartX + 1][chunkEndZ - this.chunkStartZ + 1];
+        this.chunkArray = new Chunk[chunkEndX - this.chunkStartX + 1][chunkEndZ - this.chunkStartZ + 1];
         this.empty = true;
 
         for (int cx = this.chunkStartX; cx <= chunkEndX; ++cx)
         {
             for (int cz = this.chunkStartZ; cz <= chunkEndZ; ++cz)
             {
-                this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = (WorldChunk) worldIn.getChunk(cx, cz);
+                this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ] = (Chunk) worldIn.getChunk(cx, cz);
             }
         }
 
@@ -53,7 +53,7 @@ public class ChunkCacheSchematic implements BlockRenderView
         {
             for (int cz = pos.getZ() >> 4; cz <= (pos.getZ() + 15) >> 4; ++cz)
             {
-                WorldChunk chunk = this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ];
+                Chunk chunk = this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ];
 
                 if (chunk != null && chunk.method_12228(pos.getY(), pos.getY() + 15) == false) // isEmptyBetween
                 {
@@ -94,13 +94,13 @@ public class ChunkCacheSchematic implements BlockRenderView
 
     @Override
     @Nullable
-    public BlockEntity getBlockEntity(BlockPos pos)
+    public TileEntity getBlockEntity(BlockPos pos)
     {
-        return this.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
+        return this.getBlockEntity(pos, Chunk.CreateEntityType.CHECK);
     }
 
     @Nullable
-    public BlockEntity getBlockEntity(BlockPos pos, WorldChunk.CreationType type)
+    public TileEntity getBlockEntity(BlockPos pos, Chunk.CreateEntityType type)
     {
         int i = (pos.getX() >> 4) - this.chunkStartX;
         int j = (pos.getZ() >> 4) - this.chunkStartZ;
@@ -122,7 +122,7 @@ public class ChunkCacheSchematic implements BlockRenderView
     }
 
     @Override
-    public LightingProvider getLightingProvider()
+    public WorldLightManager getLightingProvider()
     {
         return this.lightingProvider;
     }

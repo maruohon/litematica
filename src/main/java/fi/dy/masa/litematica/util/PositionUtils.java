@@ -11,15 +11,15 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
 import fi.dy.masa.litematica.data.DataManager;
@@ -45,25 +45,25 @@ public class PositionUtils
     public static final Direction[] ADJACENT_SIDES_XY = new Direction[] { Direction.DOWN, Direction.UP, Direction.EAST, Direction.WEST };
     public static final Direction[] ADJACENT_SIDES_XZ = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
 
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i(-1,  0, -1) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  0, -1), new Vec3i( 1,  0, -1) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  0,  1), new Vec3i(-1,  0,  1) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  0,  1), new Vec3i( 1,  0,  1) };
-    private static final Vec3i[][] EDGE_NEIGHBOR_OFFSETS_Y = new Vec3i[][] { EDGE_NEIGHBOR_OFFSETS_XN_ZN, EDGE_NEIGHBOR_OFFSETS_XP_ZN, EDGE_NEIGHBOR_OFFSETS_XN_ZP, EDGE_NEIGHBOR_OFFSETS_XP_ZP };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZN = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i(-1,  0,  0), new Vector3i( 0,  0, -1), new Vector3i(-1,  0, -1) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZN = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i( 1,  0,  0), new Vector3i( 0,  0, -1), new Vector3i( 1,  0, -1) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_XN_ZP = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i(-1,  0,  0), new Vector3i( 0,  0,  1), new Vector3i(-1,  0,  1) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_XP_ZP = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i( 1,  0,  0), new Vector3i( 0,  0,  1), new Vector3i( 1,  0,  1) };
+    private static final Vector3i[][] EDGE_NEIGHBOR_OFFSETS_Y = new Vector3i[][] { EDGE_NEIGHBOR_OFFSETS_XN_ZN, EDGE_NEIGHBOR_OFFSETS_XP_ZN, EDGE_NEIGHBOR_OFFSETS_XN_ZP, EDGE_NEIGHBOR_OFFSETS_XP_ZP };
 
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_YN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0, -1,  0), new Vec3i(-1, -1,  0) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_YN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0, -1,  0), new Vec3i( 1, -1,  0) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XN_YP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i(-1,  0,  0), new Vec3i( 0,  1,  0), new Vec3i(-1,  1,  0) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_XP_YP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 1,  0,  0), new Vec3i( 0,  1,  0), new Vec3i( 1,  1,  0) };
-    private static final Vec3i[][] EDGE_NEIGHBOR_OFFSETS_Z = new Vec3i[][] { EDGE_NEIGHBOR_OFFSETS_XN_YN, EDGE_NEIGHBOR_OFFSETS_XP_YN, EDGE_NEIGHBOR_OFFSETS_XN_YP, EDGE_NEIGHBOR_OFFSETS_XP_YP };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_XN_YN = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i(-1,  0,  0), new Vector3i( 0, -1,  0), new Vector3i(-1, -1,  0) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_XP_YN = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i( 1,  0,  0), new Vector3i( 0, -1,  0), new Vector3i( 1, -1,  0) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_XN_YP = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i(-1,  0,  0), new Vector3i( 0,  1,  0), new Vector3i(-1,  1,  0) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_XP_YP = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i( 1,  0,  0), new Vector3i( 0,  1,  0), new Vector3i( 1,  1,  0) };
+    private static final Vector3i[][] EDGE_NEIGHBOR_OFFSETS_Z = new Vector3i[][] { EDGE_NEIGHBOR_OFFSETS_XN_YN, EDGE_NEIGHBOR_OFFSETS_XP_YN, EDGE_NEIGHBOR_OFFSETS_XN_YP, EDGE_NEIGHBOR_OFFSETS_XP_YP };
 
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YN_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0, -1,  0), new Vec3i( 0,  0, -1), new Vec3i( 0, -1, -1) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YP_ZN = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0,  1,  0), new Vec3i( 0,  0, -1), new Vec3i( 0,  1, -1) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YN_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0, -1,  0), new Vec3i( 0,  0,  1), new Vec3i( 0, -1,  1) };
-    private static final Vec3i[] EDGE_NEIGHBOR_OFFSETS_YP_ZP = new Vec3i[] { new Vec3i( 0,  0,  0), new Vec3i( 0,  1,  0), new Vec3i( 0,  0,  1), new Vec3i( 0,  1,  1) };
-    private static final Vec3i[][] EDGE_NEIGHBOR_OFFSETS_X = new Vec3i[][] { EDGE_NEIGHBOR_OFFSETS_YN_ZN, EDGE_NEIGHBOR_OFFSETS_YP_ZN, EDGE_NEIGHBOR_OFFSETS_YN_ZP, EDGE_NEIGHBOR_OFFSETS_YP_ZP };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_YN_ZN = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i( 0, -1,  0), new Vector3i( 0,  0, -1), new Vector3i( 0, -1, -1) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_YP_ZN = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i( 0,  1,  0), new Vector3i( 0,  0, -1), new Vector3i( 0,  1, -1) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_YN_ZP = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i( 0, -1,  0), new Vector3i( 0,  0,  1), new Vector3i( 0, -1,  1) };
+    private static final Vector3i[] EDGE_NEIGHBOR_OFFSETS_YP_ZP = new Vector3i[] { new Vector3i( 0,  0,  0), new Vector3i( 0,  1,  0), new Vector3i( 0,  0,  1), new Vector3i( 0,  1,  1) };
+    private static final Vector3i[][] EDGE_NEIGHBOR_OFFSETS_X = new Vector3i[][] { EDGE_NEIGHBOR_OFFSETS_YN_ZN, EDGE_NEIGHBOR_OFFSETS_YP_ZN, EDGE_NEIGHBOR_OFFSETS_YN_ZP, EDGE_NEIGHBOR_OFFSETS_YP_ZP };
 
-    public static Vec3i[] getEdgeNeighborOffsets(Direction.Axis axis, int cornerIndex)
+    public static Vector3i[] getEdgeNeighborOffsets(Direction.Axis axis, int cornerIndex)
     {
         switch (axis)
         {
@@ -183,7 +183,7 @@ public class PositionUtils
         return new BlockPos(Math.abs(x), Math.abs(y), Math.abs(z));
     }
 
-    public static BlockPos getRelativeEndPositionFromAreaSize(Vec3i size)
+    public static BlockPos getRelativeEndPositionFromAreaSize(Vector3i size)
     {
         int x = size.getX();
         int y = size.getY();
@@ -386,7 +386,7 @@ public class PositionUtils
     /**
      * Creates an enclosing AABB around the given positions. They will both be inside the box.
      */
-    public static net.minecraft.util.math.Box createEnclosingAABB(BlockPos pos1, BlockPos pos2)
+    public static net.minecraft.util.math.AxisAlignedBB createEnclosingAABB(BlockPos pos1, BlockPos pos2)
     {
         int minX = Math.min(pos1.getX(), pos2.getX());
         int minY = Math.min(pos1.getY(), pos2.getY());
@@ -398,7 +398,7 @@ public class PositionUtils
         return createAABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public static net.minecraft.util.math.Box createAABBFrom(IntBoundingBox bb)
+    public static net.minecraft.util.math.AxisAlignedBB createAABBFrom(IntBoundingBox bb)
     {
         return createAABB(bb.minX, bb.minY, bb.minZ, bb.maxX + 1, bb.maxY + 1, bb.maxZ + 1);
     }
@@ -406,7 +406,7 @@ public class PositionUtils
     /**
      * Creates an AABB for the given position
      */
-    public static net.minecraft.util.math.Box createAABBForPosition(BlockPos pos)
+    public static net.minecraft.util.math.AxisAlignedBB createAABBForPosition(BlockPos pos)
     {
         return createAABBForPosition(pos.getX(), pos.getY(), pos.getZ());
     }
@@ -414,7 +414,7 @@ public class PositionUtils
     /**
      * Creates an AABB for the given position
      */
-    public static net.minecraft.util.math.Box createAABBForPosition(int x, int y, int z)
+    public static net.minecraft.util.math.AxisAlignedBB createAABBForPosition(int x, int y, int z)
     {
         return createAABB(x, y, z, x + 1, y + 1, z + 1);
     }
@@ -422,9 +422,9 @@ public class PositionUtils
     /**
      * Creates an AABB with the given bounds
      */
-    public static net.minecraft.util.math.Box createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
+    public static net.minecraft.util.math.AxisAlignedBB createAABB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
-        return new net.minecraft.util.math.Box(minX, minY, minZ, maxX, maxY, maxZ);
+        return new net.minecraft.util.math.AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     /**
@@ -532,7 +532,7 @@ public class PositionUtils
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
-        World world = MinecraftClient.getInstance().world;
+        World world = Minecraft.getInstance().world;
 
         if (area == null || world == null)
         {
@@ -630,7 +630,7 @@ public class PositionUtils
     /**
      * Mirrors and then rotates the given position around the origin
      */
-    public static BlockPos getTransformedBlockPos(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
+    public static BlockPos getTransformedBlockPos(BlockPos pos, Mirror mirror, Rotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -664,7 +664,7 @@ public class PositionUtils
         }
     }
 
-    public static BlockPos getReverseTransformedBlockPos(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
+    public static BlockPos getReverseTransformedBlockPos(BlockPos pos, Mirror mirror, Rotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -714,7 +714,7 @@ public class PositionUtils
      * Does the opposite transform from getTransformedBlockPos(), to return the original,
      * non-transformed position from the transformed position.
      */
-    public static BlockPos getOriginalPositionFromTransformed(BlockPos pos, BlockMirror mirror, BlockRotation rotation)
+    public static BlockPos getOriginalPositionFromTransformed(BlockPos pos, Mirror mirror, Rotation rotation)
     {
         int x = pos.getX();
         int y = pos.getY();
@@ -757,7 +757,7 @@ public class PositionUtils
         return new BlockPos(x, y, z);
     }
 
-    public static Vec3d getTransformedPosition(Vec3d originalPos, BlockMirror mirror, BlockRotation rotation)
+    public static Vector3d getTransformedPosition(Vector3d originalPos, Mirror mirror, Rotation rotation)
     {
         double x = originalPos.x;
         double y = originalPos.y;
@@ -779,26 +779,26 @@ public class PositionUtils
         switch (rotation)
         {
             case COUNTERCLOCKWISE_90:
-                return new Vec3d(z, y, 1.0D - x);
+                return new Vector3d(z, y, 1.0D - x);
             case CLOCKWISE_90:
-                return new Vec3d(1.0D - z, y, x);
+                return new Vector3d(1.0D - z, y, x);
             case CLOCKWISE_180:
-                return new Vec3d(1.0D - x, y, 1.0D - z);
+                return new Vector3d(1.0D - x, y, 1.0D - z);
             default:
-                return transformed ? new Vec3d(x, y, z) : originalPos;
+                return transformed ? new Vector3d(x, y, z) : originalPos;
         }
     }
 
-    public static BlockRotation getReverseRotation(BlockRotation rotationIn)
+    public static Rotation getReverseRotation(Rotation rotationIn)
     {
         switch (rotationIn)
         {
             case COUNTERCLOCKWISE_90:
-                return BlockRotation.CLOCKWISE_90;
+                return Rotation.CLOCKWISE_90;
             case CLOCKWISE_90:
-                return BlockRotation.COUNTERCLOCKWISE_90;
+                return Rotation.COUNTERCLOCKWISE_90;
             case CLOCKWISE_180:
-                return BlockRotation.CLOCKWISE_180;
+                return Rotation.CLOCKWISE_180;
             default:
                 return rotationIn;
         }
@@ -868,39 +868,39 @@ public class PositionUtils
         return z2 > z1 ? Direction.SOUTH : Direction.WEST;
     }
 
-    public static BlockRotation cycleRotation(BlockRotation rotation, boolean reverse)
+    public static Rotation cycleRotation(Rotation rotation, boolean reverse)
     {
         int ordinal = rotation.ordinal();
 
         if (reverse)
         {
-            ordinal = ordinal == 0 ? BlockRotation.values().length - 1 : ordinal - 1;
+            ordinal = ordinal == 0 ? Rotation.values().length - 1 : ordinal - 1;
         }
         else
         {
-            ordinal = ordinal >= BlockRotation.values().length - 1 ? 0 : ordinal + 1;
+            ordinal = ordinal >= Rotation.values().length - 1 ? 0 : ordinal + 1;
         }
 
-        return BlockRotation.values()[ordinal];
+        return Rotation.values()[ordinal];
     }
 
-    public static BlockMirror cycleMirror(BlockMirror mirror, boolean reverse)
+    public static Mirror cycleMirror(Mirror mirror, boolean reverse)
     {
         int ordinal = mirror.ordinal();
 
         if (reverse)
         {
-            ordinal = ordinal == 0 ? BlockMirror.values().length - 1 : ordinal - 1;
+            ordinal = ordinal == 0 ? Mirror.values().length - 1 : ordinal - 1;
         }
         else
         {
-            ordinal = ordinal >= BlockMirror.values().length - 1 ? 0 : ordinal + 1;
+            ordinal = ordinal >= Mirror.values().length - 1 ? 0 : ordinal + 1;
         }
 
-        return BlockMirror.values()[ordinal];
+        return Mirror.values()[ordinal];
     }
 
-    public static String getRotationNameShort(BlockRotation rotation)
+    public static String getRotationNameShort(Rotation rotation)
     {
         switch (rotation)
         {
@@ -912,7 +912,7 @@ public class PositionUtils
         }
     }
 
-    public static String getMirrorName(BlockMirror mirror)
+    public static String getMirrorName(Mirror mirror)
     {
         switch (mirror)
         {
@@ -923,7 +923,7 @@ public class PositionUtils
         }
     }
 
-    public static float getRotatedYaw(float yaw, BlockRotation rotation)
+    public static float getRotatedYaw(float yaw, Rotation rotation)
     {
         yaw = MathHelper.wrapDegrees(yaw);
 
@@ -944,7 +944,7 @@ public class PositionUtils
         return yaw;
     }
 
-    public static float getMirroredYaw(float yaw, BlockMirror mirror)
+    public static float getMirroredYaw(float yaw, Mirror mirror)
     {
         yaw = MathHelper.wrapDegrees(yaw);
 

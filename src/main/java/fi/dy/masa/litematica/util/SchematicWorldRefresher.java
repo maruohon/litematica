@@ -6,7 +6,7 @@ import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.interfaces.IRangeChangeListener;
 import fi.dy.masa.malilib.util.LayerRange;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
@@ -14,7 +14,7 @@ public class SchematicWorldRefresher implements IRangeChangeListener
 {
     public static final SchematicWorldRefresher INSTANCE = new SchematicWorldRefresher();
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
 
     @Override
     public void updateAll()

@@ -11,19 +11,19 @@ import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.WorldGenerationProgressListenerFactory;
-import net.minecraft.server.command.CommandManager;
+import net.minecraft.world.chunk.listener.IChunkStatusListenerFactory;
+import net.minecraft.command.Commands;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.UserCache;
-import net.minecraft.world.level.storage.LevelStorage.Session;
+import net.minecraft.server.management.PlayerProfileCache;
+import net.minecraft.world.storage.SaveFormat.LevelSave;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer extends MinecraftServer
 {
-    private MixinIntegratedServer(Session session, Proxy proxy, DataFixer dataFixer, CommandManager commandManager,
+    private MixinIntegratedServer(LevelSave session, Proxy proxy, DataFixer dataFixer, Commands commandManager,
             MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository,
-            UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory)
+            PlayerProfileCache userCache, IChunkStatusListenerFactory worldGenerationProgressListenerFactory)
     {
         super(session, proxy, dataFixer, commandManager, minecraftSessionService, gameProfileRepository, userCache,
                 worldGenerationProgressListenerFactory);

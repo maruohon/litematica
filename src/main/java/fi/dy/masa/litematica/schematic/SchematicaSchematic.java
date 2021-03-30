@@ -12,24 +12,24 @@ import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.StructureBlockMode;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.state.properties.StructureMode;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.structure.Structure;
-import net.minecraft.structure.StructurePlacementData;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.world.gen.feature.template.Template;
+import net.minecraft.world.gen.feature.template.PlacementSettings;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
@@ -43,21 +43,21 @@ public class SchematicaSchematic
     public static final String FILE_EXTENSION = ".schematic";
     private LitematicaBlockStateContainer blocks;
     private Block[] palette;
-    private Map<BlockPos, CompoundTag> tiles = new HashMap<>();
-    private List<CompoundTag> entities = new ArrayList<>();
-    private Vec3i size = Vec3i.ZERO;
+    private Map<BlockPos, CompoundNBT> tiles = new HashMap<>();
+    private List<CompoundNBT> entities = new ArrayList<>();
+    private Vector3i size = Vector3i.ZERO;
     private String fileName;
 
     private SchematicaSchematic()
     {
     }
 
-    public Vec3i getSize()
+    public Vector3i getSize()
     {
         return this.size;
     }
 
-    public Map<BlockPos, CompoundTag> getTiles()
+    public Map<BlockPos, CompoundNBT> getTiles()
     {
         return this.tiles;
     }
@@ -69,8 +69,8 @@ public class SchematicaSchematic
 
         for (int i = 0; i < size; ++i)
         {
-            CompoundTag entityData = this.entities.get(i);
-            Vec3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
+            CompoundNBT entityData = this.entities.get(i);
+            Vector3d posVec = NBTUtils.readEntityPositionFromTag(entityData);
 
             if (posVec != null && entityData.isEmpty() == false)
             {
@@ -81,7 +81,7 @@ public class SchematicaSchematic
         return entityList;
     }
 
-    public void placeSchematicToWorld(World world, BlockPos posStart, StructurePlacementData placement, int setBlockStateFlags)
+    public void placeSchematicToWorld(World world, BlockPos posStart, PlacementSettings placement, int setBlockStateFlags)
     {
         final int width = this.size.getX();
         final int height = this.size.getY();
@@ -90,8 +90,8 @@ public class SchematicaSchematic
 
         if (this.blocks != null && numBlocks > 0 && this.blocks.getSize().equals(this.size))
         {
-            final BlockRotation rotation = placement.getRotation();
-            final BlockMirror mirror = placement.getMirror();
+            final Rotation rotation = placement.getRotation();
+            final Mirror mirror = placement.getMirror();
 
             // Place blocks and read any TileEntity data
             for (int y = 0; y < height; ++y)
@@ -102,16 +102,16 @@ public class SchematicaSchematic
                     {
                         BlockState state = this.blocks.get(x, y, z);
                         BlockPos pos = new BlockPos(x, y, z);
-                        CompoundTag teNBT = this.tiles.get(pos);
+                        CompoundNBT teNBT = this.tiles.get(pos);
 
-                        pos = Structure.transform(placement, pos).add(posStart);
+                        pos = Template.transform(placement, pos).add(posStart);
 
                         state = state.mirror(mirror);
                         state = state.rotate(rotation);
 
                         if (teNBT != null)
                         {
-                            BlockEntity te = world.getBlockEntity(pos);
+                            TileEntity te = world.getBlockEntity(pos);
 
                             if (te != null)
                             {
@@ -126,7 +126,7 @@ public class SchematicaSchematic
 
                         if (world.setBlockState(pos, state, setBlockStateFlags) && teNBT != null)
                         {
-                            BlockEntity te = world.getBlockEntity(pos);
+                            TileEntity te = world.getBlockEntity(pos);
 
                             if (te != null)
                             {
@@ -160,14 +160,14 @@ public class SchematicaSchematic
                         for (int x = 0; x < width; ++x)
                         {
                             BlockPos pos = new BlockPos(x, y, z);
-                            CompoundTag teNBT = this.tiles.get(pos);
+                            CompoundNBT teNBT = this.tiles.get(pos);
 
-                            pos = Structure.transform(placement, pos).add(posStart);
+                            pos = Template.transform(placement, pos).add(posStart);
                             world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
 
                             if (teNBT != null)
                             {
-                                BlockEntity te = world.getBlockEntity(pos);
+                                TileEntity te = world.getBlockEntity(pos);
 
                                 if (te != null)
                                 {
@@ -186,7 +186,7 @@ public class SchematicaSchematic
         }
     }
 
-    public void placeSchematicDirectlyToChunks(World world, BlockPos posStart, StructurePlacementData placement)
+    public void placeSchematicDirectlyToChunks(World world, BlockPos posStart, PlacementSettings placement)
     {
         final int width = this.size.getX();
         final int height = this.size.getY();
@@ -200,8 +200,8 @@ public class SchematicaSchematic
         {
             final BlockPos posMin = PositionUtils.getMinCorner(posStart, posEnd);
             final BlockPos posMax = PositionUtils.getMaxCorner(posStart, posEnd);
-            final BlockRotation rotation = placement.getRotation();
-            final BlockMirror mirror = placement.getMirror();
+            final Rotation rotation = placement.getRotation();
+            final Mirror mirror = placement.getMirror();
             final int cxStart = posMin.getX() >> 4;
             final int czStart = posMin.getZ() >> 4;
             final int cxEnd = posMax.getX() >> 4;
@@ -215,7 +215,7 @@ public class SchematicaSchematic
                     final int zMinChunk = Math.max(cz << 4, posMin.getZ());
                     final int xMaxChunk = Math.min((cx << 4) + 15, posMax.getX());
                     final int zMaxChunk = Math.min((cz << 4) + 15, posMax.getZ());
-                    WorldChunk chunk = world.getChunk(cx, cz);
+                    Chunk chunk = world.getChunk(cx, cz);
 
                     if (chunk == null)
                     {
@@ -231,7 +231,7 @@ public class SchematicaSchematic
                                 BlockState state = this.blocks.get(xSrc, ySrc, zSrc);
 
                                 BlockPos pos = new BlockPos(x, y, z);
-                                CompoundTag teNBT = this.tiles.get(pos);
+                                CompoundNBT teNBT = this.tiles.get(pos);
 
                                 // TODO The rotations need to be transformed back to get the correct source position in the schematic...
                                 /*
@@ -243,7 +243,7 @@ public class SchematicaSchematic
 
                                 if (teNBT != null)
                                 {
-                                    BlockEntity te = chunk.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
+                                    TileEntity te = chunk.getBlockEntity(pos, Chunk.CreateEntityType.CHECK);
 
                                     if (te != null)
                                     {
@@ -260,7 +260,7 @@ public class SchematicaSchematic
 
                                 if (teNBT != null)
                                 {
-                                    BlockEntity te = chunk.getBlockEntity(pos, WorldChunk.CreationType.CHECK);
+                                    TileEntity te = chunk.getBlockEntity(pos, Chunk.CreateEntityType.CHECK);
 
                                     if (te != null)
                                     {
@@ -293,16 +293,16 @@ public class SchematicaSchematic
         }
     }
 
-    private void addEntitiesToWorld(World world, BlockPos posStart, StructurePlacementData placement)
+    private void addEntitiesToWorld(World world, BlockPos posStart, PlacementSettings placement)
     {
-        BlockMirror mirror = placement.getMirror();
-        BlockRotation rotation = placement.getRotation();
+        Mirror mirror = placement.getMirror();
+        Rotation rotation = placement.getRotation();
 
-        for (CompoundTag tag : this.entities)
+        for (CompoundNBT tag : this.entities)
         {
-            Vec3d relativePos = NBTUtils.readEntityPositionFromTag(tag);
-            Vec3d transformedRelativePos = PositionUtils.getTransformedPosition(relativePos, mirror, rotation);
-            Vec3d realPos = transformedRelativePos.add(posStart.getX(), posStart.getY(), posStart.getZ());
+            Vector3d relativePos = NBTUtils.readEntityPositionFromTag(tag);
+            Vector3d transformedRelativePos = PositionUtils.getTransformedPosition(relativePos, mirror, rotation);
+            Vector3d realPos = transformedRelativePos.add(posStart.getX(), posStart.getY(), posStart.getZ());
             Entity entity = EntityUtils.createEntityAndPassengersFromNBT(tag, world);
 
             if (entity != null)
@@ -315,19 +315,19 @@ public class SchematicaSchematic
         }
     }
 
-    public Map<BlockPos, String> getDataStructureBlocks(BlockPos posStart, StructurePlacementData placement)
+    public Map<BlockPos, String> getDataStructureBlocks(BlockPos posStart, PlacementSettings placement)
     {
         Map<BlockPos, String> map = new HashMap<>();
 
-        for (Map.Entry<BlockPos, CompoundTag> entry : this.tiles.entrySet())
+        for (Map.Entry<BlockPos, CompoundNBT> entry : this.tiles.entrySet())
         {
-            CompoundTag tag = entry.getValue();
+            CompoundNBT tag = entry.getValue();
 
             if (tag.getString("id").equals("minecraft:structure_block") &&
                 StructureBlockMode.valueOf(tag.getString("mode")) == StructureBlockMode.DATA)
             {
                 BlockPos pos = entry.getKey();
-                pos = Structure.transform(placement, pos).add(posStart);
+                pos = Template.transform(placement, pos).add(posStart);
                 map.put(pos, tag.getString("metadata"));
             }
         }
@@ -363,13 +363,13 @@ public class SchematicaSchematic
                     BlockState state = world.getBlockState(posMutable);
                     this.blocks.set(relX, relY, relZ, state);
 
-                    BlockEntity te = world.getBlockEntity(posMutable);
+                    TileEntity te = world.getBlockEntity(posMutable);
 
                     if (te != null)
                     {
                         try
                         {
-                            CompoundTag nbt = te.toTag(new CompoundTag());
+                            CompoundNBT nbt = te.toTag(new CompoundNBT());
 
                             nbt.putInt("x", relX);
                             nbt.putInt("y", relY);
@@ -391,15 +391,15 @@ public class SchematicaSchematic
     private void readEntitiesFromWorld(World world, BlockPos posStart, BlockPos size)
     {
         this.entities.clear();
-        List<Entity> entities = world.getEntities((Entity) null, new net.minecraft.util.math.Box(posStart, posStart.add(size)));
+        List<Entity> entities = world.getEntities((Entity) null, new net.minecraft.util.math.AxisAlignedBB(posStart, posStart.add(size)));
 
         for (Entity entity : entities)
         {
-            CompoundTag tag = new CompoundTag();
+            CompoundNBT tag = new CompoundNBT();
 
             if (entity.saveToTag(tag))
             {
-                Vec3d pos = new Vec3d(entity.getX() - posStart.getX(), entity.getY() - posStart.getY(), entity.getZ() - posStart.getZ());
+                Vector3d pos = new Vector3d(entity.getX() - posStart.getX(), entity.getY() - posStart.getY(), entity.getZ() - posStart.getZ());
                 NBTUtils.writeEntityPositionToTag(pos, tag);
 
                 this.entities.add(tag);
@@ -434,7 +434,7 @@ public class SchematicaSchematic
         return null;
     }
 
-    public boolean readFromNBT(CompoundTag nbt)
+    public boolean readFromNBT(CompoundNBT nbt)
     {
         if (this.readBlocksFromNBT(nbt))
         {
@@ -450,7 +450,7 @@ public class SchematicaSchematic
         }
     }
 
-    private boolean readPaletteFromNBT(CompoundTag nbt)
+    private boolean readPaletteFromNBT(CompoundNBT nbt)
     {
         final Block air = Blocks.AIR;
         this.palette = new Block[4096];
@@ -459,7 +459,7 @@ public class SchematicaSchematic
         // Schematica palette
         if (nbt.contains("SchematicaMapping", Constants.NBT.TAG_COMPOUND))
         {
-            CompoundTag tag = nbt.getCompound("SchematicaMapping");
+            CompoundNBT tag = nbt.getCompound("SchematicaMapping");
             Set<String> keys = tag.getKeys();
 
             for (String key : keys)
@@ -475,7 +475,7 @@ public class SchematicaSchematic
                 Block block = null;
                 try
                 {
-                    block = Registry.BLOCK.get(new Identifier(key));
+                    block = Registry.BLOCK.get(new ResourceLocation(key));
                 }
                 catch (Exception e)
                 {
@@ -495,7 +495,7 @@ public class SchematicaSchematic
         // MCEdit2 palette
         else if (nbt.contains("BlockIDs", Constants.NBT.TAG_COMPOUND))
         {
-            CompoundTag tag = nbt.getCompound("BlockIDs");
+            CompoundNBT tag = nbt.getCompound("BlockIDs");
             Set<String> keys = tag.getKeys();
 
             for (String idStr : keys)
@@ -522,7 +522,7 @@ public class SchematicaSchematic
                 Block block = null;
                 try
                 {
-                    block = Registry.BLOCK.get(new Identifier(key));
+                    block = Registry.BLOCK.get(new ResourceLocation(key));
                 }
                 catch (Exception e)
                 {
@@ -549,7 +549,7 @@ public class SchematicaSchematic
         return true;
     }
 
-    private boolean readBlocksFromNBT(CompoundTag nbt)
+    private boolean readBlocksFromNBT(CompoundNBT nbt)
     {
         if (nbt.contains("Blocks", Constants.NBT.TAG_BYTE_ARRAY) == false ||
             nbt.contains("Data", Constants.NBT.TAG_BYTE_ARRAY) == false ||
@@ -591,7 +591,7 @@ public class SchematicaSchematic
             return false;
         }
 
-        this.size = new Vec3i(sizeX, sizeY, sizeZ);
+        this.size = new Vector3i(sizeX, sizeY, sizeZ);
         this.blocks = new LitematicaBlockStateContainer(sizeX, sizeY, sizeZ);
 
         if (nbt.contains("AddBlocks", Constants.NBT.TAG_BYTE_ARRAY))
@@ -685,10 +685,10 @@ public class SchematicaSchematic
         return true;
     }
 
-    private void readEntitiesFromNBT(CompoundTag nbt)
+    private void readEntitiesFromNBT(CompoundNBT nbt)
     {
         this.entities.clear();
-        ListTag tagList = nbt.getList("Entities", Constants.NBT.TAG_COMPOUND);
+        ListNBT tagList = nbt.getList("Entities", Constants.NBT.TAG_COMPOUND);
 
         for (int i = 0; i < tagList.size(); ++i)
         {
@@ -696,14 +696,14 @@ public class SchematicaSchematic
         }
     }
 
-    private void readTileEntitiesFromNBT(CompoundTag nbt)
+    private void readTileEntitiesFromNBT(CompoundNBT nbt)
     {
         this.tiles.clear();
-        ListTag tagList = nbt.getList("TileEntities", Constants.NBT.TAG_COMPOUND);
+        ListNBT tagList = nbt.getList("TileEntities", Constants.NBT.TAG_COMPOUND);
 
         for (int i = 0; i < tagList.size(); ++i)
         {
-            CompoundTag tag = tagList.getCompound(i);
+            CompoundNBT tag = tagList.getCompound(i);
             BlockPos pos = new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
             this.tiles.put(pos, tag);
         }
@@ -718,7 +718,7 @@ public class SchematicaSchematic
             try
             {
                 FileInputStream is = new FileInputStream(file);
-                CompoundTag nbt = NbtIo.readCompressed(is);
+                CompoundNBT nbt = CompressedStreamTools.readCompressed(is);
                 is.close();
 
                 return this.readFromNBT(nbt);

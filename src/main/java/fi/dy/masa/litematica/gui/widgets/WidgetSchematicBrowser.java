@@ -8,11 +8,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.renderer.texture.NativeImage;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3i;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiSchematicBrowserBase;
@@ -29,7 +29,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     protected static final FileFilter SCHEMATIC_FILTER = new FileFilterSchematics();
 
     protected final Map<File, SchematicMetadata> cachedMetadata = new HashMap<>();
-    protected final Map<File, Pair<Identifier, NativeImageBackedTexture>> cachedPreviewImages = new HashMap<>();
+    protected final Map<File, Pair<ResourceLocation, DynamicTexture>> cachedPreviewImages = new HashMap<>();
     protected final GuiSchematicBrowserBase parent;
     protected final int infoWidth;
     protected final int infoHeight;
@@ -143,7 +143,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 this.drawString(str, x, y, textColor);
                 y += 12;
 
-                Vec3i areaSize = meta.getEnclosingSize();
+                Vector3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
                 this.drawString(tmp, x + 4, y, valueColor);
                 y += 12;
@@ -154,7 +154,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 this.drawString(str, x, y, textColor);
                 y += 12;
 
-                Vec3i areaSize = meta.getEnclosingSize();
+                Vector3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
                 str = StringUtils.translate("litematica.gui.label.schematic_info.enclosing_size_value", tmp);
                 this.drawString(str, x, y, textColor);
@@ -167,7 +167,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             */
             //y += 12;
 
-            Pair<Identifier, NativeImageBackedTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
+            Pair<ResourceLocation, DynamicTexture> pair = this.cachedPreviewImages.get(entry.getFullPath());
 
             if (pair != null)
             {
@@ -186,7 +186,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
                 this.bindTexture(pair.getLeft());
-                DrawableHelper.drawTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+                AbstractGui.drawTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
     }
@@ -225,7 +225,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
 
     private void clearPreviewImages()
     {
-        for (Pair<Identifier, NativeImageBackedTexture> pair : this.cachedPreviewImages.values())
+        for (Pair<ResourceLocation, DynamicTexture> pair : this.cachedPreviewImages.values())
         {
             this.mc.getTextureManager().destroyTexture(pair.getLeft());
         }
@@ -244,8 +244,8 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 try
                 {
                     NativeImage image = new NativeImage(size, size, false);
-                    NativeImageBackedTexture tex = new NativeImageBackedTexture(image);
-                    Identifier rl = new Identifier("litematica", DigestUtils.sha1Hex(file.getAbsolutePath()));
+                    DynamicTexture tex = new DynamicTexture(image);
+                    ResourceLocation rl = new ResourceLocation("litematica", DigestUtils.sha1Hex(file.getAbsolutePath()));
                     this.mc.getTextureManager().registerTexture(rl, tex);
 
                     for (int y = 0, i = 0; y < size; ++y)

@@ -9,10 +9,10 @@ import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.ItemType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 
 public class MaterialListUtils
 {
@@ -31,7 +31,7 @@ public class MaterialListUtils
 
             if (container != null)
             {
-                Vec3i size = container.getSize();
+                Vector3i size = container.getSize();
                 final int sizeX = size.getX();
                 final int sizeY = size.getY();
                 final int sizeZ = size.getZ();
@@ -50,7 +50,7 @@ public class MaterialListUtils
             }
         }
 
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         return getMaterialList(countsTotal, countsTotal, new Object2IntOpenHashMap<>(), mc.player);
     }

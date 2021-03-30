@@ -5,22 +5,22 @@ import java.util.List;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.BlockModelRenderer;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.BlockModelRenderer;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.BakedQuad;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.crash.ReportedException;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.BlockRenderView;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.IBlockDisplayReader;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.mixin.IMixinBlockModelRenderer;
@@ -32,15 +32,15 @@ public class BlockModelRendererSchematic
 
     public BlockModelRendererSchematic(BlockColors blockColorsIn)
     {
-        this.vanillaRenderer = MinecraftClient.getInstance().getBlockRenderManager().getModelRenderer();
+        this.vanillaRenderer = Minecraft.getInstance().getBlockRenderManager().getModelRenderer();
     }
 
-    public boolean renderModel(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
-            VertexConsumer vertexConsumer, long rand)
+    public boolean renderModel(IBlockDisplayReader worldIn, IBakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
+            IVertexBuilder vertexConsumer, long rand)
     {
-        boolean ao = MinecraftClient.isAmbientOcclusionEnabled() && stateIn.getLuminance() == 0 && modelIn.useAmbientOcclusion();
+        boolean ao = Minecraft.isAmbientOcclusionEnabled() && stateIn.getLuminance() == 0 && modelIn.useAmbientOcclusion();
 
-        Vec3d offset = stateIn.getModelOffset(worldIn, posIn);
+        Vector3d offset = stateIn.getModelOffset(worldIn, posIn);
         matrices.translate(offset.x, offset.y, offset.z);
         int overlay = OverlayTexture.DEFAULT_UV;
 
@@ -58,15 +58,15 @@ public class BlockModelRendererSchematic
         catch (Throwable throwable)
         {
             CrashReport crashreport = CrashReport.create(throwable, "Tesselating block model");
-            CrashReportSection crashreportcategory = crashreport.addElement("Block model being tesselated");
-            CrashReportSection.addBlockInfo(crashreportcategory, posIn, stateIn);
+            CrashReportCategory crashreportcategory = crashreport.addElement("Block model being tesselated");
+            CrashReportCategory.addBlockInfo(crashreportcategory, posIn, stateIn);
             crashreportcategory.add("Using AO", Boolean.valueOf(ao));
-            throw new CrashException(crashreport);
+            throw new ReportedException(crashreport);
         }
     }
 
-    public boolean renderModelSmooth(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
-            VertexConsumer vertexConsumer, Random random, long seedIn, int overlay)
+    public boolean renderModelSmooth(IBlockDisplayReader worldIn, IBakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
+            IVertexBuilder vertexConsumer, Random random, long seedIn, int overlay)
     {
         boolean renderedSomething = false;
         float[] quadBounds = new float[Direction.values().length * 2];
@@ -100,8 +100,8 @@ public class BlockModelRendererSchematic
         return renderedSomething;
     }
 
-    public boolean renderModelFlat(BlockRenderView worldIn, BakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
-            VertexConsumer vertexConsumer, Random random, long seedIn, int overlay)
+    public boolean renderModelFlat(IBlockDisplayReader worldIn, IBakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
+            IVertexBuilder vertexConsumer, Random random, long seedIn, int overlay)
     {
         boolean renderedSomething = false;
         BitSet bitset = new BitSet(3);
@@ -134,15 +134,15 @@ public class BlockModelRendererSchematic
         return renderedSomething;
     }
 
-    private boolean shouldRenderModelSide(BlockRenderView worldIn, BlockState stateIn, BlockPos posIn, Direction side)
+    private boolean shouldRenderModelSide(IBlockDisplayReader worldIn, BlockState stateIn, BlockPos posIn, Direction side)
     {
         return DataManager.getRenderLayerRange().isPositionAtRenderEdgeOnSide(posIn, side) ||
                (Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && Configs.Visuals.RENDER_TRANSLUCENT_INNER_SIDES.getBooleanValue()) ||
                Block.shouldDrawSide(stateIn, worldIn, posIn, side);
     }
 
-    private void renderQuadsSmooth(BlockRenderView world, BlockState state, BlockPos pos, MatrixStack matrices,
-            VertexConsumer vertexConsumer, List<BakedQuad> list, float[] box, BitSet flags, AmbientOcclusionCalculator ambientOcclusionCalculator, int overlay)
+    private void renderQuadsSmooth(IBlockDisplayReader world, BlockState state, BlockPos pos, MatrixStack matrices,
+            IVertexBuilder vertexConsumer, List<BakedQuad> list, float[] box, BitSet flags, AmbientOcclusionCalculator ambientOcclusionCalculator, int overlay)
     {
         final int size = list.size();
 
@@ -165,8 +165,8 @@ public class BlockModelRendererSchematic
         }
     }
 
-    private void renderQuadsFlat(BlockRenderView world, BlockState state, BlockPos pos,
-            int light, int overlay, boolean useWorldLight, MatrixStack matrices, VertexConsumer vertexConsumer, List<BakedQuad> list, BitSet flags)
+    private void renderQuadsFlat(IBlockDisplayReader world, BlockState state, BlockPos pos,
+            int light, int overlay, boolean useWorldLight, MatrixStack matrices, IVertexBuilder vertexConsumer, List<BakedQuad> list, BitSet flags)
     {
         final int size = list.size();
 
@@ -186,7 +186,7 @@ public class BlockModelRendererSchematic
     }
 
     /*
-    private void fillQuadBounds(BlockRenderView world, BlockState stateIn, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] quadBounds, BitSet boundsFlags)
+    private void fillQuadBounds(IBlockDisplayReader world, BlockState stateIn, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] quadBounds, BitSet boundsFlags)
     {
         float f = 32.0F;
         float f1 = 32.0F;
@@ -259,7 +259,7 @@ public class BlockModelRendererSchematic
         private final float[] brightness = new float[4];
         private final int[] light = new int[4];
 
-        public void apply(BlockRenderView worldIn, BlockState state, BlockPos centerPos, Direction direction, float[] faceShape, BitSet shapeState)
+        public void apply(IBlockDisplayReader worldIn, BlockState state, BlockPos centerPos, Direction direction, float[] faceShape, BitSet shapeState)
         {
             /*
             BlockPos blockpos = shapeState.get(0) ? centerPos.offset(direction) : centerPos;
