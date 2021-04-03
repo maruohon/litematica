@@ -13,7 +13,7 @@ public abstract class MixinWorldRenderer
     @Shadow
     private net.minecraft.client.world.ClientWorld world;
 
-    @Inject(method = "loadRenderers()V", at = @At("RETURN"))
+    @Inject(method = "reload()V", at = @At("RETURN"))
     private void onLoadRenderers(CallbackInfo ci)
     {
         // Also (re-)load our renderer when the vanilla renderer gets reloaded
@@ -32,8 +32,8 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewisePrepareAndUpdate(frustum);
     }
 
-    @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", ordinal = 0, shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderBlockLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 0, shift = At.Shift.AFTER,
+            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
     private void renderLayerSolid(
             com.mojang.blaze3d.matrix.MatrixStack matrices,
             float tickDelta, long limitTime, boolean renderBlockOutline,
@@ -46,8 +46,8 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderSolid(matrices, tickDelta);
     }
 
-    @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", ordinal = 1, shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderBlockLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 1, shift = At.Shift.AFTER,
+            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
     private void renderLayerCutoutMipped(
             com.mojang.blaze3d.matrix.MatrixStack matrices,
             float tickDelta, long limitTime, boolean renderBlockOutline,
@@ -60,8 +60,8 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(matrices, tickDelta);
     }
 
-    @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", ordinal = 2, shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderBlockLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 2, shift = At.Shift.AFTER,
+            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
     private void renderLayerCutout(
             com.mojang.blaze3d.matrix.MatrixStack matrices,
             float tickDelta, long limitTime, boolean renderBlockOutline,
@@ -74,8 +74,8 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderCutout(matrices, tickDelta);
     }
 
-    @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", ordinal = 3, shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderBlockLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 3, shift = At.Shift.AFTER,
+            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
     private void renderLayerTranslucent(
             com.mojang.blaze3d.matrix.MatrixStack matrices,
             float tickDelta, long limitTime, boolean renderBlockOutline,
@@ -88,9 +88,9 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewiseRenderTranslucent(matrices, tickDelta);
     }
 
-    @Inject(method = "updateCameraAndRender",
+    @Inject(method = "render",
             at = @At(value = "INVOKE_STRING", args = "ldc=blockentities",
-                     target = "Lnet/minecraft/profiler/IProfiler;endStartSection(Ljava/lang/String;)V"))
+                     target = "Lnet/minecraft/profiler/IProfiler;swap(Ljava/lang/String;)V"))
     private void onPostRenderEntities(
             com.mojang.blaze3d.matrix.MatrixStack matrices,
             float tickDelta, long limitTime, boolean renderBlockOutline,
@@ -104,7 +104,7 @@ public abstract class MixinWorldRenderer
     }
 
     /*
-    @Inject(method = "updateCameraAndRender", at = @At("TAIL"))
+    @Inject(method = "render", at = @At("TAIL"))
     private void onRenderWorldLast(
             com.mojang.blaze3d.matrix.MatrixStack matrices,
             float tickDelta, long limitTime, boolean renderBlockOutline,

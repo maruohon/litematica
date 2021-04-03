@@ -12,7 +12,7 @@ import fi.dy.masa.litematica.world.ChunkProviderSchematic;
 @Mixin(net.minecraft.client.network.play.ClientPlayNetHandler.class)
 public abstract class MixinClientPlayNetworkHandler
 {
-    @Inject(method = "handleChunkData", at = @At("RETURN"))
+    @Inject(method = "onChunkData", at = @At("RETURN"))
     private void handleChunkData(net.minecraft.network.play.server.SChunkDataPacket packetIn, CallbackInfo ci)
     {
         if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
@@ -22,7 +22,7 @@ public abstract class MixinClientPlayNetworkHandler
         }
     }
 
-    @Inject(method = "processChunkUnload", at = @At("RETURN"))
+    @Inject(method = "onUnloadChunk", at = @At("RETURN"))
     private void processChunkUnload(net.minecraft.network.play.server.SUnloadChunkPacket packet, CallbackInfo ci)
     {
         if (Configs.Generic.LOAD_ENTIRE_SCHEMATICS.getBooleanValue() == false &&

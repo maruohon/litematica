@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(net.minecraft.client.renderer.BlockModelRenderer.class)
 public interface IMixinBlockModelRenderer
 {
-    @Invoker("fillQuadBounds")
+    @Invoker("getQuadDimensions")
     public void invokeGetQuadDimensions(
             net.minecraft.world.IBlockDisplayReader world,
             net.minecraft.block.BlockState state,
@@ -17,7 +17,7 @@ public interface IMixinBlockModelRenderer
             net.minecraft.util.Direction face,
             @Nullable float[] box, BitSet flags);
 
-    @Invoker("renderQuadSmooth")
+    @Invoker("renderQuad")
     public void invokeRenderQuad(
             net.minecraft.world.IBlockDisplayReader world,
             net.minecraft.block.BlockState state,

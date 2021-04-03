@@ -28,7 +28,7 @@ public abstract class MixinClientWorld extends World
         super(props, dimType, func, profiler, isClient);
     }
 
-    @Inject(method = "invalidateRegionAndSetBlock", at = @At("HEAD"))
+    @Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("HEAD"))
     private void onInvalidateRegionAndSetBlock(BlockPos pos, BlockState state, CallbackInfo ci)
     {
         SchematicVerifier.markVerifierBlockChanges(pos);

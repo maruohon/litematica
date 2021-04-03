@@ -16,7 +16,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 @Mixin(DebugOverlayGui.class)
 public abstract class MixinDebugHud extends AbstractGui
 {
-    @Inject(method = "getDebugInfoLeft", at = @At("RETURN"))
+    @Inject(method = "getLeftText", at = @At("RETURN"))
     private void addDebugLines(CallbackInfoReturnable<List<String>> cir)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();

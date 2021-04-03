@@ -18,7 +18,7 @@ public abstract class MixinMinecraftClient extends RecursiveEventLoop<Runnable>
         super(string_1);
     }
 
-    @Inject(method = "rightClickMouse()V", at = @At(value = "INVOKE",
+    @Inject(method = "doItemUse()V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/item/ItemStack;getCount()I", ordinal = 0), cancellable = true)
     private void handlePlacementRestriction(CallbackInfo ci)
     {
@@ -31,7 +31,7 @@ public abstract class MixinMinecraftClient extends RecursiveEventLoop<Runnable>
         }
     }
 
-    @Inject(method = "runTick()V", at = @At("HEAD"))
+    @Inject(method = "tick()V", at = @At("HEAD"))
     private void onRunTickStart(CallbackInfo ci)
     {
         DataManager.onClientTickStart();
