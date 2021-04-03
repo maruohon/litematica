@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -222,7 +223,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         selected = this.shouldRenderAsSelected();
 
@@ -267,20 +268,20 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         }
         else if (this.header1 != null)
         {
-            this.drawString(this.x + 4, this.y + 7, color, this.header1);
+            this.drawString(this.x + 4, this.y + 7, color, this.header1, matrixStack);
         }
         else if (this.mismatchInfo != null &&
                 (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE ||
                  this.mismatchEntry.blockMismatch.stateExpected.isAir() == false)) 
         {
-            this.drawString(x1 + 20, y, color, this.mismatchInfo.nameExpected);
+            this.drawString(x1 + 20, y, color, this.mismatchInfo.nameExpected, matrixStack);
 
             if (this.mismatchEntry.mismatchType != MismatchType.CORRECT_STATE)
             {
-                this.drawString(x2 + 20, y, color, this.mismatchInfo.nameFound);
+                this.drawString(x2 + 20, y, color, this.mismatchInfo.nameFound, matrixStack);
             }
 
-            this.drawString(x3, y, color, String.valueOf(this.count));
+            this.drawString(x3, y, color, String.valueOf(this.count), matrixStack, matrixStack);
 
             y = this.y + 3;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
@@ -330,11 +331,11 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             RenderSystem.popMatrix();
         }
 
-        super.render(mouseX, mouseY, selected);
+        super.render(mouseX, mouseY, selected, matrixStack);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.getX())
         {
@@ -356,7 +357,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 y = mouseY - height - 2;
             }
 
-            this.mismatchInfo.render(x, y, this.mc);
+            this.mismatchInfo.render(x, y, this.mc, matrixStack);
 
             RenderSystem.popMatrix();
         }
@@ -428,7 +429,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             return this.totalHeight;
         }
 
-        public void render(int x, int y, Minecraft mc)
+        public void render(int x, int y, Minecraft mc, MatrixStack matrixStack)
         {
             if (this.stateExpected != null && this.stateFound != null)
             {
@@ -444,8 +445,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
                 String strExpected = pre + StringUtils.translate("litematica.gui.label.schematic_verifier.expected") + GuiBase.TXT_RST;
                 String strFound =    pre + StringUtils.translate("litematica.gui.label.schematic_verifier.found") + GuiBase.TXT_RST;
-                textRenderer.draw(strExpected, x1, y, 0xFFFFFFFF);
-                textRenderer.draw(strFound,    x2, y, 0xFFFFFFFF);
+                textRenderer.draw(strExpected, x1, y, 0xFFFFFFFF, matrixStack);
+                textRenderer.draw(strFound,    x2, y, 0xFFFFFFFF, matrixStack);
 
                 y += 12;
 

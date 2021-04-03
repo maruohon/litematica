@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.malilib.gui.GuiTextFieldGeneric;
 import fi.dy.masa.malilib.gui.Message.MessageType;
@@ -131,11 +132,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     }
 
     @Override
-    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.drawContents(mouseX, mouseY, partialTicks);
+        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
 
-        this.textField.render(mouseX, mouseY, partialTicks);
+        this.textField.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override

@@ -20,7 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.LongArrayNBT;
@@ -61,7 +61,7 @@ public class LitematicaSchematic
 {
     public static final String FILE_EXTENSION = ".litematic";
     public static final int SCHEMATIC_VERSION = 5;
-    public static final int MINECRAFT_DATA_VERSION = SharedConstants.getVersion().getWorldVersion();
+    public static final int MINECRAFT_DATA_VERSION = SharedConstants.getGameVersion().getWorldVersion();
 
     private final Map<String, LitematicaBlockStateContainer> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, CompoundNBT>> tileEntities = new HashMap<>();
@@ -340,10 +340,10 @@ public class LitematicaSchematic
                         continue;
                     }
 
-                    posMutable.setPos(x, y, z);
+                    posMutable.set(x, y, z);
                     CompoundNBT teNBT = tileMap.get(posMutable);
 
-                    posMutable.setPos( posMinRel.getX() + x - regionPos.getX(),
+                    posMutable.set( posMinRel.getX() + x - regionPos.getX(),
                                     posMinRel.getY() + y - regionPos.getY(),
                                     posMinRel.getZ() + z - regionPos.getZ());
 
@@ -371,9 +371,9 @@ public class LitematicaSchematic
 
                     if (teOld != null)
                     {
-                        if (teOld instanceof Inventory)
+                        if (teOld instanceof IInventory)
                         {
-                            ((Inventory) teOld).clear();
+                            ((IInventory) teOld).clear();
                         }
 
                         world.setBlockState(pos, barrier, 0x14);
@@ -416,7 +416,7 @@ public class LitematicaSchematic
                 {
                     for (int x = 0; x < sizeX; ++x)
                     {
-                        posMutable.setPos( posMinRel.getX() + x - regionPos.getX(),
+                        posMutable.set( posMinRel.getX() + x - regionPos.getX(),
                                         posMinRel.getY() + y - regionPos.getY(),
                                         posMinRel.getZ() + z - regionPos.getZ());
                         BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement).add(origin);
@@ -612,10 +612,10 @@ public class LitematicaSchematic
                         continue;
                     }
 
-                    posMutable.setPos(x, y, z);
+                    posMutable.set(x, y, z);
                     CompoundNBT teNBT = tileMap.get(posMutable);
 
-                    posMutable.setPos( posMinRel.getX() + x - regionPos.getX(),
+                    posMutable.set( posMinRel.getX() + x - regionPos.getX(),
                                     posMinRel.getY() + y - regionPos.getY(),
                                     posMinRel.getZ() + z - regionPos.getZ());
 
@@ -632,9 +632,9 @@ public class LitematicaSchematic
 
                         if (te != null)
                         {
-                            if (te instanceof Inventory)
+                            if (te instanceof IInventory)
                             {
-                                ((Inventory) te).clear();
+                                ((IInventory) te).clear();
                             }
 
                             world.setBlockState(pos, barrier, 0x14);
@@ -678,7 +678,7 @@ public class LitematicaSchematic
                 {
                     for (int x = startZ; x <= endX; ++x)
                     {
-                        posMutable.setPos( posMinRel.getX() + x - regionPos.getX(),
+                        posMutable.set( posMinRel.getX() + x - regionPos.getX(),
                                         posMinRel.getY() + y - regionPos.getY(),
                                         posMinRel.getZ() + z - regionPos.getZ());
                         BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement).add(origin);
@@ -754,7 +754,7 @@ public class LitematicaSchematic
             net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
             BlockPos regionPosAbs = box.getPos1();
             List<EntityInfo> list = new ArrayList<>();
-            List<Entity> entities = world.getEntities((Entity) null, bb, null);
+            List<Entity> entities = world.getOtherEntities((Entity) null, bb, null);
 
             for (Entity entity : entities)
             {
@@ -788,7 +788,7 @@ public class LitematicaSchematic
             }
 
             net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createAABBFrom(entry.getValue());
-            List<Entity> entities = world.getEntities((Entity) null, bb, null);
+            List<Entity> entities = world.getOtherEntities((Entity) null, bb, null);
             BlockPos regionPosAbs = box.getPos1();
 
             for (Entity entity : entities)
@@ -844,7 +844,7 @@ public class LitematicaSchematic
                 {
                     for (int x = 0; x < sizeX; ++x)
                     {
-                        posMutable.setPos(x + startX, y + startY, z + startZ);
+                        posMutable.set(x + startX, y + startY, z + startZ);
                         BlockState state = world.getBlockState(posMutable);
                         container.set(x, y, z, state);
 
@@ -970,7 +970,7 @@ public class LitematicaSchematic
                 {
                     for (int x = startX; x <= endX; ++x)
                     {
-                        posMutable.setPos(x + offsetX, y + offsetY, z + offsetZ);
+                        posMutable.set(x + offsetX, y + offsetY, z + offsetZ);
                         BlockState state = world.getBlockState(posMutable);
                         container.set(x, y, z, state);
 

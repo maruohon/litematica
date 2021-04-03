@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.io.File;
 import java.io.FileFilter;
 import javax.annotation.Nullable;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
@@ -69,7 +70,7 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
     }
 
     @Override
-    protected void drawAdditionalContents(int mouseX, int mouseY)
+    protected void drawAdditionalContents(int mouseX, int mouseY, MatrixStack matrixStack)
     {
         int x = this.posX + this.totalWidth - this.infoWidth + 4;
         int y = this.posY + 4;
@@ -86,26 +87,26 @@ public class WidgetSchematicProjectBrowser extends WidgetFileBrowserBase impleme
             int color = 0xFFB0B0B0;
 
             str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
-            this.drawString(str, x, y, color);
+            this.drawString(str, x, y, color, matrixStack);
             y += 12;
-            this.drawString(w + project.getName() + r, x + 8, y, color);
+            this.drawString(w + project.getName() + r, x + 8, y, color, matrixStack);
             y += 12;
             int versionId = project .getCurrentVersionId();
             String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
             str = StringUtils.translate("litematica.gui.label.schematic_projects.version", strVer, w + project.getVersionCount() + r);
-            this.drawString(str, x, y, color);
+            this.drawString(str, x, y, color, matrixStack);
             y += 12;
             SchematicVersion version = project.getCurrentVersion();
 
             if (version != null)
             {
                 str = StringUtils.translate("litematica.gui.label.schematic_projects.origin");
-                this.drawString(str, x, y, color);
+                this.drawString(str, x, y, color, matrixStack);
                 y += 12;
 
                 BlockPos o = project.getOrigin();
                 str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
-                this.drawString(str, x + 8, y, color);
+                this.drawString(str, x + 8, y, color, matrixStack);
             }
         }
     }

@@ -175,7 +175,7 @@ public class RayTraceUtils
         if (pos != null)
         {
             net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
-            Optional<Vector3d> optional = bb.rayTrace(start, end);
+            Optional<Vector3d> optional = bb.raycast(start, end);
 
             if (optional.isPresent())
             {
@@ -199,7 +199,7 @@ public class RayTraceUtils
         if (box.getPos1() != null && box.getPos2() != null)
         {
             net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-            Optional<Vector3d> optional = bb.rayTrace(start, end);
+            Optional<Vector3d> optional = bb.raycast(start, end);
 
             if (optional.isPresent())
             {
@@ -231,7 +231,7 @@ public class RayTraceUtils
             if (box.getPos1() != null && box.getPos2() != null)
             {
                 net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
-                Optional<Vector3d> optional = bb.rayTrace(start, end);
+                Optional<Vector3d> optional = bb.raycast(start, end);
 
                 if (optional.isPresent())
                 {
@@ -255,7 +255,7 @@ public class RayTraceUtils
         if (pos != null)
         {
             net.minecraft.util.math.AxisAlignedBB bb = PositionUtils.createAABBForPosition(pos);
-            Optional<Vector3d> optional = bb.rayTrace(start, end);
+            Optional<Vector3d> optional = bb.raycast(start, end);
 
             if (optional.isPresent())
             {
@@ -305,7 +305,7 @@ public class RayTraceUtils
         {
             if (pos != null)
             {
-                BlockRayTraceResult hit = net.minecraft.util.math.AxisAlignedBB.rayTrace(ImmutableList.of(FULL_BLOCK_BOUNDS), eyesPos, lookEndPos, pos);
+                BlockRayTraceResult hit = net.minecraft.util.math.AxisAlignedBB.raycast(ImmutableList.of(FULL_BLOCK_BOUNDS), eyesPos, lookEndPos, pos);
 
                 if (hit != null)
                 {
@@ -506,7 +506,7 @@ public class RayTraceUtils
         RayTraceResult result = rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, false, false, 1000);
 
         net.minecraft.util.math.AxisAlignedBB bb = entity.getBoundingBox().expand(rangedLookRot.x, rangedLookRot.y, rangedLookRot.z).expand(1d, 1d, 1d);
-        List<Entity> list = world.getEntities(entity, bb);
+        List<Entity> list = world.getOtherEntities(entity, bb);
 
         double closest = result != null && result.getType() == RayTraceResult.Type.BLOCK ? eyesPos.distanceTo(result.getPos()) : Double.MAX_VALUE;
         Entity targetEntity = null;
@@ -515,7 +515,7 @@ public class RayTraceUtils
         for (int i = 0; i < list.size(); i++)
         {
             Entity entityTmp = list.get(i);
-            Optional<Vector3d> optionalTmp = entityTmp.getBoundingBox().rayTrace(eyesPos, lookEndPos);
+            Optional<Vector3d> optionalTmp = entityTmp.getBoundingBox().raycast(eyesPos, lookEndPos);
 
             if (optionalTmp.isPresent())
             {
@@ -608,12 +608,12 @@ public class RayTraceUtils
 
                 if (blockCollidable)
                 {
-                    trace = blockShape.rayTrace(data.start, data.end, data.blockPos);
+                    trace = blockShape.raycast(data.start, data.end, data.blockPos);
                 }
 
                 if (trace == null && fluidCollidable)
                 {
-                    trace = fluidState.getShape(world, data.blockPos).rayTrace(data.start, data.end, data.blockPos);
+                    trace = fluidState.getShape(world, data.blockPos).raycast(data.start, data.end, data.blockPos);
                 }
 
                 if (trace != null)
@@ -651,12 +651,12 @@ public class RayTraceUtils
 
                 if (blockCollidable)
                 {
-                    traceTmp = blockShape.rayTrace(data.start, data.end, data.blockPos);
+                    traceTmp = blockShape.raycast(data.start, data.end, data.blockPos);
                 }
 
                 if (traceTmp == null && fluidCollidable)
                 {
-                    traceTmp = fluidState.getShape(world, data.blockPos).rayTrace(data.start, data.end, data.blockPos);
+                    traceTmp = fluidState.getShape(world, data.blockPos).raycast(data.start, data.end, data.blockPos);
                 }
 
                 if (traceTmp != null)

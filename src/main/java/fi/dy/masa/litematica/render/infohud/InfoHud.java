@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.render.infohud;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.malilib.config.HudAlignment;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -57,7 +58,7 @@ public class InfoHud
         return Configs.InfoOverlays.INFO_HUD_OFFSET_Y.getIntegerValue();
     }
 
-    public void renderHud()
+    public void renderHud(MatrixStack matrixStack)
     {
         if (this.mc.player != null && this.shouldRender())
         {
@@ -75,7 +76,7 @@ public class InfoHud
 
             if (this.lineList.isEmpty() == false)
             {
-                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(xOffset, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList);
+                int ySize = fi.dy.masa.malilib.render.RenderUtils.renderText(xOffset, yOffset, scale, 0xFFFFFFFF, 0x80000000, this.getHudAlignment(), true, true, this.lineList, matrixStack);
                 yOffset += (int) Math.ceil(ySize * scale);
             }
 

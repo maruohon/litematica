@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
 import fi.dy.masa.litematica.gui.Icons;
@@ -69,7 +70,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -97,7 +98,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
 
         String name = this.placement.getName();
         String pre = this.placement.isEnabled() ? GuiBase.TXT_GREEN : GuiBase.TXT_RED;
-        this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name);
+        this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, pre + name, matrixStack);
 
         Icons icon;
 
@@ -127,23 +128,23 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             icon.renderAt(this.buttonsStartX - 26, this.y + 6, this.zLevel, false, false);
         }
 
-        super.render(mouseX, mouseY, placementSelected);
+        super.render(mouseX, mouseY, placementSelected, matrixStack);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         if (this.placement.isLocked() &&
             GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 38, this.y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_locked");
-            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str), matrixStack);
         }
         else if (this.placement.isRegionPlacementModified() &&
                  GuiBase.isMouseOver(mouseX, mouseY, this.x + this.buttonsStartX - 25, this.y + 6, 11, 11))
         {
             String str = StringUtils.translate("litematica.hud.schematic_placement.hover_info.placement_modified");
-            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str));
+            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(str), matrixStack);
         }
         else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 18, this.height))
         {
@@ -161,7 +162,7 @@ public class WidgetSchematicPlacement extends WidgetListEntryBase<SchematicPlace
             String strSize = String.format("%d x %d x %d", size.getX(), size.getY(), size.getZ());
             text.add(StringUtils.translate("litematica.gui.label.schematic_placement.enclosing_size", strSize));
 
-            RenderUtils.drawHoverText(mouseX, mouseY, text);
+            RenderUtils.drawHoverText(mouseX, mouseY, text, matrixStack);
         }
     }
 

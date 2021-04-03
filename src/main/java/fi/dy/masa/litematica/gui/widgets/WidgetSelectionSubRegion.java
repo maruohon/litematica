@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSubRegion;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
@@ -58,7 +59,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -84,13 +85,13 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0, 0.001f);
         }
 
-        this.drawString(this.x + 2, this.y + 7, 0xFFFFFFFF, this.entry);
+        this.drawString(this.x + 2, this.y + 7, 0xFFFFFFFF, this.entry, matrixStack);
 
-        super.render(mouseX, mouseY, selected);
+        super.render(mouseX, mouseY, selected, matrixStack);
     }
 
     @Override
-    public void postRenderHovered(int mouseX, int mouseY, boolean selected)
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         List<String> text = new ArrayList<>();
 
@@ -123,7 +124,7 @@ public class WidgetSelectionSubRegion extends WidgetListEntryBase<String>
 
         if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - offset, this.height))
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, text);
+            RenderUtils.drawHoverText(mouseX, mouseY, text, matrixStack);
         }
     }
 

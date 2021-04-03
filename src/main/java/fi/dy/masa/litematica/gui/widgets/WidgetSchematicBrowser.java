@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.client.gui.AbstractGui;
@@ -72,12 +73,12 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
     }
 
     @Override
-    protected void drawAdditionalContents(int mouseX, int mouseY)
+    protected void drawAdditionalContents(int mouseX, int mouseY, MatrixStack matrixStack)
     {
-        this.drawSelectedSchematicInfo(this.getLastSelectedEntry());
+        this.drawSelectedSchematicInfo(this.getLastSelectedEntry(), matrixStack);
     }
 
-    protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry)
+    protected void drawSelectedSchematicInfo(@Nullable DirectoryEntry entry, MatrixStack matrixStack)
     {
         int x = this.posX + this.totalWidth - this.infoWidth;
         int y = this.posY;
@@ -102,68 +103,68 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
             int valueColor = 0xFFFFFFFF;
 
             String str = StringUtils.translate("litematica.gui.label.schematic_info.name");
-            this.drawString(str, x, y, textColor);
+            this.drawString(matrixStack, str, x, y, textColor);
             y += 12;
 
-            this.drawString(meta.getName(), x + 4, y, valueColor);
+            this.drawString(matrixStack, meta.getName(), x + 4, y, valueColor);
             y += 12;
 
             str = StringUtils.translate("litematica.gui.label.schematic_info.schematic_author", meta.getAuthor());
-            this.drawString(str, x, y, textColor);
+            this.drawString(matrixStack, str, x, y, textColor);
             y += 12;
 
             String strDate = DATE_FORMAT.format(new Date(meta.getTimeCreated()));
             str = StringUtils.translate("litematica.gui.label.schematic_info.time_created", strDate);
-            this.drawString(str, x, y, textColor);
+            this.drawString(matrixStack, str, x, y, textColor);
             y += 12;
 
             if (meta.hasBeenModified())
             {
                 strDate = DATE_FORMAT.format(new Date(meta.getTimeModified()));
                 str = StringUtils.translate("litematica.gui.label.schematic_info.time_modified", strDate);
-                this.drawString(str, x, y, textColor);
+                this.drawString(matrixStack, str, x, y, textColor);
                 y += 12;
             }
 
             str = StringUtils.translate("litematica.gui.label.schematic_info.region_count", meta.getRegionCount());
-            this.drawString(str, x, y, textColor);
+            this.drawString(matrixStack, str, x, y, textColor);
             y += 12;
 
             if (this.parent.height >= 340)
             {
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_volume", meta.getTotalVolume());
-                this.drawString(str, x, y, textColor);
+                this.drawString(matrixStack, str, x, y, textColor);
                 y += 12;
 
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_blocks", meta.getTotalBlocks());
-                this.drawString(str, x, y, textColor);
+                this.drawString(matrixStack, str, x, y, textColor);
                 y += 12;
 
                 str = StringUtils.translate("litematica.gui.label.schematic_info.enclosing_size");
-                this.drawString(str, x, y, textColor);
+                this.drawString(matrixStack, str, x, y, textColor);
                 y += 12;
 
                 Vector3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
-                this.drawString(tmp, x + 4, y, valueColor);
+                this.drawString(matrixStack, tmp, x + 4, y, valueColor);
                 y += 12;
             }
             else
             {
                 str = StringUtils.translate("litematica.gui.label.schematic_info.total_blocks_and_volume", meta.getTotalBlocks(), meta.getTotalVolume());
-                this.drawString(str, x, y, textColor);
+                this.drawString(matrixStack, str, x, y, textColor);
                 y += 12;
 
                 Vector3i areaSize = meta.getEnclosingSize();
                 String tmp = String.format("%d x %d x %d", areaSize.getX(), areaSize.getY(), areaSize.getZ());
                 str = StringUtils.translate("litematica.gui.label.schematic_info.enclosing_size_value", tmp);
-                this.drawString(str, x, y, textColor);
+                this.drawString(matrixStack, str, x, y, textColor);
                 y += 12;
             }
 
             /*
             str = StringUtils.translate("litematica.gui.label.schematic_info.description");
-            this.drawString(x, y, textColor, str);
+            this.drawString(matrixStack, x, y, textColor, str);
             */
             //y += 12;
 

@@ -36,7 +36,7 @@ public class LitematicaBitArray
         }
         else
         {
-            this.longArray = new long[MathHelper.roundUp(arraySizeIn * bitsPerEntryIn, 64) / 64];
+            this.longArray = new long[MathHelper.roundUpToMultiple(arraySizeIn * bitsPerEntryIn, 64) / 64];
         }
     }
 

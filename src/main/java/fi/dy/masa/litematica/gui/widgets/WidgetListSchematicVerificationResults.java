@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui.widgets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
 import fi.dy.masa.litematica.gui.GuiSchematicVerifier.BlockMismatchEntry;
 import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier.BlockMismatch;
@@ -37,9 +38,9 @@ public class WidgetListSchematicVerificationResults extends WidgetListBase<Block
     }
 
     @Override
-    public void drawContents(int mouseX, int mouseY, float partialTicks)
+    public void drawContents(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.drawContents(mouseX, mouseY, partialTicks);
+        super.drawContents(matrixStack, mouseX, mouseY, partialTicks);
         lastScrollbarPosition = this.scrollBar.getValue();
     }
 

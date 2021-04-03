@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
@@ -29,7 +30,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
     }
 
     @Override
-    public void render(int mouseX, int mouseY, boolean selected)
+    public void render(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -49,9 +50,9 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         }
 
         String name = this.getEntry().getDisplayName();
-        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name);
+        this.drawString(this.x + 4, this.y + 7, 0xFFFFFFFF, name, matrixStack);
 
-        this.drawSubWidgets(mouseX, mouseY);
+        this.drawSubWidgets(mouseX, mouseY, matrixStack);
 
         RenderUtils.disableDiffuseLighting();
         RenderSystem.disableLighting();

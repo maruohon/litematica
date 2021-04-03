@@ -15,7 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.state.properties.StructureMode;
 import net.minecraft.entity.Entity;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -115,9 +115,9 @@ public class SchematicaSchematic
 
                             if (te != null)
                             {
-                                if (te instanceof Inventory)
+                                if (te instanceof IInventory)
                                 {
-                                    ((Inventory) te).clear();
+                                    ((IInventory) te).clear();
                                 }
 
                                 world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 0x14);
@@ -247,9 +247,9 @@ public class SchematicaSchematic
 
                                     if (te != null)
                                     {
-                                        if (te instanceof Inventory)
+                                        if (te instanceof IInventory)
                                         {
-                                            ((Inventory) te).clear();
+                                            ((IInventory) te).clear();
                                         }
 
                                         world.setBlockState(pos, Blocks.BARRIER.getDefaultState(), 0x14);
@@ -324,7 +324,7 @@ public class SchematicaSchematic
             CompoundNBT tag = entry.getValue();
 
             if (tag.getString("id").equals("minecraft:structure_block") &&
-                StructureBlockMode.valueOf(tag.getString("mode")) == StructureBlockMode.DATA)
+                StructureMode.valueOf(tag.getString("mode")) == StructureMode.DATA)
             {
                 BlockPos pos = entry.getKey();
                 pos = Template.transform(placement, pos).add(posStart);
@@ -391,7 +391,7 @@ public class SchematicaSchematic
     private void readEntitiesFromWorld(World world, BlockPos posStart, BlockPos size)
     {
         this.entities.clear();
-        List<Entity> entities = world.getEntities((Entity) null, new net.minecraft.util.math.AxisAlignedBB(posStart, posStart.add(size)));
+        List<Entity> entities = world.getOtherEntities((Entity) null, new net.minecraft.util.math.AxisAlignedBB(posStart, posStart.add(size)));
 
         for (Entity entity : entities)
         {
