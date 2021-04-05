@@ -131,7 +131,7 @@ public class LitematicaRenderer
         frustum.setPosition(x, y, z);
 
         this.mc.getProfiler().swap("prepare_terrain");
-        this.mc.getTextureManager().bindTexture(AtlasTexture.BLOCK_ATLAS_TEX);
+        this.mc.getTextureManager().bindTexture(AtlasTexture.BLOCK_ATLAS_TEXTURE);
         fi.dy.masa.malilib.render.RenderUtils.disableDiffuseLighting();
         WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
@@ -194,7 +194,7 @@ public class LitematicaRenderer
 
             RenderSystem.enableCull();
             RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F);
-            this.mc.getTextureManager().bindTexture(AtlasTexture.BLOCK_ATLAS_TEX);
+            this.mc.getTextureManager().bindTexture(AtlasTexture.BLOCK_ATLAS_TEXTURE);
             RenderSystem.shadeModel(GL11.GL_SMOOTH);
 
             this.mc.getProfiler().swap("translucent");

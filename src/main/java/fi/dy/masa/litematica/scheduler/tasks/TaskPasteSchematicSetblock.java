@@ -165,7 +165,8 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         {
             if (this.mc.player != null)
             {
-                this.comparator.setReferencePosition(fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.mc.player));
+//                this.comparator.setReferencePosition(fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.mc.player));
+                this.comparator.setReferencePosition(new BlockPos(Math.floor(this.mc.player.getX()), Math.floor(this.mc.player.getY()), Math.floor(this.mc.player.getZ())));
                 Collections.sort(this.chunks, this.comparator);
             }
 
@@ -257,7 +258,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, ClientPlayerEntity player)
     {
         net.minecraft.util.math.AxisAlignedBB bb = new net.minecraft.util.math.AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
-        List<Entity> entities = worldSchematic.getEntities((Entity) null, bb, null);
+        List<Entity> entities = worldSchematic.getOtherEntities((Entity) null, bb, null);
 
         for (Entity entity : entities)
         {

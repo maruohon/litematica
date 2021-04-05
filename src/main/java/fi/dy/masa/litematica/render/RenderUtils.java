@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.BakedQuad;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.vector.Vector3d;
@@ -612,7 +612,7 @@ public class RenderUtils
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
             World world, BlockPos pos, Minecraft mc)
     {
-        Inventory inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
+        IInventory inv = fi.dy.masa.malilib.util.InventoryUtils.getInventory(world, pos);
 
         if (inv != null)
         {
@@ -626,7 +626,7 @@ public class RenderUtils
     }
 
     public static int renderInventoryOverlay(BlockInfoAlignment align, LeftRight side, int offY,
-            Inventory inv, InventoryRenderType type, InventoryProperties props, Minecraft mc)
+            IInventory inv, InventoryRenderType type, InventoryProperties props, Minecraft mc)
     {
         int xInv = 0;
         int yInv = 0;

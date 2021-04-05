@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import javax.annotation.Nullable;
 import com.mojang.datafixers.DataFixer;
 import net.minecraft.block.Block;
@@ -33,7 +34,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.world.gen.feature.template.Template;
 import net.minecraft.world.gen.feature.template.PlacementSettings;
-import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -160,7 +161,7 @@ public class WorldUtils
 
             PlacementSettings placementSettings = new PlacementSettings();
             placementSettings.setIgnoreEntities(ignoreEntities);
-            template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, 0x12);
+//            template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, new Random(), 0x12);
 
             String subRegionName = FileUtils.getNameWithoutExtension(structureFileName) + " (Converted Template)";
             AreaSelection area = new AreaSelection();
@@ -437,24 +438,24 @@ public class WorldUtils
 
     public static boolean handleEasyPlace(Minecraft mc)
     {
-        ActionResult result = doEasyPlaceAction(mc);
+        ActionResultType result = doEasyPlaceAction(mc);
 
-        if (result == ActionResult.FAIL)
+        if (result == ActionResultType.FAIL)
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.easy_place_fail");
             return true;
         }
 
-        return result != ActionResult.PASS;
+        return result != ActionResultType.PASS;
     }
 
-    private static ActionResult doEasyPlaceAction(Minecraft mc)
+    private static ActionResultType doEasyPlaceAction(Minecraft mc)
     {
         RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
 
         if (traceWrapper == null)
         {
-            return ActionResult.PASS;
+            return ActionResultType.PASS;
         }
 
         if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
@@ -469,7 +470,7 @@ public class WorldUtils
             // Already placed to that position, possible server sync delay
             if (easyPlaceIsPositionCached(pos))
             {
-                return ActionResult.FAIL;
+                return ActionResultType.FAIL;
             }
 
             if (stack.isEmpty() == false)
@@ -478,19 +479,19 @@ public class WorldUtils
 
                 if (stateSchematic == stateClient)
                 {
-                    return ActionResult.FAIL;
+                    return ActionResultType.FAIL;
                 }
 
                 // Abort if there is already a block in the target position
                 if (easyPlaceBlockChecksCancel(stateSchematic, stateClient, mc.player, traceVanilla, stack))
                 {
-                    return ActionResult.FAIL;
+                    return ActionResultType.FAIL;
                 }
 
                 // Abort if the required item was not able to be pick-block'd
                 if (doSchematicWorldPickBlock(true, mc) == false)
                 {
-                    return ActionResult.FAIL;
+                    return ActionResultType.FAIL;
                 }
 
                 Hand hand = EntityUtils.getUsedHandForItem(mc.player, stack);
@@ -498,7 +499,7 @@ public class WorldUtils
                 // Abort if a wrong item is in the player's hand
                 if (hand == null)
                 {
-                    return ActionResult.FAIL;
+                    return ActionResultType.FAIL;
                 }
 
                 Vector3d hitPos = trace.getPos();
@@ -513,7 +514,7 @@ public class WorldUtils
                     Direction sideVanilla = hitResult.getSide();
                     BlockState stateVanilla = mc.world.getBlockState(posVanilla);
                     Vector3d hit = traceVanilla.getPos();
-                    BlockItemUseContext ctx = new BlockItemUseContext(new ItemUsageContext(mc.player, hand, hitResult));
+                    BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(mc.player, hand, hitResult));
 
                     if (stateVanilla.canReplace(ctx) == false)
                     {
@@ -554,14 +555,14 @@ public class WorldUtils
                 }
             }
 
-            return ActionResult.SUCCESS;
+            return ActionResultType.SUCCESS;
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA_BLOCK)
         {
-            return placementRestrictionInEffect(mc) ? ActionResult.FAIL : ActionResult.PASS;
+            return placementRestrictionInEffect(mc) ? ActionResultType.FAIL : ActionResultType.PASS;
         }
 
-        return ActionResult.PASS;
+        return ActionResultType.PASS;
     }
 
     private static boolean easyPlaceBlockChecksCancel(BlockState stateSchematic, BlockState stateClient,
@@ -585,7 +586,7 @@ public class WorldUtils
         }
 
         BlockRayTraceResult hitResult = (BlockRayTraceResult) trace;
-        BlockItemUseContext ctx = new BlockItemUseContext(new ItemUsageContext(player, Hand.MAIN_HAND, hitResult));
+        BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, hitResult));
 
         if (stateClient.canReplace(ctx) == false)
         {
@@ -621,7 +622,7 @@ public class WorldUtils
         {
             x += ((state.get(RepeaterBlock.DELAY)) - 1) * propertyIncrement;
         }
-        else if (block instanceof TrapDoorBlock && state.get(TrapDoorBlock.HALF) == BlockHalf.TOP)
+        else if (block instanceof TrapDoorBlock && state.get(TrapDoorBlock.HALF) == Half.TOP)
         {
             x += propertyIncrement;
         }
@@ -629,7 +630,7 @@ public class WorldUtils
         {
             x += propertyIncrement;
         }
-        else if (block instanceof StairsBlock && state.get(StairsBlock.HALF) == BlockHalf.TOP)
+        else if (block instanceof StairsBlock && state.get(StairsBlock.HALF) == Half.TOP)
         {
             x += propertyIncrement;
         }
@@ -733,7 +734,7 @@ public class WorldUtils
         {
             BlockRayTraceResult blockHitResult = (BlockRayTraceResult) trace;
             BlockPos pos = blockHitResult.getBlockPos();
-            BlockItemUseContext ctx = new BlockItemUseContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, blockHitResult));
+            BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(mc.player, Hand.MAIN_HAND, blockHitResult));
 
             // Get the possibly offset position, if the targeted block is not replaceable
             pos = ctx.getBlockPos();
@@ -758,7 +759,7 @@ public class WorldUtils
             }
 
             blockHitResult = new BlockRayTraceResult(blockHitResult.getPos(), blockHitResult.getSide(), pos, false);
-            ctx = new BlockItemUseContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, (BlockRayTraceResult) trace));
+            ctx = new BlockItemUseContext(new ItemUseContext(mc.player, Hand.MAIN_HAND, (BlockRayTraceResult) trace));
 
             // Placement position is already occupied
             if (stateClient.canReplace(ctx) == false)

@@ -33,13 +33,13 @@ public class FakeLightingProvider extends WorldLightManager
     public static class FakeLightingView implements IWorldLightListener
     {
         @Override
-        public void updateSectionStatus(SectionPos var1, boolean var2)
+        public void setSectionStatus(SectionPos var1, boolean var2)
         {
             // NO-OP
         }
 
         @Override
-        public NibbleArray getLightArray(SectionPos var1)
+        public NibbleArray getLightSection(SectionPos var1)
         {
             return null;
         }

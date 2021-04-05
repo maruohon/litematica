@@ -55,7 +55,7 @@ public class ChunkCacheSchematic implements IBlockDisplayReader
             {
                 Chunk chunk = this.chunkArray[cx - this.chunkStartX][cz - this.chunkStartZ];
 
-                if (chunk != null && chunk.method_12228(pos.getY(), pos.getY() + 15) == false) // isEmptyBetween
+                if (chunk != null && chunk.areSectionsEmptyBetween(pos.getY(), pos.getY() + 15) == false)
                 {
                     this.empty = false;
                     break;

@@ -8,7 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.command.arguments.BlockStateParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -94,7 +94,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         if (removeEntities)
         {
             net.minecraft.util.math.AxisAlignedBB aabb = new net.minecraft.util.math.AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
-            List<Entity> entities = this.world.getEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER);
+            List<Entity> entities = this.world.getOtherEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER);
 
             for (Entity entity : entities)
             {
@@ -121,9 +121,9 @@ public class TaskFillArea extends TaskProcessChunkBase
                     {
                         TileEntity te = this.world.getBlockEntity(posMutable);
 
-                        if (te instanceof Inventory)
+                        if (te instanceof IInventory)
                         {
-                            ((Inventory) te).clear();
+                            ((IInventory) te).clear();
                             this.world.setBlockState(posMutable, barrier, 0x12);
                         }
 
@@ -140,7 +140,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         {
             net.minecraft.util.math.AxisAlignedBB aabb = new net.minecraft.util.math.AxisAlignedBB(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
 
-            if (this.world.getEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER).size() > 0)
+            if (this.world.getOtherEntities(this.mc.player, aabb, EntityUtils.NOT_PLAYER).size() > 0)
             {
                 String killCmd = String.format("/kill @e[type=!player,x=%d,y=%d,z=%d,dx=%d,dy=%d,dz=%d]",
                         box.minX               , box.minY               , box.minZ,

@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.widgets.WidgetListSchematicVersions;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVersion;
@@ -178,7 +179,8 @@ public class GuiSchematicProjectManager extends GuiListBase<SchematicVersion, Wi
 
                 if (project != null)
                 {
-                    project.setOrigin(fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.gui.mc.player));
+//                    project.setOrigin(fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.gui.mc.player));
+                    project.setOrigin(new BlockPos(Math.floor(this.gui.mc.player.getX()), Math.floor(this.gui.mc.player.getY()), Math.floor(this.gui.mc.player.getZ())));
                     this.gui.reCreateGuiElements();
                 }
             }

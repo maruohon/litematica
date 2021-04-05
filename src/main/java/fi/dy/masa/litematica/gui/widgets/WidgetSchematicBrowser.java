@@ -187,7 +187,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                 RenderUtils.drawOutlinedBox(x + 4, y, iconSize, iconSize, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
                 this.bindTexture(pair.getLeft());
-                AbstractGui.drawTexture(x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+                AbstractGui.drawTexture(matrixStack, x + 4, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
             }
         }
     }
@@ -256,7 +256,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
                             int val = previewImageData[i++];
                             // Swap the color channels from ARGB to ABGR
                             val = (val & 0xFF00FF00) | (val & 0xFF0000) >> 16 | (val & 0xFF) << 16;
-                            image.setPixelRgba(x, y, val);
+                            image.setPixelColor(x, y, val);
                         }
                     }
 

@@ -87,7 +87,7 @@ public class InfoHud
                     if (renderer.getShouldRenderCustom() && (isGui == false || renderer.shouldRenderInGuis()))
                     {
                         // FIXME: This is technically wrong, the yOffset should be separate per hud alignment
-                        yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment());
+                        yOffset += renderer.render(xOffset, yOffset, this.getHudAlignment(), matrixStack);
                     }
                 }
             }

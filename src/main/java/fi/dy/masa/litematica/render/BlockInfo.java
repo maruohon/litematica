@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -58,7 +59,7 @@ public class BlockInfo
         return this.totalHeight;
     }
 
-    public void render(int x, int y, Minecraft mc)
+    public void render(int x, int y, Minecraft mc, MatrixStack matrixStack)
     {
         if (this.state != null)
         {
@@ -70,7 +71,7 @@ public class BlockInfo
             int x1 = x + 10;
             y += 4;
 
-            textRenderer.draw(this.title, x1, y, 0xFFFFFFFF);
+            textRenderer.draw(matrixStack, this.title, x1, y, 0xFFFFFFFF);
 
             y += 12;
 
@@ -79,20 +80,20 @@ public class BlockInfo
 
             //mc.getRenderItem().zLevel += 100;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
-            mc.getItemRenderer().renderGuiItem(mc.player, this.stack, x1, y);
+            mc.getItemRenderer().renderInGui(this.stack, x1, y);
             mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stack, x1, y, null);
             //mc.getRenderItem().zLevel -= 100;
 
             //RenderSystem.disableBlend();
             RenderUtils.disableDiffuseLighting();
 
-            textRenderer.draw(this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
+            textRenderer.draw(matrixStack, this.stackName, x1 + 20, y + 4, 0xFFFFFFFF);
 
             y += 20;
-            textRenderer.draw(this.blockRegistryname, x1, y, 0xFF4060FF);
+            textRenderer.draw(matrixStack, this.blockRegistryname, x1, y, 0xFF4060FF);
             y += textRenderer.fontHeight + 4;
 
-            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props);
+            RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props, matrixStack);
 
             RenderSystem.popMatrix();
         }

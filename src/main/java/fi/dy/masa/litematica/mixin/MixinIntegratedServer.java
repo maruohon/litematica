@@ -10,22 +10,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
+import net.minecraft.resources.DataPackRegistries;
+import net.minecraft.resources.ResourcePackList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.chunk.listener.IChunkStatusListenerFactory;
 import net.minecraft.command.Commands;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.PlayerProfileCache;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.world.storage.IServerConfiguration;
 import net.minecraft.world.storage.SaveFormat.LevelSave;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer extends MinecraftServer
 {
-    private MixinIntegratedServer(LevelSave session, Proxy proxy, DataFixer dataFixer, Commands commandManager,
+    private MixinIntegratedServer(Thread thread, DynamicRegistries.Impl impl, LevelSave session, IServerConfiguration saveProperties,
+            ResourcePackList resourcePackManager, Proxy proxy, DataFixer dataFixer, DataPackRegistries serverResourceManager,
             MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository,
             PlayerProfileCache userCache, IChunkStatusListenerFactory worldGenerationProgressListenerFactory)
     {
-        super(session, proxy, dataFixer, commandManager, minecraftSessionService, gameProfileRepository, userCache,
+        super(thread, impl, session, saveProperties, resourcePackManager, proxy, dataFixer, serverResourceManager, minecraftSessionService, gameProfileRepository, userCache,
                 worldGenerationProgressListenerFactory);
     }
 

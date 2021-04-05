@@ -260,9 +260,9 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
         if (this.header1 != null && this.header2 != null)
         {
-            this.drawString(x1, y, color, this.header1);
-            this.drawString(x2, y, color, this.header2);
-            this.drawString(x3, y, color, this.header3);
+            this.drawString(x1, y, color, this.header1, matrixStack);
+            this.drawString(x2, y, color, this.header2, matrixStack);
+            this.drawString(x3, y, color, this.header3 ,matrixStack);
 
             this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
         }
@@ -281,7 +281,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 this.drawString(x2 + 20, y, color, this.mismatchInfo.nameFound, matrixStack);
             }
 
-            this.drawString(x3, y, color, String.valueOf(this.count), matrixStack, matrixStack);
+            this.drawString(x3, y, color, String.valueOf(this.count), matrixStack);
 
             y = this.y + 3;
             RenderUtils.drawRect(x1, y, 16, 16, 0x20FFFFFF); // light background for the item
@@ -306,7 +306,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             }
             else
             {
-                this.mc.getItemRenderer().renderGuiItem(this.mc.player, this.mismatchInfo.stackExpected, x1, y);
+                this.mc.getItemRenderer().renderInGui(this.mismatchInfo.stackExpected, x1, y);
                 this.mc.getItemRenderer().renderGuiItemOverlay(this.textRenderer, this.mismatchInfo.stackExpected, x1, y, null);
             }
 
@@ -321,7 +321,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    this.mc.getItemRenderer().renderGuiItem(this.mc.player, this.mismatchInfo.stackFound, x2, y);
+                    this.mc.getItemRenderer().renderInGui(this.mismatchInfo.stackFound, x2, y);
                     this.mc.getItemRenderer().renderGuiItemOverlay(this.textRenderer, this.mismatchInfo.stackFound, x2, y, null);
                 }
             }
@@ -445,8 +445,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
                 String strExpected = pre + StringUtils.translate("litematica.gui.label.schematic_verifier.expected") + GuiBase.TXT_RST;
                 String strFound =    pre + StringUtils.translate("litematica.gui.label.schematic_verifier.found") + GuiBase.TXT_RST;
-                textRenderer.draw(strExpected, x1, y, 0xFFFFFFFF, matrixStack);
-                textRenderer.draw(strFound,    x2, y, 0xFFFFFFFF, matrixStack);
+                textRenderer.draw(matrixStack, strExpected, x1, y, 0xFFFFFFFF);
+                textRenderer.draw(matrixStack, strFound,    x2, y, 0xFFFFFFFF);
 
                 y += 12;
 
@@ -475,7 +475,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    mc.getItemRenderer().renderGuiItem(mc.player, this.stackExpected, x1, y);
+                    mc.getItemRenderer().renderInGui(this.stackExpected, x1, y);
                     mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stackExpected, x1, y, null);
                 }
 
@@ -486,7 +486,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 }
                 else
                 {
-                    mc.getItemRenderer().renderGuiItem(mc.player, this.stackFound, x2, y);
+                    mc.getItemRenderer().renderInGui(this.stackFound, x2, y);
                     mc.getItemRenderer().renderGuiItemOverlay(textRenderer, this.stackFound, x2, y, null);
                 }
 
@@ -495,18 +495,18 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 //RenderSystem.disableBlend();
                 RenderUtils.disableDiffuseLighting();
 
-                textRenderer.draw(this.nameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
-                textRenderer.draw(this.nameFound,    x2 + 20, y + 4, 0xFFFFFFFF);
+                textRenderer.draw(matrixStack, this.nameExpected, x1 + 20, y + 4, 0xFFFFFFFF);
+                textRenderer.draw(matrixStack, this.nameFound,    x2 + 20, y + 4, 0xFFFFFFFF);
 
                 y += 20;
-                textRenderer.draw(this.blockRegistrynameExpected, x1, y, 0xFF4060FF);
-                textRenderer.draw(this.blockRegistrynameFound,    x2, y, 0xFF4060FF);
+                textRenderer.draw(matrixStack, this.blockRegistrynameExpected, x1, y, 0xFF4060FF);
+                textRenderer.draw(matrixStack, this.blockRegistrynameFound,    x2, y, 0xFF4060FF);
                 y += StringUtils.getFontHeight() + 4;
 
                 List<String> propsExpected = BlockUtils.getFormattedBlockStateProperties(this.stateExpected, " = ");
                 List<String> propsFound = BlockUtils.getFormattedBlockStateProperties(this.stateFound, " = ");
-                RenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected);
-                RenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound);
+                RenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected, matrixStack);
+                RenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound, matrixStack);
 
                 RenderSystem.popMatrix();
             }

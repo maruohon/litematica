@@ -91,13 +91,13 @@ public class WorldRendererSchematic
     public WorldRendererSchematic(Minecraft mc)
     {
         this.mc = mc;
-        this.entityRenderDispatcher = mc.getEntityRenderManager();
+        this.entityRenderDispatcher = mc.getEntityRenderDispatcher();
         this.bufferBuilders = mc.getBufferBuilders();
 
         this.renderChunkFactory = new RenderChunkFactoryVbo();
 
         this.blockRenderManager = Minecraft.getInstance().getBlockRenderManager();
-        this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColorMap());
+        this.blockModelRenderer = new BlockModelRendererSchematic(mc.getBlockColors());
     }
 
     public void markNeedsUpdate()

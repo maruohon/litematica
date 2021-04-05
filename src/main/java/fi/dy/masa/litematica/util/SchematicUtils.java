@@ -272,7 +272,7 @@ public class SchematicUtils
                     mc.player.world = worldSchematic;
 
                     BlockRayTraceResult hit = new BlockRayTraceResult(trace.getPos(), side, pos.offset(side), false);
-                    BlockItemUseContext ctx = new BlockItemUseContext(new ItemUsageContext(mc.player, Hand.MAIN_HAND, hit));
+                    BlockItemUseContext ctx = new BlockItemUseContext(new ItemUseContext(mc.player, Hand.MAIN_HAND, hit));
 
                     mc.player.world = worldClient;
 
@@ -720,7 +720,8 @@ public class SchematicUtils
 
                 if (origin == null)
                 {
-                    origin = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(mc.player);
+//                    origin = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(mc.player);
+                    origin = new BlockPos(Math.floor(mc.player.getX()), Math.floor(mc.player.getY()), Math.floor(mc.player.getZ()));
                 }
 
                 SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, true);

@@ -38,11 +38,11 @@ public class BufferBuilderCache
 
     public void clear()
     {
-        this.blockBufferBuilders.values().forEach(BufferBuilder::reset);
+        this.blockBufferBuilders.values().forEach(BufferBuilder::clear);
 
         for (BufferBuilder buffer : this.overlayBufferBuilders)
         {
-            buffer.reset();
+            buffer.clear();
         }
     }
 }

@@ -19,7 +19,9 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.profiler.IProfiler;
+import net.minecraft.world.World;
 import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -36,10 +38,11 @@ public class WorldSchematic extends ClientWorld
     private ChunkProviderSchematic chunkProviderSchematic;
     private int nextEntityId;
 
-    public WorldSchematic(ClientPlayNetHandler netHandler, WorldSettings settings,
+    public WorldSchematic(ClientPlayNetHandler netHandler, ClientWorldInfo settings,
+            RegistryKey<World> registryKey,
             DimensionType dimType, Supplier<IProfiler> profilerIn)
     {
-        super(netHandler, settings, dimType, 1, profilerIn, null);
+        super(netHandler, settings, registryKey, dimType, 1, profilerIn, null, false, 0L); // TODO: I have no idea what those arguments mean
 
         this.mc = Minecraft.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
@@ -126,11 +129,11 @@ public class WorldSchematic extends ClientWorld
         return this.mc.world != null ? this.mc.world.getTime() : 0;
     }
 
-    @Override
-    public void checkBlockRerender(BlockPos pos, BlockState stateOld, BlockState stateNew)
-    {
-        this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
-    }
+//    @Override
+//    public void checkBlockRerender(BlockPos pos, BlockState stateOld, BlockState stateNew)
+//    {
+//        this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+//    }
 
     @Override
     public void scheduleBlockRenders(int chunkX, int chunkY, int chunkZ)
@@ -188,16 +191,16 @@ public class WorldSchematic extends ClientWorld
         // NO-OP
     }
 
-    @Override
-    public void playGlobalEvent(int int_1, BlockPos blockPos_1, int int_2)
-    {
-        // NO-OP
-    }
+//    @Override
+//    public void playGlobalEvent(int int_1, BlockPos blockPos_1, int int_2)
+//    {
+//        // NO-OP
+//    }
     
-    @Override
-    public void playLevelEvent(@Nullable PlayerEntity playerEntity_1, int int_1, BlockPos blockPos_1, int int_2)
-    {
-    }
+//    @Override
+//    public void playLevelEvent(@Nullable PlayerEntity playerEntity_1, int int_1, BlockPos blockPos_1, int int_2)
+//    {
+//    }
 
     @Override
     public void addParticle(IParticleData particleParameters_1, double double_1, double double_2, double double_3, double double_4, double     double_5, double double_6)

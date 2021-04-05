@@ -728,7 +728,7 @@ public class ChunkRendererSchematicVbo
 
         if (te != null)
         {
-            BlockEntityRenderer<TileEntity> tesr = TileEntityRendererDispatcher.INSTANCE.get(te);
+            TileEntityRenderer<TileEntity> tesr = TileEntityRendererDispatcher.INSTANCE.get(te);
 
             if (tesr != null)
             {

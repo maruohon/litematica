@@ -57,14 +57,14 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
         RenderUtils.drawOutlinedBox(x - 4, y - 4, this.infoWidth, infoHeight, 0xA0000000, COLOR_HORIZONTAL_BAR);
 
         str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
-        this.drawString(str, x, y, color, matrixStack);
+        this.drawString(matrixStack, str, x, y, color);
         y += 12;
-        this.drawString(w + this.project.getName() + r, x + 4, y, color, matrixStack);
+        this.drawString(matrixStack, w + this.project.getName() + r, x + 4, y, color);
         y += 12;
         int versionId = this.project.getCurrentVersionId();
         String strVer = w + (versionId >= 0 ? String.valueOf(versionId + 1) : "N/A") + r;
         str = StringUtils.translate("litematica.gui.label.schematic_projects.version", strVer, w + this.project.getVersionCount() + r);
-        this.drawString(str, x, y, color, matrixStack);
+        this.drawString(matrixStack, str, x, y, color);
         y += 12;
         SchematicVersion version = this.project.getCurrentVersion();
 
@@ -73,21 +73,21 @@ public class WidgetListSchematicVersions extends WidgetListBase<SchematicVersion
             ToolHud.DATE.setTime(version.getTimeStamp());
             str = ToolHud.SIMPLE_DATE_FORMAT.format(ToolHud.DATE);
             str = StringUtils.translate("litematica.hud.schematic_projects.current_version_date", w + str + r);
-            this.drawString(str, x, y, color, matrixStack);
+            this.drawString(matrixStack, str, x, y, color);
             y += 12;
 
             str = StringUtils.translate("litematica.gui.label.schematic_projects.version_name");
-            this.drawString(str, x, y, color, matrixStack);
+            this.drawString(matrixStack, str, x, y, color);
             y += 12;
-            this.drawString(w + version.getName() + r, x + 4, y, color, matrixStack);
+            this.drawString(matrixStack, w + version.getName() + r, x + 4, y, color);
             y += 12;
             str = StringUtils.translate("litematica.gui.label.schematic_projects.origin");
-            this.drawString(str, x, y, color, matrixStack);
+            this.drawString(matrixStack, str, x, y, color);
             y += 12;
 
             BlockPos o = this.project.getOrigin();
             str = String.format("x: %s%d%s, y: %s%d%s, z: %s%d%s", w, o.getX(), r, w, o.getY(), r, w, o.getZ(), r);
-            this.drawString(str, x, y, color, matrixStack);
+            this.drawString(matrixStack, str, x, y, color);
         }
     }
 
