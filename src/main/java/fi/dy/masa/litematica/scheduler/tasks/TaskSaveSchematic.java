@@ -54,7 +54,10 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
     @Override
     protected boolean canProcessChunk(ChunkPos pos)
     {
-        return this.areSurroundingChunksLoaded(pos, this.worldClient, 1);
+        boolean b = this.areSurroundingChunksLoaded(pos, this.worldClient, 1);
+        if (!b) InfoUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "CHUNK NOT LOADED");
+        if (b) InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "CHUNK LOADED");
+        return b;
     }
 
     @Override

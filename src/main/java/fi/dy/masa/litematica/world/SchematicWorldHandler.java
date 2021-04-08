@@ -25,12 +25,12 @@ public class SchematicWorldHandler
     public static WorldSchematic createSchematicWorld()
     {
         ClientWorldInfo info = new ClientWorldInfo(Difficulty.PEACEFUL, false, true);
-        return new WorldSchematic(null, info, null, PublicDimensionType.get_THE_END(), Minecraft.getInstance()::getProfiler);
+        return new WorldSchematic(Minecraft.getInstance().getNetworkHandler(), info, net.minecraft.world.World.END, PublicDimensionType.get_THE_END(), Minecraft.getInstance()::getProfiler);
     }
 
     private static class PublicDimensionType extends DimensionType
     {
-        public PublicDimensionType(OptionalLong fixedTime,
+        private PublicDimensionType(OptionalLong fixedTime,
                                boolean hasSkylight,
                                boolean hasCeiling,
                                boolean ultrawarm,

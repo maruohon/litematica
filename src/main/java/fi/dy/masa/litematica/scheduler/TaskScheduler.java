@@ -32,7 +32,8 @@ public class TaskScheduler
         Minecraft mc = Minecraft.getInstance();
         // Yes this is actually correct despite the naming - in single player we want to
         // schedule stuff to the integrated server's thread in some cases
-        return mc.isIntegratedServerRunning() ? INSTANCE_SERVER : INSTANCE_CLIENT;
+//        return mc.isIntegratedServerRunning() ? INSTANCE_SERVER : INSTANCE_CLIENT;
+        return INSTANCE_CLIENT; // TODO get server tick mixin to work
     }
 
     public void scheduleTask(ITask task, int interval)

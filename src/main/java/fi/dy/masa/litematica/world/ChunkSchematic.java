@@ -23,7 +23,8 @@ public class ChunkSchematic extends Chunk
 
     public ChunkSchematic(World worldIn, ChunkPos pos)
     {
-        super(worldIn, pos, new BiomeContainer(worldIn.getRegistryManager().get(Registry.BIOME_KEY), Util.make(new Biome[BiomeContainer.DEFAULT_LENGTH], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
+//        super(worldIn, pos, new BiomeContainer(worldIn.getRegistryManager().get(Registry.BIOME_KEY), Util.make(new Biome[BiomeContainer.DEFAULT_LENGTH], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
+        super(worldIn, pos, new BiomeContainer(worldIn.getRegistryManager().get(Registry.BIOME_KEY), Util.make(new Biome[BiomeContainer.DEFAULT_LENGTH], (biomes) -> {})));
 
         this.timeCreated = worldIn.getTime();
     }
@@ -67,7 +68,7 @@ public class ChunkSchematic extends Chunk
 
             if (blockOld != blockNew)
             {
-                this.getWorld().removeBlockEntity(pos);
+//                this.getWorld().removeBlockEntity(pos);
             }
 
             if (section.getBlockState(x, y & 0xF, z).getBlock() != blockNew)
@@ -93,7 +94,7 @@ public class ChunkSchematic extends Chunk
                     if (te == null)
                     {
                         te = ((ITileEntityProvider) blockNew).createBlockEntity(this.getWorld());
-                        this.getWorld().setBlockEntity(pos, te);
+//                        this.getWorld().setBlockEntity(pos, te);
                     }
 
                     if (te != null)
