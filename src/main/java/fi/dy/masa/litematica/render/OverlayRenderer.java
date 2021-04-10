@@ -546,8 +546,6 @@ public class OverlayRenderer
         World worldClient = WorldUtils.getBestWorld(mc);
         BlockPos pos = traceWrapper.getBlockHitResult().getBlockPos();
 
-        if (worldSchematic == null) return;
-
         BlockState stateClient = mc.world.getBlockState(pos);
         BlockState stateSchematic = worldSchematic.getBlockState(pos);
 
@@ -622,7 +620,6 @@ public class OverlayRenderer
         BlockState stateClient = mc.world.getBlockState(pos);
 
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        if (worldSchematic == null) return;
         BlockState stateSchematic = worldSchematic.getBlockState(pos);
         String ul = GuiBase.TXT_UNDERLINE;
 

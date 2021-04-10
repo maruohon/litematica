@@ -3,6 +3,7 @@
     "package": "fi.dy.masa.litematica.mixin",
     "compatibilityLevel": "JAVA_8",
     "minVersion": "0.7",
+    "refmap": "mixins.litematica.refmap.json",
     "client": [
     	"IMixinBlockModelRenderer",
         "MixinClientPlayNetworkHandler",

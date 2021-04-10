@@ -289,8 +289,9 @@ public class LitematicaRenderer
                                this.mc.getCameraEntity() != null;
         this.renderPiecewisePrepared = false;
         this.renderPiecewiseBlocks = false;
+        WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
-        if (this.renderPiecewise && frustum != null)
+        if (this.renderPiecewise && frustum != null && worldRenderer.hasWorld())
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
             this.renderPiecewiseSchematic = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
@@ -300,7 +301,6 @@ public class LitematicaRenderer
             this.mc.getProfiler().push("litematica_culling");
 
             this.calculateFinishTime();
-            WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
             this.mc.getProfiler().swap("litematica_terrain_setup");
             worldRenderer.setupTerrain(this.getCamera(), frustum, this.frameCount++, this.mc.player.isSpectator());
