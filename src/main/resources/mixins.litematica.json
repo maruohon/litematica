@@ -11,6 +11,7 @@
         "MixinDebugHud",
         "MixinIntegratedServer",
         "MixinMinecraftClient",
+        "MixinModelDataManager",
         "MixinRailBlocks",
         "MixinWorldChunk",
         "MixinWorldRenderer"
