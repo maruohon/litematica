@@ -11,17 +11,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.common.collect.Sets;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
@@ -211,6 +208,7 @@ public class ChunkRendererSchematicVbo
             {
                 BufferBuilder buffer = buffers.getBlockBufferByLayer(layerTranslucent);
 
+                RenderSystem.setShader(GameRenderer::getRenderTypeTranslucentShader);
                 this.preRenderBlocks(buffer, layerTranslucent);
                 buffer.restoreState(bufferState);
                 this.postRenderBlocks(layerTranslucent, x, y, z, buffer, data);
@@ -432,6 +430,7 @@ public class ChunkRendererSchematicVbo
 
     protected void renderOverlay(OverlayType type, BlockPos pos, BlockState stateSchematic, boolean missing, ChunkRenderDataSchematic data, BufferBuilderCache buffers)
     {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         BlockPos.Mutable relPos = this.getChunkRelativePosition(pos);
 
         if (Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue())
@@ -762,16 +761,19 @@ public class ChunkRendererSchematicVbo
         this.existingOverlays.add(type);
         this.hasOverlay = true;
 
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         buffer.begin(type.getDrawMode(), VertexFormats.POSITION_COLOR);
     }
 
     private void preRenderOverlay(BufferBuilder buffer, VertexFormat.DrawMode drawMode)
     {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         buffer.begin(drawMode, VertexFormats.POSITION_COLOR);
     }
 
     private void postRenderOverlay(OverlayRenderType type, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
     {
+        RenderSystem.applyModelViewMatrix();
         if (type == OverlayRenderType.QUAD && chunkRenderData.isOverlayTypeEmpty(type) == false)
         {
             buffer.method_31948(x, y, z); // sortQuads

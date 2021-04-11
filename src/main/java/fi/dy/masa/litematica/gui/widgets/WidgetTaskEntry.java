@@ -55,7 +55,7 @@ public class WidgetTaskEntry extends WidgetListEntryBase<ITask>
         this.drawSubWidgets(mouseX, mouseY, matrixStack);
 
         RenderUtils.disableDiffuseLighting();
-        RenderSystem.disableLighting();
+        //TODO: RenderSystem.disableLighting();
     }
 
     private static class ButtonListener implements IButtonActionListener

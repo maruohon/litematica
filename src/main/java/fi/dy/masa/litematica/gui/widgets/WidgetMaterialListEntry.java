@@ -233,8 +233,8 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             pre = countAvailable >= countMissing ? green : red;
             this.drawString(x4, y, color, pre + String.valueOf(countAvailable), matrixStack);
 
-            RenderSystem.pushMatrix();
-            RenderSystem.disableLighting();
+            matrixStack.push();
+            //TODO: RenderSystem.disableLighting();
             RenderUtils.enableDiffuseLightingGui3D();
 
             //mc.getRenderItem().zLevel -= 110;
@@ -246,7 +246,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
 
             RenderSystem.disableBlend();
             RenderUtils.disableDiffuseLighting();
-            RenderSystem.popMatrix();
+            matrixStack.pop();
 
             super.render(mouseX, mouseY, selected, matrixStack);
         }
@@ -257,8 +257,8 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
     {
         if (this.entry != null)
         {
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(0, 0, 200);
+            matrixStack.push();
+            matrixStack.translate(0, 0, 200);
 
             String header1 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[0]);
             String header2 = GuiBase.TXT_BOLD + StringUtils.translate(HEADERS[1]);
@@ -305,7 +305,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
 
             RenderUtils.drawRect(x2, y1, 16, 16, 0x20FFFFFF); // light background for the item
 
-            RenderSystem.disableLighting();
+            //TODO: RenderSystem.disableLighting();
             RenderUtils.enableDiffuseLightingGui3D();
 
             //mc.getRenderItem().zLevel += 100;
@@ -315,7 +315,7 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             //RenderSystem.disableBlend();
 
             RenderUtils.disableDiffuseLighting();
-            RenderSystem.popMatrix();
+            matrixStack.pop();
         }
     }
 

@@ -10,11 +10,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.PillarBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.datafixer.TypeReferences;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.util.math.Direction;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
@@ -29,8 +29,8 @@ public class SchematicConversionMaps
     private static final Int2ObjectOpenHashMap<BlockState> ID_META_TO_BLOCKSTATE = new Int2ObjectOpenHashMap<>();
     private static final HashMap<String, String> OLD_NAME_TO_NEW_NAME = new HashMap<>();
     private static final HashMap<String, String> NEW_NAME_TO_OLD_NAME = new HashMap<>();
-    private static final HashMap<CompoundTag, CompoundTag> OLD_STATE_TO_NEW_STATE = new HashMap<>();
-    private static final HashMap<CompoundTag, CompoundTag> NEW_STATE_TO_OLD_STATE = new HashMap<>();
+    private static final HashMap<NbtCompound, NbtCompound> OLD_STATE_TO_NEW_STATE = new HashMap<>();
+    private static final HashMap<NbtCompound, NbtCompound> NEW_STATE_TO_OLD_STATE = new HashMap<>();
     private static final ArrayList<ConversionData> CACHED_DATA = new ArrayList<>();
 
     public static void addEntry(int idMeta, String newStateString, String... oldStateStrings)
@@ -49,7 +49,7 @@ public class SchematicConversionMaps
             {
                 if (data.oldStateStrings.length > 0)
                 {
-                    CompoundTag oldStateTag = getStateTagFromString(data.oldStateStrings[0]);
+                    NbtCompound oldStateTag = getStateTagFromString(data.oldStateStrings[0]);
 
                     if (oldStateTag != null)
                     {
@@ -58,7 +58,7 @@ public class SchematicConversionMaps
                     }
                 }
 
-                CompoundTag newStateTag = getStateTagFromString(data.newStateString);
+                NbtCompound newStateTag = getStateTagFromString(data.newStateString);
 
                 if (newStateTag != null)
                 {
@@ -78,15 +78,15 @@ public class SchematicConversionMaps
         return ID_META_TO_BLOCKSTATE.get(idMeta);
     }
 
-    public static CompoundTag get_1_13_2_StateTagFor_1_12_Tag(CompoundTag oldStateTag)
+    public static NbtCompound get_1_13_2_StateTagFor_1_12_Tag(NbtCompound oldStateTag)
     {
-        CompoundTag tag = OLD_STATE_TO_NEW_STATE.get(oldStateTag);
+        NbtCompound tag = OLD_STATE_TO_NEW_STATE.get(oldStateTag);
         return tag != null ? tag : oldStateTag;
     }
 
-    public static CompoundTag get_1_12_StateTagFor_1_13_2_Tag(CompoundTag newStateTag)
+    public static NbtCompound get_1_12_StateTagFor_1_13_2_Tag(NbtCompound newStateTag)
     {
-        CompoundTag tag = NEW_STATE_TO_OLD_STATE.get(newStateTag);
+        NbtCompound tag = NEW_STATE_TO_OLD_STATE.get(newStateTag);
         return tag != null ? tag : newStateTag;
     }
 
@@ -149,7 +149,7 @@ public class SchematicConversionMaps
         NEW_STATE_TO_OLD_STATE.clear();
     }
 
-    private static void addIdMetaToBlockState(int idMeta, CompoundTag newStateTag, String... oldStateStrings)
+    private static void addIdMetaToBlockState(int idMeta, NbtCompound newStateTag, String... oldStateStrings)
     {
         try
         {
@@ -174,7 +174,7 @@ public class SchematicConversionMaps
 
             if (oldStateStrings.length > 0)
             {
-                CompoundTag oldStateTag = getStateTagFromString(oldStateStrings[0]);
+                NbtCompound oldStateTag = getStateTagFromString(oldStateStrings[0]);
                 String oldName = oldStateTag.getString("Name");
 
                 // Don't run the vanilla block rename for overidden names
@@ -199,14 +199,14 @@ public class SchematicConversionMaps
         }
     }
 
-    private static void addOldStateToNewState(CompoundTag newStateTagIn, String... oldStateStrings)
+    private static void addOldStateToNewState(NbtCompound newStateTagIn, String... oldStateStrings)
     {
         try
         {
             // A 1:1 mapping from the old state to the new state
             if (oldStateStrings.length == 1)
             {
-                CompoundTag oldStateTag = getStateTagFromString(oldStateStrings[0]);
+                NbtCompound oldStateTag = getStateTagFromString(oldStateStrings[0]);
 
                 if (oldStateTag != null)
                 {
@@ -219,7 +219,7 @@ public class SchematicConversionMaps
             // some of the property values were calculated in the getActualState() method.
             else if (oldStateStrings.length > 1)
             {
-                CompoundTag oldStateTag = getStateTagFromString(oldStateStrings[0]);
+                NbtCompound oldStateTag = getStateTagFromString(oldStateStrings[0]);
 
                 // Same property names and same number of properties - just remap the block name.
                 // FIXME Is this going to be correct for everything?
@@ -236,7 +236,7 @@ public class SchematicConversionMaps
 
                             if (oldStateTag != null)
                             {
-                                CompoundTag newTag = oldStateTag.copy();
+                                NbtCompound newTag = oldStateTag.copy();
                                 newTag.putString("Name", newBlockName);
 
                                 OLD_STATE_TO_NEW_STATE.putIfAbsent(oldStateTag, newTag);
@@ -253,7 +253,7 @@ public class SchematicConversionMaps
         }
     }
 
-    public static CompoundTag getStateTagFromString(String str)
+    public static NbtCompound getStateTagFromString(String str)
     {
         try
         {
@@ -267,7 +267,7 @@ public class SchematicConversionMaps
 
     public static String updateBlockName(String oldName)
     {
-        StringTag tagStr = StringTag.of(oldName);
+        NbtString tagStr = NbtString.of(oldName);
 
         return MinecraftClient.getInstance().getDataFixer().update(TypeReferences.BLOCK_NAME, new Dynamic<>(NbtOps.INSTANCE, tagStr),
                         1139, LitematicaSchematic.MINECRAFT_DATA_VERSION).getValue().asString();

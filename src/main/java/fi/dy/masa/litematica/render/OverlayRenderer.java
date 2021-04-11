@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+
+import net.minecraft.client.render.*;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -12,10 +14,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventory;
@@ -136,15 +134,11 @@ public class OverlayRenderer
 
         if (renderAreas || renderPlacements || isProjectMode)
         {
-            RenderSystem.pushMatrix();
-
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
             RenderSystem.enableDepthTest();
-            RenderSystem.disableLighting();
             RenderSystem.depthMask(false);
             RenderSystem.disableTexture();
-            RenderSystem.alphaFunc(GL11.GL_GREATER, 0.01F);
 
             if (renderAreas)
             {
@@ -228,7 +222,6 @@ public class OverlayRenderer
                 }
             }
 
-            RenderSystem.popMatrix();
             RenderSystem.enableTexture();
             RenderSystem.depthMask(true);
         }
@@ -373,15 +366,12 @@ public class OverlayRenderer
     {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
-        RenderSystem.disableLighting();
-        RenderSystem.disableTexture();
-        RenderSystem.pushMatrix();
 
         RenderSystem.lineWidth(2f);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
+        RenderUtils.startDrawingLines(buffer);
         MismatchRenderPos lookedEntry = null;
         MismatchRenderPos prevEntry = null;
         boolean connections = Configs.Visuals.RENDER_ERROR_MARKER_CONNECTIONS.getBooleanValue();
@@ -415,7 +405,7 @@ public class OverlayRenderer
             }
 
             tessellator.draw();
-            buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.POSITION_COLOR);
+            RenderUtils.startDrawingLines(buffer);
 
             RenderSystem.lineWidth(6f);
             RenderUtils.drawBlockBoundingBoxOutlinesBatchedLines(lookPos, lookedEntry.type.getColor(), 0.002, buffer, this.mc);
@@ -443,10 +433,7 @@ public class OverlayRenderer
             RenderSystem.disableBlend();
         }
 
-        RenderSystem.popMatrix();
-        RenderSystem.enableTexture();
         RenderSystem.enableCull();
-        RenderSystem.enableLighting();
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
     }
@@ -691,7 +678,6 @@ public class OverlayRenderer
             BlockPos pos = trace.getBlockPos();
 
             RenderSystem.depthMask(false);
-            RenderSystem.disableLighting();
             RenderSystem.disableCull();
             RenderSystem.disableTexture();
             fi.dy.masa.malilib.render.RenderUtils.setupBlend();
@@ -711,7 +697,6 @@ public class OverlayRenderer
 
             RenderSystem.disablePolygonOffset();
             RenderSystem.enableTexture();
-            //RenderSystem.enableDepth();
             RenderSystem.disableBlend();
             RenderSystem.enableCull();
             RenderSystem.depthMask(true);

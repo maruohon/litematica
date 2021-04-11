@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.mixin;
 
+import net.minecraft.util.math.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,24 +36,24 @@ public abstract class MixinWorldRenderer
     }
 
     @Inject(method = "renderLayer", at = @At("TAIL"))
-    private void onRenderLayer(RenderLayer renderLayer, MatrixStack matrixStack, double x, double y, double z, CallbackInfo ci)
+    private void onRenderLayer(RenderLayer renderLayer, MatrixStack matrixStack, double x, double y, double z, Matrix4f matrix4f, CallbackInfo ci)
     {
         if (renderLayer == RenderLayer.getSolid())
         {
-            LitematicaRenderer.getInstance().piecewiseRenderSolid(matrixStack);
+            LitematicaRenderer.getInstance().piecewiseRenderSolid(matrixStack, matrix4f);
         }
         else if (renderLayer == RenderLayer.getCutoutMipped())
         {
-            LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(matrixStack);
+            LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(matrixStack, matrix4f);
         }
         else if (renderLayer == RenderLayer.getCutout())
         {
-            LitematicaRenderer.getInstance().piecewiseRenderCutout(matrixStack);
+            LitematicaRenderer.getInstance().piecewiseRenderCutout(matrixStack, matrix4f);
         }
         else if (renderLayer == RenderLayer.getTranslucent())
         {
-            LitematicaRenderer.getInstance().piecewiseRenderTranslucent(matrixStack);
-            LitematicaRenderer.getInstance().piecewiseRenderOverlay(matrixStack);
+            LitematicaRenderer.getInstance().piecewiseRenderTranslucent(matrixStack, matrix4f);
+            LitematicaRenderer.getInstance().piecewiseRenderOverlay(matrixStack, matrix4f);
         }
     }
 

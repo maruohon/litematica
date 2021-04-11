@@ -294,7 +294,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.mismatchInfo.stateExpected.getBlock() == Blocks.FLOWER_POT);
             boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.mismatchInfo.stateFound.getBlock() == Blocks.FLOWER_POT);
 
-            RenderSystem.pushMatrix();
+            matrixStack.push();
             RenderUtils.enableDiffuseLightingGui3D();
 
             BakedModel model;
@@ -328,7 +328,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
             RenderUtils.disableDiffuseLighting();
             RenderSystem.disableBlend();
-            RenderSystem.popMatrix();
+            matrixStack.pop();
         }
 
         super.render(mouseX, mouseY, selected, matrixStack);
@@ -339,8 +339,8 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
     {
         if (this.mismatchInfo != null && this.buttonIgnore != null && mouseX < this.buttonIgnore.getX())
         {
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(0f, 0f, 200f);
+            matrixStack.push();
+            matrixStack.translate(0, 0, 200);
 
             int x = mouseX + 10;
             int y = mouseY;
@@ -359,7 +359,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
             this.mismatchInfo.render(x, y, this.mc, matrixStack);
 
-            RenderSystem.popMatrix();
+            matrixStack.pop();
         }
     }
 
@@ -433,7 +433,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         {
             if (this.stateExpected != null && this.stateFound != null)
             {
-                RenderSystem.pushMatrix();
+                matrixStack.push();
 
                 RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
@@ -450,7 +450,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
 
                 y += 12;
 
-                RenderSystem.disableLighting();
+                //TODO: RenderSystem.disableLighting();
                 RenderUtils.enableDiffuseLightingGui3D();
 
                 boolean useBlockModelConfig = Configs.Visuals.SCHEMATIC_VERIFIER_BLOCK_MODELS.getBooleanValue();
@@ -508,7 +508,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 RenderUtils.renderText(x1, y, 0xFFB0B0B0, propsExpected, matrixStack);
                 RenderUtils.renderText(x2, y, 0xFFB0B0B0, propsFound, matrixStack);
 
-                RenderSystem.popMatrix();
+                matrixStack.pop();
             }
         }
     }

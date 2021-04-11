@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -125,9 +125,9 @@ public class SchematicMetadata
         this.timeModified = timeModified;
     }
 
-    public CompoundTag writeToNBT()
+    public NbtCompound writeToNBT()
     {
-        CompoundTag nbt = new CompoundTag();
+        NbtCompound nbt = new NbtCompound();
 
         nbt.putString("Name", this.name);
         nbt.putString("Author", this.author);
@@ -147,7 +147,7 @@ public class SchematicMetadata
         return nbt;
     }
 
-    public void readFromNBT(CompoundTag nbt)
+    public void readFromNBT(NbtCompound nbt)
     {
         this.name = nbt.getString("Name");
         this.author = nbt.getString("Author");

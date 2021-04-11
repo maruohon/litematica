@@ -63,8 +63,6 @@ public class BlockInfo
     {
         if (this.state != null)
         {
-            RenderSystem.pushMatrix();
-
             RenderUtils.drawOutlinedBox(x, y, this.totalWidth, this.totalHeight, 0xFF000000, GuiBase.COLOR_HORIZONTAL_BAR);
 
             TextRenderer textRenderer = mc.textRenderer;
@@ -75,7 +73,6 @@ public class BlockInfo
 
             y += 12;
 
-            RenderSystem.disableLighting();
             RenderUtils.enableDiffuseLightingGui3D();
 
             //mc.getRenderItem().zLevel += 100;
@@ -94,8 +91,6 @@ public class BlockInfo
             y += textRenderer.fontHeight + 4;
 
             RenderUtils.renderText(x1, y, 0xFFB0B0B0, this.props, matrixStack);
-
-            RenderSystem.popMatrix();
         }
     }
 }

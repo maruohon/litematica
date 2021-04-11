@@ -101,9 +101,9 @@ public class WidgetPlacementSubRegion extends WidgetListEntryBase<SubRegionPlace
 
         if (placementSelected)
         {
-            RenderSystem.translatef(0, 0, 1);
+            //TODO: RenderSystem.translatef(0, 0, 1);
             RenderUtils.drawOutline(this.x, this.y, this.width, this.height, 0xFFE0E0E0);
-            RenderSystem.translatef(0, 0, -1);
+            //TODO: RenderSystem.translatef(0, 0, -1);
         }
 
         String name = this.placement.getName();

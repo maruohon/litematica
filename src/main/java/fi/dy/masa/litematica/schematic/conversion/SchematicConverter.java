@@ -37,7 +37,7 @@ import net.minecraft.block.WallBlock;
 import net.minecraft.block.WallSkullBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
@@ -177,7 +177,7 @@ public class SchematicConverter
         return this.fixersPerBlock.get(state.getBlock().getClass());
     }
 
-    public CompoundTag fixTileEntityNBT(CompoundTag tag, BlockState state)
+    public NbtCompound fixTileEntityNBT(NbtCompound tag, BlockState state)
     {
         /*
         try
@@ -194,7 +194,7 @@ public class SchematicConverter
         return tag;
     }
 
-    public static void postProcessBlocks(LitematicaBlockStateContainer container, @Nullable Map<BlockPos, CompoundTag> tiles,
+    public static void postProcessBlocks(LitematicaBlockStateContainer container, @Nullable Map<BlockPos, NbtCompound> tiles,
                                          IdentityHashMap<BlockState, IStateFixer> postProcessingFilter)
     {
         final int sizeX = container.getSize().getX();
@@ -279,11 +279,11 @@ public class SchematicConverter
     public static class BlockReaderLitematicaContainer implements IBlockReaderWithData
     {
         private final LitematicaBlockStateContainer container;
-        private final Map<BlockPos, CompoundTag> blockEntityData;
+        private final Map<BlockPos, NbtCompound> blockEntityData;
         private final Vec3i size;
         private final BlockState air;
 
-        public BlockReaderLitematicaContainer(LitematicaBlockStateContainer container, @Nullable Map<BlockPos, CompoundTag> blockEntityData)
+        public BlockReaderLitematicaContainer(LitematicaBlockStateContainer container, @Nullable Map<BlockPos, NbtCompound> blockEntityData)
         {
             this.container = container;
             this.blockEntityData = blockEntityData != null ? blockEntityData : new HashMap<>();
@@ -320,7 +320,7 @@ public class SchematicConverter
 
         @Override
         @Nullable
-        public CompoundTag getBlockEntityData(BlockPos pos)
+        public NbtCompound getBlockEntityData(BlockPos pos)
         {
             return this.blockEntityData.get(pos);
         }

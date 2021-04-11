@@ -123,7 +123,7 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         }
 
         RenderUtils.disableDiffuseLighting();
-        RenderSystem.disableLighting();
+        //TODO: RenderSystem.disableLighting();
     }
 
     private static class ButtonListener implements IButtonActionListener

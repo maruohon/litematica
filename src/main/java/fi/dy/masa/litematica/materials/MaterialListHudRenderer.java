@@ -152,8 +152,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         if (scale != 1d)
         {
-            RenderSystem.pushMatrix();
-            RenderSystem.scaled(scale, scale, scale);
+            matrixStack.push();
+            matrixStack.scale((float) scale, (float) scale, (float) scale);
         }
 
         if (useBackground)
@@ -206,7 +206,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         x = posX;
         y = posY;
 
-        RenderSystem.enableRescaleNormal();
+        //TODO: RenderSystem.enableRescaleNormal();
         RenderUtils.setupBlend();
         RenderUtils.enableDiffuseLightingGui3D();
 
@@ -217,12 +217,12 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         }
 
         RenderUtils.disableDiffuseLighting();
-        RenderSystem.disableRescaleNormal();
+        //TODO: RenderSystem.disableRescaleNormal();
         RenderSystem.disableBlend();
 
         if (scale != 1d)
         {
-            RenderSystem.popMatrix();
+            matrixStack.pop();
         }
 
         return contentHeight + 4;
