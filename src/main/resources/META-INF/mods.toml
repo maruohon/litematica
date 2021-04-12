@@ -8,12 +8,12 @@
 modLoader="javafml" #mandatory
 
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[31,)" #mandatory (26 is current forge version)
+loaderVersion="[32,)" #mandatory (26 is current forge version)
 
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/maruohon/litematica/issues" #optional
 
-license="Dunno, just porting this and fml wants a license"
+license="GNU Lesser General Public License v3.0"
 
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
@@ -43,7 +43,7 @@ license="Dunno, just porting this and fml wants a license"
     authors="masa" #optional
 
     # The description text for the mod (multi line!) (#mandatory)
-    description='''Requires MaLiLib, a library mod required for many of masa's client-side mods'''
+    description='''Litematica is a client-side schematic mod for Minecraft, with also lots of extra functionality especially for creative mode (such as schematic pasting, area cloning, moving, filling, deletion)'''
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.litematica]] #optional
@@ -52,7 +52,7 @@ license="Dunno, just porting this and fml wants a license"
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[31,)" #mandatory
+    versionRange="[32,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -62,6 +62,13 @@ license="Dunno, just porting this and fml wants a license"
 [[dependencies.litematica]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.2]"
+    versionRange="[1.16.1,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.litematica]]
+    modId="malilib"
+    mandatory=true
+    versionRange="[0.10.0-dev.21+beta.1,)"
     ordering="NONE"
     side="CLIENT"
