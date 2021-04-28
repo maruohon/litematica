@@ -1,0 +1,614 @@
+elanguage.name=简体中文
+language.region=中国
+language.code=zh_cn
+
+
+litematica.error.area_selection.copy_failed=复制选区失败
+litematica.error.area_selection.create_failed=创建选区 '%s' 失败，文件已存在
+litematica.error.area_selection.failed_to_load=加载选区失败
+litematica.error.area_selection.no_placement_selected=没有选取投影放置！
+litematica.error.area_selection.no_sub_region_selected=没有选择子区域！
+litematica.error.area_selection.rename.already_exists=错误：区域已存在，文件名为：'%s'
+litematica.error.area_selection.rename.invalid_safe_file_name=生成的安全文件名 '%s' 无效
+
+litematica.error.duplicate_schematic_placement=错误：尝试添加的放置已存在
+litematica.error.generic.creative_mode_only=该操作仅在创造模式下有效
+litematica.error.generic.failed_to_sort_list_of_ignored_states=对忽略状态列表进行排序失败
+litematica.error.generic.schematic_world_not_loaded=投影世界尚未加载
+
+litematica.error.area_editor.create_sub_region.exists=子区域 '%s' 已存在
+litematica.error.area_editor.no_selection=没有活动的选区
+litematica.error.area_editor.open_gui.no_selection=当前处于“通常”选取模式，但没有已选中的区域
+litematica.error.area_editor.rename_sub_region.exists=重命名子区域失败：\n已有同名的子区域 '%s' 存在
+litematica.error.area_editor.switch_mode.no_selection=无法切换到“通常”选择模式，因为当前没有选择任何区域。\n请先选择一个区域，或在“区域选择”界面中创建一个新的选区
+
+litematica.error.execute_operation_no_tool=出于安全考虑，executeOperation 快捷键操作需要您手持操作工具才可运行，且“切换主渲染”选项及“操作工具”均需启用方可执行（在“视图选项”→ 'enableRendering' ['%s'] 和“通用”→ 'toolItemEnabled' ['%s'] 中设置）。该限制可在“通用”→ 'executeRequireHoldingTool' 中禁用。
+
+litematica.error.schematic_conversion.schematic_to_litematica.failed_to_create_schematic=创建 Litematica 投影失败
+litematica.error.schematic_conversion.schematic_to_litematica.failed_to_read_schematic=加载投影失败
+litematica.error.schematic_conversion.structure_to_litematica_failed=试图将结构转换为 Litematica 投影失败
+
+litematica.error.schematic_convert.failed_to_convert=转换投影失败：
+litematica.error.schematic_convert.failed_to_save=将投影保存为 '%s' 失败
+litematica.error.schematic_convert.no_output_type_selected=通过下拉菜单选择输出类型
+litematica.error.schematic.create.no_selections=没有有效的选择区域！
+
+litematica.error.schematic_load.cant_read_file=无法读取投影文件 '%s' （文件不存在或权限不足）
+litematica.error.schematic_load.failed=从文件 %s 加载投影失败
+litematica.error.schematic_load.no_schematic_selected=没有选择投影文件！
+litematica.error.schematic_load.no_schematic_version_information=指定的投影文件没有版本信息，无法安全加载！
+litematica.error.schematic_load.unsupported_schematic_version=版本 '%d' 不受支持，或文件的版本比 mod 新
+litematica.error.schematic_load.unsupported_type='%s' 的文件类型未知或不支持
+
+litematica.error.schematic_manager.schematic_has_no_name=选定的投影类型 ('%s) 不能存储名称
+litematica.error.schematic_manager.schematic_has_no_thumbnail=选定的投影类型 ('%s) 不能存储预览或缩略图
+
+litematica.error.schematic_placements.coordinate_locked=无法移动，因为启用了方位锁定功能
+litematica.error.schematic_placements.load_fail=从文件 '%s' 加载放置失败
+litematica.error.schematic_placements.load_fail.already_loaded=从文件加载放置 '%s' 失败，该放置似乎已经加载了
+litematica.error.schematic_placements.remove_fail_locked=此放置已锁定！\n- 按住 Shift 以强制移除
+litematica.error.schematic_placements.save_failed=将放置保存到文件失败
+litematica.error.schematic_placements.settings_load.invalid_data=加载放置设置信息失败，数据无效（非 JSON 格式？）
+litematica.error.schematic_placements.settings_load.missing_data=加载放置设置信息失败，缺少部分必要的数据！
+
+litematica.error.schematic_projects.empty_selection=空选区（0 个子区域）
+litematica.error.schematic_projects.failed_to_load_project=加载工程失败
+litematica.error.schematic_projects.failed_to_load_schematic=为当前版本加载投影失败
+litematica.error.schematic_projects.failed_to_rename_project_file_exception=试图将工程文件重命名为 '%s' 时失败（发生异常）
+litematica.error.schematic_projects.failed_to_rename_project_file_exists=无法将工程重命名为 '%s'，文件已存在
+litematica.error.schematic_projects.invalid_project_directory=工程目录无效或不存在
+litematica.error.schematic_projects.no_project_open=没有打开的工程
+litematica.error.schematic_projects.in_projects_mode_but_no_project_open=当前处于投影工程模式，但没有打开的工程
+litematica.error.schematic_projects.null_player=玩家不存在
+litematica.error.schematic_projects.project_already_exists=工程 '%s' 已存在
+litematica.error.schematic_projects.save_already_in_progress=保存已在进行中
+
+litematica.error.schematic_read_from_file_failed.cant_read=从文件 '%s' 读取投影失败
+litematica.error.schematic_read_from_file_failed.no_file=从文件加载投影失败：没有可用的文件（投影尚在内存中？）
+litematica.error.schematic_read_from_file_failed.region_container=将区域 '%s' 从 NBT 文件中为投影 '%s' 进行加载失败
+litematica.error.schematic_rename.read_failed=从文件 '%s' 加载投影失败
+
+litematica.error.schematic_save.directory_doesnt_exist=找不到指定的目录 '%s'
+litematica.error.schematic_save.file_already_exists=文件 '%s' 已存在
+litematica.error.schematic_save.invalid_directory=无效的目录 '%s'
+litematica.error.schematic_save.invalid_schematic_name=无效的投影名称 '%s'
+litematica.error.schematic_save.schematic_creation_failed=创建投影失败！
+
+litematica.error.schematic_write_to_file_failed.directory_creation_failed=创建投影目录 '%s' 失败
+litematica.error.schematic_write_to_file_failed.exception=将投影写入到文件 '%s' 失败（发生异常）
+litematica.error.schematic_write_to_file_failed.exists=将投影写入到文件 '%s' 失败，文件已存在
+litematica.error.structure_write_to_file_failed.exception=将结构写入到文件 '%s' 失败（发生异常）
+litematica.error.structure_write_to_file_failed.exists=将结构写入到文件 '%s' 失败，文件已存在
+
+litematica.hotkeys.category.generic_hotkeys=通用快捷键
+
+litematica.info.schematic_load.schematic_loaded=投影 '%s' 已成功加载到内存中
+litematica.info.schematic_manager.preview.info=使用快捷键 '%s' ['%s'] 来设置投影预览图，\n或右键点击“设置预览图”按钮来取消预览任务。
+litematica.info.schematic_manager.preview.right_click_to_cancel=右键点击该按钮来取消待定的预览图生成任务
+litematica.info.schematic_manager.preview.success=成功设置投影预览图
+
+litematica.gui.button.area_editor.analyze_area=分析该区域
+litematica.gui.button.area_editor.change_corner_mode=角点模式：%s
+litematica.gui.button.area_editor.change_selection_mode=选择模式：%s
+litematica.gui.button.area_editor.create_schematic=保存投影
+litematica.gui.button.area_editor.create_sub_region=创建子区域
+litematica.gui.button.area_editor.origin_enabled=手工指定原点：%s
+litematica.gui.button.area_editor.set_box_name=设置
+litematica.gui.button.area_editor.set_selection_name=设置
+
+litematica.gui.button.area_selection_mode=区域选择模式：%s
+litematica.gui.button.area_selections.create_directory=创建目录
+litematica.gui.button.area_selections.create_new_selection=新建选区
+litematica.gui.button.area_selections.create_selection_from_placement=从放置创建选区
+litematica.gui.button.area_selections.unselect=反选
+
+litematica.gui.button.change_menu.area_editor=区域编辑器
+litematica.gui.button.change_menu.configuration_menu=选项菜单
+litematica.gui.button.change_menu.load_schematics_to_memory=加载投影
+litematica.gui.button.change_menu.schematic_manager=投影管理器
+litematica.gui.button.change_menu.schematic_projects_manager=投影工程
+litematica.gui.button.change_menu.show_area_selections=选区浏览器
+litematica.gui.button.change_menu.show_loaded_schematics=已加载的投影
+litematica.gui.button.change_menu.show_schematic_placements=投影放置
+litematica.gui.button.change_menu.task_manager=任务管理
+litematica.gui.button.change_menu.to_main_menu=Litematica 主菜单
+
+litematica.gui.button.config_gui.colors=颜色
+litematica.gui.button.config_gui.generic=通用
+litematica.gui.button.config_gui.hotkeys=快捷键
+litematica.gui.button.config_gui.info_overlays=信息覆盖层
+litematica.gui.button.config_gui.render_layers=分层渲染
+litematica.gui.button.config_gui.visuals=视图选项
+
+litematica.gui.button.hover.area_editor.analyze_area=§7生成当前选区的材料列表
+litematica.gui.button.hover.area_editor.corner_mode.corners=§f角点模式：\n§7左键单击设置第一个角点（原点），\n§7右键单击设置第二个角点。\n§7中键单击选择一个角点，\n§7然后按住 Alt 并滑动滚轮，可向视线方向移动选区。
+litematica.gui.button.hover.area_editor.corner_mode.expand=§f扩展模式：\n§7右键点击将选框重置/缩小至点击位置，\n§7左键点击将选框扩展至所有点击位置，\n§7中间点击选择一个角点，\n§7然后按住 Alt 并滑动滚轮，可向视线方向移动选区。
+litematica.gui.button.hover.area_editor.shift_for_in_memory=§7按住 Shift 键创建仅在内存中临时存储的投影
+
+litematica.gui.button.hover.area_selections.from_placement=§7以当前的投影放置为基础创建新的选区。\n§7该操作基本上复制了用来一开始用来创建\n§7投影的原始选区。
+litematica.gui.button.hover.area_selections.unselect=§7取消选择当前选区
+litematica.gui.button.hover.material_list.clear_cache=清除材料列表缓存\n通常不需要执行此操作\n该操作可用于避免使缓存包含错误数据，如存储了类似活塞头等不应存在的\n方块的情况，而不需要手工删除'material_cache.nbt'
+litematica.gui.button.hover.material_list.write_hold_shift_for_csv=按住 Shift 可以将文件导出为 CSV 格式，\n而不是通常的文本表格形式
+litematica.gui.button.hover.material_list_shift_to_select_sub_regions=按住 Shift 来选择要在材料列表中对应的子区域
+litematica.gui.button.hover.plus_minus_tip=Left click to increase\n右键点击以减少数值\n按住 Shift 和（或）Alt 来增加步进值
+litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift=左键单击以增加数值\n右键点击以减少数值\n按住 Shift/Alt/Ctrl 来成倍增加步进值
+
+litematica.gui.button.hover.schematic_list.create_new_placement_shift_to_disable=§7为此投影创建新的放置。\n§7按住 Shift 可使创建的投影暂时处于禁用状态。
+litematica.gui.button.hover.schematic_list.reload_schematic=§7从文件重新加载投影。\n§7对于以下场景有所帮助：在投影重建模式中手滑，\n§7或投影文件在游戏外发生了修改。
+litematica.gui.button.hover.schematic_list.save_to_file=§7将投影保存到文件（以用户提供的名称保存）。\n§7当需要保存在投影重建模式下的修改时，\n§7需要执行此操作。\n§7该操作对将已加载的投影\n§7另存为其他格式也有所帮助。
+litematica.gui.button.hover.schematic_list.unload=§7将投影从内存中卸载。\n§6注意：卸载投影的同时也将移除\n§6以其为基础创建的放置。
+
+litematica.gui.button.hover.schematic_manager.convert_format=将选中的投影转换为另一种格式
+
+litematica.gui.button.hover.schematic_placement.copy_paste_settings=§6复制或粘贴放置设置\n- 单击打开文本框，在其中可以复制\n   或粘贴设置字符串\n- Shift + 左键单击可将设置字符串直接复制到剪贴板\n- Ctrl + Shift + 右键单击可直接粘贴来自剪贴板的设置字符串
+
+litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode=当前有已打开的投影工程。\n投影工程会取代通常模式下的区域选择功能
+litematica.gui.button.hover.schematic_projects.delete_area=§6删除最后放置或保存过的区域§r
+litematica.gui.button.hover.schematic_projects.move_origin_to_player=将投影工程的原点移动到玩家的当前位置\n此操作也将同时移动选区和放置的位置
+litematica.gui.button.hover.schematic_projects.place_to_world_warning=§6警告：该操作将删除或替换区域中的当前方块，\n§6这些方块可能为前一版本放置，或作为新版本保存的\n§6（基本可视同为最后一次的“有效选区”）
+litematica.gui.button.hover.schematic_projects.save_new_version=将新的投影/版本保存到当前工程
+litematica.gui.button.hover.use_text_or_icon_buttons=§7切换使用带文字说明的按钮/小型图标按钮
+
+litematica.gui.button.material_list=材料列表
+litematica.gui.button.material_list.clear_cache=清除缓存
+litematica.gui.button.material_list.clear_ignored=清除已忽略项
+litematica.gui.button.material_list.hide_available=隐藏存在的材料：%s
+litematica.gui.button.material_list.ignore=忽略
+litematica.gui.button.material_list.list_type=显示：%s
+litematica.gui.button.material_list.refresh_list=刷新：
+litematica.gui.button.material_list.toggle_info_hud=信息显示：%s
+litematica.gui.button.material_list.write_to_file=保存到文件
+
+litematica.gui.button.placement_sub.placement_configuration=放置配置
+litematica.gui.button.placement_sub.reset_sub_region_placement=重置子区域
+litematica.gui.button.placement_sub.slice_type=切片模式：%s
+
+litematica.gui.button.schematic_placement.grid_settings=网格/重复：%s
+litematica.gui.button.schematic_placement.ignore_entities=忽略实体：%s
+litematica.gui.button.schematic_placement.region_enabled=区域：%s
+litematica.gui.button.schematic_placement.reset_grid_size=重置大小
+litematica.gui.button.schematic_placement.reset_sub_region_placements=重置所有子区域
+litematica.gui.button.schematic_placement.toggle_all_off=全部置 §cOFF§r
+litematica.gui.button.schematic_placement.toggle_all_on=全部置 §aON§r
+
+litematica.gui.button.schematic_placement.hover.enclosing_box=§7封闭方框渲染：%s
+litematica.gui.button.schematic_placement.hover.grid_settings_shift_to_toggle=§7按住 Shift 键可进切换网格重复的开关状态
+litematica.gui.button.schematic_placement.hover.lock=§7锁定放置可阻止对放置的\n§7移动或（不慎）修改的操作
+
+litematica.gui.button.schematic_placements.configure=配置
+litematica.gui.button.schematic_placements.duplicate=复制
+litematica.gui.button.schematic_placements.disable=禁用
+litematica.gui.button.schematic_placements.load=加载
+litematica.gui.button.schematic_placements.locked=已锁定：%s
+litematica.gui.button.schematic_placements.placement_enabled=放置：%s
+litematica.gui.button.schematic_placements.remove=移除
+litematica.gui.button.schematic_placements.rendering_enabled=渲染：%s
+litematica.gui.button.schematic_placements.save=保存
+litematica.gui.button.schematic_placements.select=选择
+
+litematica.gui.button.schematic_projects.close_project=关闭当前工程
+litematica.gui.button.schematic_projects.create_project=创建工程
+litematica.gui.button.schematic_projects.delete_area=删除区域
+litematica.gui.button.schematic_projects.load_project=加载工程
+litematica.gui.button.schematic_projects.move_origin_to_player=移动到玩家
+litematica.gui.button.schematic_projects.open_area_editor=区域编辑器
+litematica.gui.button.schematic_projects.open_manager_gui=打开管理器
+litematica.gui.button.schematic_projects.open_project_browser=工程浏览器
+litematica.gui.button.schematic_projects.place_to_world=放置到世界中
+litematica.gui.button.schematic_projects.save_version=保存版本
+
+litematica.gui.button.schematic_verifier.ignore=忽略
+litematica.gui.button.schematic_verifier.range_type=范围：%s
+litematica.gui.button.schematic_verifier.reset_ignored=重置已忽略项
+litematica.gui.button.schematic_verifier.reset_verifier=重置数据
+litematica.gui.button.schematic_verifier.resume=继续验证
+litematica.gui.button.schematic_verifier.start=开始验证
+litematica.gui.button.schematic_verifier.stop=结束验证
+litematica.gui.button.schematic_verifier.toggle_info_hud=信息显示：%s
+
+litematica.gui.button.buttons_val=按钮：%s
+litematica.gui.button.cancel=取消
+litematica.gui.button.configure=配置
+litematica.gui.button.convert_format=格式转换
+litematica.gui.button.copy=复制
+litematica.gui.button.create_directory=创建新文件夹
+litematica.gui.button.create_placement=创建放置
+litematica.gui.button.delete=删除
+litematica.gui.button.disable=禁用
+litematica.gui.button.enable=启用
+litematica.gui.button.load_schematic_to_memory=加载投影
+litematica.gui.button.mirror_value=镜像：%s
+litematica.gui.button.move_to_player=移动到玩家
+litematica.gui.button.ok=确定
+litematica.gui.button.reload=重新加载
+litematica.gui.button.remove=移除
+litematica.gui.button.remove_placement=移除放置
+litematica.gui.button.rename=重命名
+litematica.gui.button.rename_file=重命名文件
+litematica.gui.button.rename_schematic=重命名投影
+litematica.gui.button.rotation_value=旋转：%s
+litematica.gui.button.save_new_schematic_version=保存新版本
+litematica.gui.button.save_schematic=保存投影
+litematica.gui.button.save_to_file=保存到文件
+litematica.gui.button.schematic_verifier=投影验证
+litematica.gui.button.set_preview=设置预览图
+litematica.gui.button.tool_mode=工具模式：%s
+litematica.gui.button.unload=卸载
+litematica.gui.button.unlocked=已解锁
+
+litematica.gui.hover.schematic_placement.button.load=§7将该放置加载到“活动放置”列表
+litematica.gui.hover.schematic_placement.button.configure=§7编辑该放置的属性，\n§7例如位置、旋转和镜像等。
+litematica.gui.hover.schematic_placement.button.duplicate=§7创建一个与该放置完全一致的副本
+litematica.gui.hover.schematic_placement.button.remove=§7移除该放置。\n§6如果你稍后还需要使用这个放置，\n§6可以通过“保存”按钮将其预先保存。\n§7移除放置不会将投影本身从内存中卸载。\n§7要同时卸载投影，\n§7可以从“已加载投影”中将其卸载。\n§7卸载投影的同时也将移除\n§7其对应的所有放置。
+litematica.gui.hover.schematic_placement.button.save=§7将放置保存到单独的文件。\n§7该操作使你可以将放置从列表中移除，\n§7并当后期需要时仍能在\n§7放置浏览器中重新加载它。
+litematica.gui.hover.schematic_placement.button.toggle_enabled=§7启用或停用该放置。\n§7如果你只是暂时不想看到某个放置，\n§7推荐使用该功能停用它，\n§7如此可将该放置从投影世界中移除，\n§7并减少投影 mod 在玩家移动时\n§7所需要处理的操作数量。
+
+litematica.gui.hover.schematic_save.update_dependent_placements=§7选择指向新文件时是否更新投影的所有放置，\n§7或者只更新当前选择的放置，\n§7以便在下次从文件加载放置时，\n§7加载投影的当前保存版本、而不是原始版本。\n§7此功能在对投影使用“投影重建/编辑”模式时尤为有用。
+
+litematica.gui.label.area_editor.box_name=子区域选框名称
+litematica.gui.label.area_editor.selection_name=选区名称
+litematica.gui.label.area_editor.corner_1=角 1
+litematica.gui.label.area_editor.corner_2=角 2
+litematica.gui.label.area_editor.origin=原点
+litematica.gui.label.area_editor.dimensions=尺寸
+litematica.gui.label.area_editor.pos1=角 1
+litematica.gui.label.area_editor.pos2=角 2
+litematica.gui.label.area_editor.sub_regions=子区域 (%s)
+
+litematica.gui.label.area_selection_browser.selections=选区
+litematica.gui.label.area_selection_manager.current_selection=§7已选择区域：§b%s
+
+litematica.gui.label.area_selection.hover.box_count=§7选框数：§6%d
+litematica.gui.label.area_selection.hover.origin=§7原点 - x: §9%s§7, y: §9%s§7, z: §9%s§7 [§6%s§7]
+
+litematica.gui.label.area_selection.mode.normal=通常模式
+litematica.gui.label.area_selection.mode.simple=简单模式
+
+litematica.gui.label.block_info.state_client=客户端世界方块模式
+litematica.gui.label.block_info.state_schematic=投影世界方块模式
+
+litematica.gui.label.block_info_list_type.all=全部
+litematica.gui.label.block_info_list_type.render_layers=渲染层
+
+litematica.gui.label.loaded_schematic.modified_on=§6已于 %s §r修改
+
+litematica.gui.label.material_list.abbr.shulker_box=潜影盒
+litematica.gui.label.material_list.title.available=存在
+litematica.gui.label.material_list.title.item=物品
+litematica.gui.label.material_list.title.missing=缺失
+litematica.gui.label.material_list.title.total=合计
+
+litematica.gui.label.material_list.multiplier=倍数：
+litematica.gui.label.material_list.name=名称
+litematica.gui.label.material_list.progress=进度：%s
+litematica.gui.label.material_list.progress.done=已完成 %s
+litematica.gui.label.material_list.progress.mismatch=不匹配 %s
+litematica.gui.label.material_list.progress.missing=缺失 %s
+litematica.gui.label.material_list.total=合计：%s 个物品
+
+litematica.gui.label.misc.icons=图标
+litematica.gui.label.misc.text=文字
+
+litematica.gui.label.missing_chunks=%s 缺失区块 (%s)
+litematica.gui.label.origin.auto=自动
+litematica.gui.label.origin.manual=手动
+
+litematica.gui.label.placement_grid.grid_size=网格尺寸
+litematica.gui.label.placement_grid.repeat_count=重复计数
+litematica.gui.label.placement_grid_settings.max_x=正 X
+litematica.gui.label.placement_grid_settings.max_y=正 Y
+litematica.gui.label.placement_grid_settings.max_z=正 Z
+litematica.gui.label.placement_grid_settings.min_x=负 X
+litematica.gui.label.placement_grid_settings.min_y=负 Y
+litematica.gui.label.placement_grid_settings.min_z=负 Z
+litematica.gui.label.placement_grid_settings.size_x=尺寸 X
+litematica.gui.label.placement_grid_settings.size_y=尺寸 Y
+litematica.gui.label.placement_grid_settings.size_z=尺寸 Z
+
+litematica.gui.label.placement_sub.region_name=区域名称：%s
+litematica.gui.label.placement_sub.region_position=区域位置
+
+litematica.gui.label.placement_sub.hover.region_size=§7区域尺寸：§9%s x %s x %s
+
+litematica.gui.label.placement_settings.placement_origin=放置原点
+
+litematica.gui.label.render_layers.hotkey=快捷键
+litematica.gui.label.render_layers.hover.hotkey=“上一个/下一个图层”快捷键将会影响该边界。\n如果二者均未选中，那么该快捷键将影响\n距离玩家最近的边界。
+
+litematica.gui.label.replace_behavior.all=所有
+litematica.gui.label.replace_behavior.none=无
+litematica.gui.label.replace_behavior.with_non_air=非空气方块
+
+litematica.gui.label.schematic_save.upldate_placements_option.dont_update=不更新任何放置
+litematica.gui.label.schematic_save.upldate_placements_option.update_all=更新所有从属放置
+litematica.gui.label.schematic_save.upldate_placements_option.update_selected=更新当前选中的放置
+
+litematica.gui.label.schematic_info.schematic_author=投影作者：§f%s§r
+litematica.gui.label.schematic_info.description=描述：
+litematica.gui.label.schematic_info.enclosing_size=边界尺寸：
+litematica.gui.label.schematic_info.enclosing_size_value=边界尺寸：§f%s§r
+litematica.gui.label.schematic_info.name=名称：
+litematica.gui.label.schematic_info.region_count=区域数量：§f%d§r
+litematica.gui.label.schematic_info.time_created=创建于：§f%s§r
+litematica.gui.label.schematic_info.time_modified=修改于：§f%s§r
+litematica.gui.label.schematic_info.total_blocks=总方块数：§f%d§r
+litematica.gui.label.schematic_info.total_blocks_and_volume=方块/体积：§f%d§r/§f%d§r
+litematica.gui.label.schematic_info.total_volume=总体积：§f%d§r 方块
+
+litematica.gui.label.schematic_load.checkbox.create_placement=创建放置
+litematica.gui.label.schematic_load.hoverinfo.create_placement=加载投影后，\n立刻创建一个放置并选中之
+
+litematica.gui.label.schematic_paste.missing_chunks=粘贴模式，缺失的区块 (%s)
+
+litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=按住 Shift 可在放置创建后使其暂时处于禁用状态
+litematica.gui.label.schematic_placement.open_placement_browser=浏览已保存的放置
+litematica.gui.label.schematic_placement.rename_placement=重命名放置为：
+litematica.gui.label.schematic_placement.saved_to_file=成功将放置保存到文件 '%s'
+litematica.gui.label.schematic_placement.sub_regions=子区域 (%s)：
+
+litematica.gui.label.schematic_placement.hover.enabled=§7放置：%s
+litematica.gui.label.schematic_placement.hover.enclosing_size=§7边界尺寸：§9%s x %s x %s
+litematica.gui.label.schematic_placement.hover.in_memory=§b【内存临时存储】
+litematica.gui.label.schematic_placement.hover.is_loaded=§7已加载：%s
+litematica.gui.label.schematic_placement.hover.is_saved_to_file_modified=§7已保存到文件：§a是§7 - §7自上次保存后§6 已被修改
+litematica.gui.label.schematic_placement.hover.is_saved_to_file_not_modified=§7已保存到文件：%s
+litematica.gui.label.schematic_placement.hover.name=§7名称：§2%s
+litematica.gui.label.schematic_placement.hover.origin=§7原点 - x: §9%s§7, y: §9%s§7, z: §9%s
+litematica.gui.label.schematic_placement.hover.rotation_mirror=§7旋转：§b%s§7，镜像：§b%s
+litematica.gui.label.schematic_placement.hover.placement_file=§7放置文件：§3%s
+litematica.gui.label.schematic_placement.hover.schematic_file=§7投影文件：§3%s
+litematica.gui.label.schematic_placement.hover.schematic_name=§7投影名称：§2%s
+litematica.gui.label.schematic_placement.hover.schematic_type=§7类型：§b%s
+litematica.gui.label.schematic_placement.hover.sub_region_count=§7子区域：§6%s
+
+litematica.gui.label.schematic_projects.currently_open_project=当前打开的工程：%s
+litematica.gui.label.schematic_projects.origin=原点：
+litematica.gui.label.schematic_projects.project=工程：
+litematica.gui.label.schematic_projects.version=版本：%s (共 %s 个版本)
+litematica.gui.label.schematic_projects.version_entry=版本 %d - %s
+litematica.gui.label.schematic_projects.version_name=版本名称：
+
+litematica.gui.label.schematic_save.checkbox.ignore_entities=忽略实体
+litematica.gui.label.schematic_save.hoverinfo.hold_shift_to_overwrite=按住 Shift 覆盖已存在的文件
+
+litematica.gui.label.schematic_verifier.count=数量
+litematica.gui.label.schematic_verifier.expected=预期
+litematica.gui.label.schematic_verifier.found=找到
+litematica.gui.label.schematic_verifier_display_type.all=全部（不含忽略的）
+litematica.gui.label.schematic_verifier_display_type.correct_state=状态正确
+litematica.gui.label.schematic_verifier_display_type.extra=多余方块
+litematica.gui.label.schematic_verifier_display_type.missing=缺失方块
+litematica.gui.label.schematic_verifier_display_type.wrong_blocks=错误方块
+litematica.gui.label.schematic_verifier_display_type.wrong_state=状态错误
+litematica.gui.label.schematic_verifier.status.done_errors=Wrong: §c方块：%s§r, §6状态：%s§r, §b缺失：%s§r, §d多余：%s§r
+litematica.gui.label.schematic_verifier.status.done_correct_total=§a正确：%s§r, 总数：%s
+litematica.gui.label.schematic_verifier.status.verifying=尚未验证的区块：%s / %s
+litematica.gui.label.schematic_verifier.verifier=投影验证程序
+
+litematica.gui.label.task_name.area_analyzer=区域分析程序
+litematica.gui.label.task_name.delete=删除任务
+litematica.gui.label.task_name.fill=填充任务
+litematica.gui.label.task_name.material_list=材料列表
+litematica.gui.label.task_name.paste=粘贴投影
+litematica.gui.label.task_name.save_schematic=保存投影
+litematica.gui.label.task_name.update_blocks=更新方块
+litematica.gui.label.task_name.verifier=验证程序
+
+litematica.gui.message.confirm_file_deletion=要删除文件 '%s' 吗？
+litematica.gui.message.schematic_projects.confirm_delete_area=要删除“最后受影响的”区域吗？\n该操作将删除区域内工程管理器最近放置在世界中的任何方块和实体，或者最近保存为版本的数据。（基本等同于“最后影响的区域”，例如可用于在版本之间切换时，如此可使上一版本的方块不致遗留。）
+litematica.gui.message.schematic_projects.confirm_place_to_world=要将该版本放置到世界中吗？\n该操作将删除区域内工程管理器最近放置在世界中的任何方块和实体，或者最近保存为版本的数据。（基本等同于“最后影响的区域”，例如可用于在版本之间切换时，如此可使上一版本的方块不致遗留。）
+
+litematica.gui.title.area_editor_normal=区域编辑器（通常/多选框模式）
+litematica.gui.title.area_editor_normal_schematic_projects=区域编辑器（§6§l投影工程区域§r）
+litematica.gui.title.area_editor_simple=区域编辑器（简单模式）
+litematica.gui.title.area_editor_sub_region=区域编辑器（子区域）
+litematica.gui.title.area_editor.sub_region_name=子区域名称
+litematica.gui.title.area_selection_browser=选区浏览器
+litematica.gui.title.configure_schematic_placement=配置投影放置
+litematica.gui.title.configure_schematic_sub_region=配置放置子区域
+litematica.gui.title.configs=Litematica 配置
+litematica.gui.title.confirm_file_deletion=确认文件删除操作
+litematica.gui.title.convert_schematic_format=将投影 '%s' 保存为其它投影文件格式
+litematica.gui.title.copy_area_selection=复制选区 '%s'
+litematica.gui.title.create_area_selection=创建新选区
+litematica.gui.title.create_area_selection_from_placement=从投影放置创建新选区
+litematica.gui.title.create_directory=创建新目录
+litematica.gui.title.create_in_memory_schematic=创建内存存储临时投影
+litematica.gui.title.create_schematic_project=创建新投影工程
+litematica.gui.title.litematica_main_menu=Litematica %s
+litematica.gui.title.load_schematic=加载投影
+litematica.gui.title.manage_loaded_schematics=管理已加载的投影
+litematica.gui.title.manage_schematic_placements=管理投影放置
+litematica.gui.title.material_list.area_analyzer=对选区 '%s' 的分析
+litematica.gui.title.material_list.placement=放置 '%s' 的材料列表
+litematica.gui.title.material_list.schematic=投影 '%s' 的材料列表（第 %s / %s 个区域）
+litematica.gui.title.material_list.select_schematic_regions=为 '%s' 的材料列表选择子区域
+litematica.gui.title.rename_area_selection=重命名选区
+litematica.gui.title.rename_area_sub_region=重命名子区域
+litematica.gui.title.rename_file=重命名文件
+litematica.gui.title.rename_schematic=重命名投影
+litematica.gui.title.create_schematic_from_selection=将当前选择的区域保存为投影
+litematica.gui.title.save_schematic_convert=转换/保存投影 '%s'
+litematica.gui.title.save_schematic_from_memory=将内存中临时存储的投影保存到文件
+litematica.gui.title.schematic_manager=投影管理器
+litematica.gui.title.schematic_placement.copy_or_load_settings=复制或加载放置设置
+litematica.gui.title.schematic_placement_browser=已保存的投影放置
+litematica.gui.title.schematic_placement_grid_settings=放置 '%s' 的网格/重复设置
+litematica.gui.title.schematic_project_manager=投影工程管理器
+litematica.gui.title.schematic_projects.confirm_delete_area=确认区域删除操作
+litematica.gui.title.schematic_projects.confirm_place_to_world=确认放置到世界操作
+litematica.gui.title.schematic_projects.save_new_version=保存投影的新版本
+litematica.gui.title.schematic_projects_browser=投影工程浏览器
+litematica.gui.title.schematic_verifier=投影 '%s' 验证程序
+litematica.gui.title.schematic_verifier_errors=投影验证程序错误列表
+litematica.gui.title.task_manager=任务管理器
+
+litematica.hud.area_selection.box_count=选框：%s
+litematica.hud.area_selection.dimensions_position=尺寸：%s - p1: %s, p2: %s
+litematica.hud.area_selection.mode.corners=角点
+litematica.hud.area_selection.mode.expand=扩展
+litematica.hud.area_selection.origin=原点：%s
+litematica.hud.area_selection.selected_area_normal=区域：%s
+litematica.hud.area_selection.selected_area_simple=区域 [§6简单模式§r]: %s
+litematica.hud.area_selection.selected_sub_region=子区域：%s
+litematica.hud.area_selection.selection_corners_mode=角点模式：%s
+
+litematica.hud.delete.target_mode=删除目标模式：%s
+litematica.hud.delete.target_mode.area=当前区域
+litematica.hud.delete.target_mode.placement=当前放置
+
+litematica.hud.misc.easy_place_mode_enabled=轻松放置模式 §a已启用§r
+litematica.hud.misc.none_brackets=<无>
+litematica.hud.misc.placement_restriction_mode_enabled=限制放置模式 §a已启用§r
+litematica.hud.misc.render_layer_mode=图层模式：%s - %s
+litematica.hud.misc.render_layer_mode_all=图层模式：%s
+litematica.hud.misc.renderer_status=渲染器：A: %s S: %s B: %s O: %s SEL: %s
+litematica.hud.misc.schematic_paste.replace_mode=替换方块：%s
+
+litematica.hud.schematic_placement.hover_info.lock_coordinate=§7方位锁定\n§7该功能允许在不（意外）影响已锁定放置的情况下\n§7调节其它放置的位置
+litematica.hud.schematic_placement.hover_info.placement_locked=§6该放置已被锁定，\n§6请先解锁再对其进行移动
+litematica.hud.schematic_placement.hover_info.placement_modified=§6该放置已被修改
+litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=§6该子区域已被修改
+litematica.hud.schematic_placement.selected_placement=放置
+litematica.hud.schematic_placement.selected_sub_region=子区域
+litematica.hud.schematic_placement.sub_region_count=区域计数
+litematica.hud.schematic_placement.sub_region_modified=已修改
+litematica.hud.schematic_placement.sub_region_origin=区域原点：%s
+litematica.hud.schematic_placement.sub_regions_modified=区域已修改
+
+litematica.hud.selected_mode=模式
+
+litematica.hud.schematic_projects.current_version_date=日期：%s
+litematica.hud.schematic_projects.current_version=版本：%s/%s - 名称：%s
+litematica.hud.schematic_projects.no_project_open=<没有打开的工程>
+litematica.hud.schematic_projects.no_versions=<没有版本>
+litematica.hud.schematic_projects.origin=工程原点：%s
+litematica.hud.schematic_projects.project_name=工程：%s
+litematica.hud.schematic_projects_mode=§6投影工程模式§r
+
+litematica.info.material_list=- 材料列表快捷键可用于打开上次浏览的列表\n   （如果有的话）\n- 要切换至其它材料列表，\n   可通过“放置配置”界面下的按钮\n   或投影浏览器中的对应功能先打开一次。\n- 已存储或最后浏览过的材料列表\n   在切换至其它投影放置后将会重置。\n- 如果没有之前浏览过的材料列表，\n   那么将会依据已选中的放置（如果有）进行创建。
+
+litematica.label.alignment.center=居中
+litematica.label.alignment.top_center=靠上居中
+
+litematica.label.none_lower=无
+litematica.label.no=否
+litematica.label.yes=是
+
+litematica.message.error.area_deletion_aborted=区域删除操作中断或被终止
+litematica.message.error.empty_area_selection=选区为空（无选框）
+litematica.message.error.invalid_schematic_name=投影名称 '%s' 无效
+litematica.message.error.no_area_selected=§c没有选中的区域§r
+litematica.message.error.no_placement_selected=§c没有选中的放置§r
+litematica.message.error.only_works_in_single_player=§c此操作仅在单人游戏模式下可用§r
+litematica.message.error.move.pending_tasks=§c不能启动移动操作，因为尚有其它待处理任务§r
+litematica.message.error.placement_grid_settings.open_gui_selected_is_grid=选中的放置是重复/网格型放置。\n重复类放置不能再设置重复。\n请选择一个通常型放置来配置其网格设置。
+litematica.message.error.placement_paste_outside_world=此放置不能粘贴到当前位置，因为其边界已超出了世界边界
+litematica.message.error.schematic_paste_failed=§c将投影粘贴到世界失败§r
+litematica.message.error.schematic_paste_failed_region=§c粘贴区域 '%s' 失败§r
+litematica.message.error.schematic_placement.failed_to_create_directory=创建目录 '%s' 失败
+litematica.message.error.schematic_placement.load_failed=将放置 '%s' 从投影文件 '%s' 中加载失败
+litematica.message.error.schematic_placement.save.failed_to_get_save_file=获取保存放置的目标文件失败
+litematica.message.error.schematic_placement.save.failed_to_serialize=序列化放置数据失败
+litematica.message.error.schematic_placement.save.no_changes=自上次保存后没有修改
+litematica.message.error.schematic_placement.save.should_not_save=该放置不能保存。\n例如，在内存中临时存储的投影，其放置不能保存。
+litematica.message.error.schematic_read.invalid_or_missing_size=投影尺寸无效或不存在
+litematica.message.error.schematic_read.invalid_or_missing_size_value=无效的投影尺寸：%s x %s x %s
+litematica.message.error.schematic_read.mcedit2.missing_block_data=SchematicaSchematic: 方块 '%s' 在 MCEdit2 调色板中缺失或不存在
+litematica.message.error.schematic_read.mcedit2.palette.id_not_number=SchematicaSchematic: 无效的 ID '%s'（不是数字），对应 MCEdit2 调色板中的方块 '%s'
+litematica.message.error.schematic_read.mcedit2.palette.invalid_id=SchematicaSchematic: 无效的 ID %s，对应 MCEdit2 调色板中的方块 '%s'，最大值为：%s
+litematica.message.error.schematic_read.missing_or_invalid_data=读取投影 '%s' 失败，因为其包含缺失或无效的数据
+litematica.message.error.schematic_read.registry_palette.missing_block_data=SchematicaSchematic: 方块 '%s' 在方块注册表中的 ID 无效
+litematica.message.error.schematic_read.schematica.old_schematica_format_not_supported=SchematicaSchematic: 检测到旧版本的投影格式，此功能暂未开发
+litematica.message.error.schematic_read.schematica.palette.failed_to_read=SchematicaSchematic: 读取方块调色板失败
+litematica.message.error.schematic_read.schematica.palette.invalid_block=SchematicaSchematic: SchematicaMapping 中的方块 '%s' 缺失或不存在
+litematica.message.error.schematic_read.schematica.palette.invalid_id=SchematicaSchematic: SchematicaMapping 中的 ID %s 无效（对应方块 '%s'），最大值为：%s
+litematica.message.error.schematic_read.schematica.schematic.invalid_block_add_array_size=SchematicaSchematic: 新增数组大小不符，方块：%s，待增加：%s，预期增加值：%s
+litematica.message.error.schematic_read.schematica.schematic.invalid_block_array_size=SchematicaSchematic: 方块数组长度与报告的投影尺寸不符：数组长度：%s, W x H x L: %s x %s x %s
+litematica.message.error.schematic_read.schematica.schematic.invalid_metadata_array_size=SchematicaSchematic: 方块 ID 与元数据数组大小不符，方块：%s，元数据：%s
+litematica.message.error.schematic_read.sponge.palette.invalid_id=Sponge 格式投影方块调色板中的 ID '%s' 无效
+litematica.message.error.schematic_read.sponge.palette.unknown_block=Sponge 格式投影方块调色板中存在未知方块 '%s'
+litematica.message.error.schematic_read.sponge.failed_to_read_blocks=从 Sponge 格式投影中读取方块失败
+litematica.message.error.schematic_save_failed=保存投影文件 '%s' 失败
+litematica.message.error.schematic_save_interrupted=投影保存被中断或已终止
+litematica.message.error.schematic_save.missing_container=找不到子区域 '%s' 的数据容器之一
+litematica.message.error.schematic_save.missing_entity_list=找不到子区域 '%s' 的实体列表
+litematica.message.error.schematic_save_no_area_selected=§c保存投影失败 - 没有已选择的区域§r
+litematica.message.error.schematic_write.schematica.palette.invalid_id=SchematicaSchematic: 方块 ID %s（对应方块 '%s'）超出范围，最大值为：%s
+litematica.message.error.update_blocks_aborted=已中断更新区域内方块的操作
+
+litematica.message.added_selection_box=已在 %s 添加新选框
+litematica.message.area_clear_fail=§c清除区域失败§r
+litematica.message.area_cleared=区域已清除
+litematica.message.area_filled=区域已填充
+litematica.message.area_fill_fail=填充区域失败
+litematica.message.area_selections.selection_created_from_placement=已依据放置 '%s' 创建新选区
+litematica.message.blocks_updated=区域内的方块已完成更新
+litematica.message.duplicated_selected_placement=已复制所选的放置
+litematica.message.easy_place_fail=操作已被轻松放置模式阻止
+litematica.message.grabbed_element_for_moving=已选取要移动的元素
+litematica.message.grid_paste.warning.select_base_placement_for_grid_paste=注意：网格粘贴操作只有在选择了“原版”（基础）放置、并使用“粘贴网格”功能时才会有效。如果你选择了某个重复型放置，那么就只会粘贴那一个特定的放置。
+litematica.message.in_memory_schematic_created=已创建内存临时存储投影 '%s'
+litematica.message.material_list.material_cache_cleared=材料列表缓存已清除
+litematica.message.material_list_written_to_file=已将材料列表保存到文件 '%s'
+litematica.message.moved_area_origin=已将区域原点从 %s 移动到 %s
+litematica.message.moved_selection=已将当前选择从 %s 移动到 %s
+litematica.message.placement.cant_modify_is_locked=§c该放置已锁定，不能修改§r
+litematica.message.placement.moved_placement_origin=已将放置原点从 %s 移动到 %s
+litematica.message.placement.moved_subregion_to=已将子区域移动到 %s
+litematica.message.placement.settings_copied_to_clipboard=已将设置复制到剪贴板
+litematica.message.placement.settings_loaded_from_clipboard=从剪贴板加载设置成功
+litematica.message.placement_restriction_fail=操作已被放置限制模式阻止
+litematica.message.removed_area_origin=已移除明确/手工的区域原点
+litematica.message.removed_selection_box=已移除选框 %s
+litematica.message.scheduled_task_added=已添加计划任务...
+litematica.message.schematic_convert.success=已成功转换投影格式并保存为 '%s'
+litematica.message.schematic_exported_as=投影已导出为 '%s'
+litematica.message.schematic_pasted=已将投影粘贴到世界中
+litematica.message.schematic_pasted_using_setblock=已将投影通过 %s 个 setblock 指令粘贴到世界中
+litematica.message.schematic_placement_created=已为 '%s' 创建放置
+litematica.message.schematic_placement_loaded=已从文件加载放置 '%s'
+litematica.message.schematic_placements_pasted=已成功将所有投影放置粘贴到世界中
+litematica.message.schematic_preview_cancelled=已取消预览图创建任务
+litematica.message.schematic_read_from_file_success=已从文件加载投影 '%s'
+litematica.message.schematic_rebuild.accepted_replacement=投影编辑：已接受替换方块
+litematica.message.schematic_rendering_refreshed=投影渲染已刷新
+litematica.message.schematic_saved_as=已将投影保存为 '%s'
+litematica.message.schematic_save_task_created=已创建投影保存任务
+litematica.message.set_area_origin=已将区域原点设置到 %s
+litematica.message.set_currently_held_item_as_tool=§a将当前手持的物品设置为“工具物品”
+litematica.message.set_selection_box_point=已将 %d 设置/移动到 %s
+litematica.message.toggled=已切换 %s %s
+litematica.message.value.on=ON
+litematica.message.value.off=OFF
+
+litematica.message.schematic_projects.project_created=已创建工程 '%s'
+litematica.message.schematic_projects.project_loaded=已加载工程 '%s'
+litematica.message.schematic_projects.version_saved=已将新版本 (#%s) 保存为 '%s'
+
+litematica.message.warn.area_selection.browser_open_in_simple_mode=注意：当前处于简单区域选择模式
+litematica.message.warn.layer_mode_currently_at=注意：当前处于 '%s' 图层渲染模式
+litematica.message.warn.main_rendering_disabled=警告：主渲染当前已禁用\n请参考“视图选项”下的 %s，或“快捷键”下的 %s ['%s']
+litematica.message.warn.schematic_blocks_rendering_disabled=警告：投影方块渲染当前已禁用\n请参考“视图选项”下的 %s，或“快捷键”下的 %s ['%s']
+litematica.message.warn.schematic_load_non_litematica=警告：直接打开不是 Litematica 格式的投影时，所创建的放置将不是永久性的。\n此外，如果需要多次加载此类投影，则如果投影较大，那么每次加载时都需要等待因投影格式的转换造成的延迟。\n\n因此，推荐用户在导入其它格式的投影后，在“投影管理器”菜单中将其保存为 Litematica 格式的投影，或者，更好的做法是将原始投影用 MCEdit 或 Litematica 的粘贴模式粘贴到临时世界中，然后将其制作成一个新的 Litematica 投影，并当有必要时使用多个子区域，使得构建更加紧密。
+litematica.message.warn.schematic_rebuild.subregion_not_selected=目标放置中包含已选定的不同子区域。“全部替换”操作只对当前已选择的子区域有效。要替换整个投影（所有子区域）中的方块，请不要预先选定任何子区域。此外，区域内将被替换的方块同样受当前渲染图层的限制。\n\n（你可以在“放置设置”界面中选择或取消对子区域的选定，方法是单击列表中的子区域名称。高亮的条目即为当前选中的子区域。）
+litematica.message.warn.schematic_rendering_disabled=警告：投影渲染当前已禁用\n请参考“视图选项”下的 %s，或“快捷键”下的 %s ['%s']
+litematica.message.warn.schematic_verifier.overlay_disabled=警告：投影验证视图当前已禁用！请参考“信息覆盖层”下的 %s（或“快捷键”下的 %s ['%s']）
+
+litematica.message.warning.invalid_number=输入的数字 '%s' 无效
+
+litematica.warning.area_editor.area_rendering_disabled=注意：区域选框渲染当前已禁用\n请参考“视图选项”下的 %s，或“快捷键”下的 %s ['%s']
+
+litematica.tool_hud.block_1=方块：%s
+litematica.tool_hud.block_2=替换为：%s
+litematica.tool_hud.facing=朝向：%s
+
+litematica.tool_mode.name.area_selection=选区
+litematica.tool_mode.name.delete=删除
+litematica.tool_mode.name.fill=填充
+litematica.tool_mode.name.grid_paste=在世界中网格化填充投影
+litematica.tool_mode.name.move=移动
+litematica.tool_mode.name.paste_schematic=在世界中粘贴投影
+litematica.tool_mode.name.rebuild=重建（等同于编辑）投影
+litematica.tool_mode.name.replace_block=替换方块
+litematica.tool_mode.name.schematic_placement=投影放置
