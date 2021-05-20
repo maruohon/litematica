@@ -70,5 +70,5 @@ license="GNU Lesser General Public License v3.0"
     modId="malilib"
     mandatory=true
     versionRange="[0.10.0-dev.21+beta.1,)"
-    ordering="NONE"
+    ordering="BEFORE"
     side="CLIENT"
