@@ -4,6 +4,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.item.ItemStack;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.materials.MaterialListBase;
@@ -292,15 +293,15 @@ public class WidgetMaterialListEntry extends WidgetListEntrySortable<MaterialLis
             int y1 = y;
             y += 4;
 
-            this.drawString(x1     , y, 0xFFFFFFFF, header1, matrixStack);
+            this.drawString(x1     , y, 0xFFFFFFFF, header1  , matrixStack);
             this.drawString(x2 + 20, y, 0xFFFFFFFF, stackName, matrixStack);
             y += 16;
 
-            this.drawString(x1, y, 0xFFFFFFFF, header2, matrixStack);
+            this.drawString(x1, y, 0xFFFFFFFF, header2      , matrixStack);
             this.drawString(x2, y, 0xFFFFFFFF, strCountTotal, matrixStack);
             y += 16;
 
-            this.drawString(x1, y, 0xFFFFFFFF, header3, matrixStack);
+            this.drawString(x1, y, 0xFFFFFFFF, header3        , matrixStack);
             this.drawString(x2, y, 0xFFFFFFFF, strCountMissing, matrixStack);
 
             RenderUtils.drawRect(x2, y1, 16, 16, 0x20FFFFFF); // light background for the item

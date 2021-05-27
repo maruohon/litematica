@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 import com.google.common.collect.Sets;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -21,11 +22,11 @@ import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
@@ -66,6 +67,7 @@ public class ChunkRendererSchematicVbo
     private net.minecraft.util.math.AxisAlignedBB boundingBox;
     protected Color4f overlayColor;
     protected boolean hasOverlay = false;
+    private boolean ignoreClientWorldFluids;
 
     protected ChunkCacheSchematic schematicWorldView;
     protected ChunkCacheSchematic clientWorldView;
@@ -87,10 +89,11 @@ public class ChunkRendererSchematicVbo
         this.vertexBufferOverlay = new VertexBuffer[OverlayRenderType.values().length];
         this.position = new BlockPos.Mutable();
         this.chunkRelativePos = new BlockPos.Mutable();
+        VertexFormat formatBlocks = RenderType.getSolid().getVertexFormat();
 
         for (RenderType layer : RenderType.getBlockLayers())
         {
-            this.vertexBufferBlocks.put(layer, new VertexBuffer(DefaultVertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL));
+            this.vertexBufferBlocks.put(layer, new VertexBuffer(formatBlocks));
         }
 
         for (int i = 0; i < OverlayRenderType.values().length; ++i)
@@ -371,7 +374,7 @@ public class ChunkRendererSchematicVbo
         {
             if (blockSchematic.hasBlockEntity())
             {
-                this.addBlockEntity(pos, data, tileEntities);
+                this.addTileEntity(pos, data, tileEntities);
             }
 
             boolean translucent = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
@@ -663,11 +666,11 @@ public class ChunkRendererSchematicVbo
 
             if (schematicHasAir)
             {
-                return clientHasAir ? OverlayType.NONE : OverlayType.EXTRA;
+                return (clientHasAir || (this.ignoreClientWorldFluids && stateClient.getMaterial().isLiquid())) ? OverlayType.NONE : OverlayType.EXTRA;
             }
             else
             {
-                if (clientHasAir)
+                if (clientHasAir || (this.ignoreClientWorldFluids && stateClient.getMaterial().isLiquid()))
                 {
                     return OverlayType.MISSING;
                 }
@@ -722,9 +725,9 @@ public class ChunkRendererSchematicVbo
         return overlayColor;
     }
 
-    private void addBlockEntity(BlockPos pos, ChunkRenderDataSchematic chunkRenderData, Set<TileEntity> blockEntities)
+    private void addTileEntity(BlockPos pos, ChunkRenderDataSchematic chunkRenderData, Set<TileEntity> blockEntities)
     {
-        TileEntity te = this.schematicWorldView.getBlockEntity(pos, Chunk.CreateEntityType.CHECK);
+        TileEntity te = this.schematicWorldView.getTileEntity(pos, Chunk.CreateEntityType.CHECK);
 
         if (te != null)
         {
@@ -732,7 +735,7 @@ public class ChunkRendererSchematicVbo
 
             if (tesr != null)
             {
-                chunkRenderData.addBlockEntity(te);
+                chunkRenderData.addTileEntity(te);
 
                 if (tesr.rendersOutsideBoundingBox(te))
                 {
@@ -744,7 +747,7 @@ public class ChunkRendererSchematicVbo
 
     private void preRenderBlocks(BufferBuilder buffer)
     {
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL);
+        buffer.begin(GL11.GL_QUADS, RenderType.getSolid().getVertexFormat());
     }
 
     private void postRenderBlocks(RenderType layer, float x, float y, float z, BufferBuilder buffer, ChunkRenderDataSchematic chunkRenderData)
@@ -892,6 +895,7 @@ public class ChunkRendererSchematicVbo
     {
         synchronized (this.boxes)
         {
+            this.ignoreClientWorldFluids = Configs.Visuals.IGNORE_EXISTING_FLUIDS.getBooleanValue();
             ClientWorld worldClient = Minecraft.getInstance().world;
             this.schematicWorldView = new ChunkCacheSchematic(this.world, worldClient, this.position, 2);
             this.clientWorldView    = new ChunkCacheSchematic(worldClient, worldClient, this.position, 2);

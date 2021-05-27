@@ -227,6 +227,22 @@ public class SchematicUtils
         return false;
     }
 
+    public static boolean breakAllSchematicBlocksExceptTargeted(Minecraft mc)
+    {
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+
+        if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
+        {
+            BlockRayTraceResult trace = wrapper.getBlockHitResult();
+            BlockPos pos = trace.getBlockPos();
+            BlockState stateOriginal = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+
+            return setAllStatesToAirExcept(pos, stateOriginal);
+        }
+
+        return false;
+    }
+
     public static boolean fillAirWithBlocks(Minecraft mc)
     {
         ReplacementInfo info = getTargetInfo(mc);
@@ -250,7 +266,8 @@ public class SchematicUtils
     {
         ItemStack stack = mc.player.getMainHandStack();
 
-        if (stack.isEmpty() == false && (stack.getItem() instanceof BlockItem))
+        if ((stack.isEmpty() == false && (stack.getItem() instanceof BlockItem)) ||
+            (stack.isEmpty() && ToolMode.REBUILD.getPrimaryBlock() != null))
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
@@ -277,6 +294,10 @@ public class SchematicUtils
                     mc.player.world = worldClient;
 
                     stateNew = ((BlockItem) stack.getItem()).getBlock().getPlacementState(ctx);
+                }
+                else if (ToolMode.REBUILD.getPrimaryBlock() != null)
+                {
+                    stateNew = ToolMode.REBUILD.getPrimaryBlock();
                 }
 
                 return new ReplacementInfo(pos, side, hitVec, stateOriginal, stateNew);
@@ -487,6 +508,141 @@ public class SchematicUtils
         }
 
         return false;
+    }
+
+    private static boolean setAllStatesToAirExcept(BlockPos pos, BlockState state)
+    {
+        if (pos != null)
+        {
+            SubChunkPos cpos = new SubChunkPos(pos);
+            SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+            List<PlacementPart> list = manager.getAllPlacementsTouchingSubChunk(cpos);
+
+            if (list.isEmpty() == false)
+            {
+                for (PlacementPart part : list)
+                {
+                    if (part.getBox().containsPos(pos))
+                    {
+                        if (setAllStatesToAirExcept(manager, part, state))
+                        {
+                            manager.markAllPlacementsOfSchematicForRebuild(part.getPlacement().getSchematic());
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean setAllStatesToAirExcept(SchematicPlacementManager manager, PlacementPart part, BlockState state)
+    {
+        SchematicPlacement schematicPlacement = part.getPlacement();
+        String selected = schematicPlacement.getSelectedSubRegionName();
+        List<String> regions = new ArrayList<>();
+        final BlockState air = Blocks.AIR.getDefaultState();
+
+        // Some sub-region selected, only replace in that region
+        if (selected != null)
+        {
+            regions.add(selected);
+        }
+        // The entire placement is selected, replace in all sub-regions
+        else if (manager.getSelectedSchematicPlacement() == schematicPlacement)
+        {
+            regions.addAll(schematicPlacement.getSubRegionBoxes(RequiredEnabled.PLACEMENT_ENABLED).keySet());
+        }
+        // Nothing from the targeted placement is selected, don't replace anything
+        else
+        {
+            InfoUtils.showInGameMessage(MessageType.WARNING, 20000, "litematica.message.warn.schematic_rebuild_placement_not_selected");
+            return false;
+        }
+
+        LayerRange range = DataManager.getRenderLayerRange();
+        int totalBlocks = schematicPlacement.getSchematic().getMetadata().getTotalBlocks();
+
+        for (String regionName : regions)
+        {
+            LitematicaBlockStateContainer container = schematicPlacement.getSchematic().getSubRegionContainer(regionName);
+            SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
+
+            if (container == null || placement == null)
+            {
+                continue;
+            }
+
+            int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.X), Direction.Axis.X);
+            int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.Y), Direction.Axis.Y);
+            int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.Z), Direction.Axis.Z);
+            int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.X), Direction.Axis.X);
+            int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.Y), Direction.Axis.Y);
+            int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.Z), Direction.Axis.Z);
+
+            BlockPos posStart = new BlockPos(minX, minY, minZ);
+            BlockPos posEnd = new BlockPos(maxX, maxY, maxZ);
+
+            BlockPos pos1 = getReverserTransformedWorldPosition(posStart, schematicPlacement.getSchematic(),
+                                                                regionName, schematicPlacement, schematicPlacement.getRelativeSubRegionPlacement(regionName));
+            BlockPos pos2 = getReverserTransformedWorldPosition(posEnd, schematicPlacement.getSchematic(),
+                                                                regionName, schematicPlacement, schematicPlacement.getRelativeSubRegionPlacement(regionName));
+
+            if (pos1 == null || pos2 == null)
+            {
+                return false;
+            }
+
+            BlockPos posStartWorld = PositionUtils.getMinCorner(pos1, pos2);
+            BlockPos posEndWorld   = PositionUtils.getMaxCorner(pos1, pos2);
+
+            Vector3i size = container.getSize();
+            final int startX = Math.max(posStartWorld.getX(), 0);
+            final int startY = Math.max(posStartWorld.getY(), 0);
+            final int startZ = Math.max(posStartWorld.getZ(), 0);
+            final int endX = Math.min(posEndWorld.getX(), size.getX() - 1);
+            final int endY = Math.min(posEndWorld.getY(), size.getY() - 1);
+            final int endZ = Math.min(posEndWorld.getZ(), size.getZ() - 1);
+
+            //System.out.printf("DEBUG == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
+            //        regionName, startX, startY, startZ, endX, endY, endZ, container.getSize().getX(), container.getSize().getY(), container.getSize().getZ());
+
+            if (endX >= size.getX() || endY >= size.getY() || endZ >= size.getZ())
+            {
+                System.out.printf("OUT OF BOUNDS == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
+                                  regionName, startX, startY, startZ, endX, endY, endZ, size.getX(), size.getY(), size.getZ());
+                return false;
+            }
+
+            //System.out.printf("DEBUG == region: %s, sx: %d, sy: %s, sz: %d, ex: %d, ey: %d, ez: %d - size x: %d y: %d z: %d =============\n",
+            //        regionName, startX, startY, startZ, endX, endY, endZ, size.getX(), size.getY(), size.getZ());
+
+            BlockState stateOriginal = getUntransformedBlockState(state, schematicPlacement, regionName);
+
+            for (int y = startY; y <= endY; ++y)
+            {
+                for (int z = startZ; z <= endZ; ++z)
+                {
+                    for (int x = startX; x <= endX; ++x)
+                    {
+                        BlockState oldState = container.get(x, y, z);
+
+                        if (oldState != stateOriginal && oldState.isAir() == false)
+                        {
+                            container.set(x, y, z, air);
+                            --totalBlocks;
+                        }
+                    }
+                }
+            }
+        }
+
+        schematicPlacement.getSchematic().getMetadata().setTotalBlocks(totalBlocks);
+
+        return true;
     }
 
     private static boolean replaceAllIdenticalBlocks(SchematicPlacementManager manager, PlacementPart part,

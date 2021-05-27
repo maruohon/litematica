@@ -119,7 +119,7 @@ public class ItemUtils
             tagList.add(StringNBT.of("(+NBT)"));
             tagLore.put("Lore", tagList);
             stack.putSubTag("display", tagLore);
-            stack.putSubTag("BlockEntityTag", nbt);
+            stack.putSubTag("TileEntityTag", nbt);
 
             return stack;
         }

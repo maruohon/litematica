@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +44,7 @@ import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
+import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -58,6 +58,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
+import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -146,47 +147,21 @@ public class WorldUtils
     public static LitematicaSchematic convertStructureToLitematicaSchematic(File structureDir, String structureFileName,
             boolean ignoreEntities, IStringConsumer feedback)
     {
-        DataFixer fixer = Minecraft.getInstance().getDataFixer();
-        File file = new File(structureDir, structureFileName);
-
         try
         {
-            InputStream is = new FileInputStream(file);
-            Template template = readTemplateFromStream(is, fixer);
-            is.close();
+            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(structureDir, structureFileName, true);
 
-            WorldSchematic world = SchematicWorldHandler.createSchematicWorld();
-
-            loadChunksSchematicWorld(world, BlockPos.ORIGIN, template.getSize());
-
-            PlacementSettings placementSettings = new PlacementSettings();
-            placementSettings.setIgnoreEntities(ignoreEntities);
-//            template.place(world, BlockPos.ORIGIN, BlockPos.ORIGIN, placementSettings, new Random(), 0x12);
-
-            String subRegionName = FileUtils.getNameWithoutExtension(structureFileName) + " (Converted Template)";
-            AreaSelection area = new AreaSelection();
-            area.setName(subRegionName);
-            subRegionName = area.createNewSubRegionBox(BlockPos.ORIGIN, subRegionName);
-            area.setSelectedSubRegionBox(subRegionName);
-            Box box = area.getSelectedSubRegionBox();
-            area.setSubRegionCornerPos(box, Corner.CORNER_1, BlockPos.ORIGIN);
-            area.setSubRegionCornerPos(box, Corner.CORNER_2, template.getSize().add(-1, -1, -1));
-
-            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromWorld(world, area, ignoreEntities, template.getAuthor(), feedback);
-
-            if (litematicaSchematic != null)
+            if (litematicaSchematic == null)
             {
-                //litematicaSchematic.takeEntityDataFromVanillaStructure(template, subRegionName); // TODO
-            }
-            else
-            {
-                feedback.setString("litematica.error.schematic_conversion.structure_to_litematica_failed");
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Failed to read the vanilla structure template from '" + structureFileName + '"');
             }
 
             return litematicaSchematic;
         }
-        catch (Throwable t)
+        catch (Exception e)
         {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Exception while trying to load the vanilla structure: " + e.getMessage());
+            Litematica.logger.error("Exception while trying to load the vanilla structure: " + e.getMessage());
         }
 
         return null;
@@ -338,13 +313,26 @@ public class WorldUtils
 
     public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
     {
-        RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, true, 6);
         BlockState state = Blocks.AIR.getDefaultState();
+        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
 
-        if (trace != null &&
-            trace.getType() == RayTraceResult.Type.BLOCK)
+        if (wrapper != null)
         {
-            state = mc.world.getBlockState(((BlockRayTraceResult) trace).getBlockPos());
+            RayTraceResult trace = wrapper.getBlockHitResult();
+
+            if (trace != null && trace.getType() == RayTraceResult.Type.BLOCK)
+            {
+                BlockPos pos = ((BlockRayTraceResult) trace).getBlockPos();
+
+                if (wrapper.getHitType() == HitType.SCHEMATIC_BLOCK)
+                {
+                    state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+                }
+                else if (wrapper.getHitType() == HitType.VANILLA_BLOCK)
+                {
+                    state = mc.world.getBlockState(pos);
+                }
+            }
         }
 
         if (primary)
@@ -380,11 +368,12 @@ public class WorldUtils
         {
             World world = SchematicWorldHandler.getSchematicWorld();
             BlockState state = world.getBlockState(pos);
-            ItemStack stack = MaterialCache.getInstance().getItemForState(state, world, pos);
+            ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
 
             if (stack.isEmpty() == false)
             {
                 PlayerInventory inv = mc.player.inventory;
+                stack = stack.copy();
 
                 if (mc.player.abilities.creativeMode)
                 {
@@ -465,7 +454,7 @@ public class WorldUtils
             BlockPos pos = trace.getBlockPos();
             World world = SchematicWorldHandler.getSchematicWorld();
             BlockState stateSchematic = world.getBlockState(pos);
-            ItemStack stack = MaterialCache.getInstance().getItemForState(stateSchematic);
+            ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // Already placed to that position, possible server sync delay
             if (easyPlaceIsPositionCached(pos))
@@ -688,8 +677,6 @@ public class WorldUtils
      * in the schematic, or the player is holding the wrong item in hand, then true is returned
      * to indicate that the use action should be cancelled.
      * @param mc
-     * @param doEasyPlace
-     * @param restrictPlacement
      * @return
      */
     public static boolean handlePlacementRestriction(Minecraft mc)
@@ -710,8 +697,6 @@ public class WorldUtils
      * in the schematic, or the player is holding the wrong item in hand, then true is returned
      * to indicate that the use action should be cancelled.
      * @param mc
-     * @param doEasyPlace
-     * @param restrictPlacement
      * @return true if the use action should be cancelled
      */
     private static boolean placementRestrictionInEffect(Minecraft mc)
@@ -768,7 +753,7 @@ public class WorldUtils
             }
 
             BlockState stateSchematic = worldSchematic.getBlockState(pos);
-            stack = MaterialCache.getInstance().getItemForState(stateSchematic);
+            stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
             if (stack.isEmpty() == false && EntityUtils.getUsedHandForItem(mc.player, stack) == null)

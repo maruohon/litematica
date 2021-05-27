@@ -67,7 +67,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     @Override
     protected boolean processChunk(ChunkPos pos)
     {
-        if (this.chunkCount == 0)
+        if (this.isClientWorld && this.chunkCount == 0)
         {
             this.mc.player.sendChatMessage("/gamerule sendCommandFeedback false");
         }

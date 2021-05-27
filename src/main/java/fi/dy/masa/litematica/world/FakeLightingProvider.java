@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.world;
 
+import javax.annotation.Nullable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.SectionPos;
 import net.minecraft.world.LightType;
@@ -32,14 +33,9 @@ public class FakeLightingProvider extends WorldLightManager
 
     public static class FakeLightingView implements IWorldLightListener
     {
+        @Nullable
         @Override
-        public void setSectionStatus(SectionPos var1, boolean var2)
-        {
-            // NO-OP
-        }
-
-        @Override
-        public NibbleArray getLightSection(SectionPos var1)
+        public NibbleArray getLightSection(SectionPos pos)
         {
             return null;
         }
@@ -48,6 +44,12 @@ public class FakeLightingProvider extends WorldLightManager
         public int getLightLevel(BlockPos pos)
         {
             return 15;
+        }
+
+        @Override
+        public void setSectionStatus(SectionPos pos, boolean notReady)
+        {
+            // NO-OP
         }
     }
 }

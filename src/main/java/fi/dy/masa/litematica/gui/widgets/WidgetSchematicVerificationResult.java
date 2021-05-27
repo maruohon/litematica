@@ -262,7 +262,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
         {
             this.drawString(x1, y, color, this.header1, matrixStack);
             this.drawString(x2, y, color, this.header2, matrixStack);
-            this.drawString(x3, y, color, this.header3 ,matrixStack);
+            this.drawString(x3, y, color, this.header3, matrixStack);
 
             this.renderColumnHeader(mouseX, mouseY, Icons.ARROW_DOWN, Icons.ARROW_UP);
         }
@@ -290,7 +290,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
             boolean hasModelExpected = this.mismatchInfo.stateExpected.getRenderType() == BlockRenderType.MODEL;
             boolean hasModelFound    = this.mismatchInfo.stateFound.getRenderType() == BlockRenderType.MODEL;
             boolean isAirItemExpected = this.mismatchInfo.stackExpected.isEmpty();
-            boolean isAirItemFound    = this.mismatchInfo.stackExpected.isEmpty();
+            boolean isAirItemFound    = this.mismatchInfo.stackFound.isEmpty();
             boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.mismatchInfo.stateExpected.getBlock() == Blocks.FLOWER_POT);
             boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.mismatchInfo.stateFound.getBlock() == Blocks.FLOWER_POT);
 
@@ -457,7 +457,7 @@ public class WidgetSchematicVerificationResult extends WidgetListEntrySortable<B
                 boolean hasModelExpected = this.stateExpected.getRenderType() == BlockRenderType.MODEL;
                 boolean hasModelFound    = this.stateFound.getRenderType() == BlockRenderType.MODEL;
                 boolean isAirItemExpected = this.stackExpected.isEmpty();
-                boolean isAirItemFound    = this.stackExpected.isEmpty();
+                boolean isAirItemFound    = this.stackFound.isEmpty();
                 boolean useBlockModelExpected = hasModelExpected && (isAirItemExpected || useBlockModelConfig || this.stateExpected.getBlock() == Blocks.FLOWER_POT);
                 boolean useBlockModelFound    = hasModelFound    && (isAirItemFound    || useBlockModelConfig || this.stateFound.getBlock() == Blocks.FLOWER_POT);
                 BlockRendererDispatcher blockModelShapes = mc.getBlockRenderManager();

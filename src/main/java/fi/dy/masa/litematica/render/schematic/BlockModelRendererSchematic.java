@@ -3,17 +3,17 @@ package fi.dy.masa.litematica.render.schematic;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
+import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.BakedQuad;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.crash.ReportedException;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
@@ -23,16 +23,15 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockDisplayReader;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.mixin.IMixinBlockModelRenderer;
 
 public class BlockModelRendererSchematic
 {
-    private final BlockModelRenderer vanillaRenderer;
     private final Random random = new Random();
+    private final BlockColors colorMap;
 
     public BlockModelRendererSchematic(BlockColors blockColorsIn)
     {
-        this.vanillaRenderer = Minecraft.getInstance().getBlockRenderManager().getModelRenderer();
+        this.colorMap = blockColorsIn;
     }
 
     public boolean renderModel(IBlockDisplayReader worldIn, IBakedModel modelIn, BlockState stateIn, BlockPos posIn, MatrixStack matrices,
@@ -150,10 +149,10 @@ public class BlockModelRendererSchematic
         {
             BakedQuad bakedQuad = list.get(i);
 
-            ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeGetQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), box, flags);
-            ambientOcclusionCalculator.apply(world, state, pos, bakedQuad.getFace(), box, flags);
+            this.getQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), box, flags);
+            ambientOcclusionCalculator.apply(world, state, pos, bakedQuad.getFace(), box, flags, bakedQuad.hasShade());
 
-            ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeRenderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad,
+            this.renderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad,
                     ambientOcclusionCalculator.brightness[0],
                     ambientOcclusionCalculator.brightness[1],
                     ambientOcclusionCalculator.brightness[2],
@@ -176,12 +175,109 @@ public class BlockModelRendererSchematic
 
             if (useWorldLight)
             {
-                ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeGetQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), null, flags);
+                this.getQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), null, flags);
                 BlockPos blockPos = flags.get(0) ? pos.offset(bakedQuad.getFace()) : pos;
                 light = WorldRenderer.getLightmapCoordinates(world, state, blockPos);
             }
 
-            ((IMixinBlockModelRenderer) this.vanillaRenderer).invokeRenderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad, 1.0F, 1.0F, 1.0F, 1.0F, light, light, light, light, overlay);
+            this.renderQuad(world, state, pos, vertexConsumer, matrices.peek(), bakedQuad, 1.0F, 1.0F, 1.0F, 1.0F, light, light, light, light, overlay);
+        }
+    }
+
+    private void renderQuad(IBlockDisplayReader world, BlockState state, BlockPos pos, IVertexBuilder vertexConsumer, MatrixStack.Entry matrixEntry,
+            BakedQuad quad, float brightness0, float brightness1, float brightness2, float brightness3,
+            int light0, int light1, int light2, int light3, int overlay)
+    {
+        float r;
+        float g;
+        float b;
+
+        if (quad.hasColor())
+        {
+            int color = this.colorMap.getColor(state, world, pos, quad.getColorIndex());
+            r = (float) (color >> 16 & 0xFF) / 255.0F;
+            g = (float) (color >>  8 & 0xFF) / 255.0F;
+            b = (float) (color       & 0xFF) / 255.0F;
+        }
+        else
+        {
+            r = 1.0F;
+            g = 1.0F;
+            b = 1.0F;
+        }
+
+        vertexConsumer.quad(matrixEntry, quad, new float[]{ brightness0, brightness1, brightness2, brightness3 },
+                            r, g, b, new int[]{ light0, light1, light2, light3 }, overlay, true);
+    }
+
+    private void getQuadDimensions(IBlockDisplayReader world, BlockState state, BlockPos pos, int[] vertexData, Direction face, @Nullable float[] box, BitSet flags)
+    {
+        float minX = 32.0F;
+        float minY = 32.0F;
+        float minZ = 32.0F;
+        float maxX = -32.0F;
+        float maxY = -32.0F;
+        float maxZ = -32.0F;
+        final int vertexSize = vertexData.length / 4;
+
+        for (int index = 0; index < 4; ++index)
+        {
+            float x = Float.intBitsToFloat(vertexData[index * vertexSize    ]);
+            float y = Float.intBitsToFloat(vertexData[index * vertexSize + 1]);
+            float z = Float.intBitsToFloat(vertexData[index * vertexSize + 2]);
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            minZ = Math.min(minZ, z);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+            maxZ = Math.max(maxZ, z);
+        }
+
+        if (box != null)
+        {
+            box[Direction.WEST.getId()]  = minX;
+            box[Direction.EAST.getId()]  = maxX;
+            box[Direction.DOWN.getId()]  = minY;
+            box[Direction.UP.getId()]    = maxY;
+            box[Direction.NORTH.getId()] = minZ;
+            box[Direction.SOUTH.getId()] = maxZ;
+
+            box[Direction.WEST.getId()  + 6] = 1.0F - minX;
+            box[Direction.EAST.getId()  + 6] = 1.0F - maxX;
+            box[Direction.DOWN.getId()  + 6] = 1.0F - minY;
+            box[Direction.UP.getId()    + 6] = 1.0F - maxY;
+            box[Direction.NORTH.getId() + 6] = 1.0F - minZ;
+            box[Direction.SOUTH.getId() + 6] = 1.0F - maxZ;
+        }
+
+        float min = 1.0E-4F;
+        float max = 0.9999F;
+
+        switch (face)
+        {
+            case DOWN:
+                flags.set(1, minX >= min || minZ >= min || maxX <= max || maxZ <= max);
+                flags.set(0, minY == maxY && (minY < min || state.isFullCube(world, pos)));
+                break;
+            case UP:
+                flags.set(1, minX >= min || minZ >= min || maxX <= max || maxZ <= max);
+                flags.set(0, minY == maxY && (maxY > max || state.isFullCube(world, pos)));
+                break;
+            case NORTH:
+                flags.set(1, minX >= min || minY >= min || maxX <= max || maxY <= max);
+                flags.set(0, minZ == maxZ && (minZ < min || state.isFullCube(world, pos)));
+                break;
+            case SOUTH:
+                flags.set(1, minX >= min || minY >= min || maxX <= max || maxY <= max);
+                flags.set(0, minZ == maxZ && (maxZ > max || state.isFullCube(world, pos)));
+                break;
+            case WEST:
+                flags.set(1, minY >= min || minZ >= min || maxY <= max || maxZ <= max);
+                flags.set(0, minX == maxX && (minX < min || state.isFullCube(world, pos)));
+                break;
+            case EAST:
+                flags.set(1, minY >= min || minZ >= min || maxY <= max || maxZ <= max);
+                flags.set(0, minX == maxX && (maxX > max || state.isFullCube(world, pos)));
         }
     }
 
@@ -259,7 +355,7 @@ public class BlockModelRendererSchematic
         private final float[] brightness = new float[4];
         private final int[] light = new int[4];
 
-        public void apply(IBlockDisplayReader worldIn, BlockState state, BlockPos centerPos, Direction direction, float[] faceShape, BitSet shapeState)
+        public void apply(IBlockDisplayReader world, BlockState state, BlockPos centerPos, Direction direction, float[] box, BitSet shapeState, boolean hasShade)
         {
             /*
             BlockPos blockpos = shapeState.get(0) ? centerPos.offset(direction) : centerPos;
@@ -358,37 +454,35 @@ public class BlockModelRendererSchematic
 
             EnumNeighborInfo neighborInfo = EnumNeighborInfo.getNeighbourInfo(direction);
             VertexTranslations vertexTranslations = VertexTranslations.getVertexTranslations(direction);
-            float f, f1, f2, f3, f4, f5, f6, f7, f8;
-            f = f1 = f2 = f3 = f4 = f5 = f6 = f7 = f8 = 1.0F;
             int i, j, k, l, i1, i3, j1, k1, l1;
             i = j = k = l = i1 = i3 = j1 = k1 = l1 = ((15 << 20) | (15 << 4));
+            float b1 = 1.0F;
+            float b2 = 1.0F;
+            float b3 = 1.0F;
+            float b4 = 1.0F;
 
             if (shapeState.get(1) && neighborInfo.doNonCubicWeight)
             {
-                float f29 = (f3 + f + f5 + f8) * 0.25F;
-                float f30 = (f2 + f + f4 + f8) * 0.25F;
-                float f31 = (f2 + f1 + f6 + f8) * 0.25F;
-                float f32 = (f3 + f1 + f7 + f8) * 0.25F;
-                float f13 = faceShape[neighborInfo.vert0Weights[0].shape] * faceShape[neighborInfo.vert0Weights[1].shape];
-                float f14 = faceShape[neighborInfo.vert0Weights[2].shape] * faceShape[neighborInfo.vert0Weights[3].shape];
-                float f15 = faceShape[neighborInfo.vert0Weights[4].shape] * faceShape[neighborInfo.vert0Weights[5].shape];
-                float f16 = faceShape[neighborInfo.vert0Weights[6].shape] * faceShape[neighborInfo.vert0Weights[7].shape];
-                float f17 = faceShape[neighborInfo.vert1Weights[0].shape] * faceShape[neighborInfo.vert1Weights[1].shape];
-                float f18 = faceShape[neighborInfo.vert1Weights[2].shape] * faceShape[neighborInfo.vert1Weights[3].shape];
-                float f19 = faceShape[neighborInfo.vert1Weights[4].shape] * faceShape[neighborInfo.vert1Weights[5].shape];
-                float f20 = faceShape[neighborInfo.vert1Weights[6].shape] * faceShape[neighborInfo.vert1Weights[7].shape];
-                float f21 = faceShape[neighborInfo.vert2Weights[0].shape] * faceShape[neighborInfo.vert2Weights[1].shape];
-                float f22 = faceShape[neighborInfo.vert2Weights[2].shape] * faceShape[neighborInfo.vert2Weights[3].shape];
-                float f23 = faceShape[neighborInfo.vert2Weights[4].shape] * faceShape[neighborInfo.vert2Weights[5].shape];
-                float f24 = faceShape[neighborInfo.vert2Weights[6].shape] * faceShape[neighborInfo.vert2Weights[7].shape];
-                float f25 = faceShape[neighborInfo.vert3Weights[0].shape] * faceShape[neighborInfo.vert3Weights[1].shape];
-                float f26 = faceShape[neighborInfo.vert3Weights[2].shape] * faceShape[neighborInfo.vert3Weights[3].shape];
-                float f27 = faceShape[neighborInfo.vert3Weights[4].shape] * faceShape[neighborInfo.vert3Weights[5].shape];
-                float f28 = faceShape[neighborInfo.vert3Weights[6].shape] * faceShape[neighborInfo.vert3Weights[7].shape];
-                this.brightness[vertexTranslations.vert0] = f29 * f13 + f30 * f14 + f31 * f15 + f32 * f16;
-                this.brightness[vertexTranslations.vert1] = f29 * f17 + f30 * f18 + f31 * f19 + f32 * f20;
-                this.brightness[vertexTranslations.vert2] = f29 * f21 + f30 * f22 + f31 * f23 + f32 * f24;
-                this.brightness[vertexTranslations.vert3] = f29 * f25 + f30 * f26 + f31 * f27 + f32 * f28;
+                float f13 = box[neighborInfo.vert0Weights[0].shape] * box[neighborInfo.vert0Weights[1].shape];
+                float f14 = box[neighborInfo.vert0Weights[2].shape] * box[neighborInfo.vert0Weights[3].shape];
+                float f15 = box[neighborInfo.vert0Weights[4].shape] * box[neighborInfo.vert0Weights[5].shape];
+                float f16 = box[neighborInfo.vert0Weights[6].shape] * box[neighborInfo.vert0Weights[7].shape];
+                float f17 = box[neighborInfo.vert1Weights[0].shape] * box[neighborInfo.vert1Weights[1].shape];
+                float f18 = box[neighborInfo.vert1Weights[2].shape] * box[neighborInfo.vert1Weights[3].shape];
+                float f19 = box[neighborInfo.vert1Weights[4].shape] * box[neighborInfo.vert1Weights[5].shape];
+                float f20 = box[neighborInfo.vert1Weights[6].shape] * box[neighborInfo.vert1Weights[7].shape];
+                float f21 = box[neighborInfo.vert2Weights[0].shape] * box[neighborInfo.vert2Weights[1].shape];
+                float f22 = box[neighborInfo.vert2Weights[2].shape] * box[neighborInfo.vert2Weights[3].shape];
+                float f23 = box[neighborInfo.vert2Weights[4].shape] * box[neighborInfo.vert2Weights[5].shape];
+                float f24 = box[neighborInfo.vert2Weights[6].shape] * box[neighborInfo.vert2Weights[7].shape];
+                float f25 = box[neighborInfo.vert3Weights[0].shape] * box[neighborInfo.vert3Weights[1].shape];
+                float f26 = box[neighborInfo.vert3Weights[2].shape] * box[neighborInfo.vert3Weights[3].shape];
+                float f27 = box[neighborInfo.vert3Weights[4].shape] * box[neighborInfo.vert3Weights[5].shape];
+                float f28 = box[neighborInfo.vert3Weights[6].shape] * box[neighborInfo.vert3Weights[7].shape];
+                this.brightness[vertexTranslations.vert0] = b1 * f13 + b2 * f14 + b3 * f15 + b4 * f16;
+                this.brightness[vertexTranslations.vert1] = b1 * f17 + b2 * f18 + b3 * f19 + b4 * f20;
+                this.brightness[vertexTranslations.vert2] = b1 * f21 + b2 * f22 + b3 * f23 + b4 * f24;
+                this.brightness[vertexTranslations.vert3] = b1 * f25 + b2 * f26 + b3 * f27 + b4 * f28;
                 int i2 = this.getAoBrightness(l, i, j1, i3);
                 int j2 = this.getAoBrightness(k, i, i1, i3);
                 int k2 = this.getAoBrightness(k, j, k1, i3);
@@ -400,18 +494,21 @@ public class BlockModelRendererSchematic
             }
             else
             {
-                float f9 = (f3 + f + f5 + f8) * 0.25F;
-                float f10 = (f2 + f + f4 + f8) * 0.25F;
-                float f11 = (f2 + f1 + f6 + f8) * 0.25F;
-                float f12 = (f3 + f1 + f7 + f8) * 0.25F;
                 this.light[vertexTranslations.vert0] = this.getAoBrightness(l, i, j1, i3);
                 this.light[vertexTranslations.vert1] = this.getAoBrightness(k, i, i1, i3);
                 this.light[vertexTranslations.vert2] = this.getAoBrightness(k, j, k1, i3);
                 this.light[vertexTranslations.vert3] = this.getAoBrightness(l, j, l1, i3);
-                this.brightness[vertexTranslations.vert0] = f9;
-                this.brightness[vertexTranslations.vert1] = f10;
-                this.brightness[vertexTranslations.vert2] = f11;
-                this.brightness[vertexTranslations.vert3] = f12;
+                this.brightness[vertexTranslations.vert0] = b1;
+                this.brightness[vertexTranslations.vert1] = b2;
+                this.brightness[vertexTranslations.vert2] = b3;
+                this.brightness[vertexTranslations.vert3] = b4;
+            }
+
+            float b = world.getBrightness(direction, hasShade);
+
+            for (int index = 0; index < this.brightness.length; ++index)
+            {
+                this.brightness[index] *= b;
             }
         }
 

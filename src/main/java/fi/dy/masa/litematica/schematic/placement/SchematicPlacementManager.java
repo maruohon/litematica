@@ -662,11 +662,13 @@ public class SchematicPlacementManager
         {
             if (schematicPlacement != null)
             {
+                /*
                 if (PositionUtils.isPlacementWithinWorld(mc.world, schematicPlacement, false) == false)
                 {
                     InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.placement_paste_outside_world");
                     return;
                 }
+                */
 
                 if (mc.isIntegratedServerRunning())
                 {

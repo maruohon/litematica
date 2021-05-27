@@ -173,6 +173,20 @@ public class KeyCallbacks
             boolean isToolSecondary = key == Hotkeys.TOOL_PLACE_CORNER_2.getKeybind();
             boolean isToolSelect = key == Hotkeys.TOOL_SELECT_ELEMENTS.getKeybind();
 
+            if (toolEnabled && isToolSelect)
+            {
+                if (mode.getUsesBlockPrimary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeybind().isKeybindHeld())
+                {
+                    WorldUtils.setToolModeBlockState(mode, true, this.mc);
+                    return true;
+                }
+                else if (mode.getUsesBlockSecondary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeybind().isKeybindHeld())
+                {
+                    WorldUtils.setToolModeBlockState(mode, false, this.mc);
+                    return true;
+                }
+            }
+
             if (toolEnabled && hasTool)
             {
                 int maxDistance = 200;
@@ -218,15 +232,7 @@ public class KeyCallbacks
                     {
                         SelectionManager sm = DataManager.getSelectionManager();
 
-                        if (mode.getUsesBlockPrimary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeybind().isKeybindHeld())
-                        {
-                            WorldUtils.setToolModeBlockState(mode, true, this.mc);
-                        }
-                        else if (mode.getUsesBlockSecondary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeybind().isKeybindHeld())
-                        {
-                            WorldUtils.setToolModeBlockState(mode, false, this.mc);
-                        }
-                        else if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
+                        if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
                         {
                             if (sm.hasGrabbedElement())
                             {

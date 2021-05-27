@@ -4,6 +4,7 @@ import java.util.Arrays;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -11,22 +12,46 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.BiomeContainer;
+import net.minecraft.world.biome.BiomeRegistry;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.Chunk;
 
 public class ChunkSchematic extends Chunk
 {
+    private static final BlockState AIR = Blocks.AIR.getDefaultState();
+
     private final long timeCreated;
     private boolean isEmpty = true;
 
     public ChunkSchematic(World worldIn, ChunkPos pos)
     {
-//        super(worldIn, pos, new BiomeContainer(worldIn.getRegistryManager().get(Registry.BIOME_KEY), Util.make(new Biome[BiomeContainer.DEFAULT_LENGTH], (biomes) -> { Arrays.fill(biomes, Biomes.PLAINS); })));
-        super(worldIn, pos, new BiomeContainer(worldIn.getRegistryManager().get(Registry.BIOME_KEY), Util.make(new Biome[BiomeContainer.DEFAULT_LENGTH], (biomes) -> {})));
+        super(worldIn, pos, new BiomeContainer(worldIn.getRegistryManager().get(Registry.BIOME_KEY), Util.make(new Biome[BiomeContainer.DEFAULT_LENGTH], (biomes) -> Arrays.fill(biomes, BiomeRegistry.PLAINS))));
 
         this.timeCreated = worldIn.getTime();
+    }
+
+    @Override
+    public BlockState getBlockState(BlockPos pos)
+    {
+        int x = pos.getX() & 0xF;
+        int y = pos.getY();
+        int z = pos.getZ() & 0xF;
+        int cy = y >> 4;
+
+        ChunkSection[] sections = this.getSectionArray();
+
+        if (cy >= 0 && cy < sections.length)
+        {
+            ChunkSection chunkSection = sections[cy];
+
+            if (ChunkSection.isEmpty(chunkSection) == false)
+            {
+                return chunkSection.getBlockState(x, y & 0xF, z);
+            }
+         }
+
+         return AIR;
     }
 
     @Override
@@ -68,7 +93,7 @@ public class ChunkSchematic extends Chunk
 
             if (blockOld != blockNew)
             {
-//                this.getWorld().removeBlockEntity(pos);
+//                this.getWorld().removeTileEntity(pos);
             }
 
             if (section.getBlockState(x, y & 0xF, z).getBlock() != blockNew)
@@ -94,7 +119,7 @@ public class ChunkSchematic extends Chunk
                     if (te == null)
                     {
                         te = ((ITileEntityProvider) blockNew).createBlockEntity(this.getWorld());
-//                        this.getWorld().setBlockEntity(pos, te);
+//                        this.getWorld().setTileEntity(pos, te);
                     }
 
                     if (te != null)

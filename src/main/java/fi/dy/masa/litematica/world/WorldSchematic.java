@@ -3,61 +3,87 @@ package fi.dy.masa.litematica.world;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.play.ClientPlayNetHandler;
-import net.minecraft.client.multiplayer.ClientChunkProvider;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.world.EmptyTickList;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.world.storage.MapData;
+import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.tags.ITagCollectionSupplier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.profiler.IProfiler;
-import net.minecraft.world.World;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.LightType;
+import net.minecraft.world.storage.ISpawnWorldInfo;
+import net.minecraft.world.ITickList;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeRegistry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldSettings;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class WorldSchematic extends ClientWorld
+public class WorldSchematic extends World
 {
     private final Minecraft mc;
     private final WorldRendererSchematic worldRenderer;
-    private ChunkProviderSchematic chunkProviderSchematic;
+    private final ChunkManagerSchematic chunkManagerSchematic;
+    private final Int2ObjectOpenHashMap<Entity> regularEntities = new Int2ObjectOpenHashMap<>();
     private int nextEntityId;
 
-    public WorldSchematic(ClientPlayNetHandler netHandler, ClientWorldInfo settings,
-            RegistryKey<World> registryKey,
-            DimensionType dimType, Supplier<IProfiler> profilerIn)
+    protected WorldSchematic(ISpawnWorldInfo mutableWorldProperties, DimensionType dimensionType, Supplier<IProfiler> profiler)
     {
-        super(netHandler, settings, registryKey, dimType, 1, profilerIn, null, false, 0L); // TODO: I have no idea what those arguments mean
+        super(mutableWorldProperties, null, dimensionType, profiler, true, true, 0L);
 
         this.mc = Minecraft.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
-        this.chunkProviderSchematic = new ChunkProviderSchematic(this);
+        this.chunkManagerSchematic = new ChunkManagerSchematic(this);
     }
 
-    public ChunkProviderSchematic getChunkProvider()
+    public ChunkManagerSchematic getChunkProvider()
     {
-        return this.chunkProviderSchematic;
+        return this.chunkManagerSchematic;
     }
 
     @Override
-    public ClientChunkProvider getChunkManager()
+    public ChunkManagerSchematic getChunkManager()
     {
-        return this.getChunkProvider();
+        return this.chunkManagerSchematic;
+    }
+
+    @Override
+    public ITickList<Block> getBlockTickScheduler()
+    {
+        return EmptyTickList.get();
+    }
+
+    @Override
+    public ITickList<Fluid> getFluidTickScheduler()
+    {
+        return EmptyTickList.get();
+    }
+
+    public int getRegularEntityCount()
+    {
+        return this.regularEntities.size();
     }
 
     @Override
@@ -69,13 +95,19 @@ public class WorldSchematic extends ClientWorld
     @Override
     public Chunk getChunk(int chunkX, int chunkZ)
     {
-        return this.chunkProviderSchematic.getChunk(chunkX, chunkZ);
+        return this.chunkManagerSchematic.getChunk(chunkX, chunkZ);
     }
 
     @Override
     public Chunk getChunk(int chunkX, int chunkZ, ChunkStatus status, boolean required)
     {
         return this.getChunk(chunkX, chunkZ);
+    }
+
+    @Override
+    public Biome getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ)
+    {
+        return BiomeRegistry.PLAINS;
     }
 
     @Override
@@ -96,23 +128,56 @@ public class WorldSchematic extends ClientWorld
         return this.spawnEntityBase(entityIn);
     }
 
-    private boolean spawnEntityBase(Entity entityIn)
+    private boolean spawnEntityBase(Entity entity)
     {
-        int cx = MathHelper.floor(entityIn.getX() / 16.0D);
-        int cz = MathHelper.floor(entityIn.getZ() / 16.0D);
+        int cx = MathHelper.floor(entity.getX() / 16.0D);
+        int cz = MathHelper.floor(entity.getZ() / 16.0D);
 
-        if (this.chunkProviderSchematic.isChunkLoaded(cx, cz) == false)
+        if (this.chunkManagerSchematic.isChunkLoaded(cx, cz) == false)
         {
             return false;
         }
         else
         {
-            entityIn.setEntityId(this.nextEntityId++);
+            entity.setEntityId(this.nextEntityId++);
 
-            super.addEntity(entityIn.getEntityId(), entityIn);
+            int id = entity.getEntityId();
+            this.removeEntity(id);
+
+            this.regularEntities.put(id, entity);
+            this.chunkManagerSchematic.getChunk(MathHelper.floor(entity.getX() / 16.0D), MathHelper.floor(entity.getZ() / 16.0D)).addEntity(entity);
 
             return true;
         }
+    }
+
+    public void removeEntity(int id)
+    {
+        Entity entity = this.regularEntities.remove(id);
+
+        if (entity != null)
+        {
+            entity.remove();
+            entity.detach();
+
+            if (entity.updateNeeded)
+            {
+                this.getChunk(entity.chunkX, entity.chunkZ).remove(entity);
+            }
+        }
+    }
+
+    @Nullable
+    @Override
+    public Entity getEntityById(int id)
+    {
+        return this.regularEntities.get(id);
+    }
+
+    @Override
+    public List<? extends PlayerEntity> getPlayers()
+    {
+        return ImmutableList.of();
     }
 
     public void unloadBlockEntities(Collection<TileEntity> blockEntities)
@@ -129,13 +194,49 @@ public class WorldSchematic extends ClientWorld
         return this.mc.world != null ? this.mc.world.getTime() : 0;
     }
 
-//    @Override
-//    public void checkBlockRerender(BlockPos pos, BlockState stateOld, BlockState stateNew)
-//    {
-//        this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
-//    }
+    @Override
+    @Nullable
+    public MapData getMapState(String id)
+    {
+        return null;
+    }
 
     @Override
+    public void putMapState(MapData mapState)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public int getNextMapId()
+    {
+        return 0;
+    }
+
+    @Override
+    public Scoreboard getScoreboard()
+    {
+        return this.mc.world != null ? this.mc.world.getScoreboard() : null;
+    }
+
+    @Override
+    public RecipeManager getRecipeManager()
+    {
+        return this.mc.world != null ? this.mc.world.getRecipeManager() : null;
+    }
+
+    @Override
+    public ITagCollectionSupplier getTagManager()
+    {
+        return this.mc.world != null ? this.mc.world.getTagManager() : null;
+    }
+
+    @Override
+    public void scheduleBlockRerenderIfNeeded(BlockPos pos, BlockState stateOld, BlockState stateNew)
+    {
+        this.scheduleBlockRenders(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+    }
+
     public void scheduleBlockRenders(int chunkX, int chunkY, int chunkZ)
     {
         if (chunkY >= 0 && chunkY < 16)
@@ -174,6 +275,12 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
+    public float getBrightness(Direction direction, boolean shaded)
+    {
+        return 0;
+    }
+
+    @Override
     public int getLightLevel(LightType type, BlockPos pos)
     {
         return 15;
@@ -186,21 +293,27 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void updateListeners(BlockPos blockPos_1, BlockState blockState_1, BlockState blockState_2, int int_1)
+    public void updateListeners(BlockPos blockPos_1, BlockState blockState_1, BlockState blockState_2, int flags)
     {
         // NO-OP
     }
 
-//    @Override
-//    public void playGlobalEvent(int int_1, BlockPos blockPos_1, int int_2)
-//    {
-//        // NO-OP
-//    }
+    @Override
+    public void setBlockBreakingInfo(int entityId, BlockPos pos, int progress)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public void syncGlobalEvent(int eventId, BlockPos pos, int data)
+    {
+        // NO-OP
+    }
     
-//    @Override
-//    public void playLevelEvent(@Nullable PlayerEntity playerEntity_1, int int_1, BlockPos blockPos_1, int int_2)
-//    {
-//    }
+    @Override
+    public void syncWorldEvent(@Nullable PlayerEntity playerEntity, int id, BlockPos pos, int data)
+    {
+    }
 
     @Override
     public void addParticle(IParticleData particleParameters_1, double double_1, double double_2, double double_3, double double_4, double     double_5, double double_6)
@@ -227,12 +340,6 @@ public class WorldSchematic extends ClientWorld
     }
 
     @Override
-    public void playSound(BlockPos pos, SoundEvent soundIn, SoundCategory category, float volume, float pitch, boolean distanceDelay)
-    {
-        // NO-OP
-    }
-
-    @Override
     public void playSound(double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch, boolean distanceDelay)
     {
         // NO-OP
@@ -248,5 +355,17 @@ public class WorldSchematic extends ClientWorld
     public void playSound(PlayerEntity player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch)
     {
         // NO-OP
+    }
+
+    @Override
+    public void playSoundFromEntity(@Nullable PlayerEntity player, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch)
+    {
+        // NO-OP
+    }
+
+    @Override
+    public DynamicRegistries getRegistryManager()
+    {
+        return this.mc.world.getRegistryManager();
     }
 }

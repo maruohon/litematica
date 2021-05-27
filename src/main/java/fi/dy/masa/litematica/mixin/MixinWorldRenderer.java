@@ -5,6 +5,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.minecraft.client.renderer.RenderType;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 
 @Mixin(net.minecraft.client.renderer.WorldRenderer.class)
@@ -32,60 +34,26 @@ public abstract class MixinWorldRenderer
         LitematicaRenderer.getInstance().piecewisePrepareAndUpdate(frustum);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 0, shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
-    private void renderLayerSolid(
-            com.mojang.blaze3d.matrix.MatrixStack matrices,
-            float tickDelta, long limitTime, boolean renderBlockOutline,
-            net.minecraft.client.renderer.ActiveRenderInfo camera,
-            net.minecraft.client.renderer.GameRenderer gameRenderer,
-            net.minecraft.client.renderer.LightTexture lightmapTextureManager,
-            net.minecraft.util.math.vector.Matrix4f matrix4f,
-            CallbackInfo ci)
+    @Inject(method = "renderLayer", at = @At("TAIL"))
+    private void onRenderLayer(RenderType renderLayer, MatrixStack matrixStack, double x, double y, double z, CallbackInfo ci)
     {
-        LitematicaRenderer.getInstance().piecewiseRenderSolid(matrices, tickDelta);
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 1, shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
-    private void renderLayerCutoutMipped(
-            com.mojang.blaze3d.matrix.MatrixStack matrices,
-            float tickDelta, long limitTime, boolean renderBlockOutline,
-            net.minecraft.client.renderer.ActiveRenderInfo camera,
-            net.minecraft.client.renderer.GameRenderer gameRenderer,
-            net.minecraft.client.renderer.LightTexture lightmapTextureManager,
-            net.minecraft.util.math.vector.Matrix4f matrix4f,
-            CallbackInfo ci)
-    {
-        LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(matrices, tickDelta);
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 2, shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
-    private void renderLayerCutout(
-            com.mojang.blaze3d.matrix.MatrixStack matrices,
-            float tickDelta, long limitTime, boolean renderBlockOutline,
-            net.minecraft.client.renderer.ActiveRenderInfo camera,
-            net.minecraft.client.renderer.GameRenderer gameRenderer,
-            net.minecraft.client.renderer.LightTexture lightmapTextureManager,
-            net.minecraft.util.math.vector.Matrix4f matrix4f,
-            CallbackInfo ci)
-    {
-        LitematicaRenderer.getInstance().piecewiseRenderCutout(matrices, tickDelta);
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 3, shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/renderer/WorldRenderer;renderLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/matrix/MatrixStack;DDD)V"))
-    private void renderLayerTranslucent(
-            com.mojang.blaze3d.matrix.MatrixStack matrices,
-            float tickDelta, long limitTime, boolean renderBlockOutline,
-            net.minecraft.client.renderer.ActiveRenderInfo camera,
-            net.minecraft.client.renderer.GameRenderer gameRenderer,
-            net.minecraft.client.renderer.LightTexture lightmapTextureManager,
-            net.minecraft.util.math.vector.Matrix4f matrix4f,
-            CallbackInfo ci)
-    {
-        LitematicaRenderer.getInstance().piecewiseRenderTranslucent(matrices, tickDelta);
+        if (renderLayer == RenderType.getSolid())
+        {
+            LitematicaRenderer.getInstance().piecewiseRenderSolid(matrixStack);
+        }
+        else if (renderLayer == RenderType.getCutoutMipped())
+        {
+            LitematicaRenderer.getInstance().piecewiseRenderCutoutMipped(matrixStack);
+        }
+        else if (renderLayer == RenderType.getCutout())
+        {
+            LitematicaRenderer.getInstance().piecewiseRenderCutout(matrixStack);
+        }
+        else if (renderLayer == RenderType.getTranslucent())
+        {
+            LitematicaRenderer.getInstance().piecewiseRenderTranslucent(matrixStack);
+            LitematicaRenderer.getInstance().piecewiseRenderOverlay(matrixStack);
+        }
     }
 
     @Inject(method = "render",

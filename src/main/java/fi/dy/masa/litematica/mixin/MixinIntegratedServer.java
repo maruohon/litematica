@@ -14,7 +14,6 @@ import net.minecraft.resources.DataPackRegistries;
 import net.minecraft.resources.ResourcePackList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.chunk.listener.IChunkStatusListenerFactory;
-import net.minecraft.command.Commands;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.registry.DynamicRegistries;
@@ -30,8 +29,7 @@ public abstract class MixinIntegratedServer extends MinecraftServer
             MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository,
             PlayerProfileCache userCache, IChunkStatusListenerFactory worldGenerationProgressListenerFactory)
     {
-        super(thread, impl, session, saveProperties, resourcePackManager, proxy, dataFixer, serverResourceManager, minecraftSessionService, gameProfileRepository, userCache,
-                worldGenerationProgressListenerFactory);
+        super(thread, impl, session, saveProperties, resourcePackManager, proxy, dataFixer, serverResourceManager, minecraftSessionService, gameProfileRepository, userCache, worldGenerationProgressListenerFactory);
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", shift = Shift.AFTER,

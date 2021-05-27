@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.render.infohud;
 import java.util.List;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fi.dy.masa.malilib.config.HudAlignment;
+import com.mojang.blaze3d.matrix.MatrixStack;
 
 public interface IInfoHudRenderer
 {

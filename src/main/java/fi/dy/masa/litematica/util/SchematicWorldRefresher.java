@@ -119,6 +119,20 @@ public class SchematicWorldRefresher implements IRangeChangeListener
         }
     }
 
+    public void markSchematicChunksForRenderUpdate(int chunkX, int chunkY, int chunkZ)
+    {
+        WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
+
+        if (world != null)
+        {
+            if (world.getChunkProvider().isChunkLoaded(chunkX, chunkZ) &&
+                WorldUtils.isClientChunkLoaded(this.mc.world, chunkX, chunkZ))
+            {
+                world.scheduleBlockRenders(chunkX, chunkY, chunkZ);
+            }
+        }
+    }
+
     public void markSchematicChunkForRenderUpdate(BlockPos pos)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();

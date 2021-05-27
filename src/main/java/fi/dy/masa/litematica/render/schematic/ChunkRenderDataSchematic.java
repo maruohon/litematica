@@ -128,7 +128,7 @@ public class ChunkRenderDataSchematic
         return this.blockEntities;
     }
 
-    public void addBlockEntity(TileEntity be)
+    public void addTileEntity(TileEntity be)
     {
         this.blockEntities.add(be);
     }
