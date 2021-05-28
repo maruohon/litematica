@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.model.ModelDataManager;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
 
 @Mixin(ModelDataManager.class)
 public abstract class MixinModelDataManager
@@ -18,7 +18,7 @@ public abstract class MixinModelDataManager
         // it calls requestModelData on any client world when adding a te
         // but if it's not mc.world it crashes because model data may only
         // be used on the current client world
-        if (SchematicWorldHandler.getSchematicWorld() == te.getWorld())
+        if (te.getWorld() instanceof WorldSchematic)
         {
             cir.cancel();
         }
