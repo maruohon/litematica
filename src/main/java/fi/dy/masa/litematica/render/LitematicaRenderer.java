@@ -39,7 +39,6 @@ public class LitematicaRenderer
     private boolean renderPiecewise;
     private boolean renderPiecewiseSchematic;
     private boolean renderPiecewiseBlocks;
-    private boolean renderPiecewisePrepared;
     private boolean translucentSchematic;
 
     static
@@ -305,7 +304,7 @@ public class LitematicaRenderer
         this.renderPiecewise = Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() &&
                                Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
                                this.mc.getCameraEntity() != null;
-        this.renderPiecewisePrepared = false;
+        this.renderPiecewiseSchematic = false;
         this.renderPiecewiseBlocks = false;
         WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
@@ -329,7 +328,6 @@ public class LitematicaRenderer
             this.mc.getProfiler().pop();
 
             this.frustum = frustum;
-            this.renderPiecewisePrepared = true;
         }
     }
 
@@ -500,7 +498,6 @@ public class LitematicaRenderer
     private void cleanup()
     {
         this.renderPiecewise = false;
-        this.renderPiecewisePrepared = false;
         this.renderPiecewiseSchematic = false;
         this.renderPiecewiseBlocks = false;
     }

@@ -2,17 +2,28 @@ package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.arguments.BlockStateParser;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.SkullItem;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -20,6 +31,7 @@ import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.PasteNbtBehavior;
 import fi.dy.masa.litematica.util.PositionUtils.ChunkPosComparator;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -28,6 +40,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRenderer
@@ -40,6 +53,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private final boolean changedBlockOnly;
     private final ReplaceBehavior replace;
     private int sentCommandsThisTick;
+    private int sentSetblockCommands;
     private int sentCommandsTotal;
     private int currentX;
     private int currentY;
@@ -192,6 +206,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         BlockPos.Mutable posMutable = new BlockPos.Mutable();
         Chunk chunkSchematic = worldSchematic.getChunkProvider().getChunk(pos.x, pos.z);
         Chunk chunkClient = worldClient.getChunk(pos.x, pos.z);
+        PasteNbtBehavior nbtBehavior = (PasteNbtBehavior) Configs.Generic.PASTE_NBT_BEHAVIOR.getOptionListValue();
 
         if (this.boxInProgress == false)
         {
@@ -233,9 +248,29 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
                         continue;
                     }
 
-                    this.sendSetBlockCommand(posMutable.getX(), posMutable.getY(), posMutable.getZ(), stateSchematic, player);
+                    TileEntity be = worldSchematic.getBlockEntity(posMutable);
 
-                    if (++this.sentCommandsThisTick >= this.maxCommandsPerTick)
+                    if (be != null && nbtBehavior != PasteNbtBehavior.NONE)
+                    {
+                        if (nbtBehavior == PasteNbtBehavior.PLACE_MODIFY)
+                        {
+                            this.setDataViaDataModify(posMutable, stateSchematic, be, worldSchematic, worldClient, player);
+                        }
+                        else if (nbtBehavior == PasteNbtBehavior.PLACE_CLONE)
+                        {
+                            this.placeBlockViaClone(posMutable, stateSchematic, be, worldSchematic, worldClient, player);
+                        }
+                        else if (nbtBehavior == PasteNbtBehavior.TELEPORT_PLACE)
+                        {
+                            this.placeBlockDirectly(posMutable, stateSchematic, be, worldSchematic, worldClient, player);
+                        }
+                    }
+                    else
+                    {
+                        this.sendSetBlockCommand(posMutable.getX(), posMutable.getY(), posMutable.getZ(), stateSchematic, player);
+                    }
+
+                    if (this.sentCommandsThisTick >= this.maxCommandsPerTick)
                     {
                         break;
                     }
@@ -290,16 +325,177 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         String blockString = BlockStateParser.stringifyBlockState(state);
         String strCommand = String.format("/%s %d %d %d %s", cmdName, x, y, z, blockString);
 
-        player.sendChatMessage(strCommand);
+        this.sendCommand(strCommand, player);
+        ++this.sentSetblockCommands;
+    }
+
+    private void setDataViaDataModify(BlockPos pos, BlockState state, TileEntity be,
+                                      World schematicWorld, ClientWorld clientWorld, ClientPlayerEntity player)
+    {
+        BlockPos placementPos = findEmptyNearbyPosition(clientWorld, player.getBlockPos(), 3);
+
+        if (placementPos != null && this.preparePickedStack(pos, state, be, schematicWorld, player))
+        {
+            Vector3d posVec = new Vector3d(placementPos.getX() + 0.5, placementPos.getY() + 1.0, placementPos.getZ() + 0.5);
+            BlockRayTraceResult hitResult = new BlockRayTraceResult(posVec, Direction.UP, placementPos, false);
+            this.mc.interactionManager.interactBlock(player, clientWorld, Hand.OFF_HAND, hitResult);
+
+            Set<String> keys = new HashSet<>();
+
+            try
+            {
+                keys.addAll(be.toTag(new CompoundNBT()).getKeys());
+            } catch (Exception ignore) {}
+
+            keys.remove("id");
+            keys.remove("x");
+            keys.remove("y");
+            keys.remove("z");
+
+            this.sendSetBlockCommand(pos.getX(), pos.getY(), pos.getZ(), state, player);
+
+            for (String key : keys)
+            {
+                String command = String.format("/data modify block %d %d %d %s set from block %d %d %d %s",
+                                               pos.getX(), pos.getY(), pos.getZ(), key,
+                                               placementPos.getX(), placementPos.getY(), placementPos.getZ(), key);
+                this.sendCommand(command, player);
+            }
+
+            String command = String.format("/setblock %d %d %d air", placementPos.getX(), placementPos.getY(), placementPos.getZ());
+            this.sendCommand(command, player);
+        }
+    }
+
+    private void placeBlockViaClone(BlockPos pos, BlockState state, TileEntity be,
+                                    World schematicWorld, ClientWorld clientWorld, ClientPlayerEntity player)
+    {
+        BlockPos placementPos = findEmptyNearbyPosition(clientWorld, player.getBlockPos(), 3);
+
+        if (placementPos != null && this.preparePickedStack(pos, state, be, schematicWorld, player))
+        {
+            Vector3d posVec = new Vector3d(placementPos.getX() + 0.5, placementPos.getY() + 1.0, placementPos.getZ() + 0.5);
+            BlockRayTraceResult hitResult = new BlockRayTraceResult(posVec, Direction.UP, placementPos, false);
+            this.mc.interactionManager.interactBlock(player, clientWorld, Hand.OFF_HAND, hitResult);
+
+            {
+                String command = String.format("/data get block %d %d %d", placementPos.getX(), placementPos.getY(), placementPos.getZ());
+                this.sendCommand(command, player);
+            }
+
+            String command = String.format("/clone %d %d %d %d %d %d %d %d %d",
+                                           placementPos.getX(), placementPos.getY(), placementPos.getZ(),
+                                           placementPos.getX(), placementPos.getY(), placementPos.getZ(),
+                                           pos.getX(), pos.getY(), pos.getZ());
+            this.sendCommand(command, player);
+
+            command = String.format("/setblock %d %d %d air", placementPos.getX(), placementPos.getY(), placementPos.getZ());
+            this.sendCommand(command, player);
+        }
+    }
+
+    // FIXME this method does not work, probably because of the player being too far and the teleport command getting executed later(?)
+    private void placeBlockDirectly(BlockPos pos, BlockState state, TileEntity be,
+                                    World schematicWorld, ClientWorld clientWorld, ClientPlayerEntity player)
+    {
+        if (this.preparePickedStack(pos, state, be, schematicWorld, player))
+        {
+            player.setPos(pos.getX(), pos.getY() + 2, pos.getZ());
+
+            String command = String.format("/tp @p %d %d %d", pos.getX(), pos.getY() + 2, pos.getZ());
+            this.sendCommand(command, player);
+
+            Vector3d posVec = new Vector3d(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
+            BlockRayTraceResult hitResult = new BlockRayTraceResult(posVec, Direction.UP, pos, false);
+            this.mc.interactionManager.interactBlock(player, clientWorld, Hand.OFF_HAND, hitResult);
+        }
+    }
+
+    private void sendCommand(String command, ClientPlayerEntity player)
+    {
+        player.sendChatMessage(command);
+        ++this.sentCommandsThisTick;
         ++this.sentCommandsTotal;
     }
 
+    @Nullable
+    public static BlockPos findEmptyNearbyPosition(World world, BlockPos centerPos, int radius)
+    {
+        BlockPos.Mutable pos = new BlockPos.Mutable();
+        BlockPos.Mutable sidePos = new BlockPos.Mutable();
+
+        for (int y = centerPos.getY(); y <= centerPos.getY() + radius; ++y)
+        {
+            for (int z = centerPos.getZ() - radius; z <= centerPos.getZ() + radius; ++z)
+            {
+                for (int x = centerPos.getX() - radius; x <= centerPos.getX() + radius; ++x)
+                {
+                    pos.set(x, y, z);
+
+                    if (isPositionAndSidesEmpty(world, pos, sidePos))
+                    {
+                        return pos;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean isPositionAndSidesEmpty(World world, BlockPos.Mutable centerPos, BlockPos.Mutable pos)
+    {
+        if (world.isAir(centerPos) == false)
+        {
+            return false;
+        }
+
+        for (Direction side : PositionUtils.ALL_DIRECTIONS)
+        {
+            if (world.isAir(pos.set(centerPos, side)) == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean preparePickedStack(BlockPos pos, BlockState state, TileEntity be, World world, ClientPlayerEntity player)
+    {
+        ItemStack stack = state.getBlock().getPickStack(world, pos, state);
+
+        if (stack.isEmpty() == false)
+        {
+            addBlockEntityNbt(stack, be);
+            player.inventory.offHand.set(0, stack);
+            this.mc.interactionManager.clickCreativeStack(stack, 45);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static void addBlockEntityNbt(ItemStack stack, TileEntity be)
+    {
+        CompoundNBT tag = be.toTag(new CompoundNBT());
+
+        if (stack.getItem() instanceof SkullItem && tag.contains("SkullOwner"))
+        {
+            CompoundNBT ownerTag = tag.getCompound("SkullOwner");
+            stack.getOrCreateTag().put("SkullOwner", ownerTag);
+        }
+        else
+        {
+            stack.putSubTag("BlockEntityTag", tag);
+        }
+    }
     @Override
     public void stop()
     {
         if (this.finished)
         {
-            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted_using_setblock", this.sentCommandsTotal);
+            InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted_using_setblock", this.sentSetblockCommands);
         }
         else
         {

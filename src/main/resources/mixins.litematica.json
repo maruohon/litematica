@@ -7,6 +7,7 @@
     "client": [
         "IMixinChunkDeltaUpdateS2CPacket",
         "IMixinFenceGateBlock",
+        "IMixinHandledScreen",
         "IMixinRedstoneWireBlock",
         "IMixinStairsBlock",
         "IMixinVineBlock",
@@ -14,6 +15,7 @@
         "MixinClientPlayNetworkHandler",
         "MixinClientWorld",
         "MixinDebugHud",
+        "MixinHandledScreen",
         "MixinIntegratedServer",
         "MixinMinecraftClient",
         "MixinModelDataManager",

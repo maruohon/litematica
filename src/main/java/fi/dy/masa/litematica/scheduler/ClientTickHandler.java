@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.scheduler;
 
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.util.WorldUtils;
@@ -15,6 +16,11 @@ public class ClientTickHandler implements IClientTickHandler
         {
             InputHandler.onTick(mc);
             WorldUtils.easyPlaceOnUseTick(mc);
+
+            if (Configs.Generic.LAYER_MODE_DYNAMIC.getBooleanValue())
+            {
+                DataManager.getRenderLayerRange().setToPosition(mc.player);
+            }
 
             DataManager.getSchematicPlacementManager().processQueuedChunks();
             TaskScheduler.getInstanceClient().runTasks();

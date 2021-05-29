@@ -440,10 +440,19 @@ public class RenderUtils
     {
         for (final Direction side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
         {
-            renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, RAND));
+            renderModelQuadOutlines(model, state, pos, side, color, expand, buffer);
         }
 
-        renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, null, RAND));
+        renderModelQuadOutlines(model, state, pos, null, color, expand, buffer);
+    }
+
+    private static void renderModelQuadOutlines(IBakedModel model, BlockState state, BlockPos pos, Direction side, Color4f color, double expand, BufferBuilder buffer)
+    {
+        try
+        {
+            renderModelQuadOutlines(pos, buffer, color, model.getQuads(state, side, RAND));
+        }
+        catch (Exception ignore) {}
     }
 
     private static void renderModelQuadOutlines(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
@@ -490,15 +499,19 @@ public class RenderUtils
     {
         for (final Direction side : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
         {
-            renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, RAND));
+            drawBlockModelQuadOverlayBatched(model, state, pos, side, color, expand, buffer);
         }
 
-        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, null, RAND));
+        drawBlockModelQuadOverlayBatched(model, state, pos, null, color, expand, buffer);
     }
 
     public static void drawBlockModelQuadOverlayBatched(IBakedModel model, BlockState state, BlockPos pos, Direction side, Color4f color, double expand, BufferBuilder buffer)
     {
-        renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, RAND));
+        try
+        {
+            renderModelQuadOverlayBatched(pos, buffer, color, model.getQuads(state, side, RAND));
+        }
+        catch (Exception ignore) {}
     }
 
     private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)

@@ -4,19 +4,16 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.crash.ReportedException;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.vector.Vector3d;
@@ -56,11 +53,14 @@ public class BlockModelRendererSchematic
         }
         catch (Throwable throwable)
         {
+            /*
             CrashReport crashreport = CrashReport.create(throwable, "Tesselating block model");
             CrashReportCategory crashreportcategory = crashreport.addElement("Block model being tesselated");
             CrashReportCategory.addBlockInfo(crashreportcategory, posIn, stateIn);
             crashreportcategory.add("Using AO", Boolean.valueOf(ao));
             throw new ReportedException(crashreport);
+            */
+            return false;
         }
     }
 

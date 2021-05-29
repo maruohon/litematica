@@ -104,7 +104,14 @@ public class LitematicaBlockStatePaletteLinear implements ILitematicaBlockStateP
 
         for (int id = 0; id < this.currentSize; ++id)
         {
-            CompoundNBT tag = NBTUtil.fromBlockState(this.states[id]);
+            BlockState state = this.states[id];
+
+            if (state == null)
+            {
+                state = LitematicaBlockStateContainer.AIR_BLOCK_STATE;
+            }
+
+            CompoundNBT tag = NBTUtil.fromBlockState(state);
             tagList.add(tag);
         }
 

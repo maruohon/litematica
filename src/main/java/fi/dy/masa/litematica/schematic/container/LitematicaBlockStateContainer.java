@@ -98,19 +98,20 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
     @Override
     public int onResize(int bits, BlockState state)
     {
-        LitematicaBitArray bitArray = this.storage;
-        ILitematicaBlockStatePalette statePaletteOld = this.palette;
+        LitematicaBitArray oldStorage = this.storage;
+        ILitematicaBlockStatePalette oldPalette = this.palette;
+        final int storageLength = oldStorage.size();
+
         this.setBits(bits, null);
 
-        for (int id = 0; id < bitArray.size(); ++id)
-        {
-            BlockState stateTmp = statePaletteOld.getBlockState(bitArray.getAt(id));
+        LitematicaBitArray newStorage = this.storage;
 
-            if (stateTmp != null)
-            {
-                this.set(id, stateTmp);
-            }
+        for (int index = 0; index < storageLength; ++index)
+        {
+            newStorage.setAt(index, oldStorage.getAt(index));
         }
+
+        this.palette.readFromNBT(oldPalette.writeToNBT());
 
         return this.palette.idFor(state);
     }

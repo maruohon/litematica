@@ -91,7 +91,14 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
 
         for (int id = 0; id < this.statePaletteMap.size(); ++id)
         {
-            CompoundNBT tag = NBTUtil.fromBlockState(this.statePaletteMap.get(id));
+            BlockState state = this.statePaletteMap.get(id);
+
+            if (state == null)
+            {
+                state = LitematicaBlockStateContainer.AIR_BLOCK_STATE;
+            }
+
+            CompoundNBT tag = NBTUtil.fromBlockState(state);
             tagList.add(tag);
         }
 
@@ -102,11 +109,10 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     public boolean setMapping(List<BlockState> list)
     {
         this.statePaletteMap.clear();
-        final int size = list.size();
 
-        for (int id = 0; id < size; ++id)
+        for (BlockState blockState : list)
         {
-            this.statePaletteMap.add(list.get(id));
+            this.statePaletteMap.add(blockState);
         }
 
         return true;

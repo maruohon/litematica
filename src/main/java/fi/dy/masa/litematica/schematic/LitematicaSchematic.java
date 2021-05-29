@@ -29,6 +29,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.INBT;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.ResourceLocation;
@@ -172,7 +173,8 @@ public class LitematicaSchematic
     }
 
     @Nullable
-    public static LitematicaSchematic createFromWorld(World world, AreaSelection area, boolean ignoreEntities, String author, IStringConsumer feedback)
+    public static LitematicaSchematic createFromWorld(World world, AreaSelection area, SchematicSaveInfo info,
+                                                      String author, IStringConsumer feedback)
     {
         List<Box> boxes = PositionUtils.getValidBoxes(area);
 
@@ -189,9 +191,9 @@ public class LitematicaSchematic
         schematic.setSubRegionPositions(boxes, origin);
         schematic.setSubRegionSizes(boxes);
 
-        schematic.takeBlocksFromWorld(world, boxes);
+        schematic.takeBlocksFromWorld(world, boxes, info);
 
-        if (ignoreEntities == false)
+        if (info.ignoreEntities == false)
         {
             schematic.takeEntitiesFromWorld(world, boxes, origin);
         }
@@ -869,7 +871,7 @@ public class LitematicaSchematic
         }
     }
 
-    private void takeBlocksFromWorld(World world, List<Box> boxes)
+    private void takeBlocksFromWorld(World world, List<Box> boxes, SchematicSaveInfo info)
     {
         BlockPos.Mutable posMutable = new BlockPos.Mutable(0, 0, 0);
 
@@ -891,6 +893,7 @@ public class LitematicaSchematic
             final int startX = minCorner.getX();
             final int startY = minCorner.getY();
             final int startZ = minCorner.getZ();
+            final boolean visibleOnly = info.visibleOnly;
 
             for (int y = 0; y < sizeY; ++y)
             {
@@ -899,6 +902,12 @@ public class LitematicaSchematic
                     for (int x = 0; x < sizeX; ++x)
                     {
                         posMutable.set(x + startX, y + startY, z + startZ);
+
+                        if (visibleOnly && isExposed(world, posMutable) == false)
+                        {
+                            continue;
+                        }
+
                         BlockState state = world.getBlockState(posMutable);
                         container.set(x, y, z, state);
 
@@ -975,8 +984,25 @@ public class LitematicaSchematic
         }
     }
 
-    public void takeBlocksFromWorldWithinChunk(World world, int chunkX, int chunkZ,
-            ImmutableMap<String, IntBoundingBox> volumes, ImmutableMap<String, Box> boxes)
+    public static boolean isExposed(World world, BlockPos pos)
+    {
+        for (Direction dir : fi.dy.masa.malilib.util.PositionUtils.ALL_DIRECTIONS)
+        {
+            BlockPos posAdj = pos.offset(dir);
+            BlockState stateAdj = world.getBlockState(posAdj);
+
+            if (stateAdj.isOpaque() == false ||
+                stateAdj.isSideSolidFullSquare(world, posAdj, dir) == false)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void takeBlocksFromWorldWithinChunk(World world, ImmutableMap<String, IntBoundingBox> volumes,
+                                               ImmutableMap<String, Box> boxes, SchematicSaveInfo info)
     {
         BlockPos.Mutable posMutable = new BlockPos.Mutable(0, 0, 0);
 
@@ -1017,6 +1043,7 @@ public class LitematicaSchematic
             final int endX = startX + (bb.maxX - bb.minX);
             final int endY = startY + (bb.maxY - bb.minY);
             final int endZ = startZ + (bb.maxZ - bb.minZ);
+            final boolean visibleOnly = info.visibleOnly;
 
             for (int y = startY; y <= endY; ++y)
             {
@@ -1025,6 +1052,12 @@ public class LitematicaSchematic
                     for (int x = startX; x <= endX; ++x)
                     {
                         posMutable.set(x + offsetX, y + offsetY, z + offsetZ);
+
+                        if (visibleOnly && isExposed(world, posMutable) == false)
+                        {
+                            continue;
+                        }
+
                         BlockState state = world.getBlockState(posMutable);
                         container.set(x, y, z, state);
 
@@ -1843,6 +1876,7 @@ public class LitematicaSchematic
         catch (Exception e)
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.exception", fileSchematic.getAbsolutePath());
+            Litematica.logger.error(e);
         }
 
         return null;
@@ -1857,6 +1891,18 @@ public class LitematicaSchematic
         {
             this.posVec = posVec;
             this.nbt = nbt;
+        }
+    }
+
+    public static class SchematicSaveInfo
+    {
+        public final boolean visibleOnly;
+        public final boolean ignoreEntities;
+
+        public SchematicSaveInfo(boolean visibleOnly, boolean ignoreEntities)
+        {
+            this.visibleOnly = visibleOnly;
+            this.ignoreEntities = ignoreEntities;
         }
     }
 }
