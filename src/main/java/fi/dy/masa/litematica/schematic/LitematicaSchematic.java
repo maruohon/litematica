@@ -781,7 +781,7 @@ public class LitematicaSchematic
                 if (x >= minX && x < maxX && z >= minZ && z < maxZ)
                 {
                     this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
-                    //System.out.printf("post: %.1f - rot: %s, mm: %s, ms: %s\n", entity.yaw, rotationCombined, mirrorMain, mirrorSub);
+                    //System.out.printf("post: %.1f - rot: %s, mm: %s, ms: %s\n", entity.getYaw(), rotationCombined, mirrorMain, mirrorSub);
                     EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
                 }
             }
@@ -790,14 +790,14 @@ public class LitematicaSchematic
 
     private void rotateEntity(Entity entity, double x, double y, double z, BlockRotation rotationCombined, BlockMirror mirrorMain, BlockMirror mirrorSub)
     {
-        float rotationYaw = entity.yaw;
+        float rotationYaw = entity.getYaw();
 
         if (mirrorMain != BlockMirror.NONE)         { rotationYaw = entity.applyMirror(mirrorMain); }
         if (mirrorSub != BlockMirror.NONE)          { rotationYaw = entity.applyMirror(mirrorSub); }
-        if (rotationCombined != BlockRotation.NONE) { rotationYaw += entity.yaw - entity.applyRotation(rotationCombined); }
+        if (rotationCombined != BlockRotation.NONE) { rotationYaw += entity.getYaw() - entity.applyRotation(rotationCombined); }
 
-        entity.refreshPositionAndAngles(x, y, z, rotationYaw, entity.pitch);
-        EntityUtils.setEntityRotations(entity, rotationYaw, entity.pitch);
+        entity.refreshPositionAndAngles(x, y, z, rotationYaw, entity.getPitch());
+        EntityUtils.setEntityRotations(entity, rotationYaw, entity.getPitch());
     }
 
     private void takeEntitiesFromWorld(World world, List<Box> boxes, BlockPos origin)
@@ -813,7 +813,7 @@ public class LitematicaSchematic
             {
                 NbtCompound tag = new NbtCompound();
 
-                if (entity.saveToTag(tag))
+                if (entity.saveNbt(tag))
                 {
                     Vec3d posVec = new Vec3d(entity.getX() - regionPosAbs.getX(), entity.getY() - regionPosAbs.getY(), entity.getZ() - regionPosAbs.getZ());
                     NBTUtils.writeEntityPositionToTag(posVec, tag);
@@ -856,7 +856,7 @@ public class LitematicaSchematic
                 {
                     NbtCompound tag = new NbtCompound();
 
-                    if (entity.saveToTag(tag))
+                    if (entity.saveNbt(tag))
                     {
                         Vec3d posVec = new Vec3d(entity.getX() - regionPosAbs.getX(), entity.getY() - regionPosAbs.getY(), entity.getZ() - regionPosAbs.getZ());
                         NBTUtils.writeEntityPositionToTag(posVec, tag);

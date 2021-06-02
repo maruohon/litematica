@@ -313,8 +313,8 @@ public class SchematicaSchematic
             if (entity != null)
             {
                 float rotationYaw = entity.applyMirror(mirror);
-                rotationYaw = rotationYaw + (entity.yaw - entity.applyRotation(rotation));
-                entity.refreshPositionAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.pitch);
+                rotationYaw = rotationYaw + (entity.getYaw() - entity.applyRotation(rotation));
+                entity.refreshPositionAndAngles(realPos.x, realPos.y, realPos.z, rotationYaw, entity.getPitch());
                 EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
             }
         }
@@ -402,7 +402,7 @@ public class SchematicaSchematic
         {
             NbtCompound tag = new NbtCompound();
 
-            if (entity.saveToTag(tag))
+            if (entity.saveNbt(tag))
             {
                 Vec3d pos = new Vec3d(entity.getX() - posStart.getX(), entity.getY() - posStart.getY(), entity.getZ() - posStart.getZ());
                 NBTUtils.writeEntityPositionToTag(pos, tag);

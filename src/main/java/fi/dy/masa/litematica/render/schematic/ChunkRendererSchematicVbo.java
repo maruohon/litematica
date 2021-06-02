@@ -749,7 +749,7 @@ public class ChunkRendererSchematicVbo
     {
         if (layer == RenderLayer.getTranslucent() && chunkRenderData.isBlockLayerEmpty(layer) == false)
         {
-            buffer.method_31948(x, y, z); // sortQuads
+            buffer.setCameraPosition(x, y, z);
             chunkRenderData.setBlockBufferState(layer, buffer.popState());
         }
 
@@ -776,7 +776,7 @@ public class ChunkRendererSchematicVbo
         RenderSystem.applyModelViewMatrix();
         if (type == OverlayRenderType.QUAD && chunkRenderData.isOverlayTypeEmpty(type) == false)
         {
-            buffer.method_31948(x, y, z); // sortQuads
+            buffer.setCameraPosition(x, y, z);
             chunkRenderData.setOverlayBufferState(type, buffer.popState());
         }
 
@@ -907,7 +907,7 @@ public class ChunkRendererSchematicVbo
 
     public enum OverlayRenderType
     {
-        OUTLINE     (VertexFormat.DrawMode.LINES),
+        OUTLINE     (VertexFormat.DrawMode.DEBUG_LINES),
         QUAD        (VertexFormat.DrawMode.QUADS);
 
         private final VertexFormat.DrawMode drawMode;

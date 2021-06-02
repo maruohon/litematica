@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.world;
 
+import java.util.function.BooleanSupplier;
 import javax.annotation.Nullable;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkManager;
@@ -90,5 +91,11 @@ public class ChunkManagerSchematic extends ChunkManager
     public LightingProvider getLightingProvider()
     {
         return this.lightingProvider;
+    }
+
+    @Override
+    public void tick(BooleanSupplier booleanSupplier)
+    {
+        // NO-OP
     }
 }

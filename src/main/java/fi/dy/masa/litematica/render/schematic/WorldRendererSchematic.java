@@ -272,8 +272,8 @@ public class WorldRendererSchematic
                 entityX != this.lastCameraX ||
                 entityY != this.lastCameraY ||
                 entityZ != this.lastCameraZ ||
-                entity.pitch != this.lastCameraPitch ||
-                entity.yaw != this.lastCameraYaw;
+                entity.getPitch() != this.lastCameraPitch ||
+                entity.getYaw() != this.lastCameraYaw;
         this.lastCameraX = cameraX;
         this.lastCameraY = cameraY;
         this.lastCameraZ = cameraZ;
@@ -461,20 +461,11 @@ public class WorldRendererSchematic
         Shader shader = RenderSystem.getShader();
         BufferRenderer.unbindAll();
 
-        for(int i = 0; i < 12; ++i) shader.method_34583("Sampler" + i, RenderSystem.getShaderTexture(i));
-
-        if (shader.field_29470 != null) shader.field_29470.set(matrices.peek().getModel());
-        if (shader.field_29471 != null) shader.field_29471.set(projMatrix);
-        if (shader.field_29474 != null) shader.field_29474.set(RenderSystem.getShaderColor());
-        if (shader.field_29477 != null) shader.field_29477.set(RenderSystem.getShaderFogStart());
-        if (shader.field_29478 != null) shader.field_29478.set(RenderSystem.getShaderFogEnd());
-        if (shader.field_29479 != null) shader.field_29479.set(RenderSystem.getShaderFogColor());
-        if (shader.field_29472 != null) shader.field_29472.set(RenderSystem.getTextureMatrix());
-        if (shader.field_29481 != null) shader.field_29481.set(RenderSystem.getShaderGameTime());
+        initShader(shader, matrices, projMatrix);
 
         RenderSystem.setupShaderLights(shader);
-        shader.method_34586();
-        GlUniform chunkOffsetUniform = shader.field_29482;
+        shader.upload();
+        GlUniform chunkOffsetUniform = shader.chunkOffset;
 
         boolean startedDrawing = false;
         for (int i = startIndex; i != stopIndex; i += increment)
@@ -493,21 +484,21 @@ public class WorldRendererSchematic
                 }
 
                 buffer.bind();
-                buffer.method_34432();
+                buffer.drawVertices();
                 startedDrawing = true;
 
                 ++count;
             }
         }
 
-        if (chunkOffsetUniform != null) chunkOffsetUniform.method_34413(Vec3f.field_29501);
+        if (chunkOffsetUniform != null) chunkOffsetUniform.set(Vec3f.ZERO);
 
-        shader.method_34585();
+        shader.bind();
 
         if (startedDrawing) renderLayer.getVertexFormat().endDrawing();
 
         VertexBuffer.unbind();
-        VertexBuffer.method_34430();
+        VertexBuffer.unbindVertexArray();
         renderLayer.endDrawing();
 
         this.world.getProfiler().pop();
@@ -522,7 +513,21 @@ public class WorldRendererSchematic
         this.renderBlockOverlay(OverlayRenderType.QUAD, matrices, camera, projMatrix);
     }
 
-    private void renderBlockOverlay(OverlayRenderType type, MatrixStack matrices, Camera camera, Matrix4f projMatrix)
+    private static void initShader(Shader shader, MatrixStack matrices, Matrix4f projMatrix)
+    {
+        for (int i = 0; i < 12; ++i) shader.addSampler("Sampler" + i, RenderSystem.getShaderTexture(i));
+
+        if (shader.modelViewMat != null) shader.modelViewMat.set(matrices.peek().getModel());
+        if (shader.projectionMat != null) shader.projectionMat.set(projMatrix);
+        if (shader.colorModulator != null) shader.colorModulator.set(RenderSystem.getShaderColor());
+        if (shader.fogStart != null) shader.fogStart.set(RenderSystem.getShaderFogStart());
+        if (shader.fogEnd != null) shader.fogEnd.set(RenderSystem.getShaderFogEnd());
+        if (shader.fogColor != null) shader.fogColor.set(RenderSystem.getShaderFogColor());
+        if (shader.textureMat != null) shader.textureMat.set(RenderSystem.getTextureMatrix());
+        if (shader.gameTime != null) shader.gameTime.set(RenderSystem.getShaderGameTime());
+    }
+
+    private void renderBlockOverlay(OverlayRenderType type, MatrixStack matrixStack, Camera camera, Matrix4f projMatrix)
     {
         RenderLayer renderLayer = RenderLayer.getTranslucent();
         renderLayer.startDrawing();
@@ -537,25 +542,12 @@ public class WorldRendererSchematic
         this.world.getProfiler().push("overlay_" + type.name());
         this.world.getProfiler().swap("render");
 
+        Shader originalShader = RenderSystem.getShader();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
         Shader shader = RenderSystem.getShader();
         BufferRenderer.unbindAll();
 
-        for(int i = 0; i < 12; ++i) shader.method_34583("Sampler" + i, RenderSystem.getShaderTexture(i));
-
-        if (shader.field_29470 != null) shader.field_29470.set(matrices.peek().getModel());
-        if (shader.field_29471 != null) shader.field_29471.set(projMatrix);
-        if (shader.field_29474 != null) shader.field_29474.set(RenderSystem.getShaderColor());
-        if (shader.field_29477 != null) shader.field_29477.set(RenderSystem.getShaderFogStart());
-        if (shader.field_29478 != null) shader.field_29478.set(RenderSystem.getShaderFogEnd());
-        if (shader.field_29479 != null) shader.field_29479.set(RenderSystem.getShaderFogColor());
-        if (shader.field_29472 != null) shader.field_29472.set(RenderSystem.getTextureMatrix());
-        if (shader.field_29481 != null) shader.field_29481.set(RenderSystem.getShaderGameTime());
-
-        RenderSystem.setupShaderLights(shader);
-        shader.method_34586();
-        GlUniform chunkOffsetUniform = shader.field_29482;
-
-        boolean startedDrawing = false;
         for (int i = this.renderInfos.size() - 1; i >= 0; --i)
         {
             ChunkRendererSchematicVbo renderer = this.renderInfos.get(i);
@@ -566,30 +558,20 @@ public class WorldRendererSchematic
 
                 if (compiledChunk.isOverlayTypeEmpty(type) == false)
                 {
-                    BlockPos chunkOrigin = renderer.getOrigin();
                     VertexBuffer buffer = renderer.getOverlayVertexBuffer(type);
+                    BlockPos chunkOrigin = renderer.getOrigin();
 
-                    if (chunkOffsetUniform != null) {
-                        chunkOffsetUniform.set((float)((double)chunkOrigin.getX() - x), (float)((double)chunkOrigin.getY() - y), (float)((double)chunkOrigin.getZ() - z));
-                        chunkOffsetUniform.upload();
-                    }
-
-                    buffer.bind();
-                    RenderSystem.applyModelViewMatrix();
-                    buffer.method_34432();
-                    startedDrawing = true;
+                    matrixStack.push();
+                    matrixStack.translate(chunkOrigin.getX() - x, chunkOrigin.getY() - y, chunkOrigin.getZ() - z);
+                    buffer.setShader(matrixStack.peek().getModel(), projMatrix, shader);
+                    matrixStack.pop();
                 }
             }
         }
 
-        if (chunkOffsetUniform != null) chunkOffsetUniform.method_34413(Vec3f.field_29501);
+        renderLayer.endDrawing();
 
-        shader.method_34585();
-
-        if (startedDrawing) renderLayer.getVertexFormat().endDrawing();
-        VertexBuffer.unbind();
-        VertexBuffer.method_34430();
-
+        RenderSystem.setShader(() -> originalShader);
         RenderSystem.disableBlend();
 
         this.world.getProfiler().pop();
@@ -695,7 +677,7 @@ public class WorldRendererSchematic
                             double y = entityTmp.getY() - cameraY;
                             double z = entityTmp.getZ() - cameraZ;
 
-                            this.entityRenderDispatcher.render(entityTmp, x, y, z, entityTmp.yaw, partialTicks, matrices, entityVertexConsumers, this.entityRenderDispatcher.getLight(entityTmp, partialTicks));
+                            this.entityRenderDispatcher.render(entityTmp, x, y, z, entityTmp.getYaw(), partialTicks, matrices, entityVertexConsumers, this.entityRenderDispatcher.getLight(entityTmp, partialTicks));
                             ++this.countEntitiesRendered;
                         }
                     }

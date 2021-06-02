@@ -1,10 +1,6 @@
 package fi.dy.masa.litematica.render;
 
 import javax.annotation.Nullable;
-
-import net.minecraft.util.math.Matrix4f;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -14,6 +10,7 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Matrix4f;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
@@ -43,10 +40,10 @@ public class LitematicaRenderer
     static
     {
         int program = SHADER_ALPHA.getProgram();
-        int oldProgram = GlStateManager.getInteger(GL20.GL_CURRENT_PROGRAM);
-        GlStateManager.useProgram(program);
-        GlStateManager.uniform1(GlStateManager.getUniformLocation(program, "texture"), 0);
-        GlStateManager.useProgram(oldProgram);
+        int oldProgram = GlStateManager._getInteger(GL20.GL_CURRENT_PROGRAM);
+        GlStateManager._glUseProgram(program);
+        GlStateManager._glUniform1i(GlStateManager._glGetUniformLocation(program, "texture"), 0);
+        GlStateManager._glUseProgram(oldProgram);
     }
 
     private LitematicaRenderer()
@@ -275,10 +272,10 @@ public class LitematicaRenderer
 
         if (this.translucentSchematic)
         {
-            this.originalShaderProgram = GlStateManager.getInteger(GL20.GL_CURRENT_PROGRAM);
+            this.originalShaderProgram = GlStateManager._getInteger(GL20.GL_CURRENT_PROGRAM);
             this.translucencyAlpha = (float) Configs.Visuals.GHOST_BLOCK_ALPHA.getDoubleValue();
-            GlStateManager.useProgram(SHADER_ALPHA.getProgram());
-            GL20.glUniform1f(GlStateManager.getUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), this.translucencyAlpha);
+            GlStateManager._glUseProgram(SHADER_ALPHA.getProgram());
+            GL20.glUniform1f(GlStateManager._glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), this.translucencyAlpha);
         }
     }
 
@@ -286,7 +283,7 @@ public class LitematicaRenderer
     {
         if (this.translucentSchematic)
         {
-            GlStateManager.useProgram(SHADER_ALPHA.getProgram());
+            GlStateManager._glUseProgram(SHADER_ALPHA.getProgram());
         }
     }
 
@@ -294,7 +291,7 @@ public class LitematicaRenderer
     {
         if (this.translucentSchematic)
         {
-            GlStateManager.useProgram(this.originalShaderProgram);
+            GlStateManager._glUseProgram(this.originalShaderProgram);
         }
     }
 

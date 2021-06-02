@@ -428,4 +428,10 @@ public class WorldSchematic extends World
     {
         return this.mc.world.getRegistryManager();
     }
+
+    @Override
+    public String asString()
+    {
+        return "Chunks[SCH] W: " + this.getChunkManager().getDebugString() + " E: " + this.getRegularEntityCount();
+    }
 }

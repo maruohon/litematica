@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;

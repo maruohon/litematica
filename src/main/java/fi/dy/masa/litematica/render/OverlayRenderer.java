@@ -5,15 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-
-import net.minecraft.client.render.*;
-import org.lwjgl.opengl.GL11;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventory;
@@ -121,7 +122,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderBoxes(MatrixStack matrices, float partialTicks)
+    public void renderBoxes(MatrixStack matrices)
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
@@ -342,7 +343,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSchematicVerifierMismatches(MatrixStack matrices, float partialTicks)
+    public void renderSchematicVerifierMismatches(MatrixStack matrices)
     {
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -357,12 +358,12 @@ public class OverlayRenderer
                 List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
                 HitResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 128);
                 BlockPos posLook = trace != null && trace.getType() == HitResult.Type.BLOCK ? ((BlockHitResult) trace).getBlockPos() : null;
-                this.renderSchematicMismatches(list, posLook, matrices, partialTicks);
+                this.renderSchematicMismatches(list, posLook, matrices);
             }
         }
     }
 
-    private void renderSchematicMismatches(List<MismatchRenderPos> posList, @Nullable BlockPos lookPos, MatrixStack matrices, float partialTicks)
+    private void renderSchematicMismatches(List<MismatchRenderPos> posList, @Nullable BlockPos lookPos, MatrixStack matrices)
     {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
@@ -637,7 +638,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderSchematicRebuildTargetingOverlay(MatrixStack matrixStack, float partialTicks)
+    public void renderSchematicRebuildTargetingOverlay(MatrixStack matrixStack)
     {
         RayTraceWrapper traceWrapper = null;
         Color4f color = null;
