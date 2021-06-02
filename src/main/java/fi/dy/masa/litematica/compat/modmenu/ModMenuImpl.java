@@ -1,8 +1,8 @@
 package fi.dy.masa.litematica.compat.modmenu;
 
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 import fi.dy.masa.litematica.gui.GuiConfigs;
-import io.github.prospector.modmenu.api.ConfigScreenFactory;
-import io.github.prospector.modmenu.api.ModMenuApi;
 
 public class ModMenuImpl implements ModMenuApi
 {

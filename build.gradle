@@ -22,9 +22,8 @@ plugins {
 */
 
 repositories {
-    maven {
-        url 'https://masa.dy.fi/maven'
-    }
+    maven { url 'https://masa.dy.fi/maven' }
+    maven { url 'https://maven.terraformersmc.com/releases/' }
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -49,7 +48,7 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     //modCompile "net.fabricmc:fabric:" + config.fabric_version
 
-    modCompileOnly "io.github.prospector:modmenu:${config.mod_menu_version}"
+    modCompileOnly "com.terraformersmc:modmenu:${config.mod_menu_version}"
 }
 
 minecraft {
