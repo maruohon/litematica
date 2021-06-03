@@ -7,9 +7,9 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 @Mixin(HandledScreen.class)
 public interface IMixinHandledScreen
 {
-    @Accessor("field_2776") // x
+    @Accessor("x")
     int litematica_getX();
 
-    @Accessor("field_2800") // y
+    @Accessor("y")
     int litematica_getY();
 }
