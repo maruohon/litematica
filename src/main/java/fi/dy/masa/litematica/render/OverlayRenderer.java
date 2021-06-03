@@ -470,7 +470,8 @@ public class OverlayRenderer
 
             if (renderBlockInfoLines || renderInfoOverlay)
             {
-                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+                boolean targetFluids = Configs.InfoOverlays.INFO_OVERLAYS_TARGET_FLUIDS.getBooleanValue();
+                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true, targetFluids);
             }
 
             if (traceWrapper != null &&

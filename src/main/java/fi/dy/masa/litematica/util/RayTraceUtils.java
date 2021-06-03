@@ -324,7 +324,8 @@ public class RayTraceUtils
     }
 
     @Nullable
-    public static BlockHitResult traceToSchematicWorld(Entity entity, double range, boolean respectRenderRange)
+    public static BlockHitResult traceToSchematicWorld(Entity entity, double range,
+                                                       boolean respectRenderRange, boolean targetFluids)
     {
         boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
 
@@ -345,16 +346,23 @@ public class RayTraceUtils
         Vec3d eyesPos = entity.getCameraPosVec(1f);
         Vec3d rangedLookRot = entity.getRotationVec(1f).multiply(range);
         Vec3d lookEndPos = eyesPos.add(rangedLookRot);
-        RaycastContext.FluidHandling fluidMode = RaycastContext.FluidHandling.ANY;
+        RaycastContext.FluidHandling fluidMode = targetFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE;
 
         return rayTraceBlocks(world, eyesPos, lookEndPos, fluidMode, false, true, respectRenderRange, 200);
     }
 
     @Nullable
-    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range, boolean respectRenderRange)
+    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity,
+                                                  double range, boolean respectRenderRange)
     {
-        HitResult traceClient = getRayTraceFromEntity(worldClient, entity, true, range);
-        HitResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange);
+        return getGenericTrace(worldClient, entity, range, respectRenderRange, true);
+    }
+
+    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity,
+                                                  double range, boolean respectRenderRange, boolean targetFluids)
+    {
+        HitResult traceClient = getRayTraceFromEntity(worldClient, entity, targetFluids, range);
+        HitResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange, targetFluids);
         double distClosest = -1D;
         HitType type = HitType.MISS;
         Vec3d eyesPos = entity.getCameraPosVec(1f);
