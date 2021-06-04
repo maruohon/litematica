@@ -617,8 +617,16 @@ public class SchematicaSchematic
             if (add.length != expectedAddLength)
             {
                 String str = String.format("SchematicaSchematic: Add array size mismatch, blocks: %d, add: %d, expected add: %d", numBlocks, add.length, expectedAddLength);
-                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, str);
-                return false;
+
+                if (add.length < expectedAddLength)
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, str);
+                    return false;
+                }
+                else
+                {
+                    InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, str);
+                }
             }
         }
 
