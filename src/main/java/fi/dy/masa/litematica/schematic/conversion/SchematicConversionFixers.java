@@ -51,10 +51,10 @@ public class SchematicConversionFixers
     private static final BooleanProperty[] HORIZONTAL_CONNECTING_BLOCK_PROPS = new BooleanProperty[] { null, null, FourWayBlock.NORTH, FourWayBlock.SOUTH, FourWayBlock.WEST, FourWayBlock.EAST };
     private static final BlockState REDSTONE_WIRE_DOT = Blocks.REDSTONE_WIRE.getDefaultState();
     private static final BlockState REDSTONE_WIRE_CROSS = Blocks.REDSTONE_WIRE.getDefaultState()
-                          .with(RedstoneWireBlock.WIRE_CONNECTION_NORTH, RedstoneSide.SIDE)
-                          .with(RedstoneWireBlock.WIRE_CONNECTION_EAST, RedstoneSide.SIDE)
-                          .with(RedstoneWireBlock.WIRE_CONNECTION_SOUTH, RedstoneSide.SIDE)
-                          .with(RedstoneWireBlock.WIRE_CONNECTION_WEST, RedstoneSide.SIDE);
+                          .with(RedstoneWireBlock.WIRE_CONNECTION_NORTH, RedstoneSide.NONE)
+                          .with(RedstoneWireBlock.WIRE_CONNECTION_EAST, RedstoneSide.NONE)
+                          .with(RedstoneWireBlock.WIRE_CONNECTION_SOUTH, RedstoneSide.NONE)
+                          .with(RedstoneWireBlock.WIRE_CONNECTION_WEST, RedstoneSide.NONE);
 
     public static final IStateFixer FIXER_BANNER = (reader, state, pos) -> {
         CompoundNBT tag = reader.getTileEntityData(pos);
