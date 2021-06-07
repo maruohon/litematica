@@ -27,10 +27,6 @@ configFile.withReader {
     project.ext.config = new ConfigSlurper().parse prop
 }
 
-version = project.config.mod_version
-group = config.group + "." + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = config.mod_file_name + '-' + config.minecraft_version_out
-
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -44,6 +40,12 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    ext.mod_version = config.mod_version
+
+    if (config.mod_version.endsWith('-dev')) {
+        config.mod_version = config.mod_version + "." + new Date().format('yyyyMMdd.HHmmss')
+    }
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -100,6 +102,10 @@ minecraft {
     }
 }
 
+version = project.config.mod_version
+group = config.group + "." + config.mod_id // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = config.mod_file_name + '-' + config.minecraft_version_out
+
 repositories {
     maven {
         url 'https://www.dogforce-games.com/maven/'
@@ -115,7 +121,8 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:' + config.minecraft_version + '-' + config.forge_version
     implementation fileTree(dir: "../malilib/build/libs", include: "**.jar")
-//    implementation 'fi.dy.masa.malilib:malilib-forge-' + config.minecraft_version_out + ':' + config.malilib_version + ':deobf'
+    //implementation fileTree(dir: "../malilib/build/libs", include: "malilib-forge-${config.minecraft_version_out}-${config.malilib_version}**.jar")
+    //implementation 'fi.dy.masa.malilib:malilib-forge-' + config.minecraft_version_out + ':' + config.malilib_version + ':deobf'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
