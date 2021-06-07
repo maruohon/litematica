@@ -69,6 +69,6 @@ license="GNU Lesser General Public License v3.0"
 [[dependencies.litematica]]
     modId="malilib"
     mandatory=true
-    versionRange="[0.10.0-dev.21+beta.1,)"
+    versionRange="[0.10.0-dev.21,)"
     ordering="BEFORE"
     side="CLIENT"
