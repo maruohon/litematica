@@ -141,7 +141,7 @@ public class WorldSchematic extends World
         }
         else
         {
-            entity.setEntityId(this.nextEntityId++);
+            entity.setId(this.nextEntityId++);
             this.chunkManagerSchematic.getChunk(chunkX, chunkZ).addEntity(entity);
             ++this.entityCount;
 
