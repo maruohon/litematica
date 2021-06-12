@@ -36,7 +36,6 @@ import net.minecraft.util.crash.CrashException;
 import net.minecraft.util.crash.CrashReport;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.chunk.WorldChunk;
@@ -295,8 +294,6 @@ public class WorldRendererSchematic
 
             this.displayListEntitiesDirty = false;
             this.renderInfos.clear();
-
-            Entity.setRenderDistanceMultiplier(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
 
             Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
             List<SubChunkPos> positions = new ArrayList<>(set.size());
