@@ -19,7 +19,6 @@ import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -628,7 +627,6 @@ public class WorldRendererSchematic
             //List<Entity> entitiesMultipass = Lists.<Entity>newArrayList();
 
             VertexConsumerProvider.Immediate entityVertexConsumers = this.bufferBuilders.getEntityVertexConsumers();
-            DiffuseLighting.enableForLevel(matrices.peek().getModel());
             LayerRange layerRange = DataManager.getRenderLayerRange();
 
             for (ChunkRendererSchematicVbo chunkRenderer : this.renderInfos)
