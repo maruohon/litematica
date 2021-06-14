@@ -143,7 +143,7 @@ public class ChunkSchematic extends WorldChunk
     @Override
     public void addEntity(Entity entity)
     {
-        int chunkY = MathHelper.floor(entity.getY());
+        int chunkY = MathHelper.floor(entity.getY()) >> 4;
         List<Entity> list = this.entityLists.computeIfAbsent(chunkY, (y) -> new ArrayList<>());
         list.add(entity);
         ++this.entityCount;

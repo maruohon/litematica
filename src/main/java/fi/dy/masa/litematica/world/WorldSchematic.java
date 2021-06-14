@@ -125,12 +125,8 @@ public class WorldSchematic extends World
         }
     }
 
-    public boolean spawnEntity(Entity entityIn)
-    {
-        return this.spawnEntityBase(entityIn);
-    }
-
-    private boolean spawnEntityBase(Entity entity)
+    @Override
+    public boolean spawnEntity(Entity entity)
     {
         int chunkX = MathHelper.floor(entity.getX() / 16.0D);
         int chunkZ = MathHelper.floor(entity.getZ() / 16.0D);
@@ -158,7 +154,8 @@ public class WorldSchematic extends World
     @Override
     public Entity getEntityById(int id)
     {
-        return null; // this shouldn't be used for anything in the mod, so just returning null here in 1.17+
+        // This shouldn't be used for anything in the mod, so just return null here
+        return null;
     }
 
     @Override
@@ -213,7 +210,8 @@ public class WorldSchematic extends World
     @Override
     protected EntityLookup<Entity> getEntityLookup()
     {
-        return null; // TODO 1.17
+        // This is not used in the mod
+        return null;
     }
 
     @Override
@@ -242,7 +240,8 @@ public class WorldSchematic extends World
     @Override
     public <T extends Entity> List<T> getEntitiesByType(TypeFilter<Entity, T> arg, Box box, Predicate<? super T> predicate)
     {
-        return Collections.emptyList(); // TODO 1.17
+        // This is not used in the mod, so just return an empty list...
+        return Collections.emptyList();
     }
 
     public List<ChunkSchematic> getChunksWithinBox(Box box)
