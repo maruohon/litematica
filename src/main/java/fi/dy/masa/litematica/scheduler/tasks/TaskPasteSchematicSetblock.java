@@ -291,7 +291,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
     private void summonEntities(IntBoundingBox box, WorldSchematic worldSchematic, ClientPlayerEntity player)
     {
         net.minecraft.util.math.Box bb = new net.minecraft.util.math.Box(box.minX, box.minY, box.minZ, box.maxX + 1, box.maxY + 1, box.maxZ + 1);
-        List<Entity> entities = worldSchematic.getOtherEntities(null, bb, null);
+        List<Entity> entities = worldSchematic.getOtherEntities(null, bb, (e) -> true);
 
         for (Entity entity : entities)
         {

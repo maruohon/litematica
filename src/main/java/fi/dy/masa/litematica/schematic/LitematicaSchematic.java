@@ -19,16 +19,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtLongArray;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtLongArray;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -807,7 +806,7 @@ public class LitematicaSchematic
             net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(box.getPos1(), box.getPos2());
             BlockPos regionPosAbs = box.getPos1();
             List<EntityInfo> list = new ArrayList<>();
-            List<Entity> entities = world.getOtherEntities(null, bb, (e) -> (e instanceof PlayerEntity) == false);
+            List<Entity> entities = world.getOtherEntities(null, bb, EntityUtils.NOT_PLAYER);
 
             for (Entity entity : entities)
             {
@@ -841,7 +840,7 @@ public class LitematicaSchematic
             }
 
             net.minecraft.util.math.Box bb = PositionUtils.createAABBFrom(entry.getValue());
-            List<Entity> entities = world.getOtherEntities(null, bb, (e) -> (e instanceof PlayerEntity) == false);
+            List<Entity> entities = world.getOtherEntities(null, bb, EntityUtils.NOT_PLAYER);
             BlockPos regionPosAbs = box.getPos1();
 
             for (Entity entity : entities)

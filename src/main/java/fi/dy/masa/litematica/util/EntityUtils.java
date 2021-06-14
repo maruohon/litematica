@@ -3,8 +3,8 @@ package fi.dy.masa.litematica.util;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -15,6 +15,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
@@ -26,14 +27,7 @@ import fi.dy.masa.malilib.util.InventoryUtils;
 
 public class EntityUtils
 {
-    public static final Predicate<Entity> NOT_PLAYER = new Predicate<Entity>()
-    {
-        @Override
-        public boolean apply(@Nullable Entity entity)
-        {
-            return (entity instanceof PlayerEntity) == false;
-        }
-    };
+    public static final Predicate<Entity> NOT_PLAYER = entity -> (entity instanceof PlayerEntity) == false;
 
     public static boolean hasToolItem(LivingEntity entity)
     {
@@ -253,9 +247,9 @@ public class EntityUtils
         BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
         BlockPos posEndAbs = PositionUtils.getTransformedPlacementPosition(regionSize.add(-1, -1, -1), schematicPlacement, placement).add(regionPosRelTransformed).add(origin);
         BlockPos regionPosAbs = regionPosRelTransformed.add(origin);
-        net.minecraft.util.math.Box bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
+        Box bb = PositionUtils.createEnclosingAABB(regionPosAbs, posEndAbs);
 
-        return world.getOtherEntities(null, bb, null);
+        return world.getOtherEntities(null, bb, EntityUtils.NOT_PLAYER);
     }
 
     public static boolean shouldPickBlock(PlayerEntity player)
