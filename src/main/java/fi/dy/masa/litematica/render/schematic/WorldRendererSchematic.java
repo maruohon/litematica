@@ -36,7 +36,6 @@ import net.minecraft.crash.ReportedException;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockDisplayReader;
 import net.minecraft.world.chunk.Chunk;
@@ -295,8 +294,6 @@ public class WorldRendererSchematic
 
             this.displayListEntitiesDirty = false;
             this.renderInfos.clear();
-
-            Entity.setRenderDistanceMultiplier(MathHelper.clamp((double) renderDistance / 8.0D, 1.0D, 2.5D));
 
             Set<SubChunkPos> set = DataManager.getSchematicPlacementManager().getAllTouchedSubChunks();
             List<SubChunkPos> positions = new ArrayList<>(set.size());
@@ -631,7 +628,6 @@ public class WorldRendererSchematic
             //List<Entity> entitiesMultipass = Lists.<Entity>newArrayList();
 
             IRenderTypeBuffer.Impl entityVertexConsumers = this.bufferBuilders.getEntityVertexConsumers();
-            RenderHelper.enableForLevel(matrices.peek().getModel());
             LayerRange layerRange = DataManager.getRenderLayerRange();
 
             for (ChunkRendererSchematicVbo chunkRenderer : this.renderInfos)
