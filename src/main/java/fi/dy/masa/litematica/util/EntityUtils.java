@@ -97,21 +97,21 @@ public class EntityUtils
 
     public static Direction getHorizontalLookingDirection(Entity entity)
     {
-        return Direction.fromRotation(entity.getYaw());
+        return Direction.fromRotation(entity.yaw);
     }
 
     public static Direction getVerticalLookingDirection(Entity entity)
     {
-        return entity.getPitch() > 0 ? Direction.DOWN : Direction.UP;
+        return entity.pitch > 0 ? Direction.DOWN : Direction.UP;
     }
 
     public static Direction getClosestLookingDirection(Entity entity)
     {
-        if (entity.getPitch() > 60.0f)
+        if (entity.pitch > 60.0f)
         {
             return Direction.DOWN;
         }
-        else if (-entity.getPitch() > 60.0f)
+        else if (-entity.pitch > 60.0f)
         {
             return Direction.UP;
         }
@@ -213,8 +213,8 @@ public class EntityUtils
                         entity.getX(),
                         entity.getY() + entity.getMountedHeightOffset() + passenger.getHeightOffset(),
                         entity.getZ(),
-                        passenger.getYaw(), passenger.getPitch());
-                setEntityRotations(passenger, passenger.getYaw(), passenger.getPitch());
+                        passenger.yaw, passenger.pitch);
+                setEntityRotations(passenger, passenger.yaw, passenger.pitch);
                 spawnEntityAndPassengersInWorld(passenger, world);
             }
         }
@@ -222,10 +222,10 @@ public class EntityUtils
 
     public static void setEntityRotations(Entity entity, float yaw, float pitch)
     {
-        entity.setYaw(yaw);
+        entity.yaw = yaw;
         entity.prevYaw = yaw;
 
-        entity.setPitch(pitch);
+        entity.pitch = pitch;
         entity.prevPitch = pitch;
 
         if (entity instanceof LivingEntity)

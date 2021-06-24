@@ -749,7 +749,7 @@ public class ChunkRendererSchematicVbo
     {
         if (layer == RenderLayer.getTranslucent() && chunkRenderData.isBlockLayerEmpty(layer) == false)
         {
-            buffer.setCameraPosition(x, y, z);
+            buffer.method_31948(x, y, z); // setCameraPosition
             chunkRenderData.setBlockBufferState(layer, buffer.popState());
         }
 
@@ -776,7 +776,7 @@ public class ChunkRendererSchematicVbo
         RenderSystem.applyModelViewMatrix();
         if (type == OverlayRenderType.QUAD && chunkRenderData.isOverlayTypeEmpty(type) == false)
         {
-            buffer.setCameraPosition(x, y, z);
+            buffer.method_31948(x, y, z); // setCameraPosition
             chunkRenderData.setOverlayBufferState(type, buffer.popState());
         }
 

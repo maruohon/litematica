@@ -2,6 +2,9 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import javax.annotation.Nullable;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.util.ScreenshotUtils;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
@@ -24,9 +27,6 @@ import fi.dy.masa.malilib.interfaces.IStringConsumerFeedback;
 import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.util.ScreenshotRecorder;
 
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISelectionListener<DirectoryEntry>
 {
@@ -395,7 +395,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                     MinecraftClient mc = MinecraftClient.getInstance();
                     int screenWidth = GuiUtils.getDisplayWidth();
                     int screenHeight = GuiUtils.getDisplayHeight();
-                    NativeImage screenshot = ScreenshotRecorder.takeScreenshot(screenWidth, screenHeight, mc.getFramebuffer());
+                    NativeImage screenshot = ScreenshotUtils.takeScreenshot(screenWidth, screenHeight, mc.getFramebuffer());
 
                     int x = screenshot.getWidth() >= screenshot.getHeight() ? (screenshot.getWidth() - screenshot.getHeight()) / 2 : 0;
                     int y = screenshot.getHeight() >= screenshot.getWidth() ? (screenshot.getHeight() - screenshot.getWidth()) / 2 : 0;

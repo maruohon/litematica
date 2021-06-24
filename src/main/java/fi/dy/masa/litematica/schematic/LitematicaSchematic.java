@@ -789,14 +789,14 @@ public class LitematicaSchematic
 
     private void rotateEntity(Entity entity, double x, double y, double z, BlockRotation rotationCombined, BlockMirror mirrorMain, BlockMirror mirrorSub)
     {
-        float rotationYaw = entity.getYaw();
+        float rotationYaw = entity.yaw;
 
         if (mirrorMain != BlockMirror.NONE)         { rotationYaw = entity.applyMirror(mirrorMain); }
         if (mirrorSub != BlockMirror.NONE)          { rotationYaw = entity.applyMirror(mirrorSub); }
-        if (rotationCombined != BlockRotation.NONE) { rotationYaw += entity.getYaw() - entity.applyRotation(rotationCombined); }
+        if (rotationCombined != BlockRotation.NONE) { rotationYaw += entity.yaw - entity.applyRotation(rotationCombined); }
 
-        entity.refreshPositionAndAngles(x, y, z, rotationYaw, entity.getPitch());
-        EntityUtils.setEntityRotations(entity, rotationYaw, entity.getPitch());
+        entity.refreshPositionAndAngles(x, y, z, rotationYaw, entity.pitch);
+        EntityUtils.setEntityRotations(entity, rotationYaw, entity.pitch);
     }
 
     private void takeEntitiesFromWorld(World world, List<Box> boxes, BlockPos origin)

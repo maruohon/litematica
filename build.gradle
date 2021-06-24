@@ -1,14 +1,25 @@
-plugins {
-    id 'fabric-loom' version '0.8-SNAPSHOT'
+buildscript {
+    repositories {
+        maven {
+            name = "Fabric"
+            url = "https://maven.fabricmc.net/"
+        }
+        jcenter()
+    }
+    dependencies {
+        classpath 'net.fabricmc:fabric-loom:0.5-SNAPSHOT'
+    }
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+apply plugin: "fabric-loom"
 
 repositories {
     maven { url 'https://masa.dy.fi/maven' }
     maven { url 'https://maven.terraformersmc.com/releases/' }
 }
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 ext.configFile = file "build.properties"
 
@@ -21,13 +32,13 @@ configFile.withReader {
 dependencies {
     minecraft "com.mojang:minecraft:${config.minecraft_version}"
     mappings "net.fabricmc:yarn:${config.mappings_version}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${config.fabric_loader_version}"
-    implementation "com.google.code.findbugs:jsr305:3+"
+    modCompile "net.fabricmc:fabric-loader:${config.fabric_loader_version}"
+    compile "com.google.code.findbugs:jsr305:3+"
 
-    modImplementation "fi.dy.masa.malilib:malilib-fabric-${config.minecraft_version_out}:${config.malilib_version}"
+    modCompile "fi.dy.masa.malilib:malilib-fabric-${config.minecraft_version_out}:${config.malilib_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    //modCompile "net.fabricmc:fabric:" + config.fabric_version
+    //modCompile "net.fabricmc.fabric-api:fabric-api:" + config.fabric_version
 
     modCompileOnly "com.terraformersmc:modmenu:${config.mod_menu_version}"
 }
@@ -40,32 +51,41 @@ minecraft {
     }
 }
 
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    options.encoding = 'UTF-8'
+}
+
 group = config.group + "." + config.mod_id
 archivesBaseName = config.mod_file_name + '-' + config.minecraft_version_out
 version = project.minecraft.mod_version
 
-processResources {
+processResources
+{
     // Exclude the GIMP image files
     exclude '**/*.xcf'
     exclude '**/xcf'
 
     // this will ensure that this task is redone when the versions change.
+    //inputs.property "mod_version", project.minecraft.mod_version
     //inputs.property "minecraft_version", project.config.minecraft_version
 
     inputs.property "mod_version", project.minecraft.mod_version
 
-    filesMatching("fabric.mod.json") {
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
         expand "mod_version": project.minecraft.mod_version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    // ensure that the encoding is set to UTF-8, no matter what the system default is
-    // this fixes some edge cases with special characters not displaying correctly
-    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-    // If Javadoc is generated, this must be specified in that task too.
-    it.options.encoding = "UTF-8"
-
-    // Minecraft 1.17 (21w19a) upwards uses Java 16.
-    it.options.release = 16
+// ensure that the encoding is set to UTF-8, no matter what the system default is
+// this fixes some edge cases with special characters not displaying correctly
+// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
 }

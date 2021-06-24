@@ -284,8 +284,8 @@ public class WorldRendererSchematic
                 entityX != this.lastCameraX ||
                 entityY != this.lastCameraY ||
                 entityZ != this.lastCameraZ ||
-                entity.getPitch() != this.lastCameraPitch ||
-                entity.getYaw() != this.lastCameraYaw;
+                entity.pitch != this.lastCameraPitch ||
+                entity.yaw != this.lastCameraYaw;
         this.lastCameraX = cameraX;
         this.lastCameraY = cameraY;
         this.lastCameraZ = cameraZ;
@@ -494,21 +494,21 @@ public class WorldRendererSchematic
                 }
 
                 buffer.bind();
-                buffer.drawVertices();
+                buffer.method_34432(); // drawVertices
                 startedDrawing = true;
 
                 ++count;
             }
         }
 
-        if (chunkOffsetUniform != null) chunkOffsetUniform.set(Vec3f.ZERO);
+        if (chunkOffsetUniform != null) chunkOffsetUniform.set(Vec3f.field_29501); // ZERO
 
         shader.bind();
 
         if (startedDrawing) renderLayer.getVertexFormat().endDrawing();
 
         VertexBuffer.unbind();
-        VertexBuffer.unbindVertexArray();
+        VertexBuffer.method_34430(); // unbindVertexArray();
         renderLayer.endDrawing();
 
         this.world.getProfiler().pop();
@@ -573,7 +573,7 @@ public class WorldRendererSchematic
 
                     matrixStack.push();
                     matrixStack.translate(chunkOrigin.getX() - x, chunkOrigin.getY() - y, chunkOrigin.getZ() - z);
-                    buffer.setShader(matrixStack.peek().getModel(), projMatrix, shader);
+                    buffer.method_34427(matrixStack.peek().getModel(), projMatrix, shader); // setShader
                     matrixStack.pop();
                 }
             }
@@ -686,7 +686,7 @@ public class WorldRendererSchematic
                             double y = entityTmp.getY() - cameraY;
                             double z = entityTmp.getZ() - cameraZ;
 
-                            this.entityRenderDispatcher.render(entityTmp, x, y, z, entityTmp.getYaw(), partialTicks, matrices, entityVertexConsumers, this.entityRenderDispatcher.getLight(entityTmp, partialTicks));
+                            this.entityRenderDispatcher.render(entityTmp, x, y, z, entityTmp.yaw, partialTicks, matrices, entityVertexConsumers, this.entityRenderDispatcher.getLight(entityTmp, partialTicks));
                             ++this.countEntitiesRendered;
                         }
                     }
