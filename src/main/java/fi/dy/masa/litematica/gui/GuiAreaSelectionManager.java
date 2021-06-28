@@ -163,9 +163,7 @@ public class GuiAreaSelectionManager extends GuiListBase<DirectoryEntry, WidgetD
     protected WidgetAreaSelectionBrowser createListWidget(int listX, int listY)
     {
         // The width and height will be set to the actual values in initGui()
-        WidgetAreaSelectionBrowser widget = new WidgetAreaSelectionBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
-        widget.setParent(this);
-        return widget;
+        return new WidgetAreaSelectionBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
     }
 
     private static class ButtonListener implements IButtonActionListener

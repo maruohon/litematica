@@ -19,9 +19,7 @@ public abstract class GuiSchematicBrowserBase extends GuiListBase<DirectoryEntry
     protected WidgetSchematicBrowser createListWidget(int listX, int listY)
     {
         // The width and height will be set to the actual values in initGui()
-        WidgetSchematicBrowser widget = new WidgetSchematicBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
-        widget.setParent(this.getParent());
-        return widget;
+        return new WidgetSchematicBrowser(listX, listY, 100, 100, this, this.getSelectionListener());
     }
 
     /**
