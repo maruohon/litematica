@@ -14,10 +14,12 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
     public static final BlockState AIR_BLOCK_STATE = Blocks.AIR.getDefaultState();
     protected LitematicaBitArray storage;
     protected ILitematicaBlockStatePalette palette;
+    protected final Vec3i size;
     protected final int sizeX;
     protected final int sizeY;
     protected final int sizeZ;
     protected final int sizeLayer;
+    protected final long totalVolume;
     protected int bits;
     /** Note: This is currently only used for the temporary Sponge schematic support */
     protected long[] blockCounts = new long[0];
@@ -38,13 +40,15 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
         this.sizeLayer = sizeX * sizeZ;
+        this.totalVolume = (long) this.sizeX * (long) this.sizeY * (long) this.sizeZ;
+        this.size = new Vec3i(this.sizeX, this.sizeY, this.sizeZ);
 
         this.setBits(bits, backingLongArray);
     }
 
     public Vec3i getSize()
     {
-        return new Vec3i(this.sizeX, this.sizeY, this.sizeZ);
+        return this.size;
     }
 
     public LitematicaBitArray getArray()
@@ -100,11 +104,11 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
 
             if (backingLongArray != null)
             {
-                this.storage = new LitematicaBitArray(this.bits, this.sizeX * this.sizeY * this.sizeZ, backingLongArray);
+                this.storage = new LitematicaBitArray(this.bits, this.totalVolume, backingLongArray);
             }
             else
             {
-                this.storage = new LitematicaBitArray(this.bits, this.sizeX * this.sizeY * this.sizeZ);
+                this.storage = new LitematicaBitArray(this.bits, this.totalVolume);
             }
         }
     }
@@ -114,13 +118,13 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
     {
         LitematicaBitArray oldStorage = this.storage;
         ILitematicaBlockStatePalette oldPalette = this.palette;
-        final int storageLength = oldStorage.size();
+        final long storageLength = oldStorage.size();
 
         this.setBits(bits, null);
 
         LitematicaBitArray newStorage = this.storage;
 
-        for (int index = 0; index < storageLength; ++index)
+        for (long index = 0; index < storageLength; ++index)
         {
             newStorage.setAt(index, oldStorage.getAt(index));
         }
