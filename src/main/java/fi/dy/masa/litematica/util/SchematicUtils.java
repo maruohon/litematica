@@ -778,7 +778,7 @@ public class SchematicUtils
 
     public static void moveCurrentlySelectedWorldRegionTo(BlockPos pos, MinecraftClient mc)
     {
-        if (mc.player == null || mc.player.isCreative() == false)
+        if (mc.player == null || EntityUtils.isCreativeMode(mc.player) == false)
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
             return;
@@ -886,7 +886,7 @@ public class SchematicUtils
                 manager.addSchematicPlacement(placement, false);
                 manager.setSelectedSchematicPlacement(placement);
 
-                if (mc.player.isCreative())
+                if (EntityUtils.isCreativeMode(mc.player))
                 {
                     DataManager.setToolMode(ToolMode.PASTE_SCHEMATIC);
                 }

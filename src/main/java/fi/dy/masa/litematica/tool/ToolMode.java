@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public enum ToolMode
@@ -96,7 +97,7 @@ public enum ToolMode
     public ToolMode cycle(PlayerEntity player, boolean forward)
     {
         ToolMode[] values = ToolMode.values();
-        final boolean isCreative = player.isCreative();
+        final boolean isCreative = EntityUtils.isCreativeMode(player);
         final int numModes = values.length;
         final int inc = forward ? 1 : -1;
         int nextId = this.ordinal() + inc;

@@ -375,7 +375,7 @@ public class WorldUtils
                 PlayerInventory inv = mc.player.getInventory();
                 stack = stack.copy();
 
-                if (mc.player.isCreative())
+                if (EntityUtils.isCreativeMode(mc.player))
                 {
                     BlockEntity te = world.getBlockEntity(pos);
 

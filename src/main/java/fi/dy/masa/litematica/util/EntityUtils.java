@@ -29,6 +29,11 @@ public class EntityUtils
 {
     public static final Predicate<Entity> NOT_PLAYER = entity -> (entity instanceof PlayerEntity) == false;
 
+    public static boolean isCreativeMode(PlayerEntity player)
+    {
+        return player.getAbilities().creativeMode;
+    }
+
     public static boolean hasToolItem(LivingEntity entity)
     {
         ItemStack toolItem = DataManager.getToolItem();

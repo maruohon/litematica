@@ -21,6 +21,7 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.AreaSelectionSimple;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
+import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.ICompletionListener;
@@ -234,7 +235,7 @@ public class SchematicProject
         {
             MinecraftClient mc = MinecraftClient.getInstance();
 
-            if (mc.player == null || mc.player.isCreative() == false)
+            if (mc.player == null || EntityUtils.isCreativeMode(mc.player) == false)
             {
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
                 return;
