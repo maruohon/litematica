@@ -42,6 +42,7 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockRenderView;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.world.ChunkSchematic;
@@ -471,13 +472,21 @@ public class WorldRendererSchematic
         Shader shader = RenderSystem.getShader();
         BufferRenderer.unbindAll();
 
-        initShader(shader, matrices, projMatrix);
+        boolean renderAsTranslucent = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
 
+        if (renderAsTranslucent)
+        {
+            float alpha = (float) Configs.Visuals.GHOST_BLOCK_ALPHA.getDoubleValue();
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
+        }
+
+        initShader(shader, matrices, projMatrix);
         RenderSystem.setupShaderLights(shader);
         shader.upload();
-        GlUniform chunkOffsetUniform = shader.chunkOffset;
 
+        GlUniform chunkOffsetUniform = shader.chunkOffset;
         boolean startedDrawing = false;
+
         for (int i = startIndex; i != stopIndex; i += increment)
         {
             ChunkRendererSchematicVbo renderer = this.renderInfos.get(i);
@@ -501,11 +510,22 @@ public class WorldRendererSchematic
             }
         }
 
-        if (chunkOffsetUniform != null) chunkOffsetUniform.set(Vec3f.ZERO);
+        if (renderAsTranslucent)
+        {
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+
+        if (chunkOffsetUniform != null)
+        {
+            chunkOffsetUniform.set(Vec3f.ZERO);
+        }
 
         shader.bind();
 
-        if (startedDrawing) renderLayer.getVertexFormat().endDrawing();
+        if (startedDrawing)
+        {
+            renderLayer.getVertexFormat().endDrawing();
+        }
 
         VertexBuffer.unbind();
         VertexBuffer.unbindVertexArray();

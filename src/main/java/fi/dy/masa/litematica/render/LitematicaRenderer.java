@@ -1,8 +1,6 @@
 package fi.dy.masa.litematica.render;
 
 import javax.annotation.Nullable;
-import org.lwjgl.opengl.GL20;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
@@ -15,36 +13,21 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.render.shader.ShaderProgram;
 
 public class LitematicaRenderer
 {
     private static final LitematicaRenderer INSTANCE = new LitematicaRenderer();
 
-    private static final ShaderProgram SHADER_ALPHA = new ShaderProgram("litematica", null, "shaders/alpha.frag");
-
     private MinecraftClient mc;
     private WorldRendererSchematic worldRenderer;
     private Frustum frustum;
     private int frameCount;
-    private int originalShaderProgram;
-    private float translucencyAlpha;
     private long finishTimeNano;
 
     private boolean renderCollidingSchematicBlocks;
     private boolean renderPiecewise;
     private boolean renderPiecewiseSchematic;
     private boolean renderPiecewiseBlocks;
-    private boolean translucentSchematic;
-
-    static
-    {
-        int program = SHADER_ALPHA.getProgram();
-        int oldProgram = GlStateManager._getInteger(GL20.GL_CURRENT_PROGRAM);
-        GlStateManager._glUseProgram(program);
-        GlStateManager._glUniform1i(GlStateManager._glGetUniformLocation(program, "texture"), 0);
-        GlStateManager._glUseProgram(oldProgram);
-    }
 
     private LitematicaRenderer()
     {
@@ -235,7 +218,6 @@ public class LitematicaRenderer
             boolean renderThrough = Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue() || Hotkeys.RENDER_OVERLAY_THROUGH_BLOCKS.getKeybind().isKeybindHeld();
             float lineWidth = (float) (renderThrough ? Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH.getDoubleValue() : Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
 
-            //RenderSystem.pushMatrix();
             RenderSystem.disableTexture();
             RenderSystem.disableCull();
             //TODO: RenderSystem.alphaFunc(GL11.GL_GREATER, 0.001F);
@@ -262,36 +244,6 @@ public class LitematicaRenderer
             RenderSystem.disablePolygonOffset();
             RenderSystem.enableCull();
             RenderSystem.enableTexture();
-            //RenderSystem.popMatrix();
-        }
-    }
-
-    private void setupAlphaShader()
-    {
-        this.translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
-
-        if (this.translucentSchematic)
-        {
-            this.originalShaderProgram = GlStateManager._getInteger(GL20.GL_CURRENT_PROGRAM);
-            this.translucencyAlpha = (float) Configs.Visuals.GHOST_BLOCK_ALPHA.getDoubleValue();
-            GlStateManager._glUseProgram(SHADER_ALPHA.getProgram());
-            GL20.glUniform1f(GlStateManager._glGetUniformLocation(SHADER_ALPHA.getProgram(), "alpha_multiplier"), this.translucencyAlpha);
-        }
-    }
-
-    private void enableAlphaShader()
-    {
-        if (this.translucentSchematic)
-        {
-            GlStateManager._glUseProgram(SHADER_ALPHA.getProgram());
-        }
-    }
-
-    private void disableAlphaShader()
-    {
-        if (this.translucentSchematic)
-        {
-            GlStateManager._glUseProgram(this.originalShaderProgram);
         }
     }
 
@@ -339,12 +291,7 @@ public class LitematicaRenderer
                 RenderSystem.polygonOffset(-0.3f, -0.6f);
             }
 
-            this.setupAlphaShader();
-            //this.enableAlphaShader();
-
             this.getWorldRenderer().renderBlockLayer(RenderLayer.getSolid(), matrices, this.getCamera(), projMatrix);
-
-            this.disableAlphaShader();
 
             if (this.renderCollidingSchematicBlocks)
             {
@@ -368,11 +315,7 @@ public class LitematicaRenderer
                 RenderSystem.polygonOffset(-0.3f, -0.6f);
             }
 
-            this.enableAlphaShader();
-
             this.getWorldRenderer().renderBlockLayer(RenderLayer.getCutoutMipped(), matrices, this.getCamera(), projMatrix);
-
-            this.disableAlphaShader();
 
             if (this.renderCollidingSchematicBlocks)
             {
@@ -396,11 +339,7 @@ public class LitematicaRenderer
                 RenderSystem.polygonOffset(-0.3f, -0.6f);
             }
 
-            this.enableAlphaShader();
-
             this.getWorldRenderer().renderBlockLayer(RenderLayer.getCutout(), matrices, this.getCamera(), projMatrix);
-
-            this.disableAlphaShader();
 
             if (this.renderCollidingSchematicBlocks)
             {
@@ -424,11 +363,7 @@ public class LitematicaRenderer
                 RenderSystem.polygonOffset(-0.3f, -0.6f);
             }
 
-            this.enableAlphaShader();
-
             this.getWorldRenderer().renderBlockLayer(RenderLayer.getTranslucent(), matrices, this.getCamera(), projMatrix);
-
-            this.disableAlphaShader();
 
             if (this.renderCollidingSchematicBlocks)
             {
@@ -457,7 +392,7 @@ public class LitematicaRenderer
 
             if (fb != null)
             {
-                mc.getFramebuffer().beginWrite(false);
+                this.mc.getFramebuffer().beginWrite(false);
             }
 
             this.mc.getProfiler().pop();
@@ -472,15 +407,7 @@ public class LitematicaRenderer
         {
             this.mc.getProfiler().push("litematica_entities");
 
-            fi.dy.masa.malilib.render.RenderUtils.setupBlend();
-
-            //this.enableAlphaShader();
-
             this.getWorldRenderer().renderEntities(this.getCamera(), this.frustum, matrices, partialTicks);
-
-            //this.disableAlphaShader();
-
-            RenderSystem.disableBlend();
 
             this.mc.getProfiler().pop();
         }
