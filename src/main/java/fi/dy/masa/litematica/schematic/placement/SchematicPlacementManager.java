@@ -35,6 +35,7 @@ import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblockToMcfunction;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.EntityUtils;
@@ -46,7 +47,10 @@ import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.GuiConfirmAction;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -661,6 +665,32 @@ public class SchematicPlacementManager
         this.pastePlacementToWorld(schematicPlacement, changedBlocksOnly, true, mc);
     }
 
+    private static class PasteToCommandsListener implements IConfirmationListener
+    {
+        private final SchematicPlacement schematicPlacement;
+        private final boolean changedBlocksOnly;
+
+        public PasteToCommandsListener(SchematicPlacement schematicPlacement, boolean changedBlocksOnly)
+        {
+            this.schematicPlacement = schematicPlacement;
+            this.changedBlocksOnly = changedBlocksOnly;
+        }
+
+        @Override
+        public boolean onActionConfirmed()
+        {
+            TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblockToMcfunction(this.schematicPlacement, this.changedBlocksOnly);
+            TaskScheduler.getInstanceClient().scheduleTask(task, 1);
+            return true;
+        }
+
+        @Override
+        public boolean onActionCancelled()
+        {
+            return true;
+        }
+    }
+
     public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, boolean printMessage, MinecraftClient mc)
     {
         if (mc.player != null && EntityUtils.isCreativeMode(mc.player))
@@ -675,7 +705,13 @@ public class SchematicPlacementManager
                 }
                 */
 
-                if (mc.isIntegratedServerRunning())
+                if (Configs.Generic.PASTE_TO_MCFUNCTION.getBooleanValue())
+                {
+                    PasteToCommandsListener cl = new PasteToCommandsListener(schematicPlacement, changedBlocksOnly);
+                    GuiConfirmAction screen = new GuiConfirmAction(320, "Confirm paste to command files", cl, null, "Are you sure you want to paste the current placement as setblock commands into command/mcfunction files?");
+                    GuiBase.openGui(screen);
+                }
+                else if (mc.isIntegratedServerRunning())
                 {
                     final ServerWorld world = mc.getServer().getWorld(mc.player.getEntityWorld().getRegistryKey());
                     final LitematicaSchematic schematic = schematicPlacement.getSchematic();
