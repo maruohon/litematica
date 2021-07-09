@@ -262,6 +262,11 @@ public class LitematicaSchematic
 
     public boolean placeToWorld(World world, SchematicPlacement schematicPlacement, boolean notifyNeighbors)
     {
+        return this.placeToWorld(world, schematicPlacement, notifyNeighbors, false);
+    }
+
+    public boolean placeToWorld(World world, SchematicPlacement schematicPlacement, boolean notifyNeighbors, boolean ignoreEntities)
+    {
         WorldUtils.setShouldPreventOnBlockAdded(true);
 
         ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
@@ -290,7 +295,8 @@ public class LitematicaSchematic
                     Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
                 }
 
-                if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
+                if (ignoreEntities == false && schematicPlacement.ignoreEntities() == false &&
+                    placement.ignoreEntities() == false && entityList != null)
                 {
                     this.placeEntitiesToWorld(world, origin, regionPos, regionSize, schematicPlacement, placement, entityList);
                 }
