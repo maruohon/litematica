@@ -104,11 +104,16 @@ public class ChunkRenderDispatcherSchematic
 
     public void scheduleChunkRender(int chunkX, int chunkY, int chunkZ, boolean immediate)
     {
-        chunkX = Math.floorMod(chunkX, this.sizeX);
-        chunkY = Math.floorMod(chunkY - this.world.getBottomSectionCoord(), this.sizeY);
-        chunkZ = Math.floorMod(chunkZ, this.sizeZ);
+        int bottomSectionY = this.world.getBottomSectionCoord();
 
-        this.renderers[this.getChunkIndex(chunkX, chunkY, chunkZ)].setNeedsUpdate(immediate);
+        if (chunkY >= bottomSectionY && chunkY < bottomSectionY + this.sizeY)
+        {
+            chunkX = Math.floorMod(chunkX, this.sizeX);
+            chunkY = Math.floorMod(chunkY - bottomSectionY, this.sizeY);
+            chunkZ = Math.floorMod(chunkZ, this.sizeZ);
+
+            this.renderers[this.getChunkIndex(chunkX, chunkY, chunkZ)].setNeedsUpdate(immediate);
+        }
     }
 
     @Nullable

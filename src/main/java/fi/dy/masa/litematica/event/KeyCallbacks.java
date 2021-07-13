@@ -402,7 +402,7 @@ public class KeyCallbacks
             }
             else if (key == Hotkeys.LAYER_SET_HERE.getKeybind())
             {
-                DataManager.getRenderLayerRange().setToPosition(this.mc.player);
+                DataManager.getRenderLayerRange().setSingleBoundaryToPosition(fi.dy.masa.malilib.util.EntityUtils.getCameraEntity());
                 return true;
             }
             else if (key == Hotkeys.LAYER_MODE_NEXT.getKeybind())

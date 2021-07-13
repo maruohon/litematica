@@ -159,7 +159,7 @@ public class SchematicUtils
         // The state can be null in 1.13+
         if (info != null && info.stateNew != null)
         {
-            return setAllIdenticalSchematicBlockStates(info.pos, info.stateOriginal, info.stateNew);
+            return setAllIdenticalSchematicBlockStates(info.pos, info.stateOriginal, info.stateNew, mc.world);
         }
 
         return false;
@@ -200,7 +200,7 @@ public class SchematicUtils
             BlockPos pos = trace.getBlockPos();
             BlockState stateOriginal = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
 
-            return setAllIdenticalSchematicBlockStates(pos, stateOriginal, Blocks.AIR.getDefaultState());
+            return setAllIdenticalSchematicBlockStates(pos, stateOriginal, Blocks.AIR.getDefaultState(), mc.world);
         }
 
         return false;
@@ -211,7 +211,7 @@ public class SchematicUtils
         ReplacementInfo info = getTargetInfo(mc);
 
         // The state can be null in 1.13+
-        if (info != null && info.stateNew != null)
+        if (info != null && info.stateNew != null && mc.player != null)
         {
             Direction playerFacingH = mc.player.getHorizontalFacing();
             Direction direction = fi.dy.masa.malilib.util.PositionUtils.getTargetedDirection(info.side, playerFacingH, info.pos, info.hitVec);
@@ -237,7 +237,7 @@ public class SchematicUtils
             BlockPos pos = trace.getBlockPos();
             BlockState stateOriginal = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
 
-            return setAllStatesToAirExcept(pos, stateOriginal);
+            return setAllStatesToAirExcept(pos, stateOriginal, mc.world);
         }
 
         return false;
@@ -254,7 +254,7 @@ public class SchematicUtils
 
             if (SchematicWorldHandler.getSchematicWorld().getBlockState(posStart).isAir())
             {
-                return setAllIdenticalSchematicBlockStates(posStart, Blocks.AIR.getDefaultState(), info.stateNew);
+                return setAllIdenticalSchematicBlockStates(posStart, Blocks.AIR.getDefaultState(), info.stateNew, mc.world);
             }
         }
 
@@ -481,7 +481,10 @@ public class SchematicUtils
         return false;
     }
 
-    private static boolean setAllIdenticalSchematicBlockStates(BlockPos posStart, BlockState stateOriginal, BlockState stateNew)
+    private static boolean setAllIdenticalSchematicBlockStates(BlockPos posStart,
+                                                               BlockState stateOriginal,
+                                                               BlockState stateNew,
+                                                               World world)
     {
         if (posStart != null)
         {
@@ -495,7 +498,7 @@ public class SchematicUtils
                 {
                     if (part.getBox().containsPos(posStart))
                     {
-                        if (replaceAllIdenticalBlocks(manager, part, stateOriginal, stateNew))
+                        if (replaceAllIdenticalBlocks(manager, part, stateOriginal, stateNew, world))
                         {
                             manager.markAllPlacementsOfSchematicForRebuild(part.getPlacement().getSchematic());
                             return true;
@@ -510,7 +513,7 @@ public class SchematicUtils
         return false;
     }
 
-    private static boolean setAllStatesToAirExcept(BlockPos pos, BlockState state)
+    private static boolean setAllStatesToAirExcept(BlockPos pos, BlockState state, World world)
     {
         if (pos != null)
         {
@@ -524,7 +527,7 @@ public class SchematicUtils
                 {
                     if (part.getBox().containsPos(pos))
                     {
-                        if (setAllStatesToAirExcept(manager, part, state))
+                        if (setAllStatesToAirExcept(manager, part, state, world))
                         {
                             manager.markAllPlacementsOfSchematicForRebuild(part.getPlacement().getSchematic());
                             return true;
@@ -539,7 +542,10 @@ public class SchematicUtils
         return false;
     }
 
-    private static boolean setAllStatesToAirExcept(SchematicPlacementManager manager, PlacementPart part, BlockState state)
+    private static boolean setAllStatesToAirExcept(SchematicPlacementManager manager,
+                                                   PlacementPart part,
+                                                   BlockState state,
+                                                   World world)
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
         String selected = schematicPlacement.getSelectedSubRegionName();
@@ -576,12 +582,12 @@ public class SchematicUtils
                 continue;
             }
 
-            int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.X), Direction.Axis.X);
-            int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.Y), Direction.Axis.Y);
-            int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.Z), Direction.Axis.Z);
-            int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.X), Direction.Axis.X);
-            int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.Y), Direction.Axis.Y);
-            int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.Z), Direction.Axis.Z);
+            int minX = range.getClampedValue(-30000000, Direction.Axis.X);
+            int minZ = range.getClampedValue(-30000000, Direction.Axis.Z);
+            int maxX = range.getClampedValue( 30000000, Direction.Axis.X);
+            int maxZ = range.getClampedValue( 30000000, Direction.Axis.Z);
+            int minY = range.getClampedValue(world.getBottomY(), Direction.Axis.Y);
+            int maxY = range.getClampedValue(world.getTopY() - 1, Direction.Axis.Y);
 
             BlockPos posStart = new BlockPos(minX, minY, minZ);
             BlockPos posEnd = new BlockPos(maxX, maxY, maxZ);
@@ -645,8 +651,11 @@ public class SchematicUtils
         return true;
     }
 
-    private static boolean replaceAllIdenticalBlocks(SchematicPlacementManager manager, PlacementPart part,
-            BlockState stateOriginalIn, BlockState stateNewIn)
+    private static boolean replaceAllIdenticalBlocks(SchematicPlacementManager manager,
+                                                     PlacementPart part,
+                                                     BlockState stateOriginalIn,
+                                                     BlockState stateNewIn,
+                                                     World world)
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
         String selected = schematicPlacement.getSelectedSubRegionName();
@@ -693,12 +702,12 @@ public class SchematicUtils
                 continue;
             }
 
-            int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.X), Direction.Axis.X);
-            int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.Y), Direction.Axis.Y);
-            int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(Direction.Axis.Z), Direction.Axis.Z);
-            int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.X), Direction.Axis.X);
-            int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.Y), Direction.Axis.Y);
-            int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(Direction.Axis.Z), Direction.Axis.Z);
+            int minX = range.getClampedValue(-30000000, Direction.Axis.X);
+            int minZ = range.getClampedValue(-30000000, Direction.Axis.Z);
+            int maxX = range.getClampedValue( 30000000, Direction.Axis.X);
+            int maxZ = range.getClampedValue( 30000000, Direction.Axis.Z);
+            int minY = range.getClampedValue(world.getBottomY(), Direction.Axis.Y);
+            int maxY = range.getClampedValue(world.getTopY() - 1, Direction.Axis.Y);
 
             BlockPos posStart = new BlockPos(minX, minY, minZ);
             BlockPos posEnd = new BlockPos(maxX, maxY, maxZ);

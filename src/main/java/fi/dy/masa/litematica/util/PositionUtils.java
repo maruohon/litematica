@@ -102,8 +102,8 @@ public class PositionUtils
 
     public static boolean arePositionsWithinWorld(World world, BlockPos pos1, BlockPos pos2)
     {
-        if (pos1.getY() >= LayerRange.WORLD_VERTICAL_SIZE_MIN && pos1.getY() <= LayerRange.WORLD_VERTICAL_SIZE_MAX &&
-            pos2.getY() >= LayerRange.WORLD_VERTICAL_SIZE_MIN && pos2.getY() <= LayerRange.WORLD_VERTICAL_SIZE_MAX)
+        if (pos1.getY() >= world.getBottomY() && pos1.getY() < world.getTopY() &&
+            pos2.getY() >= world.getBottomY() && pos2.getY() < world.getTopY())
         {
             WorldBorder border = world.getWorldBorder();
             return border.contains(pos1) && border.contains(pos2);

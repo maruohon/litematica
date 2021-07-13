@@ -296,6 +296,9 @@ public class WorldSchematic extends World
 
     public void scheduleChunkRenders(int minBlockX, int minBlockY, int minBlockZ, int maxBlockX, int maxBlockY, int maxBlockZ)
     {
+        minBlockY = Math.max(minBlockY, this.getBottomY());
+        maxBlockY = Math.min(maxBlockY, this.getTopY() - 1);
+
         final int minChunkX = Math.min(minBlockX, maxBlockX) >> 4;
         final int minChunkY = Math.min(minBlockY, maxBlockY) >> 4;
         final int minChunkZ = Math.min(minBlockZ, maxBlockZ) >> 4;

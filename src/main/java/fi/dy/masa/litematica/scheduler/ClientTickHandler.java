@@ -1,11 +1,12 @@
 package fi.dy.masa.litematica.scheduler;
 
+import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.interfaces.IClientTickHandler;
-import net.minecraft.client.MinecraftClient;
+import fi.dy.masa.malilib.util.EntityUtils;
 
 public class ClientTickHandler implements IClientTickHandler
 {
@@ -19,7 +20,7 @@ public class ClientTickHandler implements IClientTickHandler
 
             if (Configs.Generic.LAYER_MODE_DYNAMIC.getBooleanValue())
             {
-                DataManager.getRenderLayerRange().setToPosition(mc.player);
+                DataManager.getRenderLayerRange().setSingleBoundaryToPosition(EntityUtils.getCameraEntity());
             }
 
             DataManager.getSchematicPlacementManager().processQueuedChunks();
