@@ -280,7 +280,11 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
         if (this.currentIndex >= this.boxVolume)
         {
-            this.summonEntities(box, worldSchematic, player);
+            if (Configs.Generic.PASTE_IGNORE_ENTITIES.getBooleanValue() == false)
+            {
+                this.summonEntities(box, worldSchematic, player);
+            }
+
             this.boxInProgress = false;
 
             return true;

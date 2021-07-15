@@ -678,7 +678,7 @@ public class SchematicPlacementManager
 
                     server.send(new TickDelayedTask(server.getTicks(), () ->
                     {
-                        if (schematic.placeToWorld(world, schematicPlacement, false))
+                        if (schematic.placeToWorld(world, schematicPlacement, false, Configs.Generic.PASTE_IGNORE_ENTITIES.getBooleanValue()))
                         {
                             if (printMessage)
                             {
