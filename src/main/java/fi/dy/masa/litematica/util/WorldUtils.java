@@ -608,7 +608,7 @@ public class WorldUtils
         double z = hitVecIn.z;
         Block block = state.getBlock();
         Direction facing = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
-        final int propertyIncrement = 16;
+        final int propertyIncrement = 32;
         double relX = hitVecIn.x - pos.getX();
 
         if (facing != null)
@@ -618,7 +618,7 @@ public class WorldUtils
 
         if (block instanceof RepeaterBlock)
         {
-            x += ((state.get(RepeaterBlock.DELAY)) - 1) * propertyIncrement;
+            x += ((state.get(RepeaterBlock.DELAY))) * propertyIncrement;
         }
         else if (block instanceof TrapdoorBlock && state.get(TrapdoorBlock.HALF) == BlockHalf.TOP)
         {
