@@ -97,7 +97,7 @@ public class EntityUtils
 
     public static boolean areStacksEqualIgnoreDurability(ItemStack stack1, ItemStack stack2)
     {
-        return ItemStack.areItemsEqualIgnoreDamage(stack1, stack2) && ItemStack.areTagsEqual(stack1, stack2);
+        return ItemStack.areItemsEqualIgnoreDamage(stack1, stack2) && ItemStack.areNbtEqual(stack1, stack2);
     }
 
     public static Direction getHorizontalLookingDirection(Entity entity)
@@ -165,7 +165,7 @@ public class EntityUtils
                 return entity;
             }
         }
-        catch (Exception e)
+        catch (Exception ignore)
         {
         }
 
@@ -233,9 +233,8 @@ public class EntityUtils
         entity.setPitch(pitch);
         entity.prevPitch = pitch;
 
-        if (entity instanceof LivingEntity)
+        if (entity instanceof LivingEntity livingBase)
         {
-            LivingEntity livingBase = (LivingEntity) entity;
             livingBase.headYaw = yaw;
             livingBase.bodyYaw = yaw;
             livingBase.prevHeadYaw = yaw;

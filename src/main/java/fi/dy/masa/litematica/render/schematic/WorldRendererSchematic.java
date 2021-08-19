@@ -482,7 +482,7 @@ public class WorldRendererSchematic
 
         initShader(shader, matrices, projMatrix);
         RenderSystem.setupShaderLights(shader);
-        shader.upload();
+        shader.bind();
 
         GlUniform chunkOffsetUniform = shader.chunkOffset;
         boolean startedDrawing = false;
@@ -520,7 +520,7 @@ public class WorldRendererSchematic
             chunkOffsetUniform.set(Vec3f.ZERO);
         }
 
-        shader.bind();
+        shader.unbind();
 
         if (startedDrawing)
         {

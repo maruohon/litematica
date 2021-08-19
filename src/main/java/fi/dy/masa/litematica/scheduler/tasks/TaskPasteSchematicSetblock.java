@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -179,7 +178,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
             if (this.mc.player != null)
             {
                 this.comparator.setReferencePosition(fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(this.mc.player));
-                Collections.sort(this.chunks, this.comparator);
+                this.chunks.sort(this.comparator);
             }
 
             this.boxesInCurrentChunk.clear();
@@ -501,11 +500,11 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
         if (stack.getItem() instanceof SkullItem && tag.contains("SkullOwner"))
         {
             NbtCompound ownerTag = tag.getCompound("SkullOwner");
-            stack.getOrCreateTag().put("SkullOwner", ownerTag);
+            stack.getOrCreateNbt().put("SkullOwner", ownerTag);
         }
         else
         {
-            stack.putSubTag("BlockEntityTag", tag);
+            stack.setSubNbt("BlockEntityTag", tag);
         }
     }
 

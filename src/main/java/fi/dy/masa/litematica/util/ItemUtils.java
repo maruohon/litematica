@@ -107,7 +107,7 @@ public class ItemUtils
             NbtCompound tagSkull = new NbtCompound();
 
             tagSkull.put("SkullOwner", tagOwner);
-            stack.setTag(tagSkull);
+            stack.setNbt(tagSkull);
 
             return stack;
         }
@@ -118,8 +118,8 @@ public class ItemUtils
 
             tagList.add(NbtString.of("(+NBT)"));
             tagLore.put("Lore", tagList);
-            stack.putSubTag("display", tagLore);
-            stack.putSubTag("BlockEntityTag", nbt);
+            stack.setSubNbt("display", tagLore);
+            stack.setSubNbt("BlockEntityTag", nbt);
 
             return stack;
         }
@@ -132,8 +132,8 @@ public class ItemUtils
             Identifier rl = Registry.ITEM.getId(stack.getItem());
 
             return String.format("[%s - display: %s - NBT: %s] (%s)",
-                    rl != null ? rl.toString() : "null", stack.getName().getString(),
-                    stack.getTag() != null ? stack.getTag().toString() : "<no NBT>", stack.toString());
+                                 rl != null ? rl.toString() : "null", stack.getName().getString(),
+                                 stack.getNbt() != null ? stack.getNbt().toString() : "<no NBT>", stack);
         }
 
         return "<empty>";
