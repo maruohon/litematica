@@ -360,8 +360,9 @@ public class OverlayRenderer
 
             if (list.isEmpty() == false)
             {
+                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
                 List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-                HitResult trace = RayTraceUtils.traceToPositions(posList, this.mc.player, 128);
+                HitResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
                 BlockPos posLook = trace != null && trace.getType() == HitResult.Type.BLOCK ? ((BlockHitResult) trace).getBlockPos() : null;
                 this.renderSchematicMismatches(list, posLook, matrices, partialTicks);
             }
@@ -470,8 +471,9 @@ public class OverlayRenderer
 
             if (renderBlockInfoLines || renderInfoOverlay)
             {
+                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
                 boolean targetFluids = Configs.InfoOverlays.INFO_OVERLAYS_TARGET_FLUIDS.getBooleanValue();
-                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true, targetFluids);
+                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10, true, targetFluids);
             }
 
             if (traceWrapper != null &&
@@ -520,9 +522,10 @@ public class OverlayRenderer
 
         if (placement != null && placement.hasVerifier())
         {
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-            HitResult trace = RayTraceUtils.traceToPositions(posList, mc.player, 128);
+            HitResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
 
             if (trace != null && trace.getType() == HitResult.Type.BLOCK)
             {
@@ -655,38 +658,38 @@ public class OverlayRenderer
         RayTraceWrapper traceWrapper = null;
         Color4f color = null;
         boolean direction = false;
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
 
         if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL_EXCEPT.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_BREAK_EXCEPT_OVERLAY_COLOR.getColor();
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
             direction = true;
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, this.mc.player, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
             direction = true;
         }
 
         if (traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
             BlockHitResult trace = traceWrapper.getBlockHitResult();
             BlockPos pos = trace.getBlockPos();
 

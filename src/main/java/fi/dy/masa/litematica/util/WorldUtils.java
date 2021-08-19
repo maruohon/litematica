@@ -23,6 +23,7 @@ import net.minecraft.block.enums.SlabType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemPlacementContext;
@@ -314,7 +315,8 @@ public class WorldUtils
     public static void setToolModeBlockState(ToolMode mode, boolean primary, MinecraftClient mc)
     {
         BlockState state = Blocks.AIR.getDefaultState();
-        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6, true);
 
         if (wrapper != null)
         {

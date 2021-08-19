@@ -490,7 +490,7 @@ public class SelectionManager
     public boolean grabElement(MinecraftClient mc, int maxDistance)
     {
         World world = mc.world;
-        Entity entity = mc.player;
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
         AreaSelection area = this.getCurrentSelection();
 
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
@@ -525,7 +525,8 @@ public class SelectionManager
 
             if (movingCorner || movingOrigin)
             {
-                BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, mc.player, maxDistance, true);
+                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
 
                 if (pos == null)
                 {
@@ -583,7 +584,8 @@ public class SelectionManager
         {
             if (selection.isOriginSelected())
             {
-                BlockPos newOrigin = RayTraceUtils.getTargetedPosition(mc.world, mc.player, maxDistance, true);
+                Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                BlockPos newOrigin = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
 
                 if (newOrigin != null)
                 {
@@ -609,7 +611,8 @@ public class SelectionManager
 
         if (area != null && area.getSelectedSubRegionBox() != null)
         {
-            BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, mc.player, maxDistance, true);
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
 
             if (pos != null)
             {
@@ -625,7 +628,8 @@ public class SelectionManager
 
         if (sel != null && sel.getSelectedSubRegionBox() != null)
         {
-            BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, mc.player, maxDistance, true);
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            BlockPos pos = RayTraceUtils.getTargetedPosition(mc.world, entity, maxDistance, true);
 
             if (pos != null)
             {
