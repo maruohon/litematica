@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -167,7 +167,8 @@ public class SchematicUtils
 
     public static boolean breakSchematicBlocks(MinecraftClient mc)
     {
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 10);
 
         if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -192,7 +193,8 @@ public class SchematicUtils
 
     public static boolean breakAllIdenticalSchematicBlocks(MinecraftClient mc)
     {
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 10);
 
         if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -229,7 +231,8 @@ public class SchematicUtils
 
     public static boolean breakAllSchematicBlocksExceptTargeted(MinecraftClient mc)
     {
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 10);
 
         if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -270,7 +273,8 @@ public class SchematicUtils
             (stack.isEmpty() && ToolMode.REBUILD.getPrimaryBlock() != null))
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
-            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10, true);
 
             if (worldSchematic != null && traceWrapper != null &&
                 traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
@@ -339,7 +343,8 @@ public class SchematicUtils
     public static boolean setTargetedSchematicBlockState(MinecraftClient mc, BlockState state)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6, true);
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -773,14 +778,14 @@ public class SchematicUtils
         return true;
     }
 
-    public static void moveCurrentlySelectedWorldRegionToLookingDirection(int amount, PlayerEntity player, MinecraftClient mc)
+    public static void moveCurrentlySelectedWorldRegionToLookingDirection(int amount, Entity entity, MinecraftClient mc)
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
 
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
-            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(player), amount);
+            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(entity), amount);
             moveCurrentlySelectedWorldRegionTo(pos, mc);
         }
     }
@@ -878,18 +883,20 @@ public class SchematicUtils
             LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(false, false);
             TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, info);
             taskSave.disableCompletionMessage();
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            BlockPos originTmp = RayTraceUtils.getTargetedPosition(mc.world, entity, 6, false);
+
+            if (originTmp == null)
+            {
+                originTmp = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(entity);
+            }
+
+            final BlockPos origin = originTmp;
+            String name = schematic.getMetadata().getName();
 
             taskSave.setCompletionListener(() ->
             {
                 SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-                String name = schematic.getMetadata().getName();
-                BlockPos origin = RayTraceUtils.getTargetedPosition(mc.world, mc.player, 6, false);
-
-                if (origin == null)
-                {
-                    origin = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(mc.player);
-                }
-
                 SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, true);
 
                 manager.addSchematicPlacement(placement, false);

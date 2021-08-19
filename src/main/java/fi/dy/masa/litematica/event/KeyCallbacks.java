@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.event;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -202,11 +203,12 @@ public class KeyCallbacks
 
                         if (grabModifier && mode == ToolMode.MOVE)
                         {
-                            BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, this.mc.player, maxDistance, false);
+                            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                            BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, entity, maxDistance, false);
 
                             if (pos != null)
                             {
-                                SchematicUtils.moveCurrentlySelectedWorldRegionTo(pos, mc);
+                                SchematicUtils.moveCurrentlySelectedWorldRegionTo(pos, this.mc);
                             }
                         }
                         else if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
@@ -245,12 +247,14 @@ public class KeyCallbacks
                         }
                         else
                         {
-                            sm.changeSelection(this.mc.world, this.mc.player, maxDistance);
+                            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                            sm.changeSelection(this.mc.world, entity, maxDistance);
                         }
                     }
                     else if (mode.getUsesSchematic())
                     {
-                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
+                        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, entity, maxDistance);
                     }
 
                     return true;

@@ -562,7 +562,8 @@ public class SchematicPlacementManager
 
         if (schematicPlacement != null)
         {
-            HitResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            HitResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, entity, false, maxDistance);
 
             if (trace.getType() != HitResult.Type.BLOCK)
             {
