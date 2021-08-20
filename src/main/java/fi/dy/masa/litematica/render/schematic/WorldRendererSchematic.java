@@ -43,6 +43,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockRenderView;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.world.ChunkSchematic;
@@ -561,6 +562,7 @@ public class WorldRendererSchematic
     {
         RenderLayer renderLayer = RenderLayer.getTranslucent();
         renderLayer.startDrawing();
+
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
@@ -571,6 +573,17 @@ public class WorldRendererSchematic
 
         this.world.getProfiler().push("overlay_" + type.name());
         this.world.getProfiler().swap("render");
+
+        boolean renderThrough = Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue() || Hotkeys.RENDER_OVERLAY_THROUGH_BLOCKS.getKeybind().isKeybindHeld();
+
+        if (renderThrough)
+        {
+            RenderSystem.disableDepthTest();
+        }
+        else
+        {
+            RenderSystem.enableDepthTest();
+        }
 
         Shader originalShader = RenderSystem.getShader();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
