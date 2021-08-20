@@ -77,6 +77,8 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         MinecraftClient mc = MinecraftClient.getInstance();
         long currentTime = System.currentTimeMillis();
         List<MaterialListEntry> list;
+        MatrixStack textStack = matrixStack;
+        matrixStack = RenderSystem.getModelViewStack();
 
         if (currentTime - this.lastUpdateTime > 2000)
         {
@@ -154,29 +156,54 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         {
             matrixStack.push();
             matrixStack.scale((float) scale, (float) scale, (float) scale);
+
+            textStack.push();
+            textStack.scale((float) scale, (float) scale, (float) scale);
+
+            RenderSystem.applyModelViewMatrix();
         }
 
         if (useBackground)
         {
             RenderUtils.drawRect(posX - bgMargin, posY - bgMargin,
-                         maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor);
+                                 maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor);
+        }
+
+        int x = posX;
+        int y = posY + 12;
+
+        RenderUtils.setupBlend();
+        RenderUtils.enableDiffuseLightingGui3D();
+
+        for (int i = 0; i < size; ++i)
+        {
+            mc.getItemRenderer().renderInGui(list.get(i).getStack(), x, y);
+            y += lineHeight;
+        }
+
+        RenderUtils.disableDiffuseLighting();
+        RenderSystem.disableBlend();
+
+        if (scale != 1d)
+        {
+            matrixStack.pop();
+            RenderSystem.applyModelViewMatrix();
         }
 
         String title = GuiBase.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + GuiBase.TXT_RST;
 
         if (useShadow)
         {
-            font.drawWithShadow(matrixStack, title, posX + 2, posY + 2, textColor);
+            font.drawWithShadow(textStack, title, posX + 2, posY + 2, textColor);
         }
         else
         {
-            font.draw(matrixStack, title, posX + 2, posY + 2, textColor);
+            font.draw(textStack, title, posX + 2, posY + 2, textColor);
         }
 
-        posY += 12;
         final int itemCountTextColor = Configs.Colors.MATERIAL_LIST_HUD_ITEM_COUNTS.getIntegerValue();
-        int x = posX + 18;
-        int y = posY + 4;
+        x = posX + 18;
+        y = posY + 16;
 
         for (int i = 0; i < size; ++i)
         {
@@ -191,38 +218,21 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
             if (useShadow)
             {
-                font.drawWithShadow(matrixStack, text, x, y, textColor);
-                font.drawWithShadow(matrixStack, strCount, cntPosX, y, itemCountTextColor);
+                font.drawWithShadow(textStack, text, x, y, textColor);
+                font.drawWithShadow(textStack, strCount, cntPosX, y, itemCountTextColor);
             }
             else
             {
-                font.draw(matrixStack, text, x, y, textColor);
-                font.draw(matrixStack, strCount, cntPosX, y, itemCountTextColor);
+                font.draw(textStack, text, x, y, textColor);
+                font.draw(textStack, strCount, cntPosX, y, itemCountTextColor);
             }
 
             y += lineHeight;
         }
 
-        x = posX;
-        y = posY;
-
-        //TODO: RenderSystem.enableRescaleNormal();
-        RenderUtils.setupBlend();
-        RenderUtils.enableDiffuseLightingGui3D();
-
-        for (int i = 0; i < size; ++i)
-        {
-            mc.getItemRenderer().renderInGui(list.get(i).getStack(), x, y);
-            y += lineHeight;
-        }
-
-        RenderUtils.disableDiffuseLighting();
-        //TODO: RenderSystem.disableRescaleNormal();
-        RenderSystem.disableBlend();
-
         if (scale != 1d)
         {
-            matrixStack.pop();
+            textStack.pop();
         }
 
         return contentHeight + 4;
