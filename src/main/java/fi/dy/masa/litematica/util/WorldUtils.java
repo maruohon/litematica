@@ -16,7 +16,6 @@ import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.TrapdoorBlock;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.block.enums.ComparatorMode;
 import net.minecraft.block.enums.SlabType;
@@ -25,7 +24,6 @@ import net.minecraft.client.world.ClientChunkManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -61,7 +59,6 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
@@ -355,7 +352,7 @@ public class WorldUtils
      */
     public static boolean doSchematicWorldPickBlock(boolean closest, MinecraftClient mc)
     {
-        BlockPos pos = null;
+        BlockPos pos;
 
         if (closest)
         {
@@ -363,7 +360,7 @@ public class WorldUtils
         }
         else
         {
-            pos = RayTraceUtils.getFurthestSchematicWorldTrace(mc.world, mc.player, 6);
+            pos = RayTraceUtils.getFurthestSchematicWorldBlockBeforeVanilla(mc.world, mc.player, 6, true);
         }
 
         if (pos != null)
@@ -372,51 +369,7 @@ public class WorldUtils
             BlockState state = world.getBlockState(pos);
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
 
-            if (stack.isEmpty() == false)
-            {
-                PlayerInventory inv = mc.player.inventory;
-                stack = stack.copy();
-
-                if (mc.player.abilities.creativeMode)
-                {
-                    BlockEntity te = world.getBlockEntity(pos);
-
-                    // The creative mode pick block with NBT only works correctly
-                    // if the server world doesn't have a TileEntity in that position.
-                    // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (GuiBase.isCtrlDown() && te != null && mc.world.isAir(pos))
-                    {
-                        ItemUtils.storeTEInStack(stack, te);
-                    }
-
-                    InventoryUtils.setPickedItemToHand(stack, mc);
-                    mc.interactionManager.clickCreativeStack(mc.player.getStackInHand(Hand.MAIN_HAND), 36 + inv.selectedSlot);
-
-                    //return true;
-                }
-                else
-                {
-                    int slot = inv.getSlotWithStack(stack);
-                    boolean shouldPick = inv.selectedSlot != slot;
-
-                    if (shouldPick && slot != -1)
-                    {
-                        InventoryUtils.setPickedItemToHand(stack, mc);
-                    }
-                    else if (slot == -1 && Configs.Generic.PICK_BLOCK_SHULKERS.getBooleanValue())
-                    {
-                        slot = InventoryUtils.findSlotWithBoxWithItem(mc.player.playerScreenHandler, stack, false);
-
-                        if (slot != -1)
-                        {
-                            ItemStack boxStack = mc.player.playerScreenHandler.slots.get(slot).getStack();
-                            InventoryUtils.setPickedItemToHand(boxStack, mc);
-                        }
-                    }
-
-                    //return shouldPick == false || canPick;
-                }
-            }
+            InventoryUtils.schematicWorldPickBlock(stack, pos, world, mc);
 
             return true;
         }
@@ -451,7 +404,16 @@ public class WorldUtils
 
     private static ActionResult doEasyPlaceAction(MinecraftClient mc)
     {
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        RayTraceWrapper traceWrapper;
+
+        if (Configs.Generic.EASY_PLACE_FIRST.getBooleanValue())
+        {
+            traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        }
+        else
+        {
+            traceWrapper = RayTraceUtils.getFurthestSchematicWorldTraceBeforeVanilla(mc.world, mc.player, 6);
+        }
 
         if (traceWrapper == null)
         {
@@ -488,12 +450,7 @@ public class WorldUtils
                     return ActionResult.FAIL;
                 }
 
-                // Abort if the required item was not able to be pick-block'd
-                if (doSchematicWorldPickBlock(true, mc) == false)
-                {
-                    return ActionResult.FAIL;
-                }
-
+                InventoryUtils.schematicWorldPickBlock(stack, pos, world, mc);
                 Hand hand = EntityUtils.getUsedHandForItem(mc.player, stack);
 
                 // Abort if a wrong item is in the player's hand

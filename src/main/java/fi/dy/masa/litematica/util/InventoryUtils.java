@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -9,7 +10,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.malilib.gui.GuiBase;
 
 public class InventoryUtils
 {
@@ -84,6 +90,56 @@ public class InventoryUtils
                 {
                     fi.dy.masa.malilib.util.InventoryUtils.swapItemToMainHand(stack.copy(), mc);
                 }
+            }
+        }
+    }
+
+    public static void schematicWorldPickBlock(ItemStack stack, BlockPos pos,
+                                               World schematicWorld, MinecraftClient mc)
+    {
+        if (stack.isEmpty() == false)
+        {
+            PlayerInventory inv = mc.player.inventory;
+            stack = stack.copy();
+
+            if (mc.player.abilities.creativeMode)
+            {
+                BlockEntity te = schematicWorld.getBlockEntity(pos);
+
+                // The creative mode pick block with NBT only works correctly
+                // if the server world doesn't have a TileEntity in that position.
+                // Otherwise it would try to write whatever that TE is into the picked ItemStack.
+                if (GuiBase.isCtrlDown() && te != null && mc.world.isAir(pos))
+                {
+                    ItemUtils.storeTEInStack(stack, te);
+                }
+
+                setPickedItemToHand(stack, mc);
+                mc.interactionManager.clickCreativeStack(mc.player.getStackInHand(Hand.MAIN_HAND), 36 + inv.selectedSlot);
+
+                //return true;
+            }
+            else
+            {
+                int slot = inv.getSlotWithStack(stack);
+                boolean shouldPick = inv.selectedSlot != slot;
+
+                if (shouldPick && slot != -1)
+                {
+                    setPickedItemToHand(stack, mc);
+                }
+                else if (slot == -1 && Configs.Generic.PICK_BLOCK_SHULKERS.getBooleanValue())
+                {
+                    slot = findSlotWithBoxWithItem(mc.player.playerScreenHandler, stack, false);
+
+                    if (slot != -1)
+                    {
+                        ItemStack boxStack = mc.player.playerScreenHandler.slots.get(slot).getStack();
+                        setPickedItemToHand(boxStack, mc);
+                    }
+                }
+
+                //return shouldPick == false || canPick;
             }
         }
     }
