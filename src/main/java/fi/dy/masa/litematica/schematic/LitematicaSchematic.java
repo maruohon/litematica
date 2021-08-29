@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.schematic;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,6 +52,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.NbtUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.util.WorldUtils;
@@ -1852,9 +1852,7 @@ public class LitematicaSchematic
 
         try
         {
-            FileInputStream is = new FileInputStream(fileSchematic);
-            NbtCompound nbt = NbtIo.readCompressed(is);
-            is.close();
+            NbtCompound nbt = NbtUtils.readNbtFromFile(fileSchematic);
 
             if (nbt != null)
             {
