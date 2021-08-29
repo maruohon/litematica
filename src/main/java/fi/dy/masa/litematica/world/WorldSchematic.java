@@ -282,13 +282,10 @@ public class WorldSchematic extends World
 
     public void scheduleChunkRenders(int chunkX, int chunkZ)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        int renderDistanceChunks = mc.options.viewDistance / 16 + 2;
-        int cameraChunkY = (mc.gameRenderer.getCamera().getBlockPos().getY()) / 16;
-        int startChunkY = Math.max(this.getBottomSectionCoord(), cameraChunkY - renderDistanceChunks);
-        int endChunkY = Math.min(this.getTopSectionCoord(), cameraChunkY + renderDistanceChunks);
+        int startChunkY = this.getBottomSectionCoord();
+        int endChunkY = this.getTopSectionCoord() - 1;
 
-        for (int chunkY = startChunkY; chunkY < endChunkY; ++chunkY)
+        for (int chunkY = startChunkY; chunkY <= endChunkY; ++chunkY)
         {
             this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
         }
