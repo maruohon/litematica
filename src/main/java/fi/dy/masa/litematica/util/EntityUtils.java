@@ -36,6 +36,14 @@ public class EntityUtils
 
     public static boolean hasToolItem(LivingEntity entity)
     {
+        return hasToolItemInHand(entity, Hand.MAIN_HAND) ||
+               hasToolItemInHand(entity, Hand.OFF_HAND);
+    }
+
+    public static boolean hasToolItemInHand(LivingEntity entity, Hand hand)
+    {
+        // If the configured tool item has NBT data, then the NBT is compared, otherwise it's ignored
+
         ItemStack toolItem = DataManager.getToolItem();
 
         if (toolItem.isEmpty())
@@ -43,31 +51,14 @@ public class EntityUtils
             return entity.getMainHandStack().isEmpty();
         }
 
-        return isHoldingItem(entity, toolItem);
-    }
+        ItemStack stackHand = entity.getStackInHand(hand);
 
-    public static boolean isHoldingItem(LivingEntity entity, ItemStack stackReference)
-    {
-        return getHeldItemOfType(entity, stackReference).isEmpty() == false;
-    }
-
-    public static ItemStack getHeldItemOfType(LivingEntity entity, ItemStack stackReference)
-    {
-        ItemStack stack = entity.getMainHandStack();
-
-        if (stack.isEmpty() == false && areStacksEqualIgnoreDurability(stack, stackReference))
+        if (ItemStack.areItemsEqualIgnoreDamage(toolItem, stackHand))
         {
-            return stack;
+            return toolItem.hasNbt() == false || ItemUtils.areTagsEqualIgnoreDamage(toolItem, stackHand);
         }
 
-        stack = entity.getOffHandStack();
-
-        if (stack.isEmpty() == false && areStacksEqualIgnoreDurability(stack, stackReference))
-        {
-            return stack;
-        }
-
-        return ItemStack.EMPTY;
+        return false;
     }
 
     /**

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import fi.dy.masa.litematica.config.Configs;
@@ -256,7 +257,7 @@ public class ToolHud extends InfoHud
                 ItemStack stack = this.mc.player.getMainHandStack();
 
                 if (state != null && mode == ToolMode.REBUILD &&
-                    (stack.isEmpty() || EntityUtils.areStacksEqualIgnoreDurability(stack, DataManager.getToolItem())))
+                    (stack.isEmpty() || EntityUtils.hasToolItemInHand(this.mc.player, Hand.MAIN_HAND)))
                 {
                     lines.add(StringUtils.translate("litematica.tool_hud.block_1", this.getBlockString(state)));
                 }
