@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.util;
 
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Set;
 import net.minecraft.block.AbstractSkullBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,6 +23,34 @@ import net.minecraft.world.World;
 public class ItemUtils
 {
     private static final IdentityHashMap<BlockState, ItemStack> ITEMS_FOR_STATES = new IdentityHashMap<>();
+
+    public static boolean areTagsEqualIgnoreDamage(ItemStack stackReference, ItemStack stackToCheck)
+    {
+        NbtCompound tagReference = stackReference.getTag();
+        NbtCompound tagToCheck = stackToCheck.getTag();
+
+        if (tagReference != null && tagToCheck != null)
+        {
+            Set<String> keysReference = new HashSet<>(tagReference.getKeys());
+
+            for (String key : keysReference)
+            {
+                if (key.equals("Damage"))
+                {
+                    continue;
+                }
+
+                if (tagReference.get(key).equals(tagToCheck.get(key)) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return (tagReference == null) && (tagToCheck == null);
+    }
 
     public static ItemStack getItemForState(BlockState state)
     {
