@@ -173,16 +173,12 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         int y = posY + 12;
 
         RenderUtils.setupBlend();
-        RenderUtils.enableDiffuseLightingGui3D();
 
         for (int i = 0; i < size; ++i)
         {
             mc.getItemRenderer().renderInGui(list.get(i).getStack(), x, y);
             y += lineHeight;
         }
-
-        RenderUtils.disableDiffuseLighting();
-        RenderSystem.disableBlend();
 
         if (scale != 1d)
         {
