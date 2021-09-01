@@ -270,7 +270,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         if (mc.player != null)
         {
-            if (DataManager.getToolMode() == ToolMode.REBUILD && KeybindMulti.getTriggeredCount() == 0)
+            if (DataManager.getToolMode() == ToolMode.REBUILD)
             {
                 if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
                 {
@@ -293,11 +293,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     return SchematicUtils.placeSchematicBlock(mc);
                 }
             }
-            else if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-                     Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
-            {
-                return WorldUtils.handleEasyPlace(mc);
-            }
             else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
             {
                 if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, mc.options.keyUse))
@@ -313,19 +308,5 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         }
 
         return false;
-    }
-
-    public static void onTick(MinecraftClient mc)
-    {
-        SelectionManager sm = DataManager.getSelectionManager();
-
-        if (sm.hasGrabbedElement())
-        {
-            sm.moveGrabbedElement(mc.player);
-        }
-        else
-        {
-            WorldUtils.easyPlaceOnUseTick(mc);
-        }
     }
 }

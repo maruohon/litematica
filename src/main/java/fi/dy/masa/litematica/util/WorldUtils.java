@@ -60,7 +60,6 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -379,11 +378,10 @@ public class WorldUtils
 
     public static void easyPlaceOnUseTick(MinecraftClient mc)
     {
-        if (mc.player != null &&
-            Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
+        if (mc.player != null && DataManager.getToolMode() != ToolMode.REBUILD &&
             Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() &&
-            KeybindMulti.isKeyDown(KeybindMulti.getKeyCode(mc.options.keyUse)))
+            Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
+            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
         {
             WorldUtils.doEasyPlaceAction(mc);
         }
@@ -391,15 +389,21 @@ public class WorldUtils
 
     public static boolean handleEasyPlace(MinecraftClient mc)
     {
-        ActionResult result = doEasyPlaceAction(mc);
-
-        if (result == ActionResult.FAIL)
+        if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+            DataManager.getToolMode() != ToolMode.REBUILD)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.easy_place_fail");
-            return true;
+            ActionResult result = doEasyPlaceAction(mc);
+
+            if (result == ActionResult.FAIL)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.easy_place_fail");
+                return true;
+            }
+
+            return result != ActionResult.PASS;
         }
 
-        return result != ActionResult.PASS;
+        return false;
     }
 
     private static ActionResult doEasyPlaceAction(MinecraftClient mc)
