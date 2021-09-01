@@ -313,15 +313,15 @@ public class WorldUtils
     {
         BlockState state = Blocks.AIR.getDefaultState();
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6, true);
+        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6);
 
         if (wrapper != null)
         {
-            HitResult trace = wrapper.getBlockHitResult();
+            BlockHitResult trace = wrapper.getBlockHitResult();
 
             if (trace != null && trace.getType() == HitResult.Type.BLOCK)
             {
-                BlockPos pos = ((BlockHitResult) trace).getBlockPos();
+                BlockPos pos = trace.getBlockPos();
 
                 if (wrapper.getHitType() == HitType.SCHEMATIC_BLOCK)
                 {
@@ -408,7 +408,7 @@ public class WorldUtils
 
         if (Configs.Generic.EASY_PLACE_FIRST.getBooleanValue())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6);
         }
         else
         {

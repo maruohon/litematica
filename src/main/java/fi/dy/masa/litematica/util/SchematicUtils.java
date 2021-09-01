@@ -274,7 +274,7 @@ public class SchematicUtils
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
             Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10, true);
+            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10);
 
             if (worldSchematic != null && traceWrapper != null &&
                 traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
@@ -344,7 +344,7 @@ public class SchematicUtils
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6, true);
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6);
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {

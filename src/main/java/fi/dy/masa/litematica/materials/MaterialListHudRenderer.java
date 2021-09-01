@@ -265,7 +265,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
     {
         if (Configs.Generic.HIGHLIGHT_BLOCK_IN_INV.getBooleanValue())
         {
-            RayTraceUtils.RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+            RayTraceUtils.RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10);
 
             if (traceWrapper != null && traceWrapper.getHitType() == RayTraceUtils.RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
             {
