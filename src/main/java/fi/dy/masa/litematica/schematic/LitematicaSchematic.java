@@ -81,14 +81,20 @@ public class LitematicaSchematic
     private final Map<String, BlockPos> subRegionSizes = new HashMap<>();
     private final SchematicMetadata metadata = new SchematicMetadata();
     private final SchematicConverter converter;
-    private int totalBlocks;
-    @Nullable
-    private final File schematicFile;
+    private int totalBlocksReadFromWorld;
+    @Nullable private final File schematicFile;
+    private final boolean vanillaStructure;
 
     private LitematicaSchematic(@Nullable File file)
     {
+        this(file, false);
+    }
+
+    private LitematicaSchematic(@Nullable File file, boolean vanillaStructure)
+    {
         this.schematicFile = file;
         this.converter = SchematicConverter.createForLitematica();
+        this.vanillaStructure = vanillaStructure;
     }
 
     @Nullable
@@ -102,9 +108,9 @@ public class LitematicaSchematic
         return this.metadata.getEnclosingSize();
     }
 
-    public int getTotalBlocks()
+    public int getTotalBlocksReadFromWorld()
     {
-        return this.totalBlocks;
+        return this.totalBlocksReadFromWorld;
     }
 
     public SchematicMetadata getMetadata()
@@ -203,7 +209,7 @@ public class LitematicaSchematic
         schematic.metadata.setRegionCount(boxes.size());
         schematic.metadata.setTotalVolume(PositionUtils.getTotalVolume(boxes));
         schematic.metadata.setEnclosingSize(PositionUtils.getEnclosingAreaSize(boxes));
-        schematic.metadata.setTotalBlocks(schematic.totalBlocks);
+        schematic.metadata.setTotalBlocks(schematic.totalBlocksReadFromWorld);
 
         return schematic;
     }
@@ -917,7 +923,7 @@ public class LitematicaSchematic
 
                         if (state.isAir() == false)
                         {
-                            this.totalBlocks++;
+                            this.totalBlocksReadFromWorld++;
                         }
 
                         if (state.getBlock().hasBlockEntity())
@@ -1067,7 +1073,7 @@ public class LitematicaSchematic
 
                         if (state.isAir() == false)
                         {
-                            this.totalBlocks++;
+                            this.totalBlocksReadFromWorld++;
                         }
 
                         if (state.getBlock().hasBlockEntity())
@@ -1269,8 +1275,10 @@ public class LitematicaSchematic
         this.blockContainers.clear();
         this.tileEntities.clear();
         this.entities.clear();
+        this.pendingBlockTicks.clear();
         this.subRegionPositions.clear();
         this.subRegionSizes.clear();
+        //this.metadata.clearModifiedSinceSaved();
 
         if (nbt.contains("Version", Constants.NBT.TAG_INT))
         {
@@ -1829,12 +1837,64 @@ public class LitematicaSchematic
         return false;
     }
 
+    public boolean readFromFile()
+    {
+        return this.readFromFile(this.vanillaStructure);
+    }
+
+    private boolean readFromFile(boolean vanillaStructure)
+    {
+        if (this.schematicFile == null)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.no_file");
+            return false;
+        }
+
+        File file = this.schematicFile;
+
+        if (file.exists() == false || file.canRead() == false)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", file.getAbsolutePath());
+            return false;
+        }
+
+        try
+        {
+            NbtCompound nbt = NbtUtils.readNbtFromFile(this.schematicFile);
+
+            if (nbt != null)
+            {
+                if (vanillaStructure)
+                {
+                    String name = FileUtils.getNameWithoutExtension(this.schematicFile.getName()) + " (Converted Structure)";
+
+                    if (this.readBlocksFromVanillaStructure(name, nbt))
+                    {
+                        return true;
+                    }
+                }
+                else if (this.readFromNBT(nbt))
+                {
+                    return true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.exception", this.schematicFile.getAbsolutePath());
+            Litematica.logger.error(e);
+        }
+
+        return false;
+    }
+
     @Nullable
     public static LitematicaSchematic createFromFile(File dir, String fileName)
     {
         return createFromFile(dir, fileName, false);
     }
 
+    @Nullable
     public static LitematicaSchematic createFromFile(File dir, String fileName, boolean vanillaStructure)
     {
         if (fileName.endsWith(FILE_EXTENSION) == false && vanillaStructure == false)
@@ -1842,44 +1902,10 @@ public class LitematicaSchematic
             fileName = fileName + FILE_EXTENSION;
         }
 
-        File fileSchematic = new File(dir, fileName);
+        File file = new File(dir, fileName);
+        LitematicaSchematic schematic = new LitematicaSchematic(file, vanillaStructure);
 
-        if (fileSchematic.exists() == false || fileSchematic.canRead() == false)
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", fileSchematic.getAbsolutePath());
-            return null;
-        }
-
-        try
-        {
-            NbtCompound nbt = NbtUtils.readNbtFromFile(fileSchematic);
-
-            if (nbt != null)
-            {
-                LitematicaSchematic schematic = new LitematicaSchematic(fileSchematic);
-
-                if (vanillaStructure)
-                {
-                    String name = FileUtils.getNameWithoutExtension(fileName) + " (Converted Structure)";
-
-                    if (schematic.readBlocksFromVanillaStructure(name, nbt))
-                    {
-                        return schematic;
-                    }
-                }
-                else if (schematic.readFromNBT(nbt))
-                {
-                    return schematic;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.exception", fileSchematic.getAbsolutePath());
-            Litematica.logger.error(e);
-        }
-
-        return null;
+        return schematic.readFromFile(vanillaStructure) ? schematic : null;
     }
 
     public static class EntityInfo

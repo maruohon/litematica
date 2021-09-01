@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.schematic;
 
 import javax.annotation.Nullable;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.NBTUtils;
@@ -27,7 +28,7 @@ public class SchematicMetadata
 
     public String getAuthor()
     {
-        return author;
+        return this.author;
     }
 
     public String getDescription()
@@ -38,7 +39,7 @@ public class SchematicMetadata
     @Nullable
     public int[] getPreviewImagePixelData()
     {
-        return thumbnailPixelData;
+        return this.thumbnailPixelData;
     }
 
     public int getRegionCount()
@@ -63,12 +64,12 @@ public class SchematicMetadata
 
     public long getTimeCreated()
     {
-        return timeCreated;
+        return this.timeCreated;
     }
 
     public long getTimeModified()
     {
-        return timeModified;
+        return this.timeModified;
     }
 
     public boolean hasBeenModified()
@@ -180,15 +181,15 @@ public class SchematicMetadata
         this.timeModified = nbt.getLong("TimeModified");
 
         Vec3i size = NBTUtils.readBlockPos(nbt.getCompound("EnclosingSize"));
-
-        if (size != null)
-        {
-            this.enclosingSize = size;
-        }
+        this.enclosingSize = size != null ? size : BlockPos.ORIGIN;
 
         if (nbt.contains("PreviewImageData", Constants.NBT.TAG_INT_ARRAY))
         {
             this.thumbnailPixelData = nbt.getIntArray("PreviewImageData");
+        }
+        else
+        {
+            this.thumbnailPixelData = null;
         }
     }
 }
