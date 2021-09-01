@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.schematic;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -184,7 +183,7 @@ public class LitematicaSchematic
         }
 
         LitematicaSchematic schematic = new LitematicaSchematic(null);
-        long time = (new Date()).getTime();
+        long time = System.currentTimeMillis();
 
         BlockPos origin = area.getEffectiveOrigin();
         schematic.setSubRegionPositions(boxes, origin);

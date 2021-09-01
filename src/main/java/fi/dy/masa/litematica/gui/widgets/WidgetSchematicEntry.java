@@ -1,6 +1,9 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
@@ -16,6 +19,7 @@ import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
+import fi.dy.masa.malilib.gui.widgets.WidgetFileBrowserBase;
 import fi.dy.masa.malilib.gui.widgets.WidgetListEntryBase;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.GuiUtils;
@@ -89,8 +93,10 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
             RenderUtils.drawRect(this.x, this.y, this.width, this.height, 0x50FFFFFF);
         }
 
+        boolean modified = this.schematic.getMetadata().wasModifiedSinceSaved();
         String schematicName = this.schematic.getMetadata().getName();
-        this.drawString(this.x + 20, this.y + 7, 0xFFFFFFFF, schematicName, matrixStack);
+        int color = modified ? 0xFFFF9010 : 0xFFFFFFFF;
+        this.drawString(this.x + 20, this.y + 7, color, schematicName, matrixStack);
 
         RenderUtils.color(1f, 1f, 1f, 1f);
         RenderSystem.disableBlend();
@@ -100,30 +106,57 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         this.parent.bindTexture(Icons.TEXTURE);
 
         Icons icon;
-        String text;
 
         if (fileName != null)
         {
             icon = Icons.SCHEMATIC_TYPE_FILE;
-            text = fileName;
         }
         else
         {
             icon = Icons.SCHEMATIC_TYPE_MEMORY;
-            text = StringUtils.translate("litematica.gui.label.schematic_placement.in_memory");
         }
 
         icon.renderAt(this.typeIconX, this.typeIconY, this.zLevel, false, false);
 
-        this.drawSubWidgets(mouseX, mouseY, matrixStack);
-
-        if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
+        if (modified)
         {
-            RenderUtils.drawHoverText(mouseX, mouseY, ImmutableList.of(text), matrixStack);
+            Icons.NOTICE_EXCLAMATION_11.renderAt(this.buttonsStartX - 13, this.y + 6, this.zLevel, false, false);
         }
 
-        RenderUtils.disableDiffuseLighting();
-        RenderSystem.disableLighting();
+        this.drawSubWidgets(mouseX, mouseY, matrixStack);
+    }
+
+    @Override
+    public void postRenderHovered(int mouseX, int mouseY, boolean selected, MatrixStack matrixStack)
+    {
+        RenderUtils.color(1f, 1f, 1f, 1f);
+
+        if (this.schematic.getMetadata().wasModifiedSinceSaved() &&
+            GuiBase.isMouseOver(mouseX, mouseY, this.buttonsStartX - 13, this.y + 6, 11, 11))
+        {
+            String str = WidgetFileBrowserBase.DATE_FORMAT.format(new Date(this.schematic.getMetadata().getTimeModified()));
+            List<String> strs = ImmutableList.of(StringUtils.translate("litematica.gui.label.loaded_schematic.modified_on", str));
+            RenderUtils.drawHoverText(mouseX, mouseY, strs, matrixStack);
+        }
+        else if (GuiBase.isMouseOver(mouseX, mouseY, this.x, this.y, this.buttonsStartX - 12, this.height))
+        {
+            List<String> lines = new ArrayList<>();
+            File schematicFile = this.schematic.getFile();
+            String fileName = schematicFile != null ? schematicFile.getName() : null;
+
+            if (fileName != null)
+            {
+                lines.add(fileName);
+            }
+            else
+            {
+                lines.add(StringUtils.translate("litematica.gui.label.schematic_placement.in_memory"));
+            }
+
+            RenderUtils.drawHoverText(mouseX, mouseY, lines, matrixStack);
+        }
+
+        RenderUtils.color(1f, 1f, 1f, 1f);
     }
 
     private static class ButtonListener implements IButtonActionListener
