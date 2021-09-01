@@ -310,6 +310,21 @@ public class SchematicPlacementManager
         return ret;
     }
 
+    public List<SchematicPlacement> getAllPlacementsOfSchematic(LitematicaSchematic schematic)
+    {
+        List<SchematicPlacement> list = new ArrayList<>();
+
+        for (SchematicPlacement placement : this.schematicPlacements)
+        {
+            if (placement.getSchematic() == schematic)
+            {
+                list.add(placement);
+            }
+        }
+
+        return list;
+    }
+
     public void removeAllPlacementsOfSchematic(LitematicaSchematic schematic)
     {
         boolean removed = false;

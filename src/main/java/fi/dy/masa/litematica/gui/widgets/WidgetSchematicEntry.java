@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
@@ -45,32 +46,30 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         y += 1;
 
         int posX = x + width;
-        int len;
-        ButtonListener listener;
-        String text;
 
-        text = StringUtils.translate("litematica.gui.button.unload");
-        len = this.getStringWidth(text) + 10;
-        posX -= (len + 2);
-        listener = new ButtonListener(ButtonListener.Type.UNLOAD, this);
-        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
-
-        text = StringUtils.translate("litematica.gui.button.save_to_file");
-        len = this.getStringWidth(text) + 10;
-        posX -= (len + 2);
-        listener = new ButtonListener(ButtonListener.Type.SAVE_TO_FILE, this);
-        this.addButton(new ButtonGeneric(posX, y, len, 20, text), listener);
-
-        text = StringUtils.translate("litematica.gui.button.create_placement");
-        len = this.getStringWidth(text) + 10;
-        posX -= (len + 2);
-        String tip = StringUtils.translate("litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled");
-        listener = new ButtonListener(ButtonListener.Type.CREATE_PLACEMENT, this);
-        this.addButton(new ButtonGeneric(posX, y, len, 20, text, tip), listener);
+        posX -= this.addButton(posX, y, ButtonListener.Type.UNLOAD);
+        posX -= this.addButton(posX, y, ButtonListener.Type.RELOAD);
+        posX -= this.addButton(posX, y, ButtonListener.Type.SAVE_TO_FILE);
+        posX -= this.addButton(posX, y, ButtonListener.Type.CREATE_PLACEMENT);
 
         this.buttonsStartX = posX;
         this.typeIconX = this.x + 2;
         this.typeIconY = y + 4;
+    }
+
+    private int addButton(int x, int y, ButtonListener.Type type)
+    {
+        ButtonListener listener = new ButtonListener(type, this);
+        ButtonGeneric button = new ButtonGeneric(x, y, -1, true, type.getDisplayName());
+
+        if (type.getHoverKey() != null)
+        {
+            button.setHoverStrings(type.getHoverKey());
+        }
+
+        this.addButton(button, listener);
+
+        return button.getWidth() + 2;
     }
 
     @Override
@@ -157,6 +156,8 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
         }
 
         RenderUtils.color(1f, 1f, 1f, 1f);
+
+        super.postRenderHovered(mouseX, mouseY, selected, matrixStack);
     }
 
     private static class ButtonListener implements IButtonActionListener
@@ -192,6 +193,12 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
                 gui.setParent(GuiUtils.getCurrentScreen());
                 GuiBase.openGui(gui);
             }
+            else if (this.type == Type.RELOAD)
+            {
+                this.widget.schematic.readFromFile();
+                SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
+                manager.getAllPlacementsOfSchematic(this.widget.schematic).forEach(manager::markChunksForRebuild);
+            }
             else if (this.type == Type.UNLOAD)
             {
                 SchematicHolder.getInstance().removeSchematic(this.widget.schematic);
@@ -201,9 +208,35 @@ public class WidgetSchematicEntry extends WidgetListEntryBase<LitematicaSchemati
 
         public enum Type
         {
-            CREATE_PLACEMENT,
-            SAVE_TO_FILE,
-            UNLOAD;
+            CREATE_PLACEMENT    ("litematica.gui.button.create_placement"),
+            RELOAD              ("litematica.gui.button.reload", "litematica.gui.button.hover.schematic_list.reload_schematic"),
+            SAVE_TO_FILE        ("litematica.gui.button.save_to_file"),
+            UNLOAD              ("litematica.gui.button.unload");
+
+            private final String translationKey;
+            @Nullable private final String hoverKey;
+
+            Type(String translationKey)
+            {
+                this(translationKey, null);
+            }
+
+            Type(String translationKey, @Nullable String hoverKey)
+            {
+                this.translationKey = translationKey;
+                this.hoverKey = hoverKey;
+            }
+
+            @Nullable
+            public String getHoverKey()
+            {
+                return this.hoverKey;
+            }
+
+            public String getDisplayName()
+            {
+                return StringUtils.translate(this.translationKey);
+            }
         }
     }
 }
