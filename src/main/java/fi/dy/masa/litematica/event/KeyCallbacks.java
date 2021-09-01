@@ -58,6 +58,7 @@ public class KeyCallbacks
         Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback(valueChangeCallback);
 
         Hotkeys.CLONE_SELECTION.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_MODE_NEXT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_MODE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
@@ -261,7 +262,11 @@ public class KeyCallbacks
                 }
             }
 
-            if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
+            if (key == Hotkeys.EASY_PLACE_ACTIVATION.getKeybind())
+            {
+                return WorldUtils.handleEasyPlace(this.mc);
+            }
+            else if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
                 GuiBase.openGui(new GuiMainMenu());
                 return true;
