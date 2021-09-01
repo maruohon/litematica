@@ -135,12 +135,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                 if (this.gui.schematic != null)
                 {
                     LitematicaSchematic schematic = this.gui.schematic;
-                    schematic.getMetadata().setTimeModified(System.currentTimeMillis());
 
                     if (schematic.writeToFile(dir, fileName, GuiBase.isShiftDown()))
                     {
-                        this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
+                        schematic.getMetadata().clearModifiedSinceSaved();
                         this.gui.getListWidget().refreshEntries();
+                        this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                     }
                 }
                 else
