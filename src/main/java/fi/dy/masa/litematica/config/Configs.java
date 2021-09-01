@@ -38,6 +38,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       EASY_PLACE_HOLD_ENABLED = new ConfigBoolean(    "easyPlaceHoldEnabled", true, "When enabled, then you can hold down the use key\nand look at different schematic blocks to place them,\nwithout having to click on every block individually.");
         public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place that block in that position");
         public static final ConfigBoolean       EASY_PLACE_SP_HANDLING  = new ConfigBoolean(    "easyPlaceSinglePlayerHandling", true, "If enabled, then Litematica handles the so called\n\"Carpet mod Accurate Placement Protocol\" itself in single player.\nIf you also have Tweakeroo installed, then this can be disabled,\nas Tweakeroo's 'clientPlacementRotation' option does the exact same thing.");
+        public static final ConfigBoolean       EASY_PLACE_PROTOCOL_V3  = new ConfigBoolean(    "easyPlaceProtocolV3", true, "If enabled, then Litematica uses \"version 3\"\nof the so-called \"accurate placement protocol\".\nThis is currently only supported by Litematica itself (in single player).");
         public static final ConfigBoolean       EXECUTE_REQUIRE_TOOL    = new ConfigBoolean(    "executeRequireHoldingTool", true, "Require holding an enabled tool item\nfor the executeOperation hotkey to work");
         public static final ConfigBoolean       FIX_RAIL_ROTATION       = new ConfigBoolean(    "fixRailRotation", true, "If true, then a fix is applied for the vanilla bug in rails,\nwhere the 180 degree rotations of straight north-south and\neast-west rails rotate 90 degrees counterclockwise instead >_>");
         public static final ConfigBoolean       HIGHLIGHT_BLOCK_IN_INV  = new ConfigBoolean(    "highlightBlockInInventory", false, "When enabled, highlights the item (including Shulker Boxes containing it)\nof the looked at block in the schematic");
@@ -70,6 +71,7 @@ public class Configs implements IConfigHandler
                 EASY_PLACE_HOLD_ENABLED,
                 EASY_PLACE_MODE,
                 EASY_PLACE_SP_HANDLING,
+                EASY_PLACE_PROTOCOL_V3,
                 EXECUTE_REQUIRE_TOOL,
                 FIX_RAIL_ROTATION,
                 HIGHLIGHT_BLOCK_IN_INV,

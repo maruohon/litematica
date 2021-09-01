@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.mojang.datafixers.DataFixer;
@@ -29,6 +31,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
 import net.minecraft.util.ActionResult;
@@ -37,6 +42,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -492,7 +498,14 @@ public class WorldUtils
                 Direction side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
 
                 // Carpet Accurate Placement protocol support, plus BlockSlab support
-                hitPos = applyCarpetProtocolHitVec(pos, stateSchematic, hitPos);
+                if (Configs.Generic.EASY_PLACE_PROTOCOL_V3.getBooleanValue())
+                {
+                    hitPos = applyPlacementProtocolV3(pos, stateSchematic, hitPos);
+                }
+                else
+                {
+                    hitPos = applyCarpetProtocolHitVec(pos, stateSchematic, hitPos);
+                }
 
                 // Mark that this position has been handled (use the non-offset position that is checked above)
                 cacheEasyPlacePosition(pos);
@@ -559,10 +572,6 @@ public class WorldUtils
 
     /**
      * Apply the Carpet-Extra mod accurate block placement protocol support
-     * @param pos
-     * @param state
-     * @param hitVecIn
-     * @return
      */
     public static Vec3d applyCarpetProtocolHitVec(BlockPos pos, BlockState state, Vec3d hitVecIn)
     {
@@ -611,6 +620,74 @@ public class WorldUtils
         }
 
         return new Vec3d(x, y, z);
+    }
+
+    public static <T extends Comparable<T>> Vec3d applyPlacementProtocolV3(BlockPos pos, BlockState state, Vec3d hitVecIn)
+    {
+        Collection<Property<?>> props = state.getBlock().getStateManager().getProperties();
+
+        if (props.isEmpty())
+        {
+            return hitVecIn;
+        }
+
+        double relX = hitVecIn.x - pos.getX();
+        int protocolValue = 0;
+        int shiftAmount = 1;
+        int propCount = 0;
+
+        @Nullable DirectionProperty property = fi.dy.masa.malilib.util.BlockUtils.getFirstDirectionProperty(state);
+
+        // DirectionProperty - allow all except: VERTICAL_DIRECTION (PointedDripstone)
+        if (property != null && property != Properties.VERTICAL_DIRECTION)
+        {
+            Direction direction = state.get(property);
+            protocolValue |= direction.getId() << shiftAmount;
+            shiftAmount += 3;
+            ++propCount;
+        }
+
+        List<Property<?>> propList = new ArrayList<>(props);
+        propList.sort(Comparator.comparing(Property::getName));
+
+        try
+        {
+            for (Property<?> p : propList)
+            {
+                if ((p instanceof DirectionProperty) == false &&
+                    PlacementHandler.WHITELISTED_PROPERTIES.contains(p))
+                {
+                    @SuppressWarnings("unchecked")
+                    Property<T> prop = (Property<T>) p;
+                    List<T> list = new ArrayList<>(prop.getValues());
+                    list.sort(Comparable::compareTo);
+
+                    int requiredBits = MathHelper.log2(MathHelper.smallestEncompassingPowerOfTwo(list.size()));
+                    int valueIndex = list.indexOf(state.get(prop));
+
+                    if (valueIndex != -1)
+                    {
+                        //System.out.printf("requesting: %s = %s, index: %d\n", prop.getName(), state.get(prop), valueIndex);
+                        protocolValue |= (valueIndex << shiftAmount);
+                        shiftAmount += requiredBits;
+                        ++propCount;
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Litematica.logger.warn("Exception trying to request placement protocol value", e);
+        }
+
+        if (propCount > 0)
+        {
+            double x = pos.getX() + relX + 2 + protocolValue;
+            //System.out.printf("request prot value 0x%08X\n", protocolValue + 2);
+            return new Vec3d(x, hitVecIn.y, hitVecIn.z);
+        }
+
+        return hitVecIn;
     }
 
     private static Direction applyPlacementFacing(BlockState stateSchematic, Direction side, BlockState stateClient)
