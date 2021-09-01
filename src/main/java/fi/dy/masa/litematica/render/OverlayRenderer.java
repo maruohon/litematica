@@ -362,14 +362,14 @@ public class OverlayRenderer
             {
                 Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
                 List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-                HitResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
-                BlockPos posLook = trace != null && trace.getType() == HitResult.Type.BLOCK ? ((BlockHitResult) trace).getBlockPos() : null;
-                this.renderSchematicMismatches(list, posLook, matrices, partialTicks);
+                BlockHitResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
+                BlockPos posLook = trace != null && trace.getType() == HitResult.Type.BLOCK ? trace.getBlockPos() : null;
+                this.renderSchematicMismatches(list, posLook, matrices);
             }
         }
     }
 
-    private void renderSchematicMismatches(List<MismatchRenderPos> posList, @Nullable BlockPos lookPos, MatrixStack matrices, float partialTicks)
+    private void renderSchematicMismatches(List<MismatchRenderPos> posList, @Nullable BlockPos lookPos, MatrixStack matrices)
     {
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
@@ -458,22 +458,20 @@ public class OverlayRenderer
             boolean infoOverlayKeyActive = Hotkeys.RENDER_INFO_OVERLAY.getKeybind().isKeybindHeld();
             boolean verifierOverlayRendered = false;
 
-            if (infoOverlayKeyActive &&
-                Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue() &&
-                Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue())
+            if (infoOverlayKeyActive && Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue())
             {
                 verifierOverlayRendered = this.renderVerifierOverlay(mc, matrixStack);
             }
 
             boolean renderBlockInfoLines = Configs.InfoOverlays.BLOCK_INFO_LINES_ENABLED.getBooleanValue();
-            boolean renderInfoOverlay = verifierOverlayRendered == false && infoOverlayKeyActive && Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue();
+            boolean renderBlockInfoOverlay = verifierOverlayRendered == false && infoOverlayKeyActive && Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue();
             RayTraceWrapper traceWrapper = null;
 
-            if (renderBlockInfoLines || renderInfoOverlay)
+            if (renderBlockInfoLines || renderBlockInfoOverlay)
             {
                 Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
                 boolean targetFluids = Configs.InfoOverlays.INFO_OVERLAYS_TARGET_FLUIDS.getBooleanValue();
-                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10, true, targetFluids);
+                traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10, true, targetFluids, false);
             }
 
             if (traceWrapper != null &&
@@ -485,7 +483,7 @@ public class OverlayRenderer
                     this.renderBlockInfoLines(traceWrapper, mc, matrixStack);
                 }
 
-                if (renderInfoOverlay)
+                if (renderBlockInfoOverlay)
                 {
                     this.renderBlockInfoOverlay(traceWrapper, mc, matrixStack);
                 }
@@ -525,16 +523,22 @@ public class OverlayRenderer
             Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
-            HitResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
+            BlockHitResult trace = RayTraceUtils.traceToPositions(posList, entity, 128);
 
             if (trace != null && trace.getType() == HitResult.Type.BLOCK)
             {
-                BlockMismatch mismatch = verifier.getMismatchForPosition(((BlockHitResult) trace).getBlockPos());
+                BlockMismatch mismatch = verifier.getMismatchForPosition(trace.getBlockPos());
+                World worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
-                if (mismatch != null)
+                if (mismatch != null && worldSchematic != null)
                 {
                     BlockMismatchInfo info = new BlockMismatchInfo(mismatch.stateExpected, mismatch.stateFound);
-                    info.render(GuiUtils.getScaledWindowWidth() / 2 - info.getTotalWidth() / 2, GuiUtils.getScaledWindowHeight() / 2 + 6, mc, matrixStack);
+                    BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
+                    int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
+                    BlockPos pos = trace.getBlockPos();
+                    int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, mc.world, pos, mc);
+                    this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+                    info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
                     return true;
                 }
             }
@@ -565,7 +569,7 @@ public class OverlayRenderer
             int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
 
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
-            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+            this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
             info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA_BLOCK)
@@ -573,7 +577,7 @@ public class OverlayRenderer
             int invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.CENTER, offY, worldClient, pos, mc);
 
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-            this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+            this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
             info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
@@ -585,7 +589,7 @@ public class OverlayRenderer
                 int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
 
                 BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+                this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
                 info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
             }
             else
@@ -593,16 +597,14 @@ public class OverlayRenderer
                 int invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.CENTER, offY, worldSchematic, pos, mc);
 
                 BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
-                this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+                this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
                 info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
             }
         }
     }
 
-    protected void getOverlayPosition(int width, int height, int offY, int invHeight, MinecraftClient mc)
+    protected void getOverlayPosition(BlockInfoAlignment align, int width, int height, int offY, int invHeight, MinecraftClient mc)
     {
-        BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
-
         switch (align)
         {
             case CENTER:
@@ -643,14 +645,10 @@ public class OverlayRenderer
         }
     }
 
-    private <T extends Comparable<T>> void addBlockInfoLines(BlockState state)
+    private void addBlockInfoLines(BlockState state)
     {
         this.blockInfoLines.add(String.valueOf(Registry.BLOCK.getId(state.getBlock())));
-
-        for (String line : BlockUtils.getFormattedBlockStateProperties(state))
-        {
-            this.blockInfoLines.add(line);
-        }
+        this.blockInfoLines.addAll(BlockUtils.getFormattedBlockStateProperties(state));
     }
 
     public void renderSchematicRebuildTargetingOverlay(MatrixStack matrixStack, float partialTicks)
@@ -662,28 +660,28 @@ public class OverlayRenderer
 
         if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL_EXCEPT.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_BREAK_EXCEPT_OVERLAY_COLOR.getColor();
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
             direction = true;
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
         }
         else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
             direction = true;
         }
