@@ -77,16 +77,15 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 public class WorldUtils
 {
     private static final List<PositionCache> EASY_PLACE_POSITIONS = new ArrayList<>();
-    private static boolean preventOnBlockAdded;
 
-    public static boolean shouldPreventOnBlockAdded()
+    public static boolean shouldPreventBlockUpdates(World world)
     {
-        return preventOnBlockAdded;
+        return ((IWorldUpdateSuppressor) world).litematica_getShouldPreventBlockUpdates();
     }
 
-    public static void setShouldPreventOnBlockAdded(boolean prevent)
+    public static void setShouldPreventBlockUpdates(World world, boolean preventUpdates)
     {
-        preventOnBlockAdded = prevent;
+        ((IWorldUpdateSuppressor) world).litematica_setShouldPreventBlockUpdates(preventUpdates);
     }
 
     public static boolean convertSchematicaSchematicToLitematicaSchematic(
@@ -200,34 +199,6 @@ public class WorldUtils
         //return schematic != null && schematic.writeToFile(outputDir, outputFileName, override, feedback);
         // TODO 1.13
         return false;
-    }
-
-    @Nullable
-    public static SchematicaSchematic convertLitematicaSchematicToSchematicaSchematic(File inputDir, String inputFileName, boolean ignoreEntities, IStringConsumer feedback)
-    {
-        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(inputDir, inputFileName);
-
-        if (litematicaSchematic == null)
-        {
-            feedback.setString("litematica.error.schematic_conversion.litematica_to_schematic.failed_to_read_schematic");
-            return null;
-        }
-
-        WorldSchematic world = SchematicWorldHandler.createSchematicWorld();
-
-        BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
-        loadChunksSchematicWorld(world, BlockPos.ORIGIN, size);
-        SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
-        litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
-
-        SchematicaSchematic schematic = SchematicaSchematic.createFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities);
-
-        if (schematic == null)
-        {
-            feedback.setString("litematica.error.schematic_conversion.litematica_to_schematic.failed_to_create_schematic");
-        }
-
-        return schematic;
     }
 
     public static boolean convertLitematicaSchematicToVanillaStructure(

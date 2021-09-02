@@ -32,7 +32,6 @@ import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
@@ -57,6 +56,7 @@ import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.NbtUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
+import fi.dy.masa.litematica.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
@@ -275,7 +275,7 @@ public class LitematicaSchematic
 
     public boolean placeToWorld(World world, SchematicPlacement schematicPlacement, boolean notifyNeighbors, boolean ignoreEntities)
     {
-        WorldUtils.setShouldPreventOnBlockAdded(true);
+        WorldUtils.setShouldPreventBlockUpdates(world, true);
 
         ImmutableMap<String, SubRegionPlacement> relativePlacements = schematicPlacement.getEnabledRelativeSubRegionPlacements();
         BlockPos origin = schematicPlacement.getOrigin();
@@ -311,7 +311,7 @@ public class LitematicaSchematic
             }
         }
 
-        WorldUtils.setShouldPreventOnBlockAdded(false);
+        WorldUtils.setShouldPreventBlockUpdates(world, false);
 
         return true;
     }
@@ -544,273 +544,10 @@ public class LitematicaSchematic
                 double y = pos.y + offY;
                 double z = pos.z + offZ;
 
-                this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
+                SchematicPlacingUtils.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
                 EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
             }
         }
-    }
-
-    public boolean placeToWorldWithinChunk(World world, ChunkPos chunkPos, SchematicPlacement schematicPlacement, boolean notifyNeighbors)
-    {
-        Set<String> regionsTouchingChunk = schematicPlacement.getRegionsTouchingChunk(chunkPos.x, chunkPos.z);
-        BlockPos origin = schematicPlacement.getOrigin();
-
-        for (String regionName : regionsTouchingChunk)
-        {
-            SubRegionPlacement placement = schematicPlacement.getRelativeSubRegionPlacement(regionName);
-
-            if (placement.isEnabled())
-            {
-                BlockPos regionPos = placement.getPos();
-                BlockPos regionSize = this.subRegionSizes.get(regionName);
-                LitematicaBlockStateContainer container = this.blockContainers.get(regionName);
-                Map<BlockPos, NbtCompound> tileMap = this.tileEntities.get(regionName);
-                List<EntityInfo> entityList = this.entities.get(regionName);
-
-                if (regionPos != null && regionSize != null && container != null && tileMap != null)
-                {
-                    this.placeBlocksWithinChunk(world, chunkPos, regionName, origin, regionPos, regionSize, schematicPlacement, placement, container, tileMap, notifyNeighbors);
-                }
-                else
-                {
-                    Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", this.metadata.getName(), regionName);
-                }
-
-                if (schematicPlacement.ignoreEntities() == false && placement.ignoreEntities() == false && entityList != null)
-                {
-                    this.placeEntitiesToWorldWithinChunk(world, chunkPos, origin, regionPos, regionSize, schematicPlacement, placement, entityList);
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private void placeBlocksWithinChunk(World world, ChunkPos chunkPos, String regionName,
-            BlockPos origin, BlockPos regionPos, BlockPos regionSize,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement,
-            LitematicaBlockStateContainer container, Map<BlockPos, NbtCompound> tileMap, boolean notifyNeighbors)
-    {
-        IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
-
-        if (bounds == null)
-        {
-            return;
-        }
-
-        // These are the untransformed relative positions
-        BlockPos posEndRel = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize).add(regionPos);
-        BlockPos posMinRel = PositionUtils.getMinCorner(regionPos, posEndRel);
-
-        // The transformed sub-region origin position
-        BlockPos regionPosTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-
-        // The relative offset of the affected region's corners, to the sub-region's origin corner
-        BlockPos boxMinRel = new BlockPos(bounds.minX - origin.getX() - regionPosTransformed.getX(), 0, bounds.minZ - origin.getZ() - regionPosTransformed.getZ());
-        BlockPos boxMaxRel = new BlockPos(bounds.maxX - origin.getX() - regionPosTransformed.getX(), 0, bounds.maxZ - origin.getZ() - regionPosTransformed.getZ());
-
-        // Reverse transform that relative offset, to get the untransformed orientation's offsets
-        boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, placement.getMirror(), placement.getRotation());
-        boxMaxRel = PositionUtils.getReverseTransformedBlockPos(boxMaxRel, placement.getMirror(), placement.getRotation());
-
-        boxMinRel = PositionUtils.getReverseTransformedBlockPos(boxMinRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        boxMaxRel = PositionUtils.getReverseTransformedBlockPos(boxMaxRel, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-
-        // Get the offset relative to the sub-region's minimum corner, instead of the origin corner (which can be at any corner)
-        boxMinRel = boxMinRel.subtract(posMinRel.subtract(regionPos));
-        boxMaxRel = boxMaxRel.subtract(posMinRel.subtract(regionPos));
-
-        BlockPos posMin = PositionUtils.getMinCorner(boxMinRel, boxMaxRel);
-        BlockPos posMax = PositionUtils.getMaxCorner(boxMinRel, boxMaxRel);
-
-        final int startX = posMin.getX();
-        final int startZ = posMin.getZ();
-        final int endX = posMax.getX();
-        final int endZ = posMax.getZ();
-
-        int startY = 0;
-        int endY = Math.abs(regionSize.getY()) - 1;
-        BlockPos.Mutable posMutable = new BlockPos.Mutable();
-
-        //System.out.printf("sx: %d, sy: %d, sz: %d => ex: %d, ey: %d, ez: %d\n", startX, startY, startZ, endX, endY, endZ);
-
-        if (startX < 0 || startZ < 0 || endX >= container.getSize().getX() || endZ >= container.getSize().getZ())
-        {
-            System.out.printf("DEBUG ============= OUT OF BOUNDS - region: %s, sx: %d, sz: %d, ex: %d, ez: %d - size x: %d z: %d =============\n",
-                    regionName, startX, startZ, endX, endZ, container.getSize().getX(), container.getSize().getZ());
-            return;
-        }
-
-        final BlockRotation rotationCombined = schematicPlacement.getRotation().rotate(placement.getRotation());
-        final BlockMirror mirrorMain = schematicPlacement.getMirror();
-        final BlockState barrier = Blocks.BARRIER.getDefaultState();
-        BlockMirror mirrorSub = placement.getMirror();
-
-        if (mirrorSub != BlockMirror.NONE &&
-            (schematicPlacement.getRotation() == BlockRotation.CLOCKWISE_90 ||
-             schematicPlacement.getRotation() == BlockRotation.COUNTERCLOCKWISE_90))
-        {
-            mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
-        }
-
-        int bottomY = world.getBottomY();
-        int topY = world.getTopY();
-        int tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY();
-
-        if (tmp < bottomY)
-        {
-            startY += (bottomY - tmp);
-        }
-
-        tmp = posMinRel.getY() - regionPos.getY() + regionPosTransformed.getY() + origin.getY() + endY;
-
-        if (tmp > topY)
-        {
-            endY -= (tmp - topY);
-        }
-
-        for (int y = startY; y <= endY; ++y)
-        {
-            for (int z = startZ; z <= endZ; ++z)
-            {
-                for (int x = startX; x <= endX; ++x)
-                {
-                    BlockState state = container.get(x, y, z);
-
-                    if (state.isAir())
-                    {
-                        continue;
-                    }
-
-                    posMutable.set(x, y, z);
-                    NbtCompound teNBT = tileMap.get(posMutable);
-
-                    posMutable.set( posMinRel.getX() + x - regionPos.getX(),
-                                    posMinRel.getY() + y - regionPos.getY(),
-                                    posMinRel.getZ() + z - regionPos.getZ());
-
-                    BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
-                    pos = pos.add(regionPosTransformed).add(origin);
-
-                    if (mirrorMain != BlockMirror.NONE) { state = state.mirror(mirrorMain); }
-                    if (mirrorSub != BlockMirror.NONE)  { state = state.mirror(mirrorSub); }
-                    if (rotationCombined != BlockRotation.NONE) { state = state.rotate(rotationCombined); }
-
-                    if (teNBT != null)
-                    {
-                        BlockEntity te = world.getBlockEntity(pos);
-
-                        if (te != null)
-                        {
-                            if (te instanceof Inventory)
-                            {
-                                ((Inventory) te).clear();
-                            }
-
-                            world.setBlockState(pos, barrier, 0x14);
-                        }
-                    }
-
-                    if (world.setBlockState(pos, state, 0x12) && teNBT != null)
-                    {
-                        BlockEntity te = world.getBlockEntity(pos);
-
-                        if (te != null)
-                        {
-                            teNBT = teNBT.copy();
-                            teNBT.putInt("x", pos.getX());
-                            teNBT.putInt("y", pos.getY());
-                            teNBT.putInt("z", pos.getZ());
-
-                            try
-                            {
-                                te.readNbt(teNBT);
-                            }
-                            catch (Exception e)
-                            {
-                                Litematica.logger.warn("Failed to load TileEntity data for {} @ {}", state, pos);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (notifyNeighbors)
-        {
-            for (int y = startX; y <= endY; ++y)
-            {
-                for (int z = startY; z <= endZ; ++z)
-                {
-                    for (int x = startZ; x <= endX; ++x)
-                    {
-                        posMutable.set( posMinRel.getX() + x - regionPos.getX(),
-                                        posMinRel.getY() + y - regionPos.getY(),
-                                        posMinRel.getZ() + z - regionPos.getZ());
-                        BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement).add(origin);
-                        world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
-                    }
-                }
-            }
-        }
-    }
-
-    private void placeEntitiesToWorldWithinChunk(World world, ChunkPos chunkPos, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
-            SchematicPlacement schematicPlacement, SubRegionPlacement placement, List<EntityInfo> entityList)
-    {
-        BlockPos regionPosRelTransformed = PositionUtils.getTransformedBlockPos(regionPos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-        final int offX = regionPosRelTransformed.getX() + origin.getX();
-        final int offY = regionPosRelTransformed.getY() + origin.getY();
-        final int offZ = regionPosRelTransformed.getZ() + origin.getZ();
-        final double minX = (chunkPos.x << 4);
-        final double minZ = (chunkPos.z << 4);
-        final double maxX = (chunkPos.x << 4) + 16;
-        final double maxZ = (chunkPos.z << 4) + 16;
-
-        final BlockRotation rotationCombined = schematicPlacement.getRotation().rotate(placement.getRotation());
-        final BlockMirror mirrorMain = schematicPlacement.getMirror();
-        BlockMirror mirrorSub = placement.getMirror();
-
-        if (mirrorSub != BlockMirror.NONE &&
-            (schematicPlacement.getRotation() == BlockRotation.CLOCKWISE_90 ||
-             schematicPlacement.getRotation() == BlockRotation.COUNTERCLOCKWISE_90))
-        {
-            mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
-        }
-
-        for (EntityInfo info : entityList)
-        {
-            Entity entity = EntityUtils.createEntityAndPassengersFromNBT(info.nbt, world);
-
-            if (entity != null)
-            {
-                Vec3d pos = info.posVec;
-                pos = PositionUtils.getTransformedPosition(pos, schematicPlacement.getMirror(), schematicPlacement.getRotation());
-                pos = PositionUtils.getTransformedPosition(pos, placement.getMirror(), placement.getRotation());
-                double x = pos.x + offX;
-                double y = pos.y + offY;
-                double z = pos.z + offZ;
-
-                if (x >= minX && x < maxX && z >= minZ && z < maxZ)
-                {
-                    this.rotateEntity(entity, x, y, z, rotationCombined, mirrorMain, mirrorSub);
-                    //System.out.printf("post: %.1f - rot: %s, mm: %s, ms: %s\n", entity.getYaw(), rotationCombined, mirrorMain, mirrorSub);
-                    EntityUtils.spawnEntityAndPassengersInWorld(entity, world);
-                }
-            }
-        }
-    }
-
-    private void rotateEntity(Entity entity, double x, double y, double z, BlockRotation rotationCombined, BlockMirror mirrorMain, BlockMirror mirrorSub)
-    {
-        float rotationYaw = entity.getYaw();
-
-        if (mirrorMain != BlockMirror.NONE)         { rotationYaw = entity.applyMirror(mirrorMain); }
-        if (mirrorSub != BlockMirror.NONE)          { rotationYaw = entity.applyMirror(mirrorSub); }
-        if (rotationCombined != BlockRotation.NONE) { rotationYaw += entity.getYaw() - entity.applyRotation(rotationCombined); }
-
-        entity.refreshPositionAndAngles(x, y, z, rotationYaw, entity.getPitch());
-        EntityUtils.setEntityRotations(entity, rotationYaw, entity.getPitch());
     }
 
     private void takeEntitiesFromWorld(World world, List<Box> boxes, BlockPos origin)
@@ -1135,6 +872,18 @@ public class LitematicaSchematic
     public LitematicaBlockStateContainer getSubRegionContainer(String regionName)
     {
         return this.blockContainers.get(regionName);
+    }
+
+    @Nullable
+    public Map<BlockPos, NbtCompound> getBlockEntityMapForRegion(String regionName)
+    {
+        return this.tileEntities.get(regionName);
+    }
+
+    @Nullable
+    public List<EntityInfo> getEntityListForRegion(String regionName)
+    {
+        return this.entities.get(regionName);
     }
 
     private NbtCompound writeToNBT()

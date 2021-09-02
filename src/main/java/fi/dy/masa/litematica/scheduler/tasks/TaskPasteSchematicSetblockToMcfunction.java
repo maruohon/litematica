@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -13,17 +14,18 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import fi.dy.masa.malilib.util.LayerRange;
 
-public class TaskPasteSchematicSetblockToMcfunction extends TaskPasteSchematicSetblock
+public class TaskPasteSchematicSetblockToMcfunction extends TaskPasteSchematicPerChunkCommand
 {
     protected final String fileNameBase;
     protected BufferedWriter writer;
     protected int fileIndex = 1;
     protected int commandsInCurrentFile;
 
-    public TaskPasteSchematicSetblockToMcfunction(SchematicPlacement placement, boolean changedBlocksOnly)
+    public TaskPasteSchematicSetblockToMcfunction(Collection<SchematicPlacement> placements, LayerRange range, boolean changedBlocksOnly)
     {
-        super(placement, changedBlocksOnly);
+        super(placements, range, changedBlocksOnly);
 
         String date = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
         this.fileNameBase = "paste_commands_" + date + "_";
