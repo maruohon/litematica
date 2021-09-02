@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -50,7 +51,9 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
+import fi.dy.masa.litematica.util.BlockUtils;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.litematica.util.NbtUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
@@ -84,18 +87,18 @@ public class LitematicaSchematic
     private final SchematicConverter converter;
     private int totalBlocksReadFromWorld;
     @Nullable private final File schematicFile;
-    private final boolean vanillaStructure;
+    private final FileType schematicType;
 
     private LitematicaSchematic(@Nullable File file)
     {
-        this(file, false);
+        this(file, FileType.LITEMATICA_SCHEMATIC);
     }
 
-    private LitematicaSchematic(@Nullable File file, boolean vanillaStructure)
+    private LitematicaSchematic(@Nullable File file, FileType schematicType)
     {
         this.schematicFile = file;
+        this.schematicType = schematicType;
         this.converter = SchematicConverter.createForLitematica();
-        this.vanillaStructure = vanillaStructure;
     }
 
     @Nullable
@@ -1424,7 +1427,189 @@ public class LitematicaSchematic
         return palette.setMapping(list);
     }
 
-    public boolean readBlocksFromVanillaStructure(String name, NbtCompound tag)
+    public static boolean isValidSpongeSchematic(NbtCompound tag)
+    {
+        if (tag.contains("Width", Constants.NBT.TAG_ANY_NUMERIC) &&
+            tag.contains("Height", Constants.NBT.TAG_ANY_NUMERIC) &&
+            tag.contains("Length", Constants.NBT.TAG_ANY_NUMERIC) &&
+            tag.contains("Version", Constants.NBT.TAG_INT) &&
+            tag.contains("Palette", Constants.NBT.TAG_COMPOUND) &&
+            tag.contains("BlockData", Constants.NBT.TAG_BYTE_ARRAY))
+        {
+            return isSizeValid(readSizeFromTagSponge(tag));
+        }
+
+        return false;
+    }
+
+    public static Vec3i readSizeFromTagSponge(NbtCompound tag)
+    {
+        return new Vec3i(tag.getInt("Width"), tag.getInt("Height"), tag.getInt("Length"));
+    }
+
+    protected boolean readSpongePaletteFromTag(NbtCompound tag, ILitematicaBlockStatePalette palette)
+    {
+        final int size = tag.getKeys().size();
+        List<BlockState> list = new ArrayList<>(size);
+        BlockState air = Blocks.AIR.getDefaultState();
+
+        for (int i = 0; i < size; ++i)
+        {
+            list.add(air);
+        }
+
+        for (String key : tag.getKeys())
+        {
+            int id = tag.getInt(key);
+            Optional<BlockState> stateOptional = BlockUtils.getBlockStateFromString(key);
+            BlockState state;
+
+            if (stateOptional.isPresent())
+            {
+                state = stateOptional.get();
+            }
+            else
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "Unknown block in the Sponge schematic palette: '" + key + "'");
+                state = LitematicaBlockStateContainer.AIR_BLOCK_STATE;
+            }
+
+            if (id < 0 || id >= size)
+            {
+                String msg = "Invalid ID in the Sponge schematic palette: '" + id + "'";
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, msg);
+                Litematica.logger.error(msg);
+                return false;
+            }
+
+            list.set(id, state);
+        }
+
+        return palette.setMapping(list);
+    }
+
+    protected boolean readSpongeBlocksFromTag(NbtCompound tag, String schematicName, Vec3i size)
+    {
+        if (tag.contains("Palette", Constants.NBT.TAG_COMPOUND) &&
+            tag.contains("BlockData", Constants.NBT.TAG_BYTE_ARRAY))
+        {
+            NbtCompound paletteTag = tag.getCompound("Palette");
+            byte[] blockData = tag.getByteArray("BlockData");
+            int paletteSize = paletteTag.getKeys().size();
+            LitematicaBlockStateContainer container = LitematicaBlockStateContainer.createContainer(paletteSize, blockData, size);
+
+            if (container == null)
+            {
+                String msg = "Failed to read blocks from Sponge schematic";
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, msg);
+                Litematica.logger.error(msg);
+                return false;
+            }
+
+            this.blockContainers.put(schematicName, container);
+
+            return this.readSpongePaletteFromTag(paletteTag, container.getPalette());
+        }
+
+        return false;
+    }
+
+    protected Map<BlockPos, NbtCompound> readSpongeBlockEntitiesFromTag(NbtCompound tag)
+    {
+        Map<BlockPos, NbtCompound> blockEntities = new HashMap<>();
+
+        int version = tag.getInt("Version");
+        String tagName = version == 1 ? "TileEntities" : "BlockEntities";
+        NbtList tagList = tag.getList(tagName, Constants.NBT.TAG_COMPOUND);
+
+        final int size = tagList.size();
+
+        for (int i = 0; i < size; ++i)
+        {
+            NbtCompound beTag = tagList.getCompound(i);
+            BlockPos pos = NbtUtils.readBlockPosFromArrayTag(beTag, "Pos");
+
+            if (pos != null && beTag.isEmpty() == false)
+            {
+                beTag.putString("id", beTag.getString("Id"));
+
+                // Remove the Sponge tags from the data that is kept in memory
+                beTag.remove("Id");
+                beTag.remove("Pos");
+
+                if (version == 1)
+                {
+                    beTag.remove("ContentVersion");
+                }
+
+                blockEntities.put(pos, beTag);
+            }
+        }
+
+        return blockEntities;
+    }
+
+    protected List<EntityInfo> readSpongeEntitiesFromTag(NbtCompound tag)
+    {
+        List<EntityInfo> entities = new ArrayList<>();
+        NbtList tagList = tag.getList("Entities", Constants.NBT.TAG_COMPOUND);
+        final int size = tagList.size();
+
+        for (int i = 0; i < size; ++i)
+        {
+            NbtCompound entityData = tagList.getCompound(i);
+            Vec3d pos = NbtUtils.readVec3dFromListTag(entityData);
+
+            if (pos != null && entityData.isEmpty() == false)
+            {
+                entityData.putString("id", entityData.getString("Id"));
+
+                // Remove the Sponge tags from the data that is kept in memory
+                entityData.remove("Id");
+
+                entities.add(new EntityInfo(pos, entityData));
+            }
+        }
+
+        return entities;
+    }
+
+    public boolean readFromSpongeSchematic(String name, NbtCompound tag)
+    {
+        if (isValidSpongeSchematic(tag) == false)
+        {
+            return false;
+        }
+
+        Vec3i size = readSizeFromTagSponge(tag);
+
+        if (this.readSpongeBlocksFromTag(tag, name, size) == false)
+        {
+            return false;
+        }
+
+        this.tileEntities.put(name, this.readSpongeBlockEntitiesFromTag(tag));
+        this.entities.put(name, this.readSpongeEntitiesFromTag(tag));
+
+        if (tag.contains("author", Constants.NBT.TAG_STRING))
+        {
+            this.getMetadata().setAuthor(tag.getString("author"));
+        }
+
+        this.subRegionPositions.put(name, BlockPos.ORIGIN);
+        this.subRegionSizes.put(name, new BlockPos(size));
+        this.metadata.setName(name);
+        this.metadata.setRegionCount(1);
+        this.metadata.setTotalVolume(size.getX() * size.getY() * size.getZ());
+        this.metadata.setEnclosingSize(size);
+        this.metadata.setTimeCreated(System.currentTimeMillis());
+        this.metadata.setTimeModified(this.metadata.getTimeCreated());
+        this.metadata.setTotalBlocks(this.totalBlocksReadFromWorld);
+
+        return true;
+    }
+
+    public boolean readFromVanillaStructure(String name, NbtCompound tag)
     {
         Vec3i size = readSizeFromTagImpl(tag);
 
@@ -1838,43 +2023,30 @@ public class LitematicaSchematic
 
     public boolean readFromFile()
     {
-        return this.readFromFile(this.vanillaStructure);
+        return this.readFromFile(this.schematicType);
     }
 
-    private boolean readFromFile(boolean vanillaStructure)
+    private boolean readFromFile(FileType schematicType)
     {
-        if (this.schematicFile == null)
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.no_file");
-            return false;
-        }
-
-        File file = this.schematicFile;
-
-        if (file.exists() == false || file.canRead() == false)
-        {
-            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", file.getAbsolutePath());
-            return false;
-        }
-
         try
         {
-            NbtCompound nbt = NbtUtils.readNbtFromFile(this.schematicFile);
+            NbtCompound nbt = readNbtFromFile(this.schematicFile);
 
             if (nbt != null)
             {
-                if (vanillaStructure)
+                if (schematicType == FileType.SPONGE_SCHEMATIC)
                 {
                     String name = FileUtils.getNameWithoutExtension(this.schematicFile.getName()) + " (Converted Structure)";
-
-                    if (this.readBlocksFromVanillaStructure(name, nbt))
-                    {
-                        return true;
-                    }
+                    return this.readFromSpongeSchematic(name, nbt);
                 }
-                else if (this.readFromNBT(nbt))
+                if (schematicType == FileType.VANILLA_STRUCTURE)
                 {
-                    return true;
+                    String name = FileUtils.getNameWithoutExtension(this.schematicFile.getName()) + " (Converted Structure)";
+                    return this.readFromVanillaStructure(name, nbt);
+                }
+                else if (schematicType == FileType.LITEMATICA_SCHEMATIC)
+                {
+                    return this.readFromNBT(nbt);
                 }
             }
         }
@@ -1887,24 +2059,70 @@ public class LitematicaSchematic
         return false;
     }
 
-    @Nullable
-    public static LitematicaSchematic createFromFile(File dir, String fileName)
+    public static NbtCompound readNbtFromFile(File file)
     {
-        return createFromFile(dir, fileName, false);
+        if (file == null)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.no_file");
+            return null;
+        }
+
+        if (file.exists() == false || file.canRead() == false)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_read_from_file_failed.cant_read", file.getAbsolutePath());
+            return null;
+        }
+
+        return NbtUtils.readNbtFromFile(file);
     }
 
-    @Nullable
-    public static LitematicaSchematic createFromFile(File dir, String fileName, boolean vanillaStructure)
+    public static File fileFromDirAndName(File dir, String fileName, FileType schematicType)
     {
-        if (fileName.endsWith(FILE_EXTENSION) == false && vanillaStructure == false)
+        if (fileName.endsWith(FILE_EXTENSION) == false && schematicType == FileType.LITEMATICA_SCHEMATIC)
         {
             fileName = fileName + FILE_EXTENSION;
         }
 
-        File file = new File(dir, fileName);
-        LitematicaSchematic schematic = new LitematicaSchematic(file, vanillaStructure);
+        return new File(dir, fileName);
+    }
 
-        return schematic.readFromFile(vanillaStructure) ? schematic : null;
+    @Nullable
+    public static SchematicMetadata readMetadataFromFile(File dir, String fileName)
+    {
+        NbtCompound nbt = readNbtFromFile(fileFromDirAndName(dir, fileName, FileType.LITEMATICA_SCHEMATIC));
+
+        if (nbt != null)
+        {
+            SchematicMetadata metadata = new SchematicMetadata();
+
+            if (nbt.contains("Version", Constants.NBT.TAG_INT))
+            {
+                final int version = nbt.getInt("Version");
+
+                if (version >= 1 && version <= SCHEMATIC_VERSION)
+                {
+                    metadata.readFromNBT(nbt.getCompound("Metadata"));
+                    return metadata;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static LitematicaSchematic createFromFile(File dir, String fileName)
+    {
+        return createFromFile(dir, fileName, FileType.LITEMATICA_SCHEMATIC);
+    }
+
+    @Nullable
+    public static LitematicaSchematic createFromFile(File dir, String fileName, FileType schematicType)
+    {
+        File file = fileFromDirAndName(dir, fileName, schematicType);
+        LitematicaSchematic schematic = new LitematicaSchematic(file, schematicType);
+
+        return schematic.readFromFile(schematicType) ? schematic : null;
     }
 
     public static class EntityInfo

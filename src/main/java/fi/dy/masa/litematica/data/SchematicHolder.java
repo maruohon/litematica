@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.util.FileType;
 
 public class SchematicHolder
 {
@@ -33,7 +34,8 @@ public class SchematicHolder
             }
         }
 
-        LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName());
+        FileType type = FileType.fromFile(file);
+        LitematicaSchematic schematic = LitematicaSchematic.createFromFile(file.getParentFile(), file.getName(), type);
 
         if (schematic != null)
         {
