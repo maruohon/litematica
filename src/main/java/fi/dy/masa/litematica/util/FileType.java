@@ -9,6 +9,7 @@ public enum FileType
     JSON,
     LITEMATICA_SCHEMATIC,
     SCHEMATICA_SCHEMATIC,
+    SPONGE_SCHEMATIC,
     VANILLA_STRUCTURE;
 
     public static FileType fromFile(File file)
@@ -28,6 +29,10 @@ public enum FileType
             else if (name.endsWith(".nbt"))
             {
                 return VANILLA_STRUCTURE;
+            }
+            else if (name.endsWith(".schem"))
+            {
+                return SPONGE_SCHEMATIC;
             }
             else if (name.endsWith(".json"))
             {

@@ -139,19 +139,42 @@ public class WorldUtils
     }
 
     public static boolean convertStructureToLitematicaSchematic(File structureDir, String structureFileName,
-            File outputDir, String outputFileName, boolean ignoreEntities, boolean override, IStringConsumer feedback)
+            File outputDir, String outputFileName, boolean override)
     {
-        LitematicaSchematic litematicaSchematic = convertStructureToLitematicaSchematic(structureDir, structureFileName, ignoreEntities, feedback);
+        LitematicaSchematic litematicaSchematic = convertStructureToLitematicaSchematic(structureDir, structureFileName);
         return litematicaSchematic != null && litematicaSchematic.writeToFile(outputDir, outputFileName, override);
     }
 
     @Nullable
-    public static LitematicaSchematic convertStructureToLitematicaSchematic(File structureDir, String structureFileName,
-            boolean ignoreEntities, IStringConsumer feedback)
+    public static LitematicaSchematic convertSpongeSchematicToLitematicaSchematic(File dir, String fileName)
     {
         try
         {
-            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(structureDir, structureFileName, true);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(dir, fileName, FileType.SPONGE_SCHEMATIC);
+
+            if (schematic == null)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Failed to read the Sponge schematic from '" + fileName + '"');
+            }
+
+            return schematic;
+        }
+        catch (Exception e)
+        {
+            String msg = "Exception while trying to load the Sponge schematic: " + e.getMessage();
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, msg);
+            Litematica.logger.error(msg);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static LitematicaSchematic convertStructureToLitematicaSchematic(File structureDir, String structureFileName)
+    {
+        try
+        {
+            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(structureDir, structureFileName, FileType.VANILLA_STRUCTURE);
 
             if (litematicaSchematic == null)
             {
