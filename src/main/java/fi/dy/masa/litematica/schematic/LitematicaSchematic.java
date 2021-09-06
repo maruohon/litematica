@@ -1890,11 +1890,18 @@ public class LitematicaSchematic
     {
         public final boolean visibleOnly;
         public final boolean ignoreEntities;
+        public final boolean fromSchematicWorld;
 
         public SchematicSaveInfo(boolean visibleOnly, boolean ignoreEntities)
         {
+            this (visibleOnly, ignoreEntities, false);
+        }
+
+        public SchematicSaveInfo(boolean visibleOnly, boolean ignoreEntities, boolean fromSchematicWorld)
+        {
             this.visibleOnly = visibleOnly;
             this.ignoreEntities = ignoreEntities;
+            this.fromSchematicWorld = fromSchematicWorld;
         }
     }
 }

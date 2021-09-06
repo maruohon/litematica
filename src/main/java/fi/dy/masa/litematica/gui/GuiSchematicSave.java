@@ -21,7 +21,7 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
-    private final SelectionManager selectionManager;
+    protected final SelectionManager selectionManager;
 
     public GuiSchematicSave()
     {
@@ -78,14 +78,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         }
         else
         {
-            this.mc.execute(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    GuiSchematicSave.this.refreshList();
-                }
-            });
+            this.mc.execute(GuiSchematicSave.this::refreshList);
         }
     }
 
@@ -167,7 +160,8 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                         String author = this.gui.mc.player.getName().getString();
                         boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
                         boolean visibleOnly = this.gui.checkboxVisibleOnly.isChecked();
-                        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(visibleOnly, ignoreEntities);
+                        boolean fromSchematicWorld = this.gui.checkboxSaveFromSchematicWorld.isChecked();
+                        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(visibleOnly, ignoreEntities, fromSchematicWorld);
                         LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
                         TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, info, overwrite);
                         task.setCompletionListener(this.gui);
