@@ -10,14 +10,12 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -49,6 +47,7 @@ import fi.dy.masa.malilib.gui.LeftRight;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.Color4f;
 import fi.dy.masa.malilib.util.GuiUtils;
+import fi.dy.masa.malilib.util.InventoryUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
 
 public class OverlayRenderer
@@ -556,6 +555,9 @@ public class OverlayRenderer
 
         BlockState stateClient = mc.world.getBlockState(pos);
         BlockState stateSchematic = worldSchematic.getBlockState(pos);
+        boolean hasInvClient = InventoryUtils.getInventory(worldClient, pos) != null;
+        boolean hasInvSchematic = InventoryUtils.getInventory(worldSchematic, pos) != null;
+        int invHeight = 0;
 
         int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
         BlockInfoAlignment align = (BlockInfoAlignment) Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getOptionListValue();
@@ -563,43 +565,37 @@ public class OverlayRenderer
         ItemUtils.setItemForBlock(worldSchematic, pos, stateSchematic);
         ItemUtils.setItemForBlock(mc.world, pos, stateClient);
 
+        if (hasInvClient && hasInvSchematic)
+        {
+            invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
+        }
+        else if (hasInvClient)
+        {
+            invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.RIGHT, offY, worldClient, pos, mc);
+        }
+        else if (hasInvSchematic)
+        {
+            invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.LEFT, offY, worldSchematic, pos, mc);
+        }
+
         // Not just a missing block
         if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
         {
-            int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
-
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
             this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
             info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA_BLOCK)
         {
-            int invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.CENTER, offY, worldClient, pos, mc);
-
             BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
             this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
             info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            BlockEntity te = worldClient.getBlockEntity(pos);
-
-            if (te instanceof Inventory)
-            {
-                int invHeight = RenderUtils.renderInventoryOverlays(align, offY, worldSchematic, worldClient, pos, mc);
-
-                BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
-                this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-                info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
-            }
-            else
-            {
-                int invHeight = RenderUtils.renderInventoryOverlay(align, LeftRight.CENTER, offY, worldSchematic, pos, mc);
-
-                BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
-                this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
-                info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
-            }
+            BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
+            this.getOverlayPosition(align, info.getTotalWidth(), info.getTotalHeight(), offY, invHeight, mc);
+            info.render(this.blockInfoX, this.blockInfoY, mc, matrixStack);
         }
     }
 
