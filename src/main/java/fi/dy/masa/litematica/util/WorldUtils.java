@@ -412,7 +412,9 @@ public class WorldUtils
 
         if (Configs.Generic.EASY_PLACE_FIRST.getBooleanValue())
         {
-            traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6);
+            // Temporary hack, using this same config here
+            boolean targetFluids = Configs.InfoOverlays.INFO_OVERLAYS_TARGET_FLUIDS.getBooleanValue();
+            traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true, targetFluids, false);
         }
         else
         {
