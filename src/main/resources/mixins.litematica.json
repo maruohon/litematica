@@ -10,6 +10,8 @@
         "IMixinRedstoneWireBlock",
         "IMixinStairsBlock",
         "IMixinVineBlock",
+        "MixinBlock",
+        "MixinBlockItem",
         "MixinBlockStateFlattening",
         "MixinClientPlayNetworkHandler",
         "MixinClientWorld",
@@ -19,6 +21,7 @@
         "MixinMinecraftClient",
         "MixinModelOverrideList",
         "MixinRailBlocks",
+        "MixinWorld",
         "MixinWorldChunk",
         "MixinWorldRenderer"
     ],

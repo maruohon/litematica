@@ -1,6 +1,8 @@
 package fi.dy.masa.litematica.util;
 
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Set;
 import net.minecraft.block.AbstractSkullBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -21,6 +23,34 @@ import net.minecraft.world.World;
 public class ItemUtils
 {
     private static final IdentityHashMap<BlockState, ItemStack> ITEMS_FOR_STATES = new IdentityHashMap<>();
+
+    public static boolean areTagsEqualIgnoreDamage(ItemStack stackReference, ItemStack stackToCheck)
+    {
+        NbtCompound tagReference = stackReference.getNbt();
+        NbtCompound tagToCheck = stackToCheck.getNbt();
+
+        if (tagReference != null && tagToCheck != null)
+        {
+            Set<String> keysReference = new HashSet<>(tagReference.getKeys());
+
+            for (String key : keysReference)
+            {
+                if (key.equals("Damage"))
+                {
+                    continue;
+                }
+
+                if (tagReference.get(key).equals(tagToCheck.get(key)) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return (tagReference == null) && (tagToCheck == null);
+    }
 
     public static ItemStack getItemForState(BlockState state)
     {
@@ -107,7 +137,7 @@ public class ItemUtils
             NbtCompound tagSkull = new NbtCompound();
 
             tagSkull.put("SkullOwner", tagOwner);
-            stack.setTag(tagSkull);
+            stack.setNbt(tagSkull);
 
             return stack;
         }
@@ -118,8 +148,8 @@ public class ItemUtils
 
             tagList.add(NbtString.of("(+NBT)"));
             tagLore.put("Lore", tagList);
-            stack.putSubTag("display", tagLore);
-            stack.putSubTag("BlockEntityTag", nbt);
+            stack.setSubNbt("display", tagLore);
+            stack.setSubNbt("BlockEntityTag", nbt);
 
             return stack;
         }
@@ -132,8 +162,8 @@ public class ItemUtils
             Identifier rl = Registry.ITEM.getId(stack.getItem());
 
             return String.format("[%s - display: %s - NBT: %s] (%s)",
-                    rl != null ? rl.toString() : "null", stack.getName().getString(),
-                    stack.getTag() != null ? stack.getTag().toString() : "<no NBT>", stack.toString());
+                                 rl != null ? rl.toString() : "null", stack.getName().getString(),
+                                 stack.getNbt() != null ? stack.getNbt().toString() : "<no NBT>", stack);
         }
 
         return "<empty>";

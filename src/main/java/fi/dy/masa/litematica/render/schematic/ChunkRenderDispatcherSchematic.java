@@ -62,7 +62,7 @@ public class ChunkRenderDispatcherSchematic
     {
         int diameter = viewDistance * 2 + 1;
         this.sizeX = diameter;
-        this.sizeY = this.world.countVerticalSections();
+        this.sizeY = this.world.getHeight() >> 4;
         this.sizeZ = diameter;
     }
 
@@ -104,7 +104,7 @@ public class ChunkRenderDispatcherSchematic
 
     public void scheduleChunkRender(int chunkX, int chunkY, int chunkZ, boolean immediate)
     {
-        int bottomSectionY = this.world.getBottomSectionCoord();
+        int bottomSectionY = this.world.getBottomY() >> 4;
 
         if (chunkY >= bottomSectionY && chunkY < bottomSectionY + this.sizeY)
         {

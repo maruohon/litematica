@@ -73,7 +73,7 @@ public class ChunkSchematic extends WorldChunk
         BlockState stateOld = this.getBlockState(pos);
         int y = pos.getY();
 
-        if (stateOld == state || y >= this.topY || y < bottomY)
+        if (stateOld == state || y >= this.topY || y < this.bottomY)
         {
             return null;
         }

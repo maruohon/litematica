@@ -282,13 +282,10 @@ public class WorldSchematic extends World
 
     public void scheduleChunkRenders(int chunkX, int chunkZ)
     {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        int renderDistanceChunks = mc.options.viewDistance / 16 + 2;
-        int cameraChunkY = (mc.gameRenderer.getCamera().getBlockPos().getY()) / 16;
-        int startChunkY = Math.max(this.getBottomSectionCoord(), cameraChunkY - renderDistanceChunks);
-        int endChunkY = Math.min(this.getTopSectionCoord(), cameraChunkY + renderDistanceChunks);
+        int startChunkY = this.getBottomSectionCoord();
+        int endChunkY = this.getTopSectionCoord() - 1;
 
-        for (int chunkY = startChunkY; chunkY < endChunkY; ++chunkY)
+        for (int chunkY = startChunkY; chunkY <= endChunkY; ++chunkY)
         {
             this.worldRenderer.scheduleChunkRenders(chunkX, chunkY, chunkZ);
         }
@@ -328,6 +325,62 @@ public class WorldSchematic extends World
     public int getHeight()
     {
         return this.mc.world != null ? this.mc.world.getHeight() : 384;
+    }
+
+    // The following HeightLimitView overrides are to work around an incompatibility with Lithium 0.7.4+
+
+    @Override
+    public int getTopY()
+    {
+        return this.getBottomY() + this.getHeight();
+    }
+
+    @Override
+    public int getBottomSectionCoord()
+    {
+        return this.getBottomY() >> 4;
+    }
+
+    @Override
+    public int getTopSectionCoord()
+    {
+        return this.getTopY() >> 4;
+    }
+
+    @Override
+    public int countVerticalSections()
+    {
+        return this.getTopSectionCoord() - this.getBottomSectionCoord();
+    }
+
+    @Override
+    public boolean isOutOfHeightLimit(BlockPos pos)
+    {
+        return this.isOutOfHeightLimit(pos.getY());
+    }
+
+    @Override
+    public boolean isOutOfHeightLimit(int y)
+    {
+        return (y < this.getBottomY()) || (y >= this.getTopY());
+    }
+
+    @Override
+    public int getSectionIndex(int y)
+    {
+        return (y >> 4) - (this.getBottomY() >> 4);
+    }
+
+    @Override
+    public int sectionCoordToIndex(int coord)
+    {
+        return coord - (this.getBottomY() >> 4);
+    }
+
+    @Override
+    public int sectionIndexToCoord(int index)
+    {
+        return index + (this.getBottomY() >> 4);
     }
 
     @Override

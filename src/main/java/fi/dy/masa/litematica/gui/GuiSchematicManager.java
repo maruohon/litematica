@@ -323,7 +323,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
             if (schematic != null)
             {
                 schematic.getMetadata().setName(string);
-                schematic.getMetadata().setTimeModified(System.currentTimeMillis());
+                schematic.getMetadata().setTimeModifiedToNow();
 
                 if (schematic.writeToFile(this.dir, this.fileName, true))
                 {
@@ -404,7 +404,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                     int[] pixels = scaled.makePixelArray();
 
                     schematic.getMetadata().setPreviewImagePixelData(pixels);
-                    schematic.getMetadata().setTimeModified(System.currentTimeMillis());
+                    schematic.getMetadata().setTimeModifiedToNow();
 
                     schematic.writeToFile(this.dir, this.fileName, true);
 

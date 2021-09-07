@@ -36,6 +36,14 @@ public class EntityUtils
 
     public static boolean hasToolItem(LivingEntity entity)
     {
+        return hasToolItemInHand(entity, Hand.MAIN_HAND) ||
+               hasToolItemInHand(entity, Hand.OFF_HAND);
+    }
+
+    public static boolean hasToolItemInHand(LivingEntity entity, Hand hand)
+    {
+        // If the configured tool item has NBT data, then the NBT is compared, otherwise it's ignored
+
         ItemStack toolItem = DataManager.getToolItem();
 
         if (toolItem.isEmpty())
@@ -43,31 +51,14 @@ public class EntityUtils
             return entity.getMainHandStack().isEmpty();
         }
 
-        return isHoldingItem(entity, toolItem);
-    }
+        ItemStack stackHand = entity.getStackInHand(hand);
 
-    public static boolean isHoldingItem(LivingEntity entity, ItemStack stackReference)
-    {
-        return getHeldItemOfType(entity, stackReference).isEmpty() == false;
-    }
-
-    public static ItemStack getHeldItemOfType(LivingEntity entity, ItemStack stackReference)
-    {
-        ItemStack stack = entity.getMainHandStack();
-
-        if (stack.isEmpty() == false && areStacksEqualIgnoreDurability(stack, stackReference))
+        if (ItemStack.areItemsEqualIgnoreDamage(toolItem, stackHand))
         {
-            return stack;
+            return toolItem.hasNbt() == false || ItemUtils.areTagsEqualIgnoreDamage(toolItem, stackHand);
         }
 
-        stack = entity.getOffHandStack();
-
-        if (stack.isEmpty() == false && areStacksEqualIgnoreDurability(stack, stackReference))
-        {
-            return stack;
-        }
-
-        return ItemStack.EMPTY;
+        return false;
     }
 
     /**
@@ -97,7 +88,7 @@ public class EntityUtils
 
     public static boolean areStacksEqualIgnoreDurability(ItemStack stack1, ItemStack stack2)
     {
-        return ItemStack.areItemsEqualIgnoreDamage(stack1, stack2) && ItemStack.areTagsEqual(stack1, stack2);
+        return ItemStack.areItemsEqualIgnoreDamage(stack1, stack2) && ItemStack.areNbtEqual(stack1, stack2);
     }
 
     public static Direction getHorizontalLookingDirection(Entity entity)
@@ -165,7 +156,7 @@ public class EntityUtils
                 return entity;
             }
         }
-        catch (Exception e)
+        catch (Exception ignore)
         {
         }
 
@@ -233,9 +224,8 @@ public class EntityUtils
         entity.setPitch(pitch);
         entity.prevPitch = pitch;
 
-        if (entity instanceof LivingEntity)
+        if (entity instanceof LivingEntity livingBase)
         {
-            LivingEntity livingBase = (LivingEntity) entity;
             livingBase.headYaw = yaw;
             livingBase.bodyYaw = yaw;
             livingBase.prevHeadYaw = yaw;

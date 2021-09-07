@@ -9,9 +9,12 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.brigadier.StringReader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import fi.dy.masa.litematica.Litematica;
@@ -41,6 +44,7 @@ public class DataManager implements IDirectoryCache
 {
     private static final DataManager INSTANCE = new DataManager();
 
+    private static final Pattern PATTERN_ITEM_NBT = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)(?<nbt>\\{.*\\})$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
 
@@ -437,9 +441,9 @@ public class DataManager implements IDirectoryCache
         return new File(dir, StringUtils.getStorageFileName(globalData, Reference.MOD_ID + "_", ".json", "default"));
     }
 
-    public static void setToolItem(String itemName)
+    public static void setToolItem(String itemNameIn)
     {
-        if (itemName.isEmpty() || itemName.equals("empty"))
+        if (itemNameIn.isEmpty() || itemNameIn.equals("empty"))
         {
             toolItem = ItemStack.EMPTY;
             return;
@@ -447,20 +451,35 @@ public class DataManager implements IDirectoryCache
 
         try
         {
-            Matcher matcher = PATTERN_ITEM_BASE.matcher(itemName);
+            Matcher matcherNbt = PATTERN_ITEM_NBT.matcher(itemNameIn);
+            Matcher matcherBase = PATTERN_ITEM_BASE.matcher(itemNameIn);
 
-            if (matcher.matches())
+            String itemName = null;
+            NbtCompound nbt = null;
+
+            if (matcherNbt.matches())
             {
-                Item item = Registry.ITEM.get(new Identifier(matcher.group("name")));
+                itemName = matcherNbt.group("name");
+                nbt = (new StringNbtReader(new StringReader(matcherNbt.group("nbt")))).parseCompound();
+            }
+            else if (matcherBase.matches())
+            {
+                itemName = matcherBase.group("name");
+            }
+
+            if (itemName != null)
+            {
+                Item item = Registry.ITEM.get(new Identifier(itemName));
 
                 if (item != null && item != Items.AIR)
                 {
                     toolItem = new ItemStack(item);
+                    toolItem.setNbt(nbt);
                     return;
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception ignore)
         {
         }
 

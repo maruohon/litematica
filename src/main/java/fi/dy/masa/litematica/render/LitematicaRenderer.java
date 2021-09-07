@@ -228,15 +228,6 @@ public class LitematicaRenderer
             fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
             //TODO: RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240.0F, 240.0F);
 
-            if (renderThrough)
-            {
-                RenderSystem.disableDepthTest();
-            }
-            else
-            {
-                RenderSystem.enableDepthTest();
-            }
-
             this.getWorldRenderer().renderBlockOverlays(matrices, this.getCamera(), projMatrix);
 
             RenderSystem.enableDepthTest();
