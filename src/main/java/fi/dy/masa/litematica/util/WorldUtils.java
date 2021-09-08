@@ -635,6 +635,10 @@ public class WorldUtils
             {
                 return state.get(RailBlock.SHAPE).ordinal();
             }
+            else if (stateBlock instanceof DetectorRailBlock)
+            {
+                return state.get(DetectorRailBlock.SHAPE).ordinal();
+            }
             else
             {
                 return state.get(PoweredRailBlock.SHAPE).ordinal();
