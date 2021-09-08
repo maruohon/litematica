@@ -13,6 +13,10 @@ import com.mojang.datafixers.DataFixer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.AbstractRailBlock;
+import net.minecraft.block.DetectorRailBlock;
+import net.minecraft.block.RailBlock;
+import net.minecraft.block.PoweredRailBlock;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.SlabBlock;
@@ -396,7 +400,7 @@ public class WorldUtils
 
             if (result == ActionResult.FAIL)
             {
-                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.easy_place_fail");
+                //InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.easy_place_fail");
                 return true;
             }
 
@@ -576,6 +580,7 @@ public class WorldUtils
         double z = hitVecIn.z;
         Block block = state.getBlock();
         Direction facing = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
+        Integer railEnumCode = getRailShapeOrder(state);
         final int propertyIncrement = 32;
         double relX = hitVecIn.x - pos.getX();
 
@@ -583,7 +588,10 @@ public class WorldUtils
         {
             x = pos.getX() + relX + 2 + (facing.getId() * 2);
         }
-
+        if (railEnumCode != null)
+        {
+            x = pos.getX() + relX + 2 + (railEnumCode * 2);
+        }
         if (block instanceof RepeaterBlock)
         {
             x += ((state.get(RepeaterBlock.DELAY))) * propertyIncrement;
@@ -614,8 +622,28 @@ public class WorldUtils
                 y = pos.getY();
             }
         }
-
         return new Vec3d(x, y, z);
+    }
+
+    @Nullable
+    public static Integer getRailShapeOrder(BlockState state)
+    {
+        Block stateBlock = state.getBlock();
+        if (stateBlock instanceof AbstractRailBlock)
+        {
+            if (stateBlock instanceof RailBlock)
+            {
+                return state.get(RailBlock.SHAPE).ordinal();
+            }
+            else
+            {
+                return state.get(PoweredRailBlock.SHAPE).ordinal();
+            }
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public static <T extends Comparable<T>> Vec3d applyPlacementProtocolV3(BlockPos pos, BlockState state, Vec3d hitVecIn)
