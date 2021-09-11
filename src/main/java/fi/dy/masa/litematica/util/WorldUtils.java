@@ -385,7 +385,7 @@ public class WorldUtils
         if (mc.player != null && DataManager.getToolMode() != ToolMode.REBUILD &&
             Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
-            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
+                (Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() || Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().getKeysDisplayString() == ""))
         {
             WorldUtils.doEasyPlaceAction(mc);
         }
