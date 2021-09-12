@@ -44,6 +44,7 @@
 
     "litematica.error.schematic_read_from_file_failed.cant_read": "Не удалось прочитать схему из файла \"%s\"",
     "litematica.error.schematic_read_from_file_failed.exception": "Исключение при попытке чтения схемы из файла \"%s\"",
+    "litematica.error.schematic_read_from_file_failed.no_file": "Не удалось прочитать схему из файла: файл недоступен (возможно, временная схема?)",
 
     "litematica.error.schematic_projects.empty_selection": "Пустая область выделения (0 подрегионов)",
     "litematica.error.schematic_projects.failed_to_load_project": "Не удалось загрузить проект",
@@ -110,6 +111,7 @@
     "litematica.gui.button.hover.material_list_shift_to_select_sub_regions": "Удерживайте Shift, чтобы выбрать подрегионы для списка материалов",
     "litematica.gui.button.hover.plus_minus_tip": "ЛКМ для увеличения\nПКМ для уменьшения\nShift и/или Alt для увеличения размера шага",
     "litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift": "ЛКМ для увеличения\nПКМ для уменьшения\nShift/Alt/Ctrl для умножения размера шага",
+    "litematica.gui.button.hover.schematic_list.reload_schematic": "Перезагружает сжему из файла.\nМожет быть полезно, если вы безвозвратно\nповредили схему в режиме редактирования.",
     "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode": "Сейчас открыт проект схемы.\nПроекты схем переопределяют обычный функционал\nобластей выделения.",
     "litematica.gui.button.hover.schematic_projects.delete_area": "§6Удалить последнюю размещённую или сохранённую область§r",
     "litematica.gui.button.hover.schematic_projects.move_origin_to_player": "Переместить точку привязки проекта к текущей пощиции игрока.\nЭто также переместит область выделения и размещение.",
@@ -185,6 +187,7 @@
     "litematica.gui.button.mirror_value": "Отразить: %s",
     "litematica.gui.button.move_to_player": "К игроку",
     "litematica.gui.button.ok": "Применить",
+    "litematica.gui.button.reload": "Перезагрузить",
     "litematica.gui.button.remove": "Удалить",
     "litematica.gui.button.remove_placement": "Удалить размещение",
     "litematica.gui.button.rename": "Переименовать",
@@ -220,6 +223,8 @@
 
     "litematica.gui.label.block_info_list_type.all": "Вся схема",
     "litematica.gui.label.block_info_list_type.render_layers": "Видимые слои",
+
+    "litematica.gui.label.loaded_schematic.modified_on": "§6Изменено %s§r",
 
     "litematica.gui.label.material_list.abbr.shulker_box": "шалкеровых ящика(ов)",
     "litematica.gui.label.material_list.title.available": "Доступно",
