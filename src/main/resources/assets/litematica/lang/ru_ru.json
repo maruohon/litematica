@@ -111,7 +111,7 @@
     "litematica.gui.button.hover.material_list_shift_to_select_sub_regions": "Удерживайте Shift, чтобы выбрать подрегионы для списка материалов",
     "litematica.gui.button.hover.plus_minus_tip": "ЛКМ для увеличения\nПКМ для уменьшения\nShift и/или Alt для увеличения размера шага",
     "litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift": "ЛКМ для увеличения\nПКМ для уменьшения\nShift/Alt/Ctrl для умножения размера шага",
-    "litematica.gui.button.hover.schematic_list.reload_schematic": "Перезагружает сжему из файла.\nМожет быть полезно, если вы безвозвратно\nповредили схему в режиме редактирования.",
+    "litematica.gui.button.hover.schematic_list.reload_schematic": "Перезагружает схему из файла.\nМожет быть полезно, если вы безвозвратно\nповредили схему в режиме редактирования.",
     "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode": "Сейчас открыт проект схемы.\nПроекты схем переопределяют обычный функционал\nобластей выделения.",
     "litematica.gui.button.hover.schematic_projects.delete_area": "§6Удалить последнюю размещённую или сохранённую область§r",
     "litematica.gui.button.hover.schematic_projects.move_origin_to_player": "Переместить точку привязки проекта к текущей пощиции игрока.\nЭто также переместит область выделения и размещение.",
