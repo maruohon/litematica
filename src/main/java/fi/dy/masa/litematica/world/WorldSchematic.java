@@ -23,11 +23,14 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.TagManager;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.DynamicRegistryManager;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.TickScheduler;
@@ -38,12 +41,15 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class WorldSchematic extends World
 {
+    private static final RegistryKey<World> REGISTRY_KEY = RegistryKey.of(Registry.WORLD_KEY, new Identifier(Reference.MOD_ID, "schematic_world"));
+
     private final MinecraftClient mc;
     private final WorldRendererSchematic worldRenderer;
     private final ChunkManagerSchematic chunkManagerSchematic;
@@ -52,7 +58,7 @@ public class WorldSchematic extends World
 
     protected WorldSchematic(MutableWorldProperties mutableWorldProperties, DimensionType dimensionType, Supplier<Profiler> supplier)
     {
-        super(mutableWorldProperties, null, dimensionType, supplier, true, true, 0L);
+        super(mutableWorldProperties, REGISTRY_KEY, dimensionType, supplier, true, true, 0L);
 
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
