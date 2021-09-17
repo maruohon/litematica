@@ -22,10 +22,10 @@ import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -237,9 +237,9 @@ public class MaterialCache
         }
     }
 
-    protected CompoundTag writeToNBT()
+    protected NbtCompound writeToNBT()
     {
-        CompoundTag nbt = new CompoundTag();
+        NbtCompound nbt = new NbtCompound();
 
         nbt.put("MaterialCache", this.writeMapToNBT(this.buildItemsForStates));
         nbt.put("DisplayMaterialCache", this.writeMapToNBT(this.displayItemsForStates));
@@ -247,17 +247,17 @@ public class MaterialCache
         return nbt;
     }
 
-    protected ListTag writeMapToNBT(IdentityHashMap<BlockState, ItemStack> map)
+    protected NbtList writeMapToNBT(IdentityHashMap<BlockState, ItemStack> map)
     {
-        ListTag list = new ListTag();
+        NbtList list = new NbtList();
 
         for (Map.Entry<BlockState, ItemStack> entry : map.entrySet())
         {
-            CompoundTag tag = new CompoundTag();
-            CompoundTag stateTag = NbtHelper.fromBlockState(entry.getKey());
+            NbtCompound tag = new NbtCompound();
+            NbtCompound stateTag = NbtHelper.fromBlockState(entry.getKey());
 
             tag.put("Block", stateTag);
-            tag.put("Item", entry.getValue().toTag(new CompoundTag()));
+            tag.put("Item", entry.getValue().writeNbt(new NbtCompound()));
 
             list.add(tag);
         }
@@ -265,7 +265,7 @@ public class MaterialCache
         return list;
     }
 
-    protected void readFromNBT(CompoundTag nbt)
+    protected void readFromNBT(NbtCompound nbt)
     {
         this.buildItemsForStates.clear();
         this.displayItemsForStates.clear();
@@ -274,16 +274,16 @@ public class MaterialCache
         this.readMapFromNBT(nbt, "DisplayMaterialCache", this.displayItemsForStates);
     }
 
-    protected void readMapFromNBT(CompoundTag nbt, String tagName, IdentityHashMap<BlockState, ItemStack> map)
+    protected void readMapFromNBT(NbtCompound nbt, String tagName, IdentityHashMap<BlockState, ItemStack> map)
     {
         if (nbt.contains(tagName, Constants.NBT.TAG_LIST))
         {
-            ListTag list = nbt.getList(tagName, Constants.NBT.TAG_COMPOUND);
+            NbtList list = nbt.getList(tagName, Constants.NBT.TAG_COMPOUND);
             final int count = list.size();
 
             for (int i = 0; i < count; ++i)
             {
-                CompoundTag tag = list.getCompound(i);
+                NbtCompound tag = list.getCompound(i);
 
                 if (tag.contains("Block", Constants.NBT.TAG_COMPOUND) &&
                     tag.contains("Item", Constants.NBT.TAG_COMPOUND))
@@ -292,7 +292,7 @@ public class MaterialCache
 
                     if (state != null)
                     {
-                        ItemStack stack = ItemStack.fromTag(tag.getCompound("Item"));
+                        ItemStack stack = ItemStack.fromNbt(tag.getCompound("Item"));
                         this.buildItemsForStates.put(state, stack);
                     }
                 }
@@ -355,7 +355,7 @@ public class MaterialCache
         try
         {
             FileInputStream is = new FileInputStream(file);
-            CompoundTag nbt = NbtIo.readCompressed(is);
+            NbtCompound nbt = NbtIo.readCompressed(is);
             is.close();
 
             if (nbt != null)

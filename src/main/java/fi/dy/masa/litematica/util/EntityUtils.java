@@ -10,8 +10,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -153,11 +153,11 @@ public class EntityUtils
     }
 
     @Nullable
-    private static Entity createEntityFromNBTSingle(CompoundTag nbt, World world)
+    private static Entity createEntityFromNBTSingle(NbtCompound nbt, World world)
     {
         try
         {
-            Optional<Entity> optional = EntityType.getEntityFromTag(nbt, world);
+            Optional<Entity> optional = EntityType.getEntityFromNbt(nbt, world);
 
             if (optional.isPresent())
             {
@@ -180,7 +180,7 @@ public class EntityUtils
      * @return
      */
     @Nullable
-    public static Entity createEntityAndPassengersFromNBT(CompoundTag nbt, World world)
+    public static Entity createEntityAndPassengersFromNBT(NbtCompound nbt, World world)
     {
         Entity entity = createEntityFromNBTSingle(nbt, world);
 
@@ -192,7 +192,7 @@ public class EntityUtils
         {
             if (nbt.contains("Passengers", Constants.NBT.TAG_LIST))
             {
-                ListTag taglist = nbt.getList("Passengers", Constants.NBT.TAG_COMPOUND);
+                NbtList taglist = nbt.getList("Passengers", Constants.NBT.TAG_COMPOUND);
 
                 for (int i = 0; i < taglist.size(); ++i)
                 {

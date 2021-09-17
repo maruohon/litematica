@@ -33,7 +33,7 @@ import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.Instrument;
 import net.minecraft.block.enums.WireConnection;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
@@ -57,7 +57,7 @@ public class SchematicConversionFixers
                           .with(RedstoneWireBlock.WIRE_CONNECTION_WEST, WireConnection.SIDE);
 
     public static final IStateFixer FIXER_BANNER = (reader, state, pos) -> {
-        CompoundTag tag = reader.getBlockEntityData(pos);
+        NbtCompound tag = reader.getBlockEntityData(pos);
 
         if (tag != null)
         {
@@ -96,7 +96,7 @@ public class SchematicConversionFixers
     };
 
     public static final IStateFixer FIXER_BANNER_WALL = (reader, state, pos) -> {
-        CompoundTag tag = reader.getBlockEntityData(pos);
+        NbtCompound tag = reader.getBlockEntityData(pos);
 
         if (tag != null)
         {
@@ -135,7 +135,7 @@ public class SchematicConversionFixers
     };
 
     public static final IStateFixer FIXER_BED = (reader, state, pos) -> {
-        CompoundTag tag = reader.getBlockEntityData(pos);
+        NbtCompound tag = reader.getBlockEntityData(pos);
 
         if (tag != null && tag.contains("color", Constants.NBT.TAG_INT))
         {
@@ -260,7 +260,7 @@ public class SchematicConversionFixers
     };
 
     public static final IStateFixer FIXER_FLOWER_POT = (reader, state, pos) -> {
-        CompoundTag tag = reader.getBlockEntityData(pos);
+        NbtCompound tag = reader.getBlockEntityData(pos);
 
         if (tag != null)
         {
@@ -309,7 +309,7 @@ public class SchematicConversionFixers
     };
 
     public static final IStateFixer FIXER_NOTE_BLOCK = (reader, state, pos) -> {
-        CompoundTag tag = reader.getBlockEntityData(pos);
+        NbtCompound tag = reader.getBlockEntityData(pos);
 
         if (tag != null)
         {
@@ -355,7 +355,7 @@ public class SchematicConversionFixers
     };
 
     public static final IStateFixer FIXER_SKULL = (reader, state, pos) -> {
-        CompoundTag tag = reader.getBlockEntityData(pos);
+        NbtCompound tag = reader.getBlockEntityData(pos);
 
         if (tag != null)
         {
@@ -402,7 +402,7 @@ public class SchematicConversionFixers
     };
 
     public static final IStateFixer FIXER_SKULL_WALL = (reader, state, pos) -> {
-        CompoundTag tag = reader.getBlockEntityData(pos);
+        NbtCompound tag = reader.getBlockEntityData(pos);
 
         if (tag != null)
         {

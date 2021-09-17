@@ -16,7 +16,7 @@ import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SkullItem;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -347,7 +347,7 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
             try
             {
-                keys.addAll(be.toTag(new CompoundTag()).getKeys());
+                keys.addAll(be.writeNbt(new NbtCompound()).getKeys());
             } catch (Exception ignore) {}
 
             keys.remove("id");
@@ -481,11 +481,11 @@ public class TaskPasteSchematicSetblock extends TaskBase implements IInfoHudRend
 
     public static void addBlockEntityNbt(ItemStack stack, BlockEntity be)
     {
-        CompoundTag tag = be.toTag(new CompoundTag());
+        NbtCompound tag = be.writeNbt(new NbtCompound());
 
         if (stack.getItem() instanceof SkullItem && tag.contains("SkullOwner"))
         {
-            CompoundTag ownerTag = tag.getCompound("SkullOwner");
+            NbtCompound ownerTag = tag.getCompound("SkullOwner");
             stack.getOrCreateTag().put("SkullOwner", ownerTag);
         }
         else

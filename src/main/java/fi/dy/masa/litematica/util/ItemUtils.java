@@ -10,9 +10,9 @@ import net.minecraft.block.enums.SlabType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -98,13 +98,13 @@ public class ItemUtils
 
     public static ItemStack storeTEInStack(ItemStack stack, BlockEntity te)
     {
-        CompoundTag nbt = te.toTag(new CompoundTag());
+        NbtCompound nbt = te.writeNbt(new NbtCompound());
 
         if (nbt.contains("Owner") && stack.getItem() instanceof BlockItem &&
             ((BlockItem) stack.getItem()).getBlock() instanceof AbstractSkullBlock)
         {
-            CompoundTag tagOwner = nbt.getCompound("Owner");
-            CompoundTag tagSkull = new CompoundTag();
+            NbtCompound tagOwner = nbt.getCompound("Owner");
+            NbtCompound tagSkull = new NbtCompound();
 
             tagSkull.put("SkullOwner", tagOwner);
             stack.setTag(tagSkull);
@@ -113,10 +113,10 @@ public class ItemUtils
         }
         else
         {
-            CompoundTag tagLore = new CompoundTag();
-            ListTag tagList = new ListTag();
+            NbtCompound tagLore = new NbtCompound();
+            NbtList tagList = new NbtList();
 
-            tagList.add(StringTag.of("(+NBT)"));
+            tagList.add(NbtString.of("(+NBT)"));
             tagLore.put("Lore", tagList);
             stack.putSubTag("display", tagLore);
             stack.putSubTag("BlockEntityTag", nbt);

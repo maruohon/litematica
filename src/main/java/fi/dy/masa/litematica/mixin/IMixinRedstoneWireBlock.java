@@ -10,6 +10,6 @@ import net.minecraft.world.BlockView;
 @Mixin(RedstoneWireBlock.class)
 public interface IMixinRedstoneWireBlock
 {
-    @Invoker("method_27840")
+    @Invoker("getPlacementState")
     BlockState litematicaGetFullState(BlockView world, BlockState state, BlockPos pos);
 }

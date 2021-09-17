@@ -28,7 +28,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.structure.Structure;
 import net.minecraft.structure.StructurePlacementData;
@@ -262,7 +262,7 @@ public class WorldUtils
                 return false;
             }
 
-            CompoundTag tag = template.toTag(new CompoundTag());
+            NbtCompound tag = template.writeNbt(new NbtCompound());
             os = new FileOutputStream(file);
             NbtIo.writeCompressed(tag, os);
             os.close();
@@ -279,10 +279,10 @@ public class WorldUtils
 
     private static Structure readTemplateFromStream(InputStream stream, DataFixer fixer) throws IOException
     {
-        CompoundTag nbt = NbtIo.readCompressed(stream);
+        NbtCompound nbt = NbtIo.readCompressed(stream);
         Structure template = new Structure();
         //template.read(fixer.process(FixTypes.STRUCTURE, nbt));
-        template.fromTag(nbt);
+        template.readNbt(nbt);
 
         return template;
     }
