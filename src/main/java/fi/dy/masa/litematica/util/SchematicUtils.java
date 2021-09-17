@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
@@ -29,8 +30,8 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskBase;
 import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicDirect;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkDirect;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.SchematicMetadata;
@@ -812,8 +813,8 @@ public class SchematicUtils
         if ((currentTime - areaMovedTime) < 400 ||
             scheduler.hasTask(TaskSaveSchematic.class) ||
             scheduler.hasTask(TaskDeleteArea.class) ||
-            scheduler.hasTask(TaskPasteSchematicSetblock.class) ||
-            scheduler.hasTask(TaskPasteSchematicDirect.class))
+            scheduler.hasTask(TaskPasteSchematicPerChunkCommand.class) ||
+            scheduler.hasTask(TaskPasteSchematicPerChunkDirect.class))
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.move.pending_tasks");
             return;
@@ -842,14 +843,15 @@ public class SchematicUtils
                 taskDelete.setCompletionListener(() ->
                 {
                     TaskBase taskPaste;
+                    LayerRange range = new LayerRange(SchematicWorldRefresher.INSTANCE);
 
                     if (mc.isIntegratedServerRunning())
                     {
-                        taskPaste = new TaskPasteSchematicDirect(placement);
+                        taskPaste = new TaskPasteSchematicPerChunkDirect(Collections.singletonList(placement), range, false);
                     }
                     else
                     {
-                        taskPaste = new TaskPasteSchematicSetblock(placement, false);
+                        taskPaste = new TaskPasteSchematicPerChunkCommand(Collections.singletonList(placement), range, false);
                     }
 
                     taskPaste.disableCompletionMessage();
