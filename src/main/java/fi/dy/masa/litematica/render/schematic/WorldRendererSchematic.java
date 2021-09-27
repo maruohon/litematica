@@ -820,6 +820,10 @@ public class WorldRendererSchematic
 
     public void scheduleChunkRenders(int chunkX, int chunkY, int chunkZ)
     {
-        this.chunkRendererDispatcher.scheduleChunkRender(chunkX, chunkY, chunkZ, false);
+        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+            Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
+        {
+            this.chunkRendererDispatcher.scheduleChunkRender(chunkX, chunkY, chunkZ, false);
+        }
     }
 }
