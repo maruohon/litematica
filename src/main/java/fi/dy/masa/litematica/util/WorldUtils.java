@@ -410,16 +410,19 @@ public class WorldUtils
     private static ActionResult doEasyPlaceAction(MinecraftClient mc)
     {
         RayTraceWrapper traceWrapper;
+        double traceMaxRange;
+
+        traceMaxRange = Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5 : 6;
 
         if (Configs.Generic.EASY_PLACE_FIRST.getBooleanValue())
         {
             // Temporary hack, using this same config here
             boolean targetFluids = Configs.InfoOverlays.INFO_OVERLAYS_TARGET_FLUIDS.getBooleanValue();
-            traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true, targetFluids, false);
+            traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, traceMaxRange, true, targetFluids, false);
         }
         else
         {
-            traceWrapper = RayTraceUtils.getFurthestSchematicWorldTraceBeforeVanilla(mc.world, mc.player, 6);
+            traceWrapper = RayTraceUtils.getFurthestSchematicWorldTraceBeforeVanilla(mc.world, mc.player, traceMaxRange);
         }
 
         if (traceWrapper == null)
@@ -430,7 +433,7 @@ public class WorldUtils
         if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
             BlockHitResult trace = traceWrapper.getBlockHitResult();
-            HitResult traceVanilla = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, 6);
+            HitResult traceVanilla = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, traceMaxRange);
             BlockPos pos = trace.getBlockPos();
             World world = SchematicWorldHandler.getSchematicWorld();
             BlockState stateSchematic = world.getBlockState(pos);
@@ -500,14 +503,19 @@ public class WorldUtils
 
                 Direction side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
 
-                // Carpet Accurate Placement protocol support, plus BlockSlab support
-                if (Configs.Generic.EASY_PLACE_PROTOCOL_V3.getBooleanValue())
+                if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V3)
                 {
                     hitPos = applyPlacementProtocolV3(pos, stateSchematic, hitPos);
                 }
-                else
+                else if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V2)
                 {
+                    // Carpet Accurate Placement protocol support, plus BlockSlab support
                     hitPos = applyCarpetProtocolHitVec(pos, stateSchematic, hitPos);
+                }
+                else if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.SLAB_ONLY)
+                {
+                    //BlockSlab support only
+                    hitPos = applyBlockSlabProtocol(pos, stateSchematic, hitPos);
                 }
 
                 // Mark that this position has been handled (use the non-offset position that is checked above)
@@ -612,14 +620,35 @@ public class WorldUtils
             //x += 10; // Doesn't actually exist (yet?)
 
             // Do it via vanilla
-            if (state.get(SlabBlock.TYPE) == SlabType.TOP)
-            {
-                y = pos.getY() + 0.9;
-            }
-            else
-            {
-                y = pos.getY();
-            }
+            y = getBlockSlabY(pos, state);
+        }
+
+        return new Vec3d(x, y, z);
+    }
+
+    private static double getBlockSlabY(BlockPos pos, BlockState state)
+    {
+        double y = pos.getY();
+
+        if (state.get(SlabBlock.TYPE) == SlabType.TOP)
+        {
+            y += 0.9;
+        }
+
+        return y;
+    }
+
+    private static Vec3d applyBlockSlabProtocol(BlockPos pos, BlockState state, Vec3d hitVecIn)
+    {
+        double x = hitVecIn.x;
+        double y = hitVecIn.y;
+        double z = hitVecIn.z;
+        Block block = state.getBlock();
+
+        if (block instanceof SlabBlock && state.get(SlabBlock.TYPE) != SlabType.DOUBLE)
+        {
+            // Do it via vanilla
+            y = getBlockSlabY(pos, state);
         }
 
         return new Vec3d(x, y, z);

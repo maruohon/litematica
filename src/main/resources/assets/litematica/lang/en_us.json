@@ -224,6 +224,11 @@
     "litematica.gui.label.block_info_list_type.all": "All",
     "litematica.gui.label.block_info_list_type.render_layers": "Render Layers",
 
+    "litematica.gui.label.easy_place_protocol.v3": "Version 3",
+    "litematica.gui.label.easy_place_protocol.v2": "Version 2",
+    "litematica.gui.label.easy_place_protocol.slabs_only": "Slabs only",
+    "litematica.gui.label.easy_place_protocol.none": "None",
+
     "litematica.gui.label.loaded_schematic.modified_on": "§6Modified on %s§r",
 
     "litematica.gui.label.material_list.abbr.shulker_box": "SB",
