@@ -90,6 +90,8 @@ public class InventoryUtils
                 {
                     fi.dy.masa.malilib.util.InventoryUtils.swapItemToMainHand(stack.copy(), mc);
                 }
+
+                WorldUtils.refreshEasyPlaceLastSwap();
             }
         }
     }

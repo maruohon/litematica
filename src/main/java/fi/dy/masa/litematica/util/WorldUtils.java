@@ -77,6 +77,7 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 public class WorldUtils
 {
     private static final List<PositionCache> EASY_PLACE_POSITIONS = new ArrayList<>();
+    private static long EASY_PLACE_LAST_SWAP = 0;
 
     public static boolean shouldPreventBlockUpdates(World world)
     {
@@ -437,6 +438,12 @@ public class WorldUtils
 
             // Already placed to that position, possible server sync delay
             if (easyPlaceIsPositionCached(pos))
+            {
+                return ActionResult.FAIL;
+            }
+
+            // Ignore action if too fast
+            if (easyPlaceIsTooFast())
             {
                 return ActionResult.FAIL;
             }
@@ -1032,5 +1039,15 @@ public class WorldUtils
         {
             return currentTime - this.time > this.timeout;
         }
+    }
+
+    private static boolean easyPlaceIsTooFast()
+    {
+        return (EASY_PLACE_LAST_SWAP > 0 && System.nanoTime() - EASY_PLACE_LAST_SWAP < 1000000L * Configs.Generic.EASY_PLACE_SWAP_INTERVAL.getIntegerValue());
+    }
+
+    public static void refreshEasyPlaceLastSwap()
+    {
+        EASY_PLACE_LAST_SWAP = System.nanoTime();
     }
 }
