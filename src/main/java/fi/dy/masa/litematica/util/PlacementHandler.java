@@ -70,13 +70,17 @@ public class PlacementHandler
     @Nullable
     public static BlockState applyPlacementProtocolToPlacementState(BlockState state, UseContext context)
     {
-        if (Configs.Generic.EASY_PLACE_PROTOCOL_V3.getBooleanValue())
+        if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V3)
         {
             return applyPlacementProtocolV3(state, context);
         }
-        else
+        else if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V2)
         {
             return applyPlacementProtocolV2(state, context);
+        }
+        else
+        {
+            return state;
         }
     }
 
