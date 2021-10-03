@@ -223,7 +223,12 @@
 
     "litematica.gui.label.block_info_list_type.all": "Вся схема",
     "litematica.gui.label.block_info_list_type.render_layers": "Видимые слои",
-
+    
+    "litematica.gui.label.easy_place_protocol.v3": "Версия 3",
+    "litematica.gui.label.easy_place_protocol.v2": "Версия 2",
+    "litematica.gui.label.easy_place_protocol.slabs_only": "Только плиты",
+    "litematica.gui.label.easy_place_protocol.none": "Нет",
+    
     "litematica.gui.label.loaded_schematic.modified_on": "§6Изменено %s§r",
 
     "litematica.gui.label.material_list.abbr.shulker_box": "шалкеровых ящика(ов)",
