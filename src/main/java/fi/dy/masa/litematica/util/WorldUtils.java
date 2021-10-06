@@ -77,7 +77,7 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 public class WorldUtils
 {
     private static final List<PositionCache> EASY_PLACE_POSITIONS = new ArrayList<>();
-    private static long EASY_PLACE_LAST_SWAP = 0;
+    private static long easyPlaceLastPickBlockTime = System.nanoTime();
 
     public static boolean shouldPreventBlockUpdates(World world)
     {
@@ -410,9 +410,7 @@ public class WorldUtils
     private static ActionResult doEasyPlaceAction(MinecraftClient mc)
     {
         RayTraceWrapper traceWrapper;
-        double traceMaxRange;
-
-        traceMaxRange = Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5 : 6;
+        double traceMaxRange = Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5 : 6;
 
         if (Configs.Generic.EASY_PLACE_FIRST.getBooleanValue())
         {
@@ -1072,11 +1070,11 @@ public class WorldUtils
 
     private static boolean easyPlaceIsTooFast()
     {
-        return (EASY_PLACE_LAST_SWAP > 0 && System.nanoTime() - EASY_PLACE_LAST_SWAP < 1000000L * Configs.Generic.EASY_PLACE_SWAP_INTERVAL.getIntegerValue());
+        return System.nanoTime() - easyPlaceLastPickBlockTime < 1000000L * Configs.Generic.EASY_PLACE_SWAP_INTERVAL.getIntegerValue();
     }
 
-    public static void refreshEasyPlaceLastSwap()
+    public static void setEasyPlaceLastPickBlockTime()
     {
-        EASY_PLACE_LAST_SWAP = System.nanoTime();
+        easyPlaceLastPickBlockTime = System.nanoTime();
     }
 }
