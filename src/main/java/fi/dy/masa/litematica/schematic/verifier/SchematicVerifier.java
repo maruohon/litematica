@@ -233,18 +233,14 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         if (this.selectedEntries.containsValue(mismatch))
         {
             this.selectedEntries.remove(type, mismatch);
-            this.updateMismatchOverlays();
         }
         else
         {
-            if (this.selectedCategories.contains(type))
-            {
-                this.selectedCategories.remove(type);
-            }
-
+            this.selectedCategories.remove(type);
             this.selectedEntries.put(type, mismatch);
-            this.updateMismatchOverlays();
         }
+
+        this.updateMismatchOverlays();
     }
 
     private void removeSelectedEntriesOfType(MismatchType type)
@@ -408,9 +404,12 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             while (iter.hasNext())
             {
                 BlockPos pos = iter.next();
+                @SuppressWarnings("deprecation")
+                boolean isLoadedClient = this.worldClient.isChunkLoaded(pos);
+                @SuppressWarnings("deprecation")
+                boolean isLoadedSchematic = this.worldSchematic.isChunkLoaded(pos);
 
-                if (this.worldClient.isChunkLoaded(pos) &&
-                    this.worldSchematic.isChunkLoaded(pos))
+                if (isLoadedClient && isLoadedSchematic)
                 {
                     BlockMismatch mismatch = this.blockMismatches.get(pos);
 
@@ -935,8 +934,6 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     /**
      * Prepares/caches the strings, and returns a provider for the data.<br>
      * <b>NOTE:</b> This is actually the instance of this class, there are no separate providers for different data types atm!
-     * @param type
-     * @return
      */
     /*
     public IInfoHudRenderer getClosestMismatchedPositionListProviderFor(MismatchType type)

@@ -401,6 +401,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements ISel
                     int previewDimensions = 140;
                     NativeImage scaled = new NativeImage(previewDimensions, previewDimensions, false);
                     screenshot.resizeSubRectTo(x, y, longerSide, longerSide, scaled);
+                    @SuppressWarnings("deprecation")
                     int[] pixels = scaled.makePixelArray();
 
                     schematic.getMetadata().setPreviewImagePixelData(pixels);

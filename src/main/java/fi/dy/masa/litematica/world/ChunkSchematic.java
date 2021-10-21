@@ -140,6 +140,7 @@ public class ChunkSchematic extends WorldChunk
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void addEntity(Entity entity)
     {

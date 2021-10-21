@@ -1,31 +1,31 @@
 {
-    "required": true,
-    "package": "fi.dy.masa.litematica.mixin",
-    "compatibilityLevel": "JAVA_16",
-    "minVersion": "0.7",
-    "client": [
-        "IMixinChunkDeltaUpdateS2CPacket",
-        "IMixinFenceGateBlock",
-        "IMixinHandledScreen",
-        "IMixinRedstoneWireBlock",
-        "IMixinStairsBlock",
-        "IMixinVineBlock",
-        "MixinBlock",
-        "MixinBlockItem",
-        "MixinBlockStateFlattening",
-        "MixinClientPlayNetworkHandler",
-        "MixinClientWorld",
-        "MixinDebugHud",
-        "MixinHandledScreen",
-        "MixinIntegratedServer",
-        "MixinMinecraftClient",
-        "MixinModelOverrideList",
-        "MixinRailBlocks",
-        "MixinWorld",
-        "MixinWorldChunk",
-        "MixinWorldRenderer"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+	"required": true,
+	"package": "fi.dy.masa.litematica.mixin",
+	"compatibilityLevel": "JAVA_16",
+	"minVersion": "0.8",
+	"client": [
+		"IMixinChunkDeltaUpdateS2CPacket",
+		"IMixinFenceGateBlock",
+		"IMixinHandledScreen",
+		"IMixinRedstoneWireBlock",
+		"IMixinStairsBlock",
+		"IMixinVineBlock",
+		"MixinBlock",
+		"MixinBlockItem",
+		"MixinBlockStateFlattening",
+		"MixinClientPlayNetworkHandler",
+		"MixinClientWorld",
+		"MixinDebugHud",
+		"MixinHandledScreen",
+		"MixinIntegratedServer",
+		"MixinMinecraftClient",
+		"MixinModelOverrideList",
+		"MixinRailBlocks",
+		"MixinWorld",
+		"MixinWorldChunk",
+		"MixinWorldRenderer"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }
