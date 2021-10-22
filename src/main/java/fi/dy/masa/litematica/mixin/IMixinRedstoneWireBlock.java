@@ -10,6 +10,6 @@ import net.minecraft.world.IBlockReader;
 @Mixin(RedstoneWireBlock.class)
 public interface IMixinRedstoneWireBlock
 {
-    @Invoker("method_27840")
+    @Invoker("method_27840") // getPlacementState
     BlockState litematicaGetFullState(IBlockReader world, BlockState state, BlockPos pos);
 }

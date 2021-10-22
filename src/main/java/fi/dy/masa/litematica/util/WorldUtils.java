@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
@@ -17,28 +19,30 @@ import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.TrapDoorBlock;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.state.properties.Half;
-import net.minecraft.state.properties.ComparatorMode;
-import net.minecraft.state.properties.SlabType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientChunkProvider;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.world.gen.feature.template.Template;
-import net.minecraft.world.gen.feature.template.PlacementSettings;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.Property;
+import net.minecraft.state.properties.ComparatorMode;
+import net.minecraft.state.properties.Half;
+import net.minecraft.state.properties.SlabType;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.gen.feature.template.PlacementSettings;
+import net.minecraft.world.gen.feature.template.Template;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
@@ -61,9 +65,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.gui.Message.MessageType;
-import fi.dy.masa.malilib.hotkeys.KeybindMulti;
 import fi.dy.masa.malilib.interfaces.IStringConsumer;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
@@ -75,16 +77,15 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 public class WorldUtils
 {
     private static final List<PositionCache> EASY_PLACE_POSITIONS = new ArrayList<>();
-    private static boolean preventOnBlockAdded;
 
-    public static boolean shouldPreventOnBlockAdded()
+    public static boolean shouldPreventBlockUpdates(World world)
     {
-        return preventOnBlockAdded;
+        return ((IWorldUpdateSuppressor) world).litematica_getShouldPreventBlockUpdates();
     }
 
-    public static void setShouldPreventOnBlockAdded(boolean prevent)
+    public static void setShouldPreventBlockUpdates(World world, boolean preventUpdates)
     {
-        preventOnBlockAdded = prevent;
+        ((IWorldUpdateSuppressor) world).litematica_setShouldPreventBlockUpdates(preventUpdates);
     }
 
     public static boolean convertSchematicaSchematicToLitematicaSchematic(
@@ -138,19 +139,42 @@ public class WorldUtils
     }
 
     public static boolean convertStructureToLitematicaSchematic(File structureDir, String structureFileName,
-            File outputDir, String outputFileName, boolean ignoreEntities, boolean override, IStringConsumer feedback)
+            File outputDir, String outputFileName, boolean override)
     {
-        LitematicaSchematic litematicaSchematic = convertStructureToLitematicaSchematic(structureDir, structureFileName, ignoreEntities, feedback);
+        LitematicaSchematic litematicaSchematic = convertStructureToLitematicaSchematic(structureDir, structureFileName);
         return litematicaSchematic != null && litematicaSchematic.writeToFile(outputDir, outputFileName, override);
     }
 
     @Nullable
-    public static LitematicaSchematic convertStructureToLitematicaSchematic(File structureDir, String structureFileName,
-            boolean ignoreEntities, IStringConsumer feedback)
+    public static LitematicaSchematic convertSpongeSchematicToLitematicaSchematic(File dir, String fileName)
     {
         try
         {
-            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(structureDir, structureFileName, true);
+            LitematicaSchematic schematic = LitematicaSchematic.createFromFile(dir, fileName, FileType.SPONGE_SCHEMATIC);
+
+            if (schematic == null)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "Failed to read the Sponge schematic from '" + fileName + '"');
+            }
+
+            return schematic;
+        }
+        catch (Exception e)
+        {
+            String msg = "Exception while trying to load the Sponge schematic: " + e.getMessage();
+            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, msg);
+            Litematica.logger.error(msg);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static LitematicaSchematic convertStructureToLitematicaSchematic(File structureDir, String structureFileName)
+    {
+        try
+        {
+            LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(structureDir, structureFileName, FileType.VANILLA_STRUCTURE);
 
             if (litematicaSchematic == null)
             {
@@ -175,34 +199,6 @@ public class WorldUtils
         //return schematic != null && schematic.writeToFile(outputDir, outputFileName, override, feedback);
         // TODO 1.13
         return false;
-    }
-
-    @Nullable
-    public static SchematicaSchematic convertLitematicaSchematicToSchematicaSchematic(File inputDir, String inputFileName, boolean ignoreEntities, IStringConsumer feedback)
-    {
-        LitematicaSchematic litematicaSchematic = LitematicaSchematic.createFromFile(inputDir, inputFileName);
-
-        if (litematicaSchematic == null)
-        {
-            feedback.setString("litematica.error.schematic_conversion.litematica_to_schematic.failed_to_read_schematic");
-            return null;
-        }
-
-        WorldSchematic world = SchematicWorldHandler.createSchematicWorld();
-
-        BlockPos size = new BlockPos(litematicaSchematic.getTotalSize());
-        loadChunksSchematicWorld(world, BlockPos.ORIGIN, size);
-        SchematicPlacement schematicPlacement = SchematicPlacement.createForSchematicConversion(litematicaSchematic, BlockPos.ORIGIN);
-        litematicaSchematic.placeToWorld(world, schematicPlacement, false); // TODO use a per-chunk version for a bit more speed
-
-        SchematicaSchematic schematic = SchematicaSchematic.createFromWorld(world, BlockPos.ORIGIN, size, ignoreEntities);
-
-        if (schematic == null)
-        {
-            feedback.setString("litematica.error.schematic_conversion.litematica_to_schematic.failed_to_create_schematic");
-        }
-
-        return schematic;
     }
 
     public static boolean convertLitematicaSchematicToVanillaStructure(
@@ -315,15 +311,16 @@ public class WorldUtils
     public static void setToolModeBlockState(ToolMode mode, boolean primary, Minecraft mc)
     {
         BlockState state = Blocks.AIR.getDefaultState();
-        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6);
 
         if (wrapper != null)
         {
-            RayTraceResult trace = wrapper.getBlockHitResult();
+            BlockRayTraceResult trace = wrapper.getBlockHitResult();
 
             if (trace != null && trace.getType() == RayTraceResult.Type.BLOCK)
             {
-                BlockPos pos = ((BlockRayTraceResult) trace).getBlockPos();
+                BlockPos pos = trace.getBlockPos();
 
                 if (wrapper.getHitType() == HitType.SCHEMATIC_BLOCK)
                 {
@@ -354,7 +351,7 @@ public class WorldUtils
      */
     public static boolean doSchematicWorldPickBlock(boolean closest, Minecraft mc)
     {
-        BlockPos pos = null;
+        BlockPos pos;
 
         if (closest)
         {
@@ -362,7 +359,7 @@ public class WorldUtils
         }
         else
         {
-            pos = RayTraceUtils.getFurthestSchematicWorldTrace(mc.world, mc.player, 6);
+            pos = RayTraceUtils.getFurthestSchematicWorldBlockBeforeVanilla(mc.world, mc.player, 6, true);
         }
 
         if (pos != null)
@@ -371,51 +368,7 @@ public class WorldUtils
             BlockState state = world.getBlockState(pos);
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(state, world, pos);
 
-            if (stack.isEmpty() == false)
-            {
-                PlayerInventory inv = mc.player.inventory;
-                stack = stack.copy();
-
-                if (mc.player.abilities.creativeMode)
-                {
-                    TileEntity te = world.getBlockEntity(pos);
-
-                    // The creative mode pick block with NBT only works correctly
-                    // if the server world doesn't have a TileEntity in that position.
-                    // Otherwise it would try to write whatever that TE is into the picked ItemStack.
-                    if (GuiBase.isCtrlDown() && te != null && mc.world.isAir(pos))
-                    {
-                        ItemUtils.storeTEInStack(stack, te);
-                    }
-
-                    InventoryUtils.setPickedItemToHand(stack, mc);
-                    mc.interactionManager.clickCreativeStack(mc.player.getStackInHand(Hand.MAIN_HAND), 36 + inv.selectedSlot);
-
-                    //return true;
-                }
-                else
-                {
-                    int slot = inv.getSlotWithStack(stack);
-                    boolean shouldPick = inv.selectedSlot != slot;
-
-                    if (shouldPick && slot != -1)
-                    {
-                        InventoryUtils.setPickedItemToHand(stack, mc);
-                    }
-                    else if (slot == -1 && Configs.Generic.PICK_BLOCK_SHULKERS.getBooleanValue())
-                    {
-                        slot = InventoryUtils.findSlotWithBoxWithItem(mc.player.playerScreenHandler, stack, false);
-
-                        if (slot != -1)
-                        {
-                            ItemStack boxStack = mc.player.playerScreenHandler.slots.get(slot).getStack();
-                            InventoryUtils.setPickedItemToHand(boxStack, mc);
-                        }
-                    }
-
-                    //return shouldPick == false || canPick;
-                }
-            }
+            InventoryUtils.schematicWorldPickBlock(stack, pos, world, mc);
 
             return true;
         }
@@ -425,11 +378,10 @@ public class WorldUtils
 
     public static void easyPlaceOnUseTick(Minecraft mc)
     {
-        if (mc.player != null &&
-            Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
+        if (mc.player != null && DataManager.getToolMode() != ToolMode.REBUILD &&
             Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld() &&
-            KeybindMulti.isKeyDown(KeybindMulti.getKeyCode(mc.options.keyUse)))
+            Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
+            Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
         {
             WorldUtils.doEasyPlaceAction(mc);
         }
@@ -437,20 +389,37 @@ public class WorldUtils
 
     public static boolean handleEasyPlace(Minecraft mc)
     {
-        ActionResultType result = doEasyPlaceAction(mc);
-
-        if (result == ActionResultType.FAIL)
+        if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+            DataManager.getToolMode() != ToolMode.REBUILD)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.easy_place_fail");
-            return true;
+            ActionResultType result = doEasyPlaceAction(mc);
+
+            if (result == ActionResultType.FAIL)
+            {
+                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.easy_place_fail");
+                return true;
+            }
+
+            return result != ActionResultType.PASS;
         }
 
-        return result != ActionResultType.PASS;
+        return false;
     }
 
     private static ActionResultType doEasyPlaceAction(Minecraft mc)
     {
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        RayTraceWrapper traceWrapper;
+
+        if (Configs.Generic.EASY_PLACE_FIRST.getBooleanValue())
+        {
+            // Temporary hack, using this same config here
+            boolean targetFluids = Configs.InfoOverlays.INFO_OVERLAYS_TARGET_FLUIDS.getBooleanValue();
+            traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true, targetFluids, false);
+        }
+        else
+        {
+            traceWrapper = RayTraceUtils.getFurthestSchematicWorldTraceBeforeVanilla(mc.world, mc.player, 6);
+        }
 
         if (traceWrapper == null)
         {
@@ -487,12 +456,7 @@ public class WorldUtils
                     return ActionResultType.FAIL;
                 }
 
-                // Abort if the required item was not able to be pick-block'd
-                if (doSchematicWorldPickBlock(true, mc) == false)
-                {
-                    return ActionResultType.FAIL;
-                }
-
+                InventoryUtils.schematicWorldPickBlock(stack, pos, world, mc);
                 Hand hand = EntityUtils.getUsedHandForItem(mc.player, stack);
 
                 // Abort if a wrong item is in the player's hand
@@ -530,7 +494,14 @@ public class WorldUtils
                 Direction side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
 
                 // Carpet Accurate Placement protocol support, plus BlockSlab support
-                hitPos = applyCarpetProtocolHitVec(pos, stateSchematic, hitPos);
+                if (Configs.Generic.EASY_PLACE_PROTOCOL_V3.getBooleanValue())
+                {
+                    hitPos = applyPlacementProtocolV3(pos, stateSchematic, hitPos);
+                }
+                else
+                {
+                    hitPos = applyCarpetProtocolHitVec(pos, stateSchematic, hitPos);
+                }
 
                 // Mark that this position has been handled (use the non-offset position that is checked above)
                 cacheEasyPlacePosition(pos);
@@ -597,10 +568,6 @@ public class WorldUtils
 
     /**
      * Apply the Carpet-Extra mod accurate block placement protocol support
-     * @param pos
-     * @param state
-     * @param hitVecIn
-     * @return
      */
     public static Vector3d applyCarpetProtocolHitVec(BlockPos pos, BlockState state, Vector3d hitVecIn)
     {
@@ -649,6 +616,74 @@ public class WorldUtils
         }
 
         return new Vector3d(x, y, z);
+    }
+
+    public static <T extends Comparable<T>> Vector3d applyPlacementProtocolV3(BlockPos pos, BlockState state, Vector3d hitVecIn)
+    {
+        Collection<Property<?>> props = state.getBlock().getStateManager().getProperties();
+
+        if (props.isEmpty())
+        {
+            return hitVecIn;
+        }
+
+        double relX = hitVecIn.x - pos.getX();
+        int protocolValue = 0;
+        int shiftAmount = 1;
+        int propCount = 0;
+
+        @Nullable DirectionProperty property = fi.dy.masa.malilib.util.BlockUtils.getFirstDirectionProperty(state);
+
+        // DirectionProperty - allow all except: VERTICAL_DIRECTION (PointedDripstone)
+        if (property != null)
+        {
+            Direction direction = state.get(property);
+            protocolValue |= direction.getId() << shiftAmount;
+            shiftAmount += 3;
+            ++propCount;
+        }
+
+        List<Property<?>> propList = new ArrayList<>(props);
+        propList.sort(Comparator.comparing(Property::getName));
+
+        try
+        {
+            for (Property<?> p : propList)
+            {
+                if ((p instanceof DirectionProperty) == false &&
+                    PlacementHandler.WHITELISTED_PROPERTIES.contains(p))
+                {
+                    @SuppressWarnings("unchecked")
+                    Property<T> prop = (Property<T>) p;
+                    List<T> list = new ArrayList<>(prop.getValues());
+                    list.sort(Comparable::compareTo);
+
+                    int requiredBits = MathHelper.log2(MathHelper.smallestEncompassingPowerOfTwo(list.size()));
+                    int valueIndex = list.indexOf(state.get(prop));
+
+                    if (valueIndex != -1)
+                    {
+                        //System.out.printf("requesting: %s = %s, index: %d\n", prop.getName(), state.get(prop), valueIndex);
+                        protocolValue |= (valueIndex << shiftAmount);
+                        shiftAmount += requiredBits;
+                        ++propCount;
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Litematica.logger.warn("Exception trying to request placement protocol value", e);
+        }
+
+        if (propCount > 0)
+        {
+            double x = pos.getX() + relX + 2 + protocolValue;
+            //System.out.printf("request prot value 0x%08X\n", protocolValue + 2);
+            return new Vector3d(x, hitVecIn.y, hitVecIn.z);
+        }
+
+        return hitVecIn;
     }
 
     private static Direction applyPlacementFacing(BlockState stateSchematic, Direction side, BlockState stateClient)

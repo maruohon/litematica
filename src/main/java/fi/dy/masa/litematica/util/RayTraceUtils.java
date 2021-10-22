@@ -352,14 +352,15 @@ public class RayTraceUtils
     }
 
     @Nullable
-    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity,
-                                                  double range, boolean respectRenderRange)
+    public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity, double range)
     {
-        return getGenericTrace(worldClient, entity, range, respectRenderRange, true);
+        return getGenericTrace(worldClient, entity, range, true, true, false);
     }
 
+    @Nullable
     public static RayTraceWrapper getGenericTrace(World worldClient, Entity entity,
-                                                  double range, boolean respectRenderRange, boolean targetFluids)
+                                                  double range, boolean respectRenderRange,
+                                                  boolean targetFluids, boolean includeVerifier)
     {
         RayTraceResult traceClient = getRayTraceFromEntity(worldClient, entity, targetFluids, range);
         RayTraceResult traceSchematic = traceToSchematicWorld(entity, range, respectRenderRange, targetFluids);
@@ -387,14 +388,13 @@ public class RayTraceUtils
             if (distClosest < 0 || dist < distClosest)
             {
                 trace = traceClient;
-                distClosest = dist;
                 type = HitType.VANILLA_BLOCK;
             }
         }
 
         SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
-        if (placement != null && placement.hasVerifier())
+        if (includeVerifier && placement != null && placement.hasVerifier())
         {
             SchematicVerifier verifier = placement.getSchematicVerifier();
             List<BlockPos> posList = verifier.getSelectedMismatchBlockPositionsForRender();
@@ -419,7 +419,7 @@ public class RayTraceUtils
     @Nullable
     public static RayTraceWrapper getSchematicWorldTraceWrapperIfClosest(World worldClient, Entity entity, double range)
     {
-        RayTraceWrapper trace = getGenericTrace(worldClient, entity, range, true);
+        RayTraceWrapper trace = getGenericTrace(worldClient, entity, range);
 
         if (trace != null && trace.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -437,28 +437,37 @@ public class RayTraceUtils
     }
 
     @Nullable
-    public static BlockPos getFurthestSchematicWorldTrace(World worldClient, Entity entity, double maxRange)
+    public static BlockPos getFurthestSchematicWorldBlockBeforeVanilla(World worldClient,
+                                                                       Entity entity,
+                                                                       double maxRange,
+                                                                       boolean requireVanillaBlockBehind)
     {
         Vector3d eyesPos = entity.getCameraPosVec(1f);
         Vector3d rangedLookRot = entity.getRotationVec(1f).multiply(maxRange);
         Vector3d lookEndPos = eyesPos.add(rangedLookRot);
 
+        @Nullable BlockPos closestVanillaPos = null;
+        @Nullable Direction side = null;
+        double closestVanilla = -1.0;
+
         RayTraceResult traceVanilla = getRayTraceFromEntity(worldClient, entity, false, maxRange);
 
-        if (traceVanilla.getType() != RayTraceResult.Type.BLOCK)
+        if (traceVanilla.getType() == RayTraceResult.Type.BLOCK)
+        {
+            closestVanilla = traceVanilla.getPos().squaredDistanceTo(eyesPos);
+            BlockRayTraceResult vanillaHitResult = (BlockRayTraceResult) traceVanilla;
+            side = vanillaHitResult.getSide();
+            closestVanillaPos = vanillaHitResult.getBlockPos();
+        }
+        else if (requireVanillaBlockBehind)
         {
             return null;
         }
 
-        final double closestVanilla = traceVanilla.getPos().squaredDistanceTo(eyesPos);
-
-        BlockRayTraceResult vanillaBlockHit = (BlockRayTraceResult) traceVanilla;
-        Direction side = vanillaBlockHit.getSide();
-        BlockPos closestVanillaPos = vanillaBlockHit.getBlockPos();
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
         List<BlockRayTraceResult> list = rayTraceBlocksToList(worldSchematic, eyesPos, lookEndPos, RayTraceContext.FluidMode.NONE, false, false, true, 200);
         BlockRayTraceResult furthestTrace = null;
-        double furthestDist = -1D;
+        double furthestDist = -1.0;
 
         if (list.isEmpty() == false)
         {
@@ -466,8 +475,9 @@ public class RayTraceUtils
             {
                 double dist = trace.getPos().squaredDistanceTo(eyesPos);
 
-                if ((furthestDist < 0 || dist > furthestDist) && (dist < closestVanilla || closestVanilla < 0) &&
-                     trace.getBlockPos().equals(closestVanillaPos) == false)
+                if ((furthestDist < 0 || dist > furthestDist) &&
+                    (dist < closestVanilla || closestVanilla < 0) &&
+                    trace.getBlockPos().equals(closestVanillaPos) == false)
                 {
                     furthestDist = dist;
                     furthestTrace = trace;
@@ -487,7 +497,7 @@ public class RayTraceUtils
         // Note that this method is only used for the "pickBlockLast" type
         // of pick blocking, not for the "first" variant, where this would
         // probably be annoying if you want to pick block the client world block.
-        if (furthestTrace == null)
+        if (furthestTrace == null && side != null && closestVanillaPos != null)
         {
             BlockPos pos = closestVanillaPos.offset(side);
             LayerRange layerRange = DataManager.getRenderLayerRange();
@@ -501,6 +511,56 @@ public class RayTraceUtils
         }
 
         return furthestTrace != null ? furthestTrace.getBlockPos() : null;
+    }
+
+    @Nullable
+    public static RayTraceWrapper getFurthestSchematicWorldTraceBeforeVanilla(World worldClient,
+                                                                              Entity entity,
+                                                                              double maxRange)
+    {
+        Vector3d eyesPos = entity.getCameraPosVec(1f);
+        Vector3d rangedLookRot = entity.getRotationVec(1f).multiply(maxRange);
+        Vector3d lookEndPos = eyesPos.add(rangedLookRot);
+
+        @Nullable BlockPos closestVanillaPos = null;
+        double closestVanilla = -1.0;
+
+        RayTraceResult traceVanilla = getRayTraceFromEntity(worldClient, entity, false, maxRange);
+
+        if (traceVanilla.getType() == RayTraceResult.Type.BLOCK)
+        {
+            closestVanilla = traceVanilla.getPos().squaredDistanceTo(eyesPos);
+            BlockRayTraceResult vanillaHitResult = (BlockRayTraceResult) traceVanilla;
+            closestVanillaPos = vanillaHitResult.getBlockPos();
+        }
+
+        World worldSchematic = SchematicWorldHandler.getSchematicWorld();
+        List<BlockRayTraceResult> list = rayTraceBlocksToList(worldSchematic, eyesPos, lookEndPos, RayTraceContext.FluidMode.NONE, false, false, true, 200);
+        BlockRayTraceResult furthestTrace = null;
+        double furthestDist = -1.0;
+
+        if (list.isEmpty() == false)
+        {
+            for (BlockRayTraceResult trace : list)
+            {
+                double dist = trace.getPos().squaredDistanceTo(eyesPos);
+
+                if ((furthestDist < 0 || dist > furthestDist) &&
+                    (dist < closestVanilla || closestVanilla < 0) &&
+                    trace.getBlockPos().equals(closestVanillaPos) == false)
+                {
+                    furthestDist = dist;
+                    furthestTrace = trace;
+                }
+
+                if (closestVanilla >= 0 && dist > closestVanilla)
+                {
+                    break;
+                }
+            }
+        }
+
+        return furthestTrace != null ? new RayTraceWrapper(HitType.SCHEMATIC_BLOCK, furthestTrace) : null;
     }
 
     @Nonnull

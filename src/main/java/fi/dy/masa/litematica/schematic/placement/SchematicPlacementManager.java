@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.schematic.placement;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -17,9 +18,6 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.concurrent.TickDelayedTask;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.BlockPos;
@@ -34,22 +32,31 @@ import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkBase;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkDirect;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblockToMcfunction;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
+import fi.dy.masa.litematica.util.ReplaceBehavior;
+import fi.dy.masa.litematica.util.SchematicPlacingUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.config.options.ConfigHotkey;
+import fi.dy.masa.malilib.gui.GuiBase;
+import fi.dy.masa.malilib.gui.GuiConfirmAction;
 import fi.dy.masa.malilib.gui.Message.MessageType;
+import fi.dy.masa.malilib.interfaces.IConfirmationListener;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.LayerMode;
+import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.SubChunkPos;
 
@@ -142,7 +149,7 @@ public class SchematicPlacementManager
                         {
                             if (placement.isEnabled())
                             {
-                                placement.getSchematic().placeToWorldWithinChunk(worldSchematic, pos, placement, false);
+                                SchematicPlacingUtils.placeToWorldWithinChunk(worldSchematic, pos, placement, ReplaceBehavior.ALL, false);
                             }
                         }
 
@@ -303,6 +310,21 @@ public class SchematicPlacementManager
         }
 
         return ret;
+    }
+
+    public List<SchematicPlacement> getAllPlacementsOfSchematic(LitematicaSchematic schematic)
+    {
+        List<SchematicPlacement> list = new ArrayList<>();
+
+        for (SchematicPlacement placement : this.schematicPlacements)
+        {
+            if (placement.getSchematic() == schematic)
+            {
+                list.add(placement);
+            }
+        }
+
+        return list;
     }
 
     public void removeAllPlacementsOfSchematic(LitematicaSchematic schematic)
@@ -553,7 +575,8 @@ public class SchematicPlacementManager
 
         if (schematicPlacement != null)
         {
-            RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, mc.player, false, maxDistance);
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            RayTraceResult trace = RayTraceUtils.getRayTraceFromEntity(mc.world, entity, false, maxDistance);
 
             if (trace.getType() != RayTraceResult.Type.BLOCK)
             {
@@ -656,6 +679,33 @@ public class SchematicPlacementManager
         this.pastePlacementToWorld(schematicPlacement, changedBlocksOnly, true, mc);
     }
 
+    private static class PasteToCommandsListener implements IConfirmationListener
+    {
+        private final SchematicPlacement schematicPlacement;
+        private final boolean changedBlocksOnly;
+
+        public PasteToCommandsListener(SchematicPlacement schematicPlacement, boolean changedBlocksOnly)
+        {
+            this.schematicPlacement = schematicPlacement;
+            this.changedBlocksOnly = changedBlocksOnly;
+        }
+
+        @Override
+        public boolean onActionConfirmed()
+        {
+            LayerRange range = DataManager.getRenderLayerRange();
+            TaskPasteSchematicSetblockToMcfunction task = new TaskPasteSchematicSetblockToMcfunction(Collections.singletonList(this.schematicPlacement), range, this.changedBlocksOnly);
+            TaskScheduler.getInstanceClient().scheduleTask(task, 1);
+            return true;
+        }
+
+        @Override
+        public boolean onActionCancelled()
+        {
+            return true;
+        }
+    }
+
     public void pastePlacementToWorld(final SchematicPlacement schematicPlacement, boolean changedBlocksOnly, boolean printMessage, Minecraft mc)
     {
         if (mc.player != null && mc.player.abilities.creativeMode)
@@ -669,27 +719,18 @@ public class SchematicPlacementManager
                     return;
                 }
                 */
+                LayerRange range = DataManager.getRenderLayerRange();
 
-                if (mc.isIntegratedServerRunning())
+                if (Configs.Generic.PASTE_TO_MCFUNCTION.getBooleanValue())
                 {
-                    final ServerWorld world = mc.getServer().getWorld(mc.player.getEntityWorld().getRegistryKey());
-                    final LitematicaSchematic schematic = schematicPlacement.getSchematic();
-                    MinecraftServer server = mc.getServer();
-
-                    server.send(new TickDelayedTask(server.getTicks(), () ->
-                    {
-                        if (schematic.placeToWorld(world, schematicPlacement, false, Configs.Generic.PASTE_IGNORE_ENTITIES.getBooleanValue()))
-                        {
-                            if (printMessage)
-                            {
-                                InfoUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
-                            }
-                        }
-                        else
-                        {
-                            InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
-                        }
-                    }));
+                    PasteToCommandsListener cl = new PasteToCommandsListener(schematicPlacement, changedBlocksOnly);
+                    GuiConfirmAction screen = new GuiConfirmAction(320, "Confirm paste to command files", cl, null, "Are you sure you want to paste the current placement as setblock commands into command/mcfunction files?");
+                    GuiBase.openGui(screen);
+                }
+                else if (mc.isIntegratedServerRunning())
+                {
+                    TaskPasteSchematicPerChunkBase task = new TaskPasteSchematicPerChunkDirect(Collections.singletonList(schematicPlacement), range, changedBlocksOnly);
+                    TaskScheduler.getInstanceServer().scheduleTask(task, 20);
 
                     if (printMessage)
                     {
@@ -698,7 +739,7 @@ public class SchematicPlacementManager
                 }
                 else
                 {
-                    TaskPasteSchematicSetblock task = new TaskPasteSchematicSetblock(schematicPlacement, changedBlocksOnly);
+                    TaskPasteSchematicPerChunkBase task = new TaskPasteSchematicPerChunkCommand(Collections.singletonList(schematicPlacement), range, changedBlocksOnly);
                     TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
 
                     if (printMessage)

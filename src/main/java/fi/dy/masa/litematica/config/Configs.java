@@ -34,10 +34,14 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       BETTER_RENDER_ORDER     = new ConfigBoolean(    "betterRenderOrder", true, "If enabled, then the schematic rendering is done\nby injecting the different render call into the vanilla\nrendering code. This should result in better translucent block\nrendering/ordering and schematic blocks not getting rendered\nthrough the client world blocks/terrain.\nIf the rendering doesn't work (for example with Optifine),\ntry disabling this option.");
         public static final ConfigBoolean       CHANGE_SELECTED_CORNER  = new ConfigBoolean(    "changeSelectedCornerOnMove", true, "If true, then the selected corner of an area selection\nis always set to the last moved corner,\nwhen using the set corner hotkeys");
         public static final ConfigBoolean       DEBUG_LOGGING           = new ConfigBoolean(    "debugLogging", false, "Enables some debug log messages in the game console,\nfor debugging certain issues or crashes.");
-        public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place\nthat block in that position");
-        public static final ConfigBoolean       EASY_PLACE_HOLD_ENABLED = new ConfigBoolean(    "easyPlaceHoldEnabled", false, "When enabled, then simply holding down the use key\nand looking at different schematic blocks will place them");
+        public static final ConfigBoolean       EASY_PLACE_FIRST        = new ConfigBoolean(    "easyPlaceFirst", true, "This causes the Easy Place mode to place the first/closest block\nyou are looking at first, instead of the furthest/bottom-most block.\nSetting this to false allows you to place multiple layers \"at once\",\nsince the furthest blocks would be placed before the closer ones block the line of sight.");
+        public static final ConfigBoolean       EASY_PLACE_HOLD_ENABLED = new ConfigBoolean(    "easyPlaceHoldEnabled", true, "When enabled, then you can hold down the use key\nand look at different schematic blocks to place them,\nwithout having to click on every block individually.");
+        public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place that block in that position");
+        public static final ConfigBoolean       EASY_PLACE_SP_HANDLING  = new ConfigBoolean(    "easyPlaceSinglePlayerHandling", true, "If enabled, then Litematica handles the so called\n\"Carpet mod Accurate Placement Protocol\" itself in single player.\nIf you also have Tweakeroo installed, then this can be disabled,\nas Tweakeroo's 'clientPlacementRotation' option does the exact same thing.");
+        public static final ConfigBoolean       EASY_PLACE_PROTOCOL_V3  = new ConfigBoolean(    "easyPlaceProtocolV3", true, "If enabled, then Litematica uses \"version 3\"\nof the so-called \"accurate placement protocol\".\nThis is currently only supported by Litematica itself (in single player).");
         public static final ConfigBoolean       EXECUTE_REQUIRE_TOOL    = new ConfigBoolean(    "executeRequireHoldingTool", true, "Require holding an enabled tool item\nfor the executeOperation hotkey to work");
         public static final ConfigBoolean       FIX_RAIL_ROTATION       = new ConfigBoolean(    "fixRailRotation", true, "If true, then a fix is applied for the vanilla bug in rails,\nwhere the 180 degree rotations of straight north-south and\neast-west rails rotate 90 degrees counterclockwise instead >_>");
+        public static final ConfigBoolean       GENERATE_LOWERCASE_NAMES = new ConfigBoolean(   "generateLowercaseNames", false, "If enabled, then by default the suggested schematic names\nwill be lowercase and using underscores instead of spaces");
         public static final ConfigBoolean       HIGHLIGHT_BLOCK_IN_INV  = new ConfigBoolean(    "highlightBlockInInventory", false, "When enabled, highlights the item (including Shulker Boxes containing it)\nof the looked at block in the schematic");
         public static final ConfigBoolean       LAYER_MODE_DYNAMIC      = new ConfigBoolean(    "layerModeFollowsPlayer", false, "If true, then the render layer follows the player.\nNote: This currently collapses Layer Range type ranges unfortunately");
         public static final ConfigBoolean       LOAD_ENTIRE_SCHEMATICS  = new ConfigBoolean(    "loadEntireSchematics", false, "If true, then the entire schematic is always loaded at once.\nIf false, then only the part that is within the client's view distance is loaded.");
@@ -48,6 +52,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       PASTE_IGNORE_INVENTORY  = new ConfigBoolean(    "pasteIgnoreInventories", false, "Don't paste inventory contents when pasting a schematic");
         public static final ConfigOptionList    PASTE_NBT_BEHAVIOR      = new ConfigOptionList( "pasteNbtRestoreBehavior", PasteNbtBehavior.NONE, "Whether or not the NBT data of blocks is attempted to be restored,\nand which method is used for that.\n- Place & Data Modify will try to place the \"NBT-picked\" block\n  near the player, and then use the data modify\n  command to transfer the NBT data to the setblock'ed block\n- Place & Clone will try to place the \"NBT-picked\" block\n  near the player, and then clone it to the final location.\n- Teleport & Place will try to teleport the player nearby and then\n  directly place the NBT-picked item in the correct position.\nNote that the teleport & place method doesn't currently work correctly/at all.\nThe recommended method is §ePlace & Data Modify§r, however for that to work\nyou will probably need to lower the pasteCommandLimit to 1 per tick and increase\nthe pasteCommandInterval to 1-4 ticks or something.\nThus you should only use this for pasting important blocks that need the data,\nfor example by making a schematic of just the inventories,\nand then paste that with replace behavior set to None.");
         public static final ConfigOptionList    PASTE_REPLACE_BEHAVIOR  = new ConfigOptionList( "pasteReplaceBehavior", ReplaceBehavior.NONE, "The behavior of replacing existing blocks\nin the Paste schematic tool mode");
+        public static final ConfigBoolean       PASTE_TO_MCFUNCTION     = new ConfigBoolean(    "pasteToMcFunctionFiles", false, "If enabled, then instead of actually pasting schematics to the world,\nthey are written as setblock commands into text files.");
         public static final ConfigBoolean       PICK_BLOCK_ENABLED      = new ConfigBoolean(    "pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
         public static final ConfigBoolean       PICK_BLOCK_SHULKERS     = new ConfigBoolean(    "pickBlockShulkers", false, "If enabled, then if the required item for the pick bloc\nis not found directly in the player's inventory, but there\nis a Shulker box that contains it, the Shulker Box\nwill be switched to the player's hand instead");
         public static final ConfigString        PICK_BLOCKABLE_SLOTS    = new ConfigString(     "pickBlockableSlots", "1,2,3,4,5", "The hotbar slots that are allowed to be\nused for the schematic pick block");
@@ -63,16 +68,21 @@ public class Configs implements IConfigHandler
                 //BETTER_RENDER_ORDER,
                 CHANGE_SELECTED_CORNER,
                 DEBUG_LOGGING,
-                EASY_PLACE_MODE,
+                EASY_PLACE_FIRST,
                 EASY_PLACE_HOLD_ENABLED,
+                EASY_PLACE_MODE,
+                EASY_PLACE_SP_HANDLING,
+                EASY_PLACE_PROTOCOL_V3,
                 EXECUTE_REQUIRE_TOOL,
                 FIX_RAIL_ROTATION,
+                GENERATE_LOWERCASE_NAMES,
                 HIGHLIGHT_BLOCK_IN_INV,
                 LAYER_MODE_DYNAMIC,
                 LOAD_ENTIRE_SCHEMATICS,
                 PASTE_IGNORE_ENTITIES,
                 PASTE_IGNORE_INVENTORY,
                 PASTE_NBT_BEHAVIOR,
+                PASTE_TO_MCFUNCTION,
                 PICK_BLOCK_ENABLED,
                 PICK_BLOCK_SHULKERS,
                 PLACEMENT_RESTRICTION,

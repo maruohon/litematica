@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import javax.annotation.Nullable;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
@@ -21,7 +22,7 @@ import net.minecraft.client.Minecraft;
 
 public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletionListener
 {
-    private final SelectionManager selectionManager;
+    protected final SelectionManager selectionManager;
 
     public GuiSchematicSave()
     {
@@ -47,7 +48,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
 
         if (area != null)
         {
-            this.defaultText = area.getName();
+            this.defaultText = FileUtils.generateSafeFileName(area.getName());
+
+            if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue())
+            {
+                this.defaultText = FileUtils.generateSimpleSafeFileName(this.defaultText);
+            }
         }
     }
 
@@ -78,14 +84,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
         }
         else
         {
-            this.mc.execute(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    GuiSchematicSave.this.refreshList();
-                }
-            });
+            this.mc.execute(GuiSchematicSave.this::refreshList);
         }
     }
 
@@ -135,12 +134,12 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                 if (this.gui.schematic != null)
                 {
                     LitematicaSchematic schematic = this.gui.schematic;
-                    schematic.getMetadata().setTimeModified(System.currentTimeMillis());
 
                     if (schematic.writeToFile(dir, fileName, GuiBase.isShiftDown()))
                     {
-                        this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
+                        schematic.getMetadata().clearModifiedSinceSaved();
                         this.gui.getListWidget().refreshEntries();
+                        this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
                     }
                 }
                 else
@@ -167,7 +166,8 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements ICompletio
                         String author = this.gui.mc.player.getName().getString();
                         boolean ignoreEntities = this.gui.checkboxIgnoreEntities.isChecked();
                         boolean visibleOnly = this.gui.checkboxVisibleOnly.isChecked();
-                        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(visibleOnly, ignoreEntities);
+                        boolean fromSchematicWorld = this.gui.checkboxSaveFromSchematicWorld.isChecked();
+                        LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(visibleOnly, ignoreEntities, fromSchematicWorld);
                         LitematicaSchematic schematic = LitematicaSchematic.createEmptySchematic(area, author);
                         TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, info, overwrite);
                         task.setCompletionListener(this.gui);

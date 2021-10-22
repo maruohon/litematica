@@ -1,12 +1,13 @@
 package fi.dy.masa.litematica.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -29,10 +30,11 @@ import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskBase;
 import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicDirect;
-import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicSetblock;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkCommand;
+import fi.dy.masa.litematica.scheduler.tasks.TaskPasteSchematicPerChunkDirect;
 import fi.dy.masa.litematica.scheduler.tasks.TaskSaveSchematic;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic;
+import fi.dy.masa.litematica.schematic.SchematicMetadata;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
@@ -167,7 +169,8 @@ public class SchematicUtils
 
     public static boolean breakSchematicBlocks(Minecraft mc)
     {
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 10);
 
         if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -192,7 +195,8 @@ public class SchematicUtils
 
     public static boolean breakAllIdenticalSchematicBlocks(Minecraft mc)
     {
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 10);
 
         if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -229,7 +233,8 @@ public class SchematicUtils
 
     public static boolean breakAllSchematicBlocksExceptTargeted(Minecraft mc)
     {
-        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, mc.player, 10);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper wrapper = RayTraceUtils.getSchematicWorldTraceWrapperIfClosest(mc.world, entity, 10);
 
         if (wrapper != null && wrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -270,7 +275,8 @@ public class SchematicUtils
             (stack.isEmpty() && ToolMode.REBUILD.getPrimaryBlock() != null))
         {
             WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
-            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 10, true);
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 10);
 
             if (worldSchematic != null && traceWrapper != null &&
                 traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
@@ -339,7 +345,8 @@ public class SchematicUtils
     public static boolean setTargetedSchematicBlockState(Minecraft mc, BlockState state)
     {
         WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, mc.player, 6, true);
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+        RayTraceWrapper traceWrapper = RayTraceUtils.getGenericTrace(mc.world, entity, 6);
 
         if (world != null && traceWrapper != null && traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -391,7 +398,12 @@ public class SchematicUtils
                             totalBlocks += increment;
 
                             container.set(posSchematic.getX(), posSchematic.getY(), posSchematic.getZ(), state);
-                            part.getPlacement().getSchematic().getMetadata().setTotalBlocks(totalBlocks);
+
+                            SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
+                            metadata.setTotalBlocks(totalBlocks);
+                            metadata.setTimeModifiedToNow();
+                            metadata.setModifiedSinceSaved();
+
                             DataManager.getSchematicPlacementManager().markChunkForRebuild(new ChunkPos(cpos.getX(), cpos.getZ()));
 
                             return true;
@@ -466,7 +478,11 @@ public class SchematicUtils
                                 }
                             }
 
-                            part.getPlacement().getSchematic().getMetadata().setTotalBlocks(totalBlocks);
+                            SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
+                            metadata.setTotalBlocks(totalBlocks);
+                            metadata.setTimeModifiedToNow();
+                            metadata.setModifiedSinceSaved();
+
                             DataManager.getSchematicPlacementManager().markAllPlacementsOfSchematicForRebuild(placement.getSchematic());
 
                             return true;
@@ -759,19 +775,22 @@ public class SchematicUtils
             }
         }
 
-        schematicPlacement.getSchematic().getMetadata().setTotalBlocks(totalBlocks);
+        SchematicMetadata metadata = part.getPlacement().getSchematic().getMetadata();
+        metadata.setTotalBlocks(totalBlocks);
+        metadata.setTimeModifiedToNow();
+        metadata.setModifiedSinceSaved();
 
         return true;
     }
 
-    public static void moveCurrentlySelectedWorldRegionToLookingDirection(int amount, PlayerEntity player, Minecraft mc)
+    public static void moveCurrentlySelectedWorldRegionToLookingDirection(int amount, Entity entity, Minecraft mc)
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
 
         if (area != null && area.getAllSubRegionBoxes().size() > 0)
         {
-            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(player), amount);
+            BlockPos pos = area.getEffectiveOrigin().offset(EntityUtils.getClosestLookingDirection(entity), amount);
             moveCurrentlySelectedWorldRegionTo(pos, mc);
         }
     }
@@ -794,8 +813,8 @@ public class SchematicUtils
         if ((currentTime - areaMovedTime) < 400 ||
             scheduler.hasTask(TaskSaveSchematic.class) ||
             scheduler.hasTask(TaskDeleteArea.class) ||
-            scheduler.hasTask(TaskPasteSchematicSetblock.class) ||
-            scheduler.hasTask(TaskPasteSchematicDirect.class))
+            scheduler.hasTask(TaskPasteSchematicPerChunkCommand.class) ||
+            scheduler.hasTask(TaskPasteSchematicPerChunkDirect.class))
         {
             InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.move.pending_tasks");
             return;
@@ -824,14 +843,15 @@ public class SchematicUtils
                 taskDelete.setCompletionListener(() ->
                 {
                     TaskBase taskPaste;
+                    LayerRange range = new LayerRange(SchematicWorldRefresher.INSTANCE);
 
                     if (mc.isIntegratedServerRunning())
                     {
-                        taskPaste = new TaskPasteSchematicDirect(placement);
+                        taskPaste = new TaskPasteSchematicPerChunkDirect(Collections.singletonList(placement), range, false);
                     }
                     else
                     {
-                        taskPaste = new TaskPasteSchematicSetblock(placement, false);
+                        taskPaste = new TaskPasteSchematicPerChunkCommand(Collections.singletonList(placement), range, false);
                     }
 
                     taskPaste.disableCompletionMessage();
@@ -869,19 +889,20 @@ public class SchematicUtils
             LitematicaSchematic.SchematicSaveInfo info = new LitematicaSchematic.SchematicSaveInfo(false, false);
             TaskSaveSchematic taskSave = new TaskSaveSchematic(schematic, area, info);
             taskSave.disableCompletionMessage();
+            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+            BlockPos originTmp = RayTraceUtils.getTargetedPosition(mc.world, entity, 6, false);
+
+            if (originTmp == null)
+            {
+                originTmp = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(entity);
+            }
+
+            final BlockPos origin = originTmp;
+            String name = schematic.getMetadata().getName();
 
             taskSave.setCompletionListener(() ->
             {
                 SchematicPlacementManager manager = DataManager.getSchematicPlacementManager();
-                String name = schematic.getMetadata().getName();
-                BlockPos origin = RayTraceUtils.getTargetedPosition(mc.world, mc.player, 6, false);
-
-                if (origin == null)
-                {
-//                    origin = fi.dy.masa.malilib.util.PositionUtils.getEntityBlockPos(mc.player);
-                    origin = new BlockPos(Math.floor(mc.player.getX()), Math.floor(mc.player.getY()), Math.floor(mc.player.getZ()));
-                }
-
                 SchematicPlacement placement = SchematicPlacement.createFor(schematic, origin, name, true, true);
 
                 manager.addSchematicPlacement(placement, false);

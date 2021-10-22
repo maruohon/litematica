@@ -2,12 +2,12 @@ package fi.dy.masa.litematica.gui;
 
 import java.io.File;
 import javax.annotation.Nullable;
+import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.interfaces.IFileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.interfaces.IGuiIcon;
 import fi.dy.masa.malilib.render.RenderUtils;
-import net.minecraft.util.ResourceLocation;
 
 public enum Icons implements IGuiIcon, IFileBrowserIconProvider
 {
@@ -19,9 +19,9 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
     ENCLOSING_BOX_DISABLED  (  0, 160, 16, 16),
     FILE_ICON_LITEMATIC     (144,   0, 12, 12),
     FILE_ICON_SCHEMATIC     (144,  12, 12, 12),
-    FILE_ICON_VANILLA       (144,  24, 12, 12),
-    FILE_ICON_JSON          (144,  36, 12, 12),
-    FILE_ICON_SPONGE_SCH    (144,  48, 12, 12),
+    FILE_ICON_SPONGE_SCH    (144,  24, 12, 12),
+    FILE_ICON_VANILLA       (144,  36, 12, 12),
+    FILE_ICON_JSON          (144,  44, 12, 12),
     FILE_ICON_DIR           (156,   0, 12, 12),
     FILE_ICON_DIR_UP        (156,  12, 12, 12),
     FILE_ICON_DIR_ROOT      (156,  24, 12, 12),
@@ -131,17 +131,11 @@ public enum Icons implements IGuiIcon, IFileBrowserIconProvider
 
         switch (fileType)
         {
-            case LITEMATICA_SCHEMATIC:
-                return FILE_ICON_LITEMATIC;
-
-            case SCHEMATICA_SCHEMATIC:
-                return FILE_ICON_SCHEMATIC;
-
-            case VANILLA_STRUCTURE:
-                return FILE_ICON_VANILLA;
-
-            case JSON:
-                return FILE_ICON_JSON;
+            case LITEMATICA_SCHEMATIC:  return FILE_ICON_LITEMATIC;
+            case SCHEMATICA_SCHEMATIC:  return FILE_ICON_SCHEMATIC;
+            case VANILLA_STRUCTURE:     return FILE_ICON_VANILLA;
+            case SPONGE_SCHEMATIC:      return FILE_ICON_SPONGE_SCH;
+            case JSON:                  return FILE_ICON_JSON;
 
             default:
                 return DUMMY;

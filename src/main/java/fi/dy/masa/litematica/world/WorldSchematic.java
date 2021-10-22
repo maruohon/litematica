@@ -10,39 +10,45 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.EmptyTickList;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.world.storage.MapData;
 import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.profiler.IProfiler;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.tags.ITagCollectionSupplier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.world.LightType;
-import net.minecraft.world.storage.ISpawnWorldInfo;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.EmptyTickList;
 import net.minecraft.world.ITickList;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeRegistry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.DimensionType;
+import net.minecraft.world.storage.ISpawnWorldInfo;
+import net.minecraft.world.storage.MapData;
+import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class WorldSchematic extends World
 {
+    private static final RegistryKey<World> REGISTRY_KEY = RegistryKey.of(Registry.DIMENSION, new ResourceLocation(Reference.MOD_ID, "schematic_world"));
+
     private final Minecraft mc;
     private final WorldRendererSchematic worldRenderer;
     private final ChunkManagerSchematic chunkManagerSchematic;
@@ -51,7 +57,7 @@ public class WorldSchematic extends World
 
     protected WorldSchematic(ISpawnWorldInfo mutableWorldProperties, DimensionType dimensionType, Supplier<IProfiler> profiler)
     {
-        super(mutableWorldProperties, null, dimensionType, profiler, true, true, 0L);
+        super(mutableWorldProperties, REGISTRY_KEY, dimensionType, profiler, true, true, 0L);
 
         this.mc = Minecraft.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();

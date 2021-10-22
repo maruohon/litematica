@@ -209,11 +209,10 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
         {
             if (entry.getName().endsWith(LitematicaSchematic.FILE_EXTENSION))
             {
-                LitematicaSchematic schematic = LitematicaSchematic.createFromFile(entry.getDirectory(), entry.getName());
+                meta = LitematicaSchematic.readMetadataFromFile(entry.getDirectory(), entry.getName());
 
-                if (schematic != null)
+                if (meta != null)
                 {
-                    meta = schematic.getMetadata();
                     this.createPreviewImage(file, meta);
                 }
             }
@@ -279,6 +278,7 @@ public class WidgetSchematicBrowser extends WidgetFileBrowserBase
         {
             String name = pathName.getName();
             return  name.endsWith(".litematic") ||
+                    name.endsWith(".schem") ||
                     name.endsWith(".schematic") ||
                     name.endsWith(".nbt");
         }

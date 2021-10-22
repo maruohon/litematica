@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.event;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
@@ -57,6 +58,7 @@ public class KeyCallbacks
         Configs.Generic.PICK_BLOCKABLE_SLOTS.setValueChangeCallback(valueChangeCallback);
 
         Hotkeys.CLONE_SELECTION.getKeybind().setCallback(callbackHotkeys);
+        Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.EXECUTE_OPERATION.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_MODE_NEXT.getKeybind().setCallback(callbackHotkeys);
         Hotkeys.LAYER_MODE_PREVIOUS.getKeybind().setCallback(callbackHotkeys);
@@ -202,11 +204,12 @@ public class KeyCallbacks
 
                         if (grabModifier && mode == ToolMode.MOVE)
                         {
-                            BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, this.mc.player, maxDistance, false);
+                            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                            BlockPos pos = RayTraceUtils.getTargetedPosition(this.mc.world, entity, maxDistance, false);
 
                             if (pos != null)
                             {
-                                SchematicUtils.moveCurrentlySelectedWorldRegionTo(pos, mc);
+                                SchematicUtils.moveCurrentlySelectedWorldRegionTo(pos, this.mc);
                             }
                         }
                         else if (Configs.Generic.SELECTION_CORNERS_MODE.getOptionListValue() == CornerSelectionMode.CORNERS)
@@ -245,19 +248,25 @@ public class KeyCallbacks
                         }
                         else
                         {
-                            sm.changeSelection(this.mc.world, this.mc.player, maxDistance);
+                            Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                            sm.changeSelection(this.mc.world, entity, maxDistance);
                         }
                     }
                     else if (mode.getUsesSchematic())
                     {
-                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, this.mc.player, maxDistance);
+                        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
+                        DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, entity, maxDistance);
                     }
 
                     return true;
                 }
             }
 
-            if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
+            if (key == Hotkeys.EASY_PLACE_ACTIVATION.getKeybind())
+            {
+                return WorldUtils.handleEasyPlace(this.mc);
+            }
+            else if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
                 GuiBase.openGui(new GuiMainMenu());
                 return true;

@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.event;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.Direction;
 import fi.dy.masa.litematica.Litematica;
@@ -123,16 +123,16 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
     private boolean handleMouseScroll(double dWheel, Minecraft mc)
     {
-        PlayerEntity player = mc.player;
         boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
-        if (toolEnabled == false || EntityUtils.hasToolItem(player) == false)
+        if (toolEnabled == false || EntityUtils.hasToolItem(mc.player) == false)
         {
             return false;
         }
 
         final int amount = dWheel > 0 ? 1 : -1;
         ToolMode mode = DataManager.getToolMode();
+        Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
 
         if (Hotkeys.SELECTION_GRAB_MODIFIER.getKeybind().isKeybindHeld())
         {
@@ -142,19 +142,19 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
                 if (sm.hasGrabbedElement())
                 {
-                    sm.changeGrabDistance(player, amount);
+                    sm.changeGrabDistance(entity, amount);
                     return true;
                 }
                 else if (sm.hasSelectedOrigin())
                 {
                     AreaSelection area = sm.getCurrentSelection();
                     BlockPos old = area.getEffectiveOrigin();
-                    area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(player), amount), false);
+                    area.moveEntireSelectionTo(old.offset(EntityUtils.getClosestLookingDirection(entity), amount), false);
                     return true;
                 }
                 else if (mode == ToolMode.MOVE)
                 {
-                    SchematicUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, player, mc);
+                    SchematicUtils.moveCurrentlySelectedWorldRegionToLookingDirection(amount, entity, mc);
                     return true;
                 }
             }
@@ -167,12 +167,12 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
         if (Hotkeys.SELECTION_NUDGE_MODIFIER.getKeybind().isKeybindHeld())
         {
-            return nudgeSelection(amount, mode, player);
+            return nudgeSelection(amount, mode, entity);
         }
 
         if (Hotkeys.OPERATION_MODE_CHANGE_MODIFIER.getKeybind().isKeybindHeld())
         {
-            DataManager.setToolMode(DataManager.getToolMode().cycle(player, amount < 0));
+            DataManager.setToolMode(DataManager.getToolMode().cycle(mc.player, amount < 0));
             return true;
         }
 
@@ -188,7 +188,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         return false;
     }
 
-    public static boolean nudgeSelection(int amount, ToolMode mode, PlayerEntity player)
+    public static boolean nudgeSelection(int amount, ToolMode mode, Entity entity)
     {
         if (mode.getUsesAreaSelection())
         {
@@ -196,13 +196,13 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
 
             if (sm.hasSelectedElement())
             {
-                sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(player), amount);
+                sm.moveSelectedElement(EntityUtils.getClosestLookingDirection(entity), amount);
                 return true;
             }
         }
         else if (mode.getUsesSchematic())
         {
-            Direction direction = EntityUtils.getClosestLookingDirection(player);
+            Direction direction = EntityUtils.getClosestLookingDirection(entity);
             DataManager.getSchematicPlacementManager().nudgePositionOfCurrentSelection(direction, amount);
             return true;
         }
@@ -270,7 +270,7 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         if (mc.player != null)
         {
-            if (DataManager.getToolMode() == ToolMode.REBUILD && KeybindMulti.getTriggeredCount() == 0)
+            if (DataManager.getToolMode() == ToolMode.REBUILD)
             {
                 if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
                 {
@@ -293,11 +293,6 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     return SchematicUtils.placeSchematicBlock(mc);
                 }
             }
-            else if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-                     Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
-            {
-                return WorldUtils.handleEasyPlace(mc);
-            }
             else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
             {
                 if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, mc.options.keyUse))
@@ -313,19 +308,5 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         }
 
         return false;
-    }
-
-    public static void onTick(Minecraft mc)
-    {
-        SelectionManager sm = DataManager.getSelectionManager();
-
-        if (sm.hasGrabbedElement())
-        {
-            sm.moveGrabbedElement(mc.player);
-        }
-        else
-        {
-            WorldUtils.easyPlaceOnUseTick(mc);
-        }
     }
 }

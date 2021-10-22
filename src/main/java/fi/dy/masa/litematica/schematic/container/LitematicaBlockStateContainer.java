@@ -4,23 +4,34 @@ import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3i;
+import io.netty.buffer.Unpooled;
 
 public class LitematicaBlockStateContainer implements ILitematicaBlockStatePaletteResizer
 {
     public static final BlockState AIR_BLOCK_STATE = Blocks.AIR.getDefaultState();
     protected LitematicaBitArray storage;
     protected ILitematicaBlockStatePalette palette;
+    protected final Vector3i size;
     protected final int sizeX;
     protected final int sizeY;
     protected final int sizeZ;
     protected final int sizeLayer;
+    protected final long totalVolume;
     protected int bits;
+    /** Note: This is currently only used for the temporary Sponge schematic support */
+    protected long[] blockCounts = new long[0];
 
     public LitematicaBlockStateContainer(int sizeX, int sizeY, int sizeZ)
     {
         this(sizeX, sizeY, sizeZ, 2, null);
+    }
+
+    public LitematicaBlockStateContainer(Vector3i size, int bits, @Nullable long[] backingLongArray)
+    {
+        this(size.getX(), size.getY(), size.getZ(), bits, backingLongArray);
     }
 
     public LitematicaBlockStateContainer(int sizeX, int sizeY, int sizeZ, int bits, @Nullable long[] backingLongArray)
@@ -29,18 +40,25 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
         this.sizeLayer = sizeX * sizeZ;
+        this.totalVolume = (long) this.sizeX * (long) this.sizeY * (long) this.sizeZ;
+        this.size = new Vector3i(this.sizeX, this.sizeY, this.sizeZ);
 
         this.setBits(bits, backingLongArray);
     }
 
     public Vector3i getSize()
     {
-        return new Vector3i(this.sizeX, this.sizeY, this.sizeZ);
+        return this.size;
     }
 
     public LitematicaBitArray getArray()
     {
         return this.storage;
+    }
+
+    public long[] getBlockCounts()
+    {
+        return this.blockCounts;
     }
 
     public BlockState get(int x, int y, int z)
@@ -86,11 +104,11 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
 
             if (backingLongArray != null)
             {
-                this.storage = new LitematicaBitArray(this.bits, this.sizeX * this.sizeY * this.sizeZ, backingLongArray);
+                this.storage = new LitematicaBitArray(this.bits, this.totalVolume, backingLongArray);
             }
             else
             {
-                this.storage = new LitematicaBitArray(this.bits, this.sizeX * this.sizeY * this.sizeZ);
+                this.storage = new LitematicaBitArray(this.bits, this.totalVolume);
             }
         }
     }
@@ -100,13 +118,13 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
     {
         LitematicaBitArray oldStorage = this.storage;
         ILitematicaBlockStatePalette oldPalette = this.palette;
-        final int storageLength = oldStorage.size();
+        final long storageLength = oldStorage.size();
 
         this.setBits(bits, null);
 
         LitematicaBitArray newStorage = this.storage;
 
-        for (int index = 0; index < storageLength; ++index)
+        for (long index = 0; index < storageLength; ++index)
         {
             newStorage.setAt(index, oldStorage.getAt(index));
         }
@@ -132,5 +150,45 @@ public class LitematicaBlockStateContainer implements ILitematicaBlockStatePalet
         LitematicaBlockStateContainer container = new LitematicaBlockStateContainer(size.getX(), size.getY(), size.getZ(), bits, blockStates);
         container.palette.readFromNBT(palette);
         return container;
+    }
+
+    @Nullable
+    public static LitematicaBlockStateContainer createContainer(int paletteSize, byte[] blockData, Vector3i size)
+    {
+        int bits = Math.max(2, Integer.SIZE - Integer.numberOfLeadingZeros(paletteSize - 1));
+        SpongeBlockstateConverterResults results = convertVarIntByteArrayToPackedLongArray(size, bits, blockData);
+        LitematicaBlockStateContainer container = new LitematicaBlockStateContainer(size, bits, results.backingArray);
+        //container.palette = createPalette(bits, container);
+        container.blockCounts = results.blockCounts;
+        return container;
+    }
+
+    public static SpongeBlockstateConverterResults convertVarIntByteArrayToPackedLongArray(Vector3i size, int bits, byte[] blockStates)
+    {
+        int volume = size.getX() * size.getY() * size.getZ();
+        LitematicaBitArray bitArray = new LitematicaBitArray(bits, volume);
+        PacketBuffer buf = new PacketBuffer(Unpooled.wrappedBuffer(blockStates));
+        long[] blockCounts = new long[1 << bits];
+
+        for (int i = 0; i < volume; ++i)
+        {
+            int id = buf.readVarInt();
+            bitArray.setAt(i, id);
+            ++blockCounts[id];
+        }
+
+        return new SpongeBlockstateConverterResults(bitArray.getBackingLongArray(), blockCounts);
+    }
+
+    public static class SpongeBlockstateConverterResults
+    {
+        public final long[] backingArray;
+        public final long[] blockCounts;
+
+        protected SpongeBlockstateConverterResults(long[] backingArray, long[] blockCounts)
+        {
+            this.backingArray = backingArray;
+            this.blockCounts = blockCounts;
+        }
     }
 }

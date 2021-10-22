@@ -1,7 +1,6 @@
 package fi.dy.masa.litematica.schematic;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.world.gen.feature.template.Template;
 import net.minecraft.world.gen.feature.template.PlacementSettings;
 import net.minecraft.util.Mirror;
@@ -34,6 +32,7 @@ import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers.IStateFixer;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConverter;
 import fi.dy.masa.litematica.util.EntityUtils;
+import fi.dy.masa.litematica.util.NbtUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.Constants;
@@ -729,10 +728,7 @@ public class SchematicaSchematic
 
             try
             {
-                FileInputStream is = new FileInputStream(file);
-                CompoundNBT nbt = CompressedStreamTools.readCompressed(is);
-                is.close();
-
+                CompoundNBT nbt = NbtUtils.readNbtFromFile(file);
                 return this.readFromNBT(nbt);
             }
             catch (Exception e)
