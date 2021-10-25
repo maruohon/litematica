@@ -67,7 +67,7 @@
     "litematica.hotkeys.category.generic_hotkeys": "Generic hotkeys",
 
     "litematica.info.schematic_load.schematic_loaded": "Schematic '%s' successfully loaded to memory",
-    "litematica.info.schematic_manager.preview.right_click_to_cancel": "Right click the button to cancel a pending preview operation",
+    "litematica.info.schematic_manager.preview.right_click_to_cancel": "- Right click the button to cancel a pending preview operation\n- Ctrl + Alt + Shift + click to set the thumbnail from an existing PNG image\n  called 'thumb.png' from the same directory where the schematic file is.",
     "litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot": "Use the normal screenshot key to set the preview.\nOr right click the Set preview button to cancel setting the preview.",
     "litematica.info.schematic_manager.preview.success": "Preview image successfully set",
 
