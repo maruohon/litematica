@@ -68,19 +68,15 @@ public class PlacementHandler
     );
 
     @Nullable
-    public static BlockState applyPlacementProtocolToPlacementState(BlockState state, UseContext context)
+    public static BlockState applyPlacementProtocolToPlacementState(BlockState state, fi.dy.masa.litematica.util.PlacementHandler.UseContext context)
     {
-        if (Configs.Generic.EASY_PLACE_PROTOCOL_V3.getBooleanValue())
+        if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V3)
         {
             return applyPlacementProtocolV3(state, context);
         }
-        else if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V2)
-        {
-            return applyPlacementProtocolV2(state, context);
-        }
         else
         {
-            return state;
+            return applyPlacementProtocolV2(state, context);
         }
     }
 
@@ -105,7 +101,7 @@ public class PlacementHandler
                 return null;
             }
         }
-        protocolValue /= 2;
+        protocolValue >>= 1;
         protocolValue &= 0xFFFFFFF0;
 
         if (protocolValue >= 16)
