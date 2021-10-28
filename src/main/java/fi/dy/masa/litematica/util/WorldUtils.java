@@ -82,6 +82,7 @@ import fi.dy.masa.malilib.util.SubChunkPos;
 public class WorldUtils
 {
     private static final List<PositionCache> EASY_PLACE_POSITIONS = new ArrayList<>();
+    private static long easyPlaceLastPickBlockTime = System.nanoTime();
 
     public static boolean shouldPreventBlockUpdates(World world)
     {
@@ -414,9 +415,7 @@ public class WorldUtils
     private static ActionResult doEasyPlaceAction(MinecraftClient mc)
     {
         RayTraceWrapper traceWrapper;
-        double traceMaxRange;
-
-        traceMaxRange = Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5 : 6;
+        double traceMaxRange = Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5 : 6;
 
         if (Configs.Generic.EASY_PLACE_FIRST.getBooleanValue())
         {
@@ -445,6 +444,12 @@ public class WorldUtils
 
             // Already placed to that position, possible server sync delay
             if (easyPlaceIsPositionCached(pos))
+            {
+                return ActionResult.FAIL;
+            }
+
+            // Ignore action if too fast
+            if (easyPlaceIsTooFast())
             {
                 return ActionResult.FAIL;
             }
@@ -1094,5 +1099,15 @@ public class WorldUtils
         {
             return currentTime - this.time > this.timeout;
         }
+    }
+
+    private static boolean easyPlaceIsTooFast()
+    {
+        return System.nanoTime() - easyPlaceLastPickBlockTime < 1000000L * Configs.Generic.EASY_PLACE_SWAP_INTERVAL.getIntegerValue();
+    }
+
+    public static void setEasyPlaceLastPickBlockTime()
+    {
+        easyPlaceLastPickBlockTime = System.nanoTime();
     }
 }

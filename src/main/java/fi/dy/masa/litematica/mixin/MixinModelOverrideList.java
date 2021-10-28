@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 @Mixin(ModelOverrideList.class)
 public abstract class MixinModelOverrideList
 {
+    @SuppressWarnings("deprecation")
     @Redirect(method = "apply", at = @At(value = "INVOKE",
               target = "Lnet/minecraft/client/item/ModelPredicateProvider;call(" +
                        "Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/world/ClientWorld;" +
