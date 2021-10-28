@@ -520,6 +520,14 @@ public class WorldUtils
                     //BlockSlab support only
                     hitPos = applyBlockSlabProtocol(pos, stateSchematic, hitPos);
                 }
+                else if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.PACKET){
+                    if (!RotationUtils.requestRotate(pos, stateSchematic, hitPos)){
+                        return ActionResult.FAIL;
+                    }
+                    if (RotationUtils.isHandling()){
+                        return ActionResult.FAIL;
+                    }
+                }
 
                 // Mark that this position has been handled (use the non-offset position that is checked above)
                 cacheEasyPlacePosition(pos);
@@ -589,50 +597,58 @@ public class WorldUtils
      */
     public static Vec3d applyCarpetProtocolHitVec(BlockPos pos, BlockState state, Vec3d hitVecIn)
     {
-        double x = hitVecIn.x;
+        double code = hitVecIn.x;
         double y = hitVecIn.y;
         double z = hitVecIn.z;
         Block block = state.getBlock();
         Direction facing = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
         Integer railEnumCode = getRailShapeOrder(state);
-        final int propertyIncrement = 32;
+        final int propertyIncrement = 16;
         double relX = hitVecIn.x - pos.getX();
-
+        if (facing == null && railEnumCode == null && !(block instanceof SlabBlock))
+        {
+            return new Vec3d (code, y, z);
+        }
         if (facing != null)
         {
-            x = pos.getX() + relX + 2 + (facing.getId() * 2);
+            code = facing.getId();
         }
-        if (railEnumCode != null)
+        else if (railEnumCode != null)
         {
-            x = pos.getX() + relX + 2 + (railEnumCode * 2);
+            code = railEnumCode;
         }
         if (block instanceof RepeaterBlock)
         {
-            x += ((state.get(RepeaterBlock.DELAY))) * (propertyIncrement);
+            code += ((state.get(RepeaterBlock.DELAY))) * (propertyIncrement);
         }
         else if (block instanceof TrapdoorBlock && state.get(TrapdoorBlock.HALF) == BlockHalf.TOP)
         {
-            x += propertyIncrement;
+            code += propertyIncrement;
         }
         else if (block instanceof ComparatorBlock && state.get(ComparatorBlock.MODE) == ComparatorMode.SUBTRACT)
         {
-            x += propertyIncrement;
+            code += propertyIncrement;
         }
         else if (block instanceof StairsBlock && state.get(StairsBlock.HALF) == BlockHalf.TOP)
         {
-            x += propertyIncrement;
+            code += propertyIncrement;
         }
         else if (block instanceof SlabBlock && state.get(SlabBlock.TYPE) != SlabType.DOUBLE)
         {
             //x += 10; // Doesn't actually exist (yet?)
 
             // Do it via vanilla
-            y = getBlockSlabY(pos, state);
+            if (state.get(SlabBlock.TYPE) == SlabType.TOP)
+            {
+                y = pos.getY() + 0.9;
+            }
+            else
+            {
+                y = pos.getY();
+            }
         }
-
-        return new Vec3d(x, y, z);
+        return new Vec3d(code * 2 + 2 + pos.getX(), y, z);
     }
-
     private static double getBlockSlabY(BlockPos pos, BlockState state)
     {
         double y = pos.getY();

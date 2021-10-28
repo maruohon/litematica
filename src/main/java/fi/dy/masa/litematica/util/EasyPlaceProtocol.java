@@ -8,7 +8,8 @@ public enum EasyPlaceProtocol implements IConfigOptionListEntry
     V3                  ("v3",                    "litematica.gui.label.easy_place_protocol.v3"),
     V2                  ("v2",                    "litematica.gui.label.easy_place_protocol.v2"),
     SLAB_ONLY           ("slabs_only",            "litematica.gui.label.easy_place_protocol.slabs_only"),
-    NONE                ("none",                  "litematica.gui.label.easy_place_protocol.none");
+    NONE                ("none",                  "litematica.gui.label.easy_place_protocol.none"),
+    PACKET                ("packet",                  "litematica.gui.label.easy_place_protocol.packet");
 
     private final String configString;
     private final String translationKey;
