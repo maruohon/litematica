@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.scheduler;
 
+import fi.dy.masa.litematica.util.RotationUtils;
 import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
@@ -23,6 +24,7 @@ public class ClientTickHandler implements IClientTickHandler
             }
 
             WorldUtils.easyPlaceOnUseTick(mc);
+            RotationUtils.tick();
 
             if (Configs.Generic.LAYER_MODE_DYNAMIC.getBooleanValue())
             {
