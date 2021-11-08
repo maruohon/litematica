@@ -103,11 +103,9 @@ public class PlacementHandler
         }
         protocolValue >>= 1;
         protocolValue &= 0xFFFFFFF0;
-
+        Block block = state.getBlock();
         if (protocolValue >= 16)
         {
-            Block block = state.getBlock();
-
             if (block instanceof RepeaterBlock)
             {
                 Integer delay = (protocolValue / 16) ;
