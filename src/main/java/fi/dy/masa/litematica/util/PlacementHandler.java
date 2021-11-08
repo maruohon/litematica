@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.*;
+import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.RepeaterBlock;
