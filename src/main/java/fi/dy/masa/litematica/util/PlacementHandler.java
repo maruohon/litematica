@@ -92,7 +92,16 @@ public class PlacementHandler
         {
             return state;
         }
-
+        
+		RailShape railShape = state.getBlock() instanceof AbstractRailBlock?  RailShape.values()[protocolValue/2] : null;
+		if (railShape != null)
+        {
+			if (state.getBlock() instanceof RailBlock)
+            {
+				return state.with(RailBlock.SHAPE, railShape);
+			}
+			return state.with(PoweredRailBlock.SHAPE, railShape);
+		}
         @Nullable DirectionProperty property = fi.dy.masa.malilib.util.BlockUtils.getFirstDirectionProperty(state);
 
         if (property != null)
