@@ -130,7 +130,16 @@ public class PlacementHandler
                 state = state.with(StairsBlock.HALF, BlockHalf.TOP);
             }
         }
-
+        else {
+            if (block instanceof TrapdoorBlock)
+            {
+                state = state.with(TrapdoorBlock.HALF, BlockHalf.BOTTOM);
+            }
+            else if (block instanceof StairsBlock)
+            {
+                state = state.with(StairsBlock.HALF, BlockHalf.BOTTOM);
+            }
+        }
         return state;
     }
 
