@@ -23,7 +23,7 @@ public class ClientTickHandler implements IClientTickHandler
             }
 
             WorldUtils.easyPlaceOnUseTick(mc);
-
+            RotationUtils.tick();
             if (Configs.Generic.LAYER_MODE_DYNAMIC.getBooleanValue())
             {
                 DataManager.getRenderLayerRange().setSingleBoundaryToPosition(EntityUtils.getCameraEntity());
