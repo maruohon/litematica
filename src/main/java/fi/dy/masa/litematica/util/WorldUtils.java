@@ -414,6 +414,9 @@ public class WorldUtils
 
     private static ActionResult doEasyPlaceAction(MinecraftClient mc)
     {
+        if (RotationUtils.isHandling()){
+            return ActionResult.FAIL;
+        }
         RayTraceWrapper traceWrapper;
         double traceMaxRange = Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5 : 6;
 
@@ -661,7 +664,7 @@ public class WorldUtils
         return y;
     }
 
-    private static Vec3d applyBlockSlabProtocol(BlockPos pos, BlockState state, Vec3d hitVecIn)
+    public static Vec3d applyBlockSlabProtocol(BlockPos pos, BlockState state, Vec3d hitVecIn)
     {
         double x = hitVecIn.x;
         double y = hitVecIn.y;
