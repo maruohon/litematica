@@ -27,7 +27,7 @@ import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
@@ -117,7 +117,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel();
+        int z = this.getZ();
         int width = this.getWidth();
         int height = this.getHeight();
 
@@ -175,7 +175,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel() + 1;
+        int z = this.getZ() + 1;
         int height = this.getHeight();
 
         if (this.schematic.getMetadata().wasModifiedSinceSaved() &&
@@ -235,7 +235,7 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 
                 if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue() && schematic.getFile() == null)
                 {
-                    name = FileUtils.generateSimpleSafeFileName(name);
+                    name = FileNameUtils.generateSimpleSafeFileName(name);
                 }
 
                 GuiSchematicSaveConvert gui = new GuiSchematicSaveConvert(schematic, name);

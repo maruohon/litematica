@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.materials;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskCountBlocksArea;
 import fi.dy.masa.litematica.selection.AreaSelection;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -35,6 +35,6 @@ public class MaterialListAreaAnalyzer extends MaterialListBase
     {
         TaskCountBlocksArea task = new TaskCountBlocksArea(this.selection, this);
         TaskScheduler.getInstanceClient().scheduleTask(task, 20);
-        MessageUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+        MessageUtils.showGuiOrInGameMessage(MessageOutput.INFO, "litematica.message.scheduled_task_added");
     }
 }

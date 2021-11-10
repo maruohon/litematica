@@ -9,7 +9,7 @@ import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectsBrowser;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.minecraft.client.Minecraft;
@@ -68,7 +68,7 @@ public class SchematicProjectsManager
 
         if (this.currentProject == null)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
             return false;
         }
 
@@ -130,7 +130,7 @@ public class SchematicProjectsManager
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.no_project_open");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.no_project_open");
         }
 
         return false;
@@ -144,7 +144,7 @@ public class SchematicProjectsManager
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.no_project_open");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.no_project_open");
         }
 
         return false;

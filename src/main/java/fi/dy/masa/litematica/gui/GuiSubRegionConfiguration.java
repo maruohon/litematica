@@ -20,7 +20,7 @@ import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -125,7 +125,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
         String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x = x + offset + width + 20;
         CheckBoxWidget cb = new CheckBoxWidget(x, y + 3, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, "", hover);
-        cb.setChecked(this.placement.isCoordinateLocked(type), false);
+        cb.setSelected(this.placement.isCoordinateLocked(type), false);
         cb.setListener(new CoordinateLockListener(type, this.placement));
         this.addWidget(cb);
     }
@@ -225,7 +225,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
             BlockPos posOld = this.placement.getPos();
             posOld = PositionUtils.getTransformedBlockPos(posOld, this.schematicPlacement.getMirror(), this.schematicPlacement.getRotation());
             posOld = posOld.add(this.schematicPlacement.getOrigin());
-            this.parent.setNextMessageType(MessageType.ERROR);
+            this.parent.setNextMessageType(MessageOutput.ERROR);
 
             switch (this.type)
             {
@@ -361,7 +361,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
                     case Z: pos = new BlockPos(posOld.getX(), posOld.getY(), value        ); break;
                 }
 
-                this.parent.setNextMessageType(MessageType.ERROR);
+                this.parent.setNextMessageType(MessageOutput.ERROR);
                 this.manager.moveSubRegionTo(this.schematicPlacement, this.placement.getName(), pos, this.parent);
                 this.parent.updateElements();
             }
@@ -383,7 +383,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
         @Override
         public void onSelectionChange(CheckBoxWidget entry)
         {
-            this.placement.setCoordinateLocked(this.type, entry.isChecked());
+            this.placement.setCoordinateLocked(this.type, entry.isSelected());
         }
     }
 }

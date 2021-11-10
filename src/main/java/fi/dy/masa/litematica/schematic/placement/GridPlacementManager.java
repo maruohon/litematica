@@ -13,6 +13,7 @@ import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
 
 public class GridPlacementManager
@@ -394,7 +395,7 @@ public class GridPlacementManager
 
         int centerChunkX = ((int) Math.floor(player.posX)) >> 4;
         int centerChunkZ = ((int) Math.floor(player.posZ)) >> 4;
-        int chunkRadius = mc.gameSettings.renderDistanceChunks + expandChunks;
+        int chunkRadius = GameUtils.getRenderDistanceChunks() + expandChunks;
         BlockPos corner1 = new BlockPos( (centerChunkX - chunkRadius) << 4      ,   0,  (centerChunkZ - chunkRadius) << 4      );
         BlockPos corner2 = new BlockPos(((centerChunkX + chunkRadius) << 4) + 15, 255, ((centerChunkZ + chunkRadius) << 4) + 15);
 

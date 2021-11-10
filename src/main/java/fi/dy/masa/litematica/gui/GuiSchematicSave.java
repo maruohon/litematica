@@ -14,9 +14,10 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -27,11 +28,11 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements TaskComple
 
     public static String generateFilename(String nameIn)
     {
-        String name = FileUtils.generateSafeFileName(nameIn);
+        String name = FileNameUtils.generateSafeFileName(nameIn);
 
         if (Configs.Generic.GENERATE_LOWERCASE_NAMES.getBooleanValue())
         {
-            name = FileUtils.generateSimpleSafeFileName(name);
+            name = FileNameUtils.generateSimpleSafeFileName(name);
         }
 
         return name;
@@ -109,21 +110,21 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements TaskComple
         File dir = this.getListWidget().getCurrentDirectory();
         String fileName = this.getTextFieldText();
 
-        if (FileUtils.doesFilenameContainIllegalCharacters(fileName))
+        if (FileNameUtils.doesFileNameContainIllegalCharacters(fileName))
         {
-            this.addMessage(MessageType.ERROR, "malilib.error.illegal_characters_in_file_name", fileName);
+            this.addMessage(MessageOutput.ERROR, "malilib.error.illegal_characters_in_file_name", fileName);
             return;
         }
 
         if (dir.isDirectory() == false)
         {
-            this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
+            this.addMessage(MessageOutput.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
             return;
         }
 
         if (fileName.isEmpty())
         {
-            this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
+            this.addMessage(MessageOutput.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
             return;
         }
 
@@ -137,7 +138,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements TaskComple
                 schematic.getMetadata().clearModifiedSinceSaved();
 
                 this.getListWidget().refreshEntries();
-                this.addMessage(MessageType.SUCCESS, "litematica.message.schematic_saved_as", fileName);
+                this.addMessage(MessageOutput.SUCCESS, "litematica.message.schematic_saved_as", fileName);
             }
         }
         else
@@ -157,21 +158,21 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements TaskComple
 
                 if (FileUtils.canWriteToFile(dir, fileNameTmp, overwrite) == false)
                 {
-                    this.addMessage(MessageType.ERROR, "litematica.error.schematic_write_to_file_failed.exists", fileNameTmp);
+                    this.addMessage(MessageOutput.ERROR, "litematica.error.schematic_write_to_file_failed.exists", fileNameTmp);
                     return;
                 }
 
                 String author = this.mc.player.getName();
-                boolean takeEntities = this.checkboxIgnoreEntities.isChecked() == false;
+                boolean takeEntities = this.checkboxIgnoreEntities.isSelected() == false;
                 LitematicaSchematic schematic = SchematicCreationUtils.createEmptySchematic(area, author);
                 TaskSaveSchematic task = new TaskSaveSchematic(dir, fileName, schematic, area, takeEntities, overwrite);
                 task.setCompletionListener(this);
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 10);
-                this.addMessage(MessageType.INFO, "litematica.message.schematic_save_task_created");
+                this.addMessage(MessageOutput.INFO, "litematica.message.schematic_save_task_created");
             }
             else
             {
-                this.addMessage(MessageType.ERROR, "litematica.message.error.schematic_save_no_area_selected");
+                this.addMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save_no_area_selected");
             }
         }
     }

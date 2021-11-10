@@ -2,6 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
+import fi.dy.masa.malilib.gui.util.ScreenContext;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
@@ -17,8 +18,8 @@ public class WidgetTaskEntry extends BaseDataListEntryWidget<ITask>
     {
         super(x, y, width, height, listIndex, originalListIndex, task, listWidget);
 
-        this.removeButton = new GenericButton(x + width - 2, y + 1, -1, true, "litematica.gui.button.remove");
-        this.removeButton.setActionListener((w, btn) -> {
+        this.removeButton = new GenericButton("litematica.gui.button.remove");
+        this.removeButton.setActionListener(() -> {
             if (TaskScheduler.getInstanceClient().removeTask(this.getData()) == false)
             {
                 TaskScheduler.getInstanceServer().removeTask(this.getData());
@@ -34,7 +35,8 @@ public class WidgetTaskEntry extends BaseDataListEntryWidget<ITask>
         super.updateSubWidgetsToGeometryChanges();
 
         int x = this.getX() + this.getWidth() - 2;
-        this.removeButton.setRightX(x);
+        this.removeButton.setRight(x);
+        this.removeButton.setY(this.getY() + 1);
     }
 
     @Override
@@ -46,7 +48,7 @@ public class WidgetTaskEntry extends BaseDataListEntryWidget<ITask>
     }
 
     @Override
-    public void renderAt(int x, int y, float z, int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
+    public void renderAt(int x, int y, float z, ScreenContext ctx)
     {
         RenderUtils.color(1f, 1f, 1f, 1f);
 
@@ -71,7 +73,7 @@ public class WidgetTaskEntry extends BaseDataListEntryWidget<ITask>
         String name = this.getData().getDisplayName();
         this.drawString(x + 4, y + this.getCenteredTextOffsetY(), z, 0xFFFFFFFF, name);
 
-        this.renderSubWidgets(x, y, z, mouseX, mouseY, isActiveGui, hoveredWidgetId);
+        this.renderSubWidgets(x, y, z, ctx);
 
         //RenderUtils.disableItemLighting();
         //GlStateManager.disableLighting();

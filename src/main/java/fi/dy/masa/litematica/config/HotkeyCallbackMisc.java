@@ -24,7 +24,7 @@ import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 
 public class HotkeyCallbackMisc implements HotkeyCallback
@@ -112,7 +112,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             {
                 String keyRenderToggle = Hotkeys.TOGGLE_ALL_RENDERING.getKeyBind().getKeysDisplayString();
                 String keyToolToggle = Hotkeys.TOOL_ENABLED_TOGGLE.getKeyBind().getKeysDisplayString();
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, "litematica.error.execute_operation_no_tool", keyRenderToggle, keyToolToggle);
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, 8000, "litematica.error.execute_operation_no_tool", keyRenderToggle, keyToolToggle);
                 return true;
             }
 

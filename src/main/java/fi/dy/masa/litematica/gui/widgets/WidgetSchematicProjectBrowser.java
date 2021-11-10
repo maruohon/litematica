@@ -67,7 +67,7 @@ public class WidgetSchematicProjectBrowser extends BaseFileBrowserWidget impleme
         int x = this.getX() + this.getWidth() - this.infoWidth;
         int y = this.getY() + 4;
         int infoHeight = 100;
-        ShapeRenderUtils.renderOutlinedRectangle(x + 1, y - 4, this.getZLevel(), this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR);
+        ShapeRenderUtils.renderOutlinedRectangle(x + 1, y - 4, this.getZ(), this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR);
 
         SchematicProject project = this.selectedProject;
 

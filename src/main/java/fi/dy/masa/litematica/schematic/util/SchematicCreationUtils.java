@@ -35,7 +35,7 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
@@ -77,7 +77,7 @@ public class SchematicCreationUtils
 
         if (boxes.isEmpty())
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, StringUtils.translate("litematica.error.schematic.create.no_selections"));
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, StringUtils.translate("litematica.error.schematic.create.no_selections"));
             return null;
         }
 
@@ -142,7 +142,7 @@ public class SchematicCreationUtils
 
             if (schematicEntityList == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_entity_list", box.getName());
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save.missing_entity_list", box.getName());
                 continue;
             }
 
@@ -179,7 +179,7 @@ public class SchematicCreationUtils
 
             if (box == null || schematicEntityList == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_entity_list", regionName);
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save.missing_entity_list", regionName);
                 continue;
             }
 
@@ -226,7 +226,7 @@ public class SchematicCreationUtils
 
             if (container == null || blockEntityMap == null || tickMap == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
                 continue;
             }
 
@@ -338,7 +338,7 @@ public class SchematicCreationUtils
 
             if (container == null || blockEntityMap == null || tickMap == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
                 Litematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }

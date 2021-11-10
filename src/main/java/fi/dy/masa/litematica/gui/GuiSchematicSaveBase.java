@@ -13,8 +13,8 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
-import fi.dy.masa.malilib.overlay.message.MessageType;
-import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase implements SelectionListener<DirectoryEntry>
@@ -73,11 +73,11 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
         {
             if (entry != null && entry.getType() != DirectoryEntryType.DIRECTORY && entry.getType() != DirectoryEntryType.INVALID)
             {
-                this.setTextFieldText(FileUtils.getNameWithoutExtension(entry.getName()));
+                this.setTextFieldText(FileNameUtils.getFileNameWithoutExtension(entry.getName()));
             }
             else if (this.schematic != null && this.schematic.getFile() != null)
             {
-                this.setTextFieldText(FileUtils.getNameWithoutExtension(this.schematic.getFile().getName()));
+                this.setTextFieldText(FileNameUtils.getFileNameWithoutExtension(this.schematic.getFile().getName()));
             }
             else
             {
@@ -167,7 +167,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     @Override
     public boolean consumeString(String string)
     {
-        this.setNextMessageType(MessageType.ERROR);
+        this.setNextMessageType(MessageOutput.ERROR);
 
         return super.consumeString(string);
     }
@@ -177,7 +177,7 @@ public abstract class GuiSchematicSaveBase extends GuiSchematicBrowserBase imple
     {
         if (entry != null && entry.getType() != DirectoryEntryType.DIRECTORY && entry.getType() != DirectoryEntryType.INVALID)
         {
-            this.setTextFieldText(FileUtils.getNameWithoutExtension(entry.getName()));
+            this.setTextFieldText(FileNameUtils.getFileNameWithoutExtension(entry.getName()));
         }
     }
 

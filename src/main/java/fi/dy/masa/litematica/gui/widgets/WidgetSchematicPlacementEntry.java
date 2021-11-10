@@ -22,7 +22,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.icon.Icon;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.overlay.message.MessageHelpers;
@@ -132,7 +132,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
         boolean placementSelected = this.manager.getSelectedSchematicPlacement() == this.placement;
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel();
+        int z = this.getZ();
         int width = this.getWidth();
         int height = this.getHeight();
 
@@ -196,7 +196,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
     {
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel() + 1;
+        int z = this.getZ() + 1;
         int height = this.getHeight();
 
         if (this.placement.isLocked() &&
@@ -272,7 +272,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
             {
                 if (this.widget.placement.isLocked() && BaseScreen.isShiftDown() == false)
                 {
-                    this.widget.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_placements.remove_fail_locked");
+                    this.widget.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_placements.remove_fail_locked");
                 }
                 else
                 {
@@ -284,7 +284,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
             {
                 if (this.widget.placement.saveToFileIfChanged(this.widget.gui) == false)
                 {
-                    this.widget.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_placements.save_failed");
+                    this.widget.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_placements.save_failed");
                 }
             }
             else if (this.type == ButtonType.TOGGLE_ENABLED)

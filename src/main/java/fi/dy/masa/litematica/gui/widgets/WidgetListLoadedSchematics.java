@@ -8,7 +8,7 @@ import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
-import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
 
 public class WidgetListLoadedSchematics extends BaseListWidget<ISchematic, WidgetSchematicEntry>
@@ -34,7 +34,7 @@ public class WidgetListLoadedSchematics extends BaseListWidget<ISchematic, Widge
 
         if (entry.getFile() != null)
         {
-            String fileName = FileUtils.getNameWithoutExtension(entry.getFile().getName().toLowerCase());
+            String fileName = FileNameUtils.getFileNameWithoutExtension(entry.getFile().getName().toLowerCase());
             return ImmutableList.of(metaName, fileName);
         }
         else

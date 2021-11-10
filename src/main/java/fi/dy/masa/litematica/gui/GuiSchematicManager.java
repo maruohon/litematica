@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -23,17 +23,17 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.ConfirmActionScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.widget.button.BaseButton;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.listener.ConfirmationListener;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.util.FileUtils.FileDeleter;
-import fi.dy.masa.malilib.util.FileUtils.FileRenamer;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.consumer.StringConsumer;
 
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements SelectionListener<DirectoryEntry>
 {
@@ -185,7 +185,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
                 if (previewGenerator != null)
                 {
                     previewGenerator = null;
-                    this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_preview_cancelled");
+                    this.gui.addMessage(MessageOutput.SUCCESS, "litematica.message.schematic_preview_cancelled");
                 }
 
                 return;
@@ -195,7 +195,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
 
             if (entry == null)
             {
-                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
+                this.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_load.no_schematic_selected");
                 return;
             }
 
@@ -203,7 +203,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
 
             if (file.exists() == false || file.isFile() == false || file.canRead() == false)
             {
-                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
+                this.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
                 return;
             }
 
@@ -211,7 +211,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
 
             if (data == null)
             {
-                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
+                this.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_load.no_schematic_selected");
                 return;
             }
 
@@ -226,12 +226,12 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
                 }
                 else
                 {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_manager.schematic_has_no_name", type.getDisplayName());
+                    this.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_manager.schematic_has_no_name", type.getDisplayName());
                 }
             }
             else if (this.type == Type.RENAME_FILE)
             {
-                String oldName = FileUtils.getNameWithoutExtension(entry.getName());
+                String oldName = FileNameUtils.getFileNameWithoutExtension(entry.getName());
                 BaseScreen.openPopupScreen(new TextInputScreen("litematica.gui.title.rename_file", oldName, this.gui, new FileRenamer(entry.getDirectory(), entry.getName())));
             }
             else if (this.type == Type.DELETE_FILE)
@@ -253,11 +253,11 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
                     BaseScreen.openScreen(null);
                     String hotkeyName = Hotkeys.SET_SCHEMATIC_PREVIEW.getName();
                     String hotkeyValue = Hotkeys.SET_SCHEMATIC_PREVIEW.getKeyBind().getKeysDisplayString();
-                    MessageUtils.showGuiAndInGameMessage(MessageType.INFO, 8000, "litematica.info.schematic_manager.preview.info", hotkeyName, hotkeyValue);
+                    MessageUtils.showGuiAndInGameMessage(MessageOutput.INFO, 8000, "litematica.info.schematic_manager.preview.info", hotkeyName, hotkeyValue);
                 }
                 else
                 {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_manager.schematic_has_no_thumbnail", type.getDisplayName());
+                    this.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_manager.schematic_has_no_thumbnail", type.getDisplayName());
                 }
             }
         }
@@ -347,7 +347,85 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
             }
             else
             {
-                this.gui.addMessage(MessageType.ERROR,"litematica.error.schematic_rename.read_failed", this.fileName);
+                this.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_rename.read_failed", this.fileName);
+            }
+
+            return false;
+        }
+    }
+
+    public static class FileRenamer implements StringConsumer
+    {
+        protected final File dir;
+        protected final String oldName;
+
+        public FileRenamer(File dir, String oldName)
+        {
+            this.dir = dir;
+            this.oldName = oldName;
+        }
+
+        @Override
+        public boolean consumeString(String string)
+        {
+            if (FileNameUtils.doesFileNameContainIllegalCharacters(string))
+            {
+                MessageDispatcher.error("malilib.message.error.illegal_characters_in_file_name", string);
+                return false;
+            }
+
+            String newName = string;
+            int indexExt = this.oldName.lastIndexOf('.');
+            String ext = indexExt > 0 ? this.oldName.substring(indexExt) : null;
+
+            if (ext != null && newName.endsWith(ext) == false)
+            {
+                newName = newName + ext;
+            }
+
+            File newFile = new File(this.dir, newName);
+
+            if (newFile.exists() == false)
+            {
+                File oldFile = new File(this.dir, this.oldName);
+
+                if (oldFile.exists() && oldFile.canRead() && oldFile.renameTo(newFile))
+                {
+                    return true;
+                }
+                else
+                {
+                    MessageDispatcher.error("malilib.message.error.file_rename.rename_failed", this.oldName, newName);
+                }
+            }
+            else
+            {
+                MessageDispatcher.error("malilib.message.error.file_rename.file_already_exists", newName);
+            }
+
+            return false;
+        }
+    }
+
+    public static class FileDeleter implements ConfirmationListener
+    {
+        protected final File file;
+
+        public FileDeleter(File file)
+        {
+            this.file = file;
+        }
+
+        @Override
+        public boolean onActionConfirmed()
+        {
+            try
+            {
+                return this.file.delete();
+            }
+            catch (Exception e)
+            {
+                MessageDispatcher.error("malilib.message.error.file_delete_failed", this.file.getAbsolutePath());
             }
 
             return false;
@@ -398,7 +476,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
 
                     schematic.writeToFile(this.dir, this.fileName, true);
 
-                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.info.schematic_manager.preview.success");
+                    MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.info.schematic_manager.preview.success");
                 }
                 catch (Exception e)
                 {
@@ -407,7 +485,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_rename.read_failed");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_rename.read_failed");
             }
         }
     }

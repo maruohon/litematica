@@ -31,7 +31,7 @@ import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
@@ -350,19 +350,19 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
     {
         if (this.checkBoxOrigin != null)
         {
-            this.checkBoxOrigin.setChecked(this.selection.isOriginSelected(), false);
+            this.checkBoxOrigin.setSelected(this.selection.isOriginSelected(), false);
         }
 
         if (this.checkBoxCorner1 != null)
         {
             boolean checked = this.selection.getSelectedSubRegionBox() != null && this.selection.getSelectedSubRegionBox().getSelectedCorner() == Corner.CORNER_1;
-            this.checkBoxCorner1.setChecked(checked, false);
+            this.checkBoxCorner1.setSelected(checked, false);
         }
 
         if (this.checkBoxCorner2 != null)
         {
             boolean checked = this.selection.getSelectedSubRegionBox() != null && this.selection.getSelectedSubRegionBox().getSelectedCorner() == Corner.CORNER_2;
-            this.checkBoxCorner2.setChecked(checked, false);
+            this.checkBoxCorner2.setSelected(checked, false);
         }
     }
 
@@ -447,7 +447,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
             if (BaseScreen.isShiftDown()) { amount *= 10; }
             if (BaseScreen.isAltDown()) { amount *= 5; }
 
-            this.parent.setNextMessageType(MessageType.ERROR);
+            this.parent.setNextMessageType(MessageOutput.ERROR);
 
             switch (this.type)
             {
@@ -469,7 +469,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
 
                     if (newMode == SelectionMode.NORMAL && manager.hasNormalSelection() == false)
                     {
-                        this.parent.addMessage(MessageType.WARNING, "litematica.error.area_editor.switch_mode.no_selection");
+                        this.parent.addMessage(MessageOutput.WARNING, "litematica.error.area_editor.switch_mode.no_selection");
                     }
                     else
                     {
@@ -622,7 +622,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         @Override
         public void onSelectionChange(CheckBoxWidget entry)
         {
-            if (entry.isChecked())
+            if (entry.isSelected())
             {
                 // Origin
                 if (this.corner == Corner.NONE)

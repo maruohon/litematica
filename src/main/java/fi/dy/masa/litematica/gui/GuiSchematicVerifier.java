@@ -22,7 +22,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -264,7 +264,7 @@ public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, W
                 String name = Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getName();
                 String hotkeyName = Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getName();
                 String hotkeyVal = Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeyBind().getKeysDisplayString();
-                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.warn.schematic_verifier.overlay_disabled", name, hotkeyName, hotkeyVal);
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.WARNING, "litematica.message.warn.schematic_verifier.overlay_disabled", name, hotkeyName, hotkeyVal);
             }
         }
     }
@@ -437,7 +437,7 @@ public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, W
                     }
                     else
                     {
-                        this.parent.addMessage(MessageType.ERROR, "litematica.error.generic.schematic_world_not_loaded");
+                        this.parent.addMessage(MessageOutput.ERROR, "litematica.error.generic.schematic_world_not_loaded");
                     }
                     verifierLast = null; // force re-calculating the column lengths
                     break;

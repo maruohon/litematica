@@ -13,7 +13,7 @@ import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
@@ -114,7 +114,7 @@ public class WidgetSchematicPlacementFileEntry extends DirectoryEntryWidget
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZ() + 1, text);
         }
     }
 
@@ -149,7 +149,7 @@ public class WidgetSchematicPlacementFileEntry extends DirectoryEntryWidget
                 }
                 catch (Exception e)
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "malilib.error.file_delete_failed", file.getAbsolutePath());
+                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "malilib.error.file_delete_failed", file.getAbsolutePath());
                 }
             }
         }

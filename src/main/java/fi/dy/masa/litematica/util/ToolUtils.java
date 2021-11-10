@@ -33,7 +33,7 @@ import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
@@ -86,7 +86,7 @@ public class ToolUtils
 
             if (area == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
                 return;
             }
 
@@ -98,16 +98,16 @@ public class ToolUtils
                 TaskFillArea task = new TaskFillArea(boxes, state, stateToReplace, false);
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
 
-                MessageUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.INFO, "litematica.message.scheduled_task_added");
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.empty_area_selection");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.empty_area_selection");
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.generic.creative_mode_only");
         }
     }
 
@@ -144,7 +144,7 @@ public class ToolUtils
         {
             if (area == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
                 return;
             }
 
@@ -162,16 +162,16 @@ public class ToolUtils
 
                 TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
 
-                MessageUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.INFO, "litematica.message.scheduled_task_added");
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.empty_area_selection");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.empty_area_selection");
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.generic.creative_mode_only");
         }
     }
 
@@ -202,7 +202,7 @@ public class ToolUtils
         {
             if (area == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
                 return;
             }
 
@@ -213,16 +213,16 @@ public class ToolUtils
                 TaskUpdateBlocks task = new TaskUpdateBlocks(boxes);
                 TaskScheduler.getInstanceServer().scheduleTask(task, 20);
 
-                MessageUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.INFO, "litematica.message.scheduled_task_added");
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.empty_area_selection");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.empty_area_selection");
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.generic.creative_mode_only");
         }
     }
 
@@ -242,7 +242,7 @@ public class ToolUtils
     {
         if (mc.player == null || mc.player.capabilities.isCreativeMode == false)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.generic.creative_mode_only");
             return;
         }
 
@@ -259,7 +259,7 @@ public class ToolUtils
             scheduler.hasTask(TaskPasteSchematicPerChunkBase.class) ||
             scheduler.hasTask(TaskPasteSchematicDirect.class))
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.move.pending_tasks");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.move.pending_tasks");
             return;
         }
 
@@ -316,7 +316,7 @@ public class ToolUtils
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
         }
     }
 
@@ -369,7 +369,7 @@ public class ToolUtils
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
         }
 
         return false;

@@ -37,7 +37,7 @@ import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.data.IntBoundingBox;
@@ -670,7 +670,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         }
         catch (Exception e)
         {
-            gui.addMessage(MessageType.ERROR, "litematica.error.generic.failed_to_sort_list_of_ignored_states");
+            gui.addMessage(MessageOutput.ERROR, "litematica.error.generic.failed_to_sort_list_of_ignored_states");
         }
 
         return list;
@@ -682,12 +682,12 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         EnumFacing.Axis axis = range.getAxis();
         boolean ranged = this.schematicPlacement.getSchematicVerifierType() == BlockInfoListType.RENDER_LAYERS;
 
-        final int startX = ranged && axis == EnumFacing.Axis.X ? Math.max(box.minX, range.getLayerMin()) : box.minX;
-        final int startY = ranged && axis == EnumFacing.Axis.Y ? Math.max(box.minY, range.getLayerMin()) : box.minY;
-        final int startZ = ranged && axis == EnumFacing.Axis.Z ? Math.max(box.minZ, range.getLayerMin()) : box.minZ;
-        final int endX = ranged && axis == EnumFacing.Axis.X ? Math.min(box.maxX, range.getLayerMax()) : box.maxX;
-        final int endY = ranged && axis == EnumFacing.Axis.Y ? Math.min(box.maxY, range.getLayerMax()) : box.maxY;
-        final int endZ = ranged && axis == EnumFacing.Axis.Z ? Math.min(box.maxZ, range.getLayerMax()) : box.maxZ;
+        final int startX = ranged && axis == EnumFacing.Axis.X ? Math.max(box.minX, range.getMinLayerBoundary()) : box.minX;
+        final int startY = ranged && axis == EnumFacing.Axis.Y ? Math.max(box.minY, range.getMinLayerBoundary()) : box.minY;
+        final int startZ = ranged && axis == EnumFacing.Axis.Z ? Math.max(box.minZ, range.getMinLayerBoundary()) : box.minZ;
+        final int endX = ranged && axis == EnumFacing.Axis.X ? Math.min(box.maxX, range.getMaxLayerBoundary()) : box.maxX;
+        final int endY = ranged && axis == EnumFacing.Axis.Y ? Math.min(box.maxY, range.getMaxLayerBoundary()) : box.maxY;
+        final int endZ = ranged && axis == EnumFacing.Axis.Z ? Math.min(box.maxZ, range.getMaxLayerBoundary()) : box.maxZ;
 
         for (int y = startY; y <= endY; ++y)
         {

@@ -21,7 +21,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.malilib.overlay.message.MessageConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
@@ -285,7 +285,7 @@ public class AreaSelection
             {
                 if (feedback != null)
                 {
-                    feedback.addMessage(MessageType.ERROR, "litematica.error.area_editor.rename_sub_region.exists", newName);
+                    feedback.addMessage(MessageOutput.ERROR, "litematica.error.area_editor.rename_sub_region.exists", newName);
                 }
 
                 return false;
@@ -333,7 +333,7 @@ public class AreaSelection
         {
             String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String newStr = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_selection", oldStr, newStr);
+            MessageUtils.showGuiOrActionBarMessage(MessageOutput.SUCCESS, "litematica.message.moved_selection", oldStr, newStr);
         }
     }
 

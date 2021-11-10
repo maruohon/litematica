@@ -249,7 +249,7 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
 
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel();
+        int z = this.getZ();
         int width = this.getWidth();
         int height = this.getHeight();
 
@@ -366,7 +366,7 @@ public class WidgetSchematicVerificationResult extends SortableListEntryWidget<B
                 y = mouseY - height - 2;
             }
 
-            this.mismatchInfo.render(x, y, this.getZLevel() + 1, this.mc);
+            this.mismatchInfo.render(x, y, this.getZ() + 1, this.mc);
         }
     }
 

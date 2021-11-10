@@ -19,7 +19,7 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -140,11 +140,11 @@ public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, 
                             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(project);
                             BaseScreen.openScreen(gui);
                             String name = project.getName();
-                            MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
+                            MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.message.schematic_projects.project_loaded", name);
                         }
                         else
                         {
-                            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
+                            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.failed_to_load_project");
                         }
                     }
                 }
@@ -230,11 +230,11 @@ public class GuiSchematicProjectsBrowser extends BaseListScreen<DirectoryEntry, 
                 // would add it to the current GUI, which here is the text input GUI, which will close immediately
                 // after this method returns true.
                 this.gui.getListWidget().refreshEntries();
-                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.project_created", projectName);
+                this.gui.addMessage(MessageOutput.SUCCESS, "litematica.message.schematic_projects.project_created", projectName);
                 return true;
             }
 
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.project_already_exists", projectName);
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.project_already_exists", projectName);
 
             return false;
         }

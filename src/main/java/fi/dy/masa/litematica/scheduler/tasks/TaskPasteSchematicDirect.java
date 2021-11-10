@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.WorldUtils;
@@ -31,7 +31,7 @@ public class TaskPasteSchematicDirect extends TaskBase
     @Override
     public boolean execute()
     {
-        WorldServer world = this.mc.getIntegratedServer().getWorld(WorldUtils.getDimensionId(this.mc.world));
+        WorldServer world = WorldUtils.getServerWorldForClientWorld(this.mc);
 
         if (world != null && SchematicPlacingUtils.placeToWorld(this.placement, world, this.range, false))
         {
@@ -48,12 +48,12 @@ public class TaskPasteSchematicDirect extends TaskBase
         {
             if (this.printCompletionMessage)
             {
-                MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.schematic_pasted");
+                MessageUtils.showGuiOrActionBarMessage(MessageOutput.SUCCESS, "litematica.message.schematic_pasted");
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_paste_failed");
         }
 
         super.stop();

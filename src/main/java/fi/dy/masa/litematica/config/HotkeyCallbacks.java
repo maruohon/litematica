@@ -6,6 +6,7 @@ import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.config.ValueChangeCallback;
 import fi.dy.masa.malilib.config.option.BooleanConfig;
+import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.input.KeyAction;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
@@ -144,7 +145,7 @@ public class HotkeyCallbacks
         }
 
         @Override
-        public boolean onKeyAction(KeyAction action, KeyBind key)
+        public ActionResult onKeyAction(KeyAction action, KeyBind key)
         {
             super.onKeyAction(action, key);
 
@@ -153,7 +154,7 @@ public class HotkeyCallbacks
                 refreshRenderer();
             }
 
-            return true;
+            return ActionResult.SUCCESS;
         }
     }
 }

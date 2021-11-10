@@ -276,20 +276,9 @@ public class DataManager implements DirectoryCache
 
     private void fromJson(JsonObject obj)
     {
-        if (JsonUtils.hasObject(obj, "selections"))
-        {
-            this.selectionManager.loadFromJson(obj.get("selections").getAsJsonObject());
-        }
-
-        if (JsonUtils.hasObject(obj, "placements"))
-        {
-            this.schematicPlacementManager.loadFromJson(obj.get("placements").getAsJsonObject());
-        }
-
-        if (JsonUtils.hasObject(obj, "schematic_projects_manager"))
-        {
-            this.schematicProjectsManager.loadFromJson(obj.get("schematic_projects_manager").getAsJsonObject());
-        }
+        JsonUtils.readObjectIfPresent(obj, "selections", this.selectionManager::loadFromJson);
+        JsonUtils.readObjectIfPresent(obj, "placements", this.schematicPlacementManager::loadFromJson);
+        JsonUtils.readObjectIfPresent(obj, "schematic_projects_manager", this.schematicProjectsManager::loadFromJson);
 
         if (JsonUtils.hasObject(obj, "render_range"))
         {
@@ -476,7 +465,7 @@ public class DataManager implements DirectoryCache
     private static String getStorageFileName(boolean globalData)
     {
         Minecraft mc = Minecraft.getMinecraft();
-        return globalData ? "data_common.json" : "data_dim_" + WorldUtils.getDimensionId(mc.world) + ".json";
+        return globalData ? "data_common.json" : "data_dim_" + WorldUtils.getDimensionAsString(mc.world) + ".json";
     }
 
     public static void setToolItem(String itemNameIn)

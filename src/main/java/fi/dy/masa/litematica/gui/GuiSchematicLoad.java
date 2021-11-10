@@ -21,7 +21,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicLoad extends GuiSchematicBrowserBase
@@ -66,7 +66,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         String hover = StringUtils.translate("litematica.gui.label.schematic_load.hoverinfo.create_placement");
         CheckBoxWidget checkbox = new CheckBoxWidget(x, y, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label, hover);
         checkbox.setListener((widget) -> { Configs.Internal.CREATE_PLACEMENT_ON_LOAD.setValue(widget.isChecked()); });
-        checkbox.setChecked(Configs.Internal.CREATE_PLACEMENT_ON_LOAD.getBooleanValue(), false);
+        checkbox.setSelected(Configs.Internal.CREATE_PLACEMENT_ON_LOAD.getBooleanValue(), false);
         this.addWidget(checkbox);
 
         y = this.height - 26;
@@ -127,7 +127,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
             if (entry == null)
             {
-                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_selected");
+                this.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_load.no_schematic_selected");
                 return;
             }
 
@@ -136,17 +136,17 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
 
             if (data == null)
             {
-                this.gui.addMessage(MessageType.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
+                this.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_load.cant_read_file", file.getName());
                 return;
             }
 
-            this.gui.setNextMessageType(MessageType.ERROR);
+            this.gui.setNextMessageType(MessageOutput.ERROR);
             ISchematic schematic = data.schematic;
 
             if (this.type == Type.LOAD_SCHEMATIC)
             {
                 SchematicHolder.getInstance().addSchematic(schematic, true);
-                this.gui.addMessage(MessageType.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
+                this.gui.addMessage(MessageOutput.SUCCESS, "litematica.info.schematic_load.schematic_loaded", file.getName());
 
                 if (Configs.Internal.CREATE_PLACEMENT_ON_LOAD.getBooleanValue())
                 {
@@ -166,7 +166,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
                 {
                     MaterialListCreator creator = new MaterialListCreator(schematic);
                     StringListSelectionScreen gui = new StringListSelectionScreen(schematic.getRegionNames(), creator);
-                    gui.setTitle(StringUtils.translate("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName()));
+                    gui.setTitle("litematica.gui.title.material_list.select_schematic_regions", schematic.getMetadata().getName());
                     gui.setParent(GuiUtils.getCurrentScreen());
                     BaseScreen.openScreen(gui);
                 }

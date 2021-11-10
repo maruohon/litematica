@@ -25,7 +25,7 @@ import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFu
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.mixin.IMixinNBTTagLongArray;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
@@ -161,7 +161,7 @@ public class LitematicaSchematic extends SchematicBase
             }
             catch (Exception e)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "TODO - Failed to create the block state container for sub-region: " + regionName);
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "TODO - Failed to create the block state container for sub-region: " + regionName);
                 Litematica.logger.warn("Failed to create the block state container for sub-region '{}'", regionName, e.getMessage());
             }
 
@@ -249,12 +249,12 @@ public class LitematicaSchematic extends SchematicBase
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_load.unsupported_schematic_version", version);
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_load.unsupported_schematic_version", version);
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_load.no_schematic_version_information");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_load.no_schematic_version_information");
         }
 
         return false;

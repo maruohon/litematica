@@ -24,7 +24,7 @@ import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.input.KeyAction;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 
 public class HotkeyCallbackOpenGui implements HotkeyCallback
@@ -65,7 +65,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_area_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
             }
         }
         else if (key == Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeyBind())
@@ -92,7 +92,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 }
                 else
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
                 }
             }
 
@@ -113,7 +113,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 }
                 else
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
+                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
                 }
             }
         }
@@ -136,7 +136,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
             }
         }
         else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeyBind())
@@ -157,7 +157,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.message.error.no_placement_selected");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
             }
         }
         else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeyBind())
@@ -168,7 +168,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.WARNING, "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
             }
         }
 

@@ -20,9 +20,9 @@ import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
 import fi.dy.masa.malilib.overlay.message.MessageConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
@@ -269,7 +269,7 @@ public class SchematicPlacementUnloaded
 
             if (origin == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_placements.settings_load.missing_data");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_placements.settings_load.missing_data");
                 String name = this.schematicFile != null ? this.schematicFile.getAbsolutePath() : "<null>";
                 Litematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", name);
                 return false;
@@ -527,7 +527,7 @@ public class SchematicPlacementUnloaded
     {
         if (this.shouldBeSaved == false)
         {
-            feedback.addMessage(MessageType.WARNING, "litematica.message.error.schematic_placement.save.should_not_save");
+            feedback.addMessage(MessageOutput.WARNING, "litematica.message.error.schematic_placement.save.should_not_save");
             return false;
         }
 
@@ -544,7 +544,7 @@ public class SchematicPlacementUnloaded
 
         if (file == null)
         {
-            feedback.addMessage(MessageType.ERROR, "litematica.message.error.schematic_placement.save.failed_to_get_save_file");
+            feedback.addMessage(MessageOutput.ERROR, "litematica.message.error.schematic_placement.save.failed_to_get_save_file");
             return false;
         }
 
@@ -558,13 +558,13 @@ public class SchematicPlacementUnloaded
             }
             else
             {
-                feedback.addMessage(MessageType.ERROR, "litematica.message.error.schematic_placement.save.failed_to_serialize");
+                feedback.addMessage(MessageOutput.ERROR, "litematica.message.error.schematic_placement.save.failed_to_serialize");
                 return false;
             }
         }
         else
         {
-            feedback.addMessage(MessageType.WARNING, "litematica.message.error.schematic_placement.save.no_changes");
+            feedback.addMessage(MessageOutput.WARNING, "litematica.message.error.schematic_placement.save.no_changes");
         }
 
         return true;
@@ -610,7 +610,7 @@ public class SchematicPlacementUnloaded
                 this.placementSaveFile = file.getName();
             }
 
-            feedback.addMessage(MessageType.SUCCESS, "litematica.gui.label.schematic_placement.saved_to_file", file.getName());
+            feedback.addMessage(MessageOutput.SUCCESS, "litematica.gui.label.schematic_placement.saved_to_file", file.getName());
         }
 
         return success;
@@ -642,7 +642,7 @@ public class SchematicPlacementUnloaded
         else
         {
             String sep = File.separator;
-            String dimStr = "dim_" + WorldUtils.getDimensionId(world);
+            String dimStr = "dim_" + WorldUtils.getDimensionAsString(world);
             path = worldName + sep + dimStr;
         }
 
@@ -658,8 +658,8 @@ public class SchematicPlacementUnloaded
         }
 
         File dir = getSaveDirectory();
-        String schName = FileUtils.getNameWithoutExtension(this.getSchematicFile().getName());
-        String nameBase = FileUtils.generateSafeFileName(schName);
+        String schName = FileNameUtils.getFileNameWithoutExtension(this.getSchematicFile().getName());
+        String nameBase = FileNameUtils.generateSafeFileName(schName);
         int id = 1;
         String name = String.format("%s_%03d.json", nameBase, id);
         File file = new File(dir, name);

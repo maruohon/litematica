@@ -181,7 +181,7 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
     {
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel();
+        int z = this.getZ();
         int width = this.getWidth();
         int height = this.getHeight();
 
@@ -295,7 +295,7 @@ public class WidgetMaterialListEntry extends SortableListEntryWidget<MaterialLis
             int x1 = x + 10;
             int x2 = x1 + w1 + 20;
             int y1 = y + 6;
-            int z = this.getZLevel() + 1;
+            int z = this.getZ() + 1;
 
             ShapeRenderUtils.renderOutlinedRectangle(x, y, z, totalWidth, 60, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR);
             ShapeRenderUtils.renderRectangle(x2, y1, z, 16, 16, 0x20FFFFFF); // light background for the item

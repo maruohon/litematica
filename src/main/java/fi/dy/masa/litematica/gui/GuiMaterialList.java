@@ -25,7 +25,7 @@ import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.gui.widget.InfoIconWidget;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
@@ -270,7 +270,7 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
 
                 case CLEAR_CACHE:
                     MaterialCache.getInstance().clearCache();
-                    this.parent.addMessage(MessageType.SUCCESS, 3000, "litematica.message.material_list.material_cache_cleared");
+                    this.parent.addMessage(MessageOutput.SUCCESS, 3000, "litematica.message.material_list.material_cache_cleared");
                     break;
 
                 case WRITE_TO_FILE:
@@ -282,7 +282,7 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
                     if (file != null)
                     {
                         String key = "litematica.message.material_list_written_to_file";
-                        this.parent.addMessage(MessageType.SUCCESS, key, file.getName());
+                        this.parent.addMessage(MessageOutput.SUCCESS, key, file.getName());
                         StringUtils.sendOpenFileChatMessage(this.parent.mc.player, key, file);
                     }
                     break;

@@ -11,9 +11,9 @@ import fi.dy.masa.malilib.gui.icon.Icon;
 import fi.dy.masa.malilib.gui.icon.IconProvider;
 import fi.dy.masa.malilib.gui.widget.DropDownListWidget;
 import fi.dy.masa.malilib.gui.widget.RadioButtonWidget;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
@@ -28,7 +28,7 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
 
         this.schematic = schematic;
         boolean hasSchematicExtension = SchematicType.getPossibleTypesFromFileName(inputName).isEmpty() == false;
-        this.defaultText = hasSchematicExtension ? FileUtils.getNameWithoutExtension(inputName) : inputName;
+        this.defaultText = hasSchematicExtension ? FileNameUtils.getFileNameWithoutExtension(inputName) : inputName;
 
         this.title = StringUtils.translate("litematica.gui.title.save_schematic_convert", inputName);
         this.useTitleHierarchy = false;
@@ -60,18 +60,27 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
     protected void createCustomElements()
     {
         this.addWidget(this.widgetOutputType);
-        int x = this.widgetOutputType.getX() + this.widgetOutputType.getWidth() + 4;
+        int x = this.widgetOutputType.getRight() + 4;
         int y = this.widgetOutputType.getY();
         x = this.createButton(x, y, ButtonType.SAVE);
 
         if (this.updatePlacementsOption)
         {
-            this.widgetUpdatePlacements = new RadioButtonWidget<>(x, y - 2,
-                                                                  UpdatePlacementsOption.asList(), UpdatePlacementsOption::getDisplayString,
+            this.widgetUpdatePlacements = new RadioButtonWidget<>(UpdatePlacementsOption.asList(), UpdatePlacementsOption::getDisplayString,
                                                                   "litematica.gui.hover.schematic_save.update_dependent_placements");
             this.widgetUpdatePlacements.setSelection(UpdatePlacementsOption.NONE, false);
             this.addWidget(this.widgetUpdatePlacements);
         }
+    }
+
+    @Override
+    protected void updateWidgetPositions()
+    {
+        super.updateWidgetPositions();
+
+        int x = 0; // FIXME
+        int y = this.widgetOutputType.getY();
+        this.widgetUpdatePlacements.setPosition(x, y - 2);
     }
 
     @Override
@@ -82,19 +91,19 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
 
         if (dir.isDirectory() == false)
         {
-            this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
+            this.addMessage(MessageOutput.ERROR, "litematica.error.schematic_save.invalid_directory", dir.getAbsolutePath());
             return;
         }
 
-        if (FileUtils.doesFilenameContainIllegalCharacters(fileName))
+        if (FileNameUtils.doesFileNameContainIllegalCharacters(fileName))
         {
-            this.addMessage(MessageType.ERROR, "malilib.error.illegal_characters_in_file_name", fileName);
+            this.addMessage(MessageOutput.ERROR, "malilib.error.illegal_characters_in_file_name", fileName);
             return;
         }
 
         if (fileName.isEmpty())
         {
-            this.addMessage(MessageType.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
+            this.addMessage(MessageOutput.ERROR, "litematica.error.schematic_save.invalid_schematic_name", fileName);
             return;
         }
 
@@ -118,8 +127,8 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
                 }
                 catch (Exception e)
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, "litematica.error.schematic_convert.failed_to_convert");
-                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, e.getMessage());
+                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, 8000, "litematica.error.schematic_convert.failed_to_convert");
+                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, 8000, e.getMessage());
                 }
             }
             else
@@ -146,16 +155,16 @@ public class GuiSchematicSaveConvert extends GuiSchematicSaveBase
                     }
                 }
 
-                this.addMessage(MessageType.SUCCESS, "litematica.message.schematic_convert.success", fileName);
+                this.addMessage(MessageOutput.SUCCESS, "litematica.message.schematic_convert.success", fileName);
             }
             else
             {
-                this.addMessage(MessageType.ERROR, "litematica.error.schematic_convert.failed_to_save", fileName);
+                this.addMessage(MessageOutput.ERROR, "litematica.error.schematic_convert.failed_to_save", fileName);
             }
         }
         else
         {
-            this.addMessage(MessageType.ERROR, "litematica.error.schematic_convert.no_output_type_selected");
+            this.addMessage(MessageOutput.ERROR, "litematica.error.schematic_convert.no_output_type_selected");
         }
     }
 

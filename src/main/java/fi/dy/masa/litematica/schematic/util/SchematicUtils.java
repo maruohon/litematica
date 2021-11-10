@@ -135,12 +135,12 @@ public class SchematicUtils
     public static Pair<Vec3i, Vec3i> getLayerRangeClampedSubRegion(LayerRange range,
             SchematicPlacement schematicPlacement, SubRegionPlacement placement, Vec3i regionSize)
     {
-        int minX = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
-        int minY = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
-        int minZ = range.getClampedValue(LayerRange.getWorldMinValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
-        int maxX = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
-        int maxY = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
-        int maxZ = range.getClampedValue(LayerRange.getWorldMaxValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
+        int minX = range.getClampedValue(LayerRange.getMinValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
+        int minY = range.getClampedValue(LayerRange.getMinValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
+        int minZ = range.getClampedValue(LayerRange.getMinValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
+        int maxX = range.getClampedValue(LayerRange.getMaxValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
+        int maxY = range.getClampedValue(LayerRange.getMaxValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
+        int maxZ = range.getClampedValue(LayerRange.getMaxValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
 
         BlockPos posMinRange = new BlockPos(minX, minY, minZ);
         BlockPos posMaxRange = new BlockPos(maxX, maxY, maxZ);

@@ -65,13 +65,13 @@ public class GuiRenderLayer extends BaseRenderLayerEditScreen
         String hover = StringUtils.translate("litematica.gui.label.render_layers.hover.hotkey");
 
         CheckBoxWidget cb = new CheckBoxWidget(x, y + 4, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label, hover);
-        cb.setChecked(layerRange.getMoveLayerRangeMax(), false);
+        cb.setSelected(layerRange.getMoveLayerRangeMax(), false);
         cb.setListener(new RangeHotkeyListener(layerRange, true));
         this.addWidget(cb);
 
         y += 23;
         cb = new CheckBoxWidget(x, y + 4, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, label, hover);
-        cb.setChecked(layerRange.getMoveLayerRangeMin(), false);
+        cb.setSelected(layerRange.getMoveLayerRangeMin(), false);
         cb.setListener(new RangeHotkeyListener(layerRange, false));
         this.addWidget(cb);
 

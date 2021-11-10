@@ -29,7 +29,7 @@ public class WidgetSchematicVersion extends BaseListEntryWidget<SchematicVersion
         boolean versionSelected = this.project.getCurrentVersion() == this.entry;
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel();
+        int z = this.getZ();
         int width = this.getWidth();
         int height = this.getHeight();
 

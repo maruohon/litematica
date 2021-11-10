@@ -9,7 +9,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
 import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
-import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
 
 public class WidgetListSchematicPlacements extends BaseListWidget<SchematicPlacementUnloaded, WidgetSchematicPlacementEntry>
@@ -37,7 +37,7 @@ public class WidgetListSchematicPlacements extends BaseListWidget<SchematicPlace
     {
         if (entry.getSchematicFile() != null)
         {
-            String fileName = FileUtils.getNameWithoutExtension(entry.getSchematicFile().getName().toLowerCase());
+            String fileName = FileNameUtils.getFileNameWithoutExtension(entry.getSchematicFile().getName().toLowerCase());
             return ImmutableList.of(entry.getName().toLowerCase(), fileName);
         }
         else

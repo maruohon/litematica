@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -13,10 +14,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class SpongeSchematic extends SingleRegionSchematic
@@ -96,11 +97,16 @@ public class SpongeSchematic extends SingleRegionSchematic
         for (String key : tag.getKeySet())
         {
             int id = tag.getInteger(key);
-            IBlockState state = BlockUtils.getBlockStateFromString(key);
+            Optional<IBlockState> stateOptional = BlockUtils.getBlockStateFromString(key);
+            IBlockState state;
 
-            if (state == null)
+            if (stateOptional.isPresent())
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.error.schematic_read.sponge.palette.unknown_block", key);
+                state = stateOptional.get();
+            }
+            else
+            {
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.WARNING, "litematica.message.error.schematic_read.sponge.palette.unknown_block", key);
                 state = LitematicaBlockStateContainerFull.AIR_BLOCK_STATE;
             }
 

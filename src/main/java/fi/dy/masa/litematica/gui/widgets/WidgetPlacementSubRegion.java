@@ -88,7 +88,7 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
         boolean placementSelected = this.schematicPlacement.getSelectedSubRegionPlacement() == this.placement;
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel();
+        int z = this.getZ();
         int width = this.getWidth();
         int height = this.getHeight();
 
@@ -146,7 +146,7 @@ public class WidgetPlacementSubRegion extends BaseListEntryWidget<SubRegionPlace
         String fileName = schematicFile != null ? schematicFile.getName() : StringUtils.translate("litematica.gui.label.schematic_placement.hover.in_memory");
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel() + 1;
+        int z = this.getZ() + 1;
         int height = this.getHeight();
 
         if (this.placement.isRegionPlacementModifiedFromDefault() &&

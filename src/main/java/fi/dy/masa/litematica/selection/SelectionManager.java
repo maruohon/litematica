@@ -28,8 +28,8 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.overlay.message.MessageConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageType;
-import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
@@ -67,7 +67,7 @@ public class SelectionManager
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.error.schematic_projects.in_projects_mode_but_no_project_open");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.WARNING, "litematica.error.schematic_projects.in_projects_mode_but_no_project_open");
             }
         }
         else
@@ -234,11 +234,11 @@ public class SelectionManager
 
         if (file.exists() && file.isFile())
         {
-            String newFileName = FileUtils.generateSafeFileName(newName);
+            String newFileName = FileNameUtils.generateSafeFileName(newName);
 
             if (newFileName.isEmpty())
             {
-                feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.invalid_safe_file_name", newFileName);
+                feedback.addMessage(MessageOutput.ERROR, "litematica.error.area_selection.rename.invalid_safe_file_name", newFileName);
                 return false;
             }
 
@@ -257,7 +257,7 @@ public class SelectionManager
                     }
                     catch (Exception e)
                     {
-                        feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.copy_failed");
+                        feedback.addMessage(MessageOutput.ERROR, "litematica.error.area_selection.copy_failed");
                         Litematica.logger.warn("Copy failed", e);
                         return false;
                     }
@@ -286,7 +286,7 @@ public class SelectionManager
             }
             else
             {
-                feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.already_exists", newFile.getName());
+                feedback.addMessage(MessageOutput.ERROR, "litematica.error.area_selection.rename.already_exists", newFile.getName());
             }
         }
 
@@ -310,7 +310,7 @@ public class SelectionManager
     public String createNewSelection(File dir, final String nameIn)
     {
         String name = nameIn;
-        String safeName = FileUtils.generateSafeFileName(name);
+        String safeName = FileNameUtils.generateSafeFileName(name);
         File file = new File(dir, safeName + ".json");
         String selectionId = file.getAbsolutePath();
         int i = 1;
@@ -318,7 +318,7 @@ public class SelectionManager
         while (i < 1000 && (safeName.isEmpty() || this.selections.containsKey(selectionId) || file.exists()))
         {
             name = nameIn + " " + i;
-            safeName = FileUtils.generateSafeFileName(name);
+            safeName = FileNameUtils.generateSafeFileName(name);
             file = new File(dir, safeName + ".json");
             selectionId = file.getAbsolutePath();
             i++;
@@ -350,7 +350,7 @@ public class SelectionManager
                 if (printMessage)
                 {
                     String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                    MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
+                    MessageUtils.showGuiOrActionBarMessage(MessageOutput.SUCCESS, "litematica.message.added_selection_box", posStr);
                 }
 
                 return true;
@@ -368,7 +368,7 @@ public class SelectionManager
         {
             if (selection.getSubRegionBox(name) != null)
             {
-                feedback.addMessage(MessageType.ERROR, "litematica.error.area_editor.create_sub_region.exists", name);
+                feedback.addMessage(MessageOutput.ERROR, "litematica.error.area_editor.create_sub_region.exists", name);
                 return false;
             }
 
@@ -377,7 +377,7 @@ public class SelectionManager
             if (selection.createNewSubRegionBox(pos, name) != null)
             {
                 String posStr = String.format("x: %d, y: %d, z: %d", pos.getX(), pos.getY(), pos.getZ());
-                feedback.addMessage(MessageType.SUCCESS, "litematica.message.added_selection_box", posStr);
+                feedback.addMessage(MessageOutput.SUCCESS, "litematica.message.added_selection_box", posStr);
 
                 return true;
             }
@@ -388,11 +388,11 @@ public class SelectionManager
 
     public boolean createSelectionFromPlacement(File dir, SchematicPlacement placement, String name, MessageConsumer feedback)
     {
-        String safeName = FileUtils.generateSafeFileName(name);
+        String safeName = FileNameUtils.generateSafeFileName(name);
 
         if (safeName.isEmpty())
         {
-            feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.rename.invalid_safe_file_name", safeName);
+            feedback.addMessage(MessageOutput.ERROR, "litematica.error.area_selection.rename.invalid_safe_file_name", safeName);
             return false;
         }
 
@@ -414,7 +414,7 @@ public class SelectionManager
             return true;
         }
 
-        feedback.addMessage(MessageType.ERROR, "litematica.error.area_selection.create_failed", safeName);
+        feedback.addMessage(MessageOutput.ERROR, "litematica.error.area_selection.create_failed", safeName);
 
         return false;
     }
@@ -574,7 +574,7 @@ public class SelectionManager
 
             String posStrOld = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String posStrNew = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            MessageUtils.showGuiOrActionBarMessage(MessageType.SUCCESS, "litematica.message.moved_area_origin", posStrOld, posStrNew);
+            MessageUtils.showGuiOrActionBarMessage(MessageOutput.SUCCESS, "litematica.message.moved_area_origin", posStrOld, posStrNew);
         }
     }
 
@@ -713,7 +713,7 @@ public class SelectionManager
             }
             else
             {
-                MessageUtils.showGuiOrActionBarMessage(MessageType.WARNING, "litematica.error.area_editor.open_gui.no_selection");
+                MessageUtils.showGuiOrActionBarMessage(MessageOutput.WARNING, "litematica.error.area_editor.open_gui.no_selection");
                 return null;
             }
         }

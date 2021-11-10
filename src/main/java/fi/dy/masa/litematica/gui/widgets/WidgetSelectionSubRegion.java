@@ -68,7 +68,7 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
         boolean selected = this.entry.equals(this.selection.getCurrentSubRegionBoxName());
         int x = this.getX();
         int y = this.getY();
-        int z = this.getZLevel();
+        int z = this.getZ();
         int width = this.getWidth();
         int height = this.getHeight();
 
@@ -133,7 +133,7 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZ() + 1, text);
         }
 
         RenderUtils.color(1f, 1f, 1f, 1f);

@@ -18,10 +18,10 @@ import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
+import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, DirectoryEntryWidget, WidgetAreaSelectionBrowser> implements SelectionListener<DirectoryEntry>
@@ -45,7 +45,7 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
 
         if (this.selectionManager.getSelectionMode() == SelectionMode.SIMPLE)
         {
-            MessageUtils.showGuiMessage(MessageType.WARNING, "litematica.message.warn.area_selection.browser_open_in_simple_mode");
+            MessageUtils.showGuiMessage(MessageOutput.WARNING, "litematica.message.warn.area_selection.browser_open_in_simple_mode");
         }
     }
 
@@ -74,7 +74,7 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
 
             if (currentSelection.length() > len + 1)
             {
-                currentSelection = FileUtils.getNameWithoutExtension(currentSelection.substring(len + 1));
+                currentSelection = FileNameUtils.getFileNameWithoutExtension(currentSelection.substring(len + 1));
                 String str = StringUtils.translate("litematica.gui.label.area_selection_manager.current_selection", currentSelection);
                 this.addLabel(10, this.height - 14, 0xFFFFFFFF, str);
             }
@@ -190,7 +190,7 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
                 }
                 else
                 {
-                    this.gui.addMessage(MessageType.ERROR, "litematica.error.area_selection.no_placement_selected");
+                    this.gui.addMessage(MessageOutput.ERROR, "litematica.error.area_selection.no_placement_selected");
                 }
             }
             else if (this.type == ButtonType.UNSELECT)
@@ -258,7 +258,7 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
         {
             if (this.gui.getSelectionManager().createSelectionFromPlacement(this.dir, this.placement, name, this.gui))
             {
-                this.gui.addMessage(MessageType.SUCCESS, "litematica.message.area_selections.selection_created_from_placement", name);
+                this.gui.addMessage(MessageOutput.SUCCESS, "litematica.message.area_selections.selection_created_from_placement", name);
                 this.gui.getListWidget().refreshEntries();
                 return true;
             }

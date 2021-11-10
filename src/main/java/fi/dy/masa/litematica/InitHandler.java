@@ -12,33 +12,27 @@ import fi.dy.masa.litematica.gui.ConfigScreen;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.ClientTickHandler;
 import fi.dy.masa.malilib.config.BaseModConfig;
-import fi.dy.masa.malilib.config.ConfigManager;
 import fi.dy.masa.malilib.event.InitializationHandler;
-import fi.dy.masa.malilib.event.dispatch.ClientWorldChangeEventDispatcher;
-import fi.dy.masa.malilib.input.InputDispatcher;
-import fi.dy.masa.malilib.input.HotkeyManager;
-import fi.dy.masa.malilib.event.dispatch.RenderEventDispatcher;
-import fi.dy.masa.malilib.event.dispatch.TickEventDispatcher;
-import fi.dy.masa.malilib.gui.config.ConfigTabRegistry;
+import fi.dy.masa.malilib.registry.Registry;
 
 public class InitHandler implements InitializationHandler
 {
     @Override
     public void registerModHandlers()
     {
-        ConfigManager.INSTANCE.registerConfigHandler(BaseModConfig.createDefaultModConfig(Reference.MOD_INFO, 1, Configs.CATEGORIES));
-        ConfigTabRegistry.INSTANCE.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
+        Registry.CONFIG_MANAGER.registerConfigHandler(BaseModConfig.createDefaultModConfig(Reference.MOD_INFO, 1, Configs.CATEGORIES));
+        Registry.CONFIG_TAB.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
-        HotkeyManager.INSTANCE.registerHotkeyProvider(InputHandler.getInstance());
-        InputDispatcher.INSTANCE.registerMouseInputHandler(InputHandler.getInstance());
+        Registry.HOTKEY_MANAGER.registerHotkeyProvider(InputHandler.getInstance());
+        Registry.INPUT_DISPATCHER.registerMouseInputHandler(InputHandler.getInstance());
 
         RenderHandler renderer = new RenderHandler();
-        RenderEventDispatcher.INSTANCE.registerGameOverlayRenderer(renderer);
-        RenderEventDispatcher.INSTANCE.registerWorldPostRenderer(renderer);
+        Registry.RENDER_EVENT_DISPATCHER.registerGameOverlayRenderer(renderer);
+        Registry.RENDER_EVENT_DISPATCHER.registerWorldPostRenderer(renderer);
 
-        TickEventDispatcher.INSTANCE.registerClientTickHandler(new ClientTickHandler());
+        Registry.TICK_EVENT_DISPATCHER.registerClientTickHandler(new ClientTickHandler());
 
-        ClientWorldChangeEventDispatcher.INSTANCE.registerClientWorldChangeHandler(new ClientWorldChangeHandler());
+        Registry.CLIENT_WORLD_CHANGE_EVENT_DISPATCHER.registerClientWorldChangeHandler(new ClientWorldChangeHandler());
 
         FileMigrationUtils.tryMigrateOldPerWorldData();
         FileMigrationUtils.tryMigrateOldAreaSelections();

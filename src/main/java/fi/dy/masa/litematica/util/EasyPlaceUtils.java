@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneComparator;
@@ -35,18 +36,18 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.malilib.overlay.message.MessageType;
-import fi.dy.masa.malilib.input.KeyBindImpl;
-import fi.dy.masa.malilib.interoperation.BlockPlacementPositionHandler;
-import fi.dy.masa.malilib.util.BlockUtils;
+import fi.dy.masa.malilib.input.Keys;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.util.data.IntBoundingBox;
-import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.registry.Registry;
+import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.PlacementUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.position.SubChunkPos;
+import fi.dy.masa.malilib.util.data.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.HitPosition;
+import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class EasyPlaceUtils
 {
@@ -116,7 +117,7 @@ public class EasyPlaceUtils
         if (mc.player != null && isHandling == false &&
             shouldDoEasyPlaceActions() &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
-            KeyBindImpl.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
+            Keys.isKeyDown(mc.gameSettings.keyBindUseItem.getKeyCode()))
         {
             isHandling = true;
             handleEasyPlace(mc);
@@ -138,7 +139,7 @@ public class EasyPlaceUtils
         // Only print the warning message once per right click
         if (isFirstClickEasyPlace && result == EnumActionResult.FAIL)
         {
-            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue(), MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
+            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue(), MessageOutput.WARNING, 1000, "litematica.message.easy_place_fail");
         }
 
         isFirstClickEasyPlace = false;
@@ -160,7 +161,7 @@ public class EasyPlaceUtils
     @Nullable
     private static HitPosition getTargetPosition(@Nullable RayTraceWrapper traceWrapper, Minecraft mc)
     {
-        BlockPos overriddenPos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
+        BlockPos overriddenPos = Registry.BLOCK_PLACEMENT_POSITION_HANDLER.getCurrentPlacementPosition();
 
         if (overriddenPos != null)
         {
@@ -512,11 +513,11 @@ public class EasyPlaceUtils
         double y = hitVecIn.y;
         double z = hitVecIn.z;
         Block block = state.getBlock();
-        EnumFacing facing = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
+        Optional<EnumFacing> facingOptional = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
 
-        if (facing != null)
+        if (facingOptional.isPresent())
         {
-            x = facing.ordinal() + 2 + pos.getX();
+            x = facingOptional.get().ordinal() + 2 + pos.getX();
         }
 
         if (block instanceof BlockRedstoneRepeater)
@@ -541,11 +542,11 @@ public class EasyPlaceUtils
 
     private static EnumFacing applyPlacementFacing(IBlockState stateSchematic, EnumFacing side, IBlockState stateClient)
     {
-        PropertyDirection prop = BlockUtils.getFirstDirectionProperty(stateSchematic);
+        Optional<PropertyDirection> propOptional = BlockUtils.getFirstDirectionProperty(stateSchematic);
 
-        if (prop != null)
+        if (propOptional.isPresent())
         {
-            side = stateSchematic.getValue(prop).getOpposite();
+            side = stateSchematic.getValue(propOptional.get()).getOpposite();
         }
 
         return side;
@@ -567,7 +568,7 @@ public class EasyPlaceUtils
 
         if (cancel && isFirstClickPlacementRestriction)
         {
-            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue(), MessageType.WARNING, 1000, "litematica.message.placement_restriction_fail");
+            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue(), MessageOutput.WARNING, 1000, "litematica.message.placement_restriction_fail");
         }
 
         isFirstClickPlacementRestriction = false;

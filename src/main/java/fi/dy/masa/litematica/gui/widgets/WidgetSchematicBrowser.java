@@ -137,7 +137,7 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements Sel
     {
         int x = this.getX() + this.getWidth() - this.infoWidth;
         int y = this.getY();
-        int z = this.getZLevel();
+        int z = this.getZ();
         int height = Math.min(this.infoHeight, this.parent.getMaxInfoHeight());
 
         ShapeRenderUtils.renderOutlinedRectangle(x + 1, y, z, this.infoWidth, height, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR);

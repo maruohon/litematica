@@ -36,7 +36,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
@@ -176,7 +176,7 @@ public class SchematicEditUtils
             {
                 if (setAllIdenticalSchematicBlockStates(pos, stateOriginal, stateClient))
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_rebuild.accepted_replacement");
+                    MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.message.schematic_rebuild.accepted_replacement");
                     return true;
                 }
             }
@@ -559,7 +559,7 @@ public class SchematicEditUtils
             }
             else
             {
-                MessageUtils.showInGameMessage(MessageType.WARNING, 20000, "litematica.message.warn.schematic_rebuild.subregion_not_selected");
+                MessageUtils.showInGameMessage(MessageOutput.WARNING, 20000, "litematica.message.warn.schematic_rebuild.subregion_not_selected");
                 return false;
             }
         }

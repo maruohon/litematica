@@ -28,9 +28,8 @@ public class WidgetListSchematicVersions extends BaseListWidget<SchematicVersion
         this.project = project;
         this.entryWidgetFixedHeight = 16;
         this.infoWidth = 180;
-        this.setBackgroundColor(0xB0000000);
-        this.setNormalBorderColor(BaseScreen.COLOR_HORIZONTAL_BAR);
-        this.setBackgroundEnabled(true);
+        this.getBorderRenderer().getNormalSettings().setColor(0xFF999999);
+        this.getBackgroundRenderer().getNormalSettings().setEnabledAndColor(true, 0xB0000000);
 
         this.addSearchBarWidget(new SearchBarWidget(x + 2, y + 4, width - 14, 14, 0, DefaultIcons.SEARCH, HorizontalAlignment.LEFT));
     }
@@ -64,7 +63,7 @@ public class WidgetListSchematicVersions extends BaseListWidget<SchematicVersion
         String r = BaseScreen.TXT_RST;
         int color = 0xFFB0B0B0;
 
-        ShapeRenderUtils.renderOutlinedRectangle(x - 4, y - 4, this.getZLevel(), this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR);
+        ShapeRenderUtils.renderOutlinedRectangle(x - 4, y - 4, this.getZ(), this.infoWidth, infoHeight, 0xA0000000, BaseScreen.COLOR_HORIZONTAL_BAR);
 
         str = StringUtils.translate("litematica.gui.label.schematic_projects.project");
         this.drawString(x, y, color, str);

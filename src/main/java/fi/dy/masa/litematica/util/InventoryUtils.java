@@ -28,7 +28,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.interoperation.BlockPlacementPositionHandler;
+import fi.dy.masa.malilib.registry.Registry;
 
 public class InventoryUtils
 {
@@ -216,7 +216,7 @@ public class InventoryUtils
     @Nullable
     public static EnumHand pickBlockLast(boolean adjacentOnly, Minecraft mc)
     {
-        BlockPos pos = BlockPlacementPositionHandler.INSTANCE.getCurrentPlacementPosition();
+        BlockPos pos = Registry.BLOCK_PLACEMENT_POSITION_HANDLER.getCurrentPlacementPosition();
 
         // No overrides by other mods
         if (pos == null)

@@ -53,6 +53,7 @@ import fi.dy.masa.litematica.mixin.IMixinViewFrustum;
 import fi.dy.masa.litematica.render.schematic.RenderChunkSchematicVbo.OverlayRenderType;
 import fi.dy.masa.litematica.util.IGenericEventListener;
 import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
 
@@ -225,7 +226,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
             }
 
             this.displayListEntitiesDirty = true;
-            this.renderDistanceChunks = this.mc.gameSettings.renderDistanceChunks;
+            this.renderDistanceChunks = GameUtils.getRenderDistanceChunks();
 
             boolean vboEnabledPrevious = this.vboEnabled;
             this.vboEnabled = OpenGlHelper.useVbo();
@@ -253,7 +254,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
                 this.setTileEntities.clear();
             }
 
-            this.viewFrustum = new ViewFrustum(world, this.mc.gameSettings.renderDistanceChunks, this, this.renderChunkFactory);
+            this.viewFrustum = new ViewFrustum(world, GameUtils.getRenderDistanceChunks(), this, this.renderChunkFactory);
 
             Entity entity = this.mc.getRenderViewEntity();
 
@@ -279,7 +280,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         World world = this.world;
         world.profiler.startSection("setup_terrain");
 
-        if (this.viewFrustum == null || this.mc.gameSettings.renderDistanceChunks != this.renderDistanceChunks)
+        if (this.viewFrustum == null || GameUtils.getRenderDistanceChunks() != this.renderDistanceChunks)
         {
             this.loadRenderers();
         }
@@ -315,7 +316,7 @@ public class RenderGlobalSchematic extends RenderGlobal implements IGenericEvent
         final int centerChunkX = ((int) MathHelper.floor(x)) >> 4;
         final int centerChunkY = ((int) MathHelper.floor(y)) >> 4;
         final int centerChunkZ = ((int) MathHelper.floor(z)) >> 4;
-        final int renderDistance = this.mc.gameSettings.renderDistanceChunks;
+        final int renderDistance = GameUtils.getRenderDistanceChunks();
         SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, centerChunkY, centerChunkZ);
         this.viewPosSubChunk.setPos(centerChunkX << 4, centerChunkY << 4, centerChunkZ << 4);
 

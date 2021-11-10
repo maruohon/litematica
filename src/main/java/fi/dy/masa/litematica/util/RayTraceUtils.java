@@ -27,7 +27,7 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceCalcsData;
+import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceCalculationData;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 
 public class RayTraceUtils
@@ -542,8 +542,8 @@ public class RayTraceUtils
             return ImmutableList.of();
         }
 
-        RayTraceCalcsData data = new RayTraceCalcsData(start, end, RayTraceFluidHandling.SOURCE_ONLY,
-                fi.dy.masa.malilib.util.RayTraceUtils.BLOCK_FILTER_NON_AIR, DataManager.getRenderLayerRange());
+        RayTraceCalculationData data = new RayTraceCalculationData(start, end, RayTraceFluidHandling.SOURCE_ONLY,
+                                                                   fi.dy.masa.malilib.util.RayTraceUtils.BLOCK_FILTER_NON_AIR, DataManager.getRenderLayerRange());
         List<RayTraceResult> hits = new ArrayList<>();
 
         while (--maxSteps >= 0)

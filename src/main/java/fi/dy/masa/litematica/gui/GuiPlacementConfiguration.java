@@ -31,7 +31,7 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
@@ -170,7 +170,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         String hover = StringUtils.translate("litematica.hud.schematic_placement.hover_info.lock_coordinate");
         x += width + 20;
         CheckBoxWidget cb = new CheckBoxWidget(x, y + 3, LitematicaIcons.CHECKBOX_UNSELECTED, LitematicaIcons.CHECKBOX_SELECTED, "", hover);
-        cb.setChecked(this.placement.isCoordinateLocked(type), false);
+        cb.setSelected(this.placement.isCoordinateLocked(type), false);
         cb.setListener(new CoordinateLockListener(type, this.placement));
         this.addWidget(cb);
     }
@@ -324,7 +324,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
             if (BaseScreen.isShiftDown()) { amount *= 8; }
             if (BaseScreen.isAltDown()) { amount *= 4; }
             BlockPos oldOrigin = this.placement.getOrigin();
-            this.parent.setNextMessageType(MessageType.ERROR);
+            this.parent.setNextMessageType(MessageOutput.ERROR);
 
             switch (this.type)
             {
@@ -361,7 +361,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
 
                                 if (this.manager.loadPlacementSettings(this.placement, str, this.parent))
                                 {
-                                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
+                                    MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
                                 }
                             }
                         }
@@ -370,7 +370,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                         {
                             String str = JsonUtils.jsonToString(this.placement.baseSettingsToJson(true), true);
                             GuiScreen.setClipboardString(str);
-                            MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_copied_to_clipboard");
+                            MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.message.placement.settings_copied_to_clipboard");
                         }
                     }
                     else
@@ -384,7 +384,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                             {
                                 if (this.manager.loadPlacementSettings(this.placement, el.getAsJsonObject(), this.parent))
                                 {
-                                    MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
+                                    MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.message.placement.settings_loaded_from_clipboard");
                                 }
                             }
 
@@ -554,7 +554,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
             {
                 int value = Integer.parseInt(newText);
                 BlockPos posOld = this.placement.getOrigin();
-                this.parent.setNextMessageType(MessageType.ERROR);
+                this.parent.setNextMessageType(MessageOutput.ERROR);
 
                 switch (this.type)
                 {
@@ -583,7 +583,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         @Override
         public void onSelectionChange(CheckBoxWidget entry)
         {
-            this.placement.setCoordinateLocked(this.type, entry.isChecked());
+            this.placement.setCoordinateLocked(this.type, entry.isSelected());
         }
     }
 }

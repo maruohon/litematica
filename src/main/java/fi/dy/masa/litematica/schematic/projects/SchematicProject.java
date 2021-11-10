@@ -25,7 +25,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -103,12 +103,12 @@ public class SchematicProject
             }
             catch (Exception e)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_rename_project_file_exception", newFile.getAbsolutePath());
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.failed_to_rename_project_file_exception", newFile.getAbsolutePath());
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_rename_project_file_exists", name);
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.failed_to_rename_project_file_exists", name);
         }
     }
 
@@ -222,7 +222,7 @@ public class SchematicProject
                 }
                 else
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.failed_to_load_schematic");
+                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.failed_to_load_schematic");
                 }
 
                 this.lastCheckedOutVersion = this.currentVersionId;
@@ -238,7 +238,7 @@ public class SchematicProject
 
             if (mc.player == null || mc.player.capabilities.isCreativeMode == false)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.generic.creative_mode_only");
+                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.generic.creative_mode_only");
                 return;
             }
 
@@ -490,25 +490,25 @@ public class SchematicProject
     {
         if (this.saveInProgress)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.save_already_in_progress");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.save_already_in_progress");
             return false;
         }
 
         if (this.directory == null || this.directory.exists() == false || this.directory.isDirectory() == false)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.invalid_project_directory");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.invalid_project_directory");
             return false;
         }
 
         if (this.getSelection().getAllSubRegionBoxes().size() == 0)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.empty_selection");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.empty_selection");
             return false;
         }
 
         if (Minecraft.getMinecraft().player == null)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageType.ERROR, "litematica.error.schematic_projects.null_player");
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.null_player");
             return false;
         }
 
@@ -565,7 +565,7 @@ public class SchematicProject
                 ((TaskCompletionListener) GuiUtils.getCurrentScreen()).onTaskCompleted();
             }
 
-            MessageUtils.showGuiOrInGameMessage(MessageType.SUCCESS, "litematica.message.schematic_projects.version_saved", this.version, this.name);
+            MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.message.schematic_projects.version_saved", this.version, this.name);
         }
     }
 }

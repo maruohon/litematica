@@ -20,7 +20,7 @@ import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.consumer.StringConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageType;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
@@ -130,7 +130,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
 
         if (BaseScreen.isMouseOver(mouseX, mouseY, this.getX(), this.getY(), this.buttonsStartX - offset, this.getHeight()))
         {
-            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
+            TextRenderUtils.renderHoverText(mouseX, mouseY, this.getZ() + 1, text);
         }
     }
 
@@ -172,7 +172,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
                 }
                 else
                 {
-                    this.widget.parent.getSelectionManagerGui().addMessage(MessageType.ERROR, "litematica.error.area_selection.failed_to_load");
+                    this.widget.parent.getSelectionManagerGui().addMessage(MessageOutput.ERROR, "litematica.error.area_selection.failed_to_load");
                 }
             }
             else if (this.type == ButtonType.REMOVE)
