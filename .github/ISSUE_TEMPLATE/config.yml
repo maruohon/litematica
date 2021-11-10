@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: SciCraft Discord (`#masas-mods` channel)
+    url: https://discord.gg/scicraft
+    about: For simple questions and discussions
+  - name: masa's Discord
+    url: https://masa.dy.fi/discord
+    about: Alternative Discord, for simple questions and discussions
