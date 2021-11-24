@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
+import fi.dy.masa.litematica.mixin.IMixinWorldTickScheduler;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,12 +32,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.ScheduledTick;
+import net.minecraft.world.tick.OrderedTick;
 import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
@@ -78,8 +76,8 @@ public class LitematicaSchematic
 
     private final Map<String, LitematicaBlockStateContainer> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, NbtCompound>> tileEntities = new HashMap<>();
-    private final Map<String, Map<BlockPos, ScheduledTick<Block>>> pendingBlockTicks = new HashMap<>();
-    private final Map<String, Map<BlockPos, ScheduledTick<Fluid>>> pendingFluidTicks = new HashMap<>();
+    private final Map<String, Map<BlockPos, OrderedTick<Block>>> pendingBlockTicks = new HashMap<>();
+    private final Map<String, Map<BlockPos, OrderedTick<Fluid>>> pendingFluidTicks = new HashMap<>();
     private final Map<String, List<EntityInfo>> entities = new HashMap<>();
     private final Map<String, BlockPos> subRegionPositions = new HashMap<>();
     private final Map<String, BlockPos> subRegionSizes = new HashMap<>();
@@ -291,8 +289,8 @@ public class LitematicaSchematic
                 LitematicaBlockStateContainer container = this.blockContainers.get(regionName);
                 Map<BlockPos, NbtCompound> tileMap = this.tileEntities.get(regionName);
                 List<EntityInfo> entityList = this.entities.get(regionName);
-                Map<BlockPos, ScheduledTick<Block>> scheduledBlockTicks = this.pendingBlockTicks.get(regionName);
-                Map<BlockPos, ScheduledTick<Fluid>> scheduledFluidTicks = this.pendingFluidTicks.get(regionName);
+                Map<BlockPos, OrderedTick<Block>> scheduledBlockTicks = this.pendingBlockTicks.get(regionName);
+                Map<BlockPos, OrderedTick<Fluid>> scheduledFluidTicks = this.pendingFluidTicks.get(regionName);
 
                 if (regionPos != null && regionSize != null && container != null && tileMap != null)
                 {
@@ -319,8 +317,8 @@ public class LitematicaSchematic
     private boolean placeBlocksToWorld(World world, BlockPos origin, BlockPos regionPos, BlockPos regionSize,
             SchematicPlacement schematicPlacement, SubRegionPlacement placement,
             LitematicaBlockStateContainer container, Map<BlockPos, NbtCompound> tileMap,
-            @Nullable Map<BlockPos, ScheduledTick<Block>> scheduledBlockTicks,
-            @Nullable Map<BlockPos, ScheduledTick<Fluid>> scheduledFluidTicks, boolean notifyNeighbors)
+            @Nullable Map<BlockPos, OrderedTick<Block>> scheduledBlockTicks,
+            @Nullable Map<BlockPos, OrderedTick<Fluid>> scheduledFluidTicks, boolean notifyNeighbors)
     {
         // These are the untransformed relative positions
         BlockPos posEndRelSub = PositionUtils.getRelativeEndPositionFromAreaSize(regionSize);
@@ -486,25 +484,25 @@ public class LitematicaSchematic
 
             if (scheduledBlockTicks != null && scheduledBlockTicks.isEmpty() == false)
             {
-                for (Map.Entry<BlockPos, ScheduledTick<Block>> entry : scheduledBlockTicks.entrySet())
+                for (Map.Entry<BlockPos, OrderedTick<Block>> entry : scheduledBlockTicks.entrySet())
                 {
                     BlockPos pos = entry.getKey().add(regionPosAbs);
-                    ScheduledTick<Block> tick = entry.getValue();
-                    serverWorld.getBlockTickScheduler().schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
+                    OrderedTick<Block> tick = entry.getValue();
+                    serverWorld.getBlockTickScheduler().scheduleTick(new OrderedTick<>(tick.type(), pos, (int) tick.triggerTick(), tick.priority(), tick.subTickOrder()));
                 }
             }
 
             if (scheduledFluidTicks != null && scheduledFluidTicks.isEmpty() == false)
             {
-                for (Map.Entry<BlockPos, ScheduledTick<Fluid>> entry : scheduledFluidTicks.entrySet())
+                for (Map.Entry<BlockPos, OrderedTick<Fluid>> entry : scheduledFluidTicks.entrySet())
                 {
                     BlockPos pos = entry.getKey().add(regionPosAbs);
                     BlockState state = world.getBlockState(pos);
 
                     if (state.getFluidState().isEmpty() == false)
                     {
-                        ScheduledTick<Fluid> tick = entry.getValue();
-                        serverWorld.getFluidTickScheduler().schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
+                        OrderedTick<Fluid> tick = entry.getValue();
+                        serverWorld.getFluidTickScheduler().scheduleTick(new OrderedTick<>(tick.type(), pos, (int) tick.triggerTick(), tick.priority(), tick.subTickOrder()));
                     }
                 }
             }
@@ -630,8 +628,8 @@ public class LitematicaSchematic
             final int sizeZ = Math.abs(size.getZ());
             LitematicaBlockStateContainer container = new LitematicaBlockStateContainer(sizeX, sizeY, sizeZ);
             Map<BlockPos, NbtCompound> tileEntityMap = new HashMap<>();
-            Map<BlockPos, ScheduledTick<Block>> blockTickMap = new HashMap<>();
-            Map<BlockPos, ScheduledTick<Fluid>> fluidTickMap = new HashMap<>();
+            Map<BlockPos, OrderedTick<Block>> blockTickMap = new HashMap<>();
+            Map<BlockPos, OrderedTick<Fluid>> fluidTickMap = new HashMap<>();
 
             // We want to loop nice & easy from 0 to n here, but the per-sub-region pos1 can be at
             // any corner of the area. Thus we need to offset from the total area origin
@@ -671,7 +669,7 @@ public class LitematicaSchematic
                             {
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
-                                NbtCompound tag = te.writeNbt(new NbtCompound());
+                                NbtCompound tag = te.createNbt();
                                 NBTUtils.writeBlockPosToTag(pos, tag);
                                 tileEntityMap.put(pos, tag);
                             }
@@ -685,16 +683,17 @@ public class LitematicaSchematic
                 IntBoundingBox tickBox = IntBoundingBox.createProper(
                         startX,         startY,         startZ,
                         startX + sizeX, startY + sizeY, startZ + sizeZ);
-                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).getBlockTickScheduler().getScheduledTicks(tickBox.toVanillaBox(), false, false);
+                ArrayList blockTicks = new ArrayList<>();
+                ((IMixinWorldTickScheduler)world.getFluidTickScheduler()).litematicaVisitChunks(tickBox.toVanillaBox(), (chunkPos, chunkTickScheduler) -> chunkTickScheduler.getQueueAsStream().forEach(blockTicks::add));
 
-                if (blockTicks != null)
+                if (!blockTicks.isEmpty())
                 {
                     this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getTime());
                 }
 
-                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).getFluidTickScheduler().getScheduledTicks(tickBox.toVanillaBox(), false, false);
-
-                if (fluidTicks != null)
+                ArrayList fluidTicks = new ArrayList<>();
+                ((IMixinWorldTickScheduler)world.getFluidTickScheduler()).litematicaVisitChunks(tickBox.toVanillaBox(), (chunkPos, chunkTickScheduler) -> chunkTickScheduler.getQueueAsStream().forEach(fluidTicks::add));
+                if (!fluidTicks.isEmpty())
                 {
                     this.getPendingTicksFromWorld(fluidTickMap, fluidTicks, minCorner, startY, tickBox.maxY, world.getTime());
                 }
@@ -707,24 +706,24 @@ public class LitematicaSchematic
         }
     }
 
-    private <T> void getPendingTicksFromWorld(Map<BlockPos, ScheduledTick<T>> map, List<ScheduledTick<T>> list,
+    private <T> void getPendingTicksFromWorld(Map<BlockPos, OrderedTick<T>> map, List<OrderedTick<T>> list,
             BlockPos minCorner, int startY, int maxY, final long currentTime)
     {
         final int listSize = list.size();
 
         for (int i = 0; i < listSize; ++i)
         {
-            ScheduledTick<T> entry = list.get(i);
+            OrderedTick<T> entry = list.get(i);
 
             // The getPendingBlockUpdates() method doesn't check the y-coordinate... :-<
-            if (entry.pos.getY() >= startY && entry.pos.getY() < maxY)
+            if (entry.pos().getY() >= startY && entry.pos().getY() < maxY)
             {
                 // Store the delay, ie. relative time
                 BlockPos posRelative = new BlockPos(
-                        entry.pos.getX() - minCorner.getX(),
-                        entry.pos.getY() - minCorner.getY(),
-                        entry.pos.getZ() - minCorner.getZ());
-                ScheduledTick<T> newEntry = new ScheduledTick<>(posRelative, entry.getObject(), entry.time - currentTime, entry.priority);
+                        entry.pos().getX() - minCorner.getX(),
+                        entry.pos().getY() - minCorner.getY(),
+                        entry.pos().getZ() - minCorner.getZ());
+                OrderedTick<T> newEntry = new OrderedTick<T>(entry.type(), posRelative, entry.triggerTick() - currentTime, entry.priority(), entry.subTickOrder());
 
                 map.put(posRelative, newEntry);
             }
@@ -759,6 +758,8 @@ public class LitematicaSchematic
             IntBoundingBox bb = volumeEntry.getValue();
             Box box = boxes.get(regionName);
 
+            BlockBox blockBox = BlockBox.create(box.getPos1(), box.getPos2());
+
             if (box == null)
             {
                 Litematica.logger.error("null Box for sub-region '{}' while trying to save chunk-wise schematic", regionName);
@@ -767,8 +768,8 @@ public class LitematicaSchematic
 
             LitematicaBlockStateContainer container = this.blockContainers.get(regionName);
             Map<BlockPos, NbtCompound> tileEntityMap = this.tileEntities.get(regionName);
-            Map<BlockPos, ScheduledTick<Block>> blockTickMap = this.pendingBlockTicks.get(regionName);
-            Map<BlockPos, ScheduledTick<Fluid>> fluidTickMap = this.pendingFluidTicks.get(regionName);
+            Map<BlockPos, OrderedTick<Block>> blockTickMap = this.pendingBlockTicks.get(regionName);
+            Map<BlockPos, OrderedTick<Fluid>> fluidTickMap = this.pendingFluidTicks.get(regionName);
 
             if (container == null || tileEntityMap == null || blockTickMap == null || fluidTickMap == null)
             {
@@ -821,7 +822,7 @@ public class LitematicaSchematic
                             {
                                 // TODO Add a TileEntity NBT cache from the Chunk packets, to get the original synced data (too)
                                 BlockPos pos = new BlockPos(x, y, z);
-                                NbtCompound tag = te.writeNbt(new NbtCompound());
+                                NbtCompound tag = te.createNbt();
                                 NBTUtils.writeBlockPosToTag(pos, tag);
                                 tileEntityMap.put(pos, tag);
                             }
@@ -835,16 +836,18 @@ public class LitematicaSchematic
                 IntBoundingBox tickBox = IntBoundingBox.createProper(
                         offsetX + startX  , offsetY + startY  , offsetZ + startZ  ,
                         offsetX + endX + 1, offsetY + endY + 1, offsetZ + endZ + 1);
-                List<ScheduledTick<Block>> blockTicks = ((ServerWorld) world).getBlockTickScheduler().getScheduledTicks(tickBox.toVanillaBox(), false, false);
+                ArrayList blockTicks = new ArrayList<>();
+                ((IMixinWorldTickScheduler)world.getFluidTickScheduler()).litematicaVisitChunks(blockBox, (chunkPos, chunkTickScheduler) -> chunkTickScheduler.getQueueAsStream().forEach(blockTicks::add));
 
-                if (blockTicks != null)
+                if (blockTicks.isEmpty())
                 {
                     this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getTime());
                 }
 
-                List<ScheduledTick<Fluid>> fluidTicks = ((ServerWorld) world).getFluidTickScheduler().getScheduledTicks(tickBox.toVanillaBox(), false, false);
+                ArrayList fluidTicks = new ArrayList<>();
+                ((IMixinWorldTickScheduler)world.getFluidTickScheduler()).litematicaVisitChunks(blockBox, (chunkPos, chunkTickScheduler) -> chunkTickScheduler.getQueueAsStream().forEach(fluidTicks::add));
 
-                if (fluidTicks != null)
+                if (fluidTicks.isEmpty())
                 {
                     this.getPendingTicksFromWorld(fluidTickMap, fluidTicks, minCorner, startY, tickBox.maxY, world.getTime());
                 }
@@ -909,8 +912,8 @@ public class LitematicaSchematic
                 LitematicaBlockStateContainer blockContainer = this.blockContainers.get(regionName);
                 Map<BlockPos, NbtCompound> tileMap = this.tileEntities.get(regionName);
                 List<EntityInfo> entityList = this.entities.get(regionName);
-                Map<BlockPos, ScheduledTick<Block>> pendingBlockTicks = this.pendingBlockTicks.get(regionName);
-                Map<BlockPos, ScheduledTick<Fluid>> pendingFluidTicks = this.pendingFluidTicks.get(regionName);
+                Map<BlockPos, OrderedTick<Block>> pendingBlockTicks = this.pendingBlockTicks.get(regionName);
+                Map<BlockPos, OrderedTick<Fluid>> pendingFluidTicks = this.pendingFluidTicks.get(regionName);
 
                 NbtCompound tag = new NbtCompound();
 
@@ -962,15 +965,15 @@ public class LitematicaSchematic
         return tagList;
     }
 
-    private <T> NbtList writePendingTicksToNBT(Map<BlockPos, ScheduledTick<T>> tickMap)
+    private <T> NbtList writePendingTicksToNBT(Map<BlockPos, OrderedTick<T>> tickMap)
     {
         NbtList tagList = new NbtList();
 
         if (tickMap.isEmpty() == false)
         {
-            for (ScheduledTick<T> entry : tickMap.values())
+            for (OrderedTick<T> entry : tickMap.values())
             {
-                T target = entry.getObject();
+                T target = entry.type();
                 String tagName;
                 Identifier rl;
 
@@ -990,11 +993,11 @@ public class LitematicaSchematic
                     NbtCompound tag = new NbtCompound();
 
                     tag.putString(tagName, rl.toString());
-                    tag.putInt("Priority", entry.priority.getIndex());
-                    tag.putInt("Time", (int) entry.time);
-                    tag.putInt("x", entry.pos.getX());
-                    tag.putInt("y", entry.pos.getY());
-                    tag.putInt("z", entry.pos.getZ());
+                    tag.putInt("Priority", entry.priority().getIndex());
+                    tag.putInt("Time", (int) entry.triggerTick());
+                    tag.putInt("x", entry.pos().getX());
+                    tag.putInt("y", entry.pos().getY());
+                    tag.putInt("z", entry.pos().getZ());
 
                     tagList.add(tag);
                 }
@@ -1627,9 +1630,9 @@ public class LitematicaSchematic
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Map<BlockPos, ScheduledTick<T>> readPendingTicksFromNBT(NbtList tagList, T clazz)
+    private <T> Map<BlockPos, OrderedTick<T>> readPendingTicksFromNBT(NbtList tagList, T clazz)
     {
-        Map<BlockPos, ScheduledTick<T>> tickMap = new HashMap<>();
+        Map<BlockPos, OrderedTick<T>> tickMap = new HashMap<>();
         final int size = tagList.size();
 
         for (int i = 0; i < size; ++i)
@@ -1673,7 +1676,7 @@ public class LitematicaSchematic
                     int scheduledTime = tag.getInt("Time");
                     TickPriority priority = TickPriority.byIndex(tag.getInt("Priority"));
 
-                    ScheduledTick<T> entry = new ScheduledTick<>(pos, target, scheduledTime, priority);
+                    OrderedTick<T> entry = new OrderedTick<T>(target, pos, scheduledTime, priority, 0L);
 
                     tickMap.put(pos, entry);
                 }

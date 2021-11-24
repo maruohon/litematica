@@ -18,7 +18,7 @@ public class LitematicaBlockStatePaletteHashMap implements ILitematicaBlockState
     {
         this.bits = bitsIn;
         this.paletteResizer = paletteResizer;
-        this.statePaletteMap = new Int2ObjectBiMap<>(1 << bitsIn);
+        this.statePaletteMap = Int2ObjectBiMap.create(1 << bitsIn);
     }
 
     @Override

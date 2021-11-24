@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import javax.annotation.Nullable;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.apache.logging.log4j.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
@@ -54,7 +55,7 @@ public class ChunkRenderWorkerLitematica implements Runnable
             catch (Throwable throwable)
             {
                 CrashReport crashreport = CrashReport.create(throwable, "Batching chunks");
-                MinecraftClient.getInstance().setCrashReport(MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
+                MinecraftClient.getInstance().setCrashReportSupplier(() -> MinecraftClient.getInstance().addDetailsToCrashReport(crashreport));
                 return;
             }
         }
@@ -227,10 +228,10 @@ public class ChunkRenderWorkerLitematica implements Runnable
 
                     if ((throwable instanceof CancellationException) == false && (throwable instanceof InterruptedException) == false)
                     {
-                        MinecraftClient.getInstance().setCrashReport(CrashReport.create(throwable, "Rendering Litematica chunk"));
+                        MinecraftClient.getInstance().setCrashReportSupplier(() -> CrashReport.create(throwable, "Rendering Litematica chunk"));
                     }
                 }
-            });
+            }, MoreExecutors.directExecutor());
         }
     }
 

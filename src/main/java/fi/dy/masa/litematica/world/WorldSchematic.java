@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.DummyClientTickScheduler;
+import net.minecraft.world.tick.EmptyTickSchedulers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -33,7 +33,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.MutableWorldProperties;
-import net.minecraft.world.TickScheduler;
+import net.minecraft.world.tick.OrderedTick;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BuiltinBiomes;
@@ -46,6 +46,7 @@ import net.minecraft.world.event.GameEvent;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
+import net.minecraft.world.tick.QueryableTickScheduler;
 
 public class WorldSchematic extends World
 {
@@ -78,15 +79,15 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public TickScheduler<Block> getBlockTickScheduler()
+    public QueryableTickScheduler<Block> getBlockTickScheduler()
     {
-        return DummyClientTickScheduler.get();
+        return EmptyTickSchedulers.getClientTickScheduler();
     }
 
     @Override
-    public TickScheduler<Fluid> getFluidTickScheduler()
+    public QueryableTickScheduler<Fluid> getFluidTickScheduler()
     {
-        return DummyClientTickScheduler.get();
+        return EmptyTickSchedulers.getClientTickScheduler();
     }
 
     public int getRegularEntityCount()

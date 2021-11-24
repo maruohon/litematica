@@ -1,6 +1,7 @@
 {
-   "pack": {
-      "pack_format": 4,
-      "description": "Litematica"
-   }
+	"pack":
+	{
+		"pack_format": 8,
+		"description": "Litematica"
+	}
 }

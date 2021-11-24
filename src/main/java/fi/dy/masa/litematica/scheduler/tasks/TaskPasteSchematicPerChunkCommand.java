@@ -299,7 +299,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
             try
             {
-                keys.addAll(be.writeNbt(new NbtCompound()).getKeys());
+                keys.addAll(be.createNbt().getKeys());
             } catch (Exception ignore) {}
 
             keys.remove("id");
@@ -446,7 +446,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
     public static void addBlockEntityNbt(ItemStack stack, BlockEntity be)
     {
-        NbtCompound tag = be.writeNbt(new NbtCompound());
+        NbtCompound tag = be.createNbt();
 
         if (stack.getItem() instanceof SkullItem && tag.contains("SkullOwner"))
         {

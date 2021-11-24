@@ -699,7 +699,7 @@ public class WorldUtils
                     List<T> list = new ArrayList<>(prop.getValues());
                     list.sort(Comparable::compareTo);
 
-                    int requiredBits = MathHelper.log2(MathHelper.smallestEncompassingPowerOfTwo(list.size()));
+                    int requiredBits = MathHelper.floorLog2(MathHelper.smallestEncompassingPowerOfTwo(list.size()));
                     int valueIndex = list.indexOf(state.get(prop));
 
                     if (valueIndex != -1)

@@ -1,5 +1,7 @@
 package fi.dy.masa.litematica.mixin;
 
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.Frustum;
 import net.minecraft.util.math.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,9 +30,7 @@ public abstract class MixinWorldRenderer
 
     @Inject(method = "setupTerrain", at = @At("TAIL"))
     private void onPostSetupTerrain(
-            net.minecraft.client.render.Camera camera,
-            net.minecraft.client.render.Frustum frustum,
-            boolean hasForcedFrustum, int frame, boolean spectator, CallbackInfo ci)
+            Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci)
     {
         LitematicaRenderer.getInstance().piecewisePrepareAndUpdate(frustum);
     }

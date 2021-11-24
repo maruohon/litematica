@@ -10,6 +10,7 @@
 		"IMixinRedstoneWireBlock",
 		"IMixinStairsBlock",
 		"IMixinVineBlock",
+		"IMixinWorldTickScheduler",
 		"MixinBlock",
 		"MixinBlockItem",
 		"MixinBlockStateFlattening",

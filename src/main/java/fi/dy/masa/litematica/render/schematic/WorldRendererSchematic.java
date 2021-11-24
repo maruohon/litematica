@@ -545,7 +545,7 @@ public class WorldRendererSchematic
     {
         for (int i = 0; i < 12; ++i) shader.addSampler("Sampler" + i, RenderSystem.getShaderTexture(i));
 
-        if (shader.modelViewMat != null) shader.modelViewMat.set(matrices.peek().getModel());
+        if (shader.modelViewMat != null) shader.modelViewMat.set(matrices.peek().getPositionMatrix());
         if (shader.projectionMat != null) shader.projectionMat.set(projMatrix);
         if (shader.colorModulator != null) shader.colorModulator.set(RenderSystem.getShaderColor());
         if (shader.fogStart != null) shader.fogStart.set(RenderSystem.getShaderFogStart());
@@ -603,7 +603,7 @@ public class WorldRendererSchematic
 
                     matrixStack.push();
                     matrixStack.translate(chunkOrigin.getX() - x, chunkOrigin.getY() - y, chunkOrigin.getZ() - z);
-                    buffer.setShader(matrixStack.peek().getModel(), projMatrix, shader);
+                    buffer.setShader(matrixStack.peek().getPositionMatrix(), projMatrix, shader);
                     matrixStack.pop();
                 }
             }

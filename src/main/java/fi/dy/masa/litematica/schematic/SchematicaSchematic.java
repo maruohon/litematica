@@ -373,7 +373,7 @@ public class SchematicaSchematic
                     {
                         try
                         {
-                            NbtCompound nbt = te.writeNbt(new NbtCompound());
+                            NbtCompound nbt = te.createNbt();
 
                             nbt.putInt("x", relX);
                             nbt.putInt("y", relY);

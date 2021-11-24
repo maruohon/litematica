@@ -6,7 +6,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.biome.source.DirectBiomeAccessType;
 import net.minecraft.world.dimension.DimensionType;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
@@ -17,8 +16,7 @@ public class SchematicWorldHandler
     @Nullable private static WorldSchematic world;
     public static final DimensionType DIMENSIONTYPE = DimensionType.create(OptionalLong.of(6000L), false, false, false, false, 1.0,
                                                                            false, false, false, false, false, -64, 384, 384,
-                                                                           DirectBiomeAccessType.INSTANCE, BlockTags.INFINIBURN_END.getId(),
-                                                                           DimensionType.OVERWORLD_ID, 0.0F);
+                                                                            BlockTags.INFINIBURN_END.getId(), DimensionType.OVERWORLD_ID, 0.0F);
 
     @Nullable
     public static WorldSchematic getSchematicWorld()

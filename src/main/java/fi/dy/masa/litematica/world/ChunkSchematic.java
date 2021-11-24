@@ -16,7 +16,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BuiltinBiomes;
-import net.minecraft.world.biome.source.BiomeArray;
 import net.minecraft.world.biome.source.FixedBiomeSource;
 import net.minecraft.world.chunk.ChunkSection;
 import net.minecraft.world.chunk.WorldChunk;
@@ -35,8 +34,7 @@ public class ChunkSchematic extends WorldChunk
 
     public ChunkSchematic(World worldIn, ChunkPos pos)
     {
-        super(worldIn, pos, new BiomeArray(worldIn.getRegistryManager().get(Registry.BIOME_KEY),
-                                           worldIn, pos, new FixedBiomeSource(BuiltinBiomes.THE_VOID)));
+        super(worldIn, pos);
 
         this.timeCreated = worldIn.getTime();
         this.bottomY = worldIn.getBottomY();
@@ -58,7 +56,7 @@ public class ChunkSchematic extends WorldChunk
         {
             ChunkSection chunkSection = sections[cy];
 
-            if (ChunkSection.isEmpty(chunkSection) == false)
+            if (!chunkSection.isEmpty())
             {
                 return chunkSection.getBlockState(x, y, z);
             }
@@ -87,15 +85,9 @@ public class ChunkSchematic extends WorldChunk
             Block blockOld = stateOld.getBlock();
             ChunkSection section = this.getSectionArray()[cy];
 
-            if (section == EMPTY_SECTION)
+            if (section.isEmpty() && state.isAir())
             {
-                if (state.isAir())
-                {
-                    return null;
-                }
-
-                section = new ChunkSection(ChunkSectionPos.getSectionCoord(y));
-                this.getSectionArray()[cy] = section;
+                return null;
             }
 
             y &= 0xF;
@@ -133,7 +125,7 @@ public class ChunkSchematic extends WorldChunk
                     }
                 }
 
-                this.markDirty();
+                this.needsSaving();
 
                 return stateOld;
             }
