@@ -10,7 +10,6 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.tick.EmptyTickSchedulers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -28,25 +27,26 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.profiler.Profiler;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.DynamicRegistryManager;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.LightType;
 import net.minecraft.world.MutableWorldProperties;
-import net.minecraft.world.tick.OrderedTick;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BuiltinBiomes;
+import net.minecraft.world.biome.BiomeKeys;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.world.event.GameEvent;
+import net.minecraft.world.tick.EmptyTickSchedulers;
+import net.minecraft.world.tick.QueryableTickScheduler;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
-import net.minecraft.world.tick.QueryableTickScheduler;
 
 public class WorldSchematic extends World
 {
@@ -55,6 +55,7 @@ public class WorldSchematic extends World
     private final MinecraftClient mc;
     private final WorldRendererSchematic worldRenderer;
     private final ChunkManagerSchematic chunkManagerSchematic;
+    private final Biome biome;
     private int nextEntityId;
     private int entityCount;
 
@@ -65,6 +66,7 @@ public class WorldSchematic extends World
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
         this.chunkManagerSchematic = new ChunkManagerSchematic(this);
+        this.biome = BuiltinRegistries.BIOME.get(BiomeKeys.PLAINS);
     }
 
     public ChunkManagerSchematic getChunkProvider()
@@ -116,7 +118,7 @@ public class WorldSchematic extends World
     @Override
     public Biome getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ)
     {
-        return BuiltinBiomes.PLAINS;
+        return this.biome;
     }
 
     @Override

@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
-import fi.dy.masa.litematica.mixin.IMixinWorldTickScheduler;
 import net.minecraft.SharedConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -32,13 +31,20 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.tick.OrderedTick;
 import net.minecraft.world.TickPriority;
 import net.minecraft.world.World;
+import net.minecraft.world.tick.ChunkTickScheduler;
+import net.minecraft.world.tick.OrderedTick;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.mixin.IMixinWorldTickScheduler;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.conversion.SchematicConversionFixers;
@@ -64,6 +70,7 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.NBTUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 public class LitematicaSchematic
 {
@@ -71,8 +78,8 @@ public class LitematicaSchematic
     public static final int SCHEMATIC_VERSION_1_13_2 = 5;
     public static final int MINECRAFT_DATA_VERSION_1_13_2 = 1631; // MC 1.13.2
 
-    public static final int SCHEMATIC_VERSION = 5;
-    public static final int MINECRAFT_DATA_VERSION = SharedConstants.getGameVersion().getWorldVersion();
+    public static final int SCHEMATIC_VERSION = 6;
+    public static final int MINECRAFT_DATA_VERSION = SharedConstants.getGameVersion().getSaveVersion().getId();
 
     private final Map<String, LitematicaBlockStateContainer> blockContainers = new HashMap<>();
     private final Map<String, Map<BlockPos, NbtCompound>> tileEntities = new HashMap<>();
@@ -478,10 +485,8 @@ public class LitematicaSchematic
             }
         }
 
-        if (world instanceof ServerWorld)
+        if (world instanceof ServerWorld serverWorld)
         {
-            ServerWorld serverWorld = (ServerWorld) world;
-
             if (scheduledBlockTicks != null && scheduledBlockTicks.isEmpty() == false)
             {
                 for (Map.Entry<BlockPos, OrderedTick<Block>> entry : scheduledBlockTicks.entrySet())
@@ -616,6 +621,7 @@ public class LitematicaSchematic
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void takeBlocksFromWorld(World world, List<Box> boxes, SchematicSaveInfo info)
     {
         BlockPos.Mutable posMutable = new BlockPos.Mutable(0, 0, 0);
@@ -678,25 +684,18 @@ public class LitematicaSchematic
                 }
             }
 
-            if (world instanceof ServerWorld)
+            if (world instanceof ServerWorld serverWorld)
             {
                 IntBoundingBox tickBox = IntBoundingBox.createProper(
                         startX,         startY,         startZ,
                         startX + sizeX, startY + sizeY, startZ + sizeZ);
-                ArrayList blockTicks = new ArrayList<>();
-                ((IMixinWorldTickScheduler)world.getFluidTickScheduler()).litematicaVisitChunks(tickBox.toVanillaBox(), (chunkPos, chunkTickScheduler) -> chunkTickScheduler.getQueueAsStream().forEach(blockTicks::add));
+                long currentTick = world.getTime();
 
-                if (!blockTicks.isEmpty())
-                {
-                    this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getTime());
-                }
+                this.getTicksFromScheduler(((IMixinWorldTickScheduler<Block>) serverWorld.getBlockTickScheduler()).litematica_getChunkTickSchedulers(),
+                                           blockTickMap, tickBox, minCorner, currentTick);
 
-                ArrayList fluidTicks = new ArrayList<>();
-                ((IMixinWorldTickScheduler)world.getFluidTickScheduler()).litematicaVisitChunks(tickBox.toVanillaBox(), (chunkPos, chunkTickScheduler) -> chunkTickScheduler.getQueueAsStream().forEach(fluidTicks::add));
-                if (!fluidTicks.isEmpty())
-                {
-                    this.getPendingTicksFromWorld(fluidTickMap, fluidTicks, minCorner, startY, tickBox.maxY, world.getTime());
-                }
+                this.getTicksFromScheduler(((IMixinWorldTickScheduler<Fluid>) serverWorld.getFluidTickScheduler()).litematica_getChunkTickSchedulers(),
+                                           fluidTickMap, tickBox, minCorner, currentTick);
             }
 
             this.blockContainers.put(box.getName(), container);
@@ -706,28 +705,47 @@ public class LitematicaSchematic
         }
     }
 
-    private <T> void getPendingTicksFromWorld(Map<BlockPos, OrderedTick<T>> map, List<OrderedTick<T>> list,
-            BlockPos minCorner, int startY, int maxY, final long currentTime)
+    private <T> void getTicksFromScheduler(Long2ObjectMap<ChunkTickScheduler<T>> chunkTickSchedulers,
+                                           Map<BlockPos, OrderedTick<T>> outputMap,
+                                           IntBoundingBox box,
+                                           BlockPos minCorner,
+                                           final long currentTick)
     {
-        final int listSize = list.size();
+        int minCX = ChunkSectionPos.getSectionCoord(box.minX);
+        int minCZ = ChunkSectionPos.getSectionCoord(box.minZ);
+        int maxCX = ChunkSectionPos.getSectionCoord(box.maxX);
+        int maxCZ = ChunkSectionPos.getSectionCoord(box.maxZ);
 
-        for (int i = 0; i < listSize; ++i)
+        for (int cx = minCX; cx <= maxCX; ++cx)
         {
-            OrderedTick<T> entry = list.get(i);
-
-            // The getPendingBlockUpdates() method doesn't check the y-coordinate... :-<
-            if (entry.pos().getY() >= startY && entry.pos().getY() < maxY)
+            for (int cz = minCZ; cz <= maxCZ; ++cz)
             {
-                // Store the delay, ie. relative time
-                BlockPos posRelative = new BlockPos(
-                        entry.pos().getX() - minCorner.getX(),
-                        entry.pos().getY() - minCorner.getY(),
-                        entry.pos().getZ() - minCorner.getZ());
-                OrderedTick<T> newEntry = new OrderedTick<T>(entry.type(), posRelative, entry.triggerTick() - currentTime, entry.priority(), entry.subTickOrder());
+                long cp = ChunkPos.toLong(cx, cz);
 
-                map.put(posRelative, newEntry);
+                ChunkTickScheduler<T> chunkTickScheduler = chunkTickSchedulers.get(cp);
+
+                if (chunkTickScheduler != null)
+                {
+                    chunkTickScheduler.getQueueAsStream()
+                            .filter((t) -> box.containsPos(t.pos()))
+                            .forEach((t) -> this.addRelativeTickToMap(outputMap, t, minCorner, currentTick));
+                }
             }
         }
+    }
+
+    private <T> void addRelativeTickToMap(Map<BlockPos, OrderedTick<T>> outputMap, OrderedTick<T> tick,
+                                          BlockPos minCorner, long currentTick)
+    {
+        BlockPos pos = tick.pos();
+        BlockPos relativePos = new BlockPos(pos.getX() - minCorner.getX(),
+                                            pos.getY() - minCorner.getY(),
+                                            pos.getZ() - minCorner.getZ());
+
+        OrderedTick<T> newTick = new OrderedTick<>(tick.type(), relativePos, tick.triggerTick() - currentTick,
+                                                   tick.priority(), tick.subTickOrder());
+
+        outputMap.put(relativePos, newTick);
     }
 
     public static boolean isExposed(World world, BlockPos pos)
@@ -747,6 +765,7 @@ public class LitematicaSchematic
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public void takeBlocksFromWorldWithinChunk(World world, ImmutableMap<String, IntBoundingBox> volumes,
                                                ImmutableMap<String, Box> boxes, SchematicSaveInfo info)
     {
@@ -757,8 +776,6 @@ public class LitematicaSchematic
             String regionName = volumeEntry.getKey();
             IntBoundingBox bb = volumeEntry.getValue();
             Box box = boxes.get(regionName);
-
-            BlockBox blockBox = BlockBox.create(box.getPos1(), box.getPos2());
 
             if (box == null)
             {
@@ -831,26 +848,19 @@ public class LitematicaSchematic
                 }
             }
 
-            if (world instanceof ServerWorld)
+            if (world instanceof ServerWorld serverWorld)
             {
                 IntBoundingBox tickBox = IntBoundingBox.createProper(
                         offsetX + startX  , offsetY + startY  , offsetZ + startZ  ,
                         offsetX + endX + 1, offsetY + endY + 1, offsetZ + endZ + 1);
-                ArrayList blockTicks = new ArrayList<>();
-                ((IMixinWorldTickScheduler)world.getFluidTickScheduler()).litematicaVisitChunks(blockBox, (chunkPos, chunkTickScheduler) -> chunkTickScheduler.getQueueAsStream().forEach(blockTicks::add));
 
-                if (blockTicks.isEmpty())
-                {
-                    this.getPendingTicksFromWorld(blockTickMap, blockTicks, minCorner, startY, tickBox.maxY, world.getTime());
-                }
+                long currentTick = world.getTime();
 
-                ArrayList fluidTicks = new ArrayList<>();
-                ((IMixinWorldTickScheduler)world.getFluidTickScheduler()).litematicaVisitChunks(blockBox, (chunkPos, chunkTickScheduler) -> chunkTickScheduler.getQueueAsStream().forEach(fluidTicks::add));
+                this.getTicksFromScheduler(((IMixinWorldTickScheduler<Block>) serverWorld.getBlockTickScheduler()).litematica_getChunkTickSchedulers(),
+                                           blockTickMap, tickBox, minCorner, currentTick);
 
-                if (fluidTicks.isEmpty())
-                {
-                    this.getPendingTicksFromWorld(fluidTickMap, fluidTicks, minCorner, startY, tickBox.maxY, world.getTime());
-                }
+                this.getTicksFromScheduler(((IMixinWorldTickScheduler<Fluid>) serverWorld.getFluidTickScheduler()).litematica_getChunkTickSchedulers(),
+                                           fluidTickMap, tickBox, minCorner, currentTick);
             }
         }
     }
@@ -923,12 +933,12 @@ public class LitematicaSchematic
 
                 if (pendingBlockTicks != null)
                 {
-                    tag.put("PendingBlockTicks", this.writePendingTicksToNBT(pendingBlockTicks));
+                    tag.put("PendingBlockTicks", this.writePendingTicksToNBT(pendingBlockTicks, Registry.BLOCK, "Block"));
                 }
 
                 if (pendingFluidTicks != null)
                 {
-                    tag.put("PendingFluidTicks", this.writePendingTicksToNBT(pendingFluidTicks));
+                    tag.put("PendingFluidTicks", this.writePendingTicksToNBT(pendingFluidTicks, Registry.FLUID, "Fluid"));
                 }
 
                 // The entity list will not exist, if takeEntities is false when creating the schematic
@@ -965,7 +975,7 @@ public class LitematicaSchematic
         return tagList;
     }
 
-    private <T> NbtList writePendingTicksToNBT(Map<BlockPos, OrderedTick<T>> tickMap)
+    private <T> NbtList writePendingTicksToNBT(Map<BlockPos, OrderedTick<T>> tickMap, Registry<T> registry, String tagName)
     {
         NbtList tagList = new NbtList();
 
@@ -974,26 +984,15 @@ public class LitematicaSchematic
             for (OrderedTick<T> entry : tickMap.values())
             {
                 T target = entry.type();
-                String tagName;
-                Identifier rl;
+                Identifier id = registry.getId(target);
 
-                if (target instanceof Block)
-                {
-                    rl = Registry.BLOCK.getId((Block) target);
-                    tagName = "Block";
-                }
-                else
-                {
-                    rl = Registry.FLUID.getId((Fluid) target);
-                    tagName = "Fluid";
-                }
-
-                if (rl != null)
+                if (id != null)
                 {
                     NbtCompound tag = new NbtCompound();
 
-                    tag.putString(tagName, rl.toString());
+                    tag.putString(tagName, id.toString());
                     tag.putInt("Priority", entry.priority().getIndex());
+                    tag.putLong("SubTick", entry.subTickOrder());
                     tag.putInt("Time", (int) entry.triggerTick());
                     tag.putInt("x", entry.pos().getX());
                     tag.putInt("y", entry.pos().getY());
@@ -1013,10 +1012,7 @@ public class LitematicaSchematic
 
         if (tileMap.isEmpty() == false)
         {
-            for (NbtCompound tag : tileMap.values())
-            {
-                tagList.add(tag);
-            }
+            tagList.addAll(tileMap.values());
         }
 
         return tagList;
@@ -1089,13 +1085,13 @@ public class LitematicaSchematic
                     if (version >= 3)
                     {
                         NbtList list = regionTag.getList("PendingBlockTicks", Constants.NBT.TAG_COMPOUND);
-                        this.pendingBlockTicks.put(regionName, this.readPendingTicksFromNBT(list, Blocks.AIR));
+                        this.pendingBlockTicks.put(regionName, this.readPendingTicksFromNBT(list, Registry.BLOCK, "Block", Blocks.AIR));
                     }
 
                     if (version >= 5)
                     {
                         NbtList list = regionTag.getList("PendingFluidTicks", Constants.NBT.TAG_COMPOUND);
-                        this.pendingFluidTicks.put(regionName, this.readPendingTicksFromNBT(list, Fluids.EMPTY));
+                        this.pendingFluidTicks.put(regionName, this.readPendingTicksFromNBT(list, Registry.FLUID, "Fluid", Fluids.EMPTY));
                     }
 
                     NbtElement nbtBase = regionTag.get("BlockStates");
@@ -1629,8 +1625,8 @@ public class LitematicaSchematic
         return tileMap;
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> Map<BlockPos, OrderedTick<T>> readPendingTicksFromNBT(NbtList tagList, T clazz)
+    private <T> Map<BlockPos, OrderedTick<T>> readPendingTicksFromNBT(NbtList tagList, Registry<T> registry,
+                                                                      String tagName, T emptyValue)
     {
         Map<BlockPos, OrderedTick<T>> tickMap = new HashMap<>();
         final int size = tagList.size();
@@ -1646,39 +1642,23 @@ public class LitematicaSchematic
                 // Don't crash on invalid ResourceLocation in 1.13+
                 try
                 {
-                    if (clazz instanceof Block && tag.contains("Block", Constants.NBT.TAG_STRING))
-                    {
-                        target = (T) Registry.BLOCK.get(new Identifier(tag.getString("Block")));
+                    target = registry.get(new Identifier(tag.getString(tagName)));
 
-                        if (target == null || target == Blocks.AIR)
-                        {
-                            continue;
-                        }
-                    }
-                    else if (clazz instanceof Fluid && tag.contains("Fluid", Constants.NBT.TAG_STRING))
+                    if (target == null || target == emptyValue)
                     {
-                        target = (T) Registry.FLUID.get(new Identifier(tag.getString("Fluid")));
-
-                        if (target == null || target == Fluids.EMPTY)
-                        {
-                            continue;
-                        }
+                        continue;
                     }
                 }
-                catch (Exception e)
-                {
-                }
+                catch (Exception ignore) {}
 
                 if (target != null)
                 {
                     BlockPos pos = new BlockPos(tag.getInt("x"), tag.getInt("y"), tag.getInt("z"));
+                    TickPriority priority = TickPriority.byIndex(tag.getInt("Priority"));
                     // Note: the time is a relative delay at this point
                     int scheduledTime = tag.getInt("Time");
-                    TickPriority priority = TickPriority.byIndex(tag.getInt("Priority"));
-
-                    OrderedTick<T> entry = new OrderedTick<T>(target, pos, scheduledTime, priority, 0L);
-
-                    tickMap.put(pos, entry);
+                    long subTick = tag.getLong("SubTick");
+                    tickMap.put(pos, new OrderedTick<>(target, pos, scheduledTime, priority, subTick));
                 }
             }
         }
