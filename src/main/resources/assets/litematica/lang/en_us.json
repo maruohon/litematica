@@ -53,7 +53,7 @@
     "litematica.error.schematic_projects.failed_to_rename_project_file_exists": "Can't rename project to '%s', file already exists",
     "litematica.error.schematic_projects.invalid_project_directory": "Invalid or non-existing project directory",
     "litematica.error.schematic_projects.no_project_open": "No project open",
-    "litematica.error.schematic_projects.in_projects_mode_but_no_project_open": "Currently in Schematic Projects mode, but there is currently no project open",
+    "litematica.error.schematic_projects.in_projects_mode_but_no_project_open": "Currently in Schematic VCS mode, but there is currently no project open",
     "litematica.error.schematic_projects.null_player": "Player was null",
     "litematica.error.schematic_projects.project_already_exists": "Project '%s' already exists",
     "litematica.error.schematic_projects.save_already_in_progress": "Save already in progress",
@@ -90,7 +90,7 @@
     "litematica.gui.button.change_menu.configuration_menu": "Configuration menu",
     "litematica.gui.button.change_menu.load_schematics_to_memory": "Load Schematics",
     "litematica.gui.button.change_menu.schematic_manager": "Schematic Manager",
-    "litematica.gui.button.change_menu.schematic_projects_manager": "Schematic Projects",
+    "litematica.gui.button.change_menu.schematic_projects_manager": "Schematic VCS",
     "litematica.gui.button.change_menu.show_area_selections": "Area Selection browser",
     "litematica.gui.button.change_menu.show_loaded_schematics": "Loaded Schematics",
     "litematica.gui.button.change_menu.show_schematic_placements": "Schematic Placements",
@@ -112,8 +112,9 @@
     "litematica.gui.button.hover.plus_minus_tip": "Left click to increase\nRight click to decrease\nShift and/or Alt to increase the step size",
     "litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift": "Left click to increase\nRight click to decrease\nShift/Alt/Ctrl to increase the step size (multiplicative)",
     "litematica.gui.button.hover.schematic_list.reload_schematic": "Reloads the schematic from file.\nThis can be useful if you make a mistake\nin the Schematic Edit mode.",
-    "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode": "There is currently a Schematic Project open.\nThe Schematic Project overrides the normal area selection functionality",
+    "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode": "There is currently a Schematic VCS project open.\nThe Schematic VCS mode overrides the normal area selection functionality",
     "litematica.gui.button.hover.schematic_projects.delete_area": "§6Delete the last placed or saved area§r",
+    "litematica.gui.button.hover.schematic_projects.menu_warning": "(This was called Schematic Projects before.)\nIn general you §6should not§r be using this feature,\nunless you really know how it works and what it does.\nIt somewhat changes how the area selections, placements and pasting works,\nin particular that there is also an area delete operation when pasting.\n\nBasically this feature is intended for §6iterative, in-place§r design work,\nand it allows you to easier create multiple versions/snapshots\nof the same build, and also to switch between the versions by deleting what is\nin the world first, and then pasting the next version in its place.",
     "litematica.gui.button.hover.schematic_projects.move_origin_to_player": "Move the project origin to the player's current position\nThis will also move the area selection and placement",
     "litematica.gui.button.hover.schematic_projects.place_to_world_warning": "§6Warning: This will delete/overwrite the current blocks\n§6in the world within the area that was previously\n§6placed from a version, or saved as a version\n§6(basically the last seen \"effective area selection\")",
     "litematica.gui.button.hover.schematic_projects.save_new_version": "Saves a new schematic/version to the current project",
@@ -161,7 +162,7 @@
     "litematica.gui.button.schematic_projects.move_origin_to_player": "Move to player",
     "litematica.gui.button.schematic_projects.open_area_editor": "Area Editor",
     "litematica.gui.button.schematic_projects.open_manager_gui": "Open Manager",
-    "litematica.gui.button.schematic_projects.open_project_browser": "Projects Browser",
+    "litematica.gui.button.schematic_projects.open_project_browser": "VCS Project Browser",
     "litematica.gui.button.schematic_projects.place_to_world": "Place to world",
     "litematica.gui.button.schematic_projects.save_version": "Save Version",
 
@@ -331,7 +332,7 @@
     "litematica.gui.message.schematic_projects.confirm_place_to_world": "Do you want to place this version to the world?\nIt will delete whatever blocks are within the area that the project manager last placed to the world, or last saved as a version. (Basically the \"last seen affected area\", such that if you were to cycle versions, it would not leave blocks behind from the previous version.)",
 
     "litematica.gui.title.area_editor_normal": "Area Editor (Normal/Multi-box mode)",
-    "litematica.gui.title.area_editor_normal_schematic_projects": "Area Editor (§6§lSchematic Projects area§r)",
+    "litematica.gui.title.area_editor_normal_schematic_projects": "Area Editor (§6§lSchematic VCS area§r)",
     "litematica.gui.title.area_editor_simple": "Area Editor (Simple mode)",
     "litematica.gui.title.area_editor_sub_region": "Area Editor (sub-region)",
     "litematica.gui.title.area_editor.sub_region_name": "Sub-region name",
@@ -364,11 +365,11 @@
     "litematica.gui.title.save_schematic_filename": "Schematic File Name",
     "litematica.gui.title.schematic_browser": "Schematic Browser",
     "litematica.gui.title.schematic_manager": "Schematic Manager",
-    "litematica.gui.title.schematic_project_manager": "Schematic Project Manager",
+    "litematica.gui.title.schematic_project_manager": "Schematic VCS Project Manager",
     "litematica.gui.title.schematic_projects.confirm_delete_area": "Confirm Delete area",
     "litematica.gui.title.schematic_projects.confirm_place_to_world": "Confirm Place to world action",
     "litematica.gui.title.schematic_projects.save_new_version": "Save new schematic version",
-    "litematica.gui.title.schematic_projects_browser": "Schematic Projects Browser",
+    "litematica.gui.title.schematic_projects_browser": "Schematic VCS Projects Browser",
     "litematica.gui.title.schematic_verifier": "Schematic Verifier for '%s'",
     "litematica.gui.title.schematic_verifier_errors": "Schematic Verifier errors",
     "litematica.gui.title.task_manager": "Task Manager",
@@ -415,7 +416,7 @@
     "litematica.hud.schematic_projects.no_versions": "<no versions>",
     "litematica.hud.schematic_projects.origin": "Project origin: %s",
     "litematica.hud.schematic_projects.project_name": "Project: %s",
-    "litematica.hud.schematic_projects_mode": "§6Schematic Projects mode§r",
+    "litematica.hud.schematic_projects_mode": "§6Schematic VCS mode§r",
 
     "litematica.info.material_list": "- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one",
 
@@ -488,6 +489,7 @@
     "litematica.message.warn.schematic_verifier.overlay_disabled": "Warning: The verifier overlay rendering is currently disabled! See Info Overlays -> %s (or Hotkeys -> %s ['%s'])",
 
     "litematica.message.warning.invalid_number": "Invalid input for a number '%s'",
+    "litematica.message.warning.schematic_projects_hidden": "Warning: The Schematic Version Control System is currently hidden. In general you should NOT use this, unless you really know how it works and changes some of the mod behavior. It is meant for iteratire, in-place design work, where flipping between different versions of the build in-place (= deleting and replacing the previous version) is needed. If you want to use it, then enable the option Generic -> unhideSchematicVCS",
 
     "litematica.warning.area_editor.area_rendering_disabled": "Note: The Area Selection boxes rendering is currently disabled\nSee Visuals -> %s, or Hotkeys -> %s ['%s']",
 

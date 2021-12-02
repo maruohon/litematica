@@ -1,7 +1,10 @@
 package fi.dy.masa.litematica.gui;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.tool.ToolMode;
@@ -10,8 +13,6 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
 
 public class GuiMainMenu extends GuiBase
 {
@@ -57,15 +58,18 @@ public class GuiMainMenu extends GuiBase
         x += width + 20;
         y = 30;
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.CONFIGURATION);
-        y += 44;
+        y += 88;
 
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_MANAGER);
-        y += 44;
+        y += 22;
 
-        y += 22;
         this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.TASK_MANAGER);
-        y += 22;
-        this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PROJECTS_MANAGER);
+
+        if (Configs.Generic.UNHIDE_SCHEMATIC_PROJECTS.getBooleanValue())
+        {
+            y += 22;
+            this.createChangeMenuButton(x, y, width, ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PROJECTS_MANAGER);
+        }
     }
 
     private void createChangeMenuButton(int x, int y, int width, ButtonListenerChangeMenu.ButtonType type)
@@ -77,6 +81,10 @@ public class GuiMainMenu extends GuiBase
         {
             button.setEnabled(false);
             button.setHoverStrings("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+        }
+        else if (type == ButtonListenerChangeMenu.ButtonType.SCHEMATIC_PROJECTS_MANAGER)
+        {
+            button.setHoverStrings("litematica.gui.button.hover.schematic_projects.menu_warning");
         }
 
         this.addButton(button, new ButtonListenerChangeMenu(type, this));

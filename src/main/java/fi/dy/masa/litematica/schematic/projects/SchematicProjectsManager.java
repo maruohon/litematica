@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
 import fi.dy.masa.litematica.gui.GuiSchematicProjectsBrowser;
 import fi.dy.masa.malilib.gui.GuiBase;
@@ -24,6 +25,12 @@ public class SchematicProjectsManager
 
     public void openSchematicProjectsGui()
     {
+        if (Configs.Generic.UNHIDE_SCHEMATIC_PROJECTS.getBooleanValue() == false)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, 10000, "litematica.message.warning.schematic_projects_hidden");
+            return;
+        }
+
         if (this.currentProject != null)
         {
             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(this.currentProject);
@@ -41,12 +48,12 @@ public class SchematicProjectsManager
     @Nullable
     public SchematicProject getCurrentProject()
     {
-        return this.currentProject;
+        return this.hasProjectOpen() ? this.currentProject : null;
     }
 
     public boolean hasProjectOpen()
     {
-        return this.currentProject != null;
+        return this.currentProject != null && Configs.Generic.UNHIDE_SCHEMATIC_PROJECTS.getBooleanValue();
     }
 
     public void createNewProject(File dir, String projectName)

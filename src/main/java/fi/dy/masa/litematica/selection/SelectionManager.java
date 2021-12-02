@@ -102,11 +102,14 @@ public class SelectionManager
     @Nullable
     public AreaSelection getCurrentSelection()
     {
-        SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-
-        if (project != null)
+        if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
-            return project.getSelection();
+            SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
+
+            if (project != null)
+            {
+                return project.getSelection();
+            }
         }
 
         return this.getSelection(this.currentSelectionId);
