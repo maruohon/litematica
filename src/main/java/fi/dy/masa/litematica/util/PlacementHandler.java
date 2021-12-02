@@ -105,15 +105,16 @@ public class PlacementHandler
             }
         }
 
-        protocolValue &= 0xFFFFFFF0;
+        // Divide by two, and then remove the 4 bits used for the facing
+        protocolValue >>>= 5;
 
-        if (protocolValue >= 16)
+        if (protocolValue > 0)
         {
             Block block = state.getBlock();
 
             if (block instanceof RepeaterBlock)
             {
-                Integer delay = (protocolValue / 16) + 1;
+                Integer delay = protocolValue;
 
                 if (RepeaterBlock.DELAY.getValues().contains(delay))
                 {

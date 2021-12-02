@@ -590,28 +590,30 @@ public class WorldUtils
         Block block = state.getBlock();
         Direction facing = fi.dy.masa.malilib.util.BlockUtils.getFirstPropertyFacingValue(state);
         final int propertyIncrement = 16;
-        double relX = hitVecIn.x - pos.getX();
+        boolean hasData = false;
+        int protocolValue = 0;
 
         if (facing != null)
         {
-            x = pos.getX() + relX + 2 + (facing.getId() * 2);
+            protocolValue = facing.getId();
+            hasData = true; // without this down rotation would not be detected >_>
         }
 
         if (block instanceof RepeaterBlock)
         {
-            x += ((state.get(RepeaterBlock.DELAY)) - 1) * propertyIncrement;
+            protocolValue += state.get(RepeaterBlock.DELAY) * propertyIncrement;
         }
         else if (block instanceof TrapdoorBlock && state.get(TrapdoorBlock.HALF) == BlockHalf.TOP)
         {
-            x += propertyIncrement;
+            protocolValue += propertyIncrement;
         }
         else if (block instanceof ComparatorBlock && state.get(ComparatorBlock.MODE) == ComparatorMode.SUBTRACT)
         {
-            x += propertyIncrement;
+            protocolValue += propertyIncrement;
         }
         else if (block instanceof StairsBlock && state.get(StairsBlock.HALF) == BlockHalf.TOP)
         {
-            x += propertyIncrement;
+            protocolValue += propertyIncrement;
         }
         else if (block instanceof SlabBlock && state.get(SlabBlock.TYPE) != SlabType.DOUBLE)
         {
@@ -619,6 +621,11 @@ public class WorldUtils
 
             // Do it via vanilla
             y = getBlockSlabY(pos, state);
+        }
+
+        if (protocolValue != 0 || hasData)
+        {
+            x += (protocolValue * 2) + 2;
         }
 
         return new Vec3d(x, y, z);
