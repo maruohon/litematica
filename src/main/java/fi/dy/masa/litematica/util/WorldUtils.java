@@ -598,6 +598,12 @@ public class WorldUtils
             protocolValue = facing.getId();
             hasData = true; // without this down rotation would not be detected >_>
         }
+        else if (state.contains(Properties.AXIS))
+        {
+            Direction.Axis axis = state.get(Properties.AXIS);
+            protocolValue = axis.ordinal();
+            hasData = true; // without this id 0 would not be detected >_>
+        }
 
         if (block instanceof RepeaterBlock)
         {

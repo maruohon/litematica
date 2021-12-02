@@ -104,6 +104,15 @@ public class PlacementHandler
                 return null;
             }
         }
+        else if (state.contains(Properties.AXIS))
+        {
+            Direction.Axis axis = Direction.Axis.VALUES[((protocolValue >> 1) & 0x3) % 3];
+
+            if (Properties.AXIS.getValues().contains(axis))
+            {
+                state = state.with(Properties.AXIS, axis);
+            }
+        }
 
         // Divide by two, and then remove the 4 bits used for the facing
         protocolValue >>>= 5;
