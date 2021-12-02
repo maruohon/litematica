@@ -16,8 +16,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.SlabBlock;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.block.enums.ComparatorMode;
 import net.minecraft.block.enums.SlabType;
@@ -609,15 +607,11 @@ public class WorldUtils
         {
             protocolValue += state.get(RepeaterBlock.DELAY) * propertyIncrement;
         }
-        else if (block instanceof TrapdoorBlock && state.get(TrapdoorBlock.HALF) == BlockHalf.TOP)
-        {
-            protocolValue += propertyIncrement;
-        }
         else if (block instanceof ComparatorBlock && state.get(ComparatorBlock.MODE) == ComparatorMode.SUBTRACT)
         {
             protocolValue += propertyIncrement;
         }
-        else if (block instanceof StairsBlock && state.get(StairsBlock.HALF) == BlockHalf.TOP)
+        else if (state.contains(Properties.BLOCK_HALF) && state.get(Properties.BLOCK_HALF) == BlockHalf.TOP)
         {
             protocolValue += propertyIncrement;
         }

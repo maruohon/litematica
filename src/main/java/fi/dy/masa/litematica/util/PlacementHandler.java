@@ -10,8 +10,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ComparatorBlock;
 import net.minecraft.block.RepeaterBlock;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.block.TrapdoorBlock;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.block.enums.ComparatorMode;
 import net.minecraft.block.enums.SlabType;
@@ -134,14 +132,11 @@ public class PlacementHandler
             {
                 state = state.with(ComparatorBlock.MODE, ComparatorMode.SUBTRACT);
             }
-            else if (block instanceof TrapdoorBlock)
-            {
-                state = state.with(TrapdoorBlock.HALF, BlockHalf.TOP);
-            }
-            else if (block instanceof StairsBlock && state.get(StairsBlock.HALF) == BlockHalf.BOTTOM)
-            {
-                state = state.with(StairsBlock.HALF, BlockHalf.TOP);
-            }
+        }
+
+        if (state.contains(Properties.BLOCK_HALF))
+        {
+            state = state.with(Properties.BLOCK_HALF, protocolValue > 0 ? BlockHalf.TOP : BlockHalf.BOTTOM);
         }
 
         return state;
