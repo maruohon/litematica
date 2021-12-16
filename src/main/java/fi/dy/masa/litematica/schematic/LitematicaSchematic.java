@@ -1046,7 +1046,9 @@ public class LitematicaSchematic
             final int version = nbt.getInt("Version");
             final int minecraftDataVersion = nbt.getInt("MinecraftDataVersion");
 
-            if (version >= 1 && version <= SCHEMATIC_VERSION)
+            // Version 6 is used for 1.18 schematics, with the slightly different scheduled tick data.
+            // It's still fine to load in 1.17 though... for the most part at least.
+            if (version >= 1 && version <= 6)
             {
                 this.metadata.readFromNBT(nbt.getCompound("Metadata"));
                 this.readSubRegionsFromNBT(nbt.getCompound("Regions"), version, minecraftDataVersion);
