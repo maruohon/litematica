@@ -886,6 +886,18 @@ public class LitematicaSchematic
         return this.entities.get(regionName);
     }
 
+    @Nullable
+    public Map<BlockPos, ScheduledTick<Block>> getScheduledBlockTicksForRegion(String regionName)
+    {
+        return this.pendingBlockTicks.get(regionName);
+    }
+
+    @Nullable
+    public Map<BlockPos, ScheduledTick<Fluid>> getScheduledFluidTicksForRegion(String regionName)
+    {
+        return this.pendingFluidTicks.get(regionName);
+    }
+
     private NbtCompound writeToNBT()
     {
         NbtCompound nbt = new NbtCompound();

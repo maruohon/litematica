@@ -3,19 +3,25 @@ package fi.dy.masa.litematica.util;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerTickScheduler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.ScheduledTick;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
@@ -61,9 +67,12 @@ public class SchematicPlacingUtils
                 if (placement.isEnabled())
                 {
                     Map<BlockPos, NbtCompound> blockEntityMap = schematic.getBlockEntityMapForRegion(regionName);
+                    Map<BlockPos, ScheduledTick<Block>> scheduledBlockTicks = schematic.getScheduledBlockTicksForRegion(regionName);
+                    Map<BlockPos, ScheduledTick<Fluid>> scheduledFluidTicks = schematic.getScheduledFluidTicksForRegion(regionName);
 
                     if (placeBlocksWithinChunk(world, chunkPos, regionName, container, blockEntityMap,
-                                               origin, schematicPlacement, placement, replace, notifyNeighbors) == false)
+                                               origin, schematicPlacement, placement, scheduledBlockTicks,
+                                               scheduledFluidTicks, replace, notifyNeighbors) == false)
                     {
                         allSuccess = false;
                         Litematica.logger.warn("Invalid/missing schematic data in schematic '{}' for sub-region '{}'", schematic.getMetadata().getName(), regionName);
@@ -93,6 +102,8 @@ public class SchematicPlacingUtils
                                                  BlockPos origin,
                                                  SchematicPlacement schematicPlacement,
                                                  SubRegionPlacement placement,
+                                                 @Nullable Map<BlockPos, ScheduledTick<Block>> scheduledBlockTicks,
+                                                 @Nullable Map<BlockPos, ScheduledTick<Fluid>> scheduledFluidTicks,
                                                  ReplaceBehavior replace, boolean notifyNeighbors)
     {
         IntBoundingBox bounds = schematicPlacement.getBoxWithinChunkForRegion(regionName, chunkPos.x, chunkPos.z);
@@ -161,6 +172,10 @@ public class SchematicPlacingUtils
             mirrorSub = mirrorSub == BlockMirror.FRONT_BACK ? BlockMirror.LEFT_RIGHT : BlockMirror.FRONT_BACK;
         }
 
+        final int posMinRelMinusRegX = posMinRel.getX() - regionPos.getX();
+        final int posMinRelMinusRegY = posMinRel.getY() - regionPos.getY();
+        final int posMinRelMinusRegZ = posMinRel.getZ() - regionPos.getZ();
+
         for (int y = startY; y <= endY; ++y)
         {
             for (int z = startZ; z <= endZ; ++z)
@@ -177,9 +192,9 @@ public class SchematicPlacingUtils
                     posMutable.set(x, y, z);
                     NbtCompound teNBT = blockEntityMap.get(posMutable);
 
-                    posMutable.set(posMinRel.getX() + x - regionPos.getX(),
-                                   posMinRel.getY() + y - regionPos.getY(),
-                                   posMinRel.getZ() + z - regionPos.getZ());
+                    posMutable.set(posMinRelMinusRegX + x,
+                                   posMinRelMinusRegY + y,
+                                   posMinRelMinusRegZ + z);
 
                     BlockPos pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
                     pos = pos.add(regionPosTransformed).add(origin);
@@ -237,6 +252,63 @@ public class SchematicPlacingUtils
                             {
                                 Litematica.logger.warn("Failed to load BlockEntity data for {} @ {}", state, pos);
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (world instanceof ServerWorld serverWorld)
+        {
+            IntBoundingBox box = new IntBoundingBox(startX, startY, startZ, endX, endY, endZ);
+
+            if (scheduledBlockTicks != null && scheduledBlockTicks.isEmpty() == false)
+            {
+                ServerTickScheduler<Block> scheduler = serverWorld.getBlockTickScheduler();
+
+                for (Map.Entry<BlockPos, ScheduledTick<Block>> entry : scheduledBlockTicks.entrySet())
+                {
+                    BlockPos pos = entry.getKey();
+
+                    if (box.containsPos(pos))
+                    {
+                        posMutable.set(posMinRelMinusRegX + pos.getX(),
+                                       posMinRelMinusRegY + pos.getY(),
+                                       posMinRelMinusRegZ + pos.getZ());
+
+                        pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
+                        pos = pos.add(regionPosTransformed).add(origin);
+                        ScheduledTick<Block> tick = entry.getValue();
+
+                        if (world.getBlockState(pos).getBlock() == tick.getObject())
+                        {
+                            scheduler.schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
+                        }
+                    }
+                }
+            }
+
+            if (scheduledFluidTicks != null && scheduledFluidTicks.isEmpty() == false)
+            {
+                ServerTickScheduler<Fluid> scheduler = serverWorld.getFluidTickScheduler();
+
+                for (Map.Entry<BlockPos, ScheduledTick<Fluid>> entry : scheduledFluidTicks.entrySet())
+                {
+                    BlockPos pos = entry.getKey();
+
+                    if (box.containsPos(pos))
+                    {
+                        posMutable.set(posMinRelMinusRegX + pos.getX(),
+                                       posMinRelMinusRegY + pos.getY(),
+                                       posMinRelMinusRegZ + pos.getZ());
+
+                        pos = PositionUtils.getTransformedPlacementPosition(posMutable, schematicPlacement, placement);
+                        pos = pos.add(regionPosTransformed).add(origin);
+                        ScheduledTick<Fluid> tick = entry.getValue();
+
+                        if (world.getBlockState(pos).getFluidState().getFluid() == tick.getObject())
+                        {
+                            scheduler.schedule(pos, tick.getObject(), (int) tick.time, tick.priority);
                         }
                     }
                 }
