@@ -13,15 +13,18 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SkullItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import fi.dy.masa.litematica.config.Configs;
@@ -268,6 +271,33 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                 System.out.printf("%s\n", strCommand);
                 System.out.printf("nbt: %s\n", nbtString);
                 */
+
+                if (entity instanceof ItemFrameEntity itemFrame)
+                {
+                    ItemStack stack = itemFrame.getHeldItemStack();
+
+                    if (stack.isEmpty() == false)
+                    {
+                        Identifier itemId = Registry.ITEM.getId(stack.getItem());
+                        int facingId = itemFrame.getHorizontalFacing().getId();
+                        String nbtStr = String.format(" {Facing:%db,Item:{id:\"%s\",Count:1b}}", facingId, itemId);
+                        NbtCompound tag = stack.getNbt();
+
+                        if (tag != null)
+                        {
+                            String itemNbt = tag.toString();
+                            String tmp = String.format(" {Facing:%db,Item:{id:\"%s\",Count:1b,tag:%s}}",
+                                                       facingId, itemId, itemNbt);
+
+                            if (strCommand.length() + tmp.length() < 255)
+                            {
+                                nbtStr = tmp;
+                            }
+                        }
+
+                        strCommand += nbtStr;
+                    }
+                }
 
                 this.sendCommand(strCommand, player);
             }
