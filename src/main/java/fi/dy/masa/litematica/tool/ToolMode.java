@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.tool;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import fi.dy.masa.litematica.data.DataManager;

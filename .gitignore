@@ -7,3 +7,5 @@ logs/
 .classpath
 .project
 build.number
+.brachyura/
+buildscript/build/

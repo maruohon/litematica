@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.util;
 
 import java.util.Iterator;
 import java.util.Optional;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.google.common.base.Splitter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

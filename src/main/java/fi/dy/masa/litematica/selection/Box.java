@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.selection;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import fi.dy.masa.litematica.util.PositionUtils;

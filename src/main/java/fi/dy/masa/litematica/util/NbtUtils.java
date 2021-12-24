@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.util;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;

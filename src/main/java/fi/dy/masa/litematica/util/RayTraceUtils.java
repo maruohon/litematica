@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.BlockState;
@@ -69,7 +69,7 @@ public class RayTraceUtils
         return pos;
     }
 
-    @Nonnull
+    @NotNull
     public static RayTraceWrapper getWrappedRayTraceFromEntity(World world, Entity entity, double range)
     {
         Vec3d eyesPos = entity.getCameraPosVec(1f);
@@ -563,7 +563,7 @@ public class RayTraceUtils
         return furthestTrace != null ? new RayTraceWrapper(HitType.SCHEMATIC_BLOCK, furthestTrace) : null;
     }
 
-    @Nonnull
+    @NotNull
     public static HitResult getRayTraceFromEntity(World world, Entity entity, boolean useLiquids, double range)
     {
         Vec3d eyesPos = entity.getCameraPosVec(1f);

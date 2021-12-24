@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.io.File;
 import java.io.FileFilter;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.Icons;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
