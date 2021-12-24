@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.schematic.conversion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.datafixers.DataFixUtils;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.block.BlockState;

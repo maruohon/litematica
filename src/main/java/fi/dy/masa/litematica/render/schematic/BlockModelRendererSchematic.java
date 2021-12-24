@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.render.schematic;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;

@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.ScreenshotRecorder;

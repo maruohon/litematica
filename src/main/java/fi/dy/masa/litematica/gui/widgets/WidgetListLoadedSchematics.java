@@ -2,7 +2,7 @@ package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.litematica.data.SchematicHolder;
 import fi.dy.masa.litematica.gui.Icons;

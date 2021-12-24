@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.gui.widgets;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;

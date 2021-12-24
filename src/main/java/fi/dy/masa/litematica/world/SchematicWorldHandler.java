@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.world;
 
 import java.util.OptionalLong;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.tag.BlockTags;

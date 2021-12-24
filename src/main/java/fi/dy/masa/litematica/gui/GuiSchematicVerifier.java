@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;

@@ -3,7 +3,7 @@ package fi.dy.masa.litematica.schematic.projects;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.apache.commons.io.FileUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;

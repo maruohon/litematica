@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.world;
 
 import java.util.function.BooleanSupplier;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;

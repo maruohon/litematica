@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import fi.dy.masa.litematica.gui.widgets.WidgetSchematicBrowser;
 import fi.dy.masa.malilib.gui.GuiListBase;
 import fi.dy.masa.malilib.gui.interfaces.ISelectionListener;

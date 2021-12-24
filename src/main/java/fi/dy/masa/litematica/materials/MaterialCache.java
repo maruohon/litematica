@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;

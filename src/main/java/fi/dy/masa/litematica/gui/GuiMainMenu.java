@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import fi.dy.masa.litematica.Reference;

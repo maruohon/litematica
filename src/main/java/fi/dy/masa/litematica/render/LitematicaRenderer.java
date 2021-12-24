@@ -1,6 +1,6 @@
 package fi.dy.masa.litematica.render;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;

@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.util.Identifier;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.util.FileType;
