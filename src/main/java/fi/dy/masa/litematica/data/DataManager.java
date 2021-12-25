@@ -1,8 +1,10 @@
 package fi.dy.masa.litematica.data;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -15,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import fi.dy.masa.litematica.Litematica;
@@ -47,6 +50,7 @@ public class DataManager implements IDirectoryCache
     private static final Pattern PATTERN_ITEM_NBT = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)(?<nbt>\\{.*\\})$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
+    private static final ArrayList<Consumer<Text>> CHAT_LISTENERS = new ArrayList<>();
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static ConfigGuiTab configGuiTab = ConfigGuiTab.GENERIC;
@@ -90,6 +94,24 @@ public class DataManager implements IDirectoryCache
     public static ItemStack getToolItem()
     {
         return toolItem;
+    }
+
+    public static void addChatListener(Consumer<Text> listener)
+    {
+        CHAT_LISTENERS.add(listener);
+    }
+
+    public static void removeChatListener(Consumer<Text> listener)
+    {
+        CHAT_LISTENERS.remove(listener);
+    }
+
+    public static void onChatMessage(Text text)
+    {
+        for (Consumer<Text> listener : CHAT_LISTENERS)
+        {
+            listener.accept(text);
+        }
     }
 
     public static boolean getCreatePlacementOnLoad()
