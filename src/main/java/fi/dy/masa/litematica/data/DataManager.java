@@ -410,6 +410,11 @@ public class DataManager implements IDirectoryCache
         }
     }
 
+    public static File getDefaultBaseSchematicDirectory()
+    {
+        return FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics"));
+    }
+
     public static File getCurrentConfigDirectory()
     {
         return new File(FileUtils.getConfigDirectory(), Reference.MOD_ID);
@@ -417,7 +422,16 @@ public class DataManager implements IDirectoryCache
 
     public static File getSchematicsBaseDirectory()
     {
-        File dir = FileUtils.getCanonicalFileIfPossible(new File(FileUtils.getMinecraftDirectory(), "schematics"));
+        File dir;
+
+        if (Configs.Generic.CUSTOM_SCHEMATIC_BASE_DIRECTORY_ENABLED.getBooleanValue())
+        {
+            dir = new File(Configs.Generic.CUSTOM_SCHEMATIC_BASE_DIRECTORY.getStringValue());
+        }
+        else
+        {
+            dir = getDefaultBaseSchematicDirectory();
+        }
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
