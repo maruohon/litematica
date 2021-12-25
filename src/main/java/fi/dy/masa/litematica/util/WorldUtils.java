@@ -498,19 +498,20 @@ public class WorldUtils
                 }
 
                 Direction side = applyPlacementFacing(stateSchematic, sideOrig, stateClient);
+                EasyPlaceProtocol protocol = PlacementHandler.getEffectiveProtocolVersion();
 
-                if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V3)
+                if (protocol == EasyPlaceProtocol.V3)
                 {
                     hitPos = applyPlacementProtocolV3(pos, stateSchematic, hitPos);
                 }
-                else if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V2)
+                else if (protocol == EasyPlaceProtocol.V2)
                 {
-                    // Carpet Accurate Placement protocol support, plus BlockSlab support
+                    // Carpet Accurate Block Placement protocol support, plus slab support
                     hitPos = applyCarpetProtocolHitVec(pos, stateSchematic, hitPos);
                 }
-                else if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.SLAB_ONLY)
+                else if (protocol == EasyPlaceProtocol.SLAB_ONLY)
                 {
-                    //BlockSlab support only
+                    // Slab support only
                     hitPos = applyBlockSlabProtocol(pos, stateSchematic, hitPos);
                 }
 

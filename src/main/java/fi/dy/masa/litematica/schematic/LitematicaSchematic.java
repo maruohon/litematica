@@ -467,6 +467,7 @@ public class LitematicaSchematic
             }
         }
 
+        /*
         if (notifyNeighbors)
         {
             for (int y = 0; y < sizeY; ++y)
@@ -512,6 +513,7 @@ public class LitematicaSchematic
                 }
             }
         }
+        */
 
         return true;
     }
@@ -897,6 +899,18 @@ public class LitematicaSchematic
     public List<EntityInfo> getEntityListForRegion(String regionName)
     {
         return this.entities.get(regionName);
+    }
+
+    @Nullable
+    public Map<BlockPos, OrderedTick<Block>> getScheduledBlockTicksForRegion(String regionName)
+    {
+        return this.pendingBlockTicks.get(regionName);
+    }
+
+    @Nullable
+    public Map<BlockPos, OrderedTick<Fluid>> getScheduledFluidTicksForRegion(String regionName)
+    {
+        return this.pendingFluidTicks.get(regionName);
     }
 
     private NbtCompound writeToNBT()

@@ -64,7 +64,7 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
             return world != null && world.getChunkManager().isChunkLoaded(pos.x, pos.z);
         }
         
-        return this.areSurroundingChunksLoaded(pos, this.worldClient, 1);
+        return this.areSurroundingChunksLoaded(pos, this.clientWorld, 1);
     }
 
     @Override

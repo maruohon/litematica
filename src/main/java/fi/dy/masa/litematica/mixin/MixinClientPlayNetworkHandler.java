@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.ChunkDataS2CPacket;
 import net.minecraft.network.packet.s2c.play.ChunkDeltaUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket;
 import net.minecraft.util.math.ChunkSectionPos;
 import fi.dy.masa.litematica.config.Configs;
@@ -46,5 +47,11 @@ public abstract class MixinClientPlayNetworkHandler
         {
             DataManager.getSchematicPlacementManager().onClientChunkUnload(packet.getX(), packet.getZ());
         }
+    }
+
+    @Inject(method = "onGameMessage", at = @At("RETURN"))
+    private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci)
+    {
+        DataManager.onChatMessage(packet.getMessage());
     }
 }

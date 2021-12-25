@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import java.util.ArrayList;
 import java.util.Collection;
 import com.google.common.collect.ArrayListMultimap;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.ChunkPos;
@@ -11,8 +10,6 @@ import net.minecraft.world.World;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.SchematicPlacingUtils;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
@@ -50,19 +47,16 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     @Override
     public boolean execute()
     {
-        WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        ClientWorld worldClient = this.mc.world;
         World world = WorldUtils.getBestWorld(this.mc);
-        int processed = 0;
         MinecraftServer server = this.mc.getServer();
-        long timeStart = Util.getMeasuringTimeNano();
         long vanillaTickTime = server.lastTickLengths[server.getTicks() % 100];
+        long timeStart = Util.getMeasuringTimeNano();
+        int processed = 0;
 
         this.sortChunkList();
 
-        for (int chunkIndex = 0; chunkIndex < this.chunks.size(); ++chunkIndex)
+        for (int chunkIndex = 0; chunkIndex < this.pendingChunks.size(); ++chunkIndex)
         {
-            ChunkPos pos = this.chunks.get(chunkIndex);
             long currentTime = Util.getMeasuringTimeNano();
             long elapsedTickTime = vanillaTickTime + (currentTime - timeStart);
 
@@ -71,7 +65,9 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
                 break;
             }
 
-            if (this.canProcessChunk(pos, worldSchematic, worldClient))
+            ChunkPos pos = this.pendingChunks.get(chunkIndex);
+
+            if (this.canProcessChunk(pos, this.schematicWorld, this.mc.world))
             {
                 // New list to avoid CME
                 ArrayList<SchematicPlacement> placements = new ArrayList<>(this.placementsPerChunk.get(pos));
@@ -87,13 +83,13 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
 
                 if (this.placementsPerChunk.containsKey(pos) == false)
                 {
-                    this.chunks.remove(chunkIndex);
+                    this.pendingChunks.remove(chunkIndex);
                     --chunkIndex;
                 }
             }
         }
 
-        if (this.chunks.isEmpty())
+        if (this.pendingChunks.isEmpty())
         {
             this.finished = true;
             return true;

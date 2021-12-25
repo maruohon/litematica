@@ -6,27 +6,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
 
 public abstract class TaskProcessChunkBase extends TaskBase
 {
     protected final ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks = ArrayListMultimap.create();
     protected final Set<ChunkPos> requiredChunks = new HashSet<>();
-    protected final ClientWorld worldClient;
+    protected final ClientWorld clientWorld;
     protected final World world;
     protected final boolean isClientWorld;
 
     protected TaskProcessChunkBase(String nameOnHud)
     {
-        this.worldClient = this.mc.world;
+        this.clientWorld = this.mc.world;
         this.world = WorldUtils.getBestWorld(this.mc);
         this.isClientWorld = (this.world == this.mc.world);
         this.name = StringUtils.translate(nameOnHud);
@@ -37,19 +37,19 @@ public abstract class TaskProcessChunkBase extends TaskBase
     @Override
     public boolean execute()
     {
-        if (this.worldClient != null)
+        if (this.clientWorld != null)
         {
-            Iterator<ChunkPos> iter = this.requiredChunks.iterator();
+            Iterator<ChunkPos> iterator = this.requiredChunks.iterator();
             int processed = 0;
 
-            while (iter.hasNext())
+            while (iterator.hasNext())
             {
-                ChunkPos pos = iter.next();
+                ChunkPos pos = iterator.next();
 
                 if (this.canProcessChunk(pos))
                 {
                     this.processChunk(pos);
-                    iter.remove();
+                    iterator.remove();
                     processed++;
                 }
             }
@@ -76,14 +76,7 @@ public abstract class TaskProcessChunkBase extends TaskBase
         // Single player, saving from the integrated server world
         else
         {
-            this.mc.execute(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    TaskProcessChunkBase.this.onStop();
-                }
-            });
+            this.mc.execute(TaskProcessChunkBase.this::onStop);
         }
     }
 

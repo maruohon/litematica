@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -26,24 +27,26 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements IInfoHudRenderer
 {
+    protected final ImmutableList<SchematicPlacement> placements;
     protected final ArrayListMultimap<ChunkPos, IntBoundingBox> boxesInChunks = ArrayListMultimap.create();
-    protected final List<ChunkPos> chunks = new ArrayList<>();
-    private final HashSet<ChunkPos> individualChunks = new HashSet<>();
-    private final Collection<SchematicPlacement> placements;
-    private final LayerRange layerRange;
+    protected final List<ChunkPos> pendingChunks = new ArrayList<>();
     protected final ChunkPosComparator comparator;
-    protected final boolean changedBlockOnly;
+    protected final WorldSchematic schematicWorld;
+    protected final LayerRange layerRange;
     protected final ReplaceBehavior replace;
+    protected final boolean changedBlockOnly;
+    private final HashSet<ChunkPos> allChunksSet = new HashSet<>();
 
     public TaskPasteSchematicPerChunkBase(Collection<SchematicPlacement> placements, LayerRange range, boolean changedBlocksOnly)
     {
-        this.placements = placements;
+        this.placements = ImmutableList.copyOf(placements);
         this.layerRange = range;
         this.changedBlockOnly = changedBlocksOnly;
         this.comparator = new ChunkPosComparator();
         this.comparator.setClosestFirst(true);
         this.replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
         this.name = StringUtils.translate("litematica.gui.label.task_name.paste");
+        this.schematicWorld = SchematicWorldHandler.getSchematicWorld();
     }
 
     @Override
@@ -54,11 +57,20 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
             this.addPlacement(placement, this.layerRange);
         }
 
-        this.chunks.addAll(this.individualChunks);
+        this.pendingChunks.addAll(this.allChunksSet);
         this.sortChunkList();
 
         InfoHud.getInstance().addInfoHudRenderer(this, true);
         this.updateInfoHudLines();
+    }
+
+    @Override
+    public boolean canExecute()
+    {
+        return super.canExecute() &&
+               this.mc.player != null &&
+               this.schematicWorld != null &&
+               this.pendingChunks.isEmpty() == false;
     }
 
     protected void addPlacement(SchematicPlacement placement, LayerRange range)
@@ -82,7 +94,7 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
 
             if (count > 0)
             {
-                this.individualChunks.add(pos);
+                this.allChunksSet.add(pos);
                 this.onChunkAddedForHandling(pos, placement);
             }
         }
@@ -151,15 +163,6 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
     {
     }
 
-    @Override
-    public boolean canExecute()
-    {
-        return this.chunks.isEmpty() == false &&
-               this.mc.world != null &&
-               this.mc.player != null &&
-               SchematicWorldHandler.getSchematicWorld() != null;
-    }
-
     protected boolean canProcessChunk(ChunkPos pos, WorldSchematic worldSchematic, ClientWorld worldClient)
     {
         if (worldSchematic.getChunkProvider().isChunkLoaded(pos.x, pos.z) == false ||
@@ -174,12 +177,12 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
 
     protected void sortChunkList()
     {
-        if (this.chunks.size() > 0)
+        if (this.pendingChunks.size() > 0)
         {
             if (this.mc.player != null)
             {
                 this.comparator.setReferencePosition(this.mc.player.getBlockPos());
-                this.chunks.sort(this.comparator);
+                this.pendingChunks.sort(this.comparator);
             }
 
             this.onChunkListSorted();
@@ -195,14 +198,14 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskBase implements
         List<String> hudLines = new ArrayList<>();
 
         String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
-        String title = StringUtils.translate("litematica.gui.label.schematic_paste.missing_chunks", this.chunks.size());
+        String title = StringUtils.translate("litematica.gui.label.schematic_paste.missing_chunks", this.pendingChunks.size());
         hudLines.add(String.format("%s%s%s", pre, title, GuiBase.TXT_RST));
 
-        int maxLines = Math.min(this.chunks.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
+        int maxLines = Math.min(this.pendingChunks.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
 
         for (int i = 0; i < maxLines; ++i)
         {
-            ChunkPos pos = this.chunks.get(i);
+            ChunkPos pos = this.pendingChunks.get(i);
             hudLines.add(String.format("cx: %5d, cz: %5d (x: %d, z: %d)", pos.x, pos.z, pos.x << 4, pos.z << 4));
         }
 

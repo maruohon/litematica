@@ -13,6 +13,7 @@ import net.minecraft.block.RepeaterBlock;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.block.enums.ComparatorMode;
 import net.minecraft.block.enums.SlabType;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.property.DirectionProperty;
@@ -65,14 +66,28 @@ public class PlacementHandler
             Properties.ROTATION
     );
 
+    public static EasyPlaceProtocol getEffectiveProtocolVersion()
+    {
+        EasyPlaceProtocol protocol = (EasyPlaceProtocol) Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue();
+
+        if (protocol == EasyPlaceProtocol.AUTO)
+        {
+            return MinecraftClient.getInstance().isInSingleplayer() ? EasyPlaceProtocol.V3 : EasyPlaceProtocol.SLAB_ONLY;
+        }
+
+        return protocol;
+    }
+
     @Nullable
     public static BlockState applyPlacementProtocolToPlacementState(BlockState state, UseContext context)
     {
-        if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V3)
+        EasyPlaceProtocol protocol = getEffectiveProtocolVersion();
+
+        if (protocol == EasyPlaceProtocol.V3)
         {
             return applyPlacementProtocolV3(state, context);
         }
-        else if (Configs.Generic.EASY_PLACE_PROTOCOL.getOptionListValue() == EasyPlaceProtocol.V2)
+        else if (protocol == EasyPlaceProtocol.V2)
         {
             return applyPlacementProtocolV2(state, context);
         }
