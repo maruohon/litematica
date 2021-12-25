@@ -62,17 +62,12 @@ public class TaskFillArea extends TaskProcessChunkBase
     @Override
     protected boolean canProcessChunk(ChunkPos pos)
     {
-        return this.mc.player != null && this.areSurroundingChunksLoaded(pos, this.worldClient, 1);
+        return this.mc.player != null && this.areSurroundingChunksLoaded(pos, this.clientWorld, 1);
     }
 
     @Override
     protected boolean processChunk(ChunkPos pos)
     {
-        if (this.isClientWorld && this.chunkCount == 0)
-        {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback false");
-        }
-
         for (IntBoundingBox box : this.getBoxesInChunk(pos))
         {
             if (this.isClientWorld)
@@ -164,15 +159,8 @@ public class TaskFillArea extends TaskProcessChunkBase
     @Override
     protected void onStop()
     {
-        this.printCompletionMessage();
-
-        if (this.isClientWorld && this.mc.player != null)
-        {
-            this.mc.player.sendChatMessage("/gamerule sendCommandFeedback true");
-        }
-
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
-
+        this.printCompletionMessage();
         this.notifyListener();
     }
 

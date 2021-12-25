@@ -20,7 +20,7 @@ public class TaskCountBlocksArea extends TaskCountBlocksBase
 
     protected void countAtPosition(BlockPos pos)
     {
-        BlockState stateClient = this.worldClient.getBlockState(pos);
+        BlockState stateClient = this.clientWorld.getBlockState(pos);
         this.countsTotal.addTo(stateClient, 1);
     }
 }

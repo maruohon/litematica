@@ -39,7 +39,7 @@ public class TaskCountBlocksPlacement extends TaskCountBlocksBase
 
         if (stateSchematic.isAir() == false)
         {
-            BlockState stateClient = this.worldClient.getBlockState(pos);
+            BlockState stateClient = this.clientWorld.getBlockState(pos);
 
             this.countsTotal.addTo(stateSchematic, 1);
 

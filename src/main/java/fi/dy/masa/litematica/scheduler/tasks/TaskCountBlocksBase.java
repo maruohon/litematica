@@ -44,7 +44,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
     protected boolean canProcessChunk(ChunkPos pos)
     {
         // All surrounding chunks are loaded on the client
-        return this.areSurroundingChunksLoaded(pos, this.worldClient, 1);
+        return this.areSurroundingChunksLoaded(pos, this.clientWorld, 1);
     }
 
     @Override
