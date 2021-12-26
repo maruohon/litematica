@@ -41,7 +41,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       EASY_PLACE_HOLD_ENABLED = new ConfigBoolean(    "easyPlaceHoldEnabled", true, "When enabled, then you can hold down the use key\nand look at different schematic blocks to place them,\nwithout having to click on every block individually.");
         public static final ConfigBoolean       EASY_PLACE_MODE         = new ConfigBoolean(    "easyPlaceMode", false, "When enabled, then simply trying to use an item/place a block\non schematic blocks will place that block in that position");
         public static final ConfigBoolean       EASY_PLACE_SP_HANDLING  = new ConfigBoolean(    "easyPlaceSinglePlayerHandling", true, "If enabled, then Litematica handles the so called\n\"Carpet mod Accurate Block Placement Protocol\" itself in single player.\nIf you also have Tweakeroo installed, then this can be disabled,\nas Tweakeroo's 'clientPlacementRotation' option does the exact same thing.");
-        public static final ConfigOptionList    EASY_PLACE_PROTOCOL     = new ConfigOptionList( "easyPlaceProtocolVersion", EasyPlaceProtocol.AUTO, "The type of \"accurate placement protocol\" to use.\n- Auto: Uses v3 in single player, and Slabs-only in multiplayer.\n- Version 3: Only supported by Litematica itself (in single player).\n- Version 2: Compatible with Carpet mod.\n- Slabs only: Only fixes top slabs. Compatible with Paper servers.\n- None: Does not modify coordinates.");
+        public static final ConfigOptionList    EASY_PLACE_PROTOCOL     = new ConfigOptionList( "easyPlaceProtocolVersion", EasyPlaceProtocol.AUTO, "The type of \"accurate placement protocol\" to use.\n- Auto: Uses v3 in single player, and Slabs-only in multiplayer.\n- Version 3: Only supported by Litematica itself (in single player).\n- Version 2: Compatible with Carpet mod.\n- Slabs only: Only fixes top slabs. Compatible with Paper servers.\n- Restricted: Places what is possible in Paper servers or fails when player's orientation does not match.\n- None: Does not modify coordinates.");
         public static final ConfigInteger       EASY_PLACE_SWAP_INTERVAL = new ConfigInteger(    "easyPlaceSwapInterval", 0, 0, 10000, "The interval in milliseconds the Easy Place mode waits\nafter swapping inventory slots and placing a block.\nUseful to avoid placing wrong blocks when having high ping.");
         public static final ConfigBoolean       EASY_PLACE_VANILLA_REACH  = new ConfigBoolean(    "easyPlaceVanillaReach", false, "If enabled, reduces reach distance from 6 to 4.5\nso servers don't reject placement of far blocks.");
         public static final ConfigBoolean       EXECUTE_REQUIRE_TOOL    = new ConfigBoolean(    "executeRequireHoldingTool", true, "Require holding an enabled tool item\nfor the executeOperation hotkey to work");
@@ -195,6 +195,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    BLOCK_INFO_OVERLAY_ALIGNMENT        = new ConfigOptionList( "blockInfoOverlayAlignment", BlockInfoAlignment.TOP_CENTER, "The alignment of the Block Info Overlay");
         public static final ConfigInteger       BLOCK_INFO_OVERLAY_OFFSET_Y         = new ConfigInteger(    "blockInfoOverlayOffsetY", 6, -2000, 2000, "The y offset of the block info overlay from the selected edge");
         public static final ConfigBoolean       BLOCK_INFO_OVERLAY_ENABLED          = new ConfigBoolean(    "blockInfoOverlayEnabled", true, "Enable Block Info Overlay rendering to show info\nabout the looked-at block or verifier error marker,\nwhile holding the 'renderInfoOverlay' key", "Block Info Overlay Rendering");
+        public static final ConfigBoolean       EASY_PLACE_WARN                     = new ConfigBoolean(    "easyPlaceWarn", true, "If enabled, Easy Place warns if a block could not be placed by it.");
         public static final ConfigOptionList    INFO_HUD_ALIGNMENT                  = new ConfigOptionList( "infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"Info HUD\",\nused for the Material List, Schematic Verifier mismatch positions etc.");
         public static final ConfigInteger       INFO_HUD_MAX_LINES                  = new ConfigInteger(    "infoHudMaxLines", 10, 1, 128, "The maximum number of info lines to show on the HUD at once");
         public static final ConfigInteger       INFO_HUD_OFFSET_X                   = new ConfigInteger(    "infoHudOffsetX", 1, 0, 32000, "The X offset of the Info HUD from the screen edge");
@@ -222,6 +223,7 @@ public class Configs implements IConfigHandler
                 STATUS_INFO_HUD_AUTO,
                 VERIFIER_OVERLAY_ENABLED,
                 WARN_DISABLED_RENDERING,
+                EASY_PLACE_WARN,
 
                 BLOCK_INFO_LINES_ALIGNMENT,
                 BLOCK_INFO_OVERLAY_ALIGNMENT,

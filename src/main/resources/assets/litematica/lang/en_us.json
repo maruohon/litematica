@@ -230,6 +230,7 @@
     "litematica.gui.label.easy_place_protocol.slabs_only": "Slabs only",
     "litematica.gui.label.easy_place_protocol.v2": "Version 2",
     "litematica.gui.label.easy_place_protocol.v3": "Version 3",
+    "litematica.gui.label.easy_place_protocol.restricted": "Restricted",
 
     "litematica.gui.label.loaded_schematic.modified_on": "§6Modified on %s§r",
 
