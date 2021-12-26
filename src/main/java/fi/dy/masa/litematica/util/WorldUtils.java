@@ -713,19 +713,13 @@ public class WorldUtils
 
     private static boolean isMatchingStateRestrictedProtocol (BlockState state1, BlockState state2)
     {
-        Litematica.logger.info("Restricted protocol: state1 " + state1);
-        Litematica.logger.info("Restricted protocol: state2 " + state2);
-
         if (state1 == null || state2 == null)
         {
             return false;
         }
 
-        Litematica.logger.info(state1.getBlock().getClass().getSimpleName());
-        Litematica.logger.info(state2.getBlock().getClass().getSimpleName());
-
-        if (state1 == state2) {
-            Litematica.logger.info("Restricted protocol: matching same pointers");
+        if (state1 == state2)
+        {
             return true;
         }
 
@@ -756,24 +750,17 @@ public class WorldUtils
             if (!hasProperty1)
                 continue;
 
-            Litematica.logger.info("Restricted protocol: property " + property.getName());
-            Litematica.logger.info("Restricted protocol: state1 " + state1.get(property));
-            Litematica.logger.info("Restricted protocol: state2 " + state2.get(property));
-
             if (state1.get(property) != state2.get(property))
                 return false;
         }
 
         //Other properties are considered as matching
-        Litematica.logger.info("Restricted protocol: considered matching");
         return true;
     }
 
     private static Triple<BlockPos, Direction, Vec3d> applyRestrictedProtocol(BlockPos pos, BlockState stateSchematic, Direction sideIn, Vec3d hitVecIn, MinecraftClient mc, Hand hand)
     {
         ItemPlacementContext ctx;
-
-        Litematica.logger.info("---- Begin ----");
 
         //Handle axis and slabs first, as they are exclusive with other orientation properties
         if (stateSchematic.contains(Properties.AXIS))
@@ -815,7 +802,6 @@ public class WorldUtils
 
         if (stateSchematic.contains(Properties.BLOCK_HALF))
         {
-            Litematica.logger.info("Restricted protocol: block half - begin");
             //use floored coordinates
             double x = pos.getX();
             double y = pos.getY();
@@ -857,9 +843,6 @@ public class WorldUtils
             return getWallPlaceableOrientation(pos, stateSchematic, hitVecOut, mc, hand, isOnWall);
         }
 
-        Litematica.logger.info("Attempting placement on x " + pos.getX() + " y " + pos.getY() + " z " + pos.getZ());
-        Litematica.logger.info("with hitVec " + hitVecOut + " and side " + sideOut);
-
         var updatedHitResult = new BlockHitResult(hitVecOut, sideOut, pos, false);
         ctx = new ItemPlacementContext(mc.player, hand, mc.player.getStackInHand(hand), updatedHitResult);
         var attemptState = stateSchematic.getBlock().getPlacementState(ctx);
@@ -890,8 +873,6 @@ public class WorldUtils
             pos = pos.down();
         }
         BlockState stateFacing = mc.world.getBlockState(pos);
-
-        Litematica.logger.info("stateFacing: " + stateFacing);
 
         if (stateFacing == null || stateFacing.isAir())
             return null;
