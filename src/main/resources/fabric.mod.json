@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "litematica",
 	"name": "Litematica",
-	"version": "0.0.0-dev",
+	"version": "0.9.0",
 
 	"description": "A modern schematic mod for LiteLoader, Rift, Fabric etc.",
 	"authors": [
