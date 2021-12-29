@@ -29,18 +29,18 @@ public class Buildscript extends FabricProject {
 
     @Override
     public MappingTree createMappings() {
-        return Yarn.ofMaven(FabricMaven.URL, FabricMaven.yarn("1.17.1+build.61")).tree;
+        return Yarn.ofMaven(FabricMaven.URL, FabricMaven.yarn("1.17.1+build.65")).tree;
     }
 
     @Override
     public FabricLoader getLoader() {
-        return new FabricLoader(FabricMaven.URL, FabricMaven.loader("0.12.2"));
+        return new FabricLoader(FabricMaven.URL, FabricMaven.loader("0.12.12"));
     }
 
     @Override
     public void getModDependencies(ModDependencyCollector d) {
         d.addMaven("https://maven.terraformersmc.com/releases/", new MavenId("com.terraformersmc:modmenu:2.0.14"), ModDependencyFlag.COMPILE);
-        d.addMaven("https://masa.dy.fi/maven", new MavenId("fi.dy.masa.malilib:malilib-fabric-1.17.1:0.10.0-dev.25"), ModDependencyFlag.RUNTIME, ModDependencyFlag.COMPILE);
+        d.addMaven("https://masa.dy.fi/maven", new MavenId("fi.dy.masa.malilib:malilib-fabric-1.17.1:0.10.0-dev.26"), ModDependencyFlag.RUNTIME, ModDependencyFlag.COMPILE);
     }
 
     @Override
