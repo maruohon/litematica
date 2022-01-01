@@ -56,6 +56,7 @@ public class DataManager implements IDirectoryCache
     private static ConfigGuiTab configGuiTab = ConfigGuiTab.GENERIC;
     private static boolean createPlacementOnLoad = true;
     private static boolean canSave;
+    private static boolean isCarpetServer;
     private static long clientTickStart;
 
     private final SelectionManager selectionManager = new SelectionManager();
@@ -94,6 +95,16 @@ public class DataManager implements IDirectoryCache
     public static ItemStack getToolItem()
     {
         return toolItem;
+    }
+
+    public static void setIsCarpetServer(boolean isCarpetServer)
+    {
+        DataManager.isCarpetServer = isCarpetServer;
+    }
+
+    public static boolean isCarpetServer()
+    {
+        return isCarpetServer;
     }
 
     public static void addChatListener(Consumer<Text> listener)
@@ -305,6 +316,7 @@ public class DataManager implements IDirectoryCache
         setMaterialList(null);
 
         InfoHud.getInstance().reset(); // remove the line providers and clear the data
+        setIsCarpetServer(false);
     }
 
     private void savePerDimensionData()

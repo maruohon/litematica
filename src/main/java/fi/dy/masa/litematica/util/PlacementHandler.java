@@ -27,6 +27,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.data.DataManager;
 
 public class PlacementHandler
 {
@@ -72,7 +73,17 @@ public class PlacementHandler
 
         if (protocol == EasyPlaceProtocol.AUTO)
         {
-            return MinecraftClient.getInstance().isInSingleplayer() ? EasyPlaceProtocol.V3 : EasyPlaceProtocol.SLAB_ONLY;
+            if (MinecraftClient.getInstance().isInSingleplayer())
+            {
+                return EasyPlaceProtocol.V3;
+            }
+
+            if (DataManager.isCarpetServer())
+            {
+                return EasyPlaceProtocol.V2;
+            }
+
+            return EasyPlaceProtocol.SLAB_ONLY;
         }
 
         return protocol;
