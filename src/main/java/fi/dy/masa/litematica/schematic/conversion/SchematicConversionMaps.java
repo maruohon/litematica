@@ -33,6 +33,8 @@ public class SchematicConversionMaps
     private static final HashMap<NbtCompound, NbtCompound> NEW_STATE_TO_OLD_STATE = new HashMap<>();
     private static final ArrayList<ConversionData> CACHED_DATA = new ArrayList<>();
 
+    private static boolean initialized;
+
     public static void addEntry(int idMeta, String newStateString, String... oldStateStrings)
     {
         CACHED_DATA.add(new ConversionData(idMeta, newStateString, oldStateStrings));
@@ -40,6 +42,11 @@ public class SchematicConversionMaps
 
     public static void computeMaps()
     {
+        if (initialized)
+        {
+            return;
+        }
+
         clearMaps();
         addOverrides();
 
@@ -70,6 +77,8 @@ public class SchematicConversionMaps
                 Litematica.logger.warn("addEntry(): Exception while adding blockstate conversion map entry for ID '{}' (fixed state: '{}')", data.idMeta, data.newStateString, e);
             }
         }
+
+        initialized = true;
     }
 
     @Nullable
