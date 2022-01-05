@@ -2,6 +2,8 @@ package fi.dy.masa.litematica.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,16 +28,41 @@ public class InventoryUtils
     {
         PICK_BLOCKABLE_SLOTS.clear();
         String[] parts = configStr.split(",");
+        Pattern patternRange = Pattern.compile("^(?<start>[0-9])-(?<end>[0-9])$");
 
         for (String str : parts)
         {
             try
             {
-                int slotNum = Integer.parseInt(str);
+                Matcher matcher = patternRange.matcher(str);
 
-                if (PlayerInventory.isValidHotbarIndex(slotNum) && PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
+                if (matcher.matches())
                 {
-                    PICK_BLOCKABLE_SLOTS.add(slotNum);
+                    int slotStart = Integer.parseInt(matcher.group("start"));
+                    int slotEnd = Integer.parseInt(matcher.group("end"));
+
+                    if (slotStart <= slotEnd &&
+                        PlayerInventory.isValidHotbarIndex(slotStart - 1) &&
+                        PlayerInventory.isValidHotbarIndex(slotEnd - 1))
+                    {
+                        for (int slotNum = slotStart; slotNum <= slotEnd; ++slotNum)
+                        {
+                            if (PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
+                            {
+                                PICK_BLOCKABLE_SLOTS.add(slotNum);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    int slotNum = Integer.parseInt(str);
+
+                    if (PlayerInventory.isValidHotbarIndex(slotNum - 1) &&
+                        PICK_BLOCKABLE_SLOTS.contains(slotNum) == false)
+                    {
+                        PICK_BLOCKABLE_SLOTS.add(slotNum);
+                    }
                 }
             }
             catch (NumberFormatException e)
