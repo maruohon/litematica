@@ -262,11 +262,7 @@ public class KeyCallbacks
                 }
             }
 
-            if (key == Hotkeys.EASY_PLACE_ACTIVATION.getKeybind())
-            {
-                return WorldUtils.handleEasyPlace(this.mc);
-            }
-            else if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
+            if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeybind())
             {
                 GuiBase.openGui(new GuiMainMenu());
                 return true;

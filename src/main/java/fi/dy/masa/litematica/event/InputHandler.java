@@ -293,17 +293,9 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
                     return SchematicUtils.placeSchematicBlock(mc);
                 }
             }
-            else if (Configs.Generic.PICK_BLOCK_ENABLED.getBooleanValue())
+            else
             {
-                if (KeybindMulti.hotkeyMatchesKeybind(Hotkeys.PICK_BLOCK_LAST, mc.options.keyUse))
-                {
-                    WorldUtils.doSchematicWorldPickBlock(false, mc);
-                }
-            }
-
-            if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
-            {
-                return WorldUtils.handlePlacementRestriction(mc);
+                WorldUtils.setIsFirstClickEasyPlace();
             }
         }
 

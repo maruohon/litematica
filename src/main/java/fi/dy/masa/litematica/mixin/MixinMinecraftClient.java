@@ -18,16 +18,12 @@ public abstract class MixinMinecraftClient extends ReentrantThreadExecutor<Runna
         super(string_1);
     }
 
-    @Inject(method = "doItemUse()V", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/item/ItemStack;getCount()I", ordinal = 0), cancellable = true)
-    private void handlePlacementRestriction(CallbackInfo ci)
+    @Inject(method = "doItemUse()V", at = @At("TAIL"))
+    private void onRightClickMouseTail(CallbackInfo ci)
     {
-        if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
+        if (WorldUtils.shouldDoEasyPlaceActions())
         {
-            if (WorldUtils.handlePlacementRestriction((MinecraftClient)(Object) this))
-            {
-                ci.cancel();
-            }
+            WorldUtils.onRightClickTail((MinecraftClient)(Object) this);
         }
     }
 

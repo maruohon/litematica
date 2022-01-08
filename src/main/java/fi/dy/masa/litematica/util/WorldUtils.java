@@ -76,6 +76,9 @@ public class WorldUtils
 {
     private static final List<PositionCache> EASY_PLACE_POSITIONS = new ArrayList<>();
     private static long easyPlaceLastPickBlockTime = System.nanoTime();
+    private static boolean isHandlingEasyPlace;
+    private static boolean isFirstClickEasyPlace;
+    private static boolean isFirstClickPlacementRestriction;
 
     public static boolean shouldPreventBlockUpdates(World world)
     {
@@ -377,32 +380,15 @@ public class WorldUtils
 
     public static void easyPlaceOnUseTick(MinecraftClient mc)
     {
-        if (mc.player != null && DataManager.getToolMode() != ToolMode.REBUILD &&
-            Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
+        if (mc.player != null && isHandlingEasyPlace == false &&
+            shouldDoEasyPlaceActions() &&
             Configs.Generic.EASY_PLACE_HOLD_ENABLED.getBooleanValue() &&
             Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld())
         {
+            isHandlingEasyPlace = true;
             WorldUtils.doEasyPlaceAction(mc);
+            isHandlingEasyPlace = false;
         }
-    }
-
-    public static boolean handleEasyPlace(MinecraftClient mc)
-    {
-        if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue() &&
-            DataManager.getToolMode() != ToolMode.REBUILD)
-        {
-            ActionResult result = doEasyPlaceAction(mc);
-
-            if (result == ActionResult.FAIL)
-            {
-                InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.easy_place_fail");
-                return true;
-            }
-
-            return result != ActionResult.PASS;
-        }
-
-        return false;
     }
 
     private static ActionResult doEasyPlaceAction(MinecraftClient mc)
@@ -1084,5 +1070,67 @@ public class WorldUtils
     public static void setEasyPlaceLastPickBlockTime()
     {
         easyPlaceLastPickBlockTime = System.nanoTime();
+    }
+
+    public static boolean isHandlingEasyPlace()
+    {
+        return isHandlingEasyPlace;
+    }
+
+    public static void setHandlingEasyPlace(boolean handling)
+    {
+        isHandlingEasyPlace = handling;
+    }
+
+    public static void setIsFirstClickEasyPlace()
+    {
+        if (shouldDoEasyPlaceActions())
+        {
+            isFirstClickEasyPlace = true;
+        }
+
+        if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
+        {
+            isFirstClickPlacementRestriction = true;
+        }
+    }
+
+    public static boolean shouldDoEasyPlaceActions()
+    {
+        return Configs.Generic.EASY_PLACE_MODE.getBooleanValue() && DataManager.getToolMode() != ToolMode.REBUILD &&
+                Hotkeys.EASY_PLACE_ACTIVATION.getKeybind().isKeybindHeld();
+    }
+
+    public static boolean handleEasyPlaceWithMessage(MinecraftClient mc)
+    {
+        if (isHandlingEasyPlace)
+        {
+            return false;
+        }
+
+        isHandlingEasyPlace = true;
+        ActionResult result = doEasyPlaceAction(mc);
+        isHandlingEasyPlace = false;
+
+        // Only print the warning message once per right click
+        if (isFirstClickEasyPlace && result == ActionResult.FAIL)
+        {
+            InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, 1000, "litematica.message.easy_place_fail");
+        }
+
+        isFirstClickEasyPlace = false;
+
+        return result != ActionResult.PASS;
+    }
+
+    public static void onRightClickTail(MinecraftClient mc)
+    {
+        // If the click wasn't handled yet, handle it now.
+        // This is only called when right clicking on air with an empty hand,
+        // as in that case neither the processRightClickBlock nor the processRightClick method get called.
+        if (isFirstClickEasyPlace)
+        {
+            handleEasyPlaceWithMessage(mc);
+        }
     }
 }
