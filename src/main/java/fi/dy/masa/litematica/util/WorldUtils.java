@@ -756,10 +756,12 @@ public class WorldUtils
     {
         boolean cancel = placementRestrictionInEffect(mc);
 
-        if (cancel)
+        if (cancel && isFirstClickPlacementRestriction)
         {
-            InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, "litematica.message.placement_restriction_fail");
+            InfoUtils.showGuiOrInGameMessage(MessageType.WARNING, 1000, "litematica.message.placement_restriction_fail");
         }
+
+        isFirstClickPlacementRestriction = false;
 
         return cancel;
     }
