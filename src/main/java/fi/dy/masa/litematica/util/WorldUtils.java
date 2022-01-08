@@ -394,7 +394,7 @@ public class WorldUtils
     private static ActionResult doEasyPlaceAction(MinecraftClient mc)
     {
         RayTraceWrapper traceWrapper;
-        double traceMaxRange = Configs.Generic.EASY_PLACE_VANILLA_REACH.getBooleanValue() ? 4.5 : 6;
+        double traceMaxRange = mc.interactionManager.getReachDistance();
 
         if (Configs.Generic.EASY_PLACE_FIRST.getBooleanValue())
         {
