@@ -6,12 +6,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -153,11 +155,16 @@ public class InventoryUtils
                 int slot = inv.getSlotWithStack(stack);
                 boolean shouldPick = inv.selectedSlot != slot;
 
-                if (shouldPick && slot != -1)
+                if (slot != -1)
                 {
-                    setPickedItemToHand(stack, mc);
+                    if (shouldPick)
+                    {
+                        setPickedItemToHand(stack, mc);
+                    }
+
+                    preRestockHand(mc.player, Hand.MAIN_HAND, 6, true);
                 }
-                else if (slot == -1 && Configs.Generic.PICK_BLOCK_SHULKERS.getBooleanValue())
+                else if (Configs.Generic.PICK_BLOCK_SHULKERS.getBooleanValue())
                 {
                     slot = findSlotWithBoxWithItem(mc.player.playerScreenHandler, stack, false);
 
@@ -256,5 +263,60 @@ public class InventoryUtils
         }
 
         return -1;
+    }
+
+    //Adapted from malilib liteloader_1.12.2 branch
+    /**
+     * Re-stocks more items to the stack in the player's current hotbar slot.
+     * @param threshold the number of items at or below which the re-stocking will happen
+     * @param allowHotbar whether or not to allow taking items from other hotbar slots
+     */
+    public static void preRestockHand(PlayerEntity player, Hand hand, int threshold, boolean allowHotbar)
+    {
+        final ItemStack stackHand = player.getEquippedStack(hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+        final int count = stackHand.getCount();
+        final int max = stackHand.getMaxCount();
+
+        if (stackHand.isEmpty() == false &&
+                (count <= threshold && count < max))
+        {
+            MinecraftClient mc = MinecraftClient.getInstance();
+            ScreenHandler container = player.playerScreenHandler;
+            //mc.interactionManager.clickSlot() considers these slot numbers: https://wiki.vg/Inventory#Player_Inventory
+            //36 - 44: hotbar
+            //9 - 35: main inventory
+            //45: offhand
+            //Meanwhile, player.getInventory() considers these slot numbers:
+            //0 - 8: hotbar
+            //9 - 35: main inventory
+            //40: offhand
+            int endSlot = allowHotbar ? 44 : 35;
+            PlayerInventory inventory = player.getInventory();
+            int currentMainHandSlot = inventory.selectedSlot + 36;
+            int currentSlot = hand == Hand.MAIN_HAND ? currentMainHandSlot : 45;
+
+            for (int slotNum = 9; slotNum <= endSlot; ++slotNum)
+            {
+                if (slotNum == currentMainHandSlot)
+                {
+                    continue;
+                }
+
+                ItemStack stackSlot = inventory.getStack(slotNum >= 36 ? slotNum - 36 : slotNum);
+
+                if (stackHand.isItemEqualIgnoreDamage(stackSlot))
+                {
+                    // If all the items from the found slot can fit into the current
+                    // stack in hand, then left click, otherwise right click to split the stack
+                    int button = stackSlot.getCount() + count <= max ? 0 : 1;
+
+                    mc.interactionManager.clickSlot(container.syncId, slotNum, button, SlotActionType.PICKUP, player);
+                    mc.interactionManager.clickSlot(container.syncId, currentSlot, 0, SlotActionType.PICKUP, player);
+
+                    break;
+                }
+            }
+        }
+
     }
 }
