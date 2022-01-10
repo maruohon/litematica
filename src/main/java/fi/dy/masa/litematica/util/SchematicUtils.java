@@ -3,6 +3,8 @@ package fi.dy.masa.litematica.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -12,6 +14,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
@@ -56,6 +59,7 @@ import fi.dy.masa.malilib.util.GuiUtils;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.SubChunkPos;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 public class SchematicUtils
 {
@@ -162,6 +166,33 @@ public class SchematicUtils
         if (info != null && info.stateNew != null)
         {
             return setAllIdenticalSchematicBlockStates(info.pos, info.stateOriginal, info.stateNew, mc.world);
+        }
+
+        return false;
+    }
+
+    public static boolean replaceBlocksKeepingProperties(MinecraftClient mc)
+    {
+        ReplacementInfo info = getTargetInfo(mc);
+
+        // The state can be null in 1.13+
+        if (info != null && info.stateNew != null && info.stateNew != info.stateOriginal &&
+            BlockUtils.blocksHaveSameProperties(info.stateOriginal, info.stateNew))
+        {
+            Object2ObjectOpenHashMap<BlockState, BlockState> map = new Object2ObjectOpenHashMap<>();
+            BiPredicate<BlockState, BlockState> blockStateTest = (testedState, originalState) -> testedState.getBlock() == originalState.getBlock();
+            BiFunction<BlockState, BlockState, BlockState> blockModifier = (newState, originalState) ->  map.computeIfAbsent(originalState, (k) -> {
+                BlockState finalState = newState;
+
+                for (Property<?> prop : newState.getProperties())
+                {
+                    finalState = BlockUtils.getBlockStateWithProperty(finalState, prop, originalState.get(prop));
+                }
+
+                return finalState;
+            });
+
+            return setAllIdenticalSchematicBlockStates(info.pos, info.stateOriginal, info.stateNew, blockStateTest, blockModifier, mc.world);
         }
 
         return false;
@@ -502,6 +533,18 @@ public class SchematicUtils
                                                                BlockState stateNew,
                                                                World world)
     {
+        BiPredicate<BlockState, BlockState> blockStateTest = (testedState, originalState) -> testedState == originalState;
+        BiFunction<BlockState, BlockState, BlockState> blockModifier = (newState, originalState) -> newState;
+        return setAllIdenticalSchematicBlockStates(posStart, stateOriginal, stateNew, blockStateTest, blockModifier, world);
+    }
+
+    private static boolean setAllIdenticalSchematicBlockStates(BlockPos posStart,
+                                                               BlockState stateOriginal,
+                                                               BlockState stateNew,
+                                                               BiPredicate<BlockState, BlockState> blockStateTest,
+                                                               BiFunction<BlockState, BlockState, BlockState> blockModifier,
+                                                               World world)
+    {
         if (posStart != null)
         {
             SubChunkPos cpos = new SubChunkPos(posStart);
@@ -514,7 +557,8 @@ public class SchematicUtils
                 {
                     if (part.getBox().containsPos(posStart))
                     {
-                        if (replaceAllIdenticalBlocks(manager, part, stateOriginal, stateNew, world))
+                        if (replaceAllIdenticalBlocks(manager, part, stateOriginal, stateNew,
+                                                      blockStateTest, blockModifier, world))
                         {
                             manager.markAllPlacementsOfSchematicForRebuild(part.getPlacement().getSchematic());
                             return true;
@@ -671,6 +715,8 @@ public class SchematicUtils
                                                      PlacementPart part,
                                                      BlockState stateOriginalIn,
                                                      BlockState stateNewIn,
+                                                     BiPredicate<BlockState, BlockState> blockStateTest,
+                                                     BiFunction<BlockState, BlockState, BlockState> blockModifier,
                                                      World world)
     {
         SchematicPlacement schematicPlacement = part.getPlacement();
@@ -774,9 +820,12 @@ public class SchematicUtils
                 {
                     for (int x = startX; x <= endX; ++x)
                     {
-                        if (container.get(x, y, z) == stateOriginal)
+                        BlockState oldState = container.get(x, y, z);
+
+                        if (blockStateTest.test(oldState, stateOriginal))
                         {
-                            container.set(x, y, z, stateNew);
+                            BlockState finalState = blockModifier.apply(stateNew, oldState);
+                            container.set(x, y, z, finalState);
                             totalBlocks += increment;
                         }
                     }

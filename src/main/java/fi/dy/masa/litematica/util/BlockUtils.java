@@ -87,4 +87,11 @@ public class BlockUtils
     {
         return prop.parse(valStr).orElse(null);
     }
+
+    public static boolean blocksHaveSameProperties(BlockState state1, BlockState state2)
+    {
+        StateManager<Block, BlockState> stateManager1 = state1.getBlock().getStateManager();
+        StateManager<Block, BlockState> stateManager2 = state2.getBlock().getStateManager();
+        return stateManager1.getProperties().equals(stateManager2.getProperties());
+    }
 }

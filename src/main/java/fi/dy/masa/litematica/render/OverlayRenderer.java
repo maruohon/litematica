@@ -643,28 +643,33 @@ public class OverlayRenderer
         boolean direction = false;
         Entity entity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
 
-        if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
+        if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeybind().isKeybindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
         }
-        else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL_EXCEPT.getKeybind().isKeybindHeld())
+        else if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL_EXCEPT.getKeybind().isKeybindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_BREAK_EXCEPT_OVERLAY_COLOR.getColor();
         }
-        else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
+        else if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeybind().isKeybindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
             direction = true;
         }
-        else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
+        else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_ALL.getKeybind().isKeybindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
         }
-        else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
+        else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_BLOCK.getKeybind().isKeybindHeld())
+        {
+            traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
+            color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
+        }
+        else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20);
             color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();

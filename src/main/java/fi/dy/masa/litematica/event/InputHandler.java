@@ -245,15 +245,15 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
     {
         if (mc.player != null && DataManager.getToolMode() == ToolMode.REBUILD && KeybindMulti.getTriggeredCount() == 0)
         {
-            if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
+            if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeybind().isKeybindHeld())
             {
                 return SchematicUtils.breakSchematicBlocks(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL_EXCEPT.getKeybind().isKeybindHeld())
+            else if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL_EXCEPT.getKeybind().isKeybindHeld())
             {
                 return SchematicUtils.breakAllSchematicBlocksExceptTargeted(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
+            else if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeybind().isKeybindHeld())
             {
                 return SchematicUtils.breakAllIdenticalSchematicBlocks(mc);
             }
@@ -272,19 +272,23 @@ public class InputHandler implements IKeybindProvider, IKeyboardInputHandler, IM
         {
             if (DataManager.getToolMode() == ToolMode.REBUILD)
             {
-                if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
+                if (Hotkeys.SCHEMATIC_EDIT_REPLACE_DIRECTION.getKeybind().isKeybindHeld())
                 {
                     return SchematicUtils.replaceSchematicBlocksInDirection(mc);
                 }
-                else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeybind().isKeybindHeld())
+                else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_ALL.getKeybind().isKeybindHeld())
                 {
                     return SchematicUtils.replaceAllIdenticalSchematicBlocks(mc);
                 }
-                else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeybind().isKeybindHeld())
+                else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_BLOCK.getKeybind().isKeybindHeld())
+                {
+                    return SchematicUtils.replaceBlocksKeepingProperties(mc);
+                }
+                else if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeybind().isKeybindHeld())
                 {
                     return SchematicUtils.placeSchematicBlocksInDirection(mc);
                 }
-                else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeybind().isKeybindHeld())
+                else if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeybind().isKeybindHeld())
                 {
                     return SchematicUtils.fillAirWithBlocks(mc);
                 }

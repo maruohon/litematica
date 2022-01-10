@@ -42,11 +42,12 @@ public class Hotkeys
     public static final ConfigHotkey RERENDER_SCHEMATIC                 = new ConfigHotkey("rerenderSchematic",                 "F3,M", "Hotkey to refresh/redraw only the schematic, instead of\nhaving to refresh the vanilla terrain too with F3 + A");
     public static final ConfigHotkey SAVE_AREA_AS_IN_MEMORY_SCHEMATIC   = new ConfigHotkey("saveAreaAsInMemorySchematic",       "",     "Save the current Area Selection as an in-memory Schematic");
     public static final ConfigHotkey SAVE_AREA_AS_SCHEMATIC_TO_FILE     = new ConfigHotkey("saveAreaAsSchematicToFile",         "LEFT_CONTROL,LEFT_ALT,S",  "Save the current Area Selection as a Schematic to a file");
-    public static final ConfigHotkey SCHEMATIC_REBUILD_BREAK_ALL_EXCEPT = new ConfigHotkey("schematicRebuildBreakAllExcept",    "",     KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the \"break everything except\"\nmode/function in the Schematic Rebuild tool mode.\nBasically when you hold this key and punch a schematic block,\nall other blocks except this block will be removed from the schematic.");
-    public static final ConfigHotkey SCHEMATIC_REBUILD_BREAK_ALL        = new ConfigHotkey("schematicRebuildBreakPlaceAll",     "",     KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the \"break all identical blocks\"\nfunction in the Schematic Rebuild tool mode");
-    public static final ConfigHotkey SCHEMATIC_REBUILD_BREAK_DIRECTION  = new ConfigHotkey("schematicRebuildBreakPlaceDirection","",    KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the directional/continuous\nbreak or place function in the Schematic Rebuild tool mode");
-    public static final ConfigHotkey SCHEMATIC_REBUILD_REPLACE_ALL      = new ConfigHotkey("schematicRebuildReplaceAll",        "",     KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the \"replace all identical\"\nreplace mode/function in the Schematic Rebuild tool mode");
-    public static final ConfigHotkey SCHEMATIC_REBUILD_REPLACE_DIRECTION= new ConfigHotkey("schematicRebuildReplaceDirection",  "",     KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the directional/continuous\nreplace mode/function in the Schematic Rebuild tool mode");
+    public static final ConfigHotkey SCHEMATIC_EDIT_BREAK_ALL_EXCEPT    = new ConfigHotkey("schematicEditBreakAllExcept",       "", KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the \"break everything except\"\nmode/function in the Schematic Edit tool mode.\nBasically when you hold this key and punch a schematic block,\nall other blocks except this block will be removed from the schematic.");
+    public static final ConfigHotkey SCHEMATIC_EDIT_BREAK_ALL           = new ConfigHotkey("schematicEditBreakPlaceAll",        "", KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the \"break all identical blocks\"\nfunction in the Schematic Edit tool mode");
+    public static final ConfigHotkey SCHEMATIC_EDIT_BREAK_DIRECTION     = new ConfigHotkey("schematicEditBreakPlaceDirection",  "", KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the directional/continuous\nbreak or place function in the Schematic Edit tool mode");
+    public static final ConfigHotkey SCHEMATIC_EDIT_REPLACE_ALL         = new ConfigHotkey("schematicEditReplaceAll",           "", KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the \"replace all identical\"\nreplace mode/function in the Schematic Edit tool mode");
+    public static final ConfigHotkey SCHEMATIC_EDIT_REPLACE_BLOCK       = new ConfigHotkey("schematicEditReplaceBlock",         "", KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the \"replace block type\"\nreplace mode/function in the Schematic Edit tool mode");
+    public static final ConfigHotkey SCHEMATIC_EDIT_REPLACE_DIRECTION   = new ConfigHotkey("schematicEditReplaceDirection",     "", KeybindSettings.MODIFIER_INGAME, "Modifier key to activate the directional/continuous\nreplace mode/function in the Schematic Edit tool mode");
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_MODIFIER   = new ConfigHotkey("schematicVersionCycleModifier",     "",     KeybindSettings.MODIFIER_INGAME, "The modifier key to hold to be able to use the mouse wheel\nto cycle through the schematic versions in the Version Control tool mode");
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_NEXT       = new ConfigHotkey("schematicVersionCycleNext",         "",     "A hotkey to cycle to the next schematic version in the Version Control tool mode");
     public static final ConfigHotkey SCHEMATIC_VERSION_CYCLE_PREVIOUS   = new ConfigHotkey("schematicVersionCyclePrevious",     "",     "A hotkey to cycle to the next schematic version in the Version Control tool mode");
@@ -115,11 +116,12 @@ public class Hotkeys
             RERENDER_SCHEMATIC,
             SAVE_AREA_AS_IN_MEMORY_SCHEMATIC,
             SAVE_AREA_AS_SCHEMATIC_TO_FILE,
-            SCHEMATIC_REBUILD_BREAK_ALL,
-            SCHEMATIC_REBUILD_BREAK_ALL_EXCEPT,
-            SCHEMATIC_REBUILD_BREAK_DIRECTION,
-            SCHEMATIC_REBUILD_REPLACE_ALL,
-            SCHEMATIC_REBUILD_REPLACE_DIRECTION,
+            SCHEMATIC_EDIT_BREAK_ALL,
+            SCHEMATIC_EDIT_BREAK_ALL_EXCEPT,
+            SCHEMATIC_EDIT_BREAK_DIRECTION,
+            SCHEMATIC_EDIT_REPLACE_ALL,
+            SCHEMATIC_EDIT_REPLACE_BLOCK,
+            SCHEMATIC_EDIT_REPLACE_DIRECTION,
             SCHEMATIC_VERSION_CYCLE_MODIFIER,
             SCHEMATIC_VERSION_CYCLE_NEXT,
             SCHEMATIC_VERSION_CYCLE_PREVIOUS,
