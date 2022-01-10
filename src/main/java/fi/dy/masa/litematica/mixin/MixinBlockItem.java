@@ -14,7 +14,7 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.util.PlacementHandler;
 import fi.dy.masa.litematica.util.PlacementHandler.UseContext;
 
-@Mixin(value = BlockItem.class, priority = 999)
+@Mixin(value = BlockItem.class, priority = 980)
 public abstract class MixinBlockItem extends Item
 {
     private MixinBlockItem(Item.Settings builder)
