@@ -67,9 +67,9 @@
     "litematica.hotkeys.category.generic_hotkeys": "Основные клавиши",
 
     "litematica.info.schematic_load.schematic_loaded": "Схема \"%s\" успешно загружена в память",
-    "litematica.info.schematic_manager.preview.right_click_to_cancel": "- Нажмите ПКМ по кнопке, чтобы прервать операцию создания картинки предпросмотра\n- Удерживайте Ctrl+Alt+Shift при нажатии, чтобы загрузить картинку из существующего\n PNG-файла с именем \"thumb.png\", лежащего в той же директории, что и файл схемы.",
-    "litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot": "Используйте обычную клавишу создания скриншота, чтобы установить картинку предпросмотра. Нажмите ПКМ на «Установить картинку», чтобы прервать операцию.",
-    "litematica.info.schematic_manager.preview.success": "Картинка предпросмотра успешно установлена",
+    "litematica.info.schematic_manager.preview.right_click_to_cancel": "- Нажмите ПКМ по кнопке, чтобы прервать операцию создания миниатюры\n- Удерживайте Ctrl+Alt+Shift при нажатии, чтобы загрузить картинку из существующего\n PNG-файла с именем \"thumb.png\", лежащего в той же директории, что и файл схемы.",
+    "litematica.info.schematic_manager.preview.set_preview_by_taking_a_screenshot": "Используйте обычную клавишу создания скриншота, чтобы установить миниатюру. Нажмите ПКМ по этой кнопке, чтобы прервать операцию.",
+    "litematica.info.schematic_manager.preview.success": "Миниатюра успешно установлена",
 
     "litematica.gui.button.area_editor.analyze_area": "Анализ области",
     "litematica.gui.button.area_editor.change_corner_mode": "Режим выделения: %s",
@@ -463,7 +463,7 @@
     "litematica.message.schematic_pasted": "Схема вставлена в мир",
     "litematica.message.schematic_pasted_using_setblock": "Схема вставлена с использованием %s команд /setblock",
     "litematica.message.schematic_placement_created": "Создано расположение для \"%s\"",
-    "litematica.message.schematic_preview_cancelled": "Задача предпросмотра отменена",
+    "litematica.message.schematic_preview_cancelled": "Создание миниатюры отменено",
     "litematica.message.schematic_read_from_file_success": "Схема загружена из файла \"%s\"",
     "litematica.message.schematic_rendering_refreshed": "Отображение схемы перезагружено",
     "litematica.message.schematic_saved_as": "Сохранена схема \"%s\"",
