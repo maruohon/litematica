@@ -15,8 +15,6 @@ import fi.dy.masa.litematica.schematic.LitematicaSchematic;
 import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
@@ -51,8 +49,7 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
         this.overrideFile = overrideFile;
         this.fromSchematicWorld = info.fromSchematicWorld;
 
-        this.addBoxesPerChunks(area.getAllSubRegionBoxes());
-        this.updateInfoHudLinesMissingChunks(this.requiredChunks);
+        this.addPerChunkBoxes(area.getAllSubRegionBoxes());
     }
 
     @Override
@@ -60,17 +57,16 @@ public class TaskSaveSchematic extends TaskProcessChunkBase
     {
         if (this.fromSchematicWorld)
         {
-            WorldSchematic world = SchematicWorldHandler.getSchematicWorld();
-            return world != null && world.getChunkManager().isChunkLoaded(pos.x, pos.z);
+            return this.schematicWorld != null && this.schematicWorld.getChunkManager().isChunkLoaded(pos.x, pos.z);
         }
         
-        return this.areSurroundingChunksLoaded(pos, this.clientWorld, 1);
+        return this.areSurroundingChunksLoaded(pos, this.clientWorld, 0);
     }
 
     @Override
     protected boolean processChunk(ChunkPos pos)
     {
-        World world = this.fromSchematicWorld ? SchematicWorldHandler.getSchematicWorld() : this.world;
+        World world = this.fromSchematicWorld ? this.schematicWorld : this.world;
         ImmutableMap<String, IntBoundingBox> volumes = PositionUtils.getBoxesWithinChunk(pos.x, pos.z, this.subRegions);
         this.schematic.takeBlocksFromWorldWithinChunk(world, volumes, this.subRegions, this.info);
 

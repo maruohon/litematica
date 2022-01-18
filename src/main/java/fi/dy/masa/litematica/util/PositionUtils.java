@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
@@ -381,6 +382,40 @@ public class PositionUtils
         }
 
         return null;
+    }
+
+    public static void getPerChunkBoxes(Collection<Box> boxes, BiConsumer<ChunkPos, IntBoundingBox> consumer)
+    {
+        for (Box box : boxes)
+        {
+            final int boxMinX = Math.min(box.getPos1().getX(), box.getPos2().getX());
+            final int boxMinY = Math.min(box.getPos1().getY(), box.getPos2().getY());
+            final int boxMinZ = Math.min(box.getPos1().getZ(), box.getPos2().getZ());
+            final int boxMaxX = Math.max(box.getPos1().getX(), box.getPos2().getX());
+            final int boxMaxY = Math.max(box.getPos1().getY(), box.getPos2().getY());
+            final int boxMaxZ = Math.max(box.getPos1().getZ(), box.getPos2().getZ());
+            final int boxMinChunkX = boxMinX >> 4;
+            final int boxMinChunkZ = boxMinZ >> 4;
+            final int boxMaxChunkX = boxMaxX >> 4;
+            final int boxMaxChunkZ = boxMaxZ >> 4;
+
+            for (int cz = boxMinChunkZ; cz <= boxMaxChunkZ; ++cz)
+            {
+                for (int cx = boxMinChunkX; cx <= boxMaxChunkX; ++cx)
+                {
+                    final int chunkMinX = cx << 4;
+                    final int chunkMinZ = cz << 4;
+                    final int chunkMaxX = chunkMinX + 15;
+                    final int chunkMaxZ = chunkMinZ + 15;
+                    final int minX = Math.max(chunkMinX, boxMinX);
+                    final int minZ = Math.max(chunkMinZ, boxMinZ);
+                    final int maxX = Math.min(chunkMaxX, boxMaxX);
+                    final int maxZ = Math.min(chunkMaxZ, boxMaxZ);
+
+                    consumer.accept(new ChunkPos(cx, cz), new IntBoundingBox(minX, boxMinY, minZ, maxX, boxMaxY, maxZ));
+                }
+            }
+        }
     }
 
     /**
@@ -960,6 +995,71 @@ public class PositionUtils
         }
 
         return yaw;
+    }
+
+
+    /**
+     * Clamps the given box to the layer range bounds.
+     * @return the clamped box, or null, if the range does not intersect the original box
+     */
+    @Nullable
+    public static IntBoundingBox getClampedBox(IntBoundingBox box, LayerRange range)
+    {
+        return getClampedArea(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, range);
+    }
+
+    /**
+     * Clamps the given box to the layer range bounds.
+     * @return the clamped box, or null, if the range does not intersect the original box
+     */
+    @Nullable
+    public static IntBoundingBox getClampedArea(BlockPos posMin, BlockPos posMax, LayerRange range)
+    {
+        int minX = Math.min(posMin.getX(), posMax.getX());
+        int minY = Math.min(posMin.getY(), posMax.getY());
+        int minZ = Math.min(posMin.getZ(), posMax.getZ());
+        int maxX = Math.max(posMin.getX(), posMax.getX());
+        int maxY = Math.max(posMin.getY(), posMax.getY());
+        int maxZ = Math.max(posMin.getZ(), posMax.getZ());
+
+        return getClampedArea(minX, minY, minZ, maxX, maxY, maxZ, range);
+    }
+
+    /**
+     * Clamps the given box to the layer range bounds.
+     * @return the clamped box, or null, if the range does not intersect the original box
+     */
+    @Nullable
+    public static IntBoundingBox getClampedArea(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, LayerRange range)
+    {
+        if (range.intersectsBox(minX, minY, minZ, maxX, maxY, maxZ) == false)
+        {
+            return null;
+        }
+
+        switch (range.getAxis())
+        {
+            case X:
+            {
+                final int clampedMinX = Math.max(minX, range.getLayerMin());
+                final int clampedMaxX = Math.min(maxX, range.getLayerMax());
+                return IntBoundingBox.createProper(clampedMinX, minY, minZ, clampedMaxX, maxY, maxZ);
+            }
+            case Y:
+            {
+                final int clampedMinY = Math.max(minY, range.getLayerMin());
+                final int clampedMaxY = Math.min(maxY, range.getLayerMax());
+                return IntBoundingBox.createProper(minX, clampedMinY, minZ, maxX, clampedMaxY, maxZ);
+            }
+            case Z:
+            {
+                final int clampedMinZ = Math.max(minZ, range.getLayerMin());
+                final int clampedMaxZ = Math.min(maxZ, range.getLayerMax());
+                return IntBoundingBox.createProper(minX, minY, clampedMinZ, maxX, maxY, clampedMaxZ);
+            }
+            default:
+                return null;
+        }
     }
 
     public static class BlockPosComparator implements Comparator<BlockPos>

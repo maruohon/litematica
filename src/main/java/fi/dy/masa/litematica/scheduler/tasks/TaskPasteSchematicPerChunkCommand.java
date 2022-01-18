@@ -63,7 +63,6 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected int maxCommandsPerTick;
     protected int processedChunksThisTick;
     protected int sentCommandsThisTick;
-    protected int sentCommandsTotal;
     protected int sentSetblockCommands;
     protected long gameRuleProbeTimeout;
     protected long maxGameRuleProbeTime = 2000000000L; // 2 second timeout
@@ -72,7 +71,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     public enum TaskPhase
     {
         INIT,
-        GAMERULE_PROBE,
+        GAME_RULE_PROBE,
         WAIT_FOR_CHUNKS,
         PROCESS_BOX_BLOCKS,
         PROCESS_BOX_ENTITIES,
@@ -109,7 +108,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                 DataManager.addChatListener(this.gameRuleListener);
                 this.mc.player.sendChatMessage("/gamerule sendCommandFeedback");
                 this.gameRuleProbeTimeout = Util.getMeasuringTimeNano() + this.maxGameRuleProbeTime;
-                this.phase = TaskPhase.GAMERULE_PROBE;
+                this.phase = TaskPhase.GAME_RULE_PROBE;
             }
             else
             {
@@ -118,13 +117,17 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             }
         }
 
-        if (this.phase == TaskPhase.GAMERULE_PROBE)
+        if (this.phase == TaskPhase.GAME_RULE_PROBE)
         {
             if (Util.getMeasuringTimeNano() > this.gameRuleProbeTimeout)
             {
+                /*
                 InfoUtils.showGuiOrInGameMessage(MessageType.ERROR, 8000, "litematica.message.error.schematic_paste_failed.game_rule_probe_timeout");
                 this.finished = false;
                 return true;
+                */
+                this.shouldEnableFeedback  = false;
+                this.phase = TaskPhase.WAIT_FOR_CHUNKS;
             }
 
             return false;
@@ -134,7 +137,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         this.processedChunksThisTick = 0;
 
         if (this.currentChunk != null &&
-            this.canProcessChunk(this.currentChunk, this.schematicWorld, this.mc.world) == false)
+            this.canProcessChunk(this.currentChunk) == false)
         {
             return false;
         }
@@ -203,7 +206,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
             ChunkPos pos = this.pendingChunks.get(0);
 
-            if (this.canProcessChunk(pos, this.schematicWorld, this.mc.world))
+            if (this.canProcessChunk(pos))
             {
                 this.currentChunk = pos;
                 this.startNextBox(pos);
@@ -527,7 +530,6 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     {
         this.sendCommandToServer(command, player);
         ++this.sentCommandsThisTick;
-        ++this.sentCommandsTotal;
     }
 
     protected void sendCommandToServer(String command, ClientPlayerEntity player)
@@ -616,7 +618,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     }
 
     @Override
-    public void stop()
+    protected void onStop()
     {
         if (this.finished)
         {
@@ -638,6 +640,6 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         DataManager.removeChatListener(this.gameRuleListener);
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
 
-        super.stop();
+        super.onStop();
     }
 }

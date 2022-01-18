@@ -1,13 +1,11 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.config.Configs;
@@ -23,14 +21,13 @@ import fi.dy.masa.malilib.util.StringUtils;
 
 public abstract class TaskBase implements ITask, IInfoHudRenderer
 {
-    private TaskTimer timer = new TaskTimer(1);
-
+    protected final List<String> infoHudLines = new ArrayList<>();
     protected final MinecraftClient mc;
     protected String name = "";
-    protected List<String> infoHudLines = new ArrayList<>();
+    private TaskTimer timer = new TaskTimer(1);
+    @Nullable private ICompletionListener completionListener;
     protected boolean finished;
     protected boolean printCompletionMessage = true;
-    @Nullable private ICompletionListener completionListener;
 
     protected TaskBase()
     {
@@ -68,7 +65,7 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
     @Override
     public boolean canExecute()
     {
-        return this.mc.world != null;
+        return this.mc.world != null && this.mc.player != null;
     }
 
     @Override
@@ -130,33 +127,30 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
         return true;
     }
 
-    protected void updateInfoHudLinesMissingChunks(Set<ChunkPos> requiredChunks)
+    protected void updateInfoHudLinesPendingChunks(Collection<ChunkPos> pendingChunks)
     {
-        List<String> hudLines = new ArrayList<>();
-        PlayerEntity player = this.mc.player;
+        this.infoHudLines.clear();
 
-        if (player != null && requiredChunks.isEmpty() == false)
+        if (pendingChunks.isEmpty() == false)
         {
-            List<ChunkPos> list = new ArrayList<>();
-            list.addAll(requiredChunks);
-            PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPos()));
+            // TODO
+            List<ChunkPos> list = new ArrayList<>(pendingChunks);
+            PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(new BlockPos(this.mc.player.getPos()));
             PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
-            Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
+            list.sort(PositionUtils.CHUNK_POS_COMPARATOR);
 
             String pre = GuiBase.TXT_WHITE + GuiBase.TXT_BOLD;
-            String title = StringUtils.translate("litematica.gui.label.missing_chunks", this.name, requiredChunks.size());
-            hudLines.add(String.format("%s%s%s", pre, title, GuiBase.TXT_RST));
+            String title = StringUtils.translate("litematica.gui.label.task.title.remaining_chunks", this.getDisplayName(), pendingChunks.size());
+            this.infoHudLines.add(String.format("%s%s%s", pre, title, GuiBase.TXT_RST));
 
             int maxLines = Math.min(list.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
 
             for (int i = 0; i < maxLines; ++i)
             {
                 ChunkPos pos = list.get(i);
-                hudLines.add(String.format("cx: %5d, cz: %5d (x: %d, z: %d)", pos.x, pos.z, pos.x << 4, pos.z << 4));
+                this.infoHudLines.add(String.format("cx: %5d, cz: %5d (x: %d, z: %d)", pos.x, pos.z, pos.x << 4, pos.z << 4));
             }
         }
-
-        this.infoHudLines = hudLines;
     }
 
     @Override

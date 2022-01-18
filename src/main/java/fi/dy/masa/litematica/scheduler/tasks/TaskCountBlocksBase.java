@@ -1,6 +1,10 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.List;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.materials.IMaterialList;
 import fi.dy.masa.litematica.materials.MaterialListEntry;
@@ -11,10 +15,6 @@ import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
 
 public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
 {
@@ -43,8 +43,7 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
     @Override
     protected boolean canProcessChunk(ChunkPos pos)
     {
-        // All surrounding chunks are loaded on the client
-        return this.areSurroundingChunksLoaded(pos, this.clientWorld, 1);
+        return this.areSurroundingChunksLoaded(pos, this.clientWorld, 0);
     }
 
     @Override
@@ -97,6 +96,6 @@ public abstract class TaskCountBlocksBase extends TaskProcessChunkBase
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
 
-        this.notifyListener();
+        super.onStop();
     }
 }

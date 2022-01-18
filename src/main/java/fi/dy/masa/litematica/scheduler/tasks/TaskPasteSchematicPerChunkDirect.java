@@ -6,14 +6,12 @@ import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.SchematicPlacingUtils;
 import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.WorldUtils;
 
 public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunkBase
 {
@@ -25,6 +23,14 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     }
 
     @Override
+    public boolean canExecute()
+    {
+        return super.canExecute() &&
+               this.mc.isIntegratedServerRunning() &&
+               this.world != null && this.world.isClient == false;
+    }
+
+    @Override
     protected void onChunkAddedForHandling(ChunkPos pos, SchematicPlacement placement)
     {
         super.onChunkAddedForHandling(pos, placement);
@@ -33,25 +39,11 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     }
 
     @Override
-    public boolean canExecute()
-    {
-        if (super.canExecute() == false || this.mc.isIntegratedServerRunning() == false)
-        {
-            return false;
-        }
-
-        World world = WorldUtils.getBestWorld(this.mc);
-        return world != null && world.isClient == false;
-    }
-
-    @Override
     public boolean execute()
     {
-        World world = WorldUtils.getBestWorld(this.mc);
         MinecraftServer server = this.mc.getServer();
-        long vanillaTickTime = server.lastTickLengths[server.getTicks() % 100];
-        long timeStart = Util.getMeasuringTimeNano();
-        int processed = 0;
+        final long vanillaTickTime = server.lastTickLengths[server.getTicks() % 100];
+        final long timeStart = Util.getMeasuringTimeNano();
 
         this.sortChunkList();
 
@@ -67,25 +59,10 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
 
             ChunkPos pos = this.pendingChunks.get(chunkIndex);
 
-            if (this.canProcessChunk(pos, this.schematicWorld, this.mc.world))
+            if (this.canProcessChunk(pos) && this.processChunk(pos))
             {
-                // New list to avoid CME
-                ArrayList<SchematicPlacement> placements = new ArrayList<>(this.placementsPerChunk.get(pos));
-
-                for (SchematicPlacement placement : placements)
-                {
-                    if (SchematicPlacingUtils.placeToWorldWithinChunk(world, pos, placement, this.replace, false))
-                    {
-                        this.placementsPerChunk.remove(pos, placement);
-                        ++processed;
-                    }
-                }
-
-                if (this.placementsPerChunk.containsKey(pos) == false)
-                {
-                    this.pendingChunks.remove(chunkIndex);
-                    --chunkIndex;
-                }
+                this.pendingChunks.remove(chunkIndex);
+                --chunkIndex;
             }
         }
 
@@ -95,16 +72,30 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
             return true;
         }
 
-        if (processed > 0)
-        {
-            this.updateInfoHudLines();
-        }
+        this.updateInfoHudLines();
 
         return false;
     }
 
     @Override
-    public void stop()
+    protected boolean processChunk(ChunkPos pos)
+    {
+        // New list to avoid CME
+        ArrayList<SchematicPlacement> placements = new ArrayList<>(this.placementsPerChunk.get(pos));
+
+        for (SchematicPlacement placement : placements)
+        {
+            if (SchematicPlacingUtils.placeToWorldWithinChunk(this.world, pos, placement, this.replace, false))
+            {
+                this.placementsPerChunk.remove(pos, placement);
+            }
+        }
+
+        return this.placementsPerChunk.containsKey(pos) == false;
+    }
+
+    @Override
+    protected void onStop()
     {
         if (this.finished)
         {
@@ -117,6 +108,6 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
 
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
 
-        super.stop();
+        super.onStop();
     }
 }

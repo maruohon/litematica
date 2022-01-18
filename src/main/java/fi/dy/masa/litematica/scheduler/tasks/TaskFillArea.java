@@ -49,8 +49,7 @@ public class TaskFillArea extends TaskProcessChunkBase
 
         this.blockString = blockString;
 
-        this.addBoxesPerChunks(boxes);
-        this.updateInfoHudLinesMissingChunks(this.requiredChunks);
+        this.addPerChunkBoxes(boxes);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     @Override
     protected boolean canProcessChunk(ChunkPos pos)
     {
-        return this.mc.player != null && this.areSurroundingChunksLoaded(pos, this.clientWorld, 1);
+        return this.areSurroundingChunksLoaded(pos, this.clientWorld, 0);
     }
 
     @Override
@@ -122,10 +121,10 @@ public class TaskFillArea extends TaskProcessChunkBase
                         if (te instanceof Inventory)
                         {
                             ((Inventory) te).clear();
-                            this.world.setBlockState(posMutable, barrier, 0x12);
+                            this.world.setBlockState(posMutable, barrier, 0x32);
                         }
 
-                        this.world.setBlockState(posMutable, this.fillState, 0x12);
+                        this.world.setBlockState(posMutable, this.fillState, 0x32);
                     }
                 }
             }
@@ -161,7 +160,7 @@ public class TaskFillArea extends TaskProcessChunkBase
     {
         InfoHud.getInstance().removeInfoHudRenderer(this, false);
         this.printCompletionMessage();
-        this.notifyListener();
+        super.onStop();
     }
 
     protected void printCompletionMessage()

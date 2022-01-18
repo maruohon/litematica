@@ -247,7 +247,6 @@
     "litematica.gui.label.material_list.progress.missing": "Missing %s",
     "litematica.gui.label.material_list.total": "Total: %s items",
 
-    "litematica.gui.label.missing_chunks": "%s, missing chunks (%s)",
     "litematica.gui.label.origin.auto": "Auto",
     "litematica.gui.label.origin.manual": "Manual",
 
@@ -284,8 +283,6 @@
     "litematica.gui.label.schematic_load.checkbox.create_placement": "Create a placement",
     "litematica.gui.label.schematic_load.hoverinfo.create_placement": "Immediately create a new placement\nand select that placement",
 
-    "litematica.gui.label.schematic_paste.missing_chunks": "Paste, missing chunks (%s)",
-
     "litematica.gui.label.schematic_placement.enclosing_size": "Enclosing size: %s",
     "litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled": "Hold shift to disable the placement when created",
     "litematica.gui.label.schematic_placement.in_memory": "IN-MEMORY ONLY",
@@ -320,6 +317,7 @@
     "litematica.gui.label.schematic_verifier.status.verifying": "Unseen Chunks: %s / %s",
     "litematica.gui.label.schematic_verifier.verifier": "Schematic Verifier",
 
+    "litematica.gui.label.task.title.remaining_chunks": "%s, remaining chunks (%s)",
     "litematica.gui.label.task_name.area_analyzer": "Area Analyzer",
     "litematica.gui.label.task_name.delete": "Delete task",
     "litematica.gui.label.task_name.fill": "Fill task",

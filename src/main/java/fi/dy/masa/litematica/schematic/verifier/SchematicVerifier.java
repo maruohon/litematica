@@ -896,7 +896,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
     private void updateMismatchPositionStringList(@Nullable MismatchType mismatchType, List<MismatchRenderPos> positionList)
     {
-        List<String> hudLines = new ArrayList<>();
+        this.infoHudLines.clear();
 
         if (positionList.isEmpty() == false)
         {
@@ -904,12 +904,12 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
             if (mismatchType != null)
             {
-                hudLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), rst));
+                this.infoHudLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), rst));
             }
             else
             {
                 String title = StringUtils.translate("litematica.gui.title.schematic_verifier_errors");
-                hudLines.add(String.format("%s%s%s", GuiBase.TXT_BOLD, title, rst));
+                this.infoHudLines.add(String.format("%s%s%s", GuiBase.TXT_BOLD, title, rst));
             }
 
             final int count = Math.min(positionList.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
@@ -919,16 +919,14 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                 MismatchRenderPos entry = positionList.get(i);
                 BlockPos pos = entry.pos;
                 String pre = entry.type.getColorCode();
-                hudLines.add(String.format("%sx: %5d, y: %3d, z: %5d%s", pre, pos.getX(), pos.getY(), pos.getZ(), rst));
+                this.infoHudLines.add(String.format("%sx: %5d, y: %3d, z: %5d%s", pre, pos.getX(), pos.getY(), pos.getZ(), rst));
             }
         }
-
-        this.infoHudLines = hudLines;
     }
 
     public void updateRequiredChunksStringList()
     {
-        this.updateInfoHudLinesMissingChunks(this.requiredChunks);
+        this.updateInfoHudLinesPendingChunks(this.requiredChunks);
     }
 
     /**
