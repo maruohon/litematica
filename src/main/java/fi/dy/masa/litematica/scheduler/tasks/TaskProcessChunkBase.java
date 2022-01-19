@@ -40,12 +40,6 @@ public abstract class TaskProcessChunkBase extends TaskBase
     }
 
     @Override
-    public boolean canExecute()
-    {
-        return super.canExecute() && this.pendingChunks.isEmpty() == false;
-    }
-
-    @Override
     public boolean execute()
     {
         return this.executeForAllPendingChunks();

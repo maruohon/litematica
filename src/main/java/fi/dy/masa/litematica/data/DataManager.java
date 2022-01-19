@@ -109,19 +109,36 @@ public class DataManager implements IDirectoryCache
 
     public static void addChatListener(Consumer<Text> listener)
     {
-        CHAT_LISTENERS.add(listener);
+        synchronized (CHAT_LISTENERS)
+        {
+            CHAT_LISTENERS.add(listener);
+        }
     }
 
     public static void removeChatListener(Consumer<Text> listener)
     {
-        CHAT_LISTENERS.remove(listener);
+        synchronized (CHAT_LISTENERS)
+        {
+            CHAT_LISTENERS.remove(listener);
+        }
+    }
+
+    public static void clearChatListeners()
+    {
+        synchronized (CHAT_LISTENERS)
+        {
+            CHAT_LISTENERS.clear();
+        }
     }
 
     public static void onChatMessage(Text text)
     {
-        for (Consumer<Text> listener : CHAT_LISTENERS)
+        synchronized (CHAT_LISTENERS)
         {
-            listener.accept(text);
+            for (Consumer<Text> listener : CHAT_LISTENERS)
+            {
+                listener.accept(text);
+            }
         }
     }
 
@@ -314,6 +331,7 @@ public class DataManager implements IDirectoryCache
         getSchematicProjectsManager().clear();
         getSelectionManager().clear();
         setMaterialList(null);
+        clearChatListeners();
 
         InfoHud.getInstance().reset(); // remove the line providers and clear the data
         setIsCarpetServer(false);

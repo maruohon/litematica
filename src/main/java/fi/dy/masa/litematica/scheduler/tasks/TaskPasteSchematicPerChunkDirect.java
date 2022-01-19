@@ -41,6 +41,12 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     @Override
     public boolean execute()
     {
+        // Nothing to do
+        if (this.ignoreBlocks && this.ignoreEntities)
+        {
+            return true;
+        }
+
         MinecraftServer server = this.mc.getServer();
         final long vanillaTickTime = server.lastTickLengths[server.getTicks() % 100];
         final long timeStart = Util.getMeasuringTimeNano();
@@ -80,6 +86,8 @@ public class TaskPasteSchematicPerChunkDirect extends TaskPasteSchematicPerChunk
     @Override
     protected boolean processChunk(ChunkPos pos)
     {
+        // TODO ignoreBlocks and ignoreEntities
+
         // New list to avoid CME
         ArrayList<SchematicPlacement> placements = new ArrayList<>(this.placementsPerChunk.get(pos));
 

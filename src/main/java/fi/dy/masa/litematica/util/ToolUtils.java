@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.litematica.scheduler.tasks.TaskDeleteArea;
@@ -37,7 +38,8 @@ public class ToolUtils
                 final ImmutableList<Box> boxes = currentBox != null ? ImmutableList.of(currentBox) : ImmutableList.copyOf(area.getAllSubRegionBoxes());
 
                 TaskFillArea task = new TaskFillArea(boxes, state, stateToReplace, false);
-                TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
+                int interval = Configs.Generic.COMMAND_TASK_INTERVAL.getIntegerValue();
+                TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, interval);
 
                 InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
             }
@@ -101,7 +103,8 @@ public class ToolUtils
                     task.setCompletionListener(listener);
                 }
 
-                TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, 20);
+                int interval = Configs.Generic.COMMAND_TASK_INTERVAL.getIntegerValue();
+                TaskScheduler.getServerInstanceIfExistsOrClient().scheduleTask(task, interval);
 
                 InfoUtils.showGuiOrInGameMessage(MessageType.INFO, "litematica.message.scheduled_task_added");
             }

@@ -12,12 +12,14 @@ import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 
-public abstract class TaskPasteSchematicPerChunkBase extends TaskProcessChunkBase
+public abstract class TaskPasteSchematicPerChunkBase extends TaskProcessChunkMultiPhase
 {
     protected final ImmutableList<SchematicPlacement> placements;
     protected final LayerRange layerRange;
     protected final ReplaceBehavior replace;
     protected final boolean changedBlockOnly;
+    protected boolean ignoreBlocks;
+    protected boolean ignoreEntities;
 
     public TaskPasteSchematicPerChunkBase(Collection<SchematicPlacement> placements,
                                           LayerRange range,
@@ -28,6 +30,7 @@ public abstract class TaskPasteSchematicPerChunkBase extends TaskProcessChunkBas
         this.placements = ImmutableList.copyOf(placements);
         this.layerRange = range;
         this.changedBlockOnly = changedBlocksOnly;
+        this.ignoreEntities = Configs.Generic.PASTE_IGNORE_ENTITIES.getBooleanValue();
         this.replace = (ReplaceBehavior) Configs.Generic.PASTE_REPLACE_BEHAVIOR.getOptionListValue();
     }
 

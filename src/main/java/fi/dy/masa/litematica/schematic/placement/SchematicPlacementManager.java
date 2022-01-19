@@ -745,7 +745,7 @@ public class SchematicPlacementManager
                 else
                 {
                     TaskPasteSchematicPerChunkBase task = new TaskPasteSchematicPerChunkCommand(Collections.singletonList(schematicPlacement), range, changedBlocksOnly);
-                    TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.PASTE_COMMAND_INTERVAL.getIntegerValue());
+                    TaskScheduler.getInstanceClient().scheduleTask(task, Configs.Generic.COMMAND_TASK_INTERVAL.getIntegerValue());
 
                     if (printMessage)
                     {

@@ -435,7 +435,6 @@
     "litematica.message.error.move.pending_tasks": "§cCan not start a move operation while there are pending tasks§r",
     "litematica.message.error.placement_paste_outside_world": "The placement can't be pasted in the current position, because it goes outside the world bounds",
     "litematica.message.error.schematic_paste_failed": "§cSchematic Paste to world failed§r",
-    "litematica.message.error.schematic_paste_failed.game_rule_probe_timeout": "§cGame Rule probe timeout reached.\\nFailed to get the current state of the sendCommandFeedback game rule.\\nIf this keeps failing, disable the Generic -> 'pasteDisableFeedback' config.",
     "litematica.message.error.schematic_save_failed": "Failed to save schematic to file '%s'",
     "litematica.message.error.schematic_save_interrupted": "Schematic saving interrupted or stopped",
     "litematica.message.error.schematic_save_no_area_selected": "§cSchematic saving failed - no area selected§r",

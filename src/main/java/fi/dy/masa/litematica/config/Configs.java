@@ -36,6 +36,11 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       BETTER_RENDER_ORDER     = new ConfigBoolean(    "betterRenderOrder", true, "If enabled, then the schematic rendering is done\nby injecting the different render call into the vanilla\nrendering code. This should result in better translucent block\nrendering/ordering and schematic blocks not getting rendered\nthrough the client world blocks/terrain.\nIf the rendering doesn't work (for example with Optifine),\ntry disabling this option.");
         public static final ConfigBoolean       CHANGE_SELECTED_CORNER  = new ConfigBoolean(    "changeSelectedCornerOnMove", true, "If true, then the selected corner of an area selection\nis always set to the last moved corner,\nwhen using the set corner hotkeys");
         public static final ConfigBoolean       CLONE_AT_ORIGINAL_POS   = new ConfigBoolean(    "cloneAtOriginalPosition", false, "If enabled, then using the Clone Selection hotkey will create\nthe placement at the original area selection position,\ninstead of at the player's current position");
+        public static final ConfigBoolean       COMMAND_DISABLE_FEEDBACK = new ConfigBoolean(   "commandDisableFeedback", true, "If enabled, then command feedback is automatically disabled\nand then re-enabled for multiplayer Paste, Fill and Delete operations\n(which are using /setblock and /fill commands) by disabling and then\nre-enabling the sendCommandFeedback game rule when the task is finished");
+        public static final ConfigInteger       COMMAND_FILL_MAX_VOLUME = new ConfigInteger(    "commandFillMaxVolume", 32768, 256, 60000000, "The maximum size/volume of each individual box\nthat can be filled via the command-based Fill/Delete\noperations. Bigger areas/volumes will get split to multiple commands.\nAll areas are also split to per-chunk boxes at first anyway.");
+        public static final ConfigInteger       COMMAND_LIMIT           = new ConfigInteger(    "commandLimitPerTick", 64, 1, 1000000, "Maximum number of commands sent per game tick,\nwhen using the Paste, Fill and Delete features on a server,\nwhere they will use setblock and fill commands.\nNote that he Paste feature can overshoot this by a couple of commands\nwhen using the NBT restore functionality, which needs two additional commands for each block.");
+        public static final ConfigString        COMMAND_NAME_SETBLOCK   = new ConfigString(     "commandNameSetblock", "setblock", "The setblock command name to use when using the\ncommand-based creative mode functionality on servers,\nnamely the Paste Schematic in World function");
+        public static final ConfigInteger       COMMAND_TASK_INTERVAL   = new ConfigInteger(    "commandTaskInterval", 1, 1, 1000, "The interval in game ticks the Paste, Fill and Delete tasks\nare executed at. The commandLimitPerTick config sets the maximum\nnumber of commands to send per execution, and this config\nsets the interval in game ticks before the next execution.");
         public static final ConfigBoolean       CUSTOM_SCHEMATIC_BASE_DIRECTORY_ENABLED = new ConfigBoolean("customSchematicBaseDirectoryEnabled", false, "If enabled, then the directory set in 'customSchematicBaseDirectory'\nwill be used as the root/base schematic directory,\ninstead of the normal '.minecraft/schematics/' directory");
         public static final ConfigString        CUSTOM_SCHEMATIC_BASE_DIRECTORY         = new ConfigString( "customSchematicBaseDirectory", DataManager.getDefaultBaseSchematicDirectory().getAbsolutePath(), "The root/base schematic directory to use,\nif 'customSchematicBaseDirectoryEnabled' is enabled");
         public static final ConfigBoolean       DEBUG_LOGGING           = new ConfigBoolean(    "debugLogging", false, "Enables some debug log messages in the game console,\nfor debugging certain issues or crashes.");
@@ -52,10 +57,6 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       HIGHLIGHT_BLOCK_IN_INV  = new ConfigBoolean(    "highlightBlockInInventory", false, "When enabled, highlights the item (including Shulker Boxes containing it)\nof the looked at block in the schematic");
         public static final ConfigBoolean       LAYER_MODE_DYNAMIC      = new ConfigBoolean(    "layerModeFollowsPlayer", false, "If true, then the render layer follows the player.\nNote: This currently collapses Layer Range type ranges unfortunately");
         public static final ConfigBoolean       LOAD_ENTIRE_SCHEMATICS  = new ConfigBoolean(    "loadEntireSchematics", false, "If true, then the entire schematic is always loaded at once.\nIf false, then only the part that is within the client's view distance is loaded.");
-        public static final ConfigInteger       PASTE_COMMAND_INTERVAL  = new ConfigInteger(    "pasteCommandInterval", 1, 1, 1000, "The interval in game ticks the Paste schematic task runs at,\nin the command-based mode");
-        public static final ConfigInteger       PASTE_COMMAND_LIMIT     = new ConfigInteger(    "pasteCommandLimit", 64, 1, 1000000, "Max number of commands sent per game tick,\nwhen using the Paste schematic feature in the\ncommand mode on a server");
-        public static final ConfigString        PASTE_COMMAND_SETBLOCK  = new ConfigString(     "pasteCommandNameSetblock", "setblock", "The setblock command name to use for the\nPaste schematic feature on servers, when\nusing the command-based paste mode");
-        public static final ConfigBoolean       PASTE_DISABLE_FEEDBACK  = new ConfigBoolean(    "pasteDisableFeedback", true, "If enabled, then command feedback is disabled for\nmultiplayer paste operations (using /setblock and /fill commands)\nby disabling and then re-enabling the sendCommandFeedback game rule");
         public static final ConfigBoolean       PASTE_IGNORE_ENTITIES   = new ConfigBoolean(    "pasteIgnoreEntities", false, "If enabled, then the Paste feature will not paste any entities");
         public static final ConfigBoolean       PASTE_IGNORE_INVENTORY  = new ConfigBoolean(    "pasteIgnoreInventories", false, "Don't paste inventory contents when pasting a schematic");
         public static final ConfigOptionList    PASTE_NBT_BEHAVIOR      = new ConfigOptionList( "pasteNbtRestoreBehavior", PasteNbtBehavior.NONE, "Whether or not the NBT data of blocks is attempted to be restored,\nand which method is used for that.\n- Place & Data Modify will try to place the \"NBT-picked\" block\n  near the player, and then use the data modify\n  command to transfer the NBT data to the setblock'ed block\n- Place & Clone will try to place the \"NBT-picked\" block\n  near the player, and then clone it to the final location.\n- Teleport & Place will try to teleport the player nearby and then\n  directly place the NBT-picked item in the correct position.\nNote that the teleport & place method doesn't currently work correctly/at all.\nThe recommended method is §ePlace & Data Modify§r, however for that to work\nyou will probably need to lower the pasteCommandLimit to 1 per tick and increase\nthe pasteCommandInterval to 1-4 ticks or something.\nThus you should only use this for pasting important blocks that need the data,\nfor example by making a schematic of just the inventories,\nand then paste that with replace behavior set to None.");
@@ -92,7 +93,7 @@ public class Configs implements IConfigHandler
                 HIGHLIGHT_BLOCK_IN_INV,
                 LAYER_MODE_DYNAMIC,
                 LOAD_ENTIRE_SCHEMATICS,
-                PASTE_DISABLE_FEEDBACK,
+                COMMAND_DISABLE_FEEDBACK,
                 PASTE_IGNORE_ENTITIES,
                 PASTE_IGNORE_INVENTORY,
                 PASTE_NBT_BEHAVIOR,
@@ -111,9 +112,10 @@ public class Configs implements IConfigHandler
 
                 CUSTOM_SCHEMATIC_BASE_DIRECTORY,
                 EASY_PLACE_SWAP_INTERVAL,
-                PASTE_COMMAND_INTERVAL,
-                PASTE_COMMAND_LIMIT,
-                PASTE_COMMAND_SETBLOCK,
+                COMMAND_FILL_MAX_VOLUME,
+                COMMAND_TASK_INTERVAL,
+                COMMAND_LIMIT,
+                COMMAND_NAME_SETBLOCK,
                 PICK_BLOCKABLE_SLOTS,
                 TOOL_ITEM
         );
