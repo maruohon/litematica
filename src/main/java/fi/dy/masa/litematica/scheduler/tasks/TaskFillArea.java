@@ -28,9 +28,11 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
     protected final Queue<String> queuedCommands = Queues.newArrayDeque();
     protected final BlockState fillState;
     @Nullable protected final BlockState replaceState;
+    protected final String fillCommand;
     protected final String blockString;
     protected final int maxBoxVolume;
     protected final boolean removeEntities;
+    protected final boolean useWorldEdit;
 
     public TaskFillArea(List<Box> boxes, BlockState fillState, @Nullable BlockState replaceState, boolean removeEntities)
     {
@@ -46,6 +48,8 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
         this.removeEntities = removeEntities;
         this.maxBoxVolume = Configs.Generic.COMMAND_FILL_MAX_VOLUME.getIntegerValue();
         this.maxCommandsPerTick = Configs.Generic.COMMAND_LIMIT.getIntegerValue();
+        this.fillCommand = Configs.Generic.COMMAND_NAME_FILL.getStringValue();
+        this.useWorldEdit = Configs.Generic.COMMAND_USE_WORLDEDIT.getBooleanValue();
 
         String blockString = BlockArgumentParser.stringifyBlockState(fillState);
 
@@ -193,7 +197,7 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
 
         int totalVolume = (box.maxX - box.minX + 1) * (box.maxY - box.minY + 1) * (box.maxZ - box.minZ + 1);
 
-        if (totalVolume <= this.maxBoxVolume)
+        if (totalVolume <= this.maxBoxVolume || this.useWorldEdit)
         {
             this.queueFillCommandForBox(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
         }
@@ -218,9 +222,20 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
 
     protected void queueFillCommandForBox(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
-        String fillCmd = String.format("/fill %d %d %d %d %d %d %s",
-                                       minX, minY, minZ, maxX, maxY, maxZ, this.blockString);
-        this.queuedCommands.offer(fillCmd);
+        if (this.useWorldEdit)
+        {
+            this.queuedCommands.offer(String.format("//pos1 %d,%d,%d", minX, minY, minZ));
+            this.queuedCommands.offer(String.format("//pos2 %d,%d,%d", maxX, maxY, maxZ));
+            this.queuedCommands.offer("//perf neighbors off");
+            this.queuedCommands.offer("//set " + this.blockString);
+            this.queuedCommands.offer("//perf neighbors on");
+        }
+        else
+        {
+            String fillCmd = String.format("%s %d %d %d %d %d %d %s", this.fillCommand,
+                                           minX, minY, minZ, maxX, maxY, maxZ, this.blockString);
+            this.queuedCommands.offer(fillCmd);
+        }
     }
 
     @Override

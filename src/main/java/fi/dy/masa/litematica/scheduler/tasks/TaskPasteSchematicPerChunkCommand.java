@@ -51,6 +51,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected final String fillCommand;
     protected final String setBlockCommand;
     protected final boolean useFillCommand;
+    protected final boolean useWorldEdit;
     protected int[][][] workArr;
     protected int sentFillCommands;
     protected int sentSetblockCommands;
@@ -65,6 +66,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         this.fillCommand = Configs.Generic.COMMAND_NAME_FILL.getStringValue();
         this.setBlockCommand = Configs.Generic.COMMAND_NAME_SETBLOCK.getStringValue();
         this.useFillCommand = Configs.Generic.PASTE_USE_FILL_COMMAND.getBooleanValue();
+        this.useWorldEdit = Configs.Generic.COMMAND_USE_WORLDEDIT.getBooleanValue();
         this.nbtBehavior = (PasteNbtBehavior) Configs.Generic.PASTE_NBT_BEHAVIOR.getOptionListValue();
 
         if (this.useFillCommand)
@@ -122,6 +124,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                                      box.maxX, box.maxY, box.maxZ).iterator();
         }
 
+        if (this.useWorldEdit)
+        {
+            this.mc.player.sendChatMessage("//perf neighbors off");
+        }
+
         this.phase = TaskPhase.PROCESS_BOX_BLOCKS;
     }
 
@@ -166,7 +173,6 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         ChunkSchematic schematicChunk = this.schematicWorld.getChunkProvider().getChunk(chunkPos.x, chunkPos.z);
         Chunk clientChunk = this.mc.world.getChunk(chunkPos.x, chunkPos.z);
 
-        System.out.printf("size: %d\n", this.fillVolumes.size());
         while (this.sentCommandsThisTick < this.maxCommandsPerTick &&
                this.fillVolumes.isEmpty() == false)
         {
@@ -296,28 +302,50 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
     protected void sendSetBlockCommand(int x, int y, int z, BlockState state, ClientPlayerEntity player)
     {
-        String cmdName = this.setBlockCommand;
         String blockString = BlockArgumentParser.stringifyBlockState(state);
-        String strCommand = String.format("%s %d %d %d %s", cmdName, x, y, z, blockString);
 
-        this.sendCommand(strCommand, player);
+        if (this.useWorldEdit)
+        {
+            this.sendCommand(String.format("//pos1 %d,%d,%d", x, y, z), player);
+            this.sendCommand(String.format("//pos2 %d,%d,%d", x, y, z), player);
+            this.sendCommand("//set " + blockString, player);
+        }
+        else
+        {
+            String cmdName = this.setBlockCommand;
+            String strCommand = String.format("%s %d %d %d %s", cmdName, x, y, z, blockString);
+
+            this.sendCommand(strCommand, player);
+        }
+
         ++this.sentSetblockCommands;
     }
 
     protected void sendFillCommand(int x, int y, int z, int x2, int y2, int z2,
                                    BlockState state, ClientPlayerEntity player)
     {
-        String cmdName = this.fillCommand;
         String blockString = BlockArgumentParser.stringifyBlockState(state);
-        String strCommand = String.format("%s %d %d %d %d %d %d %s", cmdName, x, y, z, x2, y2, z2, blockString);
 
-        if (this.replace == ReplaceBehavior.NONE ||
-            (this.replace == ReplaceBehavior.WITH_NON_AIR && state.isAir()))
+        if (this.useWorldEdit)
         {
-            strCommand += " replace air";
+            this.sendCommand(String.format("//pos1 %d,%d,%d", x, y, z), player);
+            this.sendCommand(String.format("//pos2 %d,%d,%d", x2, y2, z2), player);
+            this.sendCommand("//set " + blockString, player);
+        }
+        else
+        {
+            String cmdName = this.fillCommand;
+            String strCommand = String.format("%s %d %d %d %d %d %d %s", cmdName, x, y, z, x2, y2, z2, blockString);
+
+            if (this.replace == ReplaceBehavior.NONE ||
+                (this.replace == ReplaceBehavior.WITH_NON_AIR && state.isAir()))
+            {
+                strCommand += " replace air";
+            }
+
+            this.sendCommand(strCommand, player);
         }
 
-        this.sendCommand(strCommand, player);
         ++this.sentFillCommands;
     }
 
@@ -653,7 +681,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         {
             if (this.printCompletionMessage)
             {
-                if (this.useFillCommand)
+                if (this.useWorldEdit)
+                {
+                    InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.schematic_pasted_using_world_edit", this.sentSetblockCommands + this.sentFillCommands);
+                }
+                else if (this.useFillCommand)
                 {
                     InfoUtils.showGuiOrActionBarMessage(MessageType.INFO, "litematica.message.schematic_pasted_using_fill_and_setblock", this.sentFillCommands, this.sentSetblockCommands);
                 }
@@ -666,6 +698,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         else
         {
             InfoUtils.showGuiOrActionBarMessage(MessageType.ERROR, "litematica.message.error.schematic_paste_failed");
+        }
+
+        if (this.useWorldEdit)
+        {
+            this.mc.player.sendChatMessage("//perf neighbors on");
         }
 
         if (this.mc.player != null && this.shouldEnableFeedback)
