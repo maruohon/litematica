@@ -3,7 +3,6 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -14,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.util.ToBooleanFunction;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 
 public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
@@ -31,7 +31,7 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
     protected long taskStartTimeForCurrentTick;
     protected boolean shouldEnableFeedback;
 
-    protected Consumer<Text> gameRuleListener = this::checkCommandFeedbackGameRuleState;
+    protected ToBooleanFunction<Text> gameRuleListener = this::checkCommandFeedbackGameRuleState;
     protected Runnable initTask = this::initPhaseStartProbe;
     protected Runnable probeTask = this::probePhase;
     protected Runnable waitForChunkTask = this::fetchNextChunk;
@@ -141,13 +141,12 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
     {
         if (Util.getMeasuringTimeNano() > this.gameRuleProbeTimeout)
         {
-            DataManager.removeChatListener(this.gameRuleListener);
             this.shouldEnableFeedback = false;
             this.phase = TaskPhase.WAIT_FOR_CHUNKS;
         }
     }
 
-    protected void checkCommandFeedbackGameRuleState(Text message)
+    protected boolean checkCommandFeedbackGameRuleState(Text message)
     {
         if (message instanceof TranslatableText translatableText)
         {
@@ -160,8 +159,12 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
                 {
                     this.mc.player.sendChatMessage("/gamerule sendCommandFeedback false");
                 }
+
+                return true;
             }
         }
+
+        return false;
     }
 
     protected void fetchNextChunk()

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -37,6 +36,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.util.SchematicWorldRefresher;
+import fi.dy.masa.litematica.util.ToBooleanFunction;
 import fi.dy.masa.malilib.gui.interfaces.IDirectoryCache;
 import fi.dy.masa.malilib.util.FileUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
@@ -50,7 +50,7 @@ public class DataManager implements IDirectoryCache
     private static final Pattern PATTERN_ITEM_NBT = Pattern.compile("^(?<name>[a-z0-9\\._-]+:[a-z0-9\\._-]+)(?<nbt>\\{.*\\})$");
     private static final Pattern PATTERN_ITEM_BASE = Pattern.compile("^(?<name>(?:[a-z0-9\\._-]+:)[a-z0-9\\._-]+)$");
     private static final Map<String, File> LAST_DIRECTORIES = new HashMap<>();
-    private static final ArrayList<Consumer<Text>> CHAT_LISTENERS = new ArrayList<>();
+    private static final ArrayList<ToBooleanFunction<Text>> CHAT_LISTENERS = new ArrayList<>();
 
     private static ItemStack toolItem = new ItemStack(Items.STICK);
     private static ConfigGuiTab configGuiTab = ConfigGuiTab.GENERIC;
@@ -107,7 +107,7 @@ public class DataManager implements IDirectoryCache
         return isCarpetServer;
     }
 
-    public static void addChatListener(Consumer<Text> listener)
+    public static void addChatListener(ToBooleanFunction<Text> listener)
     {
         synchronized (CHAT_LISTENERS)
         {
@@ -115,7 +115,7 @@ public class DataManager implements IDirectoryCache
         }
     }
 
-    public static void removeChatListener(Consumer<Text> listener)
+    public static void removeChatListener(ToBooleanFunction<Text> listener)
     {
         synchronized (CHAT_LISTENERS)
         {
@@ -131,14 +131,18 @@ public class DataManager implements IDirectoryCache
         }
     }
 
-    public static void onChatMessage(Text text)
+    public static boolean onChatMessage(Text text)
     {
         synchronized (CHAT_LISTENERS)
         {
-            for (Consumer<Text> listener : CHAT_LISTENERS)
+            boolean cancel = false;
+
+            for (ToBooleanFunction<Text> listener : CHAT_LISTENERS)
             {
-                listener.accept(text);
+                cancel |= listener.applyAsBoolean(text);
             }
+
+            return cancel;
         }
     }
 
