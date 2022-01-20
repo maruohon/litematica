@@ -735,7 +735,7 @@ public class SchematicPlacementManager
                 else if (mc.isIntegratedServerRunning())
                 {
                     TaskPasteSchematicPerChunkBase task = new TaskPasteSchematicPerChunkDirect(Collections.singletonList(schematicPlacement), range, changedBlocksOnly);
-                    TaskScheduler.getInstanceServer().scheduleTask(task, 20);
+                    TaskScheduler.getInstanceServer().scheduleTask(task, Configs.Generic.COMMAND_TASK_INTERVAL.getIntegerValue());
 
                     if (printMessage)
                     {

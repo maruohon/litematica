@@ -39,6 +39,7 @@ public class Configs implements IConfigHandler
         public static final ConfigBoolean       COMMAND_DISABLE_FEEDBACK = new ConfigBoolean(   "commandDisableFeedback", true, "If enabled, then command feedback is automatically disabled\nand then re-enabled for multiplayer Paste, Fill and Delete operations\n(which are using /setblock and /fill commands) by disabling and then\nre-enabling the sendCommandFeedback game rule when the task is finished");
         public static final ConfigInteger       COMMAND_FILL_MAX_VOLUME = new ConfigInteger(    "commandFillMaxVolume", 32768, 256, 60000000, "The maximum size/volume of each individual box\nthat can be filled via the command-based Fill/Delete\noperations. Bigger areas/volumes will get split to multiple commands.\nAll areas are also split to per-chunk boxes at first anyway.");
         public static final ConfigInteger       COMMAND_LIMIT           = new ConfigInteger(    "commandLimitPerTick", 64, 1, 1000000, "Maximum number of commands sent per game tick,\nwhen using the Paste, Fill and Delete features on a server,\nwhere they will use setblock and fill commands.\nNote that he Paste feature can overshoot this by a couple of commands\nwhen using the NBT restore functionality, which needs two additional commands for each block.");
+        public static final ConfigString        COMMAND_NAME_FILL       = new ConfigString(     "commandNameFill", "fill", "The fill command name to use when using the\ncommand-based creative mode functionality on servers");
         public static final ConfigString        COMMAND_NAME_SETBLOCK   = new ConfigString(     "commandNameSetblock", "setblock", "The setblock command name to use when using the\ncommand-based creative mode functionality on servers,\nnamely the Paste Schematic in World function");
         public static final ConfigInteger       COMMAND_TASK_INTERVAL   = new ConfigInteger(    "commandTaskInterval", 1, 1, 1000, "The interval in game ticks the Paste, Fill and Delete tasks\nare executed at. The commandLimitPerTick config sets the maximum\nnumber of commands to send per execution, and this config\nsets the interval in game ticks before the next execution.");
         public static final ConfigBoolean       CUSTOM_SCHEMATIC_BASE_DIRECTORY_ENABLED = new ConfigBoolean("customSchematicBaseDirectoryEnabled", false, "If enabled, then the directory set in 'customSchematicBaseDirectory'\nwill be used as the root/base schematic directory,\ninstead of the normal '.minecraft/schematics/' directory");
@@ -62,6 +63,7 @@ public class Configs implements IConfigHandler
         public static final ConfigOptionList    PASTE_NBT_BEHAVIOR      = new ConfigOptionList( "pasteNbtRestoreBehavior", PasteNbtBehavior.NONE, "Whether or not the NBT data of blocks is attempted to be restored,\nand which method is used for that.\n- Place & Data Modify will try to place the \"NBT-picked\" block\n  near the player, and then use the data modify\n  command to transfer the NBT data to the setblock'ed block\n- Place & Clone will try to place the \"NBT-picked\" block\n  near the player, and then clone it to the final location.\n- Teleport & Place will try to teleport the player nearby and then\n  directly place the NBT-picked item in the correct position.\nNote that the teleport & place method doesn't currently work correctly/at all.\nThe recommended method is §ePlace & Data Modify§r, however for that to work\nyou will probably need to lower the pasteCommandLimit to 1 per tick and increase\nthe pasteCommandInterval to 1-4 ticks or something.\nThus you should only use this for pasting important blocks that need the data,\nfor example by making a schematic of just the inventories,\nand then paste that with replace behavior set to None.");
         public static final ConfigOptionList    PASTE_REPLACE_BEHAVIOR  = new ConfigOptionList( "pasteReplaceBehavior", ReplaceBehavior.NONE, "The behavior of replacing existing blocks\nin the Paste schematic tool mode");
         public static final ConfigBoolean       PASTE_TO_MCFUNCTION     = new ConfigBoolean(    "pasteToMcFunctionFiles", false, "If enabled, then instead of actually pasting schematics to the world,\nthey are written as setblock commands into text files.");
+        public static final ConfigBoolean       PASTE_USE_FILL_COMMAND  = new ConfigBoolean(    "pasteUseFillCommand", true, "If enabled, then instead of only using individual /setblock commands,\nthe command-based Paste operation (which is used on servers)\nwill also try to use /fill commands for any continuous areas of the same block.\nThis has no effect in single player, since the mod sets the blocks directly\nin the integrated server's world in and doesn't use commands at all.");
         public static final ConfigBoolean       PICK_BLOCK_ENABLED      = new ConfigBoolean(    "pickBlockEnabled", true, "Enables the schematic world pick block hotkeys.\nThere is also a hotkey for toggling this option to toggle those hotkeys... o.o", "Pick Block Hotkeys");
         public static final ConfigBoolean       PICK_BLOCK_SHULKERS     = new ConfigBoolean(    "pickBlockShulkers", false, "If enabled, then if the required item for the pick bloc\nis not found directly in the player's inventory, but there\nis a Shulker box that contains it, the Shulker Box\nwill be switched to the player's hand instead");
         public static final ConfigString        PICK_BLOCKABLE_SLOTS    = new ConfigString(     "pickBlockableSlots", "1,2,3,4,5", "The hotbar slots that are allowed to be\nused for the schematic pick block");
@@ -79,6 +81,7 @@ public class Configs implements IConfigHandler
                 //BETTER_RENDER_ORDER,
                 CHANGE_SELECTED_CORNER,
                 CLONE_AT_ORIGINAL_POS,
+                COMMAND_DISABLE_FEEDBACK,
                 CUSTOM_SCHEMATIC_BASE_DIRECTORY_ENABLED,
                 DEBUG_LOGGING,
                 EASY_PLACE_FIRST,
@@ -93,11 +96,11 @@ public class Configs implements IConfigHandler
                 HIGHLIGHT_BLOCK_IN_INV,
                 LAYER_MODE_DYNAMIC,
                 LOAD_ENTIRE_SCHEMATICS,
-                COMMAND_DISABLE_FEEDBACK,
                 PASTE_IGNORE_ENTITIES,
                 PASTE_IGNORE_INVENTORY,
                 PASTE_NBT_BEHAVIOR,
                 PASTE_TO_MCFUNCTION,
+                PASTE_USE_FILL_COMMAND,
                 PICK_BLOCK_ENABLED,
                 PICK_BLOCK_SHULKERS,
                 PLACEMENT_RESTRICTION,
@@ -110,12 +113,13 @@ public class Configs implements IConfigHandler
                 PASTE_REPLACE_BEHAVIOR,
                 SELECTION_CORNERS_MODE,
 
+                COMMAND_FILL_MAX_VOLUME,
+                COMMAND_LIMIT,
+                COMMAND_NAME_FILL,
+                COMMAND_NAME_SETBLOCK,
+                COMMAND_TASK_INTERVAL,
                 CUSTOM_SCHEMATIC_BASE_DIRECTORY,
                 EASY_PLACE_SWAP_INTERVAL,
-                COMMAND_FILL_MAX_VOLUME,
-                COMMAND_TASK_INTERVAL,
-                COMMAND_LIMIT,
-                COMMAND_NAME_SETBLOCK,
                 PICK_BLOCKABLE_SLOTS,
                 TOOL_ITEM
         );
