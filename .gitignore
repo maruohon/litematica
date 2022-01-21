@@ -1,4 +1,5 @@
-.gradle
+.brachyura
+buildscript/build
 .settings
 bin/
 build/
