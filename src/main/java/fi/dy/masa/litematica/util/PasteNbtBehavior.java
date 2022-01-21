@@ -7,8 +7,7 @@ public enum PasteNbtBehavior implements IConfigOptionListEntry
 {
     NONE            ("none",              "litematica.gui.label.paste_nbt_behavior.none"),
     PLACE_MODIFY    ("place_data_modify", "litematica.gui.label.paste_nbt_behavior.place_data_modify"),
-    PLACE_CLONE     ("place_clone",       "litematica.gui.label.paste_nbt_behavior.place_clone"),
-    TELEPORT_PLACE  ("teleport_place",    "litematica.gui.label.paste_nbt_behavior.teleport_place");
+    PLACE_CLONE     ("place_clone",       "litematica.gui.label.paste_nbt_behavior.place_clone");
 
     private final String configString;
     private final String translationKey;

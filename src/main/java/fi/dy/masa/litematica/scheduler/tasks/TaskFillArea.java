@@ -77,6 +77,17 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
     }
 
     @Override
+    public void init()
+    {
+        super.init();
+
+        if (this.useWorldEdit && this.mc.player != null)
+        {
+            this.mc.player.sendChatMessage("//perf neighbors off");
+        }
+    }
+
+    @Override
     public boolean execute()
     {
         return this.executeMultiPhase();
@@ -226,9 +237,7 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
         {
             this.queuedCommands.offer(String.format("//pos1 %d,%d,%d", minX, minY, minZ));
             this.queuedCommands.offer(String.format("//pos2 %d,%d,%d", maxX, maxY, maxZ));
-            this.queuedCommands.offer("//perf neighbors off");
             this.queuedCommands.offer("//set " + this.blockString);
-            this.queuedCommands.offer("//perf neighbors on");
         }
         else
         {
@@ -242,6 +251,11 @@ public class TaskFillArea extends TaskProcessChunkMultiPhase
     protected void onStop()
     {
         this.printCompletionMessage();
+
+        if (this.useWorldEdit)
+        {
+            this.mc.player.sendChatMessage("//perf neighbors on");
+        }
 
         if (this.mc.player != null && this.shouldEnableFeedback)
         {

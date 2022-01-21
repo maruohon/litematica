@@ -253,7 +253,6 @@
     "litematica.gui.label.paste_nbt_behavior.none": "None",
     "litematica.gui.label.paste_nbt_behavior.place_data_modify": "Place & Data Modify",
     "litematica.gui.label.paste_nbt_behavior.place_clone": "Place & Clone",
-    "litematica.gui.label.paste_nbt_behavior.teleport_place": " Teleport & Place",
 
     "litematica.gui.label.placement_sub.region_name": "Region name: %s",
     "litematica.gui.label.placement_sub.region_position": "Region position",
