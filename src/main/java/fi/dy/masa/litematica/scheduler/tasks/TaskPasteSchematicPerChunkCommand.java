@@ -200,6 +200,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         {
             int index = this.fillVolumes.size() - 1;
             long encodedValue = this.fillVolumes.removeLong(index);
+            //System.out.printf("filling encoded: 0x%016X\n", encodedValue);
             this.fillVolume(encodedValue, baseX, baseZ, schematicChunk, clientChunk);
         }
 
@@ -558,6 +559,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         final int startZ = box.minZ & 0xF;
         final int endX = box.maxX & 0xF;
         final int endZ = box.maxZ & 0xF;
+        final int worldMinY = chunk.getBottomY();
 
         for (int y = box.minY; y <= box.maxY; ++y)
         {
@@ -571,7 +573,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                     if (state.isAir() == false || replace == ReplaceBehavior.ALL)
                     {
                         int length = this.getBlockStripLength(mutablePos, stripDirection, endX - x + 1, state, chunk);
-                        workArr[x][y][z] = length;
+                        workArr[x][y - worldMinY][z] = length;
                         //System.out.printf("strip @ [%d %d %d] %d x %s\n", x, y, z, length, state);
                         x += length - 1;
                     }
@@ -605,6 +607,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         final int startZ = box.minZ & 0xF;
         final int endX = box.maxX & 0xF;
         final int endZ = box.maxZ & 0xF;
+        final int worldMinY = chunk.getBottomY();
 
         for (int y = box.minY; y <= box.maxY; ++y)
         {
@@ -612,7 +615,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             {
                 for (int z = startZ; z <= endZ; ++z)
                 {
-                    int length = workArr[x][y][z];
+                    int length = workArr[x][y - worldMinY][z];
 
                     if (length > 0)
                     {
@@ -627,11 +630,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                         // Find identical adjacent strips, and set their data in the array to zero,
                         // since they are being combined into one layer starting from the first position.
                         while (nextX <= 15 && nextY <= box.maxY && nextZ <= 15 &&
-                               workArr[nextX][nextY][nextZ] == length &&
+                               workArr[nextX][nextY - worldMinY][nextZ] == length &&
                                chunk.getBlockState(mutablePos.set(nextX, nextY, nextZ)) == state)
                         {
                             ++stripCount;
-                            workArr[nextX][nextY][nextZ] = 0;
+                            workArr[nextX][nextY - worldMinY][nextZ] = 0;
                             nextX += scOffX;
                             nextY += scOffY;
                             nextZ += scOffZ;
@@ -645,7 +648,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                         int packedSize = packCoordinate5bit(packedX, packedY, packedZ);
 
                         //System.out.printf("layer @ [%d %d %d] len: %d x count: %d %s\n", x, y, z, length, stripCount, state);
-                        workArr[x][y][z] = packedSize;
+                        workArr[x][y - worldMinY][z] = packedSize;
 
                         // Skip the already handled/combined strips
                         if (stripCount > 1)
@@ -666,9 +669,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             {
                 for (int y = box.minY; y <= box.maxY; ++y)
                 {
-                    int packedSize = workArr[x][y][z];
+                    int packedSize = workArr[x][y - worldMinY][z];
 
-                    if (packedSize > 0)
+                    if (packedSize != 0)
                     {
                         int nextX = x + lcOffX;
                         int nextY = y + lcOffY;
@@ -680,11 +683,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
                         // Find identical adjacent layers
                         while (nextX <= 15 && nextY <= box.maxY && nextZ <= 15 &&
-                               workArr[nextX][nextY][nextZ] == packedSize &&
+                               workArr[nextX][nextY - worldMinY][nextZ] == packedSize &&
                                chunk.getBlockState(mutablePos.set(nextX, nextY, nextZ)) == state)
                         {
                             ++layerCount;
-                            workArr[nextX][nextY][nextZ] = 0;
+                            workArr[nextX][nextY - worldMinY][nextZ] = 0;
                             nextX += lcOffX;
                             nextY += lcOffY;
                             nextZ += lcOffZ;
@@ -698,11 +701,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                         int packedVolumeEndOffset = packCoordinate(volumeEndOffsetX, volumeEndOffsetY, volumeEndOffsetZ);
 
                         //System.out.printf("volume @ [%d %d %d] size: %d x %d x %d %s\n", x, y, z, volumeEndOffsetX, volumeEndOffsetY, volumeEndOffsetZ, state);
-                        long encodedValue = ((long) packedVolumeEndOffset << 32L) | packCoordinate(x, y, z);
+                        long encodedValue = ((long) packedVolumeEndOffset << 32L) | (packCoordinate(x, y, z) & 0xFFFFFFFFL);
                         volumesOut.add(encodedValue);
 
                         // Always also clear the array for the next use
-                        workArr[x][y][z] = 0;
+                        workArr[x][y - worldMinY][z] = 0;
 
                         // Skip the already handled/combined strips
                         if (layerCount > 1)
