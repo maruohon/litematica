@@ -23,7 +23,6 @@ import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.gui.GuiConfigs.ConfigGuiTab;
-import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.materials.MaterialListHudRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -295,7 +294,6 @@ public class DataManager implements IDirectoryCache
     public static void save()
     {
         save(false);
-        MaterialCache.getInstance().writeToFile();
     }
 
     public static void save(boolean forceSave)
