@@ -53,7 +53,7 @@
     "litematica.error.schematic_projects.failed_to_rename_project_file_exists": "Не удалось переименовать проект \"%s\", файл уже существует",
     "litematica.error.schematic_projects.invalid_project_directory": "Некорректный или несуществующий путь к файлу проекта",
     "litematica.error.schematic_projects.no_project_open": "Нет открытых проектов",
-    "litematica.error.schematic_projects.in_projects_mode_but_no_project_open": "Уже в режиме проектов, но ни один проект не открыт.",
+    "litematica.error.schematic_projects.in_projects_mode_but_no_project_open": "Уже в режиме УВС, но ни один проект не открыт.",
     "litematica.error.schematic_projects.null_player": "Нет данных об игроке",
     "litematica.error.schematic_projects.project_already_exists": "Проект \"%s\" уже существует",
     "litematica.error.schematic_projects.save_already_in_progress": "Сохранение уже запущено",
@@ -90,7 +90,7 @@
     "litematica.gui.button.change_menu.configuration_menu": "Настройки",
     "litematica.gui.button.change_menu.load_schematics_to_memory": "Загрузить схему",
     "litematica.gui.button.change_menu.schematic_manager": "Менеджер схем",
-    "litematica.gui.button.change_menu.schematic_projects_manager": "Менеджер проектов",
+    "litematica.gui.button.change_menu.schematic_projects_manager": "Менеджер УВС",
     "litematica.gui.button.change_menu.show_area_selections": "Менеджер областей выделения",
     "litematica.gui.button.change_menu.show_loaded_schematics": "Загруженные схемы",
     "litematica.gui.button.change_menu.show_schematic_placements": "Размещение схем",
@@ -112,8 +112,9 @@
     "litematica.gui.button.hover.plus_minus_tip": "ЛКМ для увеличения\nПКМ для уменьшения\nShift и/или Alt для увеличения размера шага",
     "litematica.gui.button.hover.plus_minus_tip_ctrl_alt_shift": "ЛКМ для увеличения\nПКМ для уменьшения\nShift/Alt/Ctrl для умножения размера шага",
     "litematica.gui.button.hover.schematic_list.reload_schematic": "Перезагружает схему из файла.\nМожет быть полезно, если вы безвозвратно\nповредили схему в режиме редактирования.",
-    "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode": "Сейчас открыт проект схемы.\nПроекты схем переопределяют обычный функционал\nобластей выделения.",
+    "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode": "Сейчас открыт проект управления версиями схемы.\nРежим УВС переопределяет обычный функционал\nобластей выделения.",
     "litematica.gui.button.hover.schematic_projects.delete_area": "§6Удалить последнюю размещённую или сохранённую область§r",
+    "litematica.gui.button.hover.schematic_projects.menu_warning": "(Ранее назывался \"Проекты схем\")\nВам §6не следует§r использовать эту функцию,\nесли вы не знаете, как она работает и что делает.\nОна несколько изменяет способ работы выделения\nобластей, размещения и вставки. Например, при\nвставке выполняется операция удаления области.\n\nЭта функция предназначается для §6итеративной работы§r\nс дизайном §6на одном и том же месте§r и позволяет вам\nлегко создавать несколько версий/набросков какой-либо\nпостройки и переключаться между ними, удаляя блоки\nна месте старой версии постройки и замещая их новой.",
     "litematica.gui.button.hover.schematic_projects.move_origin_to_player": "Переместить точку привязки проекта к текущей пощиции игрока.\nЭто также переместит область выделения и размещение.",
     "litematica.gui.button.hover.schematic_projects.place_to_world_warning": "§6Предупреждение: Это приведёт к замене блоков\n§6в пределах области, сохранённой как версия проекта\n§6или размещённой из неё.",
     "litematica.gui.button.hover.schematic_projects.save_new_version": "Сохранить новую версию проекта (в виде схемы)",
@@ -161,7 +162,7 @@
     "litematica.gui.button.schematic_projects.move_origin_to_player": "Переместить к игроку",
     "litematica.gui.button.schematic_projects.open_area_editor": "Редактор области",
     "litematica.gui.button.schematic_projects.open_manager_gui": "Открыть менеджер",
-    "litematica.gui.button.schematic_projects.open_project_browser": "Просмотр проектов",
+    "litematica.gui.button.schematic_projects.open_project_browser": "Просмотр проектов УВС",
     "litematica.gui.button.schematic_projects.place_to_world": "Разместить в мире",
     "litematica.gui.button.schematic_projects.save_version": "Сохранить новую версию",
 
@@ -199,7 +200,7 @@
     "litematica.gui.button.set_preview": "Установить картинку",
     "litematica.gui.button.tool_mode": "Режим инструмента: %s",
     "litematica.gui.button.unload": "Выгрузить",
-    "litematica.gui.button.unlocked": "Unlocked",
+    "litematica.gui.button.unlocked": "Разблокировано",
 
     "litematica.gui.label.area_editor.box_name": "Имя подрегиона",
     "litematica.gui.label.area_editor.selection_name": "Имя выделения",
@@ -224,10 +225,11 @@
     "litematica.gui.label.block_info_list_type.all": "Вся схема",
     "litematica.gui.label.block_info_list_type.render_layers": "Видимые слои",
     
-    "litematica.gui.label.easy_place_protocol.v3": "Версия 3",
-    "litematica.gui.label.easy_place_protocol.v2": "Версия 2",
-    "litematica.gui.label.easy_place_protocol.slabs_only": "Только плиты",
+    "litematica.gui.label.easy_place_protocol.auto": "Авто",
     "litematica.gui.label.easy_place_protocol.none": "Нет",
+    "litematica.gui.label.easy_place_protocol.slabs_only": "Только плиты",
+    "litematica.gui.label.easy_place_protocol.v2": "Версия 2",
+    "litematica.gui.label.easy_place_protocol.v3": "Версия 3",
     
     "litematica.gui.label.loaded_schematic.modified_on": "§6Изменено %s§r",
 
@@ -245,14 +247,12 @@
     "litematica.gui.label.material_list.progress.missing": "пропущено %s",
     "litematica.gui.label.material_list.total": "Всего: %s предметов",
 
-    "litematica.gui.label.missing_chunks": "%s, недостающие чанки (%s)",
     "litematica.gui.label.origin.auto": "Авто",
     "litematica.gui.label.origin.manual": "Ручная",
 
     "litematica.gui.label.paste_nbt_behavior.none": "Нет",
     "litematica.gui.label.paste_nbt_behavior.place_data_modify": "Разместить → /data modify",
     "litematica.gui.label.paste_nbt_behavior.place_clone": "Разместить → /clone",
-    "litematica.gui.label.paste_nbt_behavior.teleport_place": "/tp → разместить",
 
     "litematica.gui.label.placement_sub.region_name": "Имя региона: %s",
     "litematica.gui.label.placement_sub.region_position": "Позиция региона",
@@ -281,8 +281,6 @@
 
     "litematica.gui.label.schematic_load.checkbox.create_placement": "Создать размещение",
     "litematica.gui.label.schematic_load.hoverinfo.create_placement": "Создать и сделать активным размещение",
-
-    "litematica.gui.label.schematic_paste.missing_chunks": "Вставка, осталось чанков (%s)",
 
     "litematica.gui.label.schematic_placement.enclosing_size": "Суммарный размер: %s",
     "litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled": "Удерживайте Shift, чтобы скрыть размещение при создании",
@@ -318,6 +316,7 @@
     "litematica.gui.label.schematic_verifier.status.verifying": "Ожидание загрузки чанков: %s / %s",
     "litematica.gui.label.schematic_verifier.verifier": "Проверка схемы",
 
+    "litematica.gui.label.task.title.remaining_chunks": "%s, оставшиеся чанки (%s)",
     "litematica.gui.label.task_name.area_analyzer": "Анализ области",
     "litematica.gui.label.task_name.delete": "Удаление",
     "litematica.gui.label.task_name.fill": "Размещение блоков",
@@ -331,7 +330,7 @@
     "litematica.gui.message.schematic_projects.confirm_place_to_world": "Вы хотите разместить эту версию в мире? Это приведёт к удалению всех блоков, находящихся в области, которую менеджер проекта в последний раз размещал в мире или сохранял в качестве версии. (Как правило, \"последняя просмотренная затронутая область\", если бы вы циклично перебирали версии, она не оставила бы блоков после предыдущей версии.)",
 
     "litematica.gui.title.area_editor_normal": "Редактор области (обычный/мультирежим)",
-    "litematica.gui.title.area_editor_normal_schematic_projects": "Редактор области (§6§lОбласть проекта схемы§r)",
+    "litematica.gui.title.area_editor_normal_schematic_projects": "Редактор области (§6§lОбласть проекта УВС§r)",
     "litematica.gui.title.area_editor_simple": "Редактор области (простой режим)",
     "litematica.gui.title.area_editor_sub_region": "Редактор области (подрегион)",
     "litematica.gui.title.area_editor.sub_region_name": "Название подрегиона",
@@ -364,11 +363,11 @@
     "litematica.gui.title.save_schematic_filename": "Имя файла схемы",
     "litematica.gui.title.schematic_browser": "Просмотр схем",
     "litematica.gui.title.schematic_manager": "Менеджер схем",
-    "litematica.gui.title.schematic_project_manager": "Менеджер проектов схем",
+    "litematica.gui.title.schematic_project_manager": "Менеджер проектов УВС",
     "litematica.gui.title.schematic_projects.confirm_delete_area": "Подтвердите удаление области",
     "litematica.gui.title.schematic_projects.confirm_place_to_world": "Подтвердите размещение в мире",
     "litematica.gui.title.schematic_projects.save_new_version": "Сохранение новой версии схемы",
-    "litematica.gui.title.schematic_projects_browser": "Просмотр проектов схем",
+    "litematica.gui.title.schematic_projects_browser": "Просмотр проектов УВС",
     "litematica.gui.title.schematic_verifier": "Проверка схемы \"%s\"",
     "litematica.gui.title.schematic_verifier_errors": "Ошибки проверки схемы",
     "litematica.gui.title.task_manager": "Диспетчер задач",
@@ -415,7 +414,7 @@
     "litematica.hud.schematic_projects.no_versions": "<версии отсутствуют>",
     "litematica.hud.schematic_projects.origin": "Привязка проекта: %s",
     "litematica.hud.schematic_projects.project_name": "Проект: %s",
-    "litematica.hud.schematic_projects_mode": "§6Режим проекта§r",
+    "litematica.hud.schematic_projects_mode": "§6Управление версиями схемы (УВС)§r",
 
     "litematica.info.material_list": "- Клавиша списка материалов откроет последний просмотренный список материалов,\n   если он был сохранён.\n- Чтобы переключиться на другой список материалов, откройте его\n   с помощью соответствующей кнопки в окне настроек размещения\n   или в Менеджере схем.\n- Сохранённый/просмотренный список также \"забывается\",\n   если меняется размещение выбранной схемы.\n- Если ещё нет последнего просмотренного списка материалов,\n   то используется выбранное размещение (при наличии)",
 
@@ -445,7 +444,7 @@
     "litematica.message.area_filled": "Область заполнена",
     "litematica.message.area_fill_fail": "Не удалось заполнить область",
     "litematica.message.area_selections.selection_created_from_placement": "Создано новое выделение из размещения \"%s\"",
-    "litematica.message.easy_place_fail": "Действие заблокировано из-за простого режима размещения",
+    "litematica.message.easy_place_fail": "§6Действие заблокировано из-за простого режима размещения",
     "litematica.message.grabbed_element_for_moving": "Элемент захвачен",
     "litematica.message.in_memory_schematic_created": "Создана временная схема \"%s\"",
     "litematica.message.material_list.material_cache_cleared": "Кэш материалов очищен",
@@ -455,12 +454,14 @@
     "litematica.message.placement.cant_modify_is_locked": "§cРазмещение зафиксировано и не может быть перемещено§r",
     "litematica.message.placement.moved_placement_origin": "Точка привязки изменена с %s → %s",
     "litematica.message.placement.moved_subregion_to": "Подрегион перемещён на %s",
-    "litematica.message.placement_restriction_fail": "Действие предотвращено включённым режимом ограничения размещения (PlacementRestriction)",
+    "litematica.message.placement_restriction_fail": "§6Действие заблокировано включённым режимом ограничения размещения (PlacementRestriction)",
     "litematica.message.removed_area_origin": "Точка привязки региона удалена",
     "litematica.message.removed_selection_box": "Подрегион %s удалён",
     "litematica.message.scheduled_task_added": "Добавлена отложенная задача...",
     "litematica.message.schematic_exported_as": "Схема сохранена как \"%s\"",
     "litematica.message.schematic_pasted": "Схема вставлена в мир",
+    "litematica.message.schematic_pasted_using_world_edit": "Схема вставлена с использованием §b%s§r команд //set для World Edit",
+    "litematica.message.schematic_pasted_using_fill_and_setblock": "Схема вставлена с использованием §b%s§r команд /fill и §b%s§r команд /setblock",
     "litematica.message.schematic_pasted_using_setblock": "Схема вставлена с использованием %s команд /setblock",
     "litematica.message.schematic_placement_created": "Создано расположение для \"%s\"",
     "litematica.message.schematic_preview_cancelled": "Создание миниатюры отменено",
@@ -488,6 +489,7 @@
     "litematica.message.warn.schematic_verifier.overlay_disabled": "Внимание: Наложение информации проверки схемы отключено. Проверьте настройки §f[Наложение информации] §6→§f %s§6 (или §f[Клавиши] §6→§f %s [%s]§6)",
 
     "litematica.message.warning.invalid_number": "Некорректный ввод числа \"%s\"",
+    "litematica.message.warning.schematic_projects_hidden": "Внимание: Система управления версиями схемы (УВС) скрыта. Вам НЕ следует её использовать, если вы не знаете, каким образом она работает и меняет поведение мода. Она предназначена для работы в местах, где требуется быстрое переключение по итерациям между разными версиями постройки (=удаление предыдущей версии и её замена новой). Если вы хотите её использовать, включите настройку [Основные] → unhideSchematicVCS",
 
     "litematica.warning.area_editor.area_rendering_disabled": "Примечание: В настоящее время отображение регионов областей выделения отключено. Проверьте настройки §f[Визуализация] §6→§f %s§6 или §f[Клавиши] §6→§f %s [%s]",
 
