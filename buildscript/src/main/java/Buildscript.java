@@ -1,11 +1,13 @@
-
+import java.nio.file.Path;
 import io.github.coolcrabs.brachyura.decompiler.BrachyuraDecompiler;
+import io.github.coolcrabs.brachyura.decompiler.fernflower.FernflowerDecompiler;
 import io.github.coolcrabs.brachyura.fabric.FabricLoader;
 import io.github.coolcrabs.brachyura.fabric.FabricMaven;
 import io.github.coolcrabs.brachyura.fabric.FabricProject;
 import io.github.coolcrabs.brachyura.fabric.Yarn;
 import io.github.coolcrabs.brachyura.maven.Maven;
 import io.github.coolcrabs.brachyura.maven.MavenId;
+import io.github.coolcrabs.brachyura.processing.ProcessorChain;
 import net.fabricmc.mappingio.tree.MappingTree;
 
 public class Buildscript extends FabricProject {
@@ -49,5 +51,20 @@ public class Buildscript extends FabricProject {
     @Override
     public int getJavaVersion() {
         return 17;
+    }
+
+    @Override
+    public BrachyuraDecompiler decompiler() {
+        return new FernflowerDecompiler(Maven.getMavenJarDep("https://maven.quiltmc.org/repository/release", new MavenId("org.quiltmc:quiltflower:1.7.0")));
+    };
+
+    @Override
+    public Path getBuildJarPath() {
+        return getBuildLibsDir().resolve(getModId() + "-" + getMcVersion() + "-" + getVersion() + ".jar");
+    }
+
+    @Override
+    public ProcessorChain resourcesProcessingChain() {
+        return new ProcessorChain(super.resourcesProcessingChain(), new FmjVersionFixer(this));
     }
 }
