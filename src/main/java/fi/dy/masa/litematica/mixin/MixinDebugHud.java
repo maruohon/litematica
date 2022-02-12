@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.DebugHud;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -29,9 +30,14 @@ public abstract class MixinDebugHud extends DrawableHelper
 
             WorldRendererSchematic renderer = LitematicaRenderer.getInstance().getWorldRenderer();
 
-            list.add(String.format("%s[Litematica]%s %s C#: %d", pre, rst, renderer.getDebugInfoRenders(), world.getChunkProvider().getLoadedChunks().size()));
+            list.add(String.format("%s[Litematica]%s %s",
+                                   pre, rst, renderer.getDebugInfoRenders()));
 
-            String str = String.format("E: %d TE: TODO 1.17", world.getRegularEntityCount()); //, world.blockEntities.size()); // TODO 1.17
+            String str = String.format("E: %d TE: TODO 1.17+ C: %d, CS: %d, VCS: %d",
+                                       world.getRegularEntityCount(),
+                                       world.getChunkProvider().getLoadedChunks().size(),
+                                       DataManager.getSchematicPlacementManager().getAllTouchedSubChunks().size(),
+                                       DataManager.getSchematicPlacementManager().getLastVisibleSubChunks().size());
             list.add(String.format("%s[Litematica]%s %s %s", pre, rst, renderer.getDebugInfoEntities(), str));
         }
     }

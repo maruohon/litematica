@@ -42,11 +42,13 @@ public class ChunkManagerSchematic extends ChunkManager
         return this.loadedChunks.containsKey(ChunkPos.toLong(chunkX, chunkZ));
     }
 
+    @Override
     public String getDebugString()
     {
         return "Schematic Chunk Cache: " + this.getLoadedChunkCount();
     }
 
+    @Override
     public int getLoadedChunkCount()
     {
         return this.loadedChunks.size();

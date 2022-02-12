@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.ChunkSchematic;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
@@ -22,6 +23,7 @@ public class SchematicWorldRefresher implements IRangeChangeListener
 
         if (world != null)
         {
+            DataManager.getSchematicPlacementManager().setVisibleSubChunksNeedsUpdate();
             final int minY = world.getBottomY();
             final int maxY = world.getTopY() - 1;
             this.updateBetweenY(minY, maxY);
@@ -35,6 +37,7 @@ public class SchematicWorldRefresher implements IRangeChangeListener
 
         if (world != null && this.mc.world != null)
         {
+            DataManager.getSchematicPlacementManager().setVisibleSubChunksNeedsUpdate();
             final int xMin = Math.min(minX, maxX);
             final int xMax = Math.max(minX, maxX);
             final int cxMin = (xMin >> 4);
@@ -67,6 +70,7 @@ public class SchematicWorldRefresher implements IRangeChangeListener
 
         if (world != null && this.mc.world != null)
         {
+            DataManager.getSchematicPlacementManager().setVisibleSubChunksNeedsUpdate();
             Long2ObjectMap<ChunkSchematic> schematicChunks = world.getChunkProvider().getLoadedChunks();
 
             for (ChunkSchematic chunk : schematicChunks.values())
@@ -90,6 +94,7 @@ public class SchematicWorldRefresher implements IRangeChangeListener
 
         if (world != null && this.mc.world != null)
         {
+            DataManager.getSchematicPlacementManager().setVisibleSubChunksNeedsUpdate();
             final int zMin = Math.min(minZ, maxZ);
             final int zMax = Math.max(minZ, maxZ);
             final int czMin = (zMin >> 4);

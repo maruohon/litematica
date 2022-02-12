@@ -99,7 +99,7 @@ public class Configs implements IConfigHandler
                 GENERATE_LOWERCASE_NAMES,
                 HIGHLIGHT_BLOCK_IN_INV,
                 LAYER_MODE_DYNAMIC,
-                LOAD_ENTIRE_SCHEMATICS,
+                //LOAD_ENTIRE_SCHEMATICS,
                 PASTE_IGNORE_ENTITIES,
                 PASTE_IGNORE_INVENTORY,
                 PASTE_NBT_BEHAVIOR,
