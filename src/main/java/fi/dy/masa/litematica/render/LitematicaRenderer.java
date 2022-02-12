@@ -25,7 +25,6 @@ public class LitematicaRenderer
     private long finishTimeNano;
 
     private boolean renderCollidingSchematicBlocks;
-    private boolean renderPiecewise;
     private boolean renderPiecewiseSchematic;
     private boolean renderPiecewiseBlocks;
 
@@ -240,33 +239,36 @@ public class LitematicaRenderer
 
     public void piecewisePrepareAndUpdate(Frustum frustum)
     {
-        this.renderPiecewise = Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() &&
-                               Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-                               this.mc.getCameraEntity() != null;
+        boolean render = Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() &&
+                         Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+                         this.mc.getCameraEntity() != null;
         this.renderPiecewiseSchematic = false;
         this.renderPiecewiseBlocks = false;
         WorldRendererSchematic worldRenderer = this.getWorldRenderer();
 
-        if (this.renderPiecewise && frustum != null && worldRenderer.hasWorld())
+        if (render && frustum != null && worldRenderer.hasWorld())
         {
             boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeybind().isKeybindHeld();
             this.renderPiecewiseSchematic = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
             this.renderPiecewiseBlocks = this.renderPiecewiseSchematic && Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue();
             this.renderCollidingSchematicBlocks = Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue();
 
-            this.mc.getProfiler().push("litematica_culling");
+            if (this.renderPiecewiseSchematic)
+            {
+                this.mc.getProfiler().push("litematica_culling");
 
-            this.calculateFinishTime();
+                this.calculateFinishTime();
 
-            this.mc.getProfiler().swap("litematica_terrain_setup");
-            worldRenderer.setupTerrain(this.getCamera(), frustum, this.frameCount++, this.mc.player.isSpectator());
+                this.mc.getProfiler().swap("litematica_terrain_setup");
+                worldRenderer.setupTerrain(this.getCamera(), frustum, this.frameCount++, this.mc.player.isSpectator());
 
-            this.mc.getProfiler().swap("litematica_update_chunks");
-            worldRenderer.updateChunks(this.finishTimeNano);
+                this.mc.getProfiler().swap("litematica_update_chunks");
+                worldRenderer.updateChunks(this.finishTimeNano);
 
-            this.mc.getProfiler().pop();
+                this.mc.getProfiler().pop();
 
-            this.frustum = frustum;
+                this.frustum = frustum;
+            }
         }
     }
 
@@ -411,7 +413,6 @@ public class LitematicaRenderer
 
     private void cleanup()
     {
-        this.renderPiecewise = false;
         this.renderPiecewiseSchematic = false;
         this.renderPiecewiseBlocks = false;
     }
