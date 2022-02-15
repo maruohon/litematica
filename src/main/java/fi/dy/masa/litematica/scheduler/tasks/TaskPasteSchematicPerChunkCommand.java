@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import com.google.common.collect.Queues;
 import net.minecraft.block.BlockState;
@@ -161,16 +162,24 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         }
     }
 
+    protected void sendCommand(String cmd)
+    {
+        this.sendCommand(cmd, this.mc.player);
+    }
+
     protected void processBlocksInCurrentBoxUsingSetBlockOnly()
     {
         ChunkPos chunkPos = this.currentChunkPos;
         ChunkSchematic schematicChunk = this.schematicWorld.getChunkProvider().getChunk(chunkPos.x, chunkPos.z);
         Chunk clientChunk = this.mc.world.getChunk(chunkPos.x, chunkPos.z);
+        boolean ignoreLimit = Configs.Generic.PASTE_IGNORE_CMD_LIMIT.getBooleanValue();
 
-        while (this.positionIterator.hasNext() && this.queuedCommands.size() < this.maxCommandsPerTick)
+        while (this.positionIterator.hasNext() &&
+               this.queuedCommands.size() < this.maxCommandsPerTick &&
+               (ignoreLimit == false || this.sentCommandsThisTick < this.maxCommandsPerTick))
         {
             BlockPos pos = this.positionIterator.next();
-            this.pasteBlock(pos, schematicChunk, clientChunk);
+            this.pasteBlock(pos, schematicChunk, clientChunk, ignoreLimit);
         }
 
         this.sendQueuedCommands();
@@ -234,7 +243,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         }
     }
 
-    protected void pasteBlock(BlockPos pos, WorldChunk schematicChunk, Chunk clientChunk)
+    protected void pasteBlock(BlockPos pos, WorldChunk schematicChunk, Chunk clientChunk, boolean ignoreLimit)
     {
         BlockState stateSchematic = schematicChunk.getBlockState(pos);
         BlockState stateClient = clientChunk.getBlockState(pos);
@@ -246,15 +255,16 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
             if (be != null && nbtBehavior != PasteNbtBehavior.NONE)
             {
+                Consumer<String> commandHandler = ignoreLimit ? this::sendCommand : this.queuedCommands::offer;
                 World schematicWorld = schematicChunk.getWorld();
 
                 if (nbtBehavior == PasteNbtBehavior.PLACE_MODIFY)
                 {
-                    this.setDataViaDataModify(pos, stateSchematic, be, schematicWorld, this.mc.world);
+                    this.setDataViaDataModify(pos, stateSchematic, be, schematicWorld, this.mc.world, commandHandler);
                 }
                 else if (nbtBehavior == PasteNbtBehavior.PLACE_CLONE)
                 {
-                    this.placeBlockViaClone(pos, stateSchematic, be, schematicWorld, this.mc.world);
+                    this.placeBlockViaClone(pos, stateSchematic, be, schematicWorld, this.mc.world, commandHandler);
                 }
             }
             else
@@ -325,18 +335,23 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
     protected void queueSetBlockCommand(int x, int y, int z, BlockState state)
     {
+        this.queueSetBlockCommand(x, y, z, state, this.queuedCommands::offer);
+    }
+
+    protected void queueSetBlockCommand(int x, int y, int z, BlockState state, Consumer<String> commandHandler)
+    {
         String blockString = BlockArgumentParser.stringifyBlockState(state);
 
         if (this.useWorldEdit)
         {
-            this.queuedCommands.offer(String.format("//pos1 %d,%d,%d", x, y, z));
-            this.queuedCommands.offer(String.format("//pos2 %d,%d,%d", x, y, z));
-            this.queuedCommands.offer("//set " + blockString);
+            commandHandler.accept(String.format("//pos1 %d,%d,%d", x, y, z));
+            commandHandler.accept(String.format("//pos2 %d,%d,%d", x, y, z));
+            commandHandler.accept("//set " + blockString);
         }
         else
         {
             String cmdName = this.setBlockCommand;
-            this.queuedCommands.offer(String.format("%s %d %d %d %s", cmdName, x, y, z, blockString));
+            commandHandler.accept(String.format("%s %d %d %d %s", cmdName, x, y, z, blockString));
         }
 
         ++this.sentSetblockCommands;
@@ -404,13 +419,14 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     }
 
     protected void setDataViaDataModify(BlockPos pos, BlockState state, BlockEntity be,
-                                        World schematicWorld, ClientWorld clientWorld)
+                                        World schematicWorld, ClientWorld clientWorld,
+                                        Consumer<String> commandHandler)
     {
         BlockPos placementPos = this.placeNbtPickedBlock(pos, state, be, schematicWorld, clientWorld);
 
         if (placementPos != null)
         {
-            this.queueSetBlockCommand(pos.getX(), pos.getY(), pos.getZ(), state);
+            this.queueSetBlockCommand(pos.getX(), pos.getY(), pos.getZ(), state, commandHandler);
 
             try
             {
@@ -425,7 +441,7 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                     String command = String.format("data modify block %d %d %d %s set from block %d %d %d %s",
                                                    pos.getX(), pos.getY(), pos.getZ(), key,
                                                    placementPos.getX(), placementPos.getY(), placementPos.getZ(), key);
-                    this.queuedCommands.offer(command);
+                    commandHandler.accept(command);
                 }
             }
             catch (Exception ignore) {}
@@ -433,12 +449,13 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             String cmdName = this.setBlockCommand;
             String command = String.format("%s %d %d %d air",
                                            cmdName, placementPos.getX(), placementPos.getY(), placementPos.getZ());
-            this.queuedCommands.offer(command);
+            commandHandler.accept(command);
         }
     }
 
     protected void placeBlockViaClone(BlockPos pos, BlockState state, BlockEntity be,
-                                      World schematicWorld, ClientWorld clientWorld)
+                                      World schematicWorld, ClientWorld clientWorld,
+                                      Consumer<String> commandHandler)
     {
         BlockPos placementPos = this.placeNbtPickedBlock(pos, state, be, schematicWorld, clientWorld);
 
@@ -449,12 +466,12 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                            placementPos.getX(), placementPos.getY(), placementPos.getZ(),
                                            placementPos.getX(), placementPos.getY(), placementPos.getZ(),
                                            pos.getX(), pos.getY(), pos.getZ());
-            this.queuedCommands.offer(command);
+            commandHandler.accept(command);
 
             String cmdName = this.setBlockCommand;
             command = String.format("%s %d %d %d air",
                                     cmdName, placementPos.getX(), placementPos.getY(), placementPos.getZ());
-            this.queuedCommands.offer(command);
+            commandHandler.accept(command);
         }
     }
 
@@ -504,13 +521,16 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         else
         {
             //System.out.printf("fill -> setblock @ [%d %d %d] %s\n", startX, startY, startZ, schematicChunk.getBlockState(this.mutablePos));
-            this.pasteBlock(this.mutablePos, schematicChunk, clientChunk);
+            this.pasteBlock(this.mutablePos, schematicChunk, clientChunk, false);
         }
     }
 
     protected void generateFillVolumes(IntBoundingBox box)
     {
         ChunkSchematic chunk = this.schematicWorld.getChunkProvider().getChunk(box.minX >> 4, box.minZ >> 4);
+        boolean ignoreBe = Configs.Generic.PASTE_IGNORE_BE_IN_FILL.getBooleanValue() &&
+                                   Configs.Generic.PASTE_NBT_BEHAVIOR.getOptionListValue() != PasteNbtBehavior.NONE;
+
         this.fillVolumes.clear();
 
         if (this.workArr == null)
@@ -519,8 +539,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             this.workArr = new int[16][height][16];
         }
 
-        this.generateStrips(this.workArr, Direction.EAST, box, chunk);
-        this.combineStripsToLayers(this.workArr, Direction.EAST, Direction.SOUTH, Direction.UP, box, chunk, this.fillVolumes);
+        this.generateStrips(this.workArr, Direction.EAST, box, chunk, ignoreBe);
+        this.combineStripsToLayers(this.workArr, Direction.EAST, Direction.SOUTH, Direction.UP,
+                                   box, chunk, this.fillVolumes, ignoreBe);
         Collections.reverse(this.fillVolumes);
     }
 
@@ -551,7 +572,8 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected void generateStrips(int[][][] workArr,
                                   Direction stripDirection,
                                   IntBoundingBox box,
-                                  ChunkSchematic chunk)
+                                  ChunkSchematic chunk,
+                                  boolean ignoreBe)
     {
         BlockPos.Mutable mutablePos = this.mutablePos;
         ReplaceBehavior replace = this.replace;
@@ -572,7 +594,17 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
                     if (state.isAir() == false || replace == ReplaceBehavior.ALL)
                     {
-                        int length = this.getBlockStripLength(mutablePos, stripDirection, endX - x + 1, state, chunk);
+                        int length;
+
+                        if (ignoreBe && state.hasBlockEntity())
+                        {
+                            length = 1;
+                        }
+                        else
+                        {
+                            length = this.getBlockStripLength(mutablePos, stripDirection, endX - x + 1, state, chunk);
+                        }
+
                         workArr[x][y - worldMinY][z] = length;
                         //System.out.printf("strip @ [%d %d %d] %d x %s\n", x, y, z, length, state);
                         x += length - 1;
@@ -591,7 +623,8 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                          Direction layerCombineDirection,
                                          IntBoundingBox box,
                                          ChunkSchematic chunk,
-                                         LongArrayList volumesOut)
+                                         LongArrayList volumesOut,
+                                         boolean ignoreBe)
     {
         BlockPos.Mutable mutablePos = this.mutablePos;
         final int sdOffX = stripDirection.getOffsetX();
@@ -627,17 +660,20 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                         mutablePos.set(x, y, z);
                         BlockState state = chunk.getBlockState(mutablePos);
 
-                        // Find identical adjacent strips, and set their data in the array to zero,
-                        // since they are being combined into one layer starting from the first position.
-                        while (nextX <= 15 && nextY <= box.maxY && nextZ <= 15 &&
-                               workArr[nextX][nextY - worldMinY][nextZ] == length &&
-                               chunk.getBlockState(mutablePos.set(nextX, nextY, nextZ)) == state)
+                        if (ignoreBe == false || state.hasBlockEntity() == false)
                         {
-                            ++stripCount;
-                            workArr[nextX][nextY - worldMinY][nextZ] = 0;
-                            nextX += scOffX;
-                            nextY += scOffY;
-                            nextZ += scOffZ;
+                            // Find identical adjacent strips, and set their data in the array to zero,
+                            // since they are being combined into one layer starting from the first position.
+                            while (nextX <= 15 && nextY <= box.maxY && nextZ <= 15 &&
+                                   workArr[nextX][nextY - worldMinY][nextZ] == length &&
+                                   chunk.getBlockState(mutablePos.set(nextX, nextY, nextZ)) == state)
+                            {
+                                ++stripCount;
+                                workArr[nextX][nextY - worldMinY][nextZ] = 0;
+                                nextX += scOffX;
+                                nextY += scOffY;
+                                nextZ += scOffZ;
+                            }
                         }
 
                         // Encode the first two dimensions of the volume (at this point a layer).
@@ -681,16 +717,19 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                         mutablePos.set(x, y, z);
                         BlockState state = chunk.getBlockState(mutablePos);
 
-                        // Find identical adjacent layers
-                        while (nextX <= 15 && nextY <= box.maxY && nextZ <= 15 &&
-                               workArr[nextX][nextY - worldMinY][nextZ] == packedSize &&
-                               chunk.getBlockState(mutablePos.set(nextX, nextY, nextZ)) == state)
+                        if (ignoreBe == false || state.hasBlockEntity() == false)
                         {
-                            ++layerCount;
-                            workArr[nextX][nextY - worldMinY][nextZ] = 0;
-                            nextX += lcOffX;
-                            nextY += lcOffY;
-                            nextZ += lcOffZ;
+                            // Find identical adjacent layers
+                            while (nextX <= 15 && nextY <= box.maxY && nextZ <= 15 &&
+                                   workArr[nextX][nextY - worldMinY][nextZ] == packedSize &&
+                                   chunk.getBlockState(mutablePos.set(nextX, nextY, nextZ)) == state)
+                            {
+                                ++layerCount;
+                                workArr[nextX][nextY - worldMinY][nextZ] = 0;
+                                nextX += lcOffX;
+                                nextY += lcOffY;
+                                nextZ += lcOffZ;
+                            }
                         }
 
                         // Add the layer thickness, and change the encoding from 1...16 to 0...15
