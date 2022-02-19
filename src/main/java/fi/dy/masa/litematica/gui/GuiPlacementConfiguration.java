@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,7 +26,7 @@ import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.icon.Icon;
-import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.gui.widget.list.SelectionListener;
 import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
@@ -532,7 +533,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         }
     }
 
-    private static class TextFieldListener implements TextChangeListener
+    private static class TextFieldListener implements Consumer<String>
     {
         private final GuiPlacementConfiguration parent;
         private final SchematicPlacementManager manager;
@@ -548,7 +549,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
         }
 
         @Override
-        public void onTextChange(String newText)
+        public void accept(String newText)
         {
             try
             {

@@ -14,7 +14,7 @@ import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
+import fi.dy.masa.malilib.config.value.HorizontalAlignment;
 
 public class WidgetListSchematicVersions extends BaseListWidget<SchematicVersion, WidgetSchematicVersion>
 {

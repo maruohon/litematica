@@ -30,11 +30,11 @@ import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.gui.widget.list.SelectionListener;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 
 public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetSelectionSubRegion, WidgetListSelectionSubRegions>
                                           implements SelectionListener<String>
@@ -592,7 +592,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         }
     }
 
-    protected static class SubRegionCreator implements StringConsumer
+    protected static class SubRegionCreator implements ResultingStringConsumer
     {
         private final GuiAreaSelectionEditorNormal gui;
 

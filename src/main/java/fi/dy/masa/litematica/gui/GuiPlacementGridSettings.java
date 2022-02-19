@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
+import java.util.function.Consumer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
@@ -17,8 +18,7 @@ import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.widget.BaseTextFieldWidget;
 import fi.dy.masa.malilib.gui.widget.IntegerTextFieldWidget;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -177,7 +177,7 @@ public class GuiPlacementGridSettings extends BaseScreen
         this.addButton(button, new ButtonListenerSize(type, this.placement, this));
     }
 
-    private static class TextFieldListenerRepeat implements TextChangeListener
+    private static class TextFieldListenerRepeat implements Consumer<String>
     {
         private final GuiPlacementGridSettings parent;
         private final SchematicPlacement placement;
@@ -191,7 +191,7 @@ public class GuiPlacementGridSettings extends BaseScreen
         }
 
         @Override
-        public void onTextChange(String newText)
+        public void accept(String newText)
         {
             try
             {
@@ -200,7 +200,7 @@ public class GuiPlacementGridSettings extends BaseScreen
                 this.placement.getGridSettings().setRepeatCounts(PositionUtils.setIntBoxValue(old, this.type, value));
                 this.parent.updatePlacementManager();
             }
-            catch (NumberFormatException e) {}
+            catch (NumberFormatException ignore) {}
         }
     }
 
@@ -233,7 +233,7 @@ public class GuiPlacementGridSettings extends BaseScreen
         }
     }
 
-    private static class TextFieldListenerSize implements TextChangeListener
+    private static class TextFieldListenerSize implements Consumer<String>
     {
         private final GuiPlacementGridSettings parent;
         private final SchematicPlacement placement;
@@ -247,7 +247,7 @@ public class GuiPlacementGridSettings extends BaseScreen
         }
 
         @Override
-        public void onTextChange(String newText)
+        public void accept(String newText)
         {
             try
             {
@@ -255,7 +255,7 @@ public class GuiPlacementGridSettings extends BaseScreen
                 this.placement.getGridSettings().setSize(this.type, value);
                 this.parent.updatePlacementManager();
             }
-            catch (NumberFormatException e) {}
+            catch (NumberFormatException ignore) {}
         }
     }
 

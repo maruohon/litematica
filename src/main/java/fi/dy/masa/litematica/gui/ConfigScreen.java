@@ -8,8 +8,8 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.gui.BaseScreenTab;
-import fi.dy.masa.malilib.gui.ScreenTab;
+import fi.dy.masa.malilib.gui.tab.BaseScreenTab;
+import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
@@ -46,6 +46,13 @@ public class ConfigScreen
     public static ImmutableList<ConfigTab> getConfigTabs()
     {
         return CONFIG_TABS;
+    }
+
+    public static BaseConfigScreen create()
+    {
+        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, VISUALS, "litematica.gui.title.configs");
+        screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
+        return screen;
     }
 
     public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)

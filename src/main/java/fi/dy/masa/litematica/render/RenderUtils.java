@@ -30,7 +30,7 @@ import fi.dy.masa.malilib.render.overlay.InventoryOverlay;
 import fi.dy.masa.malilib.render.overlay.InventoryOverlay.InventoryProperties;
 import fi.dy.masa.malilib.render.overlay.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
+import fi.dy.masa.malilib.config.value.HorizontalAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
 
 public class RenderUtils

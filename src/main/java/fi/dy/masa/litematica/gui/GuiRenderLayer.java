@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.malilib.gui.BaseRenderLayerEditScreen;
+import fi.dy.masa.malilib.gui.edit.BaseRenderLayerEditScreen;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
 import fi.dy.masa.malilib.gui.icon.Icon;

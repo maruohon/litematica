@@ -15,7 +15,7 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.util.FileNameUtils;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.FileUtils;
@@ -177,7 +177,7 @@ public class GuiSchematicSave extends GuiSchematicSaveBase implements TaskComple
         }
     }
 
-    public static class InMemorySchematicCreator implements StringConsumer
+    public static class InMemorySchematicCreator implements ResultingStringConsumer
     {
         private final AreaSelection area;
         private final Minecraft mc;

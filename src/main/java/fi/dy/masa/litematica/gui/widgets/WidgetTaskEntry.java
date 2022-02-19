@@ -18,7 +18,7 @@ public class WidgetTaskEntry extends BaseDataListEntryWidget<ITask>
     {
         super(x, y, width, height, listIndex, originalListIndex, task, listWidget);
 
-        this.removeButton = new GenericButton("litematica.gui.button.remove");
+        this.removeButton = GenericButton.create("litematica.gui.button.remove");
         this.removeButton.setActionListener(() -> {
             if (TaskScheduler.getInstanceClient().removeTask(this.getData()) == false)
             {

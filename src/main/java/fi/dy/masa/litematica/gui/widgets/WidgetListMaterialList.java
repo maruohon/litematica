@@ -14,7 +14,7 @@ import fi.dy.masa.litematica.materials.MaterialListSorter;
 import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
-import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
+import fi.dy.masa.malilib.config.value.HorizontalAlignment;
 
 public class WidgetListMaterialList extends BaseListWidget<MaterialListEntry, WidgetMaterialListEntry>
 {

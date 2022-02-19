@@ -3,6 +3,7 @@ package fi.dy.masa.litematica.gui;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Consumer;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
 import fi.dy.masa.litematica.gui.widgets.WidgetListMaterialList;
@@ -349,7 +350,7 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
         }
     }
 
-    private static class MultiplierListener implements TextChangeListener
+    private static class MultiplierListener implements Consumer<String>
     {
         private final MaterialListBase materialList;
         private final GuiMaterialList gui;
@@ -361,7 +362,7 @@ public class GuiMaterialList extends BaseListScreen<MaterialListEntry, WidgetMat
         }
 
         @Override
-        public void onTextChange(String newText)
+        public void accept(String newText)
         {
             try
             {

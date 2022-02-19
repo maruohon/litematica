@@ -10,7 +10,7 @@ import fi.dy.masa.malilib.gui.icon.DefaultIcons;
 import fi.dy.masa.malilib.gui.widget.list.BaseListWidget;
 import fi.dy.masa.malilib.gui.widget.SearchBarWidget;
 import fi.dy.masa.malilib.util.AlphaNumComparator;
-import fi.dy.masa.malilib.gui.position.HorizontalAlignment;
+import fi.dy.masa.malilib.config.value.HorizontalAlignment;
 
 public class WidgetListPlacementSubRegions extends BaseListWidget<SubRegionPlacement, WidgetPlacementSubRegion>
 {

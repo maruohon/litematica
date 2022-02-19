@@ -19,7 +19,7 @@ import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
 import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -223,7 +223,7 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
         }
     }
 
-    private static class SelectionRenamer implements StringConsumer
+    private static class SelectionRenamer implements ResultingStringConsumer
     {
         private final WidgetAreaSelectionEntry widget;
         private final SelectionManager selectionManager;

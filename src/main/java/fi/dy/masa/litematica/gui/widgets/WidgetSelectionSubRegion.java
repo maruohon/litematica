@@ -17,7 +17,7 @@ import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
@@ -193,7 +193,7 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
         }
     }
 
-    private static class BoxRenamer implements StringConsumer
+    private static class BoxRenamer implements ResultingStringConsumer
     {
         private final WidgetSelectionSubRegion widget;
         private final AreaSelection selection;

@@ -24,7 +24,7 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class SchematicUtils
@@ -40,13 +40,17 @@ public class SchematicUtils
             {
                 String title = "litematica.gui.title.schematic_projects.save_new_version";
                 SchematicProject project = DataManager.getSchematicProjectsManager().getCurrentProject();
-                TextInputScreen gui = new TextInputScreen(title, project.getCurrentVersionName(), GuiUtils.getCurrentScreen(), new SchematicVersionCreator());
+                TextInputScreen gui = new TextInputScreen(title, project.getCurrentVersionName(),
+                                                          new SchematicVersionCreator(),
+                                                          GuiUtils.getCurrentScreen());
                 BaseScreen.openPopupScreen(gui);
             }
             else if (inMemoryOnly)
             {
                 String title = "litematica.gui.title.create_in_memory_schematic";
-                TextInputScreen gui = new TextInputScreen(title, area.getName(), GuiUtils.getCurrentScreen(), new InMemorySchematicCreator(area));
+                TextInputScreen gui = new TextInputScreen(title, area.getName(),
+                                                          new InMemorySchematicCreator(area),
+                                                          GuiUtils.getCurrentScreen());
                 BaseScreen.openPopupScreen(gui);
             }
             else
@@ -203,7 +207,7 @@ public class SchematicUtils
         return state;
     }
 
-    public static class SchematicVersionCreator implements StringConsumer
+    public static class SchematicVersionCreator implements ResultingStringConsumer
     {
         @Override
         public boolean consumeString(String string)

@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui;
 
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -15,7 +16,7 @@ import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.gui.widget.list.SelectionListener;
 import fi.dy.masa.malilib.listener.TextChangeListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
@@ -324,7 +325,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
         }
     }
 
-    private static class TextFieldListener implements TextChangeListener
+    private static class TextFieldListener implements Consumer<String>
     {
         private final GuiSubRegionConfiguration parent;
         private final SchematicPlacementManager manager;
@@ -342,7 +343,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
         }
 
         @Override
-        public void onTextChange(String newText)
+        public void accept(String newText)
         {
             try
             {
@@ -365,7 +366,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
                 this.manager.moveSubRegionTo(this.schematicPlacement, this.placement.getName(), pos, this.parent);
                 this.parent.updateElements();
             }
-            catch (NumberFormatException e) {}
+            catch (NumberFormatException ignore) {}
         }
     }
 

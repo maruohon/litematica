@@ -26,14 +26,14 @@ import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
-import fi.dy.masa.malilib.gui.widget.list.entry.SelectionListener;
+import fi.dy.masa.malilib.gui.widget.list.SelectionListener;
 import fi.dy.masa.malilib.listener.ConfirmationListener;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 
 public class GuiSchematicManager extends GuiSchematicBrowserBase implements SelectionListener<DirectoryEntry>
 {
@@ -297,7 +297,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
         }
     }
 
-    private static class SchematicRenamer implements StringConsumer
+    private static class SchematicRenamer implements ResultingStringConsumer
     {
         private final File dir;
         private final String fileName;
@@ -354,7 +354,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
         }
     }
 
-    public static class FileRenamer implements StringConsumer
+    public static class FileRenamer implements ResultingStringConsumer
     {
         protected final File dir;
         protected final String oldName;
@@ -400,7 +400,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
             }
             else
             {
-                MessageDispatcher.error("malilib.message.error.file_rename.file_already_exists", newName);
+                MessageDispatcher.error("malilib.message.error.failed_to_rename_file.exists", this.oldName, newName);
             }
 
             return false;
@@ -425,7 +425,7 @@ public class GuiSchematicManager extends GuiSchematicBrowserBase implements Sele
             }
             catch (Exception e)
             {
-                MessageDispatcher.error("malilib.message.error.file_delete_failed", this.file.getAbsolutePath());
+                MessageDispatcher.error("malilib.message.error.failed_to_delete_file", this.file.getAbsolutePath());
             }
 
             return false;

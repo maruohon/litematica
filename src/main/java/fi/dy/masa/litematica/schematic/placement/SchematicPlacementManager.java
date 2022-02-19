@@ -46,14 +46,14 @@ import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.config.value.LayerMode;
-import fi.dy.masa.malilib.util.consumer.StringConsumer;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.overlay.message.MessageConsumer;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.data.IntBoundingBox;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class SchematicPlacementManager
@@ -652,7 +652,7 @@ public class SchematicPlacementManager
         this.onPlacementModified(placement);
     }
 
-    public void setOrigin(SchematicPlacement placement, BlockPos origin, StringConsumer feedback)
+    public void setOrigin(SchematicPlacement placement, BlockPos origin, ResultingStringConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -779,7 +779,7 @@ public class SchematicPlacementManager
         }
     }
 
-    public void moveSubRegionTo(SchematicPlacement placement, String regionName, BlockPos newPos, StringConsumer feedback)
+    public void moveSubRegionTo(SchematicPlacement placement, String regionName, BlockPos newPos, ResultingStringConsumer feedback)
     {
         if (placement.isLocked())
         {
@@ -816,12 +816,12 @@ public class SchematicPlacementManager
         }
     }
 
-    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, StringConsumer feedback)
+    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, ResultingStringConsumer feedback)
     {
         this.resetAllSubRegionsToSchematicValues(placement, feedback, true);
     }
 
-    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, StringConsumer feedback, boolean updatePlacementManager)
+    public void resetAllSubRegionsToSchematicValues(SchematicPlacement placement, ResultingStringConsumer feedback, boolean updatePlacementManager)
     {
         if (placement.isLocked())
         {
