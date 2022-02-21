@@ -43,11 +43,13 @@ import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.IntBoundingBox;
 import fi.dy.masa.malilib.util.LayerRange;
 import fi.dy.masa.malilib.util.PositionUtils;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChunkBase
 {
     protected final Queue<String> queuedCommands = Queues.newArrayDeque();
+    protected final Long2LongOpenHashMap placedPositionTimestamps = new Long2LongOpenHashMap();
     protected final LongArrayList fillVolumes = new LongArrayList();
     protected final BlockPos.Mutable mutablePos = new BlockPos.Mutable();
     protected final PasteNbtBehavior nbtBehavior;
@@ -276,6 +278,11 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
     protected boolean shouldSetBlock(BlockState stateSchematic, BlockState stateClient)
     {
+        if (stateSchematic.hasBlockEntity() && Configs.Generic.PASTE_IGNORE_BE_ENTIRELY.getBooleanValue())
+        {
+            return false;
+        }
+
         if ((stateSchematic.isAir() && stateClient.isAir()) ||
             (this.changedBlockOnly && stateClient == stateSchematic))
         {
@@ -479,14 +486,15 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected BlockPos placeNbtPickedBlock(BlockPos pos, BlockState state, BlockEntity be,
                                            World schematicWorld, ClientWorld clientWorld)
     {
-        BlockPos placementPos = findEmptyNearbyPosition(clientWorld, this.mc.player.getBlockPos(), 3);
+        BlockPos placementPos = this.findEmptyNearbyPosition(clientWorld, this.mc.player.getBlockPos(), 5);
 
         if (placementPos != null && preparePickedStack(pos, state, be, schematicWorld, this.mc))
         {
-            Vec3d posVec = new Vec3d(placementPos.getX() + 0.5, placementPos.getY() + 1.0, placementPos.getZ() + 0.5);
-            BlockHitResult hitResult = new BlockHitResult(posVec, Direction.UP, placementPos, false);
+            Vec3d posVec = new Vec3d(placementPos.getX() + 0.5, placementPos.getY() + 0.5, placementPos.getZ() + 0.5);
+            BlockHitResult hitResult = new BlockHitResult(posVec, Direction.UP, placementPos, true);
 
             this.mc.interactionManager.interactBlock(this.mc.player, clientWorld, Hand.OFF_HAND, hitResult);
+            this.placedPositionTimestamps.put(placementPos.asLong(), System.nanoTime());
 
             return placementPos;
         }
@@ -528,8 +536,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
     protected void generateFillVolumes(IntBoundingBox box)
     {
         ChunkSchematic chunk = this.schematicWorld.getChunkProvider().getChunk(box.minX >> 4, box.minZ >> 4);
-        boolean ignoreBe = Configs.Generic.PASTE_IGNORE_BE_IN_FILL.getBooleanValue() &&
+        boolean ignoreBeFromFill = Configs.Generic.PASTE_IGNORE_BE_IN_FILL.getBooleanValue() &&
                                    Configs.Generic.PASTE_NBT_BEHAVIOR.getOptionListValue() != PasteNbtBehavior.NONE;
+        
 
         this.fillVolumes.clear();
 
@@ -539,9 +548,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             this.workArr = new int[16][height][16];
         }
 
-        this.generateStrips(this.workArr, Direction.EAST, box, chunk, ignoreBe);
+        this.generateStrips(this.workArr, Direction.EAST, box, chunk, ignoreBeFromFill);
         this.combineStripsToLayers(this.workArr, Direction.EAST, Direction.SOUTH, Direction.UP,
-                                   box, chunk, this.fillVolumes, ignoreBe);
+                                   box, chunk, this.fillVolumes, ignoreBeFromFill);
         Collections.reverse(this.fillVolumes);
     }
 
@@ -573,8 +582,9 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
                                   Direction stripDirection,
                                   IntBoundingBox box,
                                   ChunkSchematic chunk,
-                                  boolean ignoreBe)
+                                  boolean ignoreBeFromFill)
     {
+        boolean ignoreBeEntirely = Configs.Generic.PASTE_IGNORE_BE_ENTIRELY.getBooleanValue();
         BlockPos.Mutable mutablePos = this.mutablePos;
         ReplaceBehavior replace = this.replace;
         final int startX = box.minX & 0xF;
@@ -594,17 +604,20 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
                     if (state.isAir() == false || replace == ReplaceBehavior.ALL)
                     {
-                        int length;
-
-                        if (ignoreBe && state.hasBlockEntity())
+                        if (state.hasBlockEntity())
                         {
-                            length = 1;
-                        }
-                        else
-                        {
-                            length = this.getBlockStripLength(mutablePos, stripDirection, endX - x + 1, state, chunk);
+                            if (ignoreBeFromFill)
+                            {
+                                workArr[x][y - worldMinY][z] = 1;
+                                continue;
+                            }
+                            else if (ignoreBeEntirely)
+                            {
+                                continue;
+                            }
                         }
 
+                        int length = this.getBlockStripLength(mutablePos, stripDirection, endX - x + 1, state, chunk);
                         workArr[x][y - worldMinY][z] = length;
                         //System.out.printf("strip @ [%d %d %d] %d x %s\n", x, y, z, length, state);
                         x += length - 1;
@@ -849,10 +862,12 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
 
 
     @Nullable
-    public static BlockPos findEmptyNearbyPosition(World world, BlockPos centerPos, int radius)
+    public BlockPos findEmptyNearbyPosition(World world, BlockPos centerPos, int radius)
     {
         BlockPos.Mutable pos = new BlockPos.Mutable();
         BlockPos.Mutable sidePos = new BlockPos.Mutable();
+        long currentTime = System.nanoTime();
+        long timeout = 2000000000L;
 
         for (int y = centerPos.getY() - radius; y <= centerPos.getY() + radius; ++y)
         {
@@ -860,11 +875,26 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
             {
                 for (int x = centerPos.getX() - radius; x <= centerPos.getX() + radius; ++x)
                 {
+                    // Don't try to place a block intersecting the player
+                    if (Math.abs(centerPos.getX() - x) < 2 &&
+                        Math.abs(centerPos.getZ() - z) < 2 &&
+                        y >= centerPos.getY() - 2 && y <= centerPos.getY() + 2)
+                    {
+                        continue;
+                    }
+
                     pos.set(x, y, z);
+                    long posLong = pos.asLong();
+
+                    if (this.placedPositionTimestamps.containsKey(posLong) &&
+                        currentTime - this.placedPositionTimestamps.get(posLong) < timeout)
+                    {
+                        continue;
+                    }
 
                     if (isPositionAndSidesEmpty(world, pos, sidePos))
                     {
-                        return pos;
+                        return pos.toImmutable();
                     }
                 }
             }
