@@ -7,13 +7,15 @@ import io.github.coolcrabs.brachyura.fabric.FabricProject;
 import io.github.coolcrabs.brachyura.fabric.Yarn;
 import io.github.coolcrabs.brachyura.maven.Maven;
 import io.github.coolcrabs.brachyura.maven.MavenId;
+import io.github.coolcrabs.brachyura.minecraft.Minecraft;
+import io.github.coolcrabs.brachyura.minecraft.VersionMeta;
 import io.github.coolcrabs.brachyura.processing.ProcessorChain;
 import net.fabricmc.mappingio.tree.MappingTree;
 
 public class Buildscript extends FabricProject {
     @Override
-    public String getMcVersion() {
-        return "1.18.2";
+    public VersionMeta createMcVersion() {
+        return Minecraft.getVersion("1.18.2");
     }
 
     @Override
@@ -60,7 +62,7 @@ public class Buildscript extends FabricProject {
 
     @Override
     public Path getBuildJarPath() {
-        return getBuildLibsDir().resolve(getModId() + "-" + getMcVersion() + "-" + getVersion() + ".jar");
+        return getBuildLibsDir().resolve(getModId() + "-" + createMcVersion().version + "-" + getVersion() + ".jar");
     }
 
     @Override
