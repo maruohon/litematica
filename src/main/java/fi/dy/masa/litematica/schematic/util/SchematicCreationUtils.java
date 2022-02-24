@@ -34,12 +34,11 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.StringUtils;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 
 public class SchematicCreationUtils
 {
@@ -67,9 +66,6 @@ public class SchematicCreationUtils
     /**
      * Creates an empty schematic with all the maps and lists and containers already created.
      * This is intended to be used for the chunk-wise schematic creation.
-     * @param area
-     * @param author
-     * @return
      */
     public static LitematicaSchematic createEmptySchematic(AreaSelection area, String author)
     {
@@ -77,7 +73,7 @@ public class SchematicCreationUtils
 
         if (boxes.isEmpty())
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, StringUtils.translate("litematica.error.schematic.create.no_selections"));
+            MessageDispatcher.error().translate("litematica.error.schematic.create.no_selections");
             return null;
         }
 
@@ -142,7 +138,7 @@ public class SchematicCreationUtils
 
             if (schematicEntityList == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save.missing_entity_list", box.getName());
+                MessageDispatcher.error().translate("litematica.message.error.schematic_save.missing_entity_list", box.getName());
                 continue;
             }
 
@@ -179,7 +175,7 @@ public class SchematicCreationUtils
 
             if (box == null || schematicEntityList == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save.missing_entity_list", regionName);
+                MessageDispatcher.error().translate("litematica.message.error.schematic_save.missing_entity_list", regionName);
                 continue;
             }
 
@@ -226,7 +222,7 @@ public class SchematicCreationUtils
 
             if (container == null || blockEntityMap == null || tickMap == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
+                MessageDispatcher.error().translate("litematica.message.error.schematic_save.missing_container", regionName);
                 continue;
             }
 
@@ -280,7 +276,7 @@ public class SchematicCreationUtils
                 IntBoundingBox structureBB = IntBoundingBox.createProper(
                         startX,         startY,         startZ,
                         startX + sizeX, startY + sizeY, startZ + sizeZ);
-                List<NextTickListEntry> pendingTicks = ((WorldServer) world).getPendingBlockUpdates(structureBB.toVanillaBox(), false);
+                List<NextTickListEntry> pendingTicks = world.getPendingBlockUpdates(structureBB.toVanillaBox(), false);
 
                 if (pendingTicks != null)
                 {
@@ -338,7 +334,7 @@ public class SchematicCreationUtils
 
             if (container == null || blockEntityMap == null || tickMap == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_save.missing_container", regionName);
+                MessageDispatcher.error().translate("litematica.message.error.schematic_save.missing_container", regionName);
                 Litematica.logger.error("null map(s) for sub-region '{}' while trying to save chunk-wise schematic", regionName);
                 continue;
             }

@@ -591,18 +591,17 @@ public class OverlayRenderer
     {
         BlockInfoAlignment align = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ALIGNMENT.getValue();
 
-        switch (align)
+        if (align == BlockInfoAlignment.CENTER)
         {
-            case CENTER:
-                this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
-                this.blockInfoY = GuiUtils.getScaledWindowHeight() / 2 + offY;
-                this.blockInfoInvOffY = 4;
-                break;
-            case TOP_CENTER:
-                this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
-                this.blockInfoY = offY;
-                this.blockInfoInvOffY = height + offY + 4;
-                break;
+            this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
+            this.blockInfoY = GuiUtils.getScaledWindowHeight() / 2 + offY;
+            this.blockInfoInvOffY = 4;
+        }
+        else if (align == BlockInfoAlignment.TOP_CENTER)
+        {
+            this.blockInfoX = GuiUtils.getScaledWindowWidth() / 2 - width / 2;
+            this.blockInfoY = offY;
+            this.blockInfoInvOffY = height + offY + 4;
         }
     }
 
@@ -636,14 +635,10 @@ public class OverlayRenderer
         }
     }
 
-    private <T extends Comparable<T>> void addBlockInfoLines(IBlockState state)
+    private void addBlockInfoLines(IBlockState state)
     {
         this.blockInfoLines.add(String.valueOf(Block.REGISTRY.getNameForObject(state.getBlock())));
-
-        for (String line : BlockUtils.getFormattedBlockStateProperties(state))
-        {
-            this.blockInfoLines.add(line);
-        }
+        this.blockInfoLines.addAll(BlockUtils.getFormattedBlockStateProperties(state));
     }
 
     public void renderSchematicRebuildTargetingOverlay(float partialTicks)
@@ -752,7 +747,7 @@ public class OverlayRenderer
         }
     }
 
-    public void renderPreviewFrame(Minecraft mc)
+    public void renderPreviewFrame()
     {
         int width = GuiUtils.getScaledWindowWidth();
         int height = GuiUtils.getScaledWindowHeight();

@@ -282,7 +282,7 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
             }
             else if (this.type == ButtonType.SAVE)
             {
-                if (this.widget.placement.saveToFileIfChanged(this.widget.gui) == false)
+                if (this.widget.placement.saveToFileIfChanged() == false)
                 {
                     this.widget.gui.addMessage(MessageOutput.ERROR, "litematica.error.schematic_placements.save_failed");
                 }

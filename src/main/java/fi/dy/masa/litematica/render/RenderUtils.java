@@ -26,9 +26,6 @@ import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.render.overlay.InventoryOverlay;
-import fi.dy.masa.malilib.render.overlay.InventoryOverlay.InventoryProperties;
-import fi.dy.masa.malilib.render.overlay.InventoryOverlay.InventoryRenderType;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.config.value.HorizontalAlignment;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -590,16 +587,15 @@ public class RenderUtils
         int z = 0;
         int zItems = z + 1;
 
-        switch (align)
+        if (align == BlockInfoAlignment.CENTER)
         {
-            case CENTER:
-                xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
-                yInv = GuiUtils.getScaledWindowHeight() / 2 - props.height - offY;
-                break;
-            case TOP_CENTER:
-                xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
-                yInv = offY;
-                break;
+            xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
+            yInv = GuiUtils.getScaledWindowHeight() / 2 - props.height - offY;
+        }
+        else if (align == BlockInfoAlignment.TOP_CENTER)
+        {
+            xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
+            yInv = offY;
         }
 
         if      (side == HorizontalAlignment.LEFT)  { xInv -= (props.width / 2 + 4); }

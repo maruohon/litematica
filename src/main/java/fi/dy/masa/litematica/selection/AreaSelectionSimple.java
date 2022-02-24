@@ -74,6 +74,7 @@ public class AreaSelectionSimple extends AreaSelection
         }
     }
 
+    @Override
     public AreaSelectionSimple copy()
     {
         return fromJson(this.toJson());

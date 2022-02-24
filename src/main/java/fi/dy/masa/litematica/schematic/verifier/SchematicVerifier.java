@@ -37,6 +37,7 @@ import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.data.Color4f;
@@ -638,42 +639,41 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(BaseScreen gui)
     {
         List<Pair<IBlockState, IBlockState>> list = Lists.newArrayList(this.ignoredMismatches);
+        list.sort(this::compareByRegistryName);
+        return list;
+    }
 
+    protected int compareByRegistryName(Pair<IBlockState, IBlockState> p1, Pair<IBlockState, IBlockState> p2)
+    {
         try
         {
-            Collections.sort(list, new Comparator<Pair<IBlockState, IBlockState>>() {
-                @Override
-                public int compare(Pair<IBlockState, IBlockState> o1, Pair<IBlockState, IBlockState> o2)
-                {
-                    String name1 = Block.REGISTRY.getNameForObject(o1.getLeft().getBlock()).toString();
-                    String name2 = Block.REGISTRY.getNameForObject(o2.getLeft().getBlock()).toString();
+            String name1 = Block.REGISTRY.getNameForObject(p1.getLeft().getBlock()).toString();
+            String name2 = Block.REGISTRY.getNameForObject(p2.getLeft().getBlock()).toString();
 
-                    int val = name1.compareTo(name2);
+            int val = name1.compareTo(name2);
 
-                    if (val < 0)
-                    {
-                        return -1;
-                    }
-                    else if (val > 0)
-                    {
-                        return 1;
-                    }
-                    else
-                    {
-                        name1 = Block.REGISTRY.getNameForObject(o1.getRight().getBlock()).toString();
-                        name2 = Block.REGISTRY.getNameForObject(o2.getRight().getBlock()).toString();
+            if (val < 0)
+            {
+                return -1;
+            }
+            else if (val > 0)
+            {
+                return 1;
+            }
+            else
+            {
+                name1 = Block.REGISTRY.getNameForObject(p1.getRight().getBlock()).toString();
+                name2 = Block.REGISTRY.getNameForObject(p2.getRight().getBlock()).toString();
 
-                        return name1.compareTo(name2);
-                    }
-                }
-            });
+                return name1.compareTo(name2);
+            }
         }
         catch (Exception e)
         {
-            gui.addMessage(MessageOutput.ERROR, "litematica.error.generic.failed_to_sort_list_of_ignored_states");
+            MessageDispatcher.error().translate("litematica.error.generic.failed_to_sort_list_of_ignored_states");
         }
 
-        return list;
+        return 0;
     }
 
     private boolean verifyChunk(Chunk chunkClient, Chunk chunkSchematic, IntBoundingBox box)
@@ -942,8 +942,6 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     /**
      * Prepares/caches the strings, and returns a provider for the data.<br>
      * <b>NOTE:</b> This is actually the instance of this class, there are no separate providers for different data types atm!
-     * @param type
-     * @return
      */
     /*
     public IInfoHudRenderer getClosestMismatchedPositionListProviderFor(MismatchType type)
@@ -970,7 +968,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         @Override
         public int compareTo(BlockMismatch other)
         {
-            return this.count > other.count ? -1 : (this.count < other.count ? 1 : 0);
+            return Integer.compare(other.count, this.count);
         }
 
         @Override
@@ -978,9 +976,9 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((mismatchType == null) ? 0 : mismatchType.hashCode());
-            result = prime * result + ((stateExpected == null) ? 0 : stateExpected.hashCode());
-            result = prime * result + ((stateFound == null) ? 0 : stateFound.hashCode());
+            result = prime * result + ((this.mismatchType == null) ? 0 : this.mismatchType.hashCode());
+            result = prime * result + ((this.stateExpected == null) ? 0 : this.stateExpected.hashCode());
+            result = prime * result + ((this.stateFound == null) ? 0 : this.stateFound.hashCode());
             return result;
         }
 
@@ -991,26 +989,23 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
                 return true;
             if (obj == null)
                 return false;
-            if (getClass() != obj.getClass())
+            if (this.getClass() != obj.getClass())
                 return false;
             BlockMismatch other = (BlockMismatch) obj;
-            if (mismatchType != other.mismatchType)
+            if (this.mismatchType != other.mismatchType)
                 return false;
-            if (stateExpected == null)
+            if (this.stateExpected == null)
             {
                 if (other.stateExpected != null)
                     return false;
             }
-            else if (stateExpected != other.stateExpected)
+            else if (this.stateExpected != other.stateExpected)
                 return false;
-            if (stateFound == null)
+            if (this.stateFound == null)
             {
-                if (other.stateFound != null)
-                    return false;
+                return other.stateFound == null;
             }
-            else if (stateFound != other.stateFound)
-                return false;
-            return true;
+            else return this.stateFound == other.stateFound;
         }
     }
 
@@ -1065,7 +1060,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         private final String colorCode;
         private final Color4f color;
 
-        private MismatchType(int color, String unlocName, String colorCode)
+        MismatchType(int color, String unlocName, String colorCode)
         {
             this.color = Color4f.fromColor(color, 1f);
             this.unlocName = unlocName;

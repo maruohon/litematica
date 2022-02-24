@@ -18,6 +18,7 @@ import fi.dy.masa.malilib.gui.widget.list.SelectionListener;
 import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
@@ -256,9 +257,9 @@ public class GuiAreaSelectionManager extends BaseListScreen<DirectoryEntry, Dire
         @Override
         public boolean consumeString(String name)
         {
-            if (this.gui.getSelectionManager().createSelectionFromPlacement(this.dir, this.placement, name, this.gui))
+            if (this.gui.getSelectionManager().createSelectionFromPlacement(this.dir, this.placement, name))
             {
-                this.gui.addMessage(MessageOutput.SUCCESS, "litematica.message.area_selections.selection_created_from_placement", name);
+                MessageDispatcher.success().translate("litematica.message.area_selections.selection_created_from_placement", name);
                 this.gui.getListWidget().refreshEntries();
                 return true;
             }

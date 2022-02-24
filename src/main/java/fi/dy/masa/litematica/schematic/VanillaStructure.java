@@ -18,8 +18,8 @@ import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerSparse;
 import fi.dy.masa.litematica.schematic.container.VanillaStructurePalette;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -89,7 +89,7 @@ public class VanillaStructure extends SingleRegionSchematic
 
             if (this.readPaletteFromLitematicaFormatTag(paletteTag, palette) == false)
             {
-                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.vanilla.failed_to_read_palette");
+                MessageDispatcher.error().translate("litematica.message.error.schematic_read.vanilla.failed_to_read_palette");
                 return false;
             }
 
@@ -108,7 +108,7 @@ public class VanillaStructure extends SingleRegionSchematic
 
                 if (pos == null)
                 {
-                    MessageUtils.printErrorMessage("litematica.message.error.schematic_read.vanilla.failed_to_read_block_pos");
+                    MessageDispatcher.error().translate("litematica.message.error.schematic_read.vanilla.failed_to_read_block_pos");
                     return false;
                 }
 

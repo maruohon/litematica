@@ -11,6 +11,7 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.ToolUtils;
+import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.KeyAction;
@@ -25,11 +26,11 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, KeyBind key)
+    public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
         if (this.mc.player == null || this.mc.world == null)
         {
-            return false;
+            return ActionResult.FAIL;
         }
 
         ToolMode mode = DataManager.getToolMode();
@@ -44,12 +45,12 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
             if (mode.getUsesBlockPrimary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_1.getKeyBind().isKeyBindHeld())
             {
                 ToolUtils.setToolModeBlockState(mode, true, this.mc);
-                return true;
+                return ActionResult.SUCCESS;
             }
             else if (mode.getUsesBlockSecondary() && Hotkeys.TOOL_SELECT_MODIFIER_BLOCK_2.getKeyBind().isKeyBindHeld())
             {
                 ToolUtils.setToolModeBlockState(mode, false, this.mc);
-                return true;
+                return ActionResult.SUCCESS;
             }
         }
 
@@ -91,7 +92,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
                     DataManager.getSchematicPlacementManager().setPositionOfCurrentSelectionToRayTrace(this.mc, maxDistance);
                 }
 
-                return true;
+                return ActionResult.SUCCESS;
             }
             else if (isToolSelect)
             {
@@ -122,10 +123,10 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
                     DataManager.getSchematicPlacementManager().changeSelection(this.mc.world, entity, maxDistance);
                 }
 
-                return true;
+                return ActionResult.SUCCESS;
             }
         }
 
-        return false;
+        return ActionResult.FAIL;
     }
 }

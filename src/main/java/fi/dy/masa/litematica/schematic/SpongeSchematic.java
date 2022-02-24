@@ -14,8 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStatePalette;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.data.Constants;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
@@ -106,13 +105,13 @@ public class SpongeSchematic extends SingleRegionSchematic
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.WARNING, "litematica.message.error.schematic_read.sponge.palette.unknown_block", key);
+                MessageDispatcher.warning().translate("litematica.message.error.schematic_read.sponge.palette.unknown_block", key);
                 state = LitematicaBlockStateContainerFull.AIR_BLOCK_STATE;
             }
 
             if (id < 0 || id >= size)
             {
-                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.sponge.palette.invalid_id", id);
+                MessageDispatcher.error().translate("litematica.message.error.schematic_read.sponge.palette.invalid_id", id);
                 return false;
             }
 
@@ -137,7 +136,7 @@ public class SpongeSchematic extends SingleRegionSchematic
 
             if (this.blockContainer == null)
             {
-                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.sponge.failed_to_read_blocks");
+                MessageDispatcher.error().translate("litematica.message.error.schematic_read.sponge.failed_to_read_blocks");
                 return false;
             }
 

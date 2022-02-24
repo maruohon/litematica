@@ -42,8 +42,7 @@ import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
@@ -74,12 +73,12 @@ public class SchematicPlacingUtils
             else
             {
                 pastePlacementToWorld(placement, true, mc);
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.WARNING, 8000, "litematica.message.grid_paste.warning.select_base_placement_for_grid_paste");
+                MessageDispatcher.warning(8000).translate("litematica.message.grid_paste.warning.select_base_placement_for_grid_paste");
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
+            MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
         }
     }
 
@@ -91,11 +90,14 @@ public class SchematicPlacingUtils
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
+            MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
         }
     }
 
-    private static void pastePlacementsToWorld(List<SchematicPlacement> placements, boolean changedBlocksOnly, boolean printMessage, Minecraft mc)
+    private static void pastePlacementsToWorld(List<SchematicPlacement> placements,
+                                               boolean changedBlocksOnly,
+                                               boolean printMessage,
+                                               Minecraft mc)
     {
         if (mc.player != null && mc.player.capabilities.isCreativeMode)
         {
@@ -116,17 +118,17 @@ public class SchematicPlacingUtils
 
                 if (printMessage)
                 {
-                    MessageUtils.showGuiOrActionBarMessage(MessageOutput.INFO, "litematica.message.scheduled_task_added");
+                    MessageDispatcher.generic().screenOrActionbar().translate("litematica.message.scheduled_task_added");
                 }
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
+                MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.generic.creative_mode_only");
+            MessageDispatcher.error().translate("litematica.error.generic.creative_mode_only");
         }
     }
 
@@ -162,7 +164,7 @@ public class SchematicPlacingUtils
                                 container, blockEntityMap, scheduledBlockTicks, range, notifyNeighbors) == false)
                         {
                             success = false;
-                            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_paste_failed_region", regionName);
+                            MessageDispatcher.error().translate("litematica.message.error.schematic_paste_failed_region", regionName);
                         }
                     }
                     else

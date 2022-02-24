@@ -36,11 +36,10 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
+import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
 
 public class SchematicEditUtils
@@ -176,7 +175,7 @@ public class SchematicEditUtils
             {
                 if (setAllIdenticalSchematicBlockStates(pos, stateOriginal, stateClient))
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.message.schematic_rebuild.accepted_replacement");
+                    MessageDispatcher.success().translate("litematica.message.schematic_rebuild.accepted_replacement");
                     return true;
                 }
             }
@@ -559,7 +558,7 @@ public class SchematicEditUtils
             }
             else
             {
-                MessageUtils.showInGameMessage(MessageOutput.WARNING, 20000, "litematica.message.warn.schematic_rebuild.subregion_not_selected");
+                MessageDispatcher.warning(20000).translate("litematica.message.warn.schematic_rebuild.subregion_not_selected");
                 return false;
             }
         }

@@ -238,7 +238,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
                 {
                     boolean reverse = mouseButton == 1;
                     Rotation rotation = fi.dy.masa.malilib.util.PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
-                    this.manager.setSubRegionRotation(this.schematicPlacement, this.subRegionName, rotation, this.parent);
+                    this.manager.setSubRegionRotation(this.schematicPlacement, this.subRegionName, rotation);
                     break;
                 }
 
@@ -246,24 +246,24 @@ public class GuiSubRegionConfiguration extends BaseScreen
                 {
                     boolean reverse = mouseButton == 1;
                     Mirror mirror = fi.dy.masa.malilib.util.PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
-                    this.manager.setSubRegionMirror(this.schematicPlacement, this.subRegionName, mirror, this.parent);
+                    this.manager.setSubRegionMirror(this.schematicPlacement, this.subRegionName, mirror);
                     break;
                 }
 
                 case MOVE_TO_PLAYER:
-                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, new BlockPos(this.parent.mc.player.getPositionVector()), this.parent);
+                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, new BlockPos(this.parent.mc.player.getPositionVector()));
                     break;
 
                 case NUDGE_COORD_X:
-                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(amount, 0, 0), this.parent);
+                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(amount, 0, 0));
                     break;
 
                 case NUDGE_COORD_Y:
-                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(0, amount, 0), this.parent);
+                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(0, amount, 0));
                     break;
 
                 case NUDGE_COORD_Z:
-                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(0, 0, amount), this.parent);
+                    this.manager.moveSubRegionTo(this.schematicPlacement, this.subRegionName, posOld.add(0, 0, amount));
                     break;
 
                 case TOGGLE_ENABLED:
@@ -275,7 +275,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
                     break;
 
                 case RESET_PLACEMENT:
-                    this.manager.resetSubRegionToSchematicValues(this.schematicPlacement, this.subRegionName, this.parent);
+                    this.manager.resetSubRegionToSchematicValues(this.schematicPlacement, this.subRegionName);
                     break;
 
                 case SLICE_TYPE:
@@ -362,8 +362,7 @@ public class GuiSubRegionConfiguration extends BaseScreen
                     case Z: pos = new BlockPos(posOld.getX(), posOld.getY(), value        ); break;
                 }
 
-                this.parent.setNextMessageType(MessageOutput.ERROR);
-                this.manager.moveSubRegionTo(this.schematicPlacement, this.placement.getName(), pos, this.parent);
+                this.manager.moveSubRegionTo(this.schematicPlacement, this.placement.getName(), pos);
                 this.parent.updateElements();
             }
             catch (NumberFormatException ignore) {}

@@ -2,47 +2,17 @@ package fi.dy.masa.litematica.util;
 
 import com.google.common.collect.ImmutableList;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
-import fi.dy.masa.malilib.config.value.OptionListConfigValue;
-import fi.dy.masa.malilib.util.StringUtils;
 
-public enum ReplaceBehavior implements OptionListConfigValue<ReplaceBehavior>
+public class ReplaceBehavior extends BaseOptionListConfigValue
 {
-    NONE            ("none",            "litematica.gui.label.replace_behavior.none"),
-    ALL             ("all",             "litematica.gui.label.replace_behavior.all"),
-    WITH_NON_AIR    ("with_non_air",    "litematica.gui.label.replace_behavior.with_non_air");
+    public static final ReplaceBehavior NONE         = new ReplaceBehavior("none",         "litematica.gui.label.replace_behavior.none");
+    public static final ReplaceBehavior ALL          = new ReplaceBehavior("all",          "litematica.gui.label.replace_behavior.all");
+    public static final ReplaceBehavior WITH_NON_AIR = new ReplaceBehavior("with_non_air", "litematica.gui.label.replace_behavior.with_non_air");
 
-    public static final ImmutableList<ReplaceBehavior> VALUES = ImmutableList.copyOf(values());
+    public static final ImmutableList<ReplaceBehavior> VALUES = ImmutableList.of(NONE, ALL, WITH_NON_AIR);
 
-    private final String configString;
-    private final String translationKey;
-
-    ReplaceBehavior(String configString, String translationKey)
+    public ReplaceBehavior(String name, String translationKey)
     {
-        this.configString = configString;
-        this.translationKey = translationKey;
-    }
-
-    @Override
-    public String getName()
-    {
-        return this.configString;
-    }
-
-    @Override
-    public String getDisplayName()
-    {
-        return StringUtils.translate(this.translationKey);
-    }
-
-    @Override
-    public ReplaceBehavior cycle(boolean forward)
-    {
-        return BaseOptionListConfigValue.cycleValue(VALUES, this.ordinal(), forward);
-    }
-
-    @Override
-    public ReplaceBehavior fromString(String name)
-    {
-        return BaseOptionListConfigValue.findValueByName(name, VALUES);
+        super(name, translationKey);
     }
 }

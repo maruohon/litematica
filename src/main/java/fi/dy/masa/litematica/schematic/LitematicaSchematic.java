@@ -25,10 +25,9 @@ import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFu
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.mixin.IMixinNBTTagLongArray;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.data.Constants;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public class LitematicaSchematic extends SchematicBase
@@ -161,7 +160,7 @@ public class LitematicaSchematic extends SchematicBase
             }
             catch (Exception e)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "TODO - Failed to create the block state container for sub-region: " + regionName);
+                MessageDispatcher.error().translate("TODO - Failed to create the block state container for sub-region: " + regionName);
                 Litematica.logger.warn("Failed to create the block state container for sub-region '{}'", regionName, e.getMessage());
             }
 
@@ -201,13 +200,11 @@ public class LitematicaSchematic extends SchematicBase
                 }
 
                 Map<BlockPos, NBTTagCompound> blockEntityMap = new HashMap<>();
-                Map<BlockPos, NextTickListEntry> blockTickMap = new HashMap<>();
+                Map<BlockPos, NextTickListEntry> blockTickMap = new HashMap<>(region.getBlockTickMap());
                 List<EntityInfo> entities = new ArrayList<>();
 
-                region.getBlockEntityMap().entrySet().forEach((entry) -> blockEntityMap.put(entry.getKey(), entry.getValue().copy()));
-                region.getBlockTickMap().entrySet().forEach((entry) -> blockTickMap.put(entry.getKey(), entry.getValue()));
+                region.getBlockEntityMap().forEach((key, value) -> blockEntityMap.put(key, value.copy()));
                 region.getEntityList().forEach((info) -> entities.add(info.copy()));
-                blockTickMap.putAll(region.getBlockTickMap());
 
                 this.blockEntities.put(regionName, blockEntityMap);
                 this.pendingBlockTicks.put(regionName, blockTickMap);
@@ -249,12 +246,12 @@ public class LitematicaSchematic extends SchematicBase
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_load.unsupported_schematic_version", version);
+                MessageDispatcher.error().translate("litematica.error.schematic_load.unsupported_schematic_version", version);
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_load.no_schematic_version_information");
+            MessageDispatcher.error().translate("litematica.error.schematic_load.no_schematic_version_information");
         }
 
         return false;
@@ -380,8 +377,9 @@ public class LitematicaSchematic extends SchematicBase
 
                         if (container == null)
                         {
-                            MessageUtils.printErrorMessage("litematica.error.schematic_read_from_file_failed.region_container",
-                                                           regionName, this.getFile() != null ? this.getFile().getName() : "<null>");
+                            String fileName = this.getFile() != null ? this.getFile().getName() : "<null>";
+                            MessageDispatcher.error().translate("litematica.error.schematic_read_from_file_failed.region_container",
+                                                                regionName, fileName);
                             return false;
                         }
 

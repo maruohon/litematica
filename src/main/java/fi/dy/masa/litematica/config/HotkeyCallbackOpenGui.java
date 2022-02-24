@@ -21,11 +21,11 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
 import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
+import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.input.KeyAction;
 import fi.dy.masa.malilib.input.KeyBind;
 import fi.dy.masa.malilib.input.callback.HotkeyCallback;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 
 public class HotkeyCallbackOpenGui implements HotkeyCallback
 {
@@ -37,11 +37,11 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
     }
 
     @Override
-    public boolean onKeyAction(KeyAction action, KeyBind key)
+    public ActionResult onKeyAction(KeyAction action, KeyBind key)
     {
         if (this.mc.player == null || this.mc.world == null)
         {
-            return false;
+            return ActionResult.FAIL;
         }
 
         if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeyBind())
@@ -52,7 +52,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         {
             BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.RENDER_LAYERS ? new GuiRenderLayer() : ConfigScreen.create();
             BaseScreen.openScreen(screen);
-            return true;
+            return ActionResult.SUCCESS;
         }
 
         else if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeyBind())
@@ -65,7 +65,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
+                MessageDispatcher.error().translate("litematica.message.error.no_area_selected");
             }
         }
         else if (key == Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeyBind())
@@ -92,7 +92,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 }
                 else
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
+                    MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
                 }
             }
 
@@ -113,7 +113,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 }
                 else
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
+                    MessageDispatcher.error().translate("litematica.message.error.placement_grid_settings.open_gui_selected_is_grid");
                 }
             }
         }
@@ -136,7 +136,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
+                MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
             }
         }
         else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeyBind())
@@ -157,7 +157,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_placement_selected");
+                MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
             }
         }
         else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeyBind())
@@ -168,10 +168,10 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.WARNING, "litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
+                MessageDispatcher.warning().translate("litematica.gui.button.hover.schematic_projects.area_browser_disabled_currently_in_projects_mode");
             }
         }
 
-        return true;
+        return ActionResult.SUCCESS;
     }
 }

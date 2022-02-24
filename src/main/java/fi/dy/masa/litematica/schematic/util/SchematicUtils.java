@@ -24,12 +24,13 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.input.ActionResult;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class SchematicUtils
 {
-    public static boolean saveSchematic(boolean inMemoryOnly)
+    public static ActionResult saveSchematic(boolean inMemoryOnly)
     {
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection area = sm.getCurrentSelection();
@@ -60,10 +61,10 @@ public class SchematicUtils
                 BaseScreen.openScreen(gui);
             }
 
-            return true;
+            return ActionResult.SUCCESS;
         }
 
-        return false;
+        return ActionResult.FAIL;
     }
 
     @Nullable
@@ -139,12 +140,12 @@ public class SchematicUtils
     public static Pair<Vec3i, Vec3i> getLayerRangeClampedSubRegion(LayerRange range,
             SchematicPlacement schematicPlacement, SubRegionPlacement placement, Vec3i regionSize)
     {
-        int minX = range.getClampedValue(LayerRange.getMinValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
-        int minY = range.getClampedValue(LayerRange.getMinValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
-        int minZ = range.getClampedValue(LayerRange.getMinValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
-        int maxX = range.getClampedValue(LayerRange.getMaxValueForAxis(EnumFacing.Axis.X), EnumFacing.Axis.X);
-        int maxY = range.getClampedValue(LayerRange.getMaxValueForAxis(EnumFacing.Axis.Y), EnumFacing.Axis.Y);
-        int maxZ = range.getClampedValue(LayerRange.getMaxValueForAxis(EnumFacing.Axis.Z), EnumFacing.Axis.Z);
+        int minX = range.getClampedValue(-30000000, EnumFacing.Axis.X);
+        int minY = range.getClampedValue(        0, EnumFacing.Axis.Y);
+        int minZ = range.getClampedValue(-30000000, EnumFacing.Axis.Z);
+        int maxX = range.getClampedValue( 30000000, EnumFacing.Axis.X);
+        int maxY = range.getClampedValue(      255, EnumFacing.Axis.Y);
+        int maxZ = range.getClampedValue( 30000000, EnumFacing.Axis.Z);
 
         BlockPos posMinRange = new BlockPos(minX, minY, minZ);
         BlockPos posMaxRange = new BlockPos(maxX, maxY, maxZ);

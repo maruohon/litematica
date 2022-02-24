@@ -17,8 +17,7 @@ import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.util.EntityUtils;
 import fi.dy.masa.litematica.util.WorldUtils;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 
 public class TaskFillArea extends TaskProcessChunkBase
@@ -48,7 +47,7 @@ public class TaskFillArea extends TaskProcessChunkBase
         if (rl != null)
         {
             String blockName = rl.toString();
-            strName = blockName + " " + String.valueOf(fillState.getBlock().getMetaFromState(fillState));
+            strName = blockName + " " + fillState.getBlock().getMetaFromState(fillState);
 
             if (replaceState != null)
             {
@@ -56,18 +55,18 @@ public class TaskFillArea extends TaskProcessChunkBase
 
                 if (rl != null)
                 {
-                    strName += " replace " + rl.toString();
+                    strName += " replace " + rl;
                 }
                 else
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica-message.error.invalid_block", replaceState.toString());
+                    MessageDispatcher.error().translate("litematica-message.error.invalid_block", replaceState.toString());
                     strName = null;
                 }
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica-message.error.invalid_block", fillState.toString());
+            MessageDispatcher.error().translate("litematica-message.error.invalid_block", fillState.toString());
         }
 
         this.blockString = strName;
@@ -210,12 +209,12 @@ public class TaskFillArea extends TaskProcessChunkBase
         {
             if (this.printCompletionMessage)
             {
-                MessageUtils.showGuiMessage(MessageOutput.SUCCESS, "litematica.message.area_filled");
+                MessageDispatcher.success().translate("litematica.message.area_filled");
             }
         }
         else
         {
-            MessageUtils.showGuiMessage(MessageOutput.ERROR, "litematica.message.area_fill_fail");
+            MessageDispatcher.error().translate("litematica.message.area_fill_fail");
         }
     }
 }

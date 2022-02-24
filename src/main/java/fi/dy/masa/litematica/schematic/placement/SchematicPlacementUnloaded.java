@@ -19,9 +19,7 @@ import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnab
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.malilib.config.value.BaseOptionListConfigValue;
-import fi.dy.masa.malilib.overlay.message.MessageConsumer;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileNameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -140,17 +138,17 @@ public class SchematicPlacementUnloaded
 
     public BlockPos getOrigin()
     {
-        return origin;
+        return this.origin;
     }
 
     public Rotation getRotation()
     {
-        return rotation;
+        return this.rotation;
     }
 
     public Mirror getMirror()
     {
-        return mirror;
+        return this.mirror;
     }
 
     public Color4f getBoundingBoxColor()
@@ -204,7 +202,7 @@ public class SchematicPlacementUnloaded
     protected void copyFrom(SchematicPlacementUnloaded other, boolean copyGridSettings)
     {
         this.relativeSubRegionPlacements.clear();
-        other.relativeSubRegionPlacements.entrySet().forEach((entry) -> this.relativeSubRegionPlacements.put(entry.getKey(), entry.getValue().copy())); 
+        other.relativeSubRegionPlacements.forEach((key, value) -> this.relativeSubRegionPlacements.put(key, value.copy())); 
 
         this.origin = other.origin;
         this.name = other.name;
@@ -254,7 +252,7 @@ public class SchematicPlacementUnloaded
             }
             else
             {
-                MessageUtils.printErrorMessage("litematica.error.schematic_load.failed", this.schematicFile.getAbsolutePath());
+                MessageDispatcher.error().translate("litematica.error.schematic_load.failed", this.schematicFile.getAbsolutePath());
             }
         }
 
@@ -269,7 +267,7 @@ public class SchematicPlacementUnloaded
 
             if (origin == null)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_placements.settings_load.missing_data");
+                MessageDispatcher.error().translate("litematica.error.schematic_placements.settings_load.missing_data");
                 String name = this.schematicFile != null ? this.schematicFile.getAbsolutePath() : "<null>";
                 Litematica.logger.warn("Failed to load schematic placement for '{}', invalid origin position", name);
                 return false;
@@ -523,11 +521,11 @@ public class SchematicPlacementUnloaded
         return null;
     }
 
-    public boolean saveToFileIfChanged(MessageConsumer feedback)
+    public boolean saveToFileIfChanged()
     {
         if (this.shouldBeSaved == false)
         {
-            feedback.addMessage(MessageOutput.WARNING, "litematica.message.error.schematic_placement.save.should_not_save");
+            MessageDispatcher.warning().translate("litematica.message.error.schematic_placement.save.should_not_save");
             return false;
         }
 
@@ -544,7 +542,7 @@ public class SchematicPlacementUnloaded
 
         if (file == null)
         {
-            feedback.addMessage(MessageOutput.ERROR, "litematica.message.error.schematic_placement.save.failed_to_get_save_file");
+            MessageDispatcher.error().translate("litematica.message.error.schematic_placement.save.failed_to_get_save_file");
             return false;
         }
 
@@ -554,17 +552,17 @@ public class SchematicPlacementUnloaded
 
             if (obj != null)
             {
-                return this.saveToFile(file, obj, feedback);
+                return this.saveToFile(file, obj);
             }
             else
             {
-                feedback.addMessage(MessageOutput.ERROR, "litematica.message.error.schematic_placement.save.failed_to_serialize");
+                MessageDispatcher.error().translate("litematica.message.error.schematic_placement.save.failed_to_serialize");
                 return false;
             }
         }
         else
         {
-            feedback.addMessage(MessageOutput.WARNING, "litematica.message.error.schematic_placement.save.no_changes");
+            MessageDispatcher.warning().translate("litematica.message.error.schematic_placement.save.no_changes");
         }
 
         return true;
@@ -599,7 +597,7 @@ public class SchematicPlacementUnloaded
         return false;
     }
 
-    protected boolean saveToFile(File file, JsonObject obj, MessageConsumer feedback)
+    protected boolean saveToFile(File file, JsonObject obj)
     {
         boolean success = JsonUtils.writeJsonToFile(obj, file);
 
@@ -610,7 +608,7 @@ public class SchematicPlacementUnloaded
                 this.placementSaveFile = file.getName();
             }
 
-            feedback.addMessage(MessageOutput.SUCCESS, "litematica.gui.label.schematic_placement.saved_to_file", file.getName());
+            MessageDispatcher.success().translate("litematica.gui.label.schematic_placement.saved_to_file", file.getName());
         }
 
         return success;
@@ -623,7 +621,7 @@ public class SchematicPlacementUnloaded
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            MessageUtils.printErrorMessage("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
+            MessageDispatcher.error().translate("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
         }
 
         return dir;

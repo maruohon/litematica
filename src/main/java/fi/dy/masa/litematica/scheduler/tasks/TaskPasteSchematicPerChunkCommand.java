@@ -23,8 +23,7 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 
@@ -267,12 +266,12 @@ public class TaskPasteSchematicPerChunkCommand extends TaskPasteSchematicPerChun
         {
             if (this.printCompletionMessage)
             {
-                MessageUtils.showGuiOrActionBarMessage(MessageOutput.SUCCESS, "litematica.message.schematic_pasted_using_setblock", this.sentCommandsTotal);
+                MessageDispatcher.success().screenOrActionbar().translate("litematica.message.schematic_pasted_using_setblock", this.sentCommandsTotal);
             }
         }
         else
         {
-            MessageUtils.showGuiOrActionBarMessage(MessageOutput.ERROR, "litematica.message.error.schematic_paste_failed");
+            MessageDispatcher.error().screenOrActionbar().translate("litematica.message.error.schematic_paste_failed");
         }
 
         if (this.mc.player != null)

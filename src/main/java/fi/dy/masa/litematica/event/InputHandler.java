@@ -24,8 +24,7 @@ import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.input.HotkeyCategory;
 import fi.dy.masa.malilib.input.HotkeyProvider;
 import fi.dy.masa.malilib.input.MouseInputHandler;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 
 public class InputHandler implements HotkeyProvider, MouseInputHandler
 {
@@ -170,12 +169,12 @@ public class InputHandler implements HotkeyProvider, MouseInputHandler
             }
             else
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.area_selection.no_sub_region_selected");
+                MessageDispatcher.error().translate("litematica.error.area_selection.no_sub_region_selected");
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
+            MessageDispatcher.error().translate("litematica.message.error.no_area_selected");
         }
 
         return true;

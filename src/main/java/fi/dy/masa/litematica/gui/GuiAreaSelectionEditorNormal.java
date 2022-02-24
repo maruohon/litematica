@@ -419,7 +419,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
     {
         if (this.selectionId != null)
         {
-            DataManager.getSelectionManager().renameSelection(this.selectionId, newName, this);
+            DataManager.getSelectionManager().renameSelection(this.selectionId, newName, MessageOutput.MESSAGE_OVERLAY);
             this.selectionId = DataManager.getSelectionManager().getCurrentSelectionId();
         }
     }
@@ -604,7 +604,7 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
         @Override
         public boolean consumeString(String string)
         {
-            return DataManager.getSelectionManager().createNewSubRegionIfDoesntExist(string, this.gui.mc, this.gui);
+            return DataManager.getSelectionManager().createNewSubRegionIfNotExists(string, this.gui.mc);
         }
     }
 

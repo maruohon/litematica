@@ -25,9 +25,8 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.JsonUtils;
 
 public class SchematicProject
@@ -103,12 +102,12 @@ public class SchematicProject
             }
             catch (Exception e)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.failed_to_rename_project_file_exception", newFile.getAbsolutePath());
+                MessageDispatcher.error().translate("litematica.error.schematic_projects.failed_to_rename_project_file_exception", newFile.getAbsolutePath());
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.failed_to_rename_project_file_exists", name);
+            MessageDispatcher.error().translate("litematica.error.schematic_projects.failed_to_rename_project_file_exists", name);
         }
     }
 
@@ -132,7 +131,7 @@ public class SchematicProject
 
             if (this.currentPlacement != null)
             {
-                DataManager.getSchematicPlacementManager().setOrigin(this.currentPlacement, areaPosition, MessageUtils.INFO_MESSAGE_CONSUMER);
+                DataManager.getSchematicPlacementManager().setOrigin(this.currentPlacement, areaPosition);
             }
         }
 
@@ -222,7 +221,7 @@ public class SchematicProject
                 }
                 else
                 {
-                    MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.failed_to_load_schematic");
+                    MessageDispatcher.error().translate("litematica.error.schematic_projects.failed_to_load_schematic");
                 }
 
                 this.lastCheckedOutVersion = this.currentVersionId;
@@ -238,16 +237,13 @@ public class SchematicProject
 
             if (mc.player == null || mc.player.capabilities.isCreativeMode == false)
             {
-                MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.generic.creative_mode_only");
+                MessageDispatcher.error().translate("litematica.error.generic.creative_mode_only");
                 return;
             }
 
             this.cacheCurrentAreaFromPlacement();
 
-            ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, () ->
-            {
-                SchematicPlacingUtils.pastePlacementToWorld(this.currentPlacement, false, mc);
-            }, mc);
+            ToolUtils.deleteSelectionVolumes(this.lastSeenArea, true, () -> SchematicPlacingUtils.pastePlacementToWorld(this.currentPlacement, false, mc), mc);
         }
     }
 
@@ -399,9 +395,9 @@ public class SchematicProject
 
         JsonArray arr = new JsonArray();
 
-        for (int i = 0; i < this.versions.size(); ++i)
+        for (SchematicVersion version : this.versions)
         {
-            arr.add(this.versions.get(i).toJson());
+            arr.add(version.toJson());
         }
 
         if (arr.size() > 0)
@@ -490,25 +486,25 @@ public class SchematicProject
     {
         if (this.saveInProgress)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.save_already_in_progress");
+            MessageDispatcher.error().translate("litematica.error.schematic_projects.save_already_in_progress");
             return false;
         }
 
         if (this.directory == null || this.directory.exists() == false || this.directory.isDirectory() == false)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.invalid_project_directory");
+            MessageDispatcher.error().translate("litematica.error.schematic_projects.invalid_project_directory");
             return false;
         }
 
         if (this.getSelection().getAllSubRegionBoxes().size() == 0)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.empty_selection");
+            MessageDispatcher.error().translate("litematica.error.schematic_projects.empty_selection");
             return false;
         }
 
         if (Minecraft.getMinecraft().player == null)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.schematic_projects.null_player");
+            MessageDispatcher.error().translate("litematica.error.schematic_projects.null_player");
             return false;
         }
 
@@ -541,14 +537,7 @@ public class SchematicProject
             }
             else
             {
-                mc.addScheduledTask(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        SaveCompletionListener.this.saveVersion();
-                    }
-                });
+                mc.addScheduledTask(SaveCompletionListener.this::saveVersion);
             }
         }
 
@@ -565,7 +554,7 @@ public class SchematicProject
                 ((TaskCompletionListener) GuiUtils.getCurrentScreen()).onTaskCompleted();
             }
 
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.SUCCESS, "litematica.message.schematic_projects.version_saved", this.version, this.name);
+            MessageDispatcher.success().translate("litematica.message.schematic_projects.version_saved", this.version, this.name);
         }
     }
 }

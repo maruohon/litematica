@@ -337,7 +337,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                 {
                     boolean reverse = mouseButton == 1;
                     Rotation rotation = fi.dy.masa.malilib.util.PositionUtils.cycleRotation(this.placement.getRotation(), reverse);
-                    this.manager.setRotation(this.placement, rotation, this.parent);
+                    this.manager.setRotation(this.placement, rotation);
                     break;
                 }
 
@@ -345,7 +345,7 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                 {
                     boolean reverse = mouseButton == 1;
                     Mirror mirror = fi.dy.masa.malilib.util.PositionUtils.cycleMirror(this.placement.getMirror(), reverse);
-                    this.manager.setMirror(this.placement, mirror, this.parent);
+                    this.manager.setMirror(this.placement, mirror);
                     break;
                 }
 
@@ -399,20 +399,20 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
                 case MOVE_TO_PLAYER:
                 {
                     BlockPos pos = new BlockPos(mc.player.getPositionVector());
-                    this.manager.setOrigin(this.placement, pos, this.parent);
+                    this.manager.setOrigin(this.placement, pos);
                     break;
                 }
 
                 case NUDGE_COORD_X:
-                    this.manager.setOrigin(this.placement, oldOrigin.add(amount, 0, 0), this.parent);
+                    this.manager.setOrigin(this.placement, oldOrigin.add(amount, 0, 0));
                     break;
 
                 case NUDGE_COORD_Y:
-                    this.manager.setOrigin(this.placement, oldOrigin.add(0, amount, 0), this.parent);
+                    this.manager.setOrigin(this.placement, oldOrigin.add(0, amount, 0));
                     break;
 
                 case NUDGE_COORD_Z:
-                    this.manager.setOrigin(this.placement, oldOrigin.add(0, 0, amount), this.parent);
+                    this.manager.setOrigin(this.placement, oldOrigin.add(0, 0, amount));
                     break;
 
                 case TOGGLE_ENABLED:
@@ -555,18 +555,17 @@ public class GuiPlacementConfiguration  extends BaseListScreen<SubRegionPlacemen
             {
                 int value = Integer.parseInt(newText);
                 BlockPos posOld = this.placement.getOrigin();
-                this.parent.setNextMessageType(MessageOutput.ERROR);
 
                 switch (this.type)
                 {
-                    case X: this.manager.setOrigin(this.placement, new BlockPos(value, posOld.getY(), posOld.getZ()), this.parent); break;
-                    case Y: this.manager.setOrigin(this.placement, new BlockPos(posOld.getX(), value, posOld.getZ()), this.parent); break;
-                    case Z: this.manager.setOrigin(this.placement, new BlockPos(posOld.getX(), posOld.getY(), value), this.parent); break;
+                    case X: this.manager.setOrigin(this.placement, new BlockPos(value, posOld.getY(), posOld.getZ())); break;
+                    case Y: this.manager.setOrigin(this.placement, new BlockPos(posOld.getX(), value, posOld.getZ())); break;
+                    case Z: this.manager.setOrigin(this.placement, new BlockPos(posOld.getX(), posOld.getY(), value)); break;
                 }
 
                 this.parent.updateElements();
             }
-            catch (NumberFormatException e) {}
+            catch (NumberFormatException ignore) {}
         }
     }
 

@@ -7,8 +7,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
 import fi.dy.masa.litematica.selection.SelectionBox;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 
 public class TaskUpdateBlocks extends TaskProcessChunkBase
@@ -74,12 +73,12 @@ public class TaskUpdateBlocks extends TaskProcessChunkBase
         {
             if (this.printCompletionMessage)
             {
-                MessageUtils.showGuiMessage(MessageOutput.SUCCESS, "litematica.message.blocks_updated");
+                MessageDispatcher.success().translate("litematica.message.blocks_updated");
             }
         }
         else
         {
-            MessageUtils.showGuiMessage(MessageOutput.ERROR, "litematica.message.error.update_blocks_aborted");
+            MessageDispatcher.error().translate("litematica.message.error.update_blocks_aborted");
         }
     }
 }

@@ -3,10 +3,9 @@ package fi.dy.masa.litematica.scheduler.tasks;
 import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.util.SchematicPlacingUtils;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class TaskPasteSchematicDirect extends TaskBase
 {
@@ -48,12 +47,12 @@ public class TaskPasteSchematicDirect extends TaskBase
         {
             if (this.printCompletionMessage)
             {
-                MessageUtils.showGuiOrActionBarMessage(MessageOutput.SUCCESS, "litematica.message.schematic_pasted");
+                MessageDispatcher.success().screenOrActionbar().translate("litematica.message.schematic_pasted");
             }
         }
         else
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.schematic_paste_failed");
+            MessageDispatcher.error().translate("litematica.message.error.schematic_paste_failed");
         }
 
         super.stop();

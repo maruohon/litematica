@@ -1,5 +1,6 @@
 package fi.dy.masa.litematica.gui.widgets;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.util.math.BlockPos;
@@ -10,18 +11,18 @@ import fi.dy.masa.litematica.selection.SelectionMode;
 import fi.dy.masa.litematica.util.FileType;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.TextInputScreen;
-import fi.dy.masa.malilib.gui.widget.button.BaseButton;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.icon.FileBrowserIconProvider;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
+import fi.dy.masa.malilib.gui.widget.button.BaseButton;
+import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
+import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntryType;
-import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
+import fi.dy.masa.malilib.gui.widget.list.entry.DirectoryEntryWidget;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 
 public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
 {
@@ -240,7 +241,8 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
         public boolean consumeString(String string)
         {
             String selectionId = this.widget.getDirectoryEntry().getFullPath().getAbsolutePath();
-            return this.selectionManager.renameSelection(this.widget.getDirectoryEntry().getDirectory(), selectionId, string, this.copy, this.widget.parent.getSelectionManagerGui());
+            File dir = this.widget.getDirectoryEntry().getDirectory();
+            return this.selectionManager.renameSelection(dir, selectionId, string, this.copy, MessageOutput.MESSAGE_OVERLAY);
         }
     }
 }

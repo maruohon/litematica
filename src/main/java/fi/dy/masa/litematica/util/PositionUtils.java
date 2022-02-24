@@ -35,12 +35,11 @@ import fi.dy.masa.litematica.selection.AreaSelection;
 import fi.dy.masa.litematica.selection.Box;
 import fi.dy.masa.litematica.selection.SelectionBox;
 import fi.dy.masa.litematica.selection.SelectionManager;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.EntityUtils;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
 public class PositionUtils
 {
@@ -317,8 +316,6 @@ public class PositionUtils
     /**
      * Returns the min and max corners of the enclosing box around the given collection of boxes.
      * The minimum corner is the left entry and the maximum corner is the right entry of the pair.
-     * @param boxes
-     * @return
      */
     @Nullable
     public static Pair<BlockPos, BlockPos> getEnclosingAreaCornersForRegions(Collection<ISchematicRegion> regions)
@@ -680,7 +677,7 @@ public class PositionUtils
 
         if (area == null || world == null)
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.message.error.no_area_selected");
+            MessageDispatcher.error("litematica.message.error.no_area_selected");
             return;
         }
 
@@ -688,7 +685,7 @@ public class PositionUtils
 
         if (box == null || (box.getPos1() == null && box.getPos2() == null))
         {
-            MessageUtils.showGuiOrInGameMessage(MessageOutput.ERROR, "litematica.error.area_selection.grow.no_sub_region_selected");
+            MessageDispatcher.error("litematica.error.area_selection.grow.no_sub_region_selected");
             return;
         }
 

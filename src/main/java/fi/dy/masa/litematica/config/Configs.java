@@ -198,7 +198,7 @@ public class Configs
 
         public static final OptionListConfig<HudAlignment> BLOCK_INFO_LINES_ALIGNMENT           = new OptionListConfig<>("blockInfoLinesAlignment", HudAlignment.TOP_RIGHT, "The alignment of the block info lines overlay");
         public static final OptionListConfig<BlockInfoAlignment> BLOCK_INFO_OVERLAY_ALIGNMENT   = new OptionListConfig<>("blockInfoOverlayAlignment", BlockInfoAlignment.TOP_CENTER, "The alignment of the Block Info Overlay");
-        public static final OptionListConfig<MessageOutput> EASY_PLACE_WARNINGS                      = new OptionListConfig<>("easyPlaceWarnings", MessageOutput.MESSAGE_OVERLAY, "Whether to show the \"Action prevented by *\"\nwarnings for the Easy Place and Placement Restriction modes");
+        public static final OptionListConfig<MessageOutput> EASY_PLACE_WARNINGS                 = new OptionListConfig<>("easyPlaceWarnings", MessageOutput.MESSAGE_OVERLAY, "Whether to show the \"Action prevented by *\"\nwarnings for the Easy Place and Placement Restriction modes");
         public static final OptionListConfig<HudAlignment> INFO_HUD_ALIGNMENT                   = new OptionListConfig<>("infoHudAlignment", HudAlignment.BOTTOM_RIGHT, "The alignment of the \"Info HUD\",\nused for the Material List, Schematic Verifier mismatch positions etc.");
         public static final OptionListConfig<HudAlignment> TOOL_HUD_ALIGNMENT                   = new OptionListConfig<>("toolHudAlignment", HudAlignment.BOTTOM_LEFT, "The alignment of the \"tool HUD\", when holding the configured \"tool\"");
 

@@ -33,15 +33,15 @@ import fi.dy.masa.litematica.selection.SelectionManager;
 import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.tool.ToolModeData;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
-import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
+import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileUtils;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
-import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class DataManager implements DirectoryCache
 {
@@ -433,7 +433,7 @@ public class DataManager implements DirectoryCache
 
         if (dir.exists() == false && dir.mkdirs() == false)
         {
-            MessageUtils.printErrorMessage("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
+            MessageDispatcher.error().translate("litematica.message.error.schematic_placement.failed_to_create_directory", dir.getAbsolutePath());
         }
 
         return dir;
@@ -514,9 +514,7 @@ public class DataManager implements DirectoryCache
                 }
             }
         }
-        catch (Exception e)
-        {
-        }
+        catch (Exception ignore) {}
 
         // Fall back to a stick
         toolItem = new ItemStack(Items.STICK);
@@ -551,7 +549,7 @@ public class DataManager implements DirectoryCache
             }
 
             Configs.Generic.TOOL_ITEM.setValueFromString(cfgStr);
-            MessageUtils.printActionbarMessage("litematica.message.set_currently_held_item_as_tool");
+            MessageDispatcher.generic().customHotbar().translate("litematica.message.set_currently_held_item_as_tool");
         }
     }
 }

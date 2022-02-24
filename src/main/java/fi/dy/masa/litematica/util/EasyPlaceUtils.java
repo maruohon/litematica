@@ -37,15 +37,15 @@ import fi.dy.masa.litematica.tool.ToolMode;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.input.Keys;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.registry.Registry;
 import fi.dy.masa.malilib.util.BlockUtils;
 import fi.dy.masa.malilib.util.PlacementUtils;
 import fi.dy.masa.malilib.util.PositionUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
-import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.HitPosition;
+import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.position.SubChunkPos;
 
@@ -139,7 +139,8 @@ public class EasyPlaceUtils
         // Only print the warning message once per right click
         if (isFirstClickEasyPlace && result == EnumActionResult.FAIL)
         {
-            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue(), MessageOutput.WARNING, 1000, "litematica.message.easy_place_fail");
+            MessageOutput output = Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue();
+            MessageDispatcher.warning(1000).type(output).translate("litematica.message.easy_place_fail");
         }
 
         isFirstClickEasyPlace = false;
@@ -557,10 +558,6 @@ public class EasyPlaceUtils
      * If the targeted position is outside of the current layer range, or should be air
      * in the schematic, or the player is holding the wrong item in hand, then true is returned
      * to indicate that the use action should be cancelled.
-     * @param mc
-     * @param doEasyPlace
-     * @param restrictPlacement
-     * @return
      */
     public static boolean handlePlacementRestriction(Minecraft mc)
     {
@@ -568,7 +565,8 @@ public class EasyPlaceUtils
 
         if (cancel && isFirstClickPlacementRestriction)
         {
-            MessageUtils.showMessage(Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue(), MessageOutput.WARNING, 1000, "litematica.message.placement_restriction_fail");
+            MessageOutput output = Configs.InfoOverlays.EASY_PLACE_WARNINGS.getValue();
+            MessageDispatcher.warning(1000).type(output).translate("litematica.message.placement_restriction_fail");
         }
 
         isFirstClickPlacementRestriction = false;
@@ -581,9 +579,6 @@ public class EasyPlaceUtils
      * If the targeted position is outside of the current layer range, or should be air
      * in the schematic, or the player is holding the wrong item in hand, then true is returned
      * to indicate that the use action should be cancelled.
-     * @param mc
-     * @param doEasyPlace
-     * @param restrictPlacement
      * @return true if the use action should be cancelled
      */
     private static boolean placementRestrictionInEffect(Minecraft mc)
@@ -629,10 +624,7 @@ public class EasyPlaceUtils
             ItemStack stack = MaterialCache.getInstance().getRequiredBuildItemForState(stateSchematic);
 
             // The player is holding the wrong item for the targeted position
-            if (stack.isEmpty() || EntityUtils.getUsedHandForItem(mc.player, stack, true) == null)
-            {
-                return true;
-            }
+            return stack.isEmpty() || EntityUtils.getUsedHandForItem(mc.player, stack, true) == null;
         }
 
         return false;

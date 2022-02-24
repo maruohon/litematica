@@ -69,7 +69,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 
                 if (GuiSchematicManager.hasPendingPreviewTask())
                 {
-                    OverlayRenderer.getInstance().renderPreviewFrame(mc);
+                    OverlayRenderer.getInstance().renderPreviewFrame();
                 }
             }
         }

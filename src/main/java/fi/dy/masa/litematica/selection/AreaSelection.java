@@ -20,9 +20,8 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
-import fi.dy.masa.malilib.overlay.message.MessageConsumer;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.PositionUtils.CoordinateType;
 
@@ -264,7 +263,7 @@ public class AreaSelection
 
     public boolean removeSelectedSubRegionBox()
     {
-        boolean success = this.currentBox != null ? this.subRegionBoxes.remove(this.currentBox) != null : false;
+        boolean success = this.currentBox != null && this.subRegionBoxes.remove(this.currentBox) != null;
         this.currentBox = null;
         this.markDirty();
         return success;
@@ -272,10 +271,10 @@ public class AreaSelection
 
     public boolean renameSubRegionBox(String oldName, String newName)
     {
-        return this.renameSubRegionBox(oldName, newName, null);
+        return this.renameSubRegionBox(oldName, newName, MessageOutput.NONE);
     }
 
-    public boolean renameSubRegionBox(String oldName, String newName, @Nullable MessageConsumer feedback)
+    public boolean renameSubRegionBox(String oldName, String newName, MessageOutput output)
     {
         SelectionBox box = this.subRegionBoxes.get(oldName);
 
@@ -283,10 +282,8 @@ public class AreaSelection
         {
             if (this.subRegionBoxes.containsKey(newName))
             {
-                if (feedback != null)
-                {
-                    feedback.addMessage(MessageOutput.ERROR, "litematica.error.area_editor.rename_sub_region.exists", newName);
-                }
+                MessageDispatcher.error().type(output)
+                        .translate("litematica.error.area_editor.rename_sub_region.exists", newName);
 
                 return false;
             }
@@ -333,7 +330,8 @@ public class AreaSelection
         {
             String oldStr = String.format("x: %d, y: %d, z: %d", old.getX(), old.getY(), old.getZ());
             String newStr = String.format("x: %d, y: %d, z: %d", newOrigin.getX(), newOrigin.getY(), newOrigin.getZ());
-            MessageUtils.showGuiOrActionBarMessage(MessageOutput.SUCCESS, "litematica.message.moved_selection", oldStr, newStr);
+            // TODO malilib refactor - this used to be showGuiOrActionBarMessage
+            MessageDispatcher.success().customHotbar().translate("litematica.message.moved_selection", oldStr, newStr);
         }
     }
 

@@ -19,7 +19,7 @@ import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainerFull;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.overlay.message.MessageUtils;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.nbt.NbtUtils;
 
 public abstract class SingleRegionSchematic extends SchematicBase implements ISchematicRegion
@@ -91,7 +91,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         {
             if (isSizeValid(size) == false)
             {
-                MessageUtils.printErrorMessage("litematica.message.error.schematic_read.invalid_or_missing_size_value", size.getX(), size.getY(), size.getZ());
+                MessageDispatcher.error().translate("litematica.message.error.schematic_read.invalid_or_missing_size_value", size.getX(), size.getY(), size.getZ());
                 return;
             }
 
@@ -235,8 +235,8 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
             // No offset for this sub-region, use the positions in the maps without modifications
             if (region.getPosition().equals(BlockPos.ORIGIN))
             {
-                region.getBlockEntityMap().entrySet().forEach((entry) -> this.blockEntities.put(entry.getKey(), entry.getValue().copy()));
-                region.getBlockTickMap().entrySet().forEach((entry) -> this.pendingBlockTicks.put(entry.getKey(), entry.getValue()));
+                region.getBlockEntityMap().forEach((key, value) -> this.blockEntities.put(key, value.copy()));
+                this.pendingBlockTicks.putAll(region.getBlockTickMap());
                 region.getEntityList().forEach((info) -> this.entities.add(info.copy()));
             }
             else
@@ -244,14 +244,14 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
                 // This is the relative position of this sub-region within the new single region enclosing schematic volume
                 Vec3i regionOffsetBlocks = this.getRegionOffset(region, minCorner);
 
-                region.getBlockEntityMap().entrySet().forEach((entry) -> {
-                    BlockPos pos = entry.getKey().add(regionOffsetBlocks);
-                    this.blockEntities.put(pos, entry.getValue().copy());
+                region.getBlockEntityMap().forEach((key, value) -> {
+                    BlockPos pos = key.add(regionOffsetBlocks);
+                    this.blockEntities.put(pos, value.copy());
                 });
 
-                region.getBlockTickMap().entrySet().forEach((entry) -> {
-                    BlockPos pos = entry.getKey().add(regionOffsetBlocks);
-                    this.pendingBlockTicks.put(pos, entry.getValue());
+                region.getBlockTickMap().forEach((key, value) -> {
+                    BlockPos pos = key.add(regionOffsetBlocks);
+                    this.pendingBlockTicks.put(pos, value);
                 });
 
                 // The entity positions are not relative to the sub-region's minimum corner,
@@ -291,7 +291,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
 
         if (isSizeValid(this.regionSize) == false)
         {
-            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.invalid_or_missing_size", this.getFile().getAbsolutePath());
+            MessageDispatcher.error().translate("litematica.message.error.schematic_read.invalid_or_missing_size", this.getFile().getAbsolutePath());
             return false;
         }
 
@@ -305,7 +305,7 @@ public abstract class SingleRegionSchematic extends SchematicBase implements ISc
         }
         else
         {
-            MessageUtils.printErrorMessage("litematica.message.error.schematic_read.missing_or_invalid_data", this.getFile().getAbsolutePath());
+            MessageDispatcher.error().translate("litematica.message.error.schematic_read.missing_or_invalid_data", this.getFile().getAbsolutePath());
             return false;
         }
     }

@@ -14,14 +14,16 @@ import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
+import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.data.ResultingStringConsumer;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
+public class WidgetSelectionSubRegion extends BaseDataListEntryWidget<String>
 {
     private final WidgetListSelectionSubRegions parent;
     private final AreaSelection selection;
@@ -207,8 +209,8 @@ public class WidgetSelectionSubRegion extends BaseListEntryWidget<String>
         @Override
         public boolean consumeString(String string)
         {
-            String oldName = this.widget.entry;
-            return this.selection.renameSubRegionBox(oldName, string, this.widget.parent.getEditorGui());
+            String oldName = this.widget.getData();
+            return this.selection.renameSubRegionBox(oldName, string, MessageOutput.MESSAGE_OVERLAY);
         }
     }
 }
