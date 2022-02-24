@@ -4,8 +4,8 @@ import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.util.ScreenContext;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.list.DataListWidget;
 import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 
@@ -13,10 +13,9 @@ public class WidgetTaskEntry extends BaseDataListEntryWidget<ITask>
 {
     protected final GenericButton removeButton;
 
-    public WidgetTaskEntry(int x, int y, int width, int height, int listIndex, int originalListIndex,
-                           ITask task, DataListWidget<ITask> listWidget)
+    public WidgetTaskEntry(ITask data, DataListEntryWidgetData constructData)
     {
-        super(x, y, width, height, listIndex, originalListIndex, task, listWidget);
+        super(data, constructData);
 
         this.removeButton = GenericButton.create("litematica.gui.button.remove");
         this.removeButton.setActionListener(() -> {
@@ -30,21 +29,20 @@ public class WidgetTaskEntry extends BaseDataListEntryWidget<ITask>
     }
 
     @Override
-    public void updateSubWidgetsToGeometryChanges()
-    {
-        super.updateSubWidgetsToGeometryChanges();
-
-        int x = this.getX() + this.getWidth() - 2;
-        this.removeButton.setRight(x);
-        this.removeButton.setY(this.getY() + 1);
-    }
-
-    @Override
     public void reAddSubWidgets()
     {
         super.reAddSubWidgets();
 
         this.addWidget(this.removeButton);
+    }
+
+    @Override
+    public void updateSubWidgetPositions()
+    {
+        super.updateSubWidgetPositions();
+
+        this.removeButton.setRight(this.getRight() - 2);
+        this.removeButton.setY(this.getY() + 1);
     }
 
     @Override

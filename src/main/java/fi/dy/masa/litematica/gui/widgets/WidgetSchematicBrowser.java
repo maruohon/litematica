@@ -60,9 +60,9 @@ public class WidgetSchematicBrowser extends BaseFileBrowserWidget implements Sel
     }
 
     @Override
-    public void onGuiClosed()
+    public void onScreenClosed()
     {
-        super.onGuiClosed();
+        super.onScreenClosed();
 
         this.clearSchematicMetadataCache();
     }

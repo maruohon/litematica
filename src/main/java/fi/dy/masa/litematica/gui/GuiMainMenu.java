@@ -145,7 +145,7 @@ public class GuiMainMenu extends BaseScreen
                     gui = new GuiSchematicPlacementsList();
                     break;
                 case TASK_MANAGER:
-                    gui = new GuiTaskManager();
+                    gui = new TaskManagerScreen();
                     break;
                 case SCHEMATIC_PROJECTS_MANAGER:
                     DataManager.getSchematicProjectsManager().openSchematicProjectsGui();

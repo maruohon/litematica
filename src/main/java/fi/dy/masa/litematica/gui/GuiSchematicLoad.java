@@ -1,7 +1,7 @@
 package fi.dy.masa.litematica.gui;
 
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 import java.util.function.Consumer;
 import net.minecraft.util.math.BlockPos;
 import fi.dy.masa.litematica.config.Configs;
@@ -15,11 +15,11 @@ import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.StringListSelectionScreen;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
+import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.button.BaseButton;
 import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
 import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.CheckBoxWidget;
 import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget.DirectoryEntry;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.StringUtils;
@@ -198,7 +198,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         }
     }
 
-    private static class MaterialListCreator implements Consumer<List<String>>
+    private static class MaterialListCreator implements Consumer<Collection<String>>
     {
         private final ISchematic schematic;
 
@@ -208,7 +208,7 @@ public class GuiSchematicLoad extends GuiSchematicBrowserBase
         }
 
         @Override
-        public void accept(List<String> strings)
+        public void accept(Collection<String> strings)
         {
             MaterialListSchematic materialList = new MaterialListSchematic(this.schematic, strings, true);
             DataManager.setMaterialList(materialList); // Remember the last opened material list for the hotkey to (re-) open it

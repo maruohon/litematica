@@ -111,10 +111,4 @@ public class GuiAreaSelectionEditorSimple extends GuiAreaSelectionEditorNormal
     {
         return null;
     }
-
-    @Override
-    protected void reCreateListWidget()
-    {
-        // NO-OP
-    }
 }
