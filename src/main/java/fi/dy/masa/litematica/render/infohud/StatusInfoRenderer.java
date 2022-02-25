@@ -5,9 +5,8 @@ import java.util.List;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.malilib.config.value.LayerMode;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.util.position.LayerRange;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.position.LayerRange;
 
 public class StatusInfoRenderer implements IInfoHudRenderer
 {
@@ -53,46 +52,42 @@ public class StatusInfoRenderer implements IInfoHudRenderer
     {
         List<String> lines = new ArrayList<>();
 
-        String g = BaseScreen.TXT_GREEN;
-        String red = BaseScreen.TXT_RED;
-        String rst = BaseScreen.TXT_RST;
-
         if (Configs.Generic.EASY_PLACE_MODE.getBooleanValue())
         {
-            lines.add(StringUtils.translate("litematica.hud.misc.easy_place_mode_enabled"));
+            lines.add(StringUtils.translate("litematica.hud.status_info.easy_place_mode_enabled"));
         }
         else if (Configs.Generic.PLACEMENT_RESTRICTION.getBooleanValue())
         {
-            lines.add(StringUtils.translate("litematica.hud.misc.placement_restriction_mode_enabled"));
+            lines.add(StringUtils.translate("litematica.hud.status_info.placement_restriction_enabled"));
         }
 
         LayerRange range = DataManager.getRenderLayerRange();
         String strMode = range.getLayerMode().getDisplayName();
-        String axisName = range.getAxis().getName().toLowerCase();
-        String val = range.getCurrentLayerString();
 
         if (range.getLayerMode() == LayerMode.ALL)
         {
-            lines.add(StringUtils.translate("litematica.hud.misc.render_layer_mode_all", g + strMode + rst));
+            lines.add(StringUtils.translate("litematica.hud.status_info.render_layer_mode_all", strMode));
         }
         else
         {
-            String strVal = String.format("%s%s = %s%s", g, axisName, val, rst);
-            lines.add(StringUtils.translate("litematica.hud.misc.render_layer_mode", g + strMode + rst, g + strVal + rst));
+            String axisName = range.getAxis().getName().toLowerCase();
+            String val = range.getCurrentLayerString();
+            lines.add(StringUtils.translate("litematica.hud.status_info.render_layer_mode", strMode, axisName, val));
         }
 
-        String strOn = g + StringUtils.translate("litematica.message.value.on") + rst;
-        String strOff = red + StringUtils.translate("litematica.message.value.off") + rst;
+        String strOn = StringUtils.translate("litematica.hud.value.on.colored");
+        String strOff = StringUtils.translate("litematica.hud.value.off.colored");
         String strAll = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() ? strOn : strOff;
         String strSch = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() ? strOn : strOff;
         String strBlk = Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() ? strOn : strOff;
         String strOvl = Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue() ? strOn : strOff;
         String strSel = Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() ? strOn : strOff;
-        lines.add(StringUtils.translate("litematica.hud.misc.renderer_status", strAll, strSch, strBlk, strOvl, strSel));
+
+        lines.add(StringUtils.translate("litematica.hud.status_info.renderer_status", strAll, strSch, strBlk, strOvl, strSel));
 
         if (DataManager.getSchematicProjectsManager().hasProjectOpen())
         {
-            lines.add(StringUtils.translate("litematica.hud.schematic_projects_mode"));
+            lines.add(StringUtils.translate("litematica.hud.status_info.schematic_vcs_mode"));
         }
 
         if (this.overrideEnabled && System.currentTimeMillis() - this.lastOverrideTime > this.overrideDelay)

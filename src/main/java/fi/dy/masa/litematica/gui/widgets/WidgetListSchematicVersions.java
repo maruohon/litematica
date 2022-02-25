@@ -81,7 +81,7 @@ public class WidgetListSchematicVersions extends BaseListWidget<SchematicVersion
         {
             ToolHud.DATE.setTime(version.getTimeStamp());
             str = ToolHud.SIMPLE_DATE_FORMAT.format(ToolHud.DATE);
-            str = StringUtils.translate("litematica.hud.schematic_projects.current_version_date", w + str + r);
+            str = StringUtils.translate("litematica.label.schematic_projects.current_version_date", str);
             this.drawString(x, y, color, str);
             y += 12;
 

@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import fi.dy.masa.litematica.util.ItemUtils;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
@@ -26,27 +25,23 @@ public class BlockInfo
     private final List<String> props;
     private final int totalWidth;
     private final int totalHeight;
-    private final int columnWidth;
 
     public BlockInfo(IBlockState state, String titleKey)
     {
-        String pre = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD;
-        this.title = pre + StringUtils.translate(titleKey) + BaseScreen.TXT_RST;
+        this.title = StringUtils.translate(titleKey);
         this.state = state;
         this.stack = ItemUtils.getItemForState(this.state);
+        this.stackName = this.stack.getDisplayName();
 
         ResourceLocation rl = Block.REGISTRY.getNameForObject(this.state.getBlock());
-        this.blockRegistryname = rl != null ? rl.toString() : "<null>";
-
-        this.stackName = this.stack.getDisplayName();
+        this.blockRegistryname = rl != null ? rl.toString() : StringUtils.translate("litematica.label.misc.null.brackets");
 
         int w = StringUtils.getStringWidth(this.stackName) + 20;
         w = Math.max(w, StringUtils.getStringWidth(this.blockRegistryname));
         w = Math.max(w, StringUtils.getStringWidth(this.title));
-        this.columnWidth = w;
 
         this.props = BlockUtils.getFormattedBlockStateProperties(this.state, " = ");
-        this.totalWidth = this.columnWidth + 40;
+        this.totalWidth = w + 40;
         this.totalHeight = this.props.size() * (StringUtils.getFontHeight() + 2) + 50;
     }
 
@@ -66,7 +61,7 @@ public class BlockInfo
         {
             GlStateManager.pushMatrix();
 
-            ShapeRenderUtils.renderOutlinedRectangle(x, y, zLevel, this.totalWidth, this.totalHeight, 0xFF000000, BaseScreen.COLOR_HORIZONTAL_BAR);
+            ShapeRenderUtils.renderOutlinedRectangle(x, y, zLevel, this.totalWidth, this.totalHeight, 0xFF000000, 0xFF999999);
 
             FontRenderer textRenderer = mc.fontRenderer;
             int x1 = x + 10;

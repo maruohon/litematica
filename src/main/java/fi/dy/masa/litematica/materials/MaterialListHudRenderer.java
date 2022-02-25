@@ -16,14 +16,13 @@ import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.RenderUtils;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.util.inventory.InventoryScreenUtils;
-import fi.dy.masa.malilib.util.data.ItemType;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.data.ItemType;
+import fi.dy.masa.malilib.util.inventory.InventoryScreenUtils;
 
 public class MaterialListHudRenderer implements IInfoHudRenderer
 {
@@ -76,7 +75,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         {
             MaterialListUtils.updateAvailableCounts(this.materialList.getMaterialsAll(), this.mc.player);
             List<MaterialListEntry> list = this.materialList.getMaterialsMissingOnly(true);
-            Collections.sort(list, this.sorter);
+            list.sort(this.sorter);
             this.lastUpdateTime = currentTime;
         }
     }
@@ -93,7 +92,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             return 0;
         }
 
-        FontRenderer font = mc.fontRenderer;
+        FontRenderer font = this.mc.fontRenderer;
         final double scale = Configs.InfoOverlays.MATERIAL_LIST_HUD_SCALE.getDoubleValue();
         final int maxLines = Configs.InfoOverlays.MATERIAL_LIST_HUD_MAX_LINES.getIntegerValue();
         int bgMargin = 2;
@@ -122,22 +121,19 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             long multiplier = this.materialList.getMultiplier();
             long count = multiplier == 1L ? entry.getCountMissing() - entry.getCountAvailable() : entry.getCountTotal();
             count *= multiplier;
-            String strCount = BaseScreen.TXT_RED + this.getFormattedCountString(count, entry.getStack().getMaxStackSize()) + BaseScreen.TXT_RST;
+            String strCount = this.getFormattedCountString(count, entry.getStack().getMaxStackSize());
             maxCountLength = Math.max(maxCountLength, font.getStringWidth(strCount));
         }
 
         final int maxLineLength = maxTextLength + maxCountLength + 30;
 
-        switch (alignment)
+        if (alignment == HudAlignment.TOP_RIGHT || alignment == HudAlignment.BOTTOM_RIGHT)
         {
-            case TOP_RIGHT:
-            case BOTTOM_RIGHT:
-                posX = (int) ((GuiUtils.getScaledWindowWidth() / scale) - maxLineLength - xOffset - bgMargin);
-                break;
-            case CENTER:
-                posX = (int) ((GuiUtils.getScaledWindowWidth() / scale / 2) - (maxLineLength / 2) - xOffset);
-                break;
-            default:
+            posX = (int) ((GuiUtils.getScaledWindowWidth() / scale) - maxLineLength - xOffset - bgMargin);
+        }
+        else if (alignment == HudAlignment.CENTER)
+        {
+            posX = (int) ((GuiUtils.getScaledWindowWidth() / scale / 2) - (maxLineLength / 2) - xOffset);
         }
 
         if (scale != 1 && scale != 0)
@@ -146,7 +142,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         }
 
         posY = GuiUtils.getHudPosY(posY, yOffset, contentHeight, scale, alignment);
-        posY += GuiUtils.getHudOffsetForPotions(alignment, scale, mc.player);
+        posY += GuiUtils.getHudOffsetForPotions(alignment, scale, this.mc.player);
 
         if (scale != 1d)
         {
@@ -160,7 +156,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                                              0, maxLineLength + bgMargin * 2, contentHeight + bgMargin, bgColor);
         }
 
-        String title = BaseScreen.TXT_BOLD + StringUtils.translate("litematica.gui.button.material_list") + BaseScreen.TXT_RST;
+        String title = StringUtils.translate("litematica.title.hud.material_list");
 
         if (useShadow)
         {
@@ -210,7 +206,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
 
         for (int i = 0; i < size; ++i)
         {
-            mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, list.get(i).getStack(), x, y);
+            this.mc.getRenderItem().renderItemAndEffectIntoGUI(this.mc.player, list.get(i).getStack(), x, y);
             y += lineHeight;
         }
 
@@ -254,7 +250,7 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         return String.format("%d", count);
     }
 
-    public static void renderSlotHilights(GuiContainer gui)
+    public static void renderSlotHighlights(GuiContainer gui)
     {
         MaterialListBase materialList = DataManager.getMaterialList();
 
@@ -267,16 +263,16 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
             {
                 HashMap<ItemType, MaterialListEntry> map = new HashMap<>();
                 list.forEach((entry) -> map.put(entry.getItemType(), entry));
-                List<Pair<Slot, Color4f>> hilightedSlots = getHilightedSlots(gui, map);
+                List<Pair<Slot, Color4f>> highlightedSlots = getHighlightedSlots(gui, map);
 
-                if (hilightedSlots.isEmpty() == false)
+                if (highlightedSlots.isEmpty() == false)
                 {
                     GlStateManager.disableTexture2D();
                     RenderUtils.setupBlend();
                     int guiX = InventoryScreenUtils.getGuiPosX(gui);
                     int guiY = InventoryScreenUtils.getGuiPosY(gui);
 
-                    for (Pair<Slot, Color4f> pair : hilightedSlots)
+                    for (Pair<Slot, Color4f> pair : highlightedSlots)
                     {
                         Slot slot = pair.getLeft();
                         Color4f color = pair.getRight();
@@ -289,9 +285,9 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
         }
     }
 
-    private static List<Pair<Slot, Color4f>> getHilightedSlots(GuiContainer gui, HashMap<ItemType, MaterialListEntry> materialListEntries)
+    private static List<Pair<Slot, Color4f>> getHighlightedSlots(GuiContainer gui, HashMap<ItemType, MaterialListEntry> materialListEntries)
     {
-        List<Pair<Slot, Color4f>> hilightedSlots = new ArrayList<>();
+        List<Pair<Slot, Color4f>> highlightedSlots = new ArrayList<>();
 
         for (int slotNum = 0; slotNum < gui.inventorySlots.inventorySlots.size(); ++slotNum)
         {
@@ -321,11 +317,11 @@ public class MaterialListHudRenderer implements IInfoHudRenderer
                         color = Configs.Colors.MATERIAL_LIST_SLOT_HL_NOT_ENOUGH.getColor();
                     }
 
-                    hilightedSlots.add(Pair.of(slot, color));
+                    highlightedSlots.add(Pair.of(slot, color));
                 }
             }
         }
 
-        return hilightedSlots;
+        return highlightedSlots;
     }
 }

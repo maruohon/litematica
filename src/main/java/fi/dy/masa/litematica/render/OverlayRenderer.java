@@ -43,15 +43,15 @@ import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.malilib.config.value.HorizontalAlignment;
 import fi.dy.masa.malilib.config.value.HudAlignment;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
 import fi.dy.masa.malilib.render.TextRenderUtils;
 import fi.dy.masa.malilib.util.BlockUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.config.value.HorizontalAlignment;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 
 public class OverlayRenderer
 {
@@ -558,7 +558,7 @@ public class OverlayRenderer
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
-            BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
+            BlockInfo info = new BlockInfo(stateClient, "litematica.title.hud.block_info_overlay.state_client");
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
             info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
@@ -570,7 +570,7 @@ public class OverlayRenderer
 
             if (te instanceof IInventory)
             {
-                BlockInfo info = new BlockInfo(stateClient, "litematica.gui.label.block_info.state_client");
+                BlockInfo info = new BlockInfo(stateClient, "litematica.title.hud.block_info_overlay.state_client");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
                 info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
@@ -578,7 +578,7 @@ public class OverlayRenderer
             }
             else
             {
-                BlockInfo info = new BlockInfo(stateSchematic, "litematica.gui.label.block_info.state_schematic");
+                BlockInfo info = new BlockInfo(stateSchematic, "litematica.title.hud.block_info_overlay.state_schematic");
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
                 info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
@@ -617,20 +617,19 @@ public class OverlayRenderer
         IBlockState stateSchematic = worldSchematic.getBlockState(pos);
         stateSchematic = stateSchematic.getActualState(worldSchematic, pos);
         IBlockState air = Blocks.AIR.getDefaultState();
-        String ul = BaseScreen.TXT_UNDERLINE;
 
         if (stateSchematic != stateClient && stateSchematic != air && stateClient != air)
         {
-            this.blockInfoLines.add(ul + "Schematic:");
+            this.blockInfoLines.add(StringUtils.translate("litematica.title.hud.block_info_lines.schematic"));
             this.addBlockInfoLines(stateSchematic);
 
             this.blockInfoLines.add("");
-            this.blockInfoLines.add(ul + "Client:");
+            this.blockInfoLines.add(StringUtils.translate("litematica.title.hud.block_info_lines.client"));
             this.addBlockInfoLines(stateClient);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
-            this.blockInfoLines.add(ul + "Schematic:");
+            this.blockInfoLines.add(StringUtils.translate("litematica.title.hud.block_info_lines.schematic"));
             this.addBlockInfoLines(stateSchematic);
         }
     }

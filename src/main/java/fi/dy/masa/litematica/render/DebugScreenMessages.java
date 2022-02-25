@@ -2,11 +2,10 @@ package fi.dy.masa.litematica.render;
 
 import com.mumfrey.liteloader.util.debug.DebugMessage;
 import com.mumfrey.liteloader.util.debug.DebugMessage.Position;
-import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderGlobal;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import fi.dy.masa.litematica.world.WorldSchematic;
 
 public class DebugScreenMessages
 {
@@ -24,13 +23,10 @@ public class DebugScreenMessages
             {
                 RenderGlobal render = LitematicaRenderer.getInstance().getWorldRenderer();
 
-                String pre = BaseScreen.TXT_GOLD;
-                String rst = BaseScreen.TXT_RST;
-
-                MESSAGE_RENDERER.setMessage(String.format("%s[Litematica]%s %s", pre, rst, render.getDebugInfoRenders()));
+                MESSAGE_RENDERER.setMessage(String.format("§6[Litematica]§r %s", render.getDebugInfoRenders()));
 
                 String str = String.format("E %s TE: %d", world.getDebugLoadedEntities(), world.loadedTileEntityList.size());
-                MESSAGE_ENTITIES.setMessage(String.format("%s[Litematica]%s %s %s", pre, rst, render.getDebugInfoEntities(), str));
+                MESSAGE_ENTITIES.setMessage(String.format("§6[Litematica]§r %s %s", render.getDebugInfoEntities(), str));
             }
         }
     }

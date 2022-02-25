@@ -1,24 +1,22 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.render.infohud.IInfoHudRenderer;
 import fi.dy.masa.litematica.render.infohud.RenderPhase;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskTimer;
 import fi.dy.masa.litematica.util.PositionUtils;
-import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
 import fi.dy.masa.malilib.util.StringUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 
 public abstract class TaskBase implements ITask, IInfoHudRenderer
 {
@@ -136,15 +134,12 @@ public abstract class TaskBase implements ITask, IInfoHudRenderer
 
         if (player != null && requiredChunks.isEmpty() == false)
         {
-            List<ChunkPos> list = new ArrayList<>();
-            list.addAll(requiredChunks);
+            List<ChunkPos> list = new ArrayList<>(requiredChunks);
             PositionUtils.CHUNK_POS_COMPARATOR.setReferencePosition(new BlockPos(player.getPositionVector()));
             PositionUtils.CHUNK_POS_COMPARATOR.setClosestFirst(true);
-            Collections.sort(list, PositionUtils.CHUNK_POS_COMPARATOR);
+            list.sort(PositionUtils.CHUNK_POS_COMPARATOR);
 
-            String pre = BaseScreen.TXT_WHITE + BaseScreen.TXT_BOLD;
-            String title = StringUtils.translate("litematica.gui.label.missing_chunks", this.name, requiredChunks.size());
-            hudLines.add(String.format("%s%s%s", pre, title, BaseScreen.TXT_RST));
+            hudLines.add(StringUtils.translate("litematica.title.hud.missing_chunks", this.name, requiredChunks.size()));
 
             int maxLines = Math.min(list.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
 

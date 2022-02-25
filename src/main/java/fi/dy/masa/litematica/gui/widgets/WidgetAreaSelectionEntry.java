@@ -114,11 +114,11 @@ public class WidgetAreaSelectionEntry extends DirectoryEntryWidget
             if (o == null)
             {
                 o = selection.getEffectiveOrigin();
-                str = StringUtils.translate("litematica.gui.label.origin.auto");
+                str = StringUtils.translate("litematica.label.misc.origin.auto");
             }
             else
             {
-                str = StringUtils.translate("litematica.gui.label.origin.manual");
+                str = StringUtils.translate("litematica.label.misc.origin.manual");
             }
 
             text.add(StringUtils.translate("litematica.gui.label.area_selection.hover.origin", o.getX(), o.getY(), o.getZ(), str));

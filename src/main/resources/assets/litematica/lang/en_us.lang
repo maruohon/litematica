@@ -1,7 +1,275 @@
-language.name=English
-language.region=US
-language.code=en_US
 
+
+litematica.config.comment.areaselectionsperworld=Use per-world or per-server root directories for the area selections\n§6NOTE: Don't switch this OFF while you are live streaming, as then the Area Selection browser will show the server IP in the navigation widget and also in the current selection name/path until you change the current directory and selection again.
+litematica.config.comment.betterrenderorder=If enabled, then the schematic rendering is done by injecting the different render call into the vanilla rendering code. This should result in better translucent block rendering/ordering and schematic blocks not getting rendered through the client world blocks/terrain. If the rendering doesn't work (for example with Optifine), then try disabling this option.
+litematica.config.comment.changeselectedcorneronmove=If enabled, then the selected corner of an area selection is always set to the last moved corner, when using the set corner hotkeys
+litematica.config.comment.cloneatoriginalposition=If enabled, then using the §eClone Area§r hotkey will create the placement at the original area selection's position, instead of at the player's current position
+litematica.config.comment.customschematicdirectory=The root/base schematic directory to use, if §eUse Custom Schematic Directory§r is enabled
+litematica.config.comment.debugmessages=Enables some debug messages in the game console
+litematica.config.comment.easyplaceclickadjacent=If enabled, then the Easy Place mode will always try to click on existing adjacent blocks. This may help on Spigot or similar servers, which don't allow clicking on air blocks.
+litematica.config.comment.easyplacemode=Enables the "Easy Place" mode, which allows you to simply right click on the schematic blocks to place them.\n§6Note:§rIf you want to just hold down right click and walk around, then also enable the §eEasy Place Hold§r option.
+litematica.config.comment.easyplacehold=Allows you to hold down the use key (right click) and look at different schematic blocks to place them via the "Easy Place" mode. Without this option you need to separately click on each block.
+litematica.config.comment.executerequireholdingtool=Require holding an enabled tool item for the §eExecute Operation§r hotkey to work. An "enabled tool item" means that you need to hold the tool item set in §eTool Item§r and also the §eTool Enabled§r config needs to be §aON§r. The §eMain Rendering Toggle§r option also needs to ne §aON§r. Basically you will need to see the tool HUD on the bottom left corner of the screen while holding the tool item.
+litematica.config.comment.fixrailrotation=Applies a fix for the vanilla bug in the rail rotation method, where the 180 degree rotations of straight north-south and east-west rails rotate 90 degrees counterclockwise instead >_>
+litematica.config.comment.generatelowercasenames=If enabled, then by default the suggested schematic file names in the name text field of the save schematic screen will be lowercased and using underscores in place of spaces or other "special" characters
+litematica.config.comment.loadentireschematics=If enabled, then the entire schematic is always loaded at once to the scheamtic world. If siabled, then only the part that is within the client's view distance is loaded. Normally in pretty much all cases you want to keep this disabled.
+litematica.config.comment.materiallistignoreblockstate=Ignore the exact block state when generating material lists. Useful for example for redstone components where the block state may be different while building or constantly changing. Be aware that this might ignore more than you want in MC versions before 1.13, so use with caution in 1.12.2 or lower versions.
+litematica.config.comment.materiallistfromcontainer=When enabled, the schematic-based Material List is fetched directly from the block state container. Normally you want this. Only disable this if there is an issue where it gets it wrong for some reason (and then also report the issue and send the affected schematic).
+litematica.config.comment.pastecommandinterval=The task execution interval in game ticks the Paste Schematic task runs at in the command-based mode (on multiplayer servers without proper server-side support for Litematica features)
+litematica.config.comment.pastecommandlimit=Max number of commands sent per game tick, when using the Paste Schematic feature in the command-based mode (on multiplayer servers without proper server-side support for Litematica features)
+litematica.config.comment.pastecommandnamesetblock=The setblock command name to use for the Paste Schematic feature on servers, when using the command-based paste mode (on multiplayer servers without proper server-side support for Litematica features)
+litematica.config.comment.pastereplacebehavior=The block replace behavior for the Paste Schematic feature.\n- §bNone:§r Don't replace any existing blocks\n- §bWith non-air:§r Only "actual" (non-air) blocks\n  from the schematic will replace existing blocks\n- §bAll:§r Everything from the schematic will\n  replace existing blocks.\n\nThe difference between §bWith non-air§r and §bAll§r is whether or not air from the schematic will carve away existing blocks from the world. So if you for example want to paste something under water without making a cube of air around it, then use §bWith non-air§r.
+litematica.config.comment.pickblockauto=Automatically do a pick block before every placed block
+litematica.config.comment.pickblockenabled=Enables the schematic pick block features
+litematica.config.comment.pickblockignorenbt=Ignores the NBT data on the expected vs. found items for pick block. Allows the pick block to work for example with renamed items.
+litematica.config.comment.pickblockableslots=The hotbar slots that are allowed to be used for the schematic pick block features. Can use comma separated individual slots and dash separated slot ranges (no spaces anywhere).\nExample: §a2,4-6,9
+litematica.config.comment.placementrestriction=When enabled, blocks can only be placed according to the schematic within 2 blocks of any schematic placement sub-regions. In other words this feature tries to prevent any wrongly or accidentally placed blocks near any schematics, which may in some cases be useful with delicate redstone contraptions etc.
+litematica.config.comment.placementinfrontofplayer=When enabled, created or moved placements are positioned so that they are fully infront of the player, instead of the placement's origin point being at the player's location
+litematica.config.comment.rendermateriallistinguis=Whether or not the material list should be rendered behind GUIs, ie. while any GUIs are open
+litematica.config.comment.renderthreadnotimeout=Removes the timeout from the rendering worker threads. If you get very stuttery rendering when moving around or dealing with large schematics, try disabling this. It will however make the schematic rendering a lot slower in some cases.
+litematica.config.comment.selectioncornersmode=The Area Selection corners mode (tool item behavior) to use. In the §bCorners§r mode you left click to set the primary corner and right click to set the secondary corner. In the §bExpand§r mode you right click to reset/collapse the selection box to the clicked position, and then you left click to expand the selection around all the clicked points.\n\n§dTip:§r The §bExpand§r mode is almost always superior, the only downside being that it can't shrink by clicking (other than fully collapsing the seelction). Because there is always a block somewhere at each side of the thing you want to select, you can always use the §bExpand§r mode to select anything, while in the §bCorners§r mode you often don't have a block at the opposite corners of the build, which would require using annoying temporary blocks.\n\n§dTL;DR;§r Use the §bExpand§r mode, it's much more Pog :kappa:
+litematica.config.comment.signtextpaste=Automatically set the text in the sign GUIs from the schematic
+litematica.config.comment.toolitem=The item to use as the "tool item" for the mod actions such as controlling area selection boxes. You can also use an empty hand as the "tool" by leaving this text field empty, or putting in the literal word §a"empty"§r.
+litematica.config.comment.toolitemenabled=If enabled, then the "tool item" can be used to control selections etc. You can toggle this ON/OFF as needed to be able to use for example your regular food item as the tool, so that you don't need to carry around unnecessary extra items like sticks.
+litematica.config.comment.usecustomschematicdirectory=If enabled, then the directory set in §eCustom Schematic Directory§r will be used as the root/base schematic directory, instead of the normal §e'.minecraft/schematics/'§r directory
+
+litematica.config.comment.enableareaselectionboxesrendering=Enable the Area Selection rendering
+litematica.config.comment.enableplacementboxesrendering=Enable Schematic Placement bounding boxes rendering
+litematica.config.comment.enablerendering=This is the mod main rendering toggle option. Enables/disables ALL mod rendering.
+litematica.config.comment.enableschematicblocksrendering=Enable or disable schematic §bblock§r rendering. Disabling this allows you to only see the colored overlay.
+litematica.config.comment.enableschematicoverlay=The main toggle option for the schematic block overlay rendering. Disabling this turns off all the colored overlays at once. You can turn off only some of the overlay types (missing blocks, wrong blocks, wrong states, extra blocks) using the §eOverlay Type *§r options.
+litematica.config.comment.enableschematicrendering=Enable rendering the schematic and the overlay. This turns off the entire schematic rendering, but allows other things like the placement bounding box and the info HUDs to still render.
+litematica.config.comment.ignoreexistingfluids=If enabled, then any fluid blocks are ignored as "extra blocks" and as "wrong blocks", ie. where the schematic has air or other blocks. Basically this makes building stuff under water a whole lot less annoying. §6Note:§r You will most likely also want to enable the §eRender Colliding Schematic Blocks§r option at the same time, to allow the schematic blocks to be rendered over existing blocks.
+litematica.config.comment.overlayreducedinnersides=If enabled, then the adjacent/touching inner sides of the block overlays are removed/not rendered.§6Note:§r This is currently still unfinished and somewhat buggy especially at the render layer boundaries, but this can still be a big help with large schematics that have tons of overlay being rendered.
+litematica.config.comment.placementboxsidealpha=The alpha value for rendering the sub-region box sides
+litematica.config.comment.renderareaselectionboxsides=If enabled, then the Area Selection boxes will have their side quads rendered
+litematica.config.comment.rendercollidingblockatcursor=If enabled, then the expected block in the schematic is rendered at the hovered/tardeted block, if it's not currently correct
+litematica.config.comment.rendercollidingschematicblocks=If enabled, then blocks in the schematics are rendered also when there is already an existing (wrong) block in the client world. Probably mostly useful when trying to build something where there are snow layers or water in the way.
+litematica.config.comment.rendererrormarkerconnections=Render connecting lines between subsequent verifier highlight box corners. This was a rendering bug that some people experienced in older versions of the mod, but at least some players liked it and requested for it to stay, so this option "restores" that behavior.
+litematica.config.comment.rendererrormarkersides=If enabled, then the error markers in the Schematic Verifier will also have (translucent) side quads rendered instead of just the outlines
+litematica.config.comment.renderplacementboxsides=If enabled, then the placed schematic sub-region boxes will have their side quads rendered
+litematica.config.comment.renderplacementenclosingbox=If enabled, then an enclosing box is rendered around all the sub-regions in a schematic (placement)
+litematica.config.comment.renderplacementenclosingboxsides=If enabled, then the enclosing box around a schematic placement will have its side quads rendered
+litematica.config.comment.rendertranslucentblockinnersides=If enabled, then the model sides are also rendered for inner sides (normally obstructed/not visible) in the Translucent Schematic rendering mode
+litematica.config.comment.schematicoverlayenableoutlines=Enables rendering a wire frame outline for the colored schematic block overlay
+litematica.config.comment.schematicoverlayenablesides=Enables rendering translucent boxes/sides for the colored schematic block overlay
+litematica.config.comment.schematicoverlaymodeloutline=If enabled, then the wireframe of the schematic overlay will use the block model quads/vertices instead of the traditional full block overlay
+litematica.config.comment.schematicoverlaymodelsides=If enabled, then the side quads of the schematic overlay will use the block model quads/vertices instead of the traditional full block overlay
+litematica.config.comment.schematicoverlayoutlinewidth=The line width of the overlay block (model) outlines
+litematica.config.comment.schematicoverlayoutlinewidththrough=The line width of the overlay block (model) outlines, when the overlay is being rendered through blocks (see §eSchematic Overlay Render Through§r option and the §eSchematic Overlay Render Through§r hotkey)
+litematica.config.comment.schematicoverlayrenderthroughblocks=If enabled, then the schematic overlay will be rendered through blocks. This is probably only useful once you are finished building and want to see any errors easier. Also see the corresponfing hotkey for only renderin gthe overlay through blocks while you hold the key.
+litematica.config.comment.schematicoverlaytypeextra=Enables the colored schematic overlay for extra blocks that are not supposed to be there according to the schematic
+litematica.config.comment.schematicoverlaytypemissing=Enables the colored schematic overlay for missing blocks
+litematica.config.comment.schematicoverlaytypewrongblock=Enables the colored schematic overlay for wrong blocks
+litematica.config.comment.schematicoverlaytypewrongstate=Enables the colored schematic overlay for wrong block states
+litematica.config.comment.schematicverifieruseblockmodels=Forces using blocks models for everything in the Schematic Verifier result list. Normally item models are used for anything that has an item, and block models are only used for blocks that don't have an item, plus for Flower Pots to see the contained item.
+litematica.config.comment.translucentschematicalpha=The alpha value (opacity) for translucent schematic rendering.\n§b0.0§r = completely transparent.\n§b1.0§r = completely opaque.\n§6Note:§r You also need to enable the translucent rendering using the §eTranslucent Schematic§r option!
+litematica.config.comment.translucentschematicenabled=Enables translucent schematic rendering. Set the alpha value (opacity) in §eTranslucent Schematic Alpha§r.
+
+litematica.config.comment.blockinfolinesenabled=If enabled, then a MiniHUD-style §fBlock Info Overlay§r is rendered for the looked-at block
+litematica.config.comment.blockinfolinesfontscale=The font size/scale for the §fBlock Info Lines§r HUD
+litematica.config.comment.blockinfolinesoffsetx=The x-offset of the §fBlock Info Lines§r from the selected screen edge
+litematica.config.comment.blockinfolinesoffsety=The y-offset of the §fBlock Info Lines§r from the selected screen edge
+litematica.config.comment.blockinfooverlayoffsety=The y-offset of the §fBlock Info Overlay§r from the selected screen edge
+litematica.config.comment.blockinfooverlayenabled=Enables the §fBlock Info Overlay§r rendering to show info about the looked-at block or verifier error marker, while holding the §eRender Info Overlay§r hotkey
+litematica.config.comment.infohudmaxlines=The maximum number of info lines to show at once on the various info HUDs
+litematica.config.comment.infohudoffsetx=The x-offset of the Info HUD from the screen edge
+litematica.config.comment.infohudoffsety=The y-offset of the Info HUD from the screen edge
+litematica.config.comment.infohudscale=Scale factor for the Info HUD rendering
+litematica.config.comment.materiallisthudmaxlines=The maximum number of items to show at once on the Material List Info HUD
+litematica.config.comment.materiallisthudscale=Scale factor for the Material List Info HUD
+litematica.config.comment.materiallisthudstacks=Whether or not the number of stacks should be shown on the Material List HUD, or only the total number of items
+litematica.config.comment.materiallistslothighlight=Highlight inventory slots containing items that are currently missing or running low in the player's inventory according to the currently active Material List
+litematica.config.comment.statusinfohud=Enable a status info HUD renderer, which renders a few bits of status info, such as the current Render Layer mode and the various renderers' enabled state
+litematica.config.comment.statusinfohudauto=Allow automatically momentarily enabling the status info HUD "when needed", for example when creating a placement while having rendering disabled
+litematica.config.comment.toolhudalwaysvisible=Whether or not the Tool HUD should always be rendered, even when not holding the tool item
+litematica.config.comment.toolhudoffsetx=The x-offset of the Info HUD from the screen edge
+litematica.config.comment.toolhudoffsety=The y-offset of the Info HUD from the screen edge
+litematica.config.comment.toolhudscale=Scale factor for the Tool HUD
+litematica.config.comment.verifiererrorhighlightalpha=The alpha value for the error marker box side quads
+litematica.config.comment.verifiererrorhighlightmaxpositions=The maximum number of verifier mismatch positions to render at once in the Schematic Verifier overlay
+litematica.config.comment.verifieroverlayenabled=Enable Schematic Verifier marker overlay rendering
+litematica.config.comment.warndisabledrendering=Should the warning message about being in a layer mode or having some of the rendering options disabled be shown when loading a new schematic or creating a new placement
+
+litematica.config.comment.blockinfolinesalignment=The alignment of the §fBlock Info Lines§r overlay
+litematica.config.comment.blockinfooverlayalignment=The alignment of the §fBlock Info Overlay§r HUD
+litematica.config.comment.easyplacewarnings=Whether to show the §a"Action prevented by *"§r warnings for the §eEasy Place§r and §ePlacement Restriction§r modes
+litematica.config.comment.infohudalignment=The alignment of the "Info HUD", used for the Material List, Schematic Verifier mismatch positions etc.
+litematica.config.comment.toolhudalignment=The alignment of the "Tool HUD", when holding the configured "tool item"
+
+litematica.config.comment.areaselectionboxsidecolor=The color of the Area Selection boxes, when they are unselected
+litematica.config.comment.materiallisthuditemcountscolor=The color of the item count text in the Material List info HUD
+litematica.config.comment.materiallistslothighlightlessthanstack=The color for the "less than one stack available" slot highlight
+litematica.config.comment.materiallistslothighlightnone=The color for the "completely out" slot highlight
+litematica.config.comment.materiallistslothighlightnotenough=The color for the "not enough" slot highlight
+litematica.config.comment.schematicrebuildbreakplaceoverlaycolor=The color of Edit Schematic mode's break or place blocks selector overlay
+litematica.config.comment.schematicrebuildreplaceoverlaycolor=The color of Edit Schematic mode's replace selector overlay
+litematica.config.comment.schematicoverlaycolorextra=The color of the schematic block overlay for extra blocks
+litematica.config.comment.schematicoverlaycolormissing=The color of the schematic block overlay for missing blocks
+litematica.config.comment.schematicoverlaycolorwrongblock=The color of the schematic block overlay for wrong blocks
+litematica.config.comment.schematicoverlaycolorwrongstate=The color of the schematic block overlay for wrong block states
+
+litematica.config.name.areaselectionsperworld=Area Selections Per-World
+litematica.config.name.betterrenderorder=Better Render Order
+litematica.config.name.changeselectedcorneronmove=Select Moved Corner
+litematica.config.name.cloneatoriginalposition=Clone at Original Position
+litematica.config.name.customschematicdirectory=Custom Schematic Directory
+litematica.config.name.debugmessages=Debug Messages
+litematica.config.name.easyplaceclickadjacent=Easy Place Click Adjacent
+litematica.config.name.easyplacemode=Easy Place Mode
+litematica.config.name.easyplacehold=Easy Place Hold
+litematica.config.name.executerequireholdingtool=Execute Require Holding Tool
+litematica.config.name.fixrailrotation=Fix Rail Rotation
+litematica.config.name.generatelowercasenames=Generate Lower Case Names
+litematica.config.name.loadentireschematics=Load Entire Schematics
+litematica.config.name.materiallistignoreblockstate=Material List Ignore Block State
+litematica.config.name.materiallistfromcontainer=Material List From Container
+litematica.config.name.pastecommandinterval=Paste Command Interval
+litematica.config.name.pastecommandlimit=Paste Command Limit
+litematica.config.name.pastecommandnamesetblock=Command Name Setblock
+litematica.config.name.pastereplacebehavior=Paste Replace Behavior
+litematica.config.name.pickblockauto=Pick Block Auto
+litematica.config.name.pickblockenabled=Pick Block Enabled
+litematica.config.name.pickblockignorenbt=Pick Block Ignore NBT
+litematica.config.name.pickblockableslots=Pick Blockable Slots
+litematica.config.name.placementrestriction=Placement Restriction
+litematica.config.name.placementinfrontofplayer=Placement Infront of Player
+litematica.config.name.rendermateriallistinguis=Render Material List in GUIs
+litematica.config.name.renderthreadnotimeout=Render Thread No Timeout
+litematica.config.name.selectioncornersmode=Selection Corners Mode
+litematica.config.name.signtextpaste=Sign Text Paste
+litematica.config.name.toolitem=Tool Item
+litematica.config.name.toolitemenabled=Tool Item Enabled
+litematica.config.name.usecustomschematicdirectory=Use Custom Schematic Directory
+
+litematica.config.name.enableareaselectionboxesrendering=Area Selection Boxes Rendering
+litematica.config.name.enableplacementboxesrendering=Placement Boxes Rendering
+litematica.config.name.enablerendering=Main Rendering Toggle
+litematica.config.name.enableschematicblocksrendering=Schematic Blocks Rendering
+litematica.config.name.enableschematicoverlay=Schematic Overlay
+litematica.config.name.enableschematicrendering=Schematic Rendering
+litematica.config.name.ignoreexistingfluids=Ignore Existing Fluids
+litematica.config.name.overlayreducedinnersides=Overlay Reduced Inner Sides
+litematica.config.name.placementboxsidealpha=Placement Box Side Alpha
+litematica.config.name.renderareaselectionboxsides=Area Selection Box Sides
+litematica.config.name.rendercollidingblockatcursor=Render Colliding Block at Cursor
+litematica.config.name.rendercollidingschematicblocks=Render Colliding Schematic Blocks
+litematica.config.name.rendererrormarkerconnections=Render Error Marker Connections
+litematica.config.name.rendererrormarkersides=Render Error Marker Sides
+litematica.config.name.renderplacementboxsides=Render Placement Box Sides
+litematica.config.name.renderplacementenclosingbox=Render Placement Enclosing Box
+litematica.config.name.renderplacementenclosingboxsides=Render Placement Enclosing Box Sides
+litematica.config.name.rendertranslucentblockinnersides=Render Translucent Block Inner Sides
+litematica.config.name.schematicoverlayenableoutlines=Schematic Overlay Outlines
+litematica.config.name.schematicoverlayenablesides=Schematic Overlay Sides
+litematica.config.name.schematicoverlaymodeloutline=Schematic Overlay Model Outline
+litematica.config.name.schematicoverlaymodelsides=Schematic Overlay Model Sides
+litematica.config.name.schematicoverlayoutlinewidth=Schematic Overlay Outline Width
+litematica.config.name.schematicoverlayoutlinewidththrough=Schematic Overlay Outline Width Through
+litematica.config.name.schematicoverlayrenderthroughblocks=Schematic Overlay Render Through Blocks
+litematica.config.name.schematicoverlaytypeextra=Schematic Overlay Type Extra
+litematica.config.name.schematicoverlaytypemissing=Schematic Overlay Type Missing
+litematica.config.name.schematicoverlaytypewrongblock=Schematic Overlay Type Wrong Block
+litematica.config.name.schematicoverlaytypewrongstate=Schematic Overlay Type Wrong State
+litematica.config.name.schematicverifieruseblockmodels=Schematic Verifier Use Block Models
+litematica.config.name.translucentschematicalpha=Translucent Schematic Alpha
+litematica.config.name.translucentschematicenabled=Translucent Schematic Enabled
+
+litematica.config.name.blockinfolinesenabled=Block Info Lines
+litematica.config.name.blockinfolinesfontscale=Block Info Lines Font Scale
+litematica.config.name.blockinfolinesoffsetx=Block Info Lines X-Offset
+litematica.config.name.blockinfolinesoffsety=Block Info Lines Y-Offset
+litematica.config.name.blockinfooverlayoffsety=Block Info Overlay Y-Offset
+litematica.config.name.blockinfooverlayenabled=Block Info Overlay
+litematica.config.name.infohudmaxlines=Info HUD Max Lines
+litematica.config.name.infohudoffsetx=Info HUD X-Offset
+litematica.config.name.infohudoffsety=Info HUD Y-Offset
+litematica.config.name.infohudscale=Info HUD Scale
+litematica.config.name.materiallisthudmaxlines=Material List HUD Max Lines
+litematica.config.name.materiallisthudscale=Material List HUD Scale
+litematica.config.name.materiallisthudstacks=Material List HUD Stacks
+litematica.config.name.materiallistslothighlight=Material List Slot Highlight
+litematica.config.name.statusinfohud=Status Info HUD
+litematica.config.name.statusinfohudauto=StatusInfo HUD Auto
+litematica.config.name.toolhudalwaysvisible=Tool HUD Always Visible
+litematica.config.name.toolhudoffsetx=Tool HUD X-Offset
+litematica.config.name.toolhudoffsety=Tool HUD Y-Offset
+litematica.config.name.toolhudscale=Tool HUD Scale
+litematica.config.name.verifiererrorhighlightalpha=Verifier Error Hilight Alpha
+litematica.config.name.verifiererrorhighlightmaxpositions=Verifier Error Highlight Max Positions
+litematica.config.name.verifieroverlayenabled=Verifier Overlay
+litematica.config.name.warndisabledrendering=Warn Disabled Rendering
+litematica.config.name.blockinfolinesalignment=Block Info Lines Alignment
+litematica.config.name.blockinfooverlayalignment=Block Info Overlay Alignment
+litematica.config.name.easyplacewarnings=Easy Place Warnings
+litematica.config.name.infohudalignment=Info HUD Alignment
+litematica.config.name.toolhudalignment=Tool HUD Alignment
+
+litematica.config.name.areaselectionboxsidecolor=Area Selection Box Side
+litematica.config.name.materiallisthuditemcountscolor=Material List HUD Item Counts
+litematica.config.name.materiallistslothighlightlessthanstack=Material List Slot Highlight (< stack)
+litematica.config.name.materiallistslothighlightnone=Material List Slot Highlight (None)
+litematica.config.name.materiallistslothighlightnotenough=Material List Slot Highlight (Not Enough)
+litematica.config.name.schematicrebuildbreakplaceoverlaycolor=Edit Schematic Break/Place Overlay
+litematica.config.name.schematicrebuildreplaceoverlaycolor=Edit Schematic Replace Overlay
+litematica.config.name.schematicoverlaycolorextra=Schematic Overlay Color Extra
+litematica.config.name.schematicoverlaycolormissing=Schematic Overlay Color Missing
+litematica.config.name.schematicoverlaycolorwrongblock=Schematic Overlay Color Wrong Block
+litematica.config.name.schematicoverlaycolorwrongstate=Schematic Overlay Color Wrong State
+
+litematica.hud.status_info.easy_place_enabled=Easy Place: §aON§r
+litematica.hud.status_info.render_layer_mode=Layer Mode: §b%s§r - §a%s§r = §6%s
+litematica.hud.status_info.render_layer_mode_all=Render Layer Mode: §b%s
+litematica.hud.status_info.renderer_status=Renderers: All: %s Sch: %s Bl: %s Ov: %s Sel: %s
+litematica.hud.status_info.placement_restriction_enabled=Placement Restriction: §aON§r
+litematica.hud.status_info.schematic_vcs_mode=§6Schematic VCS mode§r
+litematica.hud.tool_hud.area_selection.dimensions_positions=Dim: §a%s x %s x %s§r - pos1: §a%s, %s, %s§r, pos2: §a%s, %s, %s§r
+litematica.hud.tool_hud.area_selection.corners_mode=Corners Mode: §b%s
+litematica.hud.tool_hud.area_selection.origin.normal=Origin: §9%s, %s, %s§r [§b%s§r] - Boxes: §6%s
+litematica.hud.tool_hud.area_selection.origin.simple=Origin: §9%s, %s, %s§r [§b%s§r]
+litematica.hud.tool_hud.area_selection.selected_area.normal=Area: §a%s
+litematica.hud.tool_hud.area_selection.selected_area.simple=Area [§6Simple mode§r]: §a%s
+litematica.hud.tool_hud.area_selection.selected_sub_region=Sub-region: §a%s
+litematica.hud.tool_hud.block_state_string_no_facing=§a%s (%s)
+litematica.hud.tool_hud.block_state_string_with_facing=§a%s (%s)§r - Facing: §b%s
+litematica.hud.tool_hud.delete.target_mode=Delete Target: §b%s
+litematica.hud.tool_hud.delete.target_mode.area=Area Selection
+litematica.hud.tool_hud.delete.target_mode.placement=Schematic Placement
+litematica.hud.tool_hud.replaced_block=Replace: §a%s
+litematica.hud.tool_hud.schematic_paste.replace_mode.none=Replace Blocks: §c%s
+litematica.hud.tool_hud.schematic_paste.replace_mode.some=Replace Blocks: §6%s
+litematica.hud.tool_hud.schematic_placement.origin=Origin: §9%s, %s, %s§r
+litematica.hud.tool_hud.schematic_placement.selected_placement=Placement: §a%s
+litematica.hud.tool_hud.schematic_placement.selected_sub_region=Sub-region: §a%s§r - Modified: %s
+litematica.hud.tool_hud.schematic_placement.region_count_and_modified=Region Count: §6%s§r - Modified: %s
+litematica.hud.tool_hud.schematic_placement.sub_region_origin=Region origin: §a%s, %s, %s
+litematica.hud.tool_hud.schematic_projects.current_version_date=Date: §a%s
+litematica.hud.tool_hud.schematic_projects.current_version=Version: §6%s§r/§6%s§r - Name: §a%s
+litematica.hud.tool_hud.schematic_projects.no_versions=<no versions>
+litematica.hud.tool_hud.schematic_projects.origin=Project origin: §a%s
+litematica.hud.tool_hud.schematic_projects.project_name=Project: §a%s
+litematica.hud.tool_hud.tool_mode=Mode: §a%s§r [§a%s§r/§a%s§r]: §a%s
+litematica.hud.tool_hud.used_block=Block: §a%s
+
+litematica.hud.value.on.colored=§aON§r
+litematica.hud.value.off.colored=§cOFF§r
+
+litematica.hud.area_selection.mode.corners=Corners
+litematica.hud.area_selection.mode.expand=Expand
+
+litematica.label.misc.none.brackets=<none>
+litematica.label.misc.null.brackets=<null>
+litematica.label.misc.origin.auto=Auto
+litematica.label.misc.origin.manual=Manual
+litematica.label.schematic_projects.current_version_date=Date: %s
+
+litematica.title.hud.block_info_lines.client=§nClient:
+litematica.title.hud.block_info_lines.schematic=§nSchematic:
+litematica.title.hud.block_info_overlay.state_client=§f§lClient World Block State
+litematica.title.hud.block_info_overlay.state_schematic=§f§lSchematic World Block State
+litematica.title.hud.material_list=§lMaterial List
+litematica.title.hud.missing_chunks=§f§l%s, un-seen chunks (%s)
+litematica.title.hud.missing_chunks.schematic_paste=§f§lPaste, un-seen chunks (%s)
 
 litematica.error.area_selection.copy_failed=Failed to copy the selection
 litematica.error.area_selection.create_failed=Failed to create a new selection by the name '%s', file already exists
@@ -257,9 +525,6 @@ litematica.gui.label.area_selection.hover.origin=§7Origin - x: §9%s§7, y: §9
 litematica.gui.label.area_selection.mode.normal=Normal
 litematica.gui.label.area_selection.mode.simple=Simple
 
-litematica.gui.label.block_info.state_client=Client World Block State
-litematica.gui.label.block_info.state_schematic=Schematic World Block State
-
 litematica.gui.label.block_info_list_type.all=All
 litematica.gui.label.block_info_list_type.render_layers=Render Layers
 
@@ -281,10 +546,6 @@ litematica.gui.label.material_list.total=Total: %s items
 
 litematica.gui.label.misc.icons=Icons
 litematica.gui.label.misc.text=Text
-
-litematica.gui.label.missing_chunks=%s, missing chunks (%s)
-litematica.gui.label.origin.auto=Auto
-litematica.gui.label.origin.manual=Manual
 
 litematica.gui.label.placement_grid.grid_size=Grid size
 litematica.gui.label.placement_grid.repeat_count=Repeat count
@@ -330,8 +591,6 @@ litematica.gui.label.schematic_info.total_volume=Total volume: §f%d§r blocks
 
 litematica.gui.label.schematic_load.checkbox.create_placement=Create a placement
 litematica.gui.label.schematic_load.hoverinfo.create_placement=Immediately create a new placement\nand select that placement
-
-litematica.gui.label.schematic_paste.missing_chunks=Paste, missing chunks (%s)
 
 litematica.gui.label.schematic_placement.hoverinfo.hold_shift_to_create_as_disabled=Hold shift to disable the placement when created
 litematica.gui.label.schematic_placement.open_placement_browser=Browse Saved Placements
@@ -436,48 +695,12 @@ litematica.gui.title.schematic_verifier=Schematic Verifier for '%s'
 litematica.gui.title.schematic_verifier_errors=Schematic Verifier errors
 litematica.gui.title.task_manager=Task Manager
 
-litematica.hud.area_selection.box_count=Boxes: %s
-litematica.hud.area_selection.dimensions_position=Dim: %s - p1: %s, p2: %s
-litematica.hud.area_selection.mode.corners=Corners
-litematica.hud.area_selection.mode.expand=Expand
-litematica.hud.area_selection.origin=Origin: %s
-litematica.hud.area_selection.selected_area_normal=Area: %s
-litematica.hud.area_selection.selected_area_simple=Area [§6Simple mode§r]: %s
-litematica.hud.area_selection.selected_sub_region=Sub-region: %s
-litematica.hud.area_selection.selection_corners_mode=Corners Mode: %s
-
-litematica.hud.delete.target_mode=Delete target mode: %s
-litematica.hud.delete.target_mode.area=Current Area
-litematica.hud.delete.target_mode.placement=Current Placement
-
-litematica.hud.misc.easy_place_mode_enabled=Easy Place mode §aON§r
 litematica.hud.misc.none_brackets=<none>
-litematica.hud.misc.placement_restriction_mode_enabled=Placement Restriction mode §aON§r
-litematica.hud.misc.render_layer_mode=Layer Mode: %s - %s
-litematica.hud.misc.render_layer_mode_all=Layer Mode: %s
-litematica.hud.misc.renderer_status=Renderers: A: %s S: %s B: %s O: %s SEL: %s
-litematica.hud.misc.schematic_paste.replace_mode=Replace blocks: %s
 
 litematica.hud.schematic_placement.hover_info.lock_coordinate=§7Lock this coordinate\n§7This allows changing the other coordinates\n§7without (accidentally) affecting the locked ones
 litematica.hud.schematic_placement.hover_info.placement_locked=§6This placement has been locked and can't\n§6be modified without unlocking it first
 litematica.hud.schematic_placement.hover_info.placement_modified=§6This placement has been modified
 litematica.hud.schematic_placement.hover_info.placement_sub_region_modified=§6This sub-region has been modified
-litematica.hud.schematic_placement.selected_placement=Placement
-litematica.hud.schematic_placement.selected_sub_region=Sub-region
-litematica.hud.schematic_placement.sub_region_count=Regions
-litematica.hud.schematic_placement.sub_region_modified=Modified
-litematica.hud.schematic_placement.sub_region_origin=Region origin: %s
-litematica.hud.schematic_placement.sub_regions_modified=Regions modified
-
-litematica.hud.selected_mode=Mode
-
-litematica.hud.schematic_projects.current_version_date=Date: %s
-litematica.hud.schematic_projects.current_version=Version: %s/%s - name: %s
-litematica.hud.schematic_projects.no_project_open=<no project open>
-litematica.hud.schematic_projects.no_versions=<no versions>
-litematica.hud.schematic_projects.origin=Project origin: %s
-litematica.hud.schematic_projects.project_name=Project: %s
-litematica.hud.schematic_projects_mode=§6Schematic Projects mode§r
 
 litematica.info.material_list=- The Material List hotkey will open the last viewed Material List,\n   if there is one stored\n- To switch to a different Material List, open one via\n   the GUI button in the Placement Configuration GUI or\n   the schematic browser\n- The stored/last viewed list is also forgot\n   if the selected Schematic Placement is changed\n- If there is no last viewed Material List yet,\n   then the selected Placement is used, if there is one
 
@@ -491,7 +714,6 @@ litematica.label.config_tab.info_overlays=Info Overlays
 litematica.label.config_tab.render_layers=Render Layers
 litematica.label.config_tab.visuals=Visuals
 
-litematica.label.none_lower=none
 litematica.label.no=no
 litematica.label.yes=yes
 
@@ -579,8 +801,6 @@ litematica.message.set_area_origin=Set the area origin point to %s
 litematica.message.set_currently_held_item_as_tool=§aSet the currently held item as the tool item
 litematica.message.set_selection_box_point=Set/moved point %d to %s
 litematica.message.toggled=Toggled %s %s
-litematica.message.value.on=ON
-litematica.message.value.off=OFF
 
 litematica.message.schematic_projects.project_created=Project '%s' created
 litematica.message.schematic_projects.project_loaded=Project '%s' loaded
@@ -598,10 +818,6 @@ litematica.message.warn.schematic_verifier.overlay_disabled=Warning: The verifie
 litematica.message.warning.invalid_number=Invalid input for a number '%s'
 
 litematica.warning.area_editor.area_rendering_disabled=Note: The Area Selection boxes rendering is currently disabled\nSee Visuals -> %s, or Hotkeys -> %s ['%s']
-
-litematica.tool_hud.block_1=Block: %s
-litematica.tool_hud.block_2=Replace: %s
-litematica.tool_hud.facing=Facing: %s
 
 litematica.tool_mode.name.area_selection=Area Selection
 litematica.tool_mode.name.delete=Delete

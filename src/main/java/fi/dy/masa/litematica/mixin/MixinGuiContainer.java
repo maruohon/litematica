@@ -16,7 +16,7 @@ public abstract class MixinGuiContainer extends net.minecraft.client.gui.GuiScre
     {
         if (Configs.InfoOverlays.MATERIAL_LIST_SLOT_HIGHLIGHT.getBooleanValue())
         {
-            MaterialListHudRenderer.renderSlotHilights((net.minecraft.client.gui.inventory.GuiContainer) (Object) this);
+            MaterialListHudRenderer.renderSlotHighlights((net.minecraft.client.gui.inventory.GuiContainer) (Object) this);
         }
     }
 }

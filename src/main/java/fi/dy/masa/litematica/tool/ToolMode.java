@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.tool;
 
 import javax.annotation.Nullable;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import fi.dy.masa.litematica.data.DataManager;
@@ -27,12 +28,14 @@ public enum ToolMode
     @Nullable private IBlockState blockPrimary;
     @Nullable private IBlockState blockSecondary;
 
-    private ToolMode(String unlocName, boolean creativeOnly, boolean usesSchematic)
+    public static final ImmutableList<ToolMode> VALUES = ImmutableList.copyOf(values());
+
+    ToolMode(String unlocName, boolean creativeOnly, boolean usesSchematic)
     {
         this(unlocName, creativeOnly, usesSchematic, false, false);
     }
 
-    private ToolMode(String unlocName, boolean creativeOnly, boolean usesSchematic, boolean usesBlockPrimary, boolean usesBlockSecondary)
+    ToolMode(String unlocName, boolean creativeOnly, boolean usesSchematic, boolean usesBlockPrimary, boolean usesBlockSecondary)
     {
         this.unlocName = unlocName;
         this.creativeOnly = creativeOnly;
