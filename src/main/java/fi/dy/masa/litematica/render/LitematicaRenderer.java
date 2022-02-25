@@ -134,7 +134,7 @@ public class LitematicaRenderer
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
         GlStateManager.disableAlpha();
 
-        if (Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue())
+        if (Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue())
         {
             GlStateManager.pushMatrix();
 
@@ -220,7 +220,7 @@ public class LitematicaRenderer
     {
         boolean invert = Hotkeys.INVERT_OVERLAY_RENDER_STATE.getKeyBind().isKeyBindHeld();
 
-        if (Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue() != invert)
+        if (Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.getBooleanValue() != invert)
         {
             boolean renderThrough = Configs.Visuals.SCHEMATIC_OVERLAY_RENDER_THROUGH.getBooleanValue() || Hotkeys.RENDER_OVERLAY_THROUGH_BLOCKS.getKeyBind().isKeyBindHeld();
             float lineWidth = (float) (renderThrough ? Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH_THROUGH.getDoubleValue() : Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINE_WIDTH.getDoubleValue());
@@ -253,11 +253,11 @@ public class LitematicaRenderer
 
     public void startShaderIfEnabled()
     {
-        this.translucentSchematic = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue() && OpenGlHelper.shadersSupported;
+        this.translucentSchematic = Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING.getBooleanValue() && OpenGlHelper.shadersSupported;
 
         if (this.translucentSchematic)
         {
-            enableAlphaShader(Configs.Visuals.GHOST_BLOCK_ALPHA.getFloatValue());
+            enableAlphaShader(Configs.Visuals.TRANSLUCENT_SCHEMATIC_ALPHA.getFloatValue());
         }
     }
 
@@ -289,16 +289,16 @@ public class LitematicaRenderer
     public void piecewisePrepareAndUpdate(float partialTicks)
     {
         this.renderPiecewise = Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() &&
-                               Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
+                               Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
                                this.mc.getRenderViewEntity() != null;
         this.renderPiecewisePrepared = false;
         this.renderPiecewiseBlocks = false;
 
         if (this.renderPiecewise)
         {
-            boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeyBind().isKeyBindHeld();
-            this.renderPiecewiseSchematic = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
-            this.renderPiecewiseBlocks = this.renderPiecewiseSchematic && Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue();
+            boolean invert = Hotkeys.INVERT_SCHEMATIC_RENDER_STATE.getKeyBind().isKeyBindHeld();
+            this.renderPiecewiseSchematic = Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() != invert;
+            this.renderPiecewiseBlocks = this.renderPiecewiseSchematic && Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue();
 
             this.mc.profiler.startSection("litematica_culling");
 

@@ -111,7 +111,7 @@ public class WidgetListSchematicVerificationResults extends BaseListWidget<Block
 
     private void addEntriesForType(MismatchType type)
     {
-        String title = type.getFormattingCode() + type.getDisplayname() + BaseScreen.TXT_RST;
+        String title = type.getTitleDisplayName();
         this.listContents.add(new BlockMismatchEntry(type, title));
         List<BlockMismatch> list;
 
@@ -153,7 +153,7 @@ public class WidgetListSchematicVerificationResults extends BaseListWidget<Block
             list = this.guiSchematicVerifier.getPlacement().getSchematicVerifier().getMismatchOverviewFor(type);
         }
 
-        Collections.sort(list, this.sorter);
+        list.sort(this.sorter);
 
         for (BlockMismatch mismatch : list)
         {

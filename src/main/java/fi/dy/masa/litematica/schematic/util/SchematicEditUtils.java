@@ -50,11 +50,11 @@ public class SchematicEditUtils
             DataManager.getToolMode() == ToolMode.REBUILD &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
-            if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
+            if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
             {
                 return breakSchematicBlocks(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeyBind().isKeyBindHeld())
+            else if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeyBind().isKeyBindHeld())
             {
                 return breakAllIdenticalSchematicBlocks(mc);
             }
@@ -73,19 +73,19 @@ public class SchematicEditUtils
             DataManager.getToolMode() == ToolMode.REBUILD &&
             RenderUtils.areSchematicBlocksCurrentlyRendered())
         {
-            if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeyBind().isKeyBindHeld())
+            if (Hotkeys.SCHEMATIC_EDIT_REPLACE_DIRECTION.getKeyBind().isKeyBindHeld())
             {
                 return replaceSchematicBlocksInDirection(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeyBind().isKeyBindHeld())
+            else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_ALL.getKeyBind().isKeyBindHeld())
             {
                 return replaceAllIdenticalSchematicBlocks(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
+            else if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
             {
                 return placeSchematicBlocksInDirection(mc);
             }
-            else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeyBind().isKeyBindHeld())
+            else if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeyBind().isKeyBindHeld())
             {
                 return fillAirWithBlocks(mc);
             }

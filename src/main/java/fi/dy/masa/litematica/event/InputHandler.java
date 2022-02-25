@@ -1,12 +1,9 @@
 package fi.dy.masa.litematica.event;
 
-import java.util.List;
-import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
@@ -20,13 +17,10 @@ import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
 import fi.dy.masa.litematica.util.ToolUtils;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.input.Hotkey;
-import fi.dy.masa.malilib.input.HotkeyCategory;
-import fi.dy.masa.malilib.input.HotkeyProvider;
 import fi.dy.masa.malilib.input.MouseInputHandler;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 
-public class InputHandler implements HotkeyProvider, MouseInputHandler
+public class InputHandler implements MouseInputHandler
 {
     private static final InputHandler INSTANCE = new InputHandler();
 
@@ -37,18 +31,6 @@ public class InputHandler implements HotkeyProvider, MouseInputHandler
     public static InputHandler getInstance()
     {
         return INSTANCE;
-    }
-
-    @Override
-    public List<? extends Hotkey> getAllHotkeys()
-    {
-        return Hotkeys.HOTKEY_LIST;
-    }
-
-    @Override
-    public List<HotkeyCategory> getHotkeysByCategories()
-    {
-        return ImmutableList.of(new HotkeyCategory(Reference.MOD_INFO, "litematica.hotkeys.category.generic_hotkeys", Hotkeys.HOTKEY_LIST));
     }
 
     @Override
@@ -68,7 +50,7 @@ public class InputHandler implements HotkeyProvider, MouseInputHandler
     private boolean handleMouseScroll(double dWheel, Minecraft mc)
     {
         EntityPlayer player = mc.player;
-        boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
+        boolean toolEnabled = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
         if (toolEnabled == false || EntityUtils.hasToolItem(player) == false)
         {

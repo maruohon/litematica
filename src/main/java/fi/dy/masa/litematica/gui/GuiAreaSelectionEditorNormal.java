@@ -171,10 +171,10 @@ public class GuiAreaSelectionEditorNormal extends BaseListScreen<String, WidgetS
 
     protected void addRenderingDisabledWarning(int x, int y)
     {
-        if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
+        if (Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue() == false)
         {
             HotkeyConfig hotkey = Hotkeys.TOGGLE_AREA_SELECTION_RENDERING;
-            String configName = Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getName();
+            String configName = Configs.Visuals.AREA_SELECTION_RENDERING.getName();
             String hotkeyName = hotkey.getName();
             String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
             String str = StringUtils.translate("litematica.warning.area_editor.area_rendering_disabled", configName, hotkeyName, hotkeyVal);

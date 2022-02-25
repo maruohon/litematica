@@ -104,8 +104,8 @@ public class OverlayRenderer
         Entity renderViewEntity = fi.dy.masa.malilib.util.EntityUtils.getCameraEntity();
         SelectionManager sm = DataManager.getSelectionManager();
         AreaSelection currentSelection = sm.getCurrentSelection();
-        boolean renderAreas = currentSelection != null && Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue();
-        boolean renderPlacements = this.placements.isEmpty() == false && Configs.Visuals.ENABLE_PLACEMENT_BOXES_RENDERING.getBooleanValue();
+        boolean renderAreas = currentSelection != null && Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue();
+        boolean renderPlacements = this.placements.isEmpty() == false && Configs.Visuals.PLACEMENT_BOX_RENDERING.getBooleanValue();
         boolean isProjectMode = DataManager.getSchematicProjectsManager().hasProjectOpen();
         float expand = 0.001f;
         float lineWidthBlockBox = 2f;
@@ -274,7 +274,7 @@ public class OverlayRenderer
         {
             color1 = box.getSelectedCorner() == Corner.CORNER_1 ? this.colorSelectedCorner : this.colorPos1;
             color2 = box.getSelectedCorner() == Corner.CORNER_2 ? this.colorSelectedCorner : this.colorPos2;
-            sideColor = Color4f.fromColor(Configs.Colors.AREA_SELECTION_BOX_SIDE_COLOR.getIntegerValue());
+            sideColor = Color4f.fromColor(Configs.Colors.AREA_SELECTION_BOX_SIDE.getIntegerValue());
         }
 
         if (pos1 != null && pos2 != null)
@@ -433,18 +433,18 @@ public class OverlayRenderer
     {
         if (mc.world != null && mc.player != null)
         {
-            boolean infoOverlayKeyActive = Hotkeys.RENDER_INFO_OVERLAY.getKeyBind().isKeyBindHeld();
+            boolean infoOverlayKeyActive = Hotkeys.RENDER_BLOCK_INFO_OVERLAY.getKeyBind().isKeyBindHeld();
             boolean verifierOverlayRendered = false;
 
             if (infoOverlayKeyActive &&
-                Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue() &&
-                Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue())
+                Configs.InfoOverlays.VERIFIER_OVERLAY_RENDERING.getBooleanValue() &&
+                Configs.InfoOverlays.BLOCK_INFO_OVERLAY_RENDERING.getBooleanValue())
             {
                 verifierOverlayRendered = this.renderVerifierOverlay(mc);
             }
 
-            boolean renderBlockInfoLines = Configs.InfoOverlays.BLOCK_INFO_LINES_ENABLED.getBooleanValue();
-            boolean renderInfoOverlay = verifierOverlayRendered == false && infoOverlayKeyActive && Configs.InfoOverlays.BLOCK_INFO_OVERLAY_ENABLED.getBooleanValue();
+            boolean renderBlockInfoLines = Configs.InfoOverlays.BLOCK_INFO_LINES_RENDERING.getBooleanValue();
+            boolean renderInfoOverlay = verifierOverlayRendered == false && infoOverlayKeyActive && Configs.InfoOverlays.BLOCK_INFO_OVERLAY_RENDERING.getBooleanValue();
             RayTraceWrapper traceWrapper = null;
 
             if (renderBlockInfoLines || renderInfoOverlay)
@@ -562,7 +562,7 @@ public class OverlayRenderer
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
             info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
-            RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldClient, pos, mc);
+            RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldClient, pos);
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
         {
@@ -582,7 +582,7 @@ public class OverlayRenderer
                 this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
                 info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
-                RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldSchematic, pos, mc);
+                RenderUtils.renderInventoryOverlay(align, HorizontalAlignment.CENTER, this.blockInfoInvOffY, worldSchematic, pos);
             }
         }
     }
@@ -647,26 +647,26 @@ public class OverlayRenderer
         Color4f color = null;
         boolean direction = false;
 
-        if (Hotkeys.SCHEMATIC_REBUILD_BREAK_ALL.getKeyBind().isKeyBindHeld())
+        if (Hotkeys.SCHEMATIC_EDIT_BREAK_ALL.getKeyBind().isKeyBindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
-            color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
+            color = Configs.Colors.REBUILD_BREAK_OVERLAY.getColor();
         }
-        else if (Hotkeys.SCHEMATIC_REBUILD_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
+        else if (Hotkeys.SCHEMATIC_EDIT_BREAK_DIRECTION.getKeyBind().isKeyBindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
-            color = Configs.Colors.REBUILD_BREAK_OVERLAY_COLOR.getColor();
+            color = Configs.Colors.REBUILD_BREAK_OVERLAY.getColor();
             direction = true;
         }
-        else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_ALL.getKeyBind().isKeyBindHeld())
+        else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_ALL.getKeyBind().isKeyBindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
-            color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
+            color = Configs.Colors.REBUILD_REPLACE_OVERLAY.getColor();
         }
-        else if (Hotkeys.SCHEMATIC_REBUILD_REPLACE_DIRECTION.getKeyBind().isKeyBindHeld())
+        else if (Hotkeys.SCHEMATIC_EDIT_REPLACE_DIRECTION.getKeyBind().isKeyBindHeld())
         {
             traceWrapper = RayTraceUtils.getGenericTrace(this.mc.world, entity, 20, true);
-            color = Configs.Colors.REBUILD_REPLACE_OVERLAY_COLOR.getColor();
+            color = Configs.Colors.REBUILD_REPLACE_OVERLAY.getColor();
             direction = true;
         }
 
@@ -729,7 +729,7 @@ public class OverlayRenderer
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder buffer = tessellator.getBuffer();
 
-                LitematicaRenderer.enableAlphaShader(Configs.Visuals.GHOST_BLOCK_ALPHA.getFloatValue());
+                LitematicaRenderer.enableAlphaShader(Configs.Visuals.TRANSLUCENT_SCHEMATIC_ALPHA.getFloatValue());
 
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
                 LitematicaRenderer.getInstance().getWorldRenderer().renderBlock(stateSchematic, pos, worldSchematic, buffer);

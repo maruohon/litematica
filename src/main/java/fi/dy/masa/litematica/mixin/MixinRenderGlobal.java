@@ -36,8 +36,8 @@ public abstract class MixinRenderGlobal
         {
             SchematicVerifier.markVerifierBlockChanges(pos);
 
-            if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-                Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
+            if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
+                Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue())
             {
                 SchematicWorldRenderingNotifier.markSchematicChunkForRenderUpdate(pos);
             }

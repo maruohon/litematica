@@ -5,25 +5,18 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityLockableLoot;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.materials.MaterialCache;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
@@ -76,48 +69,8 @@ public class InventoryUtils
                     }
                 }
             }
-            catch (NumberFormatException e)
-            {
-            }
+            catch (NumberFormatException ignore) {}
         }
-    }
-
-    /**
-     * Returns the inventory at the requested location, if any.
-     * If the target is a double chest, then the combined inventory is returned.
-     * @param world
-     * @param pos
-     * @return
-     */
-    @Nullable
-    public static IInventory getInventory(World world, BlockPos pos)
-    {
-        IInventory inv = null;
-        TileEntity te = world.getTileEntity(pos);
-
-        if (te instanceof IInventory)
-        {
-            // Prevent loot generation attempt from crashing due to NPEs
-            if (te instanceof TileEntityLockableLoot && (world instanceof WorldServer) == false)
-            {
-                ((TileEntityLockableLoot) te).setLootTable(null, 0);
-            }
-
-            inv = (IInventory) te;
-            Block block = world.getBlockState(pos).getBlock();
-
-            if (block instanceof BlockChest)
-            {
-                ILockableContainer cont = ((BlockChest) block).getLockableContainer(world, pos);
-
-                if (cont instanceof InventoryLargeChest)
-                {
-                    inv = (InventoryLargeChest) cont;
-                }
-            }
-        }
-
-        return inv;
     }
 
     public static boolean switchItemToHand(ItemStack stack, boolean ignoreNbt, Minecraft mc)

@@ -9,6 +9,7 @@ import fi.dy.masa.litematica.event.ClientWorldChangeHandler;
 import fi.dy.masa.litematica.event.InputHandler;
 import fi.dy.masa.litematica.event.RenderHandler;
 import fi.dy.masa.litematica.gui.ConfigScreen;
+import fi.dy.masa.litematica.input.HotkeyProvider;
 import fi.dy.masa.litematica.render.infohud.StatusInfoRenderer;
 import fi.dy.masa.litematica.scheduler.ClientTickHandler;
 import fi.dy.masa.malilib.config.BaseModConfig;
@@ -24,7 +25,7 @@ public class InitHandler implements InitializationHandler
         Registry.CONFIG_SCREEN.registerConfigScreenFactory(Reference.MOD_INFO, ConfigScreen::create);
         Registry.CONFIG_TAB.registerConfigTabProvider(Reference.MOD_INFO, ConfigScreen::getConfigTabs);
 
-        Registry.HOTKEY_MANAGER.registerHotkeyProvider(InputHandler.getInstance());
+        Registry.HOTKEY_MANAGER.registerHotkeyProvider(new HotkeyProvider());
         Registry.INPUT_DISPATCHER.registerMouseInputHandler(InputHandler.getInstance());
 
         RenderHandler renderer = new RenderHandler();

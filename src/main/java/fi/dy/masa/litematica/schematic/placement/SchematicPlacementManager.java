@@ -327,30 +327,30 @@ public class SchematicPlacementManager
                         MessageDispatcher.warning().translate("litematica.message.warn.layer_mode_currently_at", mode.getDisplayName());
                     }
 
-                    if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false)
+                    if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() == false)
                     {
                         HotkeyConfig hotkey = Hotkeys.TOGGLE_ALL_RENDERING;
-                        String configName = Configs.Visuals.ENABLE_RENDERING.getName();
+                        String configName = Configs.Visuals.MAIN_RENDERING_TOGGLE.getName();
                         String hotkeyName = hotkey.getName();
                         String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
 
                         MessageDispatcher.error(8000).translate("litematica.message.warn.main_rendering_disabled", configName, hotkeyName, hotkeyVal);
                     }
 
-                    if (Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false)
+                    if (Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() == false)
                     {
                         HotkeyConfig hotkey = Hotkeys.TOGGLE_SCHEMATIC_RENDERING;
-                        String configName = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getName();
+                        String configName = Configs.Visuals.SCHEMATIC_RENDERING.getName();
                         String hotkeyName = hotkey.getName();
                         String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
 
                         MessageDispatcher.error(8000).translate("litematica.message.warn.schematic_rendering_disabled", configName, hotkeyName, hotkeyVal);
                     }
 
-                    if (Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false)
+                    if (Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue() == false)
                     {
                         HotkeyConfig hotkey = Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING;
-                        String configName = Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getName();
+                        String configName = Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getName();
                         String hotkeyName = hotkey.getName();
                         String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
 

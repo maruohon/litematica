@@ -38,7 +38,7 @@ public class StatusInfoRenderer implements IInfoHudRenderer
 
     public boolean shouldRenderStatusInfoHud()
     {
-        return this.overrideEnabled || Configs.InfoOverlays.STATUS_INFO_HUD.getBooleanValue();
+        return this.overrideEnabled || Configs.InfoOverlays.STATUS_INFO_HUD_RENDERING.getBooleanValue();
     }
 
     @Override
@@ -77,11 +77,11 @@ public class StatusInfoRenderer implements IInfoHudRenderer
 
         String strOn = StringUtils.translate("litematica.hud.value.on.colored");
         String strOff = StringUtils.translate("litematica.hud.value.off.colored");
-        String strAll = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() ? strOn : strOff;
-        String strSch = Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() ? strOn : strOff;
-        String strBlk = Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() ? strOn : strOff;
-        String strOvl = Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue() ? strOn : strOff;
-        String strSel = Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() ? strOn : strOff;
+        String strAll = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() ? strOn : strOff;
+        String strSch = Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() ? strOn : strOff;
+        String strBlk = Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue() ? strOn : strOff;
+        String strOvl = Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.getBooleanValue() ? strOn : strOff;
+        String strSel = Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue() ? strOn : strOff;
 
         lines.add(StringUtils.translate("litematica.hud.status_info.renderer_status", strAll, strSch, strBlk, strOvl, strSel));
 
@@ -106,10 +106,10 @@ public class StatusInfoRenderer implements IInfoHudRenderer
         }
 
         return  DataManager.getRenderLayerRange().getLayerMode() != LayerMode.ALL ||
-                Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false ||
-                Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == false ||
-                Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() == false ||
-                Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue() == false ||
-                Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false;
+                Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() == false ||
+                Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() == false ||
+                Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue() == false ||
+                Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.getBooleanValue() == false ||
+                Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue() == false;
     }
 }

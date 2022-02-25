@@ -776,23 +776,23 @@ public class RenderChunkSchematicVbo extends RenderChunk
         synchronized (this.boxes)
         {
             this.ignoreClientWorldFluids = Configs.Visuals.IGNORE_EXISTING_FLUIDS.getBooleanValue();
-            this.overlayEnabled = Configs.Visuals.ENABLE_SCHEMATIC_OVERLAY.getBooleanValue();
+            this.overlayEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_RENDERING.getBooleanValue();
             this.overlayReducedInnerSides = Configs.Visuals.OVERLAY_REDUCED_INNER_SIDES.getBooleanValue();
-            this.overlayLinesEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_OUTLINES.getBooleanValue();
+            this.overlayLinesEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_OUTLINES.getBooleanValue();
             this.overlayModelLines = Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_OUTLINE.getBooleanValue();
             this.overlayModelSides = Configs.Visuals.SCHEMATIC_OVERLAY_MODEL_SIDES.getBooleanValue();
-            this.overlaySidesEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_ENABLE_SIDES.getBooleanValue();
+            this.overlaySidesEnabled = Configs.Visuals.SCHEMATIC_OVERLAY_SIDES.getBooleanValue();
             this.renderColliding = Configs.Visuals.RENDER_COLLIDING_SCHEMATIC_BLOCKS.getBooleanValue();
-            this.renderAsTranslucent = Configs.Visuals.RENDER_BLOCKS_AS_TRANSLUCENT.getBooleanValue();
+            this.renderAsTranslucent = Configs.Visuals.TRANSLUCENT_SCHEMATIC_RENDERING.getBooleanValue();
             this.overlayTypeExtra = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_EXTRA.getBooleanValue();
             this.overlayTypeMissing = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_MISSING.getBooleanValue();
             this.overlayTypeWrongBlock = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_BLOCK.getBooleanValue();
             this.overlayTypeWrongState = Configs.Visuals.SCHEMATIC_OVERLAY_TYPE_WRONG_STATE.getBooleanValue();
 
-            this.overlayColorExtra = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_EXTRA.getColor();
-            this.overlayColorMissing = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_MISSING.getColor();
-            this.overlayColorWrongBlock = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_BLOCK.getColor();
-            this.overlayColorWrongState = Configs.Colors.SCHEMATIC_OVERLAY_COLOR_WRONG_STATE.getColor();
+            this.overlayColorExtra = Configs.Colors.SCHEMATIC_OVERLAY_EXTRA.getColor();
+            this.overlayColorMissing = Configs.Colors.SCHEMATIC_OVERLAY_MISSING.getColor();
+            this.overlayColorWrongBlock = Configs.Colors.SCHEMATIC_OVERLAY_WRONG_BLOCK.getColor();
+            this.overlayColorWrongState = Configs.Colors.SCHEMATIC_OVERLAY_WRONG_STATE.getColor();
 
             this.schematicWorldView = new ChunkCacheSchematic(this.getWorld(), this.getPosition(), 2);
             this.clientWorldView    = new ChunkCacheSchematic(Minecraft.getMinecraft().world, this.getPosition(), 2);

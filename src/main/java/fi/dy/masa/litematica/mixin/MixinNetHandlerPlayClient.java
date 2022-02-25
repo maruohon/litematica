@@ -16,8 +16,8 @@ public abstract class MixinNetHandlerPlayClient
     @Inject(method = "handleChunkData", at = @At("RETURN"))
     private void onChunkData(SPacketChunkData packetIn, CallbackInfo ci)
     {
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-            Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue())
+        if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
+            Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue())
         {
             SchematicWorldRenderingNotifier.markSchematicChunksForRenderUpdate(new ChunkPos(packetIn.getChunkX(), packetIn.getChunkZ()));
         }

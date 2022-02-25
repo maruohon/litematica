@@ -119,32 +119,32 @@ public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, W
         switch (type)
         {
             case SET_RESULT_MODE_ALL:
-                label = MismatchType.ALL.getDisplayname();
+                label = MismatchType.ALL.getDisplayName();
                 enabled = resultMode != MismatchType.ALL;
                 break;
 
             case SET_RESULT_MODE_WRONG_BLOCKS:
-                label = MismatchType.WRONG_BLOCK.getDisplayname();
+                label = MismatchType.WRONG_BLOCK.getDisplayName();
                 enabled = resultMode != MismatchType.WRONG_BLOCK;
                 break;
 
             case SET_RESULT_MODE_WRONG_STATES:
-                label = MismatchType.WRONG_STATE.getDisplayname();
+                label = MismatchType.WRONG_STATE.getDisplayName();
                 enabled = resultMode != MismatchType.WRONG_STATE;
                 break;
 
             case SET_RESULT_MODE_EXTRA:
-                label = MismatchType.EXTRA.getDisplayname();
+                label = MismatchType.EXTRA.getDisplayName();
                 enabled = resultMode != MismatchType.EXTRA;
                 break;
 
             case SET_RESULT_MODE_MISSING:
-                label = MismatchType.MISSING.getDisplayname();
+                label = MismatchType.MISSING.getDisplayName();
                 enabled = resultMode != MismatchType.MISSING;
                 break;
 
             case SET_RESULT_MODE_CORRECT:
-                label = MismatchType.CORRECT_STATE.getDisplayname();
+                label = MismatchType.CORRECT_STATE.getDisplayName();
                 enabled = resultMode != MismatchType.CORRECT_STATE;
                 break;
 
@@ -259,9 +259,9 @@ public class GuiSchematicVerifier   extends BaseListScreen<BlockMismatchEntry, W
                 this.verifier.toggleMismatchEntrySelected(entry.blockMismatch);
             }
 
-            if (Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue() == false)
+            if (Configs.InfoOverlays.VERIFIER_OVERLAY_RENDERING.getBooleanValue() == false)
             {
-                String name = Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getName();
+                String name = Configs.InfoOverlays.VERIFIER_OVERLAY_RENDERING.getName();
                 String hotkeyName = Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getName();
                 String hotkeyVal = Hotkeys.TOGGLE_VERIFIER_OVERLAY_RENDERING.getKeyBind().getKeysDisplayString();
                 MessageUtils.showGuiOrInGameMessage(MessageOutput.WARNING, "litematica.message.warn.schematic_verifier.overlay_disabled", name, hotkeyName, hotkeyVal);

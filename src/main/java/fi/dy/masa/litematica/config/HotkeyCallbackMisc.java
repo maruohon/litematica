@@ -107,13 +107,13 @@ public class HotkeyCallbackMisc implements HotkeyCallback
         }
         else if (key == Hotkeys.EXECUTE_OPERATION.getKeyBind())
         {
-            boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
+            boolean toolEnabled = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
 
             if (Configs.Generic.EXECUTE_REQUIRE_TOOL.getBooleanValue()
                 && (EntityUtils.hasToolItem(this.mc.player) == false || toolEnabled == false))
             {
-                String keyRenderToggle = Hotkeys.TOGGLE_ALL_RENDERING.getKeyBind().getKeysDisplayString();
-                String keyToolToggle = Hotkeys.TOOL_ENABLED_TOGGLE.getKeyBind().getKeysDisplayString();
+                String keyRenderToggle = Configs.Visuals.MAIN_RENDERING_TOGGLE.getKeyBind().getKeysDisplayString();
+                String keyToolToggle = Configs.Generic.TOOL_ITEM_ENABLED.getKeyBind().getKeysDisplayString();
                 MessageDispatcher.error(8000).translate("litematica.error.execute_operation_no_tool", keyRenderToggle, keyToolToggle);
                 return ActionResult.SUCCESS;
             }
@@ -248,7 +248,7 @@ public class HotkeyCallbackMisc implements HotkeyCallback
             DataManager.getSchematicPlacementManager().removeSelectedSchematicPlacement();
             return ActionResult.SUCCESS;
         }
-        else if (key == Hotkeys.RERENDER_SCHEMATIC.getKeyBind())
+        else if (key == Hotkeys.REFRESH_SCHEMATIC_RENDERER.getKeyBind())
         {
             SchematicWorldRenderingNotifier.INSTANCE.updateAll();
             MessageDispatcher.generic().customHotbar().translate("litematica.message.schematic_rendering_refreshed");
@@ -276,15 +276,15 @@ public class HotkeyCallbackMisc implements HotkeyCallback
                 return ActionResult.SUCCESS;
             }
         }
-        else if (key == Hotkeys.SAVE_AREA_AS_IN_MEMORY_SCHEMATIC.getKeyBind())
+        else if (key == Hotkeys.SAVE_SCHEMATIC_IN_MEMORY.getKeyBind())
         {
             return SchematicUtils.saveSchematic(true);
         }
-        else if (key == Hotkeys.SAVE_AREA_AS_SCHEMATIC_TO_FILE.getKeyBind())
+        else if (key == Hotkeys.SAVE_SCHEMATIC_TO_FILE.getKeyBind())
         {
             return SchematicUtils.saveSchematic(false);
         }
-        else if (key == Hotkeys.SCHEMATIC_REBUILD_ACCEPT_REPLACEMENT.getKeyBind())
+        else if (key == Hotkeys.SCHEMATIC_EDIT_ACCEPT_REPLACEMENT.getKeyBind())
         {
             SchematicEditUtils.rebuildAcceptReplacement(this.mc);
             return ActionResult.SUCCESS;

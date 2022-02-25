@@ -36,14 +36,13 @@ import fi.dy.masa.litematica.util.BlockInfoListType;
 import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
+import fi.dy.masa.malilib.config.option.ColorConfig;
 import fi.dy.masa.malilib.listener.TaskCompletionListener;
+import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
+import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import fi.dy.masa.malilib.util.position.IntBoundingBox;
 import fi.dy.masa.malilib.util.position.LayerRange;
-import fi.dy.masa.malilib.util.StringUtils;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
@@ -96,9 +95,9 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
     public static void markVerifierBlockChanges(BlockPos pos)
     {
-        for (int i = 0; i < ACTIVE_VERIFIERS.size(); ++i)
+        for (SchematicVerifier activeVerifier : ACTIVE_VERIFIERS)
         {
-            ACTIVE_VERIFIERS.get(i).markBlockChanged(pos);
+            activeVerifier.markBlockChanged(pos);
         }
     }
 
@@ -111,7 +110,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
     public boolean getShouldRenderText(RenderPhase phase)
     {
         return this.shouldRenderInfoHud && phase == RenderPhase.POST &&
-               Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue();
+               Configs.InfoOverlays.VERIFIER_OVERLAY_RENDERING.getBooleanValue();
     }
 
     public void toggleShouldRenderInfoHUD()
@@ -243,11 +242,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         }
         else
         {
-            if (this.selectedCategories.contains(type))
-            {
-                this.selectedCategories.remove(type);
-            }
-
+            this.selectedCategories.remove(type);
             this.selectedEntries.put(type, mismatch);
             this.updateMismatchOverlays();
         }
@@ -547,18 +542,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         {
             this.ignoredMismatches.add(ignore);
             this.getMapForMismatchType(mismatch.mismatchType).removeAll(ignore);
-
-            Iterator<Map.Entry<BlockPos, BlockMismatch>> iter = this.blockMismatches.entrySet().iterator();
-
-            while (iter.hasNext())
-            {
-                Map.Entry<BlockPos, BlockMismatch> entry = iter.next();
-
-                if (entry.getValue().equals(mismatch))
-                {
-                    iter.remove();
-                }
-            }
+            this.blockMismatches.entrySet().removeIf(entry -> entry.getValue().equals(mismatch));
         }
 
         if (updateOverlay)
@@ -636,7 +620,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         }
     }
 
-    public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs(BaseScreen gui)
+    public List<Pair<IBlockState, IBlockState>> getIgnoredStateMismatchPairs()
     {
         List<Pair<IBlockState, IBlockState>> list = Lists.newArrayList(this.ignoredMismatches);
         list.sort(this::compareByRegistryName);
@@ -788,7 +772,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
             // This needs to happen first
             BlockPos centerPos = new BlockPos(mc.player.getPositionVector());
-            this.updateClosestPositions(centerPos, maxEntries);
+            this.updateClosestPositions(centerPos);
             this.combineClosestPositions(centerPos, maxEntries);
 
             // Only one category selected, show the title
@@ -804,20 +788,20 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         }
     }
 
-    private void updateClosestPositions(BlockPos centerPos, int maxEntries)
+    private void updateClosestPositions(BlockPos centerPos)
     {
         PositionUtils.BLOCK_POS_COMPARATOR.setReferencePosition(centerPos);
         PositionUtils.BLOCK_POS_COMPARATOR.setClosestFirst(true);
 
-        this.addAndSortPositions(MismatchType.WRONG_BLOCK,  this.wrongBlocksPositions, this.mismatchedBlocksPositionsClosest, maxEntries);
-        this.addAndSortPositions(MismatchType.WRONG_STATE,  this.wrongStatesPositions, this.mismatchedStatesPositionsClosest, maxEntries);
-        this.addAndSortPositions(MismatchType.EXTRA,        this.extraBlocksPositions, this.extraBlocksPositionsClosest, maxEntries);
-        this.addAndSortPositions(MismatchType.MISSING,      this.missingBlocksPositions, this.missingBlocksPositionsClosest, maxEntries);
+        this.addAndSortPositions(MismatchType.WRONG_BLOCK,  this.wrongBlocksPositions, this.mismatchedBlocksPositionsClosest);
+        this.addAndSortPositions(MismatchType.WRONG_STATE,  this.wrongStatesPositions, this.mismatchedStatesPositionsClosest);
+        this.addAndSortPositions(MismatchType.EXTRA,        this.extraBlocksPositions, this.extraBlocksPositionsClosest);
+        this.addAndSortPositions(MismatchType.MISSING,      this.missingBlocksPositions, this.missingBlocksPositionsClosest);
     }
 
     private void addAndSortPositions(MismatchType type,
-            ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> sourceMap,
-            List<BlockPos> listOut, int maxEntries)
+                                     ArrayListMultimap<Pair<IBlockState, IBlockState>, BlockPos> sourceMap,
+                                     List<BlockPos> listOut)
     {
         listOut.clear();
 
@@ -839,7 +823,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             }
         }
 
-        Collections.sort(listOut, PositionUtils.BLOCK_POS_COMPARATOR);
+        listOut.sort(PositionUtils.BLOCK_POS_COMPARATOR);
 
         /*
         final int max = Math.min(maxEntries, tempList.size());
@@ -863,7 +847,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
         this.getMismatchRenderPositionFor(MismatchType.EXTRA, tempList);
         this.getMismatchRenderPositionFor(MismatchType.MISSING, tempList);
 
-        Collections.sort(tempList, new RenderPosComparator(centerPos, true));
+        tempList.sort(new RenderPosComparator(centerPos, true));
 
         final int max = Math.min(maxEntries, tempList.size());
 
@@ -908,16 +892,13 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
         if (positionList.isEmpty() == false)
         {
-            String rst = BaseScreen.TXT_RST;
-
             if (mismatchType != null)
             {
-                hudLines.add(String.format("%s%s%s", mismatchType.getFormattingCode(), mismatchType.getDisplayname(), rst));
+                hudLines.add(mismatchType.getTitleDisplayName());
             }
             else
             {
-                String title = StringUtils.translate("litematica.gui.title.schematic_verifier_errors");
-                hudLines.add(String.format("%s%s%s", BaseScreen.TXT_BOLD, title, rst));
+                hudLines.add(StringUtils.translate("litematica.title.hud.schematic_verifier.errors"));
             }
 
             final int count = Math.min(positionList.size(), Configs.InfoOverlays.INFO_HUD_MAX_LINES.getIntegerValue());
@@ -925,9 +906,7 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
             for (int i = 0; i < count; ++i)
             {
                 MismatchRenderPos entry = positionList.get(i);
-                BlockPos pos = entry.pos;
-                String pre = entry.type.getColorCode();
-                hudLines.add(String.format("%sx: %5d, y: %3d, z: %5d%s", pre, pos.getX(), pos.getY(), pos.getZ(), rst));
+                hudLines.add(entry.type.getHudPositionLine(entry.pos));
             }
         }
 
@@ -1049,42 +1028,40 @@ public class SchematicVerifier extends TaskBase implements IInfoHudRenderer
 
     public enum MismatchType
     {
-        ALL             (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.all", BaseScreen.TXT_WHITE),
-        MISSING         (0x00FFFF, "litematica.gui.label.schematic_verifier_display_type.missing", BaseScreen.TXT_AQUA),
-        EXTRA           (0xFF00CF, "litematica.gui.label.schematic_verifier_display_type.extra", BaseScreen.TXT_LIGHT_PURPLE),
-        WRONG_BLOCK     (0xFF0000, "litematica.gui.label.schematic_verifier_display_type.wrong_blocks", BaseScreen.TXT_RED),
-        WRONG_STATE     (0xFFAF00, "litematica.gui.label.schematic_verifier_display_type.wrong_state", BaseScreen.TXT_GOLD),
-        CORRECT_STATE   (0x11FF11, "litematica.gui.label.schematic_verifier_display_type.correct_state", BaseScreen.TXT_GREEN);
+        ALL             ("litematica.name.schematic_verifier.all",           Configs.Colors.VERIFIER_CORRECT), // color not used
+        CORRECT_STATE   ("litematica.name.schematic_verifier.correct_state", Configs.Colors.VERIFIER_CORRECT),
+        EXTRA           ("litematica.name.schematic_verifier.extra",         Configs.Colors.VERIFIER_EXTRA),
+        MISSING         ("litematica.name.schematic_verifier.missing",       Configs.Colors.VERIFIER_MISSING),
+        WRONG_BLOCK     ("litematica.name.schematic_verifier.wrong_blocks",  Configs.Colors.VERIFIER_WRONG_BLOCK),
+        WRONG_STATE     ("litematica.name.schematic_verifier.wrong_state",   Configs.Colors.VERIFIER_WRONG_STATE);
 
-        private final String unlocName;
-        private final String colorCode;
-        private final Color4f color;
+        private final String translationKey;
+        private final ColorConfig colorConfig;
 
-        MismatchType(int color, String unlocName, String colorCode)
+        MismatchType(String translationKey, ColorConfig colorConfig)
         {
-            this.color = Color4f.fromColor(color, 1f);
-            this.unlocName = unlocName;
-            this.colorCode = colorCode;
+            this.translationKey = translationKey;
+            this.colorConfig = colorConfig;
         }
 
         public Color4f getColor()
         {
-            return this.color;
+            return this.colorConfig.getColor();
         }
 
-        public String getDisplayname()
+        public String getDisplayName()
         {
-            return StringUtils.translate(this.unlocName);
+            return StringUtils.translate(this.translationKey);
         }
 
-        public String getColorCode()
+        public String getTitleDisplayName()
         {
-            return this.colorCode;
+            return StringUtils.translate(this.translationKey + ".title");
         }
 
-        public String getFormattingCode()
+        public String getHudPositionLine(BlockPos pos)
         {
-            return this.colorCode + BaseScreen.TXT_BOLD;
+            return StringUtils.translate(this.translationKey + ".pos_line", pos.getX(), pos.getY(), pos.getZ());
         }
     }
 

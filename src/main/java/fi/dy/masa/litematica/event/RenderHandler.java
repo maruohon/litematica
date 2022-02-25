@@ -19,11 +19,11 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
     @Override
     public void onPostWorldRender(Minecraft mc, float partialTicks)
     {
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue())
+        if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue())
         {
-            boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.isHeld();
+            boolean invert = Hotkeys.INVERT_SCHEMATIC_RENDER_STATE.isHeld();
 
-            if (Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert &&
+            if (Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() != invert &&
                 Configs.Generic.BETTER_RENDER_ORDER.getBooleanValue() == false)
             {
                 LitematicaRenderer.getInstance().renderSchematicWorld(partialTicks);
@@ -31,15 +31,15 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
 
             OverlayRenderer.getInstance().renderBoxes(partialTicks);
 
-            if (Configs.InfoOverlays.VERIFIER_OVERLAY_ENABLED.getBooleanValue())
+            if (Configs.InfoOverlays.VERIFIER_OVERLAY_RENDERING.getBooleanValue())
             {
                 OverlayRenderer.getInstance().renderSchematicVerifierMismatches(partialTicks);
             }
 
             if (Configs.Visuals.RENDER_COLLIDING_BLOCK_AT_CURSOR.getBooleanValue())
             {
-                boolean render = Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue() &&
-                                 Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != invert;
+                boolean render = Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue() &&
+                                 Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() != invert;
 
                 if (render)
                 {
@@ -57,7 +57,7 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
     @Override
     public void onPostGameOverlayRender(Minecraft mc, float partialTicks)
     {
-        if (Configs.Visuals.ENABLE_RENDERING.getBooleanValue())
+        if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue())
         {
             // The Info HUD renderers can decide if they want to be rendered in GUIs
             InfoHud.getInstance().renderHud();

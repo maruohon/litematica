@@ -34,7 +34,7 @@ public class HotkeyCallbackToolActions implements HotkeyCallback
         }
 
         ToolMode mode = DataManager.getToolMode();
-        boolean toolEnabled = Configs.Visuals.ENABLE_RENDERING.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
+        boolean toolEnabled = Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() && Configs.Generic.TOOL_ITEM_ENABLED.getBooleanValue();
         boolean hasTool = EntityUtils.hasToolItem(this.mc.player);
         boolean isToolPrimary = key == Hotkeys.TOOL_PLACE_CORNER_1.getKeyBind();
         boolean isToolSecondary = key == Hotkeys.TOOL_PLACE_CORNER_2.getKeyBind();

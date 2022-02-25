@@ -1,5 +1,8 @@
 package fi.dy.masa.litematica.gui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.gui.GuiScreen;
@@ -8,11 +11,13 @@ import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
+import fi.dy.masa.malilib.config.option.ConfigInfo;
 import fi.dy.masa.malilib.gui.tab.BaseScreenTab;
 import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
+import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.util.data.ModInfo;
 
 public class ConfigScreen
@@ -42,6 +47,19 @@ public class ConfigScreen
             HOTKEYS,
             RENDER_LAYERS
     );
+
+    private static final HashMap<ScreenTab, List<ConfigInfo>> EXTENSION_MOD_CONFIGS = new HashMap<>();
+
+    /**
+     * If you are an extension mod, you can use this method to add your custom configs
+     * to be shown on the main mod config screens.
+     */
+    public static void addExtensionModHotkeys(BaseConfigTab tab, List<? extends ConfigInfo> configs)
+    {
+        // TODO
+        List<ConfigInfo> list = EXTENSION_MOD_CONFIGS.computeIfAbsent(tab, (t) -> new ArrayList<>());
+        list.addAll(configs);
+    }
 
     public static ImmutableList<ConfigTab> getConfigTabs()
     {

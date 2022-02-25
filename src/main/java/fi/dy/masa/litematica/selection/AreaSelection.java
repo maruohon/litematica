@@ -62,7 +62,7 @@ public class AreaSelection
     {
         this.calculatedOriginDirty = true;
 
-        if (Configs.Visuals.ENABLE_AREA_SELECTION_RENDERING.getBooleanValue() == false)
+        if (Configs.Visuals.AREA_SELECTION_RENDERING.getBooleanValue() == false)
         {
             StatusInfoRenderer.getInstance().startOverrideDelay();
         }

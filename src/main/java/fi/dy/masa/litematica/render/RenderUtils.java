@@ -1,6 +1,7 @@
 package fi.dy.masa.litematica.render;
 
 import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -12,7 +13,6 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -22,13 +22,16 @@ import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.util.BlockInfoAlignment;
-import fi.dy.masa.litematica.util.InventoryUtils;
 import fi.dy.masa.litematica.util.PositionUtils;
+import fi.dy.masa.malilib.config.value.HorizontalAlignment;
+import fi.dy.masa.malilib.config.value.VerticalAlignment;
 import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
-import fi.dy.masa.malilib.config.value.HorizontalAlignment;
+import fi.dy.masa.malilib.render.inventory.InventoryRenderDefinition;
+import fi.dy.masa.malilib.render.inventory.InventoryRenderUtils;
 import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
+import fi.dy.masa.malilib.util.inventory.InventoryView;
 
 public class RenderUtils
 {
@@ -40,8 +43,8 @@ public class RenderUtils
      */
     public static boolean isSchematicCurrentlyRendered()
     {
-        return Configs.Visuals.ENABLE_RENDERING.getBooleanValue() &&
-               Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() != Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeyBind().isKeyBindHeld();
+        return Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() &&
+               Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() != Hotkeys.INVERT_SCHEMATIC_RENDER_STATE.getKeyBind().isKeyBindHeld();
     }
 
     /**
@@ -52,7 +55,7 @@ public class RenderUtils
     public static boolean areSchematicBlocksCurrentlyRendered()
     {
         return isSchematicCurrentlyRendered() &&
-               Configs.Visuals.ENABLE_SCHEMATIC_BLOCKS.getBooleanValue();
+               Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue();
     }
 
     public static int getMaxStringRenderLength(List<String> list)
@@ -457,11 +460,9 @@ public class RenderUtils
 
     private static void renderModelQuadOutlines(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
     {
-        final int size = quads.size();
-
-        for (int i = 0; i < size; i++)
+        for (BakedQuad quad : quads)
         {
-            renderQuadOutlinesBatched(pos, buffer, color, quads.get(i).getVertexData());
+            renderQuadOutlinesBatched(pos, buffer, color, quad.getVertexData());
         }
     }
 
@@ -470,13 +471,13 @@ public class RenderUtils
         final int x = pos.getX();
         final int y = pos.getY();
         final int z = pos.getZ();
-        float fx[] = new float[4];
-        float fy[] = new float[4];
-        float fz[] = new float[4];
+        float[] fx = new float[4];
+        float[] fy = new float[4];
+        float[] fz = new float[4];
 
         for (int index = 0; index < 4; ++index)
         {
-            fx[index] = x + Float.intBitsToFloat(vertexData[index * 7 + 0]);
+            fx[index] = x + Float.intBitsToFloat(vertexData[index * 7    ]);
             fy[index] = y + Float.intBitsToFloat(vertexData[index * 7 + 1]);
             fz[index] = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
         }
@@ -514,11 +515,9 @@ public class RenderUtils
 
     private static void renderModelQuadOverlayBatched(BlockPos pos, BufferBuilder buffer, Color4f color, List<BakedQuad> quads)
     {
-        final int size = quads.size();
-
-        for (int i = 0; i < size; i++)
+        for (BakedQuad quad : quads)
         {
-            renderModelQuadOverlayBatched(pos, buffer, color, quads.get(i).getVertexData());
+            renderModelQuadOverlayBatched(pos, buffer, color, quad.getVertexData());
         }
     }
 
@@ -531,7 +530,7 @@ public class RenderUtils
 
         for (int index = 0; index < 4; ++index)
         {
-            fx = x + Float.intBitsToFloat(vertexData[index * 7 + 0]);
+            fx = x + Float.intBitsToFloat(vertexData[index * 7    ]);
             fy = y + Float.intBitsToFloat(vertexData[index * 7 + 1]);
             fz = z + Float.intBitsToFloat(vertexData[index * 7 + 2]);
 
@@ -557,56 +556,33 @@ public class RenderUtils
 
     public static int renderInventoryOverlays(BlockInfoAlignment align, int offY, World worldSchematic, World worldClient, BlockPos pos, Minecraft mc)
     {
-        int heightSch = renderInventoryOverlay(align, HorizontalAlignment.LEFT, offY, worldSchematic, pos, mc);
-        int heightCli = renderInventoryOverlay(align, HorizontalAlignment.RIGHT, offY, worldClient, pos, mc);
+        int heightSch = renderInventoryOverlay(align, HorizontalAlignment.LEFT, offY, worldSchematic, pos);
+        int heightCli = renderInventoryOverlay(align, HorizontalAlignment.RIGHT, offY, worldClient, pos);
 
         return Math.max(heightSch, heightCli);
     }
 
-    public static int renderInventoryOverlay(BlockInfoAlignment align, HorizontalAlignment side, int offY,
-            World world, BlockPos pos, Minecraft mc)
+    public static int renderInventoryOverlay(BlockInfoAlignment align, HorizontalAlignment side,
+                                             int offY, World world, BlockPos pos)
     {
-        IInventory inv = InventoryUtils.getInventory(world, pos);
+        Pair<InventoryView, InventoryRenderDefinition> pair = InventoryRenderUtils.getInventoryViewFromBlock(pos, world);
 
-        if (inv != null)
+        if (pair != null)
         {
-            final InventoryRenderType type = InventoryOverlay.getInventoryType(inv);
-            final InventoryProperties props = InventoryOverlay.getInventoryPropsTemp(type, inv.getSizeInventory());
+            InventoryRenderDefinition renderer = pair.getRight();
+            InventoryView inv = pair.getLeft();
+            int gap = 4;
+            int height = renderer.getRenderHeight(inv);
+            final int xCenter = GuiUtils.getScaledWindowWidth() / 2 + side.getXStartOffsetForEdgeAlignment(renderer.getRenderWidth(inv) + gap);
+            final int yCenter = GuiUtils.getScaledWindowHeight() / 2;
+            int y = (align.getVerticalAlign() == VerticalAlignment.CENTER ? yCenter - height : 8) + offY;
 
-            return renderInventoryOverlay(align, side, offY, inv, type, props, mc);
+            InventoryRenderUtils.renderInventoryPreview(inv, renderer, xCenter, y, 300, 0xFFFFFFFF, side, VerticalAlignment.TOP);
+
+            return height;
         }
 
         return 0;
-    }
-
-    public static int renderInventoryOverlay(BlockInfoAlignment align, HorizontalAlignment side, int offY,
-            IInventory inv, InventoryRenderType type, InventoryProperties props, Minecraft mc)
-    {
-        int xInv = 0;
-        int yInv = 0;
-        int z = 0;
-        int zItems = z + 1;
-
-        if (align == BlockInfoAlignment.CENTER)
-        {
-            xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
-            yInv = GuiUtils.getScaledWindowHeight() / 2 - props.height - offY;
-        }
-        else if (align == BlockInfoAlignment.TOP_CENTER)
-        {
-            xInv = GuiUtils.getScaledWindowWidth() / 2 - (props.width / 2);
-            yInv = offY;
-        }
-
-        if      (side == HorizontalAlignment.LEFT)  { xInv -= (props.width / 2 + 4); }
-        else if (side == HorizontalAlignment.RIGHT) { xInv += (props.width / 2 + 4); }
-
-        fi.dy.masa.malilib.render.RenderUtils.color(1f, 1f, 1f, 1f);
-
-        InventoryOverlay.renderInventoryBackground(type, xInv, yInv, z, props.slotsPerRow, props.totalSlots);
-        InventoryOverlay.renderInventoryStacks(type, inv, xInv + props.slotOffsetX, yInv + props.slotOffsetY, zItems, props.slotsPerRow, 0, -1, mc);
-
-        return props.height;
     }
 
     /*

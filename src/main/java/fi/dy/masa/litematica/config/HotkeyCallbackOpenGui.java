@@ -44,18 +44,18 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             return ActionResult.FAIL;
         }
 
-        if (key == Hotkeys.OPEN_GUI_MAIN_MENU.getKeyBind())
+        if (key == Hotkeys.OPEN_MAIN_MENU.getKeyBind())
         {
             BaseScreen.openScreen(new GuiMainMenu());
         }
-        else if (key == Hotkeys.OPEN_GUI_SETTINGS.getKeyBind())
+        else if (key == Hotkeys.OPEN_CONFIG_SCREEN.getKeyBind())
         {
             BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.RENDER_LAYERS ? new GuiRenderLayer() : ConfigScreen.create();
             BaseScreen.openScreen(screen);
             return ActionResult.SUCCESS;
         }
 
-        else if (key == Hotkeys.OPEN_GUI_AREA_SETTINGS.getKeyBind())
+        else if (key == Hotkeys.OPEN_AREA_EDITOR_SCREEN.getKeyBind())
         {
             SelectionManager manager = DataManager.getSelectionManager();
 
@@ -68,15 +68,15 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 MessageDispatcher.error().translate("litematica.message.error.no_area_selected");
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_LOAD_SCHEMATICS.getKeyBind())
+        else if (key == Hotkeys.OPEN_LOAD_SCHEMATICS_SCREEN.getKeyBind())
         {
             BaseScreen.openScreen(new GuiSchematicLoad());
         }
-        else if (key == Hotkeys.OPEN_GUI_LOADED_SCHEMATICS.getKeyBind())
+        else if (key == Hotkeys.OPEN_LOADED_SCHEMATICS_SCREEN.getKeyBind())
         {
             BaseScreen.openScreen(new GuiSchematicLoadedList());
         }
-        else if (key == Hotkeys.OPEN_GUI_MATERIAL_LIST.getKeyBind())
+        else if (key == Hotkeys.OPEN_MATERIAL_LIST_SCREEN.getKeyBind())
         {
             MaterialListBase materialList = DataManager.getMaterialList();
 
@@ -101,7 +101,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 BaseScreen.openScreen(new GuiMaterialList(materialList));
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_PLACEMENT_GRID_SETTINGS.getKeyBind())
+        else if (key == Hotkeys.OPEN_PLACEMENT_GRID_SETTINGS.getKeyBind())
         {
             SchematicPlacement placement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -117,7 +117,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 }
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_PLACEMENT_SETTINGS.getKeyBind())
+        else if (key == Hotkeys.OPEN_PLACEMENT_SETTINGS_SCREEN.getKeyBind())
         {
             SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -139,15 +139,15 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PLACEMENTS.getKeyBind())
+        else if (key == Hotkeys.OPEN_PLACEMENTS_LIST_SCREEN.getKeyBind())
         {
             BaseScreen.openScreen(new GuiSchematicPlacementsList());
         }
-        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_PROJECTS.getKeyBind())
+        else if (key == Hotkeys.OPEN_SCHEMATIC_VCS_SCREEN.getKeyBind())
         {
             DataManager.getSchematicProjectsManager().openSchematicProjectsGui();
         }
-        else if (key == Hotkeys.OPEN_GUI_SCHEMATIC_VERIFIER.getKeyBind())
+        else if (key == Hotkeys.OPEN_SCHEMATIC_VERIFIER_SCREEN.getKeyBind())
         {
             SchematicPlacement schematicPlacement = DataManager.getSchematicPlacementManager().getSelectedSchematicPlacement();
 
@@ -160,7 +160,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
                 MessageDispatcher.error().translate("litematica.message.error.no_placement_selected");
             }
         }
-        else if (key == Hotkeys.OPEN_GUI_SELECTION_MANAGER.getKeyBind())
+        else if (key == Hotkeys.OPEN_AREA_SELECTION_BROWSER.getKeyBind())
         {
             if (DataManager.getSchematicProjectsManager().hasProjectOpen() == false)
             {

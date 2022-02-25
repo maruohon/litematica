@@ -322,12 +322,12 @@ public class RayTraceUtils
     public static RayTraceResult traceToSchematicWorld(Entity entity, double range, boolean respectRenderRange)
     {
         World world = SchematicWorldHandler.getSchematicWorld();
-        boolean invert = Hotkeys.INVERT_GHOST_BLOCK_RENDER_STATE.getKeyBind().isKeyBindHeld();
+        boolean invert = Hotkeys.INVERT_SCHEMATIC_RENDER_STATE.getKeyBind().isKeyBindHeld();
 
         if (world == null ||
             (respectRenderRange &&
-                (Configs.Visuals.ENABLE_RENDERING.getBooleanValue() == false ||
-                 Configs.Visuals.ENABLE_SCHEMATIC_RENDERING.getBooleanValue() == invert)))
+                (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() == false ||
+                 Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() == invert)))
         {
             return null;
         }
