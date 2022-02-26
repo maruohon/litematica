@@ -1,26 +1,27 @@
-package fi.dy.masa.litematica.gui.widgets;
+package fi.dy.masa.litematica.gui.widget.list.entry;
 
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.schematic.projects.SchematicVersion;
-import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
+import fi.dy.masa.malilib.render.text.StyledTextLine;
 
-public class WidgetSchematicVersion extends BaseListEntryWidget<SchematicVersion>
+public class SchematicVcsVersionEntryWidget extends BaseDataListEntryWidget<SchematicVersion>
 {
     private final SchematicProject project;
-    private final boolean isOdd;
 
-    public WidgetSchematicVersion(int x, int y, int width, int height, boolean isOdd,
-            SchematicVersion entry, int listIndex, SchematicProject project)
+    public SchematicVcsVersionEntryWidget(SchematicVersion entry,
+                                          DataListEntryWidgetData constructData,
+                                          SchematicProject project)
     {
-        super(x, y, width, height, entry, listIndex);
+        super(entry, constructData);
 
         this.project = project;
-        this.isOdd = isOdd;
+        this.setText(StyledTextLine.translate("litematica.label.widget.schematic_vcs.version_entry",
+                                              entry.getVersion(), entry.getName()));
     }
 
+    /*
     @Override
     public void render(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId, boolean selected)
     {
@@ -58,11 +59,12 @@ public class WidgetSchematicVersion extends BaseListEntryWidget<SchematicVersion
 
         RenderUtils.color(1f, 1f, 1f, 1f);
     }
+    */
 
+    /*
     @Override
     public void postRenderHovered(int mouseX, int mouseY, boolean isActiveGui, int hoveredWidgetId)
     {
-        /*
         List<String> text = new ArrayList<>();
 
         text.add(StringUtils.translate("litematica.gui.label.schematic_placement.schematic_name", this.placement.getSchematic().getMetadata().getName()));
@@ -77,6 +79,6 @@ public class WidgetSchematicVersion extends BaseListEntryWidget<SchematicVersion
         text.add(StringUtils.translate("litematica.gui.label.schematic_placement.enclosing_size", strSize));
 
         RenderUtils.drawHoverText(mouseX, mouseY, this.getZLevel() + 1, text);
-        */
     }
+    */
 }

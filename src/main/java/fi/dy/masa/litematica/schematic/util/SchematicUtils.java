@@ -10,8 +10,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.GuiSchematicSave;
-import fi.dy.masa.litematica.gui.GuiSchematicSave.InMemorySchematicCreator;
 import fi.dy.masa.litematica.schematic.ISchematic;
 import fi.dy.masa.litematica.schematic.ISchematicRegion;
 import fi.dy.masa.litematica.schematic.container.ILitematicaBlockStateContainer;
@@ -46,6 +44,7 @@ public class SchematicUtils
                                                           GuiUtils.getCurrentScreen());
                 BaseScreen.openPopupScreen(gui);
             }
+            /* TODO FIXME malilib refactor
             else if (inMemoryOnly)
             {
                 String title = "litematica.gui.title.create_in_memory_schematic";
@@ -60,6 +59,7 @@ public class SchematicUtils
                 gui.setParent(GuiUtils.getCurrentScreen());
                 BaseScreen.openScreen(gui);
             }
+            */
 
             return ActionResult.SUCCESS;
         }

@@ -2,8 +2,7 @@ package fi.dy.masa.litematica.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import fi.dy.masa.litematica.gui.GuiMainMenu.ButtonListenerChangeMenu;
-import fi.dy.masa.litematica.gui.widgets.WidgetTaskEntry;
+import fi.dy.masa.litematica.gui.widget.list.entry.TaskEntryWidget;
 import fi.dy.masa.litematica.scheduler.ITask;
 import fi.dy.masa.litematica.scheduler.TaskScheduler;
 import fi.dy.masa.malilib.gui.BaseListScreen;
@@ -16,11 +15,9 @@ public class TaskManagerScreen extends BaseListScreen<DataListWidget<ITask>>
 
     public TaskManagerScreen()
     {
-        super(12, 30, 20, 68);
+        super(12, 30, 20, 60);
 
-        ButtonListenerChangeMenu.ButtonType type = ButtonListenerChangeMenu.ButtonType.MAIN_MENU;
-        this.mainMenuButton = GenericButton.create(type.getLabelKey(), new ButtonListenerChangeMenu(type, this.getParent()));
-
+        this.mainMenuButton = GenericButton.create("litematica.button.change_menu.main_menu", MainMenuScreen::openMainMenuScreen);
         this.setTitle("litematica.gui.title.task_manager");
     }
 
@@ -28,7 +25,6 @@ public class TaskManagerScreen extends BaseListScreen<DataListWidget<ITask>>
     protected void reAddActiveWidgets()
     {
         super.reAddActiveWidgets();
-
         this.addWidget(this.mainMenuButton);
     }
 
@@ -53,9 +49,7 @@ public class TaskManagerScreen extends BaseListScreen<DataListWidget<ITask>>
     protected DataListWidget<ITask> createListWidget()
     {
         DataListWidget<ITask> listWidget = new DataListWidget<>(this::getAllTasks, true);
-
-        listWidget.setEntryWidgetFactory(WidgetTaskEntry::new);
-
+        listWidget.setEntryWidgetFactory(TaskEntryWidget::new);
         return listWidget;
     }
 }

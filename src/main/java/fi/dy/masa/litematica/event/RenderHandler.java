@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.GuiSchematicManager;
 import fi.dy.masa.litematica.render.LitematicaRenderer;
 import fi.dy.masa.litematica.render.OverlayRenderer;
 import fi.dy.masa.litematica.render.infohud.InfoHud;
@@ -67,10 +66,12 @@ public class RenderHandler implements PostGameOverlayRenderer, PostWorldRenderer
                 ToolHud.getInstance().renderHud();
                 OverlayRenderer.getInstance().renderHoverInfo(mc);
 
+                /* TODO FIXME malilib refactor
                 if (GuiSchematicManager.hasPendingPreviewTask())
                 {
                     OverlayRenderer.getInstance().renderPreviewFrame();
                 }
+                */
             }
         }
     }

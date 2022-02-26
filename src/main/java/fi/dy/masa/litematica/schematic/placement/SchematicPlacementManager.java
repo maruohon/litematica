@@ -44,8 +44,8 @@ import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.litematica.util.ReplaceBehavior;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.config.option.HotkeyConfig;
 import fi.dy.masa.malilib.config.value.LayerMode;
+import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.RayTraceUtils.RayTraceFluidHandling;
@@ -329,7 +329,7 @@ public class SchematicPlacementManager
 
                     if (Configs.Visuals.MAIN_RENDERING_TOGGLE.getBooleanValue() == false)
                     {
-                        HotkeyConfig hotkey = Hotkeys.TOGGLE_ALL_RENDERING;
+                        Hotkey hotkey = Configs.Visuals.MAIN_RENDERING_TOGGLE;
                         String configName = Configs.Visuals.MAIN_RENDERING_TOGGLE.getName();
                         String hotkeyName = hotkey.getName();
                         String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
@@ -339,7 +339,7 @@ public class SchematicPlacementManager
 
                     if (Configs.Visuals.SCHEMATIC_RENDERING.getBooleanValue() == false)
                     {
-                        HotkeyConfig hotkey = Hotkeys.TOGGLE_SCHEMATIC_RENDERING;
+                        Hotkey hotkey = Configs.Visuals.SCHEMATIC_RENDERING;
                         String configName = Configs.Visuals.SCHEMATIC_RENDERING.getName();
                         String hotkeyName = hotkey.getName();
                         String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();
@@ -349,7 +349,7 @@ public class SchematicPlacementManager
 
                     if (Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getBooleanValue() == false)
                     {
-                        HotkeyConfig hotkey = Hotkeys.TOGGLE_SCHEMATIC_BLOCK_RENDERING;
+                        Hotkey hotkey = Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING;
                         String configName = Configs.Visuals.SCHEMATIC_BLOCKS_RENDERING.getName();
                         String hotkeyName = hotkey.getName();
                         String hotkeyVal = hotkey.getKeyBind().getKeysDisplayString();

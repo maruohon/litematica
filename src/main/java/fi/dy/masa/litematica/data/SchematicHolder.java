@@ -2,7 +2,6 @@ package fi.dy.masa.litematica.data;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import fi.dy.masa.litematica.schematic.ISchematic;
@@ -94,7 +93,7 @@ public class SchematicHolder
         return false;
     }
 
-    public Collection<ISchematic> getAllSchematics()
+    public List<ISchematic> getAllSchematics()
     {
         return this.schematics;
     }

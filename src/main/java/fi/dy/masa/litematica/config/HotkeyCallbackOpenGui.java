@@ -4,17 +4,10 @@ import net.minecraft.client.Minecraft;
 import fi.dy.masa.litematica.Reference;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.gui.ConfigScreen;
-import fi.dy.masa.litematica.gui.GuiAreaSelectionManager;
-import fi.dy.masa.litematica.gui.GuiMainMenu;
-import fi.dy.masa.litematica.gui.GuiMaterialList;
-import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
-import fi.dy.masa.litematica.gui.GuiPlacementGridSettings;
-import fi.dy.masa.litematica.gui.GuiRenderLayer;
-import fi.dy.masa.litematica.gui.GuiSchematicLoad;
-import fi.dy.masa.litematica.gui.GuiSchematicLoadedList;
-import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
-import fi.dy.masa.litematica.gui.GuiSchematicVerifier;
-import fi.dy.masa.litematica.gui.GuiSubRegionConfiguration;
+import fi.dy.masa.litematica.gui.LoadedSchematicsListScreen;
+import fi.dy.masa.litematica.gui.MainMenuScreen;
+import fi.dy.masa.litematica.gui.RenderLayerEditScreen;
+import fi.dy.masa.litematica.gui.SchematicPlacementsListScreen;
 import fi.dy.masa.litematica.materials.MaterialListBase;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement;
@@ -46,11 +39,11 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
         if (key == Hotkeys.OPEN_MAIN_MENU.getKeyBind())
         {
-            BaseScreen.openScreen(new GuiMainMenu());
+            BaseScreen.openScreen(new MainMenuScreen());
         }
         else if (key == Hotkeys.OPEN_CONFIG_SCREEN.getKeyBind())
         {
-            BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.RENDER_LAYERS ? new GuiRenderLayer() : ConfigScreen.create();
+            BaseScreen screen = BaseConfigScreen.getCurrentTab(Reference.MOD_ID) == ConfigScreen.RENDER_LAYERS ? new RenderLayerEditScreen() : ConfigScreen.create();
             BaseScreen.openScreen(screen);
             return ActionResult.SUCCESS;
         }
@@ -70,11 +63,11 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_LOAD_SCHEMATICS_SCREEN.getKeyBind())
         {
-            BaseScreen.openScreen(new GuiSchematicLoad());
+            //BaseScreen.openScreen(new GuiSchematicLoad());
         }
         else if (key == Hotkeys.OPEN_LOADED_SCHEMATICS_SCREEN.getKeyBind())
         {
-            BaseScreen.openScreen(new GuiSchematicLoadedList());
+            BaseScreen.openScreen(new LoadedSchematicsListScreen());
         }
         else if (key == Hotkeys.OPEN_MATERIAL_LIST_SCREEN.getKeyBind())
         {
@@ -98,7 +91,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
             if (materialList != null)
             {
-                BaseScreen.openScreen(new GuiMaterialList(materialList));
+                //BaseScreen.openScreen(new GuiMaterialList(materialList));
             }
         }
         else if (key == Hotkeys.OPEN_PLACEMENT_GRID_SETTINGS.getKeyBind())
@@ -109,7 +102,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
             {
                 if (placement.isRepeatedPlacement() == false)
                 {
-                    BaseScreen.openScreen(new GuiPlacementGridSettings(placement, null));
+                    //BaseScreen.openScreen(new GuiPlacementGridSettings(placement, null));
                 }
                 else
                 {
@@ -127,11 +120,11 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
                 if (placement != null)
                 {
-                    BaseScreen.openScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
+                    //BaseScreen.openScreen(new GuiSubRegionConfiguration(schematicPlacement, placement));
                 }
                 else
                 {
-                    BaseScreen.openScreen(new GuiPlacementConfiguration(schematicPlacement));
+                    //BaseScreen.openScreen(new GuiPlacementConfiguration(schematicPlacement));
                 }
             }
             else
@@ -141,7 +134,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         }
         else if (key == Hotkeys.OPEN_PLACEMENTS_LIST_SCREEN.getKeyBind())
         {
-            BaseScreen.openScreen(new GuiSchematicPlacementsList());
+            BaseScreen.openScreen(new SchematicPlacementsListScreen());
         }
         else if (key == Hotkeys.OPEN_SCHEMATIC_VCS_SCREEN.getKeyBind())
         {
@@ -153,7 +146,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
 
             if (schematicPlacement != null)
             {
-                BaseScreen.openScreen(new GuiSchematicVerifier(schematicPlacement));
+                //BaseScreen.openScreen(new GuiSchematicVerifier(schematicPlacement));
             }
             else
             {
@@ -164,7 +157,7 @@ public class HotkeyCallbackOpenGui implements HotkeyCallback
         {
             if (DataManager.getSchematicProjectsManager().hasProjectOpen() == false)
             {
-                BaseScreen.openScreen(new GuiAreaSelectionManager());
+                //BaseScreen.openScreen(new GuiAreaSelectionManager());
             }
             else
             {

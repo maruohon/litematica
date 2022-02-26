@@ -12,12 +12,12 @@ import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.world.SchematicWorldRenderingNotifier;
 import fi.dy.masa.malilib.config.option.ConfigInfo;
+import fi.dy.masa.malilib.gui.BaseScreen;
 import fi.dy.masa.malilib.gui.tab.BaseScreenTab;
 import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.config.BaseConfigScreen;
 import fi.dy.masa.malilib.gui.config.BaseConfigTab;
 import fi.dy.masa.malilib.gui.config.ConfigTab;
-import fi.dy.masa.malilib.input.Hotkey;
 import fi.dy.masa.malilib.util.data.ModInfo;
 
 public class ConfigScreen
@@ -29,7 +29,7 @@ public class ConfigScreen
     public static final BaseConfigTab VISUALS       = new BaseConfigTab(MOD_INFO, "visuals",       160, Configs.Visuals.OPTIONS,      ConfigScreen::create);
     public static final BaseConfigTab COLORS        = new BaseConfigTab(MOD_INFO, "colors",        100, Configs.Colors.OPTIONS,       ConfigScreen::create);
     public static final BaseConfigTab HOTKEYS       = new BaseConfigTab(MOD_INFO, "hotkeys",       200, Hotkeys.HOTKEY_LIST,          ConfigScreen::create);
-    public static final BaseScreenTab RENDER_LAYERS = new BaseScreenTab("litematica.label.config_tab.render_layers", (scr) -> scr instanceof GuiRenderLayer, ConfigScreen::openRenderLayersScreen);
+    public static final BaseScreenTab RENDER_LAYERS = new BaseScreenTab(MOD_INFO, "render_layers", RenderLayerEditScreen::screenValidator, RenderLayerEditScreen::openRenderLayerEditScreen);
 
     public static final ImmutableList<ConfigTab> CONFIG_TABS = ImmutableList.of(
             GENERIC,
@@ -68,29 +68,35 @@ public class ConfigScreen
 
     public static BaseConfigScreen create()
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, VISUALS, "litematica.gui.title.configs");
+        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC, "litematica.gui.title.configs");
         screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
         return screen;
     }
 
     public static BaseConfigScreen create(@Nullable GuiScreen currentScreen)
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, VISUALS, "litematica.gui.title.configs");
+        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC, "litematica.gui.title.configs");
         screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
         return screen;
     }
 
     public static BaseConfigScreen createOnTab(ConfigTab tab)
     {
-        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, VISUALS, "litematica.gui.title.configs");
+        BaseConfigScreen screen = new BaseConfigScreen(MOD_INFO, null, ALL_TABS, GENERIC, "litematica.gui.title.configs");
+        screen.setConfigSaveListener(SchematicWorldRenderingNotifier.INSTANCE::updateAll);
         screen.setCurrentTab(tab);
         DataManager.setConfigGuiTab(tab);
         return screen;
     }
 
-    public static GuiRenderLayer openRenderLayersScreen(@Nullable GuiScreen currentScreen)
+    public static void openConfigScreen()
     {
-        GuiRenderLayer screen = new GuiRenderLayer();
+        BaseScreen.openScreen(create());
+    }
+
+    public static RenderLayerEditScreen openRenderLayersScreen(@Nullable GuiScreen currentScreen)
+    {
+        RenderLayerEditScreen screen = new RenderLayerEditScreen();
         //screen.setCurrentTab(RENDER_LAYERS);
         return screen;
     }

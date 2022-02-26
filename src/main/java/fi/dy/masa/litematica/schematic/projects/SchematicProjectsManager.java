@@ -7,10 +7,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.litematica.gui.GuiSchematicProjectManager;
-import fi.dy.masa.litematica.gui.GuiSchematicProjectsBrowser;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.JsonUtils;
 
@@ -24,6 +20,7 @@ public class SchematicProjectsManager
 
     public void openSchematicProjectsGui()
     {
+        /* TODO FIXME malilib refactor
         if (this.currentProject != null)
         {
             GuiSchematicProjectManager gui = new GuiSchematicProjectManager(this.currentProject);
@@ -36,6 +33,7 @@ public class SchematicProjectsManager
             gui.setParent(GuiUtils.getCurrentScreen());
             BaseScreen.openScreen(gui);
         }
+        */
     }
 
     @Nullable

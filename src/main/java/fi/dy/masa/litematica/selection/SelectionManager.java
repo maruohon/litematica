@@ -18,8 +18,7 @@ import net.minecraft.world.World;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorNormal;
-import fi.dy.masa.litematica.gui.GuiAreaSelectionEditorSimple;
+import fi.dy.masa.litematica.gui.MainMenuScreen;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.projects.SchematicProject;
 import fi.dy.masa.litematica.util.PositionUtils.Corner;
@@ -27,6 +26,7 @@ import fi.dy.masa.litematica.util.RayTraceUtils;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper;
 import fi.dy.masa.litematica.util.RayTraceUtils.RayTraceWrapper.HitType;
 import fi.dy.masa.malilib.gui.BaseScreen;
+import fi.dy.masa.malilib.gui.util.GuiUtils;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.overlay.message.MessageOutput;
 import fi.dy.masa.malilib.util.FileNameUtils;
@@ -709,6 +709,7 @@ public class SelectionManager
     @Nullable
     public BaseScreen getEditGui()
     {
+        /* TODO FIXME malilib refactor
         AreaSelection selection = this.getCurrentSelection();
 
         if (this.getSelectionMode() == SelectionMode.NORMAL)
@@ -728,6 +729,13 @@ public class SelectionManager
         {
             return new GuiAreaSelectionEditorSimple(selection);
         }
+        */
+        return new MainMenuScreen();
+    }
+
+    public void openEditGuiWithParent()
+    {
+        this.openEditGui(GuiUtils.getCurrentScreen());
     }
 
     public void openEditGui(@Nullable GuiScreen parent)

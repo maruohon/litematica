@@ -38,6 +38,7 @@ import fi.dy.masa.malilib.gui.tab.ScreenTab;
 import fi.dy.masa.malilib.gui.widget.util.DirectoryCache;
 import fi.dy.masa.malilib.overlay.message.MessageDispatcher;
 import fi.dy.masa.malilib.util.FileUtils;
+import fi.dy.masa.malilib.util.GameUtils;
 import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.StringUtils;
 import fi.dy.masa.malilib.util.WorldUtils;
@@ -152,6 +153,11 @@ public class DataManager implements DirectoryCache
     public static void setToolMode(ToolMode mode)
     {
         operationMode = mode;
+    }
+
+    public static void cycleToolMode(boolean forward)
+    {
+        operationMode = operationMode.cycle(GameUtils.getClientPlayer(), forward);
     }
 
     public static LayerRange getRenderLayerRange()

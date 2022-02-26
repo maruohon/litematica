@@ -1,55 +1,33 @@
-package fi.dy.masa.litematica.gui.widgets;
+package fi.dy.masa.litematica.gui.widget.list.entry;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.GuiPlacementConfiguration;
-import fi.dy.masa.litematica.gui.GuiSchematicPlacementsList;
-import fi.dy.masa.litematica.gui.LitematicaIcons;
-import fi.dy.masa.litematica.schematic.SchematicMetadata;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
+import java.util.Locale;
+import fi.dy.masa.litematica.gui.SchematicPlacementsListScreen;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementUnloaded;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.button.BaseButton;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.OnOffButton;
-import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.icon.Icon;
-import fi.dy.masa.malilib.overlay.message.MessageOutput;
-import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.overlay.message.MessageHelpers;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.render.TextRenderUtils;
-import fi.dy.masa.malilib.util.StringUtils;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
+import fi.dy.masa.malilib.util.FileNameUtils;
 
-public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<SchematicPlacementUnloaded>
+public class SchematicPlacementEntryWidget extends BaseDataListEntryWidget<SchematicPlacementUnloaded>
 {
-    private final SchematicPlacementManager manager;
-    private final GuiSchematicPlacementsList gui;
-    private final WidgetListSchematicPlacements listWidget;
-    private final SchematicPlacementUnloaded placement;
-    @Nullable private final SchematicPlacement loadedPlacement;
-    private final boolean isOdd;
-    private int buttonsStartX;
+    /*
+    protected final SchematicPlacementManager manager;
+    protected final SchematicPlacementsListScreen gui;
+    protected final SchematicPlacementUnloaded placement;
+    @Nullable protected final SchematicPlacement loadedPlacement;
+    protected int buttonsStartX;
+    */
 
-    public WidgetSchematicPlacementEntry(int x, int y, int width, int height, boolean isOdd,
-            SchematicPlacementUnloaded placement, int listIndex, WidgetListSchematicPlacements listWidget, GuiSchematicPlacementsList gui)
+    public SchematicPlacementEntryWidget(SchematicPlacementUnloaded placement,
+                                         DataListEntryWidgetData constructData,
+                                         SchematicPlacementsListScreen gui)
     {
-        super(x, y, width, height, placement, listIndex);
+        super(placement, constructData);
 
+        /*
         this.gui = gui;
-        this.listWidget = listWidget;
         this.placement = placement;
         this.loadedPlacement = placement.isLoaded() ? (SchematicPlacement) placement : null;
-        this.isOdd = isOdd;
         this.manager = DataManager.getSchematicPlacementManager();
 
         int posX = x + width - 2;
@@ -75,8 +53,10 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
         }
 
         this.buttonsStartX = posX;
+        */
     }
 
+    /*
     private boolean useIconButtons()
     {
         return Configs.Internal.PLACEMENT_LIST_ICON_BUTTONS.getBooleanValue();
@@ -253,13 +233,41 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
 
         super.postRenderHovered(mouseX, mouseY, isActiveGui, hoveredWidgetId);
     }
+    */
 
+    public static boolean placementSearchFilter(SchematicPlacementUnloaded entry, List<String> searchTerms)
+    {
+        String fileName = null;
+
+        if (entry.getSchematicFile() != null)
+        {
+            fileName = entry.getSchematicFile().getName().toLowerCase(Locale.ROOT);
+            fileName = FileNameUtils.getFileNameWithoutExtension(fileName);
+        }
+
+        for (String searchTerm : searchTerms)
+        {
+            if (entry.getName().toLowerCase(Locale.ROOT).contains(searchTerm))
+            {
+                return true;
+            }
+
+            if (fileName != null && fileName.contains(searchTerm))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*
     static class ButtonListener implements ButtonActionListener
     {
         private final ButtonType type;
-        private final WidgetSchematicPlacementEntry widget;
+        private final SchematicPlacementEntryWidget widget;
 
-        public ButtonListener(ButtonType type, WidgetSchematicPlacementEntry widget)
+        public ButtonListener(ButtonType type, SchematicPlacementEntryWidget widget)
         {
             this.type = type;
             this.widget = widget;
@@ -349,4 +357,5 @@ public class WidgetSchematicPlacementEntry extends BaseListEntryWidget<Schematic
             }
         }
     }
+    */
 }

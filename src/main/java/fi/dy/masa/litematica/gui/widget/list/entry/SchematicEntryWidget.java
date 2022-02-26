@@ -1,58 +1,27 @@
-package fi.dy.masa.litematica.gui.widgets;
+package fi.dy.masa.litematica.gui.widget.list.entry;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import javax.annotation.Nullable;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.math.BlockPos;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.data.SchematicHolder;
-import fi.dy.masa.litematica.gui.GuiSchematicSaveConvert;
-import fi.dy.masa.litematica.gui.LitematicaIcons;
+import java.util.Locale;
 import fi.dy.masa.litematica.schematic.ISchematic;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
-import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
-import fi.dy.masa.malilib.gui.BaseScreen;
-import fi.dy.masa.malilib.gui.widget.button.BaseButton;
-import fi.dy.masa.malilib.gui.widget.button.GenericButton;
-import fi.dy.masa.malilib.gui.widget.button.ButtonActionListener;
-import fi.dy.masa.malilib.gui.icon.Icon;
-import fi.dy.masa.malilib.gui.util.GuiUtils;
-import fi.dy.masa.malilib.gui.widget.list.BaseFileBrowserWidget;
-import fi.dy.masa.malilib.gui.widget.list.entry.BaseListEntryWidget;
-import fi.dy.masa.malilib.render.RenderUtils;
-import fi.dy.masa.malilib.render.ShapeRenderUtils;
-import fi.dy.masa.malilib.render.TextRenderUtils;
+import fi.dy.masa.malilib.gui.widget.list.entry.BaseDataListEntryWidget;
+import fi.dy.masa.malilib.gui.widget.list.entry.DataListEntryWidgetData;
 import fi.dy.masa.malilib.util.FileNameUtils;
-import fi.dy.masa.malilib.util.StringUtils;
 
-public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
+public class SchematicEntryWidget extends BaseDataListEntryWidget<ISchematic>
 {
-    private final WidgetListLoadedSchematics parent;
-    private final ISchematic schematic;
+    /*
     private final int typeIconX;
     private final int typeIconY;
-    private final boolean isOdd;
     private final int buttonsStartX;
+    */
 
-    public WidgetSchematicEntry(int x, int y, int width, int height, boolean isOdd,
-            ISchematic schematic, int listIndex, WidgetListLoadedSchematics parent)
+    public SchematicEntryWidget(ISchematic schematic, DataListEntryWidgetData constructData)
     {
-        super(x, y, width, height, schematic, listIndex);
-
-        this.parent = parent;
-        this.schematic = schematic;
-        this.isOdd = isOdd;
-        y += 1;
-
-        int posX = x + width - 2;
+        super(schematic, constructData);
 
         // Note: These are placed from right to left
 
+        /*
         if (this.useIconButtons())
         {
             posX -= this.createButtonIconOnly(posX, y, ButtonListener.Type.UNLOAD);
@@ -71,8 +40,10 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
         this.buttonsStartX = posX;
         this.typeIconX = x + 2;
         this.typeIconY = y + 4;
+        */
     }
 
+    /*
     private boolean useIconButtons()
     {
         return Configs.Internal.SCHEMATIC_LIST_ICON_BUTTONS.getBooleanValue();
@@ -201,13 +172,41 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 
         RenderUtils.color(1f, 1f, 1f, 1f);
     }
+    */
 
+    public static boolean schematicSearchFilter(ISchematic entry, List<String> searchTerms)
+    {
+        String fileName = null;
+
+        if (entry.getFile() != null)
+        {
+            fileName = entry.getFile().getName().toLowerCase(Locale.ROOT);
+            fileName = FileNameUtils.getFileNameWithoutExtension(fileName);
+        }
+
+        for (String searchTerm : searchTerms)
+        {
+            if (entry.getMetadata().getName().toLowerCase(Locale.ROOT).contains(searchTerm))
+            {
+                return true;
+            }
+
+            if (fileName != null && fileName.contains(searchTerm))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*
     private static class ButtonListener implements ButtonActionListener
     {
         private final Type type;
-        private final WidgetSchematicEntry widget;
+        private final SchematicEntryWidget widget;
 
-        public ButtonListener(Type type, WidgetSchematicEntry widget)
+        public ButtonListener(Type type, SchematicEntryWidget widget)
         {
             this.type = type;
             this.widget = widget;
@@ -265,7 +264,8 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
 
             private final Icon icon;
             private final String translationKey;
-            @Nullable private final String hoverKey;
+            @Nullable
+            private final String hoverKey;
 
             private Type(Icon icon, String translationKey, @Nullable String hoverKey)
             {
@@ -291,4 +291,5 @@ public class WidgetSchematicEntry extends BaseListEntryWidget<ISchematic>
             }
         }
     }
+    */
 }

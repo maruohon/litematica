@@ -25,7 +25,6 @@ import net.minecraft.world.World;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.config.Hotkeys;
 import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.gui.widgets.WidgetSchematicVerificationResult.BlockMismatchInfo;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.schematic.placement.SchematicPlacementManager;
 import fi.dy.masa.litematica.schematic.placement.SubRegionPlacement.RequiredEnabled;
@@ -508,6 +507,7 @@ public class OverlayRenderer
                     BlockPos pos = trace.getBlockPos();
                     BlockMismatch mismatch = verifier.getMismatchForPosition(pos);
 
+                    /* TODO FIXME malilib refactor
                     if (mismatch != null)
                     {
                         int offY = Configs.InfoOverlays.BLOCK_INFO_OVERLAY_OFFSET_Y.getIntegerValue();
@@ -521,6 +521,7 @@ public class OverlayRenderer
                         RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
                         return true;
                     }
+                    */
                 }
             }
         }
@@ -550,11 +551,13 @@ public class OverlayRenderer
         // Not just a missing block
         if (stateSchematic != stateClient && stateClient != air && stateSchematic != air)
         {
+            /* TODO FIXME malilib refactor
             BlockMismatchInfo info = new BlockMismatchInfo(stateSchematic, stateClient);
             this.getOverlayPosition(info.getTotalWidth(), info.getTotalHeight(), offY, mc);
             info.render(this.blockInfoX, this.blockInfoY, 0, mc);
 
             RenderUtils.renderInventoryOverlays(align, this.blockInfoInvOffY, worldSchematic, worldClient, pos, mc);
+            */
         }
         else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.VANILLA)
         {
